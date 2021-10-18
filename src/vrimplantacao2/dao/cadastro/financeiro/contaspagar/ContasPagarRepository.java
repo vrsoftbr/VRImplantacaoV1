@@ -308,7 +308,7 @@ public class ContasPagarRepository {
         vo.setId_loja(provider.getLojaVR());
         vo.setId_tipoentrada(imp.getIdTipoEntradaVR() == null ? 210 : imp.getIdTipoEntradaVR());
         vo.setDataemissao(imp.getDataEmissao());
-        vo.setDataentrada(imp.getDataEntrada() == null ? imp.getDataEmissao() : imp.getDataEntrada());
+        vo.setDataentrada(imp.getDataEntrada() == null ? imp.getDataEmissao() : imp.getDataEntrada());        
         vo.setNumerodocumento(Utils.stringToInt(imp.getNumeroDocumento()));
 
         if (imp.getValor() == 0) {

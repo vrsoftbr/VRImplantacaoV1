@@ -1298,9 +1298,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n"
+        
+        String aa2cclir = "SELECT \n"
                     + "	     TIP.tip_cgc_cpf Cgc_cpf, \n"
                     + "      TIP.tip_codigo Codigo, \n"
                     + "      TIP.tip_digito Digito, \n"        
@@ -1325,7 +1324,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      CLI.cli_contato Contato_principal,  \n"
                     + "	     CLI.cli_cod_vend Vendedor,  \n"
                     + "	     CLI.cli_situacao Status, \n"
-                    + "      CLI.cli_limite_cred,  \n"
+                    + "      CLI.cli_limite_cred,\n"
                     + "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n"
                     + "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n"
                     + "				FROM   aa2cempr  \n"
@@ -1346,15 +1345,57 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      aa1rport, \n"
                     + "      aa1dtipo \n"
                     + "WHERE  \n"
-                    + "		  TIP.tip_cgc_cpf >= 0 \n"
-                    + "       AND 	TIP.tip_codigo >= 0 \n"
-                    + "       AND 	TIP.tip_digito >= 0 \n"
-                    + "       AND 	TIP.tip_codigo = CLI.cli_codigo(+) \n"
-                    + "       AND 	TIP.tip_digito = CLI.cli_digito(+) \n"
-                    + "       AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n"
-                    + "       AND 	por_portador (+) = cli.cli_port \n"
-                    + "       AND 	dtip_codigo (+) = tip_codigo\n"
-                    + "       and  tip.tip_loj_cli in ('C','R', 'V')")) {
+                    + "      TIP.tip_cgc_cpf >= 0 \n"
+                    + "      AND TIP.tip_codigo >= 0 \n"
+                    + "      AND TIP.tip_digito >= 0 \n"
+                    + "      AND TIP.tip_codigo = CLI.cli_codigo(+) \n"
+                    + "      AND TIP.tip_digito = CLI.cli_digito(+) \n"
+                    + "      AND FIN.cli_codigo(+) = CLI.cli_codigo \n"
+                    + "      AND por_portador (+) = cli.cli_port \n"
+                    + "      AND dtip_codigo (+) = tip_codigo\n"
+                    + "      and tip.tip_loj_cli in ('C','R','V')";
+        
+        String cad_cliente = "select \n" +
+                                "   cli.cli_codigo||cli.cli_digito id,\n" +
+                                "   cli.CLI_CPF_CNPJ cnpj,\n" +
+                                "   cli.CLI_NOME razao,\n" +
+                                "   cli.cli_cpf_cnpj cnpj,\n" +
+                                "   cli.cli_rg_insc_est ie,\n" +
+                                "   ender.end_rua endereco,\n" +
+                                "   ender.end_nro numero,\n" +
+                                "   ender.end_compl complemento,\n" +
+                                "   ender.end_bairro bairro,\n" +
+                                "   ender.end_cid municipio,\n" +
+                                "   ender.end_cep cep,\n" +
+                                "   ender.end_uf uf,\n" +
+                                "   cli.cli_dta_nasc dtnascimento,\n" +
+                                "   cli.cli_sexo sexo,\n" +
+                                "   cli.cli_dta_admis dtadmissao,\n" +
+                                "   cli.cli_salario salario,\n" +
+                                "   cli.cli_dta_cad dtcadastro,\n" +
+                                "   cli.cli_email email,\n" +
+                                "   cli.cli_nome_pai pai,\n" +
+                                "   cli.cli_nome_mae mae,\n" +
+                                "   cli.cli_nro_propt,\n" +
+                                "   cli.cli_cargo cargo,\n" +
+                                "   cli.CLI_FIL_CAD loja,\n" +
+                                "   cli.cli_convenio idEmpresa,\n" +
+                                "   case when cli.CLI_STATUS = 0 then 0 else 1 end bloqueado,\n" +
+                                "   coalesce(lim_cv.LIM_LIMITE, 0) limite_convenio\n" +
+                                "from \n" +
+                                "   CAD_CLIENTE cli\n" +
+                                "   left join END_CLIENTE ender on\n" +
+                                "	   cli.cli_codigo = ender.cli_codigo\n" +
+                                "	   and ender.end_tpo_end = 1\n" +
+                                "   left join AC1QLIMI lim_cv on\n" +
+                                "	   cli.cli_codigo = lim_cv.lim_codigo\n" +
+                                "	   and cli.cli_digito = lim_cv.LIM_DIGITO\n" +
+                                "	   and lim_cv.LIM_MODALIDADE = 3 \n" +
+                                "order by \n" +
+                                "   cli.cli_codigo";
+        
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(aa2cclir)) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -1650,7 +1691,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBanco(rst.getInt("banco"));
                     imp.setAgencia(rst.getString("agencia"));
                     imp.setConta(rst.getString("conta"));
-                    imp.setDate(format.parse(rst.getString("vencimento")));
+                    imp.setDate(format.parse(rst.getString("data")));
+                    imp.setDataDeposito(format.parse(rst.getString("vencimento")));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
@@ -2012,7 +2054,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    ag1pagcp cp\n"
                     + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
-                    + "   and cp.cpd_emissao >= 170601\n"
+                    //+ "   and cp.cpd_emissao >= 100101\n"
+                    + "and cp.cpd_dta_baixa = 0\n"        
                     + "order by\n"
                     + "    cp.cpd_emissao"
             )) {
@@ -2045,9 +2088,41 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        String sqlBaixas = "select\n" +
+                            "   cp.cpd_cgc_cpf cnpj,\n" +
+                            "   F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n" +
+                            "   cp.cpd_forne,\n" +
+                            "   cp.cpd_ntfis numerodocumento,\n" +
+                            "   cp.cpd_emissao dataemissao,\n" +
+                            "   cp.cpd_dt_emi,\n" +
+                            "   cp.cpd_recep dataentrada,\n" +
+                            "   cp.cpd_dt_inclusao,\n" +
+                            "   cp.cpd_vrnota valor,\n" +
+                            "   cp.cpd_loja id_loja,\n" +
+                            "   cp.cpd_dta_baixa,\n" +
+                            "   cp.cpd_ven_org,\n" +
+                            "   cp.cpd_serie,\n" +
+                            "   cp.cpd_ntfis,\n" +
+                            "   cp.cpd_vlr_pago_cheque,\n" +
+                            "   cp.cpd_vlr_pago_dinhei,    \n" +
+                            "   case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n" +
+                            "   cp.cpm_banco,\n" +
+                            "   cp.cpd_agencia_emp,\n" +
+                            "   cp.cpd_conta_emp,\n" +
+                            "   cp.cpm_ncheq,\n" +
+                            "   cp.cpm_venc datavencimento,\n" +
+                            "   cp.cpd_duplicata duplicata\n" +
+                            "from\n" +
+                            "   ag1pagcp cp\n" +
+                            "   join AA2CTIPO F on\n" +
+                            "		cp.cpd_forne = f.TIP_CODIGO\n" +
+                            "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
+                            "and CPD_DTA_BAIXA > 0 \n" +
+                            "and cpd_dt_inclusao >= 190101\n" +
+                            "order by\n" +
+                            "   cp.cpd_emissao";
+        
+        String sqlAbertos = "select\n"
                     + "    cp.cpd_cgc_cpf cnpj,\n"
                     + "    F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
                     + "    cp.cpd_forne,\n"
@@ -2075,12 +2150,17 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ag1pagcp cp\n"
                     + "    join AA2CTIPO F on\n"
                     + "         cp.cpd_forne = f.TIP_CODIGO\n"
-                    + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " and CPD_DTA_BAIXA = 0\n"
+                    + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " "
+                    + "and CPD_DTA_BAIXA = 0\n"
                     + "order by\n"
-                    + "    cp.cpd_emissao"
-            )) {
+                    + "    cp.cpd_emissao";
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sqlAbertos)) {
+                
                 SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
                 SimpleDateFormat format2 = new SimpleDateFormat("1yyMMdd");
+                
                 while (rst.next()) {
                     ContaPagarIMP vo = new ContaPagarIMP();
 
@@ -2109,8 +2189,15 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
                     vo.setObservacao("DUPLICATA " + rst.getString("duplicata"));
                     vo.setValor(rst.getDouble("valor"));
-                    vo.addVencimento(format2.parse(rst.getString("datavencimento")), vo.getValor()).setObservacao("DUPLICATA " + rst.getString("duplicata"));
-
+                    vo.addVencimento(
+                            format2.parse(rst.getString("datavencimento")), 
+                            vo.getValor()
+                            /*format.parse(rst.getString("cpd_dta_baixa")*/).
+                                setObservacao("DUPLICATA " + 
+                                        rst.getString("duplicata") + 
+                                        " - " + 
+                                        rst.getString("situacao"));
+                    
                     result.add(vo);
                 }
             }
