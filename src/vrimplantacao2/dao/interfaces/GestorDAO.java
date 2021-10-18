@@ -10,6 +10,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -175,7 +176,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    and pc.empresa = " + getLojaOrigem() + "\n"
                     + "left join SM_CD_ES_PRODUTO_EF icm on icm.cod = p.cod\n"
                     + "    and icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    and icm.uf = 'MS'"
+                    + "    and icm.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
