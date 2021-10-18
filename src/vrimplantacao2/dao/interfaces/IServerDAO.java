@@ -736,6 +736,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
+                        next.setCustoComImposto(rst.getDouble("custo"));
+                        next.setCustoSemImposto(rst.getDouble("custo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
@@ -760,7 +763,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	i.Quantidade_Produto quantidade,\n"
                     + "	i.Preco_Item precovenda,\n"
                     + "	i.Preco_Total_Item total,\n"
-                    + "	case when i.Status_Cupom = 'C' then 1 else 0 end cancelado,\n"
+                    + " i.Custo_Item as custo, \n"
+                    + " i.Desconto_Item as desconto, \n"
+                    + "	case when i.Item_Cancelado = 'S' then 1 else 0 end cancelado,\n"
                     + "	i.Ecf ecf,\n"
                     + "	i.Data_Emissao data\n"
                     + "from\n"
@@ -771,7 +776,8 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.Codigo_Prod = i.Cod_Interno_Produto\n"
                     + "where\n"
                     + "	v.Data_Emissao_Cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + " and v.Status_Cupom <> 'C'";
+                    + " and v.Status_Cupom <> 'C' \n"
+                    + " and i.Item_Cancelado <> 'S'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
