@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -428,6 +429,35 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    cod as idproduto,\n"
+                    + "    fornecedor as idfornecedor,\n"
+                    + "    unidade_quantidade as qtd,\n"
+                    + "    ref as codigoexterno\n"
+                    + "from SM_CD_ES_PRODUTO_REF\n"
+                    + "order by 2, 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtd") <= 0 ? 1 : rst.getDouble("qtd"));
                     result.add(imp);
                 }
             }
