@@ -124,7 +124,7 @@ public class SupermercadoHipermaxDAO extends InterfaceDAO {
                     + "	trim(cp) as cp,\n"
                     + "	trim(csticms) as csticms,\n"
                     + "	trim(replace(preco, ',', '.')) as precovenda,\n"
-                    + "	trim(custo) as custo\n"
+                    + "	trim(replace(custo, ',', '.')) as custo\n"
                     + "from implantacao.produtos_hipermax\n"
                     + "where trim(codigointerno) like 'B%'"
             )) {
@@ -138,10 +138,12 @@ public class SupermercadoHipermaxDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setCodMercadologico1(rst.getString("mercadologico"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));                    
                     imp.setSituacaoCadastro("S".equals(rst.getString("at")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCodMercadologico1(rst.getString("mercadologico"));
                     imp.setCodMercadologico2("1");
                     imp.setCodMercadologico3("1");
                     imp.setNcm(rst.getString("ncm"));
@@ -195,7 +197,7 @@ public class SupermercadoHipermaxDAO extends InterfaceDAO {
                     + "	trim(cp) as cp,\n"
                     + "	trim(csticms) as csticms,\n"
                     + "	trim(replace(preco, ',', '.')) as precovenda,\n"
-                    + "	trim(custo) as custo\n"
+                    + "	trim(replace(custo, ',', '.')) as custo\n"
                     + "from implantacao.produtos_hipermax"
             )) {
                 while (rst.next()) {
@@ -208,10 +210,12 @@ public class SupermercadoHipermaxDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setCodMercadologico1(rst.getString("mercadologico"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));                    
                     imp.setSituacaoCadastro("S".equals(rst.getString("at")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCodMercadologico1(rst.getString("mercadologico"));
                     imp.setCodMercadologico2("1");
                     imp.setCodMercadologico3("1");
                     imp.setNcm(rst.getString("ncm"));
