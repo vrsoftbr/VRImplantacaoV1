@@ -23,7 +23,7 @@ import vrimplantacao2.parametro.Parametros;
 
 /**
  *
- * @author Guilherme
+ * @author Lucas
  */
 public class GestorGUI extends VRInternalFrame {
 
@@ -91,6 +91,7 @@ public class GestorGUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
+                dao.setComplemento(txtCompl.getText());
                 return dao.getSistema();
             }
 
@@ -189,6 +190,8 @@ public class GestorGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    
+                    dao.setComplemento(txtCompl.getText());
                     
                     switch (tabs.getSelectedIndex()) {
                         case 0:

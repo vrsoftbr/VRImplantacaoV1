@@ -26,9 +26,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
+    
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }    
+    
     @Override
     public String getSistema() {
-        return "Gestor";
+        return "Gestor" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
     @Override
@@ -110,10 +116,10 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct "
                     + "    icm.tributacao as cst,\n"
                     + "    icm.icms as aliquota,\n"
-                    + "    icm.icms_reducao as reducao\n"
-                    + " SM_CD_ES_PRODUTO_EF icm \n"
+                    + "    icm.icms_base_reducao as reducao\n"
+                    + "from SM_CD_ES_PRODUTO_EF icm \n"
                     + "where icm.empresa = " + getLojaOrigem() + "\n"
-                    + "and icm.uf = 'MS'"
+                    + "and icm.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
             )) {
                 while (rst.next()) {
                     String id = rst.getString("cst") + "-" + rst.getString("aliquota") + rst.getString("reducao");
@@ -195,10 +201,10 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pr.margem_maxima as margemmaxima,\n"
                     + "    pr.estoque_minimo as estoqueminimo,\n"
                     + "    pr.estoque_maximo as estoquemaximo,\n"
-                    + "    pr.estoque_fiscal as estque ,\n"
+                    + "    pr.estoque_fiscal as estoque ,\n"
                     + "    icm.tributacao as csticms,\n"
                     + "    icm.icms as aliqicms,\n"
-                    + "    icm.icms_reducao as redicms\n"
+                    + "    icm.icms_base_reducao as redicms\n"
                     + "from SM_CD_ES_PRODUTO p\n"
                     + "left join SM_CD_ES_PRODUTO_BAR b on b.cod = p.cod\n"
                     + "left join SM_CD_ES_PRODUTO_DNM pr on pr.cod = p.cod\n"
@@ -319,17 +325,17 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setDataNascimento(rs.getDate("dtnascimento"));
 
-                    imp.setCnpj(rs.getString("cpfcnpj"));
-                    imp.setInscricaoestadual(rs.getString("inscricao"));
+                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rs.getString("ie_rg"));
 
                     imp.setTelefone(rs.getString("telefone1"));
                     //imp.setFax(rs.getString("telefone2"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataCadastro(rs.getDate("dtcadastro"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setAtivo(rs.getBoolean("status"));
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setObservacao("CLIENTE LOJA " + complemento + "..." + rs.getString("obs"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -352,7 +358,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeConjuge(rs.getString("conjuge"));
                     imp.setCargo(rs.getString("profissao"));
                     imp.setSalario(rs.getDouble("salario"));
-                    imp.setValorLimite(rs.getDouble("valorlimite"));
+                    imp.setValorLimite(rs.getDouble("limite"));
 
                     result.add(imp);
                 }
