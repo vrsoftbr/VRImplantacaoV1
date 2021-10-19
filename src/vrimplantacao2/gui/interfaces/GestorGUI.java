@@ -14,8 +14,8 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.controller.PrimeController;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.interfaces.GestorDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.PrimeDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -34,7 +34,7 @@ public class GestorGUI extends VRInternalFrame {
 
     private String vLojaCliente;
     private int vLojaVR;
-    private final PrimeDAO dao;
+    private final GestorDAO dao;
     private PrimeController controller;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
@@ -59,7 +59,7 @@ public class GestorGUI extends VRInternalFrame {
      */
     public GestorGUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new PrimeDAO();
+        this.dao = new GestorDAO();
         this.controller = new PrimeController();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
