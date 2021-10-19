@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -16,6 +17,9 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -365,6 +369,197 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	cb.lancto id,\n" +
+                    "	cb.empresa idempresa,\n" +
+                    "	em.nome as empresa,\n" +
+                    "	cb.movimentador idcliente,\n" +
+                    "	fo.pd_nome as razao,\n" +
+                    "	fo.pd_cnpj_cpf_tipo as tipocliente,\n" +
+                    "	fo.pd_cnpj_cpf as cnpj_cpf,\n" +
+                    "	pa.parcela,\n" +
+                    "	cb.ref,\n" +
+                    "	tc.dsc as cobranca,\n" +
+                    "	cb.emissao,\n" +
+                    "	pa.vencimento,\n" +
+                    "	pa.documento,\n" +
+                    "	cb.historico,\n" +
+                    "	cb.valor_total,\n" +
+                    "	pa.valor as valor_parcela,\n" +
+                    "	cb.tipo_moeda,\n" +
+                    "	pa.valor_moeda as valor_parcela_moeda,\n" +
+                    "	pa.baixa,\n" +
+                    "	pa.valor_baixa,\n" +
+                    "	pa.valor_baixa_corrigido,\n" +
+                    "	pa.multa,\n" +
+                    "	pa.juro,\n" +
+                    "	pa.desconto,\n" +
+                    "	pa.variacao_moeda,\n" +
+                    "	pa.valor_baixa_quita,\n" +
+                    "	cb.observacao\n" +
+                    "from\n" +
+                    "	sm_mv_fi_tl_pa_titulo pa\n" +
+                    "join st_cd_empresas em on\n" +
+                    "	pa.empresa = em.codigo\n" +
+                    "join sm_mv_fi_tl_cb_titulo cb on\n" +
+                    "	pa.empresa = cb.empresa\n" +
+                    "	and pa.lancto = cb.lancto\n" +
+                    "join sm_cd_mo_movimentador fo on\n" +
+                    "	cb.movimentador = fo.cod\n" +
+                    "join sm_cd_mo_movimentador_fo_a fa on\n" +
+                    "	cb.empresa = fa.empresa\n" +
+                    "	and cb.movimentador = fa.cod\n" +
+                    "join sm_cd_mo_movimentador_fo_e fe on\n" +
+                    "	cb.empresa = fe.empresa\n" +
+                    "	and cb.movimentador = fe.cod\n" +
+                    "join sm_cd_fi_tpcobranca tc on\n" +
+                    "	cb.empresa = tc.empresa\n" +
+                    "	and cb.tipo_cobranca = tc.cod\n" +
+                    "left join sm_cd_fi_operacoes_lancto op on\n" +
+                    "	cb.empresa = op.empresa\n" +
+                    "	and cb.operacao = op.cod\n" +
+                    "left join sm_cd_mo_tipo tf on\n" +
+                    "	fo.pd_tipo = tf.cod\n" +
+                    "left join sm_cd_fi_banco bc on\n" +
+                    "	fa.ad_banco = bc.cod\n" +
+                    "left join sm_cd_fi_contrato cn on\n" +
+                    "	cb.empresa = cn.empresa\n" +
+                    "	and cb.contrato = cn.cod\n" +
+                    "left join sm_mv_fi_tl_pa_at_titulo ap on\n" +
+                    "	pa.empresa = ap.empresa\n" +
+                    "	and pa.lancto = ap.lancto\n" +
+                    "	and pa.parcela = ap.parcela\n" +
+                    "	and pa.origem = ap.origem\n" +
+                    "left join sm_cd_fi_formapgto fp on\n" +
+                    "	cb.empresa = fp.empresa\n" +
+                    "	and cb.formapgto = fp.cod\n" +
+                    "left join sm_cd_fi_cb_condicaopgto cg on\n" +
+                    "	cb.empresa = cg.empresa\n" +
+                    "	and cb.condicaopgto = cg.cod\n" +
+                    "where fo.pd_cnpj_cpf_tipo = 1 and \n" +
+                    "	cb.empresa = " + getLojaOrigem() + " and\n" + 
+                    "	pa.valor_baixa < pa.valor")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj_cpf"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(Util.round(rs.getDouble("valor_parcela") - rs.getDouble("valor_baixa"), 2));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setObservacao(rs.getString("historico"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	cb.lancto id,\n" +
+                    "	cb.empresa idempresa,\n" +
+                    "	em.nome as empresa,\n" +
+                    "	cb.movimentador idfornecedor,\n" +
+                    "	fo.pd_nome as razao,\n" +
+                    "	fo.pd_cnpj_cpf_tipo as tipo,\n" +
+                    "	fo.pd_cnpj_cpf as cnpj_cpf,\n" +
+                    "	pa.parcela,\n" +
+                    "	cb.ref,\n" +
+                    "	tc.dsc as cobranca,\n" +
+                    "	cb.emissao,\n" +
+                    "	pa.vencimento,\n" +
+                    "	pa.documento,\n" +
+                    "	cb.historico,\n" +
+                    "	cb.valor_total,\n" +
+                    "	pa.valor as valor_parcela,\n" +
+                    "	cb.tipo_moeda,\n" +
+                    "	pa.valor_moeda as valor_parcela_moeda,\n" +
+                    "	pa.baixa,\n" +
+                    "	pa.valor_baixa,\n" +
+                    "	pa.valor_baixa_corrigido,\n" +
+                    "	pa.multa,\n" +
+                    "	pa.juro,\n" +
+                    "	pa.desconto,\n" +
+                    "	pa.variacao_moeda,\n" +
+                    "	pa.valor_baixa_quita,\n" +
+                    "	cb.observacao\n" +
+                    "from\n" +
+                    "	sm_mv_fi_tl_pa_titulo pa\n" +
+                    "join st_cd_empresas em on\n" +
+                    "	pa.empresa = em.codigo\n" +
+                    "join sm_mv_fi_tl_cb_titulo cb on\n" +
+                    "	pa.empresa = cb.empresa\n" +
+                    "	and pa.lancto = cb.lancto\n" +
+                    "join sm_cd_mo_movimentador fo on\n" +
+                    "	cb.movimentador = fo.cod\n" +
+                    "join sm_cd_mo_movimentador_fo_a fa on\n" +
+                    "	cb.empresa = fa.empresa\n" +
+                    "	and cb.movimentador = fa.cod\n" +
+                    "join sm_cd_mo_movimentador_fo_e fe on\n" +
+                    "	cb.empresa = fe.empresa\n" +
+                    "	and cb.movimentador = fe.cod\n" +
+                    "join sm_cd_fi_tpcobranca tc on\n" +
+                    "	cb.empresa = tc.empresa\n" +
+                    "	and cb.tipo_cobranca = tc.cod\n" +
+                    "left join sm_cd_fi_operacoes_lancto op on\n" +
+                    "	cb.empresa = op.empresa\n" +
+                    "	and cb.operacao = op.cod\n" +
+                    "left join sm_cd_mo_tipo tf on\n" +
+                    "	fo.pd_tipo = tf.cod\n" +
+                    "left join sm_cd_fi_banco bc on\n" +
+                    "	fa.ad_banco = bc.cod\n" +
+                    "left join sm_cd_fi_contrato cn on\n" +
+                    "	cb.empresa = cn.empresa\n" +
+                    "	and cb.contrato = cn.cod\n" +
+                    "left join sm_mv_fi_tl_pa_at_titulo ap on\n" +
+                    "	pa.empresa = ap.empresa\n" +
+                    "	and pa.lancto = ap.lancto\n" +
+                    "	and pa.parcela = ap.parcela\n" +
+                    "	and pa.origem = ap.origem\n" +
+                    "left join sm_cd_fi_formapgto fp on\n" +
+                    "	cb.empresa = fp.empresa\n" +
+                    "	and cb.formapgto = fp.cod\n" +
+                    "left join sm_cd_fi_cb_condicaopgto cg on\n" +
+                    "	cb.empresa = cg.empresa\n" +
+                    "	and cb.condicaopgto = cg.cod\n" +
+                    "where fo.pd_cnpj_cpf_tipo = 0 and \n" +
+                    "	cb.empresa = " + getLojaOrigem() + " AND \n" +
+                    "	pa.valor_baixa < pa.valor")) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor_parcela"), rs.getInt("parcela"));
+                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setNumeroDocumento(rs.getString("documento"));
+                    imp.setObservacao(rs.getString("historico"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 
