@@ -6,27 +6,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -204,31 +198,6 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         return result;
     }
 
-    /*@Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	\"Id\" as id,\n"
-                    + "	\"Descricao\" as descricao\n"
-                    + "from dbo.\"Familia\"\n"
-                    + "order by 1"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -304,7 +273,6 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCest(rst.getString("cest"));
                     imp.seteBalanca(rst.getBoolean("balanca"));
 
-                    //imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_credito"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
@@ -349,7 +317,7 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -408,37 +376,6 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
 
                     imp.setObservacao(rst.getString("obs"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	p.\"Id\" as idproduto,\n"
-                    + "	pf.\"FkProduto\",\n"
-                    + "	pf.\"FkEntidade\" as idfornecedor,\n"
-                    + "	pf.\"CodigoEntidade\" as codigoexterno,\n"
-                    + "	pf.\"DtReferencia\"  as dataalteracao\n"
-                    + "from dbo.\"Referencia\" pf\n"
-                    + "join dbo.\"Produto\" p on p.\"EAN\" = pf.\"FkProduto\"\n"
-                    + "order by 2, 1"
-            )) {
-                while (rst.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     result.add(imp);
                 }
             }
@@ -532,29 +469,33 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	crpNroLancamento as id,\n"
-                    + "	crpDataLancamento as data_emissao,\n"
-                    + "	crpNumDocumento as nrocupom,\n"
-                    + "	crpCodCliente as id_cliente,\n"
-                    + "	crpCliente_Fornecedor as nome_cliente,\n"
-                    + "	crpVencimentoConta as data_vencimento,\n"
-                    + "	crpValorLancamento as valor,\n"
-                    + "	crpDesLancamento as obs\n"
-                    + "FROM \n"
-                    + "	tbcontasreceberpagar\n"
-                    + "WHERE\n"
-                    + "	crpDataPagamento is NULL\n"
-                    + "ORDER BY\n"
-                    + "	crpNroLancamento"
+                    + "    crpnrolancamento as id,\n"
+                    + "    crpdatalancamento as emissao,\n"
+                    + "    crpnumdocumento as cupom,\n"
+                    + "    crpnrocaixa as ecf,\n"
+                    + "    crpvalorlancamento as valor,\n"
+                    + "    crpcodcliente as idcliente,\n"
+                    + "    c.clicpf_cgc as cnpjcpf,\n"
+                    + "    crpvencimentoconta as vencimento,\n"
+                    + "    crpdeslancamento as obs \n"
+                    + "FROM    \n"
+                    + "    tbcontasreceberpagar cr\n"
+                    + "    left join tbclientes c on cr.crpcodcliente = c.cliId\n"
+                    + "where\n"
+                    + "    crpdatapagamento is null\n"
+                    + "    and crpflaglancado = false\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setDataEmissao(rst.getDate("data_emissao"));
-                    imp.setNumeroCupom(rst.getString("nrocupom"));
-                    imp.setIdCliente(rst.getString("id_cliente"));
-                    imp.setDataVencimento(rst.getDate("data_vencimento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setCnpjCliente(rst.getString("cnpjcpf"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setObservacao(rst.getString("obs"));
 
                     result.add(imp);
@@ -563,36 +504,4 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         }
         return result;
     }
-
-    /*@Override
-    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	\"FkProduto\" as idproduto,\n"
-                    + "	\"VlVenda\" as preconormal,\n"
-                    + "	\"VlPromocao\" as precooferta,\n"
-                    + "	\"DtPromocaoDe\" as datainicio,\n"
-                    + "	\"DtPromocaoAte\" as datafim\n"
-                    + "from dbo.\"ProdutoMultiLoja\"\n"
-                    + "where \"VlPromocao\" > 0 \n"
-                    + "and \"DtPromocaoDe\" >= '2021-01-01'"
-            )) {
-
-                while (rs.next()) {
-                    OfertaIMP imp = new OfertaIMP();
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setDataInicio(rs.getDate("datainicio"));
-                    imp.setDataFim(rs.getDate("datafim"));
-                    imp.setPrecoNormal(rs.getDouble("preconormal"));
-                    imp.setPrecoOferta(rs.getDouble("precooferta"));
-
-                    result.add(imp);
-
-                }
-            }
-        }
-        return result;
-    }*/
 }
