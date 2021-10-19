@@ -101,7 +101,9 @@ public class OutraReceitaRepositoryProvider {
     }
 
     public Map<String, Integer> getEventuais() throws Exception {
-        return clienteEventualAnteriorDAO.getClientesImportador(sistema, loja);
+        //return clienteEventualAnteriorDAO.getClientesImportador(sistema, loja);
+        
+        return clienteEventualAnteriorDAO.getClientesEventuaisImportados(sistema, loja);
     }
 
     public MultiMap<String, ContaReceberItemAnteriorVO> getItemAnteriores() throws Exception {

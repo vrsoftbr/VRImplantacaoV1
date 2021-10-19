@@ -535,11 +535,14 @@ public class Importador {
      */
     public void importarClienteEventual(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes eventuais...");
+        
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesEventuais();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        
         ClienteRepository rep = new ClienteRepository(provider);
         rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
