@@ -12,13 +12,13 @@ import java.util.Set;
 import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -84,6 +84,13 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.RECEITA
         ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
