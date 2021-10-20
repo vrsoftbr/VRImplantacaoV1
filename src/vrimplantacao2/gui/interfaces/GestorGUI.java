@@ -305,11 +305,17 @@ public class GestorGUI extends VRInternalFrame {
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+            .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+                .addContainerGap())
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+            .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabParametros.addTab("Fornecedores", tabImpFornecedor);
