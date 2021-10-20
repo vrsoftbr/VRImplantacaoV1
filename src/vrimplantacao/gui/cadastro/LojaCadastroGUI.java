@@ -2,6 +2,7 @@ package vrimplantacao.gui.cadastro;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.dao.cadastro.LojaDAO;
@@ -408,13 +409,19 @@ public class LojaCadastroGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnSairActionPerformed
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
+            //ProgressBar.show();
+            //ProgressBar.setCancel(false);
+            //ProgressBar.setStatus("Salvando Loja...");
+            
             this.setWaitCursor();
             salvar();
 
         } catch (Exception ex) {
+            //ProgressBar.dispose();
             Util.exibirMensagemErro(ex, getTitle());
 
         } finally {
+            //ProgressBar.dispose();
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
