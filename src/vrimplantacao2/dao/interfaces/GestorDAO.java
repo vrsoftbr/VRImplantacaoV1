@@ -20,6 +20,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -99,8 +100,22 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.CONTATOS,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                            OpcaoFornecedor.DADOS,
+                            OpcaoFornecedor.ENDERECO,
+                            OpcaoFornecedor.CONTATOS,
+                            OpcaoFornecedor.PAGAR_FORNECEDOR));
+    }
+    
+    
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
