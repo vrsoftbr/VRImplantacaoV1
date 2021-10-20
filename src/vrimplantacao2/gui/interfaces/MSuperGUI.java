@@ -177,6 +177,7 @@ public class MSuperGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
+                    dao.utilizarSup025 = chkUtlizaSup025.isSelected();
                     
                     switch (tab.getSelectedIndex()) {
                         case 0:
@@ -274,6 +275,7 @@ public class MSuperGUI extends VRInternalFrame {
         cbxUnifProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtlizaSup025 = new vrframework.bean.checkBox.VRCheckBox();
         tabVendas = new javax.swing.JPanel();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
@@ -430,21 +432,27 @@ public class MSuperGUI extends VRInternalFrame {
 
         chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
 
+        chkUtlizaSup025.setText("Utiliza Tabela SUP025 para Cliente");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(364, Short.MAX_VALUE))
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(366, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(319, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(292, Short.MAX_VALUE))
         );
 
         tab.addTab("Especiais", vRPanel1);
@@ -714,6 +722,7 @@ public class MSuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private vrframework.bean.checkBox.VRCheckBox chkUtlizaSup025;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JPanel jPanel1;
