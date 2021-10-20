@@ -37,6 +37,7 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
@@ -45,11 +46,15 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -494,7 +499,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.git_cod_item id,\n"
                     + "	p.git_cod_item||p.git_digito codigosped,\n"
                     + "	p.GIT_DAT_ENT_LIN datacadastro,\n"
-                    + "	p.GIT_EMB_FOR qtdembalagemcotacao,\n"        
+                    + "	p.GIT_EMB_FOR qtdembalagemcotacao,\n"
                     + "	ean.EAN_COD_EAN ean,\n"
                     + "	ean.EAN_EMB_VENDA qtdEmbalagem,\n"
                     + "	ean.EAN_TPO_EMB_VENDA tipoEmbalagem,\n"
@@ -518,7 +523,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	0 estoqueminimo,\n"
                     + "	0 estoquemaximo,\n"
                     + "	est.GET_ESTOQUE estoque,\n"
-                    + " est.get_qtd_pend_vda pendencia,\n"        
+                    + " est.get_qtd_pend_vda pendencia,\n"
                     + "	p.GIT_MRG_LUCRO_1 margem,\n"
                     + "	p.git_envia_pdv,\n"
                     + "	p.git_dat_sai_lin saidadelinha,\n"
@@ -528,12 +533,12 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n"
                     //+ " p.git_cus_rep custosemimposto,\n"
                     + " p.git_cus_ult_ent_bru as custocomimposto,\n"
-                    + " p.git_cus_ult_ent as custosemimposto,\n"        
+                    + " p.git_cus_ult_ent as custosemimposto,\n"
                     + "	det.DET_CLASS_FIS ncm,\n"
                     + "	det.DET_NCM_EXCECAO excecao,\n"
                     + "	det.DET_CEST cest,\n"
                     + "	trib.piscofins_debito,\n"
-                    + " trib.pis_cofins_debito,\n"        
+                    + " trib.pis_cofins_debito,\n"
                     + "	det.DET_NAT_REC nat_rec,\n"
                     + "	p.git_nat_fiscal icms_id,\n"
                     + "	trib.icms_cst,\n"
@@ -603,7 +608,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	    pdv.PDV_TRIBUT icms_aliq,\n"
                     + "	    pdv.PDV_REDUCAO icms_red,\n"
                     + "	    pdv.PDV_CST_PIS piscofins_debito,\n"
-                    + "     pdv.pdv_pis_cofins pis_cofins_debito\n"        
+                    + "     pdv.pdv_pis_cofins pis_cofins_debito\n"
                     + "	    from\n"
                     + "	    AG1PDVPD pdv\n"
                     + "	    where pdv.PDV_EXCLUIR != 'S'\n"
@@ -631,7 +636,6 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + //(somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "where p.GIT_DAT_SAI_LIN = 1\n") +                            
                     "order by \n"
                     + "	  p.git_cod_item"
-            
             /*
             POSSÍVEL TABELA DE TRIBUTAÇÃO DE PRODUTOS
             
@@ -641,7 +645,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 WHERE TFI_CFOP = 5102
                 AND TFI_ORIGEM = 'CE'  <- ESTADO
             ORDER BY TFI_FIGURA
-            */
+             */
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd");
@@ -679,11 +683,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescontinuado(dataForaDeLinha < dataatual);
                     }
                     imp.setEstoque(rst.getDouble("estoque"));
-                    
-                    if(imp.getEstoque() == 0) {
+
+                    if (imp.getEstoque() == 0) {
                         imp.setEstoque(rst.getDouble("pendencia") * -1);
                     }
-                    
+
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -705,7 +709,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_e"));
                         imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_s"));
                         imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliq_e"));
-                        
+
                         imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
                         imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
                         imp.setIcmsReducaoConsumidor(rst.getDouble("icms_rbc_s"));
@@ -729,95 +733,95 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
-        
-    SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-    
+
+        SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+
         if (opt == OpcaoProduto.TROCA) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
-                        "       cd_fil_origem id_loja,\n" +
-                        "       cd_prod, \n" +
-                        "       sum(qtde_mvto) troca\n" +
-                        "from\n" +
-                        "     (select distinct nr_seq,\n" +
-                        "       dt_mvto,\n" +
-                        "       cd_fil_origem,\n" +
-                        "       git_codigo_ean13,\n" +
-                        "       cd_prod,\n" +
-                        "       git_descricao,\n" +
-                        "       git_sis_abast,\n" +
-                        "       cd_fornec_fat as cod_fornec,\n" +
-                        "       sum(qtde_mvto)  qtde_mvto,\n" +
-                        "       OBSERVACAO,cd_ent_estq,\n" +
-                        "       nvl(tab_conteudo,0) as motivo,\n" +
-                        "       GET_CUS_MED,\n" +
-                        "       GET_CUS_ULT_ENT,\n" +
-                        "       GIT_CUS_REP,\n" +
-                        "       GIT_CUS_FOR,\n" +
-                        "       GET_CUS_MED_C,\n" +
-                        "       CD_FORNEC_FAT, CD_ORD_COL,\n" +
-                        "       CD_CUSTO,\n" +
-                        "       CD_CUSTO_BRU,\n" +
-                        "       CD_ped_fat,\n" +
-                        "       CD_agd_fat,\n" +
-                        "       cd_movimento,\n" +
-                        "       sts_atu,\n" +
-                        "       NRO_NOTA,\n" +
-                        "       SERIE_NOTA,\n" +
-                        "       GIT_TPO_EMB_VENDA,\n" +
-                        "       GIT_TIPO_ETQ,\n" +
-                        "       GIT_TIPO_PRO,\n" +
-                        "       CD_USR_NTF,\n" +
-                        "       DET_DEST_DEP_TROCAS\n" +
-                        "FROM   ag3ttrdv, aa3citem, aa2ctabe, aa2cestq, aa2ctipo, aa1ditem\n" +
-                        "Where  CD_PROD_PRINC = 0\n" +
-                        "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n" +
-                        "and    cd_fil_origem = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
-                        "and    sts_atu in(1)\n" +
-                        "and    git_sis_abast IN (10,20,1,11,2)\n" +
-                        "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n" +
-                        "and    CD_ENT_ESTQ       = 1\n" +
-                        "and    git_cod_item  = cd_prod\n" +
-                        "and    git_digito    = dac(cd_prod)\n" +
-                        "and    tab_codigo (+)= 76\n" +
-                        "and    tab_acesso (+)='MOTIVO' || to_char(cd_motivo,'fm0000')\n" +
-                        "and    git_cod_item  = det_cod_item\n" +
-                        "and    get_cod_local = cd_ent_estq || dac(cd_ent_estq)\n" +
-                        "and    get_cod_produto = cd_prod || dac(cd_prod)\n" +
-                        "and    tip_codigo= cd_ent_estq \n" +
-                        "and    CD_PROD_PRINC = 0\n" +
-                        "Group By nr_seq,\n" +
-                        "  dt_mvto,\n" +
-                        "  cd_fil_origem,\n" +
-                        "  cd_prod, git_codigo_ean13, \n" +
-                        "  git_descricao,\n" +
-                        "  git_sis_abast,\n" +
-                        "  git_cod_for,\n" +
-                        "  OBSERVACAO,\n" +
-                        "  cd_ent_estq,\n" +
-                        "  nvl(tab_conteudo, 0),\n" +
-                        "  GET_CUS_MED,\n" +
-                        "  GET_CUS_ULT_ENT,\n" +
-                        "  GIT_CUS_REP,\n" +
-                        "  GIT_CUS_FOR,\n" +
-                        "  GET_CUS_MED_C,\n" +
-                        "  CD_FORNEC_FAT,\n" +
-                        "  CD_ORD_COL,\n" +
-                        "  CD_CUSTO,\n" +
-                        "  CD_CUSTO_BRU,\n" +
-                        "  CD_ped_fat, CD_agd_fat,\n" +
-                        "  cd_movimento,\n" +
-                        "  sts_atu,\n" +
-                        "  NRO_NOTA,\n" +
-                        "  SERIE_NOTA,\n" +
-                        "  GIT_TPO_EMB_VENDA, GIT_TIPO_ETQ, GIT_TIPO_PRO, CD_USR_NTF, DET_DEST_DEP_TROCAS\n" +
-                        " order by dt_mvto, cd_fil_origem, nr_seq, cd_prod) troca\n" +
-                        " group by cd_fil_origem, cd_prod"
+                        "select\n"
+                        + "       cd_fil_origem id_loja,\n"
+                        + "       cd_prod, \n"
+                        + "       sum(qtde_mvto) troca\n"
+                        + "from\n"
+                        + "     (select distinct nr_seq,\n"
+                        + "       dt_mvto,\n"
+                        + "       cd_fil_origem,\n"
+                        + "       git_codigo_ean13,\n"
+                        + "       cd_prod,\n"
+                        + "       git_descricao,\n"
+                        + "       git_sis_abast,\n"
+                        + "       cd_fornec_fat as cod_fornec,\n"
+                        + "       sum(qtde_mvto)  qtde_mvto,\n"
+                        + "       OBSERVACAO,cd_ent_estq,\n"
+                        + "       nvl(tab_conteudo,0) as motivo,\n"
+                        + "       GET_CUS_MED,\n"
+                        + "       GET_CUS_ULT_ENT,\n"
+                        + "       GIT_CUS_REP,\n"
+                        + "       GIT_CUS_FOR,\n"
+                        + "       GET_CUS_MED_C,\n"
+                        + "       CD_FORNEC_FAT, CD_ORD_COL,\n"
+                        + "       CD_CUSTO,\n"
+                        + "       CD_CUSTO_BRU,\n"
+                        + "       CD_ped_fat,\n"
+                        + "       CD_agd_fat,\n"
+                        + "       cd_movimento,\n"
+                        + "       sts_atu,\n"
+                        + "       NRO_NOTA,\n"
+                        + "       SERIE_NOTA,\n"
+                        + "       GIT_TPO_EMB_VENDA,\n"
+                        + "       GIT_TIPO_ETQ,\n"
+                        + "       GIT_TIPO_PRO,\n"
+                        + "       CD_USR_NTF,\n"
+                        + "       DET_DEST_DEP_TROCAS\n"
+                        + "FROM   ag3ttrdv, aa3citem, aa2ctabe, aa2cestq, aa2ctipo, aa1ditem\n"
+                        + "Where  CD_PROD_PRINC = 0\n"
+                        + "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n"
+                        + "and    cd_fil_origem = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                        + "and    sts_atu in(1)\n"
+                        + "and    git_sis_abast IN (10,20,1,11,2)\n"
+                        + "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n"
+                        + "and    CD_ENT_ESTQ       = 1\n"
+                        + "and    git_cod_item  = cd_prod\n"
+                        + "and    git_digito    = dac(cd_prod)\n"
+                        + "and    tab_codigo (+)= 76\n"
+                        + "and    tab_acesso (+)='MOTIVO' || to_char(cd_motivo,'fm0000')\n"
+                        + "and    git_cod_item  = det_cod_item\n"
+                        + "and    get_cod_local = cd_ent_estq || dac(cd_ent_estq)\n"
+                        + "and    get_cod_produto = cd_prod || dac(cd_prod)\n"
+                        + "and    tip_codigo= cd_ent_estq \n"
+                        + "and    CD_PROD_PRINC = 0\n"
+                        + "Group By nr_seq,\n"
+                        + "  dt_mvto,\n"
+                        + "  cd_fil_origem,\n"
+                        + "  cd_prod, git_codigo_ean13, \n"
+                        + "  git_descricao,\n"
+                        + "  git_sis_abast,\n"
+                        + "  git_cod_for,\n"
+                        + "  OBSERVACAO,\n"
+                        + "  cd_ent_estq,\n"
+                        + "  nvl(tab_conteudo, 0),\n"
+                        + "  GET_CUS_MED,\n"
+                        + "  GET_CUS_ULT_ENT,\n"
+                        + "  GIT_CUS_REP,\n"
+                        + "  GIT_CUS_FOR,\n"
+                        + "  GET_CUS_MED_C,\n"
+                        + "  CD_FORNEC_FAT,\n"
+                        + "  CD_ORD_COL,\n"
+                        + "  CD_CUSTO,\n"
+                        + "  CD_CUSTO_BRU,\n"
+                        + "  CD_ped_fat, CD_agd_fat,\n"
+                        + "  cd_movimento,\n"
+                        + "  sts_atu,\n"
+                        + "  NRO_NOTA,\n"
+                        + "  SERIE_NOTA,\n"
+                        + "  GIT_TPO_EMB_VENDA, GIT_TIPO_ETQ, GIT_TIPO_PRO, CD_USR_NTF, DET_DEST_DEP_TROCAS\n"
+                        + " order by dt_mvto, cd_fil_origem, nr_seq, cd_prod) troca\n"
+                        + " group by cd_fil_origem, cd_prod"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -836,38 +840,38 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return null;
     }
-    
+
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "       it.git_cod_item id_produtopai,\n" +
-                    "       it.git_descricao,\n" +
-                    "       itf.git_cod_item id_produtofilho,\n" +
-                    "       itf.git_descricao descricaofilho,\n" +
-                    "       rec.rece_quantidade,\n" +
-                    "       rec.rece_quantidade * 1000 as qtd,\n" +
-                    "       (select \n" +
-                    "             sum(rece_quantidade)\n" +
-                    "        from \n" +
-                    "            AA1CRECE\n" +
-                    "        where \n" +
-                    "            rece_produto = rec.rece_produto) as rendimento\n" +        
-                    "from \n" +
-                    "     AA1CRECE rec \n" +
-                    "join AA3CITEM it on rec.rece_produto = it.git_cod_item || it.git_digito\n" +
-                    "join AA3CITEM itf on rec.rece_componente = itf.git_cod_item || itf.git_digito\n" +
-                    "join AA2CESTQ est on est.GET_COD_PRODUTO = it.GIT_COD_ITEM || it.GIT_DIGITO and \n" +
-                    "     est.get_cod_produto = rec.rece_produto\n" +
-                    "join AA2CESTQ esti on esti.GET_COD_PRODUTO = itf.GIT_COD_ITEM || itf.GIT_DIGITO and \n" +
-                    "     esti.get_cod_produto = rec.rece_componente\n" +
-                    "join AA2CLOJA loja on est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO and \n" +
-                    "     esti.get_cod_local = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n" +
-                    "where \n" +
-                    "      loja.LOJ_CODIGO || loja.LOJ_DIGITO = " + getLojaOrigem()
+                    "select \n"
+                    + "       it.git_cod_item id_produtopai,\n"
+                    + "       it.git_descricao,\n"
+                    + "       itf.git_cod_item id_produtofilho,\n"
+                    + "       itf.git_descricao descricaofilho,\n"
+                    + "       rec.rece_quantidade,\n"
+                    + "       rec.rece_quantidade * 1000 as qtd,\n"
+                    + "       (select \n"
+                    + "             sum(rece_quantidade)\n"
+                    + "        from \n"
+                    + "            AA1CRECE\n"
+                    + "        where \n"
+                    + "            rece_produto = rec.rece_produto) as rendimento\n"
+                    + "from \n"
+                    + "     AA1CRECE rec \n"
+                    + "join AA3CITEM it on rec.rece_produto = it.git_cod_item || it.git_digito\n"
+                    + "join AA3CITEM itf on rec.rece_componente = itf.git_cod_item || itf.git_digito\n"
+                    + "join AA2CESTQ est on est.GET_COD_PRODUTO = it.GIT_COD_ITEM || it.GIT_DIGITO and \n"
+                    + "     est.get_cod_produto = rec.rece_produto\n"
+                    + "join AA2CESTQ esti on esti.GET_COD_PRODUTO = itf.GIT_COD_ITEM || itf.GIT_DIGITO and \n"
+                    + "     esti.get_cod_produto = rec.rece_componente\n"
+                    + "join AA2CLOJA loja on est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO and \n"
+                    + "     esti.get_cod_local = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n"
+                    + "where \n"
+                    + "      loja.LOJ_CODIGO || loja.LOJ_DIGITO = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
@@ -898,51 +902,51 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "	F.TIP_CODIGO||F.TIP_DIGITO id,\n" +
-                    "	F.TIP_RAZAO_SOCIAL razao,\n" +
-                    "	F.TIP_NOME_FANTASIA fantasia,\n" +
-                    "	F.TIP_CGC_CPF cnpj,\n" +
-                    "	F.TIP_INSC_EST_IDENT inscricaoestadual,\n" +
-                    "	F.TIP_INSC_MUN insc_municipal,\n" +
-                    "	F.TIP_ENDERECO endereco,\n" +
-                    "	F.TIP_BAIRRO bairro,\n" +
-                    "	F.TIP_CIDADE cidade,\n" +
-                    "	F.TIP_ESTADO uf,\n" +
-                    "	F.TIP_CEP cep,\n" +
-                    "	F.TIP_DATA_CAD datacadastro,\n" +
-                    "	coalesce(cast(F.TIP_FONE_DDD as varchar(20)), '') ||	cast(F.TIP_FONE_NUM as varchar(20)) fone1,\n" +
-                    "	case when not F.TIP_TELEX_NUM is null then coalesce(cast(F.TIP_TELEX_DDD as varchar(20)), '') || cast(F.TIP_TELEX_NUM as varchar(20)) else null end fone2,\n" +
-                    "	case when not F.TIP_FAX_NUM is null then coalesce(cast(F.TIP_FAX_DDD as varchar(20)), '') || cast(F.TIP_FAX_NUM as varchar(20)) else null end fax,\n" +
-                    "   f2.for_contato contato,\n" +
-                    "   f4.tipc_nome nome_contato,\n" +
-                    "   f4.tipc_ddd_1 ddd,\n" +
-                    "   f4.tipc_ddd_2 ddd2,\n" +
-                    "   f4.tipc_fone_1 fone_contato,\n" +
-                    "   f4.tipc_fone_2 fone_contato2,\n" +
-                    "   f4.tipc_cargo cargo,\n" +
-                    "   f4.tipc_email_1 email_cont,\n" +
-                    "   f4.tipc_email_2 email2_cont,\n" +
-                    "   f4.tipc_obs obs_cont,\n" +
-                    "	F2.FOR_COND_1 condicaopag,\n" +
-                    "	f2.FOR_PRZ_ENTREGA entrega,\n" +
-                    "	f2.FOR_FREQ_VISITA visita,\n" +
-                    "	f3.FOR_PED_MIN_EMB qtd_pedido_minimo,\n" +
-                    "	f3.FOR_PED_MIN_VLR valor_pedido_minimo\n" +
-                    "FROM\n" +
-                    "	AA2CTIPO F\n" +
-                    "	left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n" +
-                    "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n" +
-                    "   left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n" +
-                    "WHERE\n" +
-                    "	F.TIP_LOJ_CLI in ('F', 'L')\n" +
-                    "order by\n" +
-                    "	id"
+                    "SELECT\n"
+                    + "	F.TIP_CODIGO||F.TIP_DIGITO id,\n"
+                    + "	F.TIP_RAZAO_SOCIAL razao,\n"
+                    + "	F.TIP_NOME_FANTASIA fantasia,\n"
+                    + "	F.TIP_CGC_CPF cnpj,\n"
+                    + "	F.TIP_INSC_EST_IDENT inscricaoestadual,\n"
+                    + "	F.TIP_INSC_MUN insc_municipal,\n"
+                    + "	F.TIP_ENDERECO endereco,\n"
+                    + "	F.TIP_BAIRRO bairro,\n"
+                    + "	F.TIP_CIDADE cidade,\n"
+                    + "	F.TIP_ESTADO uf,\n"
+                    + "	F.TIP_CEP cep,\n"
+                    + "	F.TIP_DATA_CAD datacadastro,\n"
+                    + "	coalesce(cast(F.TIP_FONE_DDD as varchar(20)), '') ||	cast(F.TIP_FONE_NUM as varchar(20)) fone1,\n"
+                    + "	case when not F.TIP_TELEX_NUM is null then coalesce(cast(F.TIP_TELEX_DDD as varchar(20)), '') || cast(F.TIP_TELEX_NUM as varchar(20)) else null end fone2,\n"
+                    + "	case when not F.TIP_FAX_NUM is null then coalesce(cast(F.TIP_FAX_DDD as varchar(20)), '') || cast(F.TIP_FAX_NUM as varchar(20)) else null end fax,\n"
+                    + "   f2.for_contato contato,\n"
+                    + "   f4.tipc_nome nome_contato,\n"
+                    + "   f4.tipc_ddd_1 ddd,\n"
+                    + "   f4.tipc_ddd_2 ddd2,\n"
+                    + "   f4.tipc_fone_1 fone_contato,\n"
+                    + "   f4.tipc_fone_2 fone_contato2,\n"
+                    + "   f4.tipc_cargo cargo,\n"
+                    + "   f4.tipc_email_1 email_cont,\n"
+                    + "   f4.tipc_email_2 email2_cont,\n"
+                    + "   f4.tipc_obs obs_cont,\n"
+                    + "	F2.FOR_COND_1 condicaopag,\n"
+                    + "	f2.FOR_PRZ_ENTREGA entrega,\n"
+                    + "	f2.FOR_FREQ_VISITA visita,\n"
+                    + "	f3.FOR_PED_MIN_EMB qtd_pedido_minimo,\n"
+                    + "	f3.FOR_PED_MIN_VLR valor_pedido_minimo\n"
+                    + "FROM\n"
+                    + "	AA2CTIPO F\n"
+                    + "	left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n"
+                    + "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n"
+                    + "   left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n"
+                    + "WHERE\n"
+                    + "	F.TIP_LOJ_CLI in ('F', 'L')\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy");
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -1007,18 +1011,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoVisita(rst.getInt("visita"));
                     imp.setPrazoSeguranca(0);
                     imp.setCondicaoPagamento(rst.getInt("condicaopag"));
-                    
+
                     int cargo = rst.getInt("cargo");
-                    imp.addContato(null, 
-                            rst.getString("nome_contato"), 
-                            rst.getString("ddd") + "" + rst.getString("fone_contato"), 
-                            rst.getString("ddd2") + "" + rst.getString("fone_contato2"), 
-                            cargo == 3 ? TipoContato.COMERCIAL :
-                                    cargo == 4 ? TipoContato.NFE :
-                                    cargo == 2 ? TipoContato.COMERCIAL :
-                                            TipoContato.FISCAL, 
+                    imp.addContato(null,
+                            rst.getString("nome_contato"),
+                            rst.getString("ddd") + "" + rst.getString("fone_contato"),
+                            rst.getString("ddd2") + "" + rst.getString("fone_contato2"),
+                            cargo == 3 ? TipoContato.COMERCIAL
+                                    : cargo == 4 ? TipoContato.NFE
+                                            : cargo == 2 ? TipoContato.COMERCIAL
+                                                    : TipoContato.FISCAL,
                             rst.getString("email_cont"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -1141,166 +1145,181 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     /*@Override
-     public List<ClienteIMP> getClientesPreferenciais() throws Exception {
-     List<ClienteIMP> result = new ArrayList<>();
-        
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (Statement stm2 = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(                        
-     "select \n" +
-     "    cli.cli_codigo||cli.cli_digito id,\n" +
-     "    cli.cli_codigo idSemDigito,\n" +
-     "    cli.CLI_CPF_CNPJ cnpj,\n" +
-     "    cli.CLI_RG_INSC_EST inscricaoestadual,\n" +
-     "    cli.CLI_ORG_EMIS orgaoemissor,\n" +
-     "    cli.CLI_NOME razao,\n" +
-     "    cli.CLI_NOME fantasia,\n" +
-     "    1 ativo,\n" +
-     "    case when cli.CLI_STATUS = 0 then 0 else 1 end bloqueado,\n" +
-     "    ender.END_RUA endereco,\n" +
-     "    ender.END_NRO numero,\n" +
-     "    ender.END_COMPL complemento,\n" +
-     "    ender.END_BAIRRO bairro,\n" +
-     "    ender.END_CID cidade,\n" +
-     "    ender.END_UF uf,\n" +
-     "    ender.END_CEP cep,\n" +
-     "    cli.CLI_ESTADO_CIVIL estadoCivil,\n" +
-     "    cli.CLI_DTA_NASC dataNascimento,\n" +
-     "    cli.CLI_DTA_CAD dataCadastro,\n" +
-     "    coalesce(cli.CLI_SEXO, 'M') sexo,\n" +
-     "    cli.CLI_NOME_EMPRESA empresa,\n" +
-     "    cli.CLI_DTA_ADMIS dataAdmissao,\n" +
-     "    cli.CLI_CARGO cargo,\n" +
-     "    cli.CLI_SALARIO salario,\n" +
-     "    coalesce(lim_ch.LIM_LIMITE,0) limite_cheque,\n" +
-     "    coalesce(lim_rt.LIM_LIMITE,0) limite_rotativo,\n" +
-     "    coalesce(lim_cv.LIM_LIMITE,0) limite_convenio,\n" +
-     "    cli.CLI_NOME_PAI nomepai,\n" +
-     "    cli.CLI_NOME_MAE nomemae\n" +
-     "from \n" +
-     "    CAD_CLIENTE cli\n" +
-     "    left join END_CLIENTE ender on\n" +
-     "        cli.cli_codigo = ender.cli_codigo\n" +
-     "        and ender.end_tpo_end = 1\n" +
-     "    left join AC1QLIMI lim_ch on\n" +
-     "        cli.cli_codigo = lim_ch.lim_codigo\n" +
-     "        and cli.cli_digito = lim_ch.LIM_DIGITO\n" +
-     "        and lim_ch.LIM_MODALIDADE = 1\n" +
-     "    left join AC1QLIMI lim_rt on\n" +
-     "        cli.cli_codigo = lim_rt.lim_codigo\n" +
-     "        and cli.cli_digito = lim_rt.LIM_DIGITO\n" +
-     "        and lim_rt.LIM_MODALIDADE = 2\n" +
-     "    left join AC1QLIMI lim_cv on\n" +
-     "        cli.cli_codigo = lim_cv.lim_codigo\n" +
-     "        and cli.cli_digito = lim_cv.LIM_DIGITO\n" +
-     "        and lim_cv.LIM_MODALIDADE = 3\n" +
-     "order by \n" +
-     "    cli.cli_codigo"
-     )) {
-     SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
-     while (rst.next()) {
-     ClienteIMP imp = new ClienteIMP();
-     imp.setId(rst.getString("id"));
-     imp.setCnpj(rst.getString("cnpj"));
-     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
-     imp.setOrgaoemissor(rst.getString("orgaoemissor"));
-     imp.setRazao(rst.getString("razao"));
-     imp.setFantasia(rst.getString("fantasia"));
-     imp.setAtivo(true);
-     imp.setBloqueado(rst.getBoolean("bloqueado"));
-     imp.setEndereco(rst.getString("endereco"));
-     imp.setNumero(rst.getString("numero"));
-     imp.setComplemento(rst.getString("complemento"));
-     imp.setBairro(rst.getString("bairro"));
-     imp.setMunicipio(rst.getString("cidade"));
-     imp.setUf(rst.getString("uf"));
-     imp.setCep(rst.getString("cep"));
-     switch(rst.getInt("estadocivil")) {
-     case 1: imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO); break;
-     case 2: imp.setEstadoCivil(TipoEstadoCivil.CASADO); break;
-     case 3: imp.setEstadoCivil(TipoEstadoCivil.VIUVO); break;
-     case 4: imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO); break;
-     default: imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO); break;
-     }
-     imp.setDataNascimento(rst.getDate("datanascimento"));
-     imp.setDataCadastro(rst.getDate("datacadastro"));
-     switch (rst.getString("sexo")) {
-     case "F": imp.setSexo(TipoSexo.FEMININO); break;
-     default: imp.setSexo(TipoSexo.MASCULINO); break;
-     }
-     imp.setEmpresa(rst.getString("empresa"));
-     imp.setDataAdmissao(rst.getDate("dataadmissao"));
-     imp.setCargo(rst.getString("cargo"));
-     imp.setSalario(rst.getDouble("salario"));
-     imp.setValorLimite(rst.getDouble("limite_rotativo"));
-     imp.setNomePai(rst.getString("nomepai"));
-     imp.setNomeMae(rst.getString("nomemae"));
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
 
-     try (ResultSet rst2 = stm2.executeQuery(
-     "select\n" +
-     "    CLI_CODIGO idCliente,\n" +
-     "    CONT_COD_SEQ seq,\n" +
-     "    CONT_TIPO tipo,\n" +
-     "    cast(CONT_DDD||CONT_NUMERO as numeric) telefone,\n" +
-     "    CONT_RAMAL ramal,\n" +
-     "    CONT_OBS obs\n" +
-     "from \n" +
-     "    CONTATO_CLIENTE\n" +
-     "where \n" +
-     "    CLI_CODIGO = " + rst.getString("idSemDigito") + "\n" +
-     "order by\n" +
-     "    CLI_CODIGO, CONT_COD_SEQ"
-     )) {
-     while (rst2.next()) {
-     if (imp.getTelefone() == null) {
-     imp.setTelefone(rst2.getString("telefone"));
-     } else {
-     ClienteContatoIMP cont = new ClienteContatoIMP();
-     if (rst2.getInt("tipo") == 1) {
-     cont.setId(rst2.getString("seq"));
-     cont.setNome("RESIDENCIA");
-     cont.setCliente(imp);
-     cont.setTelefone(rst2.getString("telefone"));
-     } else if (rst2.getInt("tipo") == 2) {                                        
-     cont.setId(rst2.getString("seq"));
-     cont.setNome("COMERCIAL");
-     cont.setCliente(imp);
-     cont.setTelefone(rst2.getString("telefone"));
-     } else if (rst2.getInt("tipo") == 3) {                                        
-     cont.setId(rst2.getString("seq"));
-     cont.setNome("CELULAR");
-     cont.setCliente(imp);
-     cont.setTelefone(rst2.getString("telefone"));
-     } else if (rst2.getInt("tipo") == 4) {                                        
-     cont.setId(rst2.getString("seq"));
-     cont.setNome("FAX");
-     cont.setCliente(imp);
-     cont.setTelefone(rst2.getString("telefone"));
-     } else if (rst2.getInt("tipo") == 5) {                                        
-     cont.setId(rst2.getString("seq"));
-     cont.setNome("RECADOS");
-     cont.setCliente(imp);
-     cont.setTelefone(rst2.getString("telefone"));
-     }
-     imp.getContatos().add(cont);
-     }
-     }
-     }                    
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (Statement stm2 = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "    'CR'||cli.cli_codigo||cli.cli_digito id,\n"
+                        + "    cli.cli_codigo idSemDigito,\n"
+                        + "    cli.CLI_CPF_CNPJ cnpj,\n"
+                        + "    cli.CLI_RG_INSC_EST inscricaoestadual,\n"
+                        + "    cli.CLI_ORG_EMIS orgaoemissor,\n"
+                        + "    cli.CLI_NOME razao,\n"
+                        + "    cli.CLI_NOME fantasia,\n"
+                        + "    1 ativo,\n"
+                        + "    case when cli.CLI_STATUS = 0 then 0 else 1 end bloqueado,\n"
+                        + "    ender.END_RUA endereco,\n"
+                        + "    ender.END_NRO numero,\n"
+                        + "    ender.END_COMPL complemento,\n"
+                        + "    ender.END_BAIRRO bairro,\n"
+                        + "    ender.END_CID cidade,\n"
+                        + "    ender.END_UF uf,\n"
+                        + "    ender.END_CEP cep,\n"
+                        + "    cli.CLI_ESTADO_CIVIL estadoCivil,\n"
+                        + "    cli.CLI_DTA_NASC dataNascimento,\n"
+                        + "    cli.CLI_DTA_CAD dataCadastro,\n"
+                        + "    coalesce(cli.CLI_SEXO, 'M') sexo,\n"
+                        + "    cli.CLI_NOME_EMPRESA empresa,\n"
+                        + "    cli.CLI_DTA_ADMIS dataAdmissao,\n"
+                        + "    cli.CLI_CARGO cargo,\n"
+                        + "    cli.CLI_SALARIO salario,\n"
+                        + "    coalesce(lim_ch.LIM_LIMITE,0) limite_cheque,\n"
+                        + "    coalesce(lim_rt.LIM_LIMITE,0) limite_rotativo,\n"
+                        + "    coalesce(lim_cv.LIM_LIMITE,0) limite_convenio,\n"
+                        + "    cli.CLI_NOME_PAI nomepai,\n"
+                        + "    cli.CLI_NOME_MAE nomemae\n"
+                        + "from \n"
+                        + "    CAD_CLIENTE cli\n"
+                        + "    left join END_CLIENTE ender on\n"
+                        + "        cli.cli_codigo = ender.cli_codigo\n"
+                        + "        and ender.end_tpo_end = 1\n"
+                        + "    left join AC1QLIMI lim_ch on\n"
+                        + "        cli.cli_codigo = lim_ch.lim_codigo\n"
+                        + "        and cli.cli_digito = lim_ch.LIM_DIGITO\n"
+                        + "        and lim_ch.LIM_MODALIDADE = 1\n"
+                        + "    left join AC1QLIMI lim_rt on\n"
+                        + "        cli.cli_codigo = lim_rt.lim_codigo\n"
+                        + "        and cli.cli_digito = lim_rt.LIM_DIGITO\n"
+                        + "        and lim_rt.LIM_MODALIDADE = 2\n"
+                        + "    left join AC1QLIMI lim_cv on\n"
+                        + "        cli.cli_codigo = lim_cv.lim_codigo\n"
+                        + "        and cli.cli_digito = lim_cv.LIM_DIGITO\n"
+                        + "        and lim_cv.LIM_MODALIDADE = 3\n"
+                        + "order by \n"
+                        + "    cli.cli_codigo"
+                )) {
+                    SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+                    while (rst.next()) {
+                        ClienteIMP imp = new ClienteIMP();
+                        
+                        imp.setId(rst.getString("id"));
+                        imp.setCnpj(rst.getString("cnpj"));
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                        imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                        imp.setRazao(rst.getString("razao"));
+                        imp.setFantasia(rst.getString("fantasia"));
+                        imp.setAtivo(true);
+                        imp.setBloqueado(rst.getBoolean("bloqueado"));
+                        imp.setEndereco(rst.getString("endereco"));
+                        imp.setNumero(rst.getString("numero"));
+                        imp.setComplemento(rst.getString("complemento"));
+                        imp.setBairro(rst.getString("bairro"));
+                        imp.setMunicipio(rst.getString("cidade"));
+                        imp.setUf(rst.getString("uf"));
+                        imp.setCep(rst.getString("cep"));
+                        switch (rst.getInt("estadocivil")) {
+                            case 1:
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case 2:
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case 3:
+                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            case 4:
+                                imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
+                        }
+                        imp.setDataNascimento(rst.getDate("datanascimento"));
+                        imp.setDataCadastro(rst.getDate("datacadastro"));
+                        switch (rst.getString("sexo")) {
+                            case "F":
+                                imp.setSexo(TipoSexo.FEMININO);
+                                break;
+                            default:
+                                imp.setSexo(TipoSexo.MASCULINO);
+                                break;
+                        }
+                        imp.setEmpresa(rst.getString("empresa"));
+                        imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                        imp.setCargo(rst.getString("cargo"));
+                        imp.setSalario(rst.getDouble("salario"));
+                        imp.setValorLimite(rst.getDouble("limite_rotativo"));
+                        imp.setNomePai(rst.getString("nomepai"));
+                        imp.setNomeMae(rst.getString("nomemae"));
 
-     result.add(imp);
-     }
-     }
-     }
-     }
-        
-     return result;
-     }*/
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select\n"
+                                + "    CLI_CODIGO idCliente,\n"
+                                + "    CONT_COD_SEQ seq,\n"
+                                + "    CONT_TIPO tipo,\n"
+                                + "    cast(CONT_DDD||CONT_NUMERO as numeric) telefone,\n"
+                                + "    CONT_RAMAL ramal,\n"
+                                + "    CONT_OBS obs\n"
+                                + "from \n"
+                                + "    CONTATO_CLIENTE\n"
+                                + "where \n"
+                                + "    CLI_CODIGO = " + rst.getString("idSemDigito") + "\n"
+                                + "order by\n"
+                                + "    CLI_CODIGO, CONT_COD_SEQ"
+                        )) {
+                            while (rst2.next()) {
+                                if (imp.getTelefone() == null) {
+                                    imp.setTelefone(rst2.getString("telefone"));
+                                } else {
+                                    ClienteContatoIMP cont = new ClienteContatoIMP();
+                                    if (rst2.getInt("tipo") == 1) {
+                                        cont.setId(rst2.getString("seq"));
+                                        cont.setNome("RESIDENCIA");
+                                        cont.setCliente(imp);
+                                        cont.setTelefone(rst2.getString("telefone"));
+                                    } else if (rst2.getInt("tipo") == 2) {
+                                        cont.setId(rst2.getString("seq"));
+                                        cont.setNome("COMERCIAL");
+                                        cont.setCliente(imp);
+                                        cont.setTelefone(rst2.getString("telefone"));
+                                    } else if (rst2.getInt("tipo") == 3) {
+                                        cont.setId(rst2.getString("seq"));
+                                        cont.setNome("CELULAR");
+                                        cont.setCliente(imp);
+                                        cont.setTelefone(rst2.getString("telefone"));
+                                    } else if (rst2.getInt("tipo") == 4) {
+                                        cont.setId(rst2.getString("seq"));
+                                        cont.setNome("FAX");
+                                        cont.setCliente(imp);
+                                        cont.setTelefone(rst2.getString("telefone"));
+                                    } else if (rst2.getInt("tipo") == 5) {
+                                        cont.setId(rst2.getString("seq"));
+                                        cont.setNome("RECADOS");
+                                        cont.setCliente(imp);
+                                        cont.setTelefone(rst2.getString("telefone"));
+                                    }
+                                    imp.getContatos().add(cont);
+                                }
+                            }
+                        }
+
+                        result.add(imp);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }*/
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n"
+        
+        String aa2cclir = "SELECT \n"
                     + "	     TIP.tip_cgc_cpf Cgc_cpf, \n"
                     + "      TIP.tip_codigo Codigo, \n"
                     + "      TIP.tip_digito Digito, \n"        
@@ -1325,7 +1344,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      CLI.cli_contato Contato_principal,  \n"
                     + "	     CLI.cli_cod_vend Vendedor,  \n"
                     + "	     CLI.cli_situacao Status, \n"
-                    + "      CLI.cli_limite_cred,  \n"
+                    + "      CLI.cli_limite_cred,\n"
                     + "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n"
                     + "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n"
                     + "				FROM   aa2cempr  \n"
@@ -1346,16 +1365,21 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      aa1rport, \n"
                     + "      aa1dtipo \n"
                     + "WHERE  \n"
-                    + "		  TIP.tip_cgc_cpf >= 0 \n"
-                    + "       AND 	TIP.tip_codigo >= 0 \n"
-                    + "       AND 	TIP.tip_digito >= 0 \n"
-                    + "       AND 	TIP.tip_codigo = CLI.cli_codigo(+) \n"
-                    + "       AND 	TIP.tip_digito = CLI.cli_digito(+) \n"
-                    + "       AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n"
-                    + "       AND 	por_portador (+) = cli.cli_port \n"
-                    + "       AND 	dtip_codigo (+) = tip_codigo\n"
-                    + "       and  tip.tip_loj_cli in ('C','R', 'V')")) {
+                    + "      TIP.tip_cgc_cpf >= 0 \n"
+                    + "      AND TIP.tip_codigo >= 0 \n"
+                    + "      AND TIP.tip_digito >= 0 \n"
+                    + "      AND TIP.tip_codigo = CLI.cli_codigo(+) \n"
+                    + "      AND TIP.tip_digito = CLI.cli_digito(+) \n"
+                    + "      AND FIN.cli_codigo(+) = CLI.cli_codigo \n"
+                    + "      AND por_portador (+) = cli.cli_port \n"
+                    + "      AND dtip_codigo (+) = tip_codigo\n"
+                    + "      and tip.tip_loj_cli in ('C','R','V','L')";
+        
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(aa2cclir)) {
+                
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+                
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -1401,7 +1425,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     public void importarPagamentoRotativo() throws Exception {
         Conexao.begin();
         try {
@@ -1538,7 +1562,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
-    @Override
+    /*@Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
@@ -1604,6 +1628,207 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }*/
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "   lanc_codigo||'-'||lanc_data||'-'||lanc_seq id,\n" +        
+                    "	'CR'||NVL(CLI_CODIGO||DAC(CLI_CODIGO),LANC_CODIGO) AS CLIENTE,\n" +
+                    "	DEP_CODIGO,\n" +
+                    "	DEP_CLIENTE.CLI_CODIGO as DEP_CLI_CODIGO,\n" +
+                    "   case lanc_cupom when 0 then lanc_documento else lanc_cupom end numerocupom,\n" +
+                    "	AC1CLANC.*,\n" +
+                    "	A.CONV_CODIGO,\n" +
+                    "	A.CONV_DESCRICAO\n" +
+                    "from\n" +
+                    "	AC1CLANC,\n" +
+                    "	DEP_CLIENTE,\n" +
+                    "	AC1CCONV A\n" +
+                    "where\n" +
+                    "	trunc(LANC_CODIGO / 10) = DEP_CODIGO (+)\n" +
+                    "	and DEP_CLIENTE.cli_codigo (+)> 0\n" +
+                    "	and LANC_DATA >= 0\n" +
+                    "	and LANC_SEQ >= 0\n" +
+                    //"	and LANC_DATA >= 1211001\n" +
+                    //"	and LANC_DATA <= 1211018\n" +
+                    "	and LANC_TIPO in(0, 1, 2, 3, 4)\n" +
+                    "	and LANC_CONVENIO = A.CONV_CODIGO(+)\n" +
+                    "   and LANC_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(format.parse(rst.getString("lanc_data")));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("lanc_caixa"));
+                    imp.setValor(rst.getDouble("lanc_valor"));
+                    imp.setObservacao(
+                            (rst.getString("lanc_usuario") != null ? " USUARIO: " + rst.getString("lanc_usuario") : "")
+                            + (rst.getString("lanc_historico") != null ? " HISTORICO: " + rst.getString("lanc_historico") : "")
+                    );
+                    imp.setIdCliente(rst.getString("cliente"));
+                    try {
+                        imp.setDataVencimento(format.parse(rst.getString("lanc_vencimento")));
+                    } catch (ParseException e) {
+                        imp.setDataVencimento(imp.getDataEmissao());
+                        System.out.println("**ERRO DE PARSING - vencimento: " + rst.getString("id") + " valor: " + rst.getString("valor"));
+                    }
+                    imp.setParcela(rst.getInt("lanc_parcela"));
+                    imp.setJuros(rst.getDouble("lanc_vlr_juros"));
+                    imp.setMulta(rst.getDouble("lanc_vlr_multa"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
+        SimpleDateFormat format2 = new SimpleDateFormat("1yyMMdd");
+        
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "       DUP_TITULO || '-' || DUP_DESD DUPLICATA, \n" +
+                    "       DUP_CLIPRI || '' || DAC(DUP_CLIPRI) cliente, \n" +
+                    "       tip_loj_cli tipo_cliente,\n" +        
+                    "       DUP_COD_FIL || '' || DUP_DIG_FIL LOJA, \n" +
+                    "       DUP_AGENDA, \n" +
+                    "       DUP_PORT, \n" +
+                    "       LPAD(DUP_COD_VEN,7,' ') || DUP_DIG_VEN VENDEDOR,\n" +
+                    "       DUP_MOTIVO_BAIXA, \n" +
+                    "       DUP_CDPGT, \n" +
+                    "       decode(dup_venc ,0,'',\n" +
+                    "              substr(to_char(DUP_DT_EMI,'fm0000000'),6,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_DT_EMI,'fm0000000'),4,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_DT_EMI,'fm0000000'),2,2))\n" +
+                    "       AS DUP_DT_EMI, \n" +
+                    "       decode(dup_venc ,0,'',\n" +
+                    "              substr(to_char(DUP_VENC,'fm0000000'),6,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_VENC,'fm0000000'),4,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_VENC,'fm0000000'),2,2))    \n" +
+                    "       AS DUP_VENC, \n" +
+                    "       DUP_DT_EMI emissao,\n" +        
+                    "       dup_venc as vencto, \n" +
+                    "       decode(dup_dt_pag ,0,'',\n" +
+                    "              substr(to_char(DUP_DT_PAG,'fm0000000'),6,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_DT_PAG,'fm0000000'),4,2)||'/'\n" +
+                    "            ||substr(to_char(DUP_DT_PAG,'fm0000000'),2,2)) \n" +
+                    "       AS DUP_DT_PAG, \n" +
+                    "       0 DIAS, \n" +
+                    "       DUP_VALOR, \n" +
+                    "      (DUP_VALOR-DUP_DESC-DUP_ABATIMENTO+DUP_JUROS+DUP_CORRECAO) VALOR_LIQ, \n" +
+                    "       (select 'O'\n" +
+                    "          from AA1ROBSR\n" +
+                    "         where OBS_TITULO   = DUP_TITULO\n" +
+                    "           and OBS_DESD     = DUP_DESD\n" +
+                    "           and OBS_COD_FIL  = DUP_COD_FIL\n" +
+                    "           and ROWNUM <=1)    \n" +
+                    "    || (select decode(nvl(imp_fatura,0),0,decode(por_dup_fita,'F','B'\n" +
+                    "                                                ,'B','B' ,NULL) ,NULL)\n" +
+                    "          from aa1rport, aa1rimti, aa1rtitu dup2\n" +
+                    "         where por_portador       (+) = dup2.dup_port\n" +
+                    "           and imp_fatura_alt_3   (+) = dup2.dup_titulo\n" +
+                    "           and imp_desd_alt_3     (+) = dup2.dup_desd\n" +
+                    "           and imp_loja_alt_3     (+) = dup2.dup_fil_8\n" +
+                    "           and imp_operacao_alt_3 (+) = 1\n" +
+                    "           and dup2.dup_titulo        = dup.dup_titulo\n" +
+                    "           and dup2.dup_desd          = dup.dup_desd\n" +
+                    "           and dup2.dup_venc          = dup.dup_venc\n" +
+                    "           and dup2.dup_cod_cli       = dup.dup_cod_cli\n" +
+                    "           and dup2.dup_cod_fil       = dup.dup_cod_fil\n" +
+                    "           and dup2.dup_agenda        = dup.dup_agenda)\n" +
+                    "    || (select 'P'\n" +
+                    "          from ag1pagcp\n" +
+                    "         where cpd_forpri = dup_clipri\n" +
+                    "           and cpm_dtpg   = 0\n" +
+                    "           and rownum     <=1) as obs,\n" +
+                    "       DECODE(BX_PGTO,'',0, -1) AS  ATUALIZA, \n" +
+                    "       0 TAXA,\n" +
+                    "       DUP_CGC_CPF, \n" +
+                    "       DUP_JUROS, \n" +
+                    "       DUP_DESC, \n" +
+                    "       DUP_ABATIMENTO, \n" +
+                    "       DUP_CORRECAO, \n" +
+                    "       DUP_VALOR_PAG, \n" +
+                    "       DUP_VALOR_PAG_MOEDA, \n" +
+                    "       DUP_SERIE, \n" +
+                    "       BX_PGTO AS DUP_DT_PGTOBANCO,\n" +
+                    "       DUP_DT_AGENDA\n" +
+                    "       ,RTRIM(Decode(tip_natureza,'CV',CLV_RAZAO_SOCIAL,TIP_RAZAO_SOCIAL)) AS TIP_RAZAO_SOCIAL\n" +
+                    "       ,RTRIM(TAB_CONTEUDO) AS TAB_CONTEUDO_AGE \n" +
+                    "       ,DUP_COD_MOEDA \n" +
+                    "       ,dup_cdfis \n" +
+                    "       ,DECODE(NVL(FRD_TIT,0),0,'N','S') AS FACTORAGEM\n" +
+                    "       ,ADICIONA_SECULO(DUP_DT_CRED) DUP_DT_CRED\n" +
+                    "       ,DUP_DOC_CREDITO\n" +
+                    "       ,NVL((SELECT 'S' \n" +
+                    "               FROM AG1AUABT  \n" +
+                    "              WHERE ABT_FOR_CLI     (+) = DUP_CLIPRI * 10 + DAC(DUP_CLIPRI) \n" +
+                    "                AND ABT_TITULO      (+) = DUP_TITULO  \n" +
+                    "                AND ABT_DESD        (+) = DUP_DESD  \n" +
+                    "                AND ABT_COD_FIL     (+) = DUP_COD_FIL  \n" +
+                    "                AND ABT_DIG_FIL     (+) = DUP_DIG_FIL \n" +
+                    "                AND ROWNUM <=1),'N')     AS TEM_ABATIMENTO \n" +
+                    "       ,DUP_EMPRESA\n" +
+                    "       ,BX_TIPO,\n" +
+                    "       LPAD(DUP_COD_CLI,7,' ') || '-' || DUP_DIG_CLI CODIGO \n" +
+                    " FROM AA1RTITU DUP, AA1RBAIX, AA2CTIPO, AA2CTABE, AA1CCVAR, AA1FCRDT, AA1CTCON\n" +
+                    "WHERE TBC_AGENDA (+) = DUP_AGENDA\n" +
+                    "  AND TBC_CODIGO (+) = DUP_CDFIS\n" +
+                    "  AND BX_CLIENTE (+) = DUP_COD_CLI|| DUP_DIG_CLI\n" +
+                    "  AND BX_CODIGO  (+) = DUP_TITULO\n" +
+                    "  AND BX_DESD (+) = DUP_DESD\n" +
+                    "  AND BX_LOJA_ALT_0 (+) = DUP_COD_FIL||DUP_DIG_FIL\n" +
+                    "  AND TIP_CODIGO (+) = DUP_CLIPRI\n" +
+                    "  AND TIP_DIGITO (+) = DAC(DUP_CLIPRI)\n" +
+                    "  AND TAB_CODIGO (+) = 14\n" +
+                    "  AND TAB_ACESSO (+) = RPAD(TO_CHAR(NVL(DUP_AGENDA,0),'FM000'),10)\n" +
+                    "  AND CLV_CGC_CPF (+) = DUP_CGC_CPF\n" +
+                    "  AND frd_tit (+) = dup_Titulo\n" +
+                    "  AND frd_dsd (+) = dup_Desd\n" +
+                    "  AND frd_fil (+) = dup_Cod_Fil\n" +
+                    "  AND DUP_TITULO > 0 \n" +
+                    "  AND DUP_DT_PAG = 0\n" +
+                    "  AND DUP_COD_FIL = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1))) {
+                while (rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(rs.getString("duplicata"));
+                    imp.setDataEmissao(format.parse(rs.getString("emissao")));
+                    imp.setDataVencimento(format2.parse(rs.getString("vencto")));
+                    
+                    String tipo = rs.getString("tipo_cliente");
+                    
+                    if(tipo.equals("F")) {
+                        imp.setIdFornecedor(rs.getString("cliente"));
+                    } else {
+                        String idClienteSemDigito = rs.getString("cliente").substring(0, rs.getString("cliente").length() - 1);
+                        imp.setIdClienteEventual(idClienteSemDigito);
+                    }
+                    
+                    imp.setObservacao(rs.getString("TAB_CONTEUDO_AGE") + " - CPF: " + rs.getString("dup_cgc_cpf"));
+                    imp.setValor(rs.getDouble("valor_liq"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override
@@ -1621,7 +1846,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ch.CHE_AGENCIA agencia,\n"
                     + "    ch.CHE_CONTA_CORRENTE conta,\n"
                     + "    ch.CHE_EMISSAO data,\n"
-                    + "    ch.CHE_VENCIMENTO vencimento,\n"        
+                    + "    ch.CHE_VENCIMENTO vencimento,\n"
                     + "    ch.CHE_VALOR valor,\n"
                     + "    cli.CLI_RG_INSC_EST rg,\n"
                     + "    (select cast(CONT_DDD||CONT_NUMERO as numeric) from CONTATO_CLIENTE where CLI_CODIGO = cli.CLI_CODIGO and ROWNUM = 1) telefone,\n"
@@ -1643,14 +1868,15 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCpf(rst.getString("cpf"));
                     imp.setNumeroCheque(rst.getString("numeroCheque"));
                     imp.setBanco(rst.getInt("banco"));
                     imp.setAgencia(rst.getString("agencia"));
                     imp.setConta(rst.getString("conta"));
-                    imp.setDate(format.parse(rst.getString("vencimento")));
+                    imp.setDate(format.parse(rst.getString("data")));
+                    imp.setDataDeposito(format.parse(rst.getString("vencimento")));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
@@ -1658,17 +1884,17 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCmc7(rst.getString("cmc7"));
                     imp.setAlinea(rst.getInt("alinea"));
                     imp.setValorJuros(rst.getDouble("juros"));
-                    
+
                     String dataAlteracao = rst.getString("dataHoraAlteracao");
-                    
+
                     if (dataAlteracao != null && !dataAlteracao.equals("") && dataAlteracao.equals("0")) {
                         imp.setDataHoraAlteracao(new Timestamp(format.
-                                                parse(rst.getString("data")).
-                                                    getTime()));
+                                parse(rst.getString("data")).
+                                getTime()));
                     } else {
                         imp.setDataHoraAlteracao(new Timestamp(format.
-                                                parse(rst.getString("dataHoraAlteracao")).
-                                                    getTime()));
+                                parse(rst.getString("dataHoraAlteracao")).
+                                getTime()));
                     }
 
                     result.add(imp);
@@ -1727,11 +1953,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setCnpj(rst.getString("cnpj"));
-                    
-                    if(imp.getId().equals("13")) {
+
+                    if (imp.getId().equals("13")) {
                         imp.setCnpj(imp.getId());
                     }
-                    
+
                     imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero("0");
@@ -1739,18 +1965,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setTelefone(rst.getString("fone1"));
-                    
+
                     String dataInicio = rst.getString("datainicio");
                     String dataTermino = rst.getString("datatermino");
-                    
+
                     if (dataInicio == null) {
                         dataInicio = "1280920";
                     }
-                    
+
                     if (dataTermino == null) {
                         dataTermino = "1280926";
                     }
-                    
+
                     imp.setDataInicio(format.parse(dataInicio));
                     imp.setDataTermino(format.parse(dataTermino));
                     imp.setDesconto(rst.getDouble("desconto"));
@@ -1799,7 +2025,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setNome(rst.getString("razao"));
@@ -2012,7 +2238,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    ag1pagcp cp\n"
                     + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
-                    + "   and cp.cpd_emissao >= 170601\n"
+                    //+ "   and cp.cpd_emissao >= 100101\n"
+                    + "and cp.cpd_dta_baixa = 0\n"
                     + "order by\n"
                     + "    cp.cpd_emissao"
             )) {
@@ -2045,42 +2272,79 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
 
+        String sqlBaixas = "select\n"
+                + "   cp.cpd_cgc_cpf cnpj,\n"
+                + "   F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
+                + "   cp.cpd_forne,\n"
+                + "   cp.cpd_ntfis numerodocumento,\n"
+                + "   cp.cpd_emissao dataemissao,\n"
+                + "   cp.cpd_dt_emi,\n"
+                + "   cp.cpd_recep dataentrada,\n"
+                + "   cp.cpd_dt_inclusao,\n"
+                + "   cp.cpd_vrnota valor,\n"
+                + "   cp.cpd_loja id_loja,\n"
+                + "   cp.cpd_dta_baixa,\n"
+                + "   cp.cpd_ven_org,\n"
+                + "   cp.cpd_serie,\n"
+                + "   cp.cpd_ntfis,\n"
+                + "   cp.cpd_vlr_pago_cheque,\n"
+                + "   cp.cpd_vlr_pago_dinhei,    \n"
+                + "   case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n"
+                + "   cp.cpm_banco,\n"
+                + "   cp.cpd_agencia_emp,\n"
+                + "   cp.cpd_conta_emp,\n"
+                + "   cp.cpm_ncheq,\n"
+                + "   cp.cpm_venc datavencimento,\n"
+                + "   cp.cpd_duplicata duplicata\n"
+                + "from\n"
+                + "   ag1pagcp cp\n"
+                + "   join AA2CTIPO F on\n"
+                + "		cp.cpd_forne = f.TIP_CODIGO\n"
+                + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                + "and CPD_DTA_BAIXA > 0 \n"
+                + "and cpd_dt_inclusao >= 190101\n"
+                + "order by\n"
+                + "   cp.cpd_emissao";
+
+        String sqlAbertos = "select\n"
+                + "    cp.cpd_cgc_cpf cnpj,\n"
+                + "    F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
+                + "    cp.cpd_forne,\n"
+                + "    cp.cpd_ntfis numerodocumento,\n"
+                + "    cp.cpd_emissao dataemissao,\n"
+                + "    cp.cpd_dt_emi,\n"
+                + "    cp.cpd_recep dataentrada,\n"
+                + "    cp.cpd_dt_inclusao,\n"
+                + "    cp.cpd_vrnota valor,\n"
+                + "    cp.cpd_loja id_loja,\n"
+                + "    cp.cpd_dta_baixa,\n"
+                + "    cp.cpd_ven_org,\n"
+                + "    cp.cpd_serie,\n"
+                + "    cp.cpd_ntfis,\n"
+                + "    cp.cpd_vlr_pago_cheque,\n"
+                + "    cp.cpd_vlr_pago_dinhei,    \n"
+                + "    case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n"
+                + "    cp.cpm_banco,\n"
+                + "    cp.cpd_agencia_emp,\n"
+                + "    cp.cpd_conta_emp,\n"
+                + "    cp.cpm_ncheq,\n"
+                + "    cp.cpm_venc datavencimento,\n"
+                + "    cp.cpd_duplicata duplicata\n"
+                + "from\n"
+                + "    ag1pagcp cp\n"
+                + "    join AA2CTIPO F on\n"
+                + "         cp.cpd_forne = f.TIP_CODIGO\n"
+                + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " "
+                + "and CPD_DTA_BAIXA = 0\n"
+                + "order by\n"
+                + "    cp.cpd_emissao";
+
         try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    cp.cpd_cgc_cpf cnpj,\n"
-                    + "    F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
-                    + "    cp.cpd_forne,\n"
-                    + "    cp.cpd_ntfis numerodocumento,\n"
-                    + "    cp.cpd_emissao dataemissao,\n"
-                    + "    cp.cpd_dt_emi,\n"
-                    + "    cp.cpd_recep dataentrada,\n"
-                    + "    cp.cpd_dt_inclusao,\n"
-                    + "    cp.cpd_vrnota valor,\n"
-                    + "    cp.cpd_loja id_loja,\n"
-                    + "    cp.cpd_dta_baixa,\n"
-                    + "    cp.cpd_ven_org,\n"
-                    + "    cp.cpd_serie,\n"
-                    + "    cp.cpd_ntfis,\n"
-                    + "    cp.cpd_vlr_pago_cheque,\n"
-                    + "    cp.cpd_vlr_pago_dinhei,    \n"
-                    + "    case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n"
-                    + "    cp.cpm_banco,\n"
-                    + "    cp.cpd_agencia_emp,\n"
-                    + "    cp.cpd_conta_emp,\n"
-                    + "    cp.cpm_ncheq,\n"
-                    + "    cp.cpm_venc datavencimento,\n"
-                    + "    cp.cpd_duplicata duplicata\n"
-                    + "from\n"
-                    + "    ag1pagcp cp\n"
-                    + "    join AA2CTIPO F on\n"
-                    + "         cp.cpd_forne = f.TIP_CODIGO\n"
-                    + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " and CPD_DTA_BAIXA = 0\n"
-                    + "order by\n"
-                    + "    cp.cpd_emissao"
-            )) {
+            try (ResultSet rst = stm.executeQuery(sqlAbertos)) {
+
                 SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
                 SimpleDateFormat format2 = new SimpleDateFormat("1yyMMdd");
+
                 while (rst.next()) {
                     ContaPagarIMP vo = new ContaPagarIMP();
 
@@ -2094,8 +2358,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("duplicata")
                     ));
                     vo.setIdFornecedor(rst.getString("id_fornecedor"));
-                    
-                    if(rst.getString("dataemissao") != null && rst.getString("dataemissao").length() > 5) {
+
+                    if (rst.getString("dataemissao") != null && rst.getString("dataemissao").length() > 5) {
                         vo.setDataHoraAlteracao(
                                 new Timestamp(format.parse(rst.getString("dataemissao")).getTime()));
                         vo.setDataEmissao(format.parse(rst.getString("dataemissao")));
@@ -2104,12 +2368,19 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                                 new Timestamp(format.parse(rst.getString("dataentrada")).getTime()));
                         vo.setDataEmissao(format.parse(rst.getString("dataentrada")));
                     }
-                    
+
                     vo.setDataEntrada(format.parse(rst.getString("dataentrada")));
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
                     vo.setObservacao("DUPLICATA " + rst.getString("duplicata"));
                     vo.setValor(rst.getDouble("valor"));
-                    vo.addVencimento(format2.parse(rst.getString("datavencimento")), vo.getValor()).setObservacao("DUPLICATA " + rst.getString("duplicata"));
+                    vo.addVencimento(
+                            format2.parse(rst.getString("datavencimento")),
+                            vo.getValor()
+                    /*format.parse(rst.getString("cpd_dta_baixa")*/).
+                            setObservacao("DUPLICATA "
+                                    + rst.getString("duplicata")
+                                    + " - "
+                                    + rst.getString("situacao"));
 
                     result.add(vo);
                 }
@@ -2564,6 +2835,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "       AA1FR60I_" + tabela_venda + " itm\n"
                         + "join\n"
                         + "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n"
+                        + "WHERE \n"
+                        + "	  itm.r60i_fil = " + idLojaCliente
                         + "order by\n"
                         + "       itm.r60i_cup, itm.r60i_seq";
             } else if (versaoDaVenda == 3) {
@@ -2733,7 +3006,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ROWNUM >= 0 \n"
                     + "	AND I.ESCHC_DATA >= " + format.format(dataInicioVenda) + " \n"
                     + "	AND I.ESCHC_DATA <= " + format.format(dataTerminoVenda) + " \n"
-                    + "	AND FIS.FIS_OPER in (231,238)\n" + //TUDO QUE NÃO FOR VENDA PDV
+                    + "	AND FIS.FIS_OPER in (231,238)\n"
+                    + //TUDO QUE NÃO FOR VENDA PDV
                     "	AND NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' \n"
                     + "	AND NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' \n"
                     + "	AND I.ESCHC_AGENDA IN (\n"

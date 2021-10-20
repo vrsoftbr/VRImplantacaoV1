@@ -450,6 +450,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         return null;
     }
 
+    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
