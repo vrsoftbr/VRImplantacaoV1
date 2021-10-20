@@ -25,7 +25,6 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -41,7 +40,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
-
+    
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
@@ -51,6 +50,17 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
         return "Gestor" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
+    private Date vendaDataIni;
+    private Date vendaDataFim;
+    
+    public void setVendaDataIni(Date vendaDataIni) {
+        this.vendaDataIni = vendaDataIni;
+    }
+
+    public void setVendaDataFim(Date vendaDataFim) {
+        this.vendaDataFim = vendaDataFim;
+    }
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -682,12 +692,12 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new GestorDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new GestorDAO.VendaIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new GestorDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new GestorDAO.VendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -812,7 +822,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	REPLACE(vi.EMPRESA || vi.DATA || vi.PDV || vi.ECF || vi.CUPOM || vi.PRODUTO || vi.ITEM, '-', '') AS id_item,\n"
                     + "	vi.ITEM nroitem, \n"
                     + "	vi.PRODUTO,\n"
-                    + "	p.PD_UNIDADE,\n"
+                    + "	p.PD_UNIDADE unidade,\n"
                     + "	vi.PRODUTO_BARRAS codigobarras,\n"
                     + "	p.DSC descricao,\n"
                     + "	vi.QUANTIDADE,\n"
