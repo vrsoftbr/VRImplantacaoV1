@@ -18,7 +18,7 @@ import vrimplantacao2.utils.sql.SQLBuilder;
 public class LojaDAO {
 
     private Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-    
+
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         List<LojaVO> result = new ArrayList();
 
@@ -33,17 +33,17 @@ public class LojaDAO {
         if (i_filtro.getId() > -1) {
             sql = sql + " AND lj.id = " + i_filtro.getId();
         }
-        
+
         if (!i_filtro.getDescricao().trim().equals("")) {
             sql = sql + " AND " + Util.getGoogle("lj.descricao", i_filtro.getDescricao());
         }
-        
+
         if (i_filtro.getOrdenacao().isEmpty()) {
             sql = sql + " ORDER BY lj.descricao";
         } else {
             sql = sql + " ORDER BY " + i_filtro.getOrdenacao() + ", lj.descricao";
         }
-        
+
         if (i_filtro.getLimite() > 0) {
             sql = sql + " LIMIT " + i_filtro.getLimite();
         }
@@ -118,9 +118,9 @@ public class LojaDAO {
 
     public LojaVO carregar2(int i_id) throws Exception {
         LojaVO oLoja = new LojaVO();
-        
+
         String sql = "SELECT * FROM loja WHERE id = " + i_id;
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql
@@ -136,13 +136,13 @@ public class LojaDAO {
                 }
             }
         }
-        
+
         return oLoja;
     }
 
-    private boolean isLojaExiste(LojaVO i_loja) throws Exception {
+    public boolean isLojaExiste(LojaVO i_loja) throws Exception {
         String sql = "SELECT id FROM loja WHERE id = " + i_loja.getId();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql
@@ -151,7 +151,7 @@ public class LojaDAO {
             }
         }
     }
-    
+
     private SQLBuilder criarLoja(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
@@ -168,89 +168,83 @@ public class LojaDAO {
 
         return sql;
     }
-    
-    public void salvarNovo(LojaVO i_loja) throws Exception {
 
-        if (!isLojaExiste(i_loja)) {
+    public void salvarLoja(LojaVO i_loja) throws Exception {
 
-            try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = Conexao.createStatement()) {
 
-                /* criar loja */
-                stm.execute(criarLoja(i_loja).getInsert());
-                
-                /* cópia da tabela produtocomplemento */
-                stm.execute(copiarProdutoComplemento(i_loja));
+            /* criar loja */
+            stm.execute(criarLoja(i_loja).getInsert());
 
-                /* cópia da tabela fornecedorprazo */
-                stm.execute(copiarFornecedorPrazo(i_loja));
+            /* cópia da tabela produtocomplemento */
+            stm.execute(copiarProdutoComplemento(i_loja));
 
-                /* cópia da tabela fornecedorprazopedido */
-                stm.execute(copiarFornecedorPrazoPedido(i_loja));
+            /* cópia da tabela fornecedorprazo */
+            stm.execute(copiarFornecedorPrazo(i_loja));
 
-                /*cópia da tabela parametrovalor */
-                stm.execute(copiarParametroValor(i_loja));
+            /* cópia da tabela fornecedorprazopedido */
+            stm.execute(copiarFornecedorPrazoPedido(i_loja));
 
-                /*cópia da tabela pdv.funcaoniveloperador */
-                stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
+            /*cópia da tabela parametrovalor */
+            stm.execute(copiarParametroValor(i_loja));
 
-                /* cópia da tabela pdv.parametrovalor */
-                stm.execute(copiarPdvParametroValor(i_loja));
+            /*cópia da tabela pdv.funcaoniveloperador */
+            stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
 
-                /* update campo valor na tabela pdv.parametrovalor */
-                atualizarValorPdvParametroValor(i_loja);
-                
-                /* cópia da tabela pdv.cartaolayout */
-                if (copiarPdvCartaoLayout(i_loja) != null && !copiarPdvCartaoLayout(i_loja).isEmpty()) {
-                    stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
-                }
+            /* cópia da tabela pdv.parametrovalor */
+            stm.execute(copiarPdvParametroValor(i_loja));
 
-                /* cópia da tabela pdv.balancaetiquetalayout */
-                if (copiarPdvBalancaEtiquetaLayout(i_loja) != null && !copiarPdvBalancaEtiquetaLayout(i_loja).isEmpty()) {
-                    stm.execute(copiarPdvBalancaEtiquetaLayout(i_loja).getInsert());
-                }
-                
-                /* cópia da tabela pdv.tecladolayout e tecladolayoutfuncao*/
-                if (i_loja.isCopiaTecladoLayout()) {
-                    copiarPdvTecladoLayout(i_loja);
-                }
-                
-                /* cópia da tabela pdv.finalizadoraconfiguracao */
-                stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
-                
-                /* inserir tabela dataprocessamento */
-                stm.execute(inserirDataProcessamento(i_loja).getInsert());
-                
-                /* inserir tabela comprovante */
-                stm.execute(inserirComprovante(i_loja));
-                
-                /* cópia da tabela pdv.operador */
-                stm.execute(copiarPdvOperador(i_loja));
-                
-                /* inserir tabela notasaidasequencia */
-                stm.execute(inserirNotaSaidaSequencia(i_loja).getInsert());
-                
-                /* cópia tabela tiposaidanotasaidasequencia */
-                stm.execute(copiarTipoSaidaNotaSaidaSequencia(i_loja));                
+            /* update campo valor na tabela pdv.parametrovalor */
+            atualizarValorPdvParametroValor(i_loja);
+
+            /* cópia da tabela pdv.cartaolayout */
+            if (copiarPdvCartaoLayout(i_loja) != null && !copiarPdvCartaoLayout(i_loja).isEmpty()) {
+                stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
             }
-        } else {
-            SQLBuilder sql = new SQLBuilder();
-            sql.setSchema("public");
-            sql.setTableName("loja");
 
-            sql.put("descricao", i_loja.getDescricao());
-            sql.put("id_fornecedor", i_loja.getIdFornecedor());
-            sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
-            sql.put("nomeservidor", i_loja.getNomeServidor());
-            sql.put("servidorcentral", i_loja.isServidorCentral());
-            sql.put("id_regiao", i_loja.getIdRegiao());
-            sql.put("geraconcentrador", i_loja.isGeraConcentrador());
+            /* cópia da tabela pdv.balancaetiquetalayout */
+            if (copiarPdvBalancaEtiquetaLayout(i_loja) != null && !copiarPdvBalancaEtiquetaLayout(i_loja).isEmpty()) {
+                stm.execute(copiarPdvBalancaEtiquetaLayout(i_loja).getInsert());
+            }
 
-            sql.setWhere("id = " + i_loja.getId());
+            /* cópia da tabela pdv.finalizadoraconfiguracao */
+            stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
 
-            if (!sql.isEmpty()) {
-                try (Statement stmUpdate = Conexao.createStatement()) {
-                    stmUpdate.execute(sql.getUpdate());
-                }
+            /* inserir tabela dataprocessamento */
+            stm.execute(inserirDataProcessamento(i_loja).getInsert());
+
+            /* inserir tabela comprovante */
+            stm.execute(inserirComprovante(i_loja));
+
+            /* cópia da tabela pdv.operador */
+            stm.execute(copiarPdvOperador(i_loja));
+
+            /* inserir tabela notasaidasequencia */
+            stm.execute(inserirNotaSaidaSequencia(i_loja).getInsert());
+
+            /* cópia tabela tiposaidanotasaidasequencia */
+            stm.execute(copiarTipoSaidaNotaSaidaSequencia(i_loja));
+        }
+    }
+    
+    public void atualizarLoja(LojaVO i_loja) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("public");
+        sql.setTableName("loja");
+
+        sql.put("descricao", i_loja.getDescricao());
+        sql.put("id_fornecedor", i_loja.getIdFornecedor());
+        sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+        sql.put("nomeservidor", i_loja.getNomeServidor());
+        sql.put("servidorcentral", i_loja.isServidorCentral());
+        sql.put("id_regiao", i_loja.getIdRegiao());
+        sql.put("geraconcentrador", i_loja.isGeraConcentrador());
+
+        sql.setWhere("id = " + i_loja.getId());
+
+        if (!sql.isEmpty()) {
+            try (Statement stmUpdate = Conexao.createStatement()) {
+                stmUpdate.execute(sql.getUpdate());
             }
         }
     }
@@ -294,28 +288,28 @@ public class LojaDAO {
         }
 
         sql = sql + " from produtocomplemento where id_loja = " + i_loja.getIdCopiarLoja() + ")";
-        
+
         return sql;
     }
-    
+
     private String copiarFornecedorPrazo(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO fornecedorprazo("
                 + "id_fornecedor, id_loja, id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca)"
                 + "(SELECT id_fornecedor, " + i_loja.getId() + ", id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca \n"
                 + "FROM fornecedorprazo WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
-        
+
         return sql;
     }
-    
+
     private String copiarFornecedorPrazoPedido(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO fornecedorprazopedido(id_fornecedor, id_loja, \n"
                 + "diasentregapedido,diasatualizapedidoparcial) \n"
                 + "(SELECT id_fornecedor, " + i_loja.getId() + ", diasentregapedido,diasatualizapedidoparcial \n"
                 + "FROM fornecedorprazopedido WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
-        
+
         return sql;
     }
-    
+
     private String copiarParametroValor(LojaVO i_loja) throws Exception {
         String sql = "insert into parametrovalor (\n"
                 + "	id_loja,\n"
@@ -349,55 +343,55 @@ public class LojaDAO {
 
         return sql;
     }
-    
+
     private void atualizarValorPdvParametroValor(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("pdv");
         sql.setTableName("parametrovalor");
-        
+
         sql.put("valor", i_loja.getId());
-        
+
         sql.setWhere("id_loja = " + i_loja.getId() + " and id_parametro = 99");
-        
+
         if (!sql.isEmpty()) {
             try (Statement stmUpdate = Conexao.createStatement()) {
                 stmUpdate.execute(sql.getUpdate());
             }
-        }        
+        }
     }
-    
+
     private SQLBuilder copiarPdvCartaoLayout(LojaVO i_loja) throws Exception {
         String sql = "SELECT * FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
         SQLBuilder sqlInsert = null;
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql
             )) {
                 while (rst.next()) {
                     int proximoId = new CodigoInternoDAO().get("pdv.cartaolayout");
-                    
+
                     sqlInsert = new SQLBuilder();
                     sqlInsert.setSchema("pdv");
                     sqlInsert.setTableName("cartaolayout");
-                    
+
                     sqlInsert.put("id", proximoId);
                     sqlInsert.put("id_loja", i_loja.getId());
                     sqlInsert.put("id_tipocartao", rst.getInt("id_tipocartao"));
                     sqlInsert.put("posicao", rst.getInt("posicao"));
                     sqlInsert.put("tamanho", rst.getInt("tamanho"));
-                    sqlInsert.put("id_tipocartaocampo", rst.getInt("id_tipocartaocampo"));                    
+                    sqlInsert.put("id_tipocartaocampo", rst.getInt("id_tipocartaocampo"));
                 }
             }
         }
-        
+
         return sqlInsert;
     }
-    
+
     private SQLBuilder copiarPdvBalancaEtiquetaLayout(LojaVO i_loja) throws Exception {
         String sql = "SELECT * FROM pdv.balancaetiquetalayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
         SQLBuilder sqlInsert = null;
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql
@@ -405,31 +399,34 @@ public class LojaDAO {
                 while (rst.next()) {
                     sqlInsert = new SQLBuilder();
                     int proximoId = new CodigoInternoDAO().get("pdv.balancaetiquetalayout");
-                    
+
                     sqlInsert.setSchema("pdv");
                     sqlInsert.setTableName("balancaetiquetalayout");
-                    
+
                     sqlInsert.put("id", proximoId);
-                    sqlInsert.put("id_loja", i_loja.getId());                    
+                    sqlInsert.put("id_loja", i_loja.getId());
                     sqlInsert.put("id_tipobalancaetiqueta", rst.getInt("id_tipobalancaetiqueta"));
                     sqlInsert.put("id_tipobalancoetiquetacampo", rst.getInt("id_tipobalancoetiquetacampo"));
                     sqlInsert.put("iniciopeso", rst.getInt("iniciopeso"));
                     sqlInsert.put("tamanhopeso", rst.getInt("tamanhopeso"));
                     sqlInsert.put("iniciopreco", rst.getInt("iniciopreco"));
-                    sqlInsert.put("tamanhopreco", rst.getInt("tamanhopreco"));                    
+                    sqlInsert.put("tamanhopreco", rst.getInt("tamanhopreco"));
                 }
             }
         }
-        
+
         return sqlInsert;
     }
-    
-    private void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
-        String sql = "SELECT * FROM pdv.tecladolayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
 
+    public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    sql
+                    "SELECT \n"
+                    + "     id, \n"
+                    + "     id_loja, \n"
+                    + "     descricao \n"
+                    + "FROM pdv.tecladolayout \n"
+                    + "WHERE id_loja = " + i_loja.getIdCopiarLoja()
             )) {
                 while (rst.next()) {
                     int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
@@ -442,35 +439,36 @@ public class LojaDAO {
                     sqlTecladoLayout.put("id_loja", i_loja.getId());
                     sqlTecladoLayout.put("descricao", rst.getString("descricao"));
 
-                    int idTecladoLayout = rst.getInt("id");
-                    
                     stm.execute(sqlTecladoLayout.getInsert());
-                    
-                    String sql2 = "SELECT * FROM pdv.tecladolayoutfuncao AS tlf \n"
-                            + "INNER JOIN pdv.tecladolayout AS tl ON tl.id = tlf.id_tecladolayout \n"
-                            + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                            + "AND tl.id = " + idTecladoLayout;
-                    
-                    try (Statement stm2 = Conexao.createStatement()) {
-                        try (ResultSet rst2 = stm2.executeQuery(
-                                sql2
-                        )) {
-                            while (rst2.next()) {
-                                int proximoIdLayoutFuncao = new CodigoInternoDAO().get("pdv.tecladolayoutfuncao");
+                }
+            }
+        }
+    }
 
-                                SQLBuilder sqlTecladoLayoutFuncao = new SQLBuilder();
-                                sqlTecladoLayoutFuncao.setSchema("pdv");
-                                sqlTecladoLayoutFuncao.setTableName("tecladolayoutfuncao");
+    public void copiarPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "     tl.id as idtecladolayout, \n"
+                    + "     tlf.codigoretorno, \n"
+                    + "     tlf.id_funcao \n"
+                    + "FROM pdv.tecladolayoutfuncao AS tlf \n"
+                    + "INNER JOIN pdv.tecladolayout AS tl ON tl.id = tlf.id_tecladolayout \n"
+                    + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja()
+            )) {
+                while (rst.next()) {
+                    int proximoIdLayoutFuncao = new CodigoInternoDAO().get("pdv.tecladolayoutfuncao");
 
-                                sqlTecladoLayoutFuncao.put("id", proximoIdLayoutFuncao);
-                                sqlTecladoLayoutFuncao.put("id_tecladolayout", proximoIdTecladoLayout);
-                                sqlTecladoLayoutFuncao.put("codigoretorno", rst2.getString("codigoretorno"));
-                                sqlTecladoLayoutFuncao.put("id_funcao", rst2.getString("id_funcao"));
+                    SQLBuilder sqlTecladoLayoutFuncao = new SQLBuilder();
+                    sqlTecladoLayoutFuncao.setSchema("pdv");
+                    sqlTecladoLayoutFuncao.setTableName("tecladolayoutfuncao");
 
-                                stm2.execute(sqlTecladoLayoutFuncao.getInsert());
-                            }
-                        }
-                    }
+                    sqlTecladoLayoutFuncao.put("id", proximoIdLayoutFuncao);
+                    sqlTecladoLayoutFuncao.put("id_tecladolayout", rst.getString("idtecladolayout"));
+                    sqlTecladoLayoutFuncao.put("codigoretorno", rst.getString("codigoretorno"));
+                    sqlTecladoLayoutFuncao.put("id_funcao", rst.getString("id_funcao"));
+
+                    stm.execute(sqlTecladoLayoutFuncao.getInsert());
                 }
             }
         }
@@ -479,54 +477,53 @@ public class LojaDAO {
     private String copiarPdvFinalizadoraConfiguracao(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento, \n"
                 + "aceitarecebimento,utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado)\n"
-                + "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento,\n"
                 + "(SELECT " + i_loja.getId() + ",id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento,aceitarecebimento, \n"
                 + "utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado \n"
                 + "FROM pdv.finalizadoraconfiguracao WHERE id_loja = " + i_loja.getIdCopiarLoja() + ")";
 
         return sql;
     }
-    
+
     private SQLBuilder inserirDataProcessamento(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
         sql.setTableName("dataprocessamento");
-        
+
         sql.put("id_loja", i_loja.getId());
         sql.put("data", Util.formatDataBanco(new DataProcessamentoDAO().get()));
-        
+
         return sql;
     }
-    
+
     private String inserirComprovante(LojaVO i_loja) throws Exception {
         String sql = "insert into comprovante select id, " + i_loja.getId() + " as id_loja, descricao, cabecalho, \n"
                 + "detalhe, rodape from comprovante where id_loja = " + i_loja.getIdCopiarLoja();
-        
+
         return sql;
     }
-    
+
     private String copiarPdvOperador(LojaVO i_loja) throws Exception {
         String sql = "insert into pdv.operador (id_loja, matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro) \n"
                 + "select " + i_loja.getId() + ", matricula, nome, senha, codigo, id_tiponiveloperador, id_situacaocadastro \n"
                 + "from pdv.operador \n"
                 + "where id_loja = " + i_loja.getIdCopiarLoja() + " "
                 + "and matricula = 500001";
-        
+
         return sql;
     }
-    
+
     private SQLBuilder inserirNotaSaidaSequencia(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
         sql.setTableName("notasaidasequencia");
-        
+
         sql.put("id_loja", i_loja.getId());
         sql.put("numerocontrole", 1);
         sql.put("serie", 1);
-        
+
         return sql;
     }
-    
+
     private String copiarTipoSaidaNotaSaidaSequencia(LojaVO i_loja) throws Exception {
         String sql = "insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n"
                 + "select\n"
@@ -545,11 +542,10 @@ public class LojaDAO {
                 + " loja l on l.id = n.id_loja\n"
                 + " where\n"
                 + " l.id_situacaocadastro = 1)";
-        
+
         return sql;
     }
-    
-    
+
     public void salvar(LojaVO i_loja) throws Exception {
         Statement stm = null;
         Statement stm2 = null;
@@ -589,7 +585,7 @@ public class LojaDAO {
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
                 sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao,");
                 sql.append("id_tipocalculoddv");
-                if (versao.igualOuMaiorQue(3,17,10)) {
+                if (versao.igualOuMaiorQue(3, 17, 10)) {
                     sql.append(", id_tipoproduto, fabricacaopropria");
                 }
                 sql.append(")");
@@ -598,7 +594,7 @@ public class LojaDAO {
                 sql.append("  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,");
                 sql.append(" null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,");
                 sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3");
-                if (versao.igualOuMaiorQue(3,17,10)) {
+                if (versao.igualOuMaiorQue(3, 17, 10)) {
                     sql.append(", 0, false");
                 }
                 sql.append(" from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");
@@ -621,22 +617,22 @@ public class LojaDAO {
                 stm.execute(sql.toString());
 
                 stm.execute(
-                        "insert into parametrovalor (\n" +
-                        "	id_loja,\n" +
-                        "	id_parametro,\n" +
-                        "	valor\n" +
-                        ") \n" +
-                        "select\n" +
-                        "	" + i_loja.id + ",\n" +
-                        "	id_parametro,\n" +
-                        "	valor\n" +
-                        "from\n" +
-                        "	parametrovalor\n" +
-                        "where\n" +
-                        "	id_loja = " + i_loja.idCopiarLoja + "\n" +
-                        "	and id_parametro not in (456, 485, 486)"
+                        "insert into parametrovalor (\n"
+                        + "	id_loja,\n"
+                        + "	id_parametro,\n"
+                        + "	valor\n"
+                        + ") \n"
+                        + "select\n"
+                        + "	" + i_loja.id + ",\n"
+                        + "	id_parametro,\n"
+                        + "	valor\n"
+                        + "from\n"
+                        + "	parametrovalor\n"
+                        + "where\n"
+                        + "	id_loja = " + i_loja.idCopiarLoja + "\n"
+                        + "	and id_parametro not in (456, 485, 486)"
                 );
-                
+
                 sql = new StringBuilder();
                 sql.append("INSERT INTO pdv.funcaoniveloperador (id_loja, id_funcao, id_tiponiveloperador)");
                 sql.append(" (SELECT " + i_loja.id + ", id_funcao, id_tiponiveloperador FROM pdv.funcaoniveloperador WHERE id_loja = " + i_loja.idCopiarLoja + ")");
@@ -770,32 +766,32 @@ public class LojaDAO {
                 sql.append("and matricula = 500001 ");
 
                 stm.execute(sql.toString());
-                
-                sql =  new StringBuilder();
+
+                sql = new StringBuilder();
                 sql.append("insert into notasaidasequencia (id_loja, numerocontrole, serie) values (" + i_loja.id + ", 1, 1)");
                 stm.execute(sql.toString());
-                
+
                 sql = new StringBuilder();
-                sql.append("insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n" +
-                            "select\n" +
-                                i_loja.id + ", \n" +
-                            "	t.id_tiposaida, \n" +
-                            "	(select id from notasaidasequencia where id_loja = " + i_loja.id + ") id  \n" +
-                            "from  \n" +
-                            "	tiposaidanotasaidasequencia t\n" +
-                            "where  \n" +
-                            "   t.id_notasaidasequencia in "
-                                + " (select\n" +
-                                        " min(n.id)\n" +
-                                   " from\n" +
-                                        " notasaidasequencia n\n" +
-                                   " join\n" +
-                                        " loja l on l.id = n.id_loja\n" +
-                                   " where\n" +
-                                        " l.id_situacaocadastro = 1)");
-                
+                sql.append("insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n"
+                        + "select\n"
+                        + i_loja.id + ", \n"
+                        + "	t.id_tiposaida, \n"
+                        + "	(select id from notasaidasequencia where id_loja = " + i_loja.id + ") id  \n"
+                        + "from  \n"
+                        + "	tiposaidanotasaidasequencia t\n"
+                        + "where  \n"
+                        + "   t.id_notasaidasequencia in "
+                        + " (select\n"
+                        + " min(n.id)\n"
+                        + " from\n"
+                        + " notasaidasequencia n\n"
+                        + " join\n"
+                        + " loja l on l.id = n.id_loja\n"
+                        + " where\n"
+                        + " l.id_situacaocadastro = 1)");
+
                 stm.execute(sql.toString());
-                
+
             } else {
                 sql = new StringBuilder();
                 sql.append("UPDATE loja SET");
@@ -824,7 +820,7 @@ public class LojaDAO {
 
     public boolean isLoja(int i_idLoja) throws Exception {
         String sql = "SELECT id from loja where id = " + i_idLoja;
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql

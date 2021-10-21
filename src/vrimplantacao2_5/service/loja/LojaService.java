@@ -31,14 +31,28 @@ public class LojaService {
         try {
             provider.begin();
             
-            lojaDAO.salvarNovo(vo);
+            if (isLojaExiste(vo)) {
+                lojaDAO.atualizarLoja(vo);
+            } else {
+                lojaDAO.salvarLoja(vo);
+
+                if (vo.isCopiaTecladoLayout()) {
+                    lojaDAO.copiarPdvTecladoLayout(vo);
+                    lojaDAO.copiarPdvTecladoLayoutFuncao(vo);
+                }
+            }
             
             provider.commit();
             
         } catch (Exception ex) {
+            ex.printStackTrace();
             Util.exibirMensagemErro(ex, getTitle());
             provider.rollback();
         }
+    }
+    
+    private boolean isLojaExiste(LojaVO vo) throws Exception {
+        return lojaDAO.isLojaExiste(vo);
     }
     
     private String getTitle() {
