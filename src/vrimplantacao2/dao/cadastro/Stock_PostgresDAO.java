@@ -504,5 +504,7 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             }
         }
         return result;
+        
+        
     }
 }
