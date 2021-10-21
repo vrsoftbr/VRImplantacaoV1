@@ -49,6 +49,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date vendaDataInicio;
     private Date vendaDataTermino;
+    public boolean utilizarSup025 = false;
 
     private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
@@ -152,7 +153,10 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.DATA_CADASTRO
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
     }
 
@@ -313,6 +317,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cst.perpisd AS aliquotapis,\n"
                     + "	cst.cstcofins_s AS cstcofins,\n"
                     + "	cst.percofinsd AS aliquotacofins,\n"
+                    + " p.SUP002 || p.IVA_ST || ncm.DIGITOS as idpautafiscal,\n"
                     + "	CASE\n"
                     + "		WHEN bal.SUP001 IS NOT NULL THEN 1\n"
                     + "		ELSE 0\n"
@@ -377,6 +382,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(rst.getString("idaliquota"));
                     imp.setIdFamiliaProduto(rst.getString("familiaid"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
+                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));
 
                     result.add(imp);
                 }
@@ -537,66 +543,42 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
-                    /*"select\n"
-                    + "    id_produto,\n"
-                    + "    nome_produto,\n"
-                    + "    ncm,\n"
-                    + "    tabicm aliquota_debito_id,\n"
-                    + "    icm.tabicm_st cst_debito,\n"
-                    + "    icm.tabicm_aliq icms_aliquota_debito,\n"
-                    + "    icm.tabicm_pbc icms_aliquota_debito_reducao,\n"
-                    + "    icm_aliq aliquota_credito,\n"
-                    + "    icm_cst cst_credito,\n"
-                    + "    icm_pbc aliquota_reducao_credito,\n"
-                    + "    icm_stperc aliquota_final_credito,\n"
-                    + "    icm_mva\n"
-                    + "from\n"
-                    + "    est_produtos p\n"
-                    + "join tab_icm icm on p.tabicm = icm.id_tabicm\n"
-                    + "where\n"
-                    + "    icm_mva > 0\n"
-                    + "order by\n"
-                    + "    2"*/
+                    "SELECT\n"
+                    + "	distinct\n"
+                    + "	p.SUP002 AS idaliquota,\n"
+                    + "	p.IVA_ST,\n"
+                    + "	ncm.DIGITOS ncm\n"
+                    + "FROM\n"
+                    + "	SUP001 p\n"
+                    + "JOIN SUP008 pr ON pr.SUP001 = p.SUP001\n"
+                    + "LEFT JOIN sup090 ncm ON p.sup090 = ncm.sup090\n"
+                    + "WHERE\n"
+                    + "	pr.SUP999 = 1 AND \n"
+                    + "	IVA_ST <> 0 AND \n"
+                    + "	IVA_ST > 0.01"
             )) {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    
-                    imp.setId(rst.getString("id_produto"));
-                    imp.setIva(rst.getDouble("icm_mva"));
+
+                    String id = rst.getString("idaliquota") + rst.getString("IVA_ST") + rst.getString("ncm");
+
+                    imp.setId(id);
+                    imp.setIva(rst.getDouble("IVA_ST"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
-                    
-                    int cst;
-                    double aliquota = rst.getDouble("aliquota_credito");
-                    double reduzido = 0;
-                    
-                    if (rst.getDouble("aliquota_reducao_credito") == 100) {
-                        reduzido = 0;
-                    } else {
-                        reduzido = rst.getDouble("aliquota_reducao_credito");
-                    }
-                    
-                    if (reduzido > 0) {
-                        cst = 20;
-                    } else if (aliquota == 0) {
-                        cst = rst.getInt("cst_debito");
-                    } else {
-                        cst = 0;
-                    }
-                    
-                    imp.setAliquotaDebito(cst, aliquota, reduzido);
-                    imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
-                    imp.setAliquotaCredito(cst, aliquota, reduzido);
-                    imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
-                                        
+
+                    imp.setAliquotaCreditoId(rst.getString("idaliquota"));
+                    imp.setAliquotaDebitoId(imp.getAliquotaCreditoId());
+                    imp.setAliquotaCreditoForaEstadoId(imp.getAliquotaCreditoId());
+                    imp.setAliquotaDebitoForaEstadoId(imp.getAliquotaCreditoId());
+
                     result.add(imp);
                 }
             }
@@ -690,42 +672,90 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	c.sup024 id,\n"
-                    + "	c.razaosocial razao,\n"
-                    + "	c.FANTASIA ,\n"
-                    + "	c.DTNASCIMENTO as dtnascimento,\n"
-                    + "	c.CNPJ_CPF as cpfcnpj,\n"
-                    + "	c.INSCRICAO,\n"
+        String sqlCliente
+                = "SELECT\n"
+                + "	c.sup024 id,\n"
+                + "	c.razaosocial razao,\n"
+                + "	c.FANTASIA ,\n"
+                + "	c.DTNASCIMENTO as dtnascimento,\n"
+                + "	c.CNPJ_CPF as cpfcnpj,\n"
+                + "	c.INSCRICAO,\n"
+                + "	c.TELEFONE1,\n"
+                + "	c.TELEFONE2,\n"
+                + "	c.CELULAR,\n"
+                + "	c.EMAIL,\n"
+                + "	c.DTCADASTRO as datacadastro,\n"
+                + "	c.DTALTERACAO,\n"
+                + "	c.ENDERECO,\n"
+                + "	c.NUMERO,\n"
+                + "	c.COMPLEMENTO,\n"
+                + "	c.BAIRRO,\n"
+                + "	c.CEP,\n"
+                + "	mun.nome as municipio,\n"
+                + "	mun.uf as uf,\n"
+                + "	c.NOME_PAI as pai,\n"
+                + "	c.NOME_MAE as mae,\n"
+                + "	c.CONJUJE as conjuge,\n"
+                + "	c.OBSERVACAO,\n"
+                + "	CASE WHEN ATIVO = 'S' THEN 1\n"
+                + "	ELSE 0 END AS STATUS\n"
+                + "FROM\n"
+                + "	SUP024 C\n"
+                + "JOIN sup118 Mun ON\n"
+                + "	Mun.sup118 = c.sup118\n"
+                + "ORDER BY 1";
+
+        if (utilizarSup025) {
+            sqlCliente = "SELECT\n"
+                    + "	'D.'||c.sup025 AS  id,\n"
+                    + "	c.nome razao,\n"
+                    + "	c.APELIDO fantasia,\n"
+                    + "	c.NASCIMENTO dtnascimento,\n"
+                    + "	c.CPF cpfcnpj,\n"
+                    + "	c.rg inscricao,\n"
                     + "	c.TELEFONE1,\n"
                     + "	c.TELEFONE2,\n"
                     + "	c.CELULAR,\n"
                     + "	c.EMAIL,\n"
-                    + "	c.DTCADASTRO as datacadastro,\n"
-                    + "	c.DTALTERACAO,\n"
+                    + "	c.EMISSAO AS datacadastro,\n"
+                    + "	CASE\n"
+                    + "		WHEN c.BLOQUEADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END AS BLOQUEADO,\n"
+                    + "	c.databloq databloqueio,\n"
+                    + "	CASE\n"
+                    + "		WHEN c.CANCELADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END status,\n"
+                    + "	c.OBSERVACAO,\n"
+                    + "	c.PRAZO_PGTO,\n"
+                    + "	c.DIA_VENCTO vencimento,\n"
+                    + "	CASE\n"
+                    + "		WHEN c.CHEQUE_BLOQUEADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END permitechq,\n"
                     + "	c.ENDERECO,\n"
                     + "	c.NUMERO,\n"
                     + "	c.COMPLEMENTO,\n"
                     + "	c.BAIRRO,\n"
                     + "	c.CEP,\n"
-                    + "	mun.nome as municipio,\n"
-                    + "	mun.uf as uf,\n"
-                    + "	c.NOME_PAI as pai,\n"
-                    + "	c.NOME_MAE as mae,\n"
-                    + "	c.CONJUJE as conjuge,\n"
-                    + "	c.OBSERVACAO,\n"
-                    + "	CASE WHEN ATIVO = 'S' THEN 1\n"
-                    + "	ELSE 0 END AS STATUS\n"
+                    + "	mun.nome municipio,\n"
+                    + "	mun.uf uf,\n"
+                    + "	c.pai,\n"
+                    + "	c.MAE,\n"
+                    + "	c.CONJUGE,\n"
+                    + "	c.CPFCONJUGE,\n"
+                    + "	c.PROFISSAO,\n"
+                    + "	c.RENDAMENSAL SALARIO,\n"
+                    + "	c.LIMITE valorlimite\n"
                     + "FROM\n"
-                    + "	SUP024 C\n"
-                    + "JOIN sup118 Mun ON\n"
-                    + "	Mun.sup118 = c.sup118\n"
-                    + "WHERE\n"
-                    + "	sup999 = " + getLojaOrigem() + " --(Num. Loja)\n"
-                    + "ORDER BY 1"
-            )) {
+                    + "	SUP025 C\n"
+                    + "JOIN sup118 Mun ON Mun.sup118 = c.sup118\n"
+                    + "ORDER BY 1";
+        }
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sqlCliente)) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
@@ -743,13 +773,8 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    //imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    //imp.setDataBloqueio(rs.getDate("databloqueio"));
                     imp.setAtivo(rs.getBoolean("status"));
                     imp.setObservacao(rs.getString("OBSERVACAO"));
-                    //imp.setPrazoPagamento(rs.getInt("prazo_pgto"));
-                    //imp.setDiaVencimento(rs.getInt("vencimento"));
-                    //imp.setPermiteCheque(rs.getBoolean("permitechq"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -762,9 +787,17 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
-                    //imp.setCargo(rs.getString("profissao"));
-                    //imp.setSalario(rs.getDouble("salario"));
-                    //imp.setValorLimite(rs.getDouble("valorlimite"));
+                    
+                    if (utilizarSup025) {
+                        imp.setCargo(rs.getString("profissao"));
+                        imp.setSalario(rs.getDouble("salario"));
+                        imp.setValorLimite(rs.getDouble("valorlimite"));
+                        imp.setBloqueado(rs.getBoolean("bloqueado"));
+                        imp.setDataBloqueio(rs.getDate("databloqueio"));
+                        imp.setPrazoPagamento(rs.getInt("prazo_pgto"));
+                        imp.setDiaVencimento(rs.getInt("vencimento"));
+                        imp.setPermiteCheque(rs.getBoolean("permitechq"));
+                    }
 
                     result.add(imp);
                 }
@@ -776,30 +809,57 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        String rotativoCliente = "SELECT\n"
+                + "	d.SUP043 AS id,\n"
+                + "	c.SUP024 AS clienteid,\n"
+                + "	d.DUPLICATA AS numerocupom,\n"
+                + "	d.PARCIAL,\n"
+                + "	d.EMISSAO AS dataemissao,\n"
+                + "	d.VENCIMENTO AS dataevencimento,\n"
+                + "	d.DATA_PGTO,\n"
+                + "	d.VALOR,\n"
+                + "	d.VALOR_PAGO,\n"
+                + "	d.JUROS as juros,\n"
+                + "	d.DESCONTO,\n"
+                + "	d.ACRESCIMO,\n"
+                + "	d.OBSERVACAO as obs\n"
+                + "FROM\n"
+                + "	SUP043 d\n"
+                + "JOIN SUP024 c ON c.SUP024 = d.SUP024\n"
+                + "WHERE\n"
+                + "	d.VALOR_PAGO = 0\n"
+                + "	AND\n"
+                + " d.SUP029 <> 638\n"
+                + "	AND\n"
+                + "	d.SUP999 = " + getLojaOrigem() + " -- Num. Loja";
+
+        if (utilizarSup025) {
+            rotativoCliente = "SELECT \n"
+                    + " r.SUP026 AS id,\n"
+                    + " 'D.'||c.SUP025 AS clienteid,\n"
+                    + " r.CUPOM AS numerocupom,\n"
+                    + " r.DATA AS dataemissao,\n"
+                    + " r.DATAVENC AS dataevencimento,\n"
+                    + " r.DATA_PGTO,\n"
+                    + " r.VALOR,\n"
+                    + " r.VALOR_PAGO,\n"
+                    + " r.VALOR_DESC,\n"
+                    + " r.JUROS,\n"
+                    + " r.TOTAL_JUROS,\n"
+                    + " 'IMP' AS OBS\n"
+                    + "FROM SUP026 r\n"
+                    + "JOIN SUP025 c ON c.SUP025 = r.SUP025 \n"
+                    + "WHERE \n"
+                    + " r.VALOR_PAGO = 0\n"
+                    + " AND \n"
+                    + " r.VALOR > 0\n"
+                    + " AND \n"
+                    + " r.SUP999 = " + getLojaOrigem() + " -- Num. Loja";
+        }
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	d.SUP043 AS id,\n"
-                    + "	c.SUP024 AS clienteid,\n"
-                    + "	d.DUPLICATA AS numerocupom,\n"
-                    + "	d.PARCIAL,\n"
-                    + "	d.EMISSAO AS dataemissao,\n"
-                    + "	d.VENCIMENTO AS dataevencimento,\n"
-                    + "	d.DATA_PGTO,\n"
-                    + "	d.VALOR,\n"
-                    + "	d.VALOR_PAGO,\n"
-                    + "	d.JUROS as juros,\n"
-                    + "	d.DESCONTO,\n"
-                    + "	d.ACRESCIMO,\n"
-                    + "	d.OBSERVACAO as obs\n"
-                    + "FROM\n"
-                    + "	SUP043 d\n"
-                    + "JOIN SUP024 c ON c.SUP024 = d.SUP024\n"
-                    + "WHERE\n"
-                    + "	d.VALOR_PAGO = 0\n"
-                    + "	AND\n"
-                    + "	d.SUP999 = " + getLojaOrigem() + "-- Num. Loja"
-            )) {
+            try (ResultSet rs = stm.executeQuery(rotativoCliente)) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
