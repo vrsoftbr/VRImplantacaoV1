@@ -26,6 +26,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -247,6 +248,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pr.estoque_minimo as estoqueminimo,\n"
                     + "    pr.estoque_maximo as estoquemaximo,\n"
                     + "    pr.estoque_fiscal as estoque ,\n"
+                    + "    pr.inativo, \n"        
                     + "    icm.tributacao as csticms,\n"
                     + "    icm.icms as aliqicms,\n"
                     + "    icm.icms_base_reducao as redicms\n"
@@ -285,6 +287,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setSituacaoCadastro(rst.getInt("inativo") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
