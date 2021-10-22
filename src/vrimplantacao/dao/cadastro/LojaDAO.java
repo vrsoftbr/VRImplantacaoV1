@@ -14,6 +14,8 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2_5.vo.cadastro.TecladoLayoutFuncaoVO;
+import vrimplantacao2_5.vo.cadastro.TecladoLayoutVO;
 
 public class LojaDAO {
 
@@ -418,7 +420,9 @@ public class LojaDAO {
         return sqlInsert;
     }
 
-    public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
+    public List<TecladoLayoutVO> getTecladoLayout(LojaVO i_loja) throws Exception {
+        List<TecladoLayoutVO> result = new ArrayList<>();
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
@@ -429,47 +433,89 @@ public class LojaDAO {
                     + "WHERE id_loja = " + i_loja.getIdCopiarLoja()
             )) {
                 while (rst.next()) {
-                    int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
-
-                    SQLBuilder sqlTecladoLayout = new SQLBuilder();
-                    sqlTecladoLayout.setSchema("pdv");
-                    sqlTecladoLayout.setTableName("tecladolayout");
-
-                    sqlTecladoLayout.put("id", proximoIdTecladoLayout);
-                    sqlTecladoLayout.put("id_loja", i_loja.getId());
-                    sqlTecladoLayout.put("descricao", rst.getString("descricao"));
-
-                    stm.execute(sqlTecladoLayout.getInsert());
+                    TecladoLayoutVO vo = new TecladoLayoutVO();
+                    vo.setIdTecladoLayoutCopiado(rst.getInt("id"));
+                    vo.setDescricao(rst.getString("descricao"));
+                    result.add(vo);
                 }
+            }
+            return result;
+        }
+    }
+    
+    public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
+        
+        List<TecladoLayoutVO> tecladoLayoutVO = getTecladoLayout(i_loja);
+        
+        try (Statement stm = Conexao.createStatement()) {
+            for (TecladoLayoutVO vo : tecladoLayoutVO) {
+
+                int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
+
+                SQLBuilder sqlTecladoLayout = new SQLBuilder();
+                sqlTecladoLayout.setSchema("pdv");
+                sqlTecladoLayout.setTableName("tecladolayout");
+
+                sqlTecladoLayout.put("id", proximoIdTecladoLayout);
+                sqlTecladoLayout.put("id_loja", i_loja.getId());
+                sqlTecladoLayout.put("descricao", vo.getDescricao());
+
+                stm.execute(sqlTecladoLayout.getInsert());
             }
         }
     }
 
-    public void copiarPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
+    public List<TecladoLayoutFuncaoVO> getPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
+        List<TecladoLayoutFuncaoVO> result = new ArrayList<>();
+        
+        List<TecladoLayoutVO> tecladoLayout = getTecladoLayout(i_loja);
+        
         try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "     tl.id as idtecladolayout, \n"
-                    + "     tlf.codigoretorno, \n"
-                    + "     tlf.id_funcao \n"
-                    + "FROM pdv.tecladolayoutfuncao AS tlf \n"
-                    + "INNER JOIN pdv.tecladolayout AS tl ON tl.id = tlf.id_tecladolayout \n"
-                    + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja()
-            )) {
-                while (rst.next()) {
-                    int proximoIdLayoutFuncao = new CodigoInternoDAO().get("pdv.tecladolayoutfuncao");
-
-                    SQLBuilder sqlTecladoLayoutFuncao = new SQLBuilder();
-                    sqlTecladoLayoutFuncao.setSchema("pdv");
-                    sqlTecladoLayoutFuncao.setTableName("tecladolayoutfuncao");
-
-                    sqlTecladoLayoutFuncao.put("id", proximoIdLayoutFuncao);
-                    sqlTecladoLayoutFuncao.put("id_tecladolayout", rst.getString("idtecladolayout"));
-                    sqlTecladoLayoutFuncao.put("codigoretorno", rst.getString("codigoretorno"));
-                    sqlTecladoLayoutFuncao.put("id_funcao", rst.getString("id_funcao"));
-
-                    stm.execute(sqlTecladoLayoutFuncao.getInsert());
+            
+            for (TecladoLayoutVO tecladoLayoutVO : tecladoLayout) {
+                
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "     tl.id as idtecladolayout, \n"
+                        + "     tlf.codigoretorno, \n"
+                        + "     tlf.id_funcao \n"
+                        + "FROM pdv.tecladolayoutfuncao AS tlf \n"
+                        + "INNER JOIN pdv.tecladolayout AS tl ON tl.id = tlf.id_tecladolayout \n"
+                        + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                        + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
+                )) {
+                    while (rst.next()) {
+                        TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
+                        vo.setIdTecladoLayout(rst.getInt("idtecladolayout"));
+                        vo.setCodigoRetorno(rst.getInt("codigoretorno"));
+                        vo.setIdFuncao(rst.getInt("id_funcao"));
+                        
+                        result.add(vo);
+                    }
                 }
+            }
+        }
+        return result;
+    }
+        
+    public void copiarPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
+
+        List<TecladoLayoutFuncaoVO> tecladoLayoutFuncao = getPdvTecladoLayoutFuncao(i_loja);
+
+        try (Statement stm = Conexao.createStatement()) {
+            for (TecladoLayoutFuncaoVO vo : tecladoLayoutFuncao) {
+                int proximoIdLayoutFuncao = new CodigoInternoDAO().get("pdv.tecladolayoutfuncao");
+
+                SQLBuilder sqlTecladoLayoutFuncao = new SQLBuilder();
+                sqlTecladoLayoutFuncao.setSchema("pdv");
+                sqlTecladoLayoutFuncao.setTableName("tecladolayoutfuncao");
+
+                sqlTecladoLayoutFuncao.put("id", proximoIdLayoutFuncao);
+                sqlTecladoLayoutFuncao.put("id_tecladolayout", vo.getIdTecladoLayout());
+                sqlTecladoLayoutFuncao.put("codigoretorno", vo.getCodigoRetorno());
+                sqlTecladoLayoutFuncao.put("id_funcao", vo.getIdFuncao());
+
+                stm.execute(sqlTecladoLayoutFuncao.getInsert());
             }
         }
     }
