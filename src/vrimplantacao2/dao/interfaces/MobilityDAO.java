@@ -699,6 +699,14 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    public void setVendaDataInicio(Date vendaDataInicio) {
+        this.vendaDataInicio = vendaDataInicio;
+    }
+
+    public void setVendaDataTermino(Date vendaDataTermino) {
+        this.vendaDataTermino = vendaDataTermino;
+    }
+    
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);

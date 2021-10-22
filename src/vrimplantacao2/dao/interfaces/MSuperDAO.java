@@ -24,6 +24,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -487,30 +488,37 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	sup010 id,\n"
-                    + "	razaosocial razao,\n"
-                    + "	fantasia,\n"
-                    + "	cgc cnpj_cpf,\n"
-                    + "	inscricao ie_rg,\n"
-                    + "	inscmunicipal insc_municipal,\n"
-                    + "	case when ativo = 'S' then 1 else 0 end ativo,\n"
-                    + "	endereco,\n"
-                    + "	numero,\n"
-                    + "	complemento,\n"
-                    + "	bairro,\n"
-                    + "	cep,\n"
+                      "SELECT\n"
+                    + "	f.sup010 id,\n"
+                    + "	f.razaosocial razao,\n"
+                    + "	f.fantasia,\n"
+                    + "	f.cgc cnpj_cpf,\n"
+                    + "	f.inscricao ie_rg,\n"
+                    + "	f.inscmunicipal insc_municipal,\n"
+                    + "	case when f.ativo = 'S' then 1 else 0 end as ativo,\n"
+                    + "	f.endereco,\n"
+                    + "	f.numero,\n"
+                    + "	f.complemento,\n"
+                    + "	f.bairro,\n"
+                    + "	f.cep,\n"
                     + "	c.nome municipio,\n"
                     + "	f.sup118 ibge_municipio,\n"
                     + "	c.uf uf,\n"
-                    + "	telefone tel_principal,\n"
-                    + "	dtcadastro datacadastro,\n"
-                    + "	obs observacao\n"
+                    + "	f.telefone as tel_principal,\n"
+                    + "	cnt.NOME as nomecontato,\n"
+                    + "	cnt.TELEFONE as telefone,\n"
+                    + "	cnt.TELEFONE2 as telefone2,\n"
+                    + "	cnt.CELULAR as celular,\n"
+                    + "	cnt.FAX as fax,\n"
+                    + "	cnt.EMAIL as email,\n"
+                    + "	f.dtcadastro datacadastro,\n"
+                    + "	f.obs observacao\n"
                     + "FROM\n"
                     + "	sup010 f\n"
                     + "JOIN sup118 c ON c.sup118 = f.sup118\n"
+                    + "LEFT JOIN SUP012 cnt ON cnt.SUP010 = f.SUP010 \n"
                     + "WHERE\n"
-                    + "	sup999 = " + getLojaOrigem() + "\n"
+                    + "	f.sup999 = " + getLojaOrigem() + "\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -536,6 +544,24 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rst.getString("tel_principal"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
+
+                    imp.addContato(
+                            rst.getString("nomecontato"),
+                            rst.getString("telefone"),
+                            rst.getString("celular"),
+                            TipoContato.COMERCIAL,
+                            rst.getString("email"));
+
+                    if (rst.getString("telefone2") != null && !rst.getString("telefone2").isEmpty()) {
+                            
+                        imp.addContato(
+                            rst.getString("nomecontato"), 
+                            rst.getString("telefone2"), 
+                            null, 
+                            TipoContato.COMERCIAL, 
+                            null);
+                    }
+                    
 
                     result.add(imp);
                 }
@@ -787,7 +813,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
-                    
+
                     if (utilizarSup025) {
                         imp.setCargo(rs.getString("profissao"));
                         imp.setSalario(rs.getDouble("salario"));
@@ -907,8 +933,12 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n"
                     + "	v.SUP184 AS id,\n"
-                    + "	v.COO AS numerocupom,\n"
-                    + "	s.ECF_NUMERO AS ecf,\n"
+                    + "	CAST(v.COO AS INT) AS numerocupom,\n"
+                    + "	s.ECF_NUMERO,\n"
+                    + " CAST(V.CAIXA AS INT) as CAIXA,\n"
+                    + " CASE WHEN v.ECF_SERIE =  'IMP NAO FISCAL' \n"
+                    + " THEN \n"
+                    + " V.CAIXA ELSE s.ECF_NUMERO END AS ecf, \n"
                     + "	v.ECF_SERIE AS numeroserie,\n"
                     + "	v.DATA,\n"
                     + "	CASE\n"
@@ -949,8 +979,8 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (rst.next()) {
                     VendaIMP imp = new VendaIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setNumeroCupom(Utils.stringToInt(imp.getId()));
-                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setNumeroCupom(rst.getInt("numerocupom"));
+                    imp.setEcf(rst.getInt("CAIXA"));
                     imp.setData(rst.getDate("data"));
 
                     String horaInicio = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horainicio");
@@ -1013,7 +1043,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	END AS cancelado,\n"
                     + "	v.DESCONTO,\n"
                     + "	v.ACRESCIMO,\n"
-                    + "	v.TOTAL AS valor,\n"
+                    + "	v.UNITARIO AS valor,\n"
                     + "	tr.DESCRICAO AS unidade,\n"
                     + "	v.CST_ICMS AS cst,\n"
                     + "	v.VL_ICMS AS aliquota\n"
@@ -1059,8 +1089,6 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorAcrescimo(rst.getDouble("acrescimo"));
                     imp.setCodigoBarras(rst.getString("ean"));
                     imp.setUnidadeMedida(rst.getString("unidade"));
-                    imp.setIcmsCst(rst.getInt("cst"));
-                    imp.setIcmsAliq(rst.getDouble("aliquota"));
                     imp.setCancelado(rst.getBoolean("cancelado"));
 
                     return imp;
