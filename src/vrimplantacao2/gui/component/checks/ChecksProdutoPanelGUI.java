@@ -1449,10 +1449,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         addTab("Importação de Produtos", scrollImportação);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-        
-    }//GEN-LAST:event_btnMapaTributActionPerformed
-
     private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
         chkPautaUsarEansMenores.setEnabled(rdbPautaEan.isSelected());
     }//GEN-LAST:event_rdbPautaEanActionPerformed

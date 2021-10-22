@@ -275,6 +275,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                         }
                         
                         if (chkFContasAPagar.isSelected()) {
+                            dao.setContaPagarBaixado(chkCPBaixados.isSelected());
+                            
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
 
@@ -420,6 +422,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         chkFPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkFContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkCPBaixados = new vrframework.bean.checkBox.VRCheckBox();
         tabConvenio = new javax.swing.JPanel();
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
@@ -697,6 +700,14 @@ public class RMSGUI_2 extends VRInternalFrame {
             }
         });
 
+        chkCPBaixados.setText("Importar Baixados");
+        chkCPBaixados.setEnabled(true);
+        chkCPBaixados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCPBaixadosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
         vRPanel8.setLayout(vRPanel8Layout);
         vRPanel8Layout.setHorizontalGroup(
@@ -705,6 +716,9 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(vRPanel8Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel8Layout.createSequentialGroup()
                         .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -712,7 +726,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                     .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(422, Short.MAX_VALUE))
+                .addContainerGap(394, Short.MAX_VALUE))
         );
         vRPanel8Layout.setVerticalGroup(
             vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -730,7 +744,9 @@ public class RMSGUI_2 extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(201, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(154, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
@@ -1388,10 +1404,15 @@ public class RMSGUI_2 extends VRInternalFrame {
         );
     }//GEN-LAST:event_tipoVendaSelect
 
+    private void chkCPBaixadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCPBaixadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCPBaixadosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkBancoUnificado;
+    private vrframework.bean.checkBox.VRCheckBox chkCPBaixados;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
