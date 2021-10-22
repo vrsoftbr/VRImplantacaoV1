@@ -42,7 +42,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
-    
+
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
@@ -54,7 +54,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date vendaDataIni;
     private Date vendaDataFim;
-    
+
     public void setVendaDataIni(Date vendaDataIni) {
         this.vendaDataIni = vendaDataIni;
     }
@@ -62,7 +62,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -120,13 +120,11 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
-                            OpcaoFornecedor.DADOS,
-                            OpcaoFornecedor.ENDERECO,
-                            OpcaoFornecedor.CONTATOS,
-                            OpcaoFornecedor.PAGAR_FORNECEDOR));
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
-    
-    
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -360,7 +358,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN ST_CD_UF scu ON scu.UF = scc.UF \n"
                     + "LEFT JOIN SM_CD_MO_SITUACAO scms ON scms.COD = f.PD_SITUACAO\n"
                     + "LEFT JOIN SM_CD_MO_MOVIMENTADOR_CL scmmc ON scmmc.COD = f.COD\n"
-                    + "WHERE PD_CNPJ_CPF_TIPO = 1\n"
+                    + "WHERE TIPO like '%0%'\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -376,7 +374,6 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rs.getString("ie_rg"));
 
                     imp.setTelefone(rs.getString("telefone1"));
-                    //imp.setFax(rs.getString("telefone2"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
@@ -414,7 +411,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
@@ -508,87 +505,130 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }*/
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	cr.LANCTO id,\n"
+                    + "	a.movimentador id_cliente,\n"
+                    + "	b.PD_CNPJ_CPF cnpj_cpf,\n"
+                    + "	a.emissao,\n"
+                    + "	cr.vencimento,\n"
+                    + "	cr.PARCELA,\n"
+                    + "	cr.VALOR,\n"
+                    + "	a.observacao\n"
+                    + "FROM \n"
+                    + "	sm_mv_fi_tl_pa_titulo cr\n"
+                    + "JOIN sm_mv_fi_tl_cb_titulo A ON A.empresa = cr.empresa AND a.lancto = CR.lancto\n"
+                    + "JOIN sm_cd_mo_movimentador B ON a.movimentador = B.COD\n"
+                    + "WHERE \n"
+                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND B.tipo like '%0%'\n"
+                    + "	AND cr.BAIXA IS NULL"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj_cpf"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setObservacao(rs.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	cb.lancto id,\n" +
-                    "	cb.empresa idempresa,\n" +
-                    "	em.nome as empresa,\n" +
-                    "	cb.movimentador idfornecedor,\n" +
-                    "	fo.pd_nome as razao,\n" +
-                    "	fo.pd_cnpj_cpf_tipo as tipo,\n" +
-                    "	fo.pd_cnpj_cpf as cnpj_cpf,\n" +
-                    "	pa.parcela,\n" +
-                    "	cb.ref,\n" +
-                    "	tc.dsc as cobranca,\n" +
-                    "	cb.emissao,\n" +
-                    "	pa.vencimento,\n" +
-                    "	pa.documento,\n" +
-                    "	cb.historico,\n" +
-                    "	cb.valor_total,\n" +
-                    "	pa.valor as valor_parcela,\n" +
-                    "	cb.tipo_moeda,\n" +
-                    "	pa.valor_moeda as valor_parcela_moeda,\n" +
-                    "	pa.baixa,\n" +
-                    "	pa.valor_baixa,\n" +
-                    "	pa.valor_baixa_corrigido,\n" +
-                    "	pa.multa,\n" +
-                    "	pa.juro,\n" +
-                    "	pa.desconto,\n" +
-                    "	pa.variacao_moeda,\n" +
-                    "	pa.valor_baixa_quita,\n" +
-                    "	cb.observacao\n" +
-                    "from\n" +
-                    "	sm_mv_fi_tl_pa_titulo pa\n" +
-                    "join st_cd_empresas em on\n" +
-                    "	pa.empresa = em.codigo\n" +
-                    "join sm_mv_fi_tl_cb_titulo cb on\n" +
-                    "	pa.empresa = cb.empresa\n" +
-                    "	and pa.lancto = cb.lancto\n" +
-                    "join sm_cd_mo_movimentador fo on\n" +
-                    "	cb.movimentador = fo.cod\n" +
-                    "join sm_cd_mo_movimentador_fo_a fa on\n" +
-                    "	cb.empresa = fa.empresa\n" +
-                    "	and cb.movimentador = fa.cod\n" +
-                    "join sm_cd_mo_movimentador_fo_e fe on\n" +
-                    "	cb.empresa = fe.empresa\n" +
-                    "	and cb.movimentador = fe.cod\n" +
-                    "join sm_cd_fi_tpcobranca tc on\n" +
-                    "	cb.empresa = tc.empresa\n" +
-                    "	and cb.tipo_cobranca = tc.cod\n" +
-                    "left join sm_cd_fi_operacoes_lancto op on\n" +
-                    "	cb.empresa = op.empresa\n" +
-                    "	and cb.operacao = op.cod\n" +
-                    "left join sm_cd_mo_tipo tf on\n" +
-                    "	fo.pd_tipo = tf.cod\n" +
-                    "left join sm_cd_fi_banco bc on\n" +
-                    "	fa.ad_banco = bc.cod\n" +
-                    "left join sm_cd_fi_contrato cn on\n" +
-                    "	cb.empresa = cn.empresa\n" +
-                    "	and cb.contrato = cn.cod\n" +
-                    "left join sm_mv_fi_tl_pa_at_titulo ap on\n" +
-                    "	pa.empresa = ap.empresa\n" +
-                    "	and pa.lancto = ap.lancto\n" +
-                    "	and pa.parcela = ap.parcela\n" +
-                    "	and pa.origem = ap.origem\n" +
-                    "left join sm_cd_fi_formapgto fp on\n" +
-                    "	cb.empresa = fp.empresa\n" +
-                    "	and cb.formapgto = fp.cod\n" +
-                    "left join sm_cd_fi_cb_condicaopgto cg on\n" +
-                    "	cb.empresa = cg.empresa\n" +
-                    "	and cb.condicaopgto = cg.cod\n" +
-                    "where fo.pd_cnpj_cpf_tipo = 0 and \n" +
-                    "	cb.empresa = " + getLojaOrigem() + " AND \n" +
-                    "	pa.valor_baixa < pa.valor")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	cb.lancto id,\n"
+                    + "	cb.empresa idempresa,\n"
+                    + "	em.nome as empresa,\n"
+                    + "	cb.movimentador idfornecedor,\n"
+                    + "	fo.pd_nome as razao,\n"
+                    + "	fo.pd_cnpj_cpf_tipo as tipo,\n"
+                    + "	fo.pd_cnpj_cpf as cnpj_cpf,\n"
+                    + "	pa.parcela,\n"
+                    + "	cb.ref,\n"
+                    + "	tc.dsc as cobranca,\n"
+                    + "	cb.emissao,\n"
+                    + "	pa.vencimento,\n"
+                    + "	pa.documento,\n"
+                    + "	cb.historico,\n"
+                    + "	cb.valor_total,\n"
+                    + "	pa.valor as valor_parcela,\n"
+                    + "	cb.tipo_moeda,\n"
+                    + "	pa.valor_moeda as valor_parcela_moeda,\n"
+                    + "	pa.baixa,\n"
+                    + "	pa.valor_baixa,\n"
+                    + "	pa.valor_baixa_corrigido,\n"
+                    + "	pa.multa,\n"
+                    + "	pa.juro,\n"
+                    + "	pa.desconto,\n"
+                    + "	pa.variacao_moeda,\n"
+                    + "	pa.valor_baixa_quita,\n"
+                    + "	cb.observacao\n"
+                    + "from\n"
+                    + "	sm_mv_fi_tl_pa_titulo pa\n"
+                    + "join st_cd_empresas em on\n"
+                    + "	pa.empresa = em.codigo\n"
+                    + "join sm_mv_fi_tl_cb_titulo cb on\n"
+                    + "	pa.empresa = cb.empresa\n"
+                    + "	and pa.lancto = cb.lancto\n"
+                    + "join sm_cd_mo_movimentador fo on\n"
+                    + "	cb.movimentador = fo.cod\n"
+                    + "join sm_cd_mo_movimentador_fo_a fa on\n"
+                    + "	cb.empresa = fa.empresa\n"
+                    + "	and cb.movimentador = fa.cod\n"
+                    + "join sm_cd_mo_movimentador_fo_e fe on\n"
+                    + "	cb.empresa = fe.empresa\n"
+                    + "	and cb.movimentador = fe.cod\n"
+                    + "join sm_cd_fi_tpcobranca tc on\n"
+                    + "	cb.empresa = tc.empresa\n"
+                    + "	and cb.tipo_cobranca = tc.cod\n"
+                    + "left join sm_cd_fi_operacoes_lancto op on\n"
+                    + "	cb.empresa = op.empresa\n"
+                    + "	and cb.operacao = op.cod\n"
+                    + "left join sm_cd_mo_tipo tf on\n"
+                    + "	fo.pd_tipo = tf.cod\n"
+                    + "left join sm_cd_fi_banco bc on\n"
+                    + "	fa.ad_banco = bc.cod\n"
+                    + "left join sm_cd_fi_contrato cn on\n"
+                    + "	cb.empresa = cn.empresa\n"
+                    + "	and cb.contrato = cn.cod\n"
+                    + "left join sm_mv_fi_tl_pa_at_titulo ap on\n"
+                    + "	pa.empresa = ap.empresa\n"
+                    + "	and pa.lancto = ap.lancto\n"
+                    + "	and pa.parcela = ap.parcela\n"
+                    + "	and pa.origem = ap.origem\n"
+                    + "left join sm_cd_fi_formapgto fp on\n"
+                    + "	cb.empresa = fp.empresa\n"
+                    + "	and cb.formapgto = fp.cod\n"
+                    + "left join sm_cd_fi_cb_condicaopgto cg on\n"
+                    + "	cb.empresa = cg.empresa\n"
+                    + "	and cb.condicaopgto = cg.cod\n"
+                    + "where fo.tipo like '%1%' and \n"
+                    + "	cb.empresa = " + getLojaOrigem() + " AND \n"
+                    + "	pa.valor_baixa < pa.valor")) {
+                while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
@@ -596,12 +636,12 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpj(rs.getString("cnpj_cpf"));
                     imp.setNumeroDocumento(rs.getString("documento"));
                     imp.setObservacao(rs.getString("historico"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -640,7 +680,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN ST_CD_CIDADES scc ON scc.CODIGO = f.PD_CIDADE \n"
                     + "LEFT JOIN ST_CD_UF scu ON scu.UF = scc.UF \n"
                     + "LEFT JOIN SM_CD_MO_SITUACAO scms ON scms.COD = f.PD_SITUACAO\n"
-                    + "WHERE PD_CNPJ_CPF_TIPO = 0\n"
+                    + "WHERE TIPO like '%1%'\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -748,12 +788,12 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
-                        
+
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        
+
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                     }
                 }
