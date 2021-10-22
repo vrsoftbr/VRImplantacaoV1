@@ -97,6 +97,7 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
+                OpcaoCliente.RAZAO,
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.CEP,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO

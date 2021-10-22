@@ -46,11 +46,8 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIva;
-import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
-import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -87,6 +84,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     public static String tabela_venda = "";
     public static int digito;
     private boolean digitoCliente = false;
+    private boolean contaPagarBaixado = false;
 
     private boolean utilizarViewMixFiscal = true;
     private Date dataFinalTroca;
@@ -94,6 +92,14 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     private int versaoDaVenda;
 
     private boolean somenteAtivos = false;
+
+    public boolean isContaPagarBaixado() {
+        return contaPagarBaixado;
+    }
+
+    public void setContaPagarBaixado(boolean contaPagarBaixado) {
+        this.contaPagarBaixado = contaPagarBaixado;
+    }
 
     public void setSomenteAtivos(boolean somenteAtivos) {
         this.somenteAtivos = somenteAtivos;
@@ -1435,7 +1441,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "    lan.lanc_codigo,\n"
+                        + "    'CR'||lan.lanc_codigo cliente,\n"
                         + "    sum(lan.lanc_valor) valor\n"
                         + "from\n"
                         + "    ac1clanc lan\n"
@@ -1445,6 +1451,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    lan.lanc_tipo = 2\n"
                         + "    and lan.lanc_modalidade in (2, 3)\n"
                         + "    and c.cli_convenio = 0\n"
+                        + "    and lan.lanc_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)        
                         + "group by\n"
                         + "    lan.lanc_codigo\n"
                         + "order by\n"
@@ -1455,22 +1462,23 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         if (valor < 0) {
                             valor *= -1;
                         }
-                        pagamentos.put(rst.getString("lanc_codigo"), MathUtils.trunc(valor, 2));
+                        pagamentos.put(rst.getString("cliente"), MathUtils.trunc(valor, 2));
                     }
                 }
             }
 
-            System.out.println("Pagamentos: " + pagamentos.size() + " (209015) = " + pagamentos.get("209015"));
+            System.out.println("Pagamentos: " + pagamentos.size());
 
             CreditoRotativoDAO rotDao = new CreditoRotativoDAO();
             CreditoRotativoItemDAO dao = new CreditoRotativoItemDAO();
             CreditoRotativoItemAnteriorDAO antDao = new CreditoRotativoItemAnteriorDAO();
-            MultiMap<String, CreditoRotativoItemAnteriorVO> baixasAnteriores = antDao.getBaixasAnteriores(null, null);
+            MultiMap<String, CreditoRotativoItemAnteriorVO> baixasAnteriores = 
+                    antDao.getBaixasAnteriores(getSistema(), getLojaOrigem());
 
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "	 ant.sistema,\n"
+                        + "    ant.sistema,\n"
                         + "    ant.loja,\n"
                         + "    ant.id_cliente,\n"
                         + "    ant.id,\n"
@@ -1480,8 +1488,10 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    r.datavencimento\n"
                         + "from \n"
                         + "	implantacao.codant_recebercreditorotativo ant\n"
-                        + "    join recebercreditorotativo r on\n"
+                        + "     join recebercreditorotativo r on\n"
                         + "    	ant.codigoatual = r.id\n"
+                        + "where ant.sistema = '" + getSistema() + "' and\n"
+                        + "     ant.loja = '" + getLojaOrigem() + "'\n"
                         + "order by\n"
                         + "	ant.id_cliente, r.datavencimento"
                 )) {
@@ -1637,28 +1647,26 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "   lanc_codigo||'-'||lanc_data||'-'||lanc_seq id,\n" +        
-                    "	'CR'||NVL(CLI_CODIGO||DAC(CLI_CODIGO),LANC_CODIGO) AS CLIENTE,\n" +
-                    "	DEP_CODIGO,\n" +
-                    "	DEP_CLIENTE.CLI_CODIGO as DEP_CLI_CODIGO,\n" +
-                    "   case lanc_cupom when 0 then lanc_documento else lanc_cupom end numerocupom,\n" +
-                    "	AC1CLANC.*,\n" +
-                    "	A.CONV_CODIGO,\n" +
-                    "	A.CONV_DESCRICAO\n" +
+                    "  lanc_codigo||'-'||lanc_data||'-'||lanc_seq id,        \n" +
+                    "  'CR'||NVL(C.CLI_CODIGO||DAC(C.CLI_CODIGO),LANC_CODIGO) AS CLIENTE,\n" +
+                    "  LANC_TIPO,\n" +
+                    "  DEP_CLIENTE.CLI_CODIGO as DEP_CLI_CODIGO,\n" +
+                    "  case lanc_cupom when 0 then lanc_documento else lanc_cupom end numerocupom,\n" +
+                    "  AC1CLANC.*\n" +
                     "from\n" +
                     "	AC1CLANC,\n" +
                     "	DEP_CLIENTE,\n" +
-                    "	AC1CCONV A\n" +
+                    "   CAD_CLIENTE C\n" +
                     "where\n" +
                     "	trunc(LANC_CODIGO / 10) = DEP_CODIGO (+)\n" +
                     "	and DEP_CLIENTE.cli_codigo (+)> 0\n" +
+                    "   and C.CLI_CODIGO||C.CLI_DIGITO = LANC_CODIGO\n" +
                     "	and LANC_DATA >= 0\n" +
                     "	and LANC_SEQ >= 0\n" +
-                    //"	and LANC_DATA >= 1211001\n" +
-                    //"	and LANC_DATA <= 1211018\n" +
-                    "	and LANC_TIPO in(0, 1, 2, 3, 4)\n" +
-                    "	and LANC_CONVENIO = A.CONV_CODIGO(+)\n" +
-                    "   and LANC_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)
+                    "   and lanc_tipo = 1\n" +
+                    "	and lanc_modalidade in (2, 3)\n" +
+                    "   and LANC_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
+                    "   and c.cli_convenio = 0"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -1730,34 +1738,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       AS DUP_DT_PAG, \n" +
                     "       0 DIAS, \n" +
                     "       DUP_VALOR, \n" +
+                    "       DUP_DESC, \n" +        
                     "      (DUP_VALOR-DUP_DESC-DUP_ABATIMENTO+DUP_JUROS+DUP_CORRECAO) VALOR_LIQ, \n" +
-                    "       (select 'O'\n" +
-                    "          from AA1ROBSR\n" +
-                    "         where OBS_TITULO   = DUP_TITULO\n" +
-                    "           and OBS_DESD     = DUP_DESD\n" +
-                    "           and OBS_COD_FIL  = DUP_COD_FIL\n" +
-                    "           and ROWNUM <=1)    \n" +
-                    "    || (select decode(nvl(imp_fatura,0),0,decode(por_dup_fita,'F','B'\n" +
-                    "                                                ,'B','B' ,NULL) ,NULL)\n" +
-                    "          from aa1rport, aa1rimti, aa1rtitu dup2\n" +
-                    "         where por_portador       (+) = dup2.dup_port\n" +
-                    "           and imp_fatura_alt_3   (+) = dup2.dup_titulo\n" +
-                    "           and imp_desd_alt_3     (+) = dup2.dup_desd\n" +
-                    "           and imp_loja_alt_3     (+) = dup2.dup_fil_8\n" +
-                    "           and imp_operacao_alt_3 (+) = 1\n" +
-                    "           and dup2.dup_titulo        = dup.dup_titulo\n" +
-                    "           and dup2.dup_desd          = dup.dup_desd\n" +
-                    "           and dup2.dup_venc          = dup.dup_venc\n" +
-                    "           and dup2.dup_cod_cli       = dup.dup_cod_cli\n" +
-                    "           and dup2.dup_cod_fil       = dup.dup_cod_fil\n" +
-                    "           and dup2.dup_agenda        = dup.dup_agenda)\n" +
-                    "    || (select 'P'\n" +
-                    "          from ag1pagcp\n" +
-                    "         where cpd_forpri = dup_clipri\n" +
-                    "           and cpm_dtpg   = 0\n" +
-                    "           and rownum     <=1) as obs,\n" +
-                    "       DECODE(BX_PGTO,'',0, -1) AS  ATUALIZA, \n" +
-                    "       0 TAXA,\n" +
                     "       DUP_CGC_CPF, \n" +
                     "       DUP_JUROS, \n" +
                     "       DUP_DESC, \n" +
@@ -1775,14 +1757,6 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       ,DECODE(NVL(FRD_TIT,0),0,'N','S') AS FACTORAGEM\n" +
                     "       ,ADICIONA_SECULO(DUP_DT_CRED) DUP_DT_CRED\n" +
                     "       ,DUP_DOC_CREDITO\n" +
-                    "       ,NVL((SELECT 'S' \n" +
-                    "               FROM AG1AUABT  \n" +
-                    "              WHERE ABT_FOR_CLI     (+) = DUP_CLIPRI * 10 + DAC(DUP_CLIPRI) \n" +
-                    "                AND ABT_TITULO      (+) = DUP_TITULO  \n" +
-                    "                AND ABT_DESD        (+) = DUP_DESD  \n" +
-                    "                AND ABT_COD_FIL     (+) = DUP_COD_FIL  \n" +
-                    "                AND ABT_DIG_FIL     (+) = DUP_DIG_FIL \n" +
-                    "                AND ROWNUM <=1),'N')     AS TEM_ABATIMENTO \n" +
                     "       ,DUP_EMPRESA\n" +
                     "       ,BX_TIPO,\n" +
                     "       LPAD(DUP_COD_CLI,7,' ') || '-' || DUP_DIG_CLI CODIGO \n" +
@@ -2272,41 +2246,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
 
-        String sqlBaixas = "select\n"
-                + "   cp.cpd_cgc_cpf cnpj,\n"
-                + "   F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
-                + "   cp.cpd_forne,\n"
-                + "   cp.cpd_ntfis numerodocumento,\n"
-                + "   cp.cpd_emissao dataemissao,\n"
-                + "   cp.cpd_dt_emi,\n"
-                + "   cp.cpd_recep dataentrada,\n"
-                + "   cp.cpd_dt_inclusao,\n"
-                + "   cp.cpd_vrnota valor,\n"
-                + "   cp.cpd_loja id_loja,\n"
-                + "   cp.cpd_dta_baixa,\n"
-                + "   cp.cpd_ven_org,\n"
-                + "   cp.cpd_serie,\n"
-                + "   cp.cpd_ntfis,\n"
-                + "   cp.cpd_vlr_pago_cheque,\n"
-                + "   cp.cpd_vlr_pago_dinhei,    \n"
-                + "   case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n"
-                + "   cp.cpm_banco,\n"
-                + "   cp.cpd_agencia_emp,\n"
-                + "   cp.cpd_conta_emp,\n"
-                + "   cp.cpm_ncheq,\n"
-                + "   cp.cpm_venc datavencimento,\n"
-                + "   cp.cpd_duplicata duplicata\n"
-                + "from\n"
-                + "   ag1pagcp cp\n"
-                + "   join AA2CTIPO F on\n"
-                + "		cp.cpd_forne = f.TIP_CODIGO\n"
-                + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
-                + "and CPD_DTA_BAIXA > 0 \n"
-                + "and cpd_dt_inclusao >= 190101\n"
-                + "order by\n"
-                + "   cp.cpd_emissao";
-
-        String sqlAbertos = "select\n"
+        String scriptCP = 
+                "select\n"
                 + "    cp.cpd_cgc_cpf cnpj,\n"
                 + "    F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n"
                 + "    cp.cpd_forne,\n"
@@ -2316,6 +2257,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    cp.cpd_recep dataentrada,\n"
                 + "    cp.cpd_dt_inclusao,\n"
                 + "    cp.cpd_vrnota valor,\n"
+                + "    cp.cpd_desc desconto,\n"
                 + "    cp.cpd_loja id_loja,\n"
                 + "    cp.cpd_dta_baixa,\n"
                 + "    cp.cpd_ven_org,\n"
@@ -2334,13 +2276,13 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    ag1pagcp cp\n"
                 + "    join AA2CTIPO F on\n"
                 + "         cp.cpd_forne = f.TIP_CODIGO\n"
-                + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " "
-                + "and CPD_DTA_BAIXA = 0\n"
+                + "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                + (isContaPagarBaixado() ? "and CPD_DTA_BAIXA > 0 and cpd_dt_inclusao >= 190101\n" : 
+                                                            " and CPD_DTA_BAIXA = 0\n")
                 + "order by\n"
                 + "    cp.cpd_emissao";
-
         try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(sqlAbertos)) {
+            try (ResultSet rst = stm.executeQuery(scriptCP)) {
 
                 SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
                 SimpleDateFormat format2 = new SimpleDateFormat("1yyMMdd");
@@ -2371,16 +2313,27 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     vo.setDataEntrada(format.parse(rst.getString("dataentrada")));
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
-                    vo.setObservacao("DUPLICATA " + rst.getString("duplicata"));
-                    vo.setValor(rst.getDouble("valor"));
-                    vo.addVencimento(
+                    vo.setObservacao("DUPLICATA " + rst.getString("duplicata").trim());
+                    vo.setValor(rst.getDouble("valor") - rst.getDouble("desconto"));
+                    
+                    if(contaPagarBaixado) {
+                        vo.addVencimento(
                             format2.parse(rst.getString("datavencimento")),
-                            vo.getValor()
-                    /*format.parse(rst.getString("cpd_dta_baixa")*/).
-                            setObservacao("DUPLICATA "
-                                    + rst.getString("duplicata")
+                            vo.getValor(),
+                            format.parse(rst.getString("cpd_dta_baixa"))).
+                                setObservacao("DUPLICATA "
+                                    + rst.getString("duplicata").trim()
                                     + " - "
-                                    + rst.getString("situacao"));
+                                    + rst.getString("situacao") + " - DESCONTO: " + rst.getDouble("desconto"));
+                    } else {
+                        vo.addVencimento(
+                            format2.parse(rst.getString("datavencimento")),
+                            vo.getValor()).
+                                setObservacao("DUPLICATA "
+                                    + rst.getString("duplicata").trim()
+                                    + " - "
+                                    + rst.getString("situacao") + " - DESCONTO: " + rst.getDouble("desconto"));
+                    }
 
                     result.add(vo);
                 }

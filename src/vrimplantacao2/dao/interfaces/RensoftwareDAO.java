@@ -66,6 +66,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.DATA_ALTERACAO,
                 OpcaoProduto.EAN,
