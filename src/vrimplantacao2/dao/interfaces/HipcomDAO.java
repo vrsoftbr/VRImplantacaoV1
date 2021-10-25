@@ -86,6 +86,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Integer versaoVenda = 2;
     
+    private boolean importarIcmsEntradaCad = false;
+    
     public Integer getVersaoVenda() {
         return this.versaoVenda;
     }
@@ -130,15 +132,23 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.vendaUtilizaDigito = vendaUtilizaDigito;
     }
 
+    public boolean isImportarIcmsEntradaCad() {
+        return this.importarIcmsEntradaCad;
+    }
+    
+    public void setImportarIcmsEntradaCad(boolean importarIcmsEntradaCad) {
+        this.importarIcmsEntradaCad = importarIcmsEntradaCad;
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select lojcod, concat(lojcod,' - ', lojfantas) descricao from hiploj order by 1"
+                    "select lojcod, concat(lojcod,' - ', lojfantas) descricao, lojcnpj from hiploj order by 1"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("lojcod"), rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("lojcod"), rst.getString("descricao") + " - " + rst.getString("lojcnpj")));
                 }
             }
         }
@@ -189,6 +199,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
@@ -227,7 +238,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICACAO_PROPRIA,
                 OpcaoProduto.RECEITA,
                 OpcaoProduto.NCM,
-                OpcaoProduto.CEST
+                OpcaoProduto.CEST,
+                OpcaoProduto.MAPA_TRIBUTACAO
         ));
     }
 
@@ -376,6 +388,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
+        String importacaoIcmsEntrada = isImportarIcmsEntradaCad() ? "prc.prlcodtriecad icmsentradaid,\n" : "prc.prlcodtrie icmsentradaid,\n";
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
@@ -414,6 +428,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlcodpiscofs piscofinssaida,\n" +
                     "	prc.prltabpiscof piscofinsnatrec,\n" +
                     "	prc.prlcodtris icmssaidaid,\n" +
+                        importacaoIcmsEntrada +
                     "	prc.prlcodtrie icmsentradaid,\n" +
                     "	prc.prlprvena precoatacado,\n" +
                     "	prc.prlmargata margematacado,\n" +
@@ -968,6 +983,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	clicli c\n" +
                     "	left join clisit sit on\n" +
                     "		c.clicodsitu = sit.sitcod\n" +
+                    "where cliloja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "	1"
             )) {
@@ -1133,6 +1149,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pr.prlloja = " + getLojaOrigem() + " and\n" +
                     "	not pr.prldtfimpr is null and\n" +
                     "	pr.prldtfimpr >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n" +
+                    "   and prldtinipr is not null\n" +
                     "order by\n" +
                     "	datainicio"
             )) {

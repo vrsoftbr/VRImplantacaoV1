@@ -93,6 +93,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.ATACADO,
@@ -168,7 +169,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rs.getString("idproduto"));
                     imp.setDescricao(rs.getString("descricaoassociado"));
-                    imp.setProdutoAssociadoId(rs.getString("descricaoassociadoitem"));
+                    imp.setDescricaoProdutoAssociado(rs.getString("descricaoassociadoitem"));
                     imp.setProdutoAssociadoId(rs.getString("idprodutoitem"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemItem(rs.getInt("qtdembalagemitem"));

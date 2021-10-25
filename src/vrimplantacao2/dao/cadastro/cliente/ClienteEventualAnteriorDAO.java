@@ -208,6 +208,7 @@ public class ClienteEventualAnteriorDAO {
 
     public Map<String, Integer> getClientesEventuaisImportados(String sistema, String lojaOrigem) throws Exception {
         Map<String, Integer> result = new HashMap<>();
+        
         try (Statement stm = Conexao.createStatement()) {
             String sql = "select id, codigoatual from implantacao.codant_clienteeventual where \n" +
                     "	sistema = '" + sistema + "' and\n" +

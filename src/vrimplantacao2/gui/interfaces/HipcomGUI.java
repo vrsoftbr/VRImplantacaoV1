@@ -184,6 +184,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
 
                     dao.setVersaoVenda(rdbVendasV1.isSelected() ? 1 : 2);
+                    dao.setImportarIcmsEntradaCad(chkImportarIcmsEntradaCad.isSelected());
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -329,10 +330,14 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
         txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
+        vRPanelBeanInfo1 = new vr.view.components.panel.VRPanelBeanInfo();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
+        jPanel4 = new javax.swing.JPanel();
+        vRPanel3 = new vr.view.components.panel.VRPanel();
+        chkImportarIcmsEntradaCad = new vr.view.components.checkbox.VRCheckBox();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -397,6 +402,45 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
 
+        vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Produtos"));
+
+        chkImportarIcmsEntradaCad.setText("Importar Icms Entrada (Cad)");
+
+        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
+        vRPanel3.setLayout(vRPanel3Layout);
+        vRPanel3Layout.setHorizontalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkImportarIcmsEntradaCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(377, Short.MAX_VALUE))
+        );
+        vRPanel3Layout.setVerticalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkImportarIcmsEntradaCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(217, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Paramêtros Hipcom", jPanel4);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -879,6 +923,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vr.view.components.checkbox.VRCheckBox chkImportarIcmsEntradaCad;
     private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
@@ -898,6 +943,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private javax.swing.JPanel pnlOutrasReceitas;
@@ -922,6 +968,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
+    private vr.view.components.panel.VRPanel vRPanel3;
+    private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     // End of variables declaration//GEN-END:variables
 
     @Override

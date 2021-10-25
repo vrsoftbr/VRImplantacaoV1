@@ -64,7 +64,7 @@ public class FornecedorIDStack {
         long id = -1;
         try {
             id = Long.parseLong(strId);
-            if (id > 999999) {
+            if (id > 999999 || id <= 0) {
                 gerarID = true;
             } else if (idsExistentes.contains((int) id)) {
                 gerarID = true;
@@ -78,6 +78,7 @@ public class FornecedorIDStack {
         } else {
             stack.remove(id);
         }
+        
         idsExistentes.add((int) id);
         
         return (int) id;

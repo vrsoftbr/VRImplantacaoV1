@@ -179,7 +179,7 @@ public class AutoMacDAO
                     if(imp.isBalanca() &&
                                 ean != 0 &&
                                     ean <= 999999) {
-                        imp.setEan(imp.getImportId());
+                        imp.setEan(String.valueOf(ean));
                     }
                     
                     imp.setValidade(rs.getInt("validade"));
@@ -386,7 +386,7 @@ public class AutoMacDAO
                     imp.setId(rs.getString("codigo"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("apelido"));
-                    imp.setCnpj(rs.getString("cnjcpf"));
+                    imp.setCnpj(rs.getString("cnpjcpf"));
                     imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("end_numero"));
@@ -421,7 +421,8 @@ public class AutoMacDAO
                     "	documento,\n" +
                     "	dt_entrada,\n" +
                     "	dt_venc,\n" +
-                    "	valor\n" +
+                    "	valor,\n" +
+                    "   pendente\n" +        
                     "FROM\n" +
                     "	contarcb\n" +
                     "ORDER BY \n" +
@@ -435,6 +436,7 @@ public class AutoMacDAO
                     imp.setDataEmissao(rs.getDate("dt_entrada"));
                     imp.setDataVencimento(rs.getDate("dt_venc"));
                     imp.setValor(rs.getDouble("valor"));
+                    imp.setValor(rs.getDouble("pendente"));
                     
                     result.add(imp);
                 }

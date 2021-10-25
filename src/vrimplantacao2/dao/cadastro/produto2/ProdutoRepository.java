@@ -101,6 +101,7 @@ public class ProdutoRepository {
             produtos.clear();
             System.gc();
 
+            setNotify("Produtos - Carregando IDs vagos...", produtos.size());
             ProdutoIDStack idStack = provider.getIDStack();
 
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {

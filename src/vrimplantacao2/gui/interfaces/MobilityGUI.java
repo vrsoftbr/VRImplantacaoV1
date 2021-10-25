@@ -255,9 +255,10 @@ public class MobilityGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         if (chkPdvVendas.isSelected()) {
-                            //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            dao.setVendaDataInicio(edtDtVendaIni.getDate());
+                            dao.setVendaDataTermino(edtDtVendaFim.getDate());
+                            
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {

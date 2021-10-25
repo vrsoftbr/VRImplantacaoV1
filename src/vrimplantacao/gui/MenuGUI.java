@@ -50,7 +50,6 @@ import vrimplantacao2.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.GdoorGUI;
 import vrimplantacao.gui.interfaces.GeraContaPagarGUI;
 import vrimplantacao.gui.interfaces.GerarCodigoBarrasAtacadoGUI;
-import vrimplantacao.gui.interfaces.GestoraGUI;
 import vrimplantacao.gui.interfaces.GetWayCloudGUI;
 import vrimplantacao.gui.interfaces.HostMundoGUI;
 import vrimplantacao.gui.interfaces.IdealGUI;
@@ -278,10 +277,14 @@ import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LCSistemaGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
+import vrimplantacao2.gui.interfaces.MRC6GUI;
+import vrimplantacao2.gui.interfaces.MSuperGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.NeoGUI;
@@ -291,9 +294,17 @@ import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.PrimeGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+<<<<<<< .merge_file_a13148
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
+=======
+import vrimplantacao2.gui.interfaces.SBOnlineGUI;
+import vrimplantacao2.gui.interfaces.SGMasterGUI;
+import vrimplantacao2.gui.interfaces.SicGUI;
+import vrimplantacao2.gui.interfaces.StockGUI;
+import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
+>>>>>>> .merge_file_a21056
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -717,6 +728,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuiWeber = new javax.swing.JMenuItem();
         mnuFirebird3 = new javax.swing.JMenu();
         mnuAutocom = new javax.swing.JMenuItem();
+        mnuAutoMac = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
@@ -724,10 +736,17 @@ public final class MenuGUI extends VRMdiFrame {
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+<<<<<<< .merge_file_a13148
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
         mnuAutoMac = new javax.swing.JMenuItem();
+=======
+        mnuMSuper = new javax.swing.JMenuItem();
+        mnuNeo = new javax.swing.JMenuItem();
+        mnuPlenus = new javax.swing.JMenuItem();
+        chkSGMaster = new javax.swing.JMenuItem();
+>>>>>>> .merge_file_a21056
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -769,6 +788,10 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSTI = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
         mnuEptus = new javax.swing.JMenuItem();
+<<<<<<< .merge_file_a13148
+=======
+        mnuLCSistema = new javax.swing.JMenuItem();
+>>>>>>> .merge_file_a21056
         mnuOracle = new javax.swing.JMenu();
         mnuApollo = new javax.swing.JMenuItem();
         jMenuItemArius = new javax.swing.JMenuItem();
@@ -833,6 +856,10 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
+<<<<<<< .merge_file_a13148
+=======
+        mnuStockPostgres = new javax.swing.JMenuItem();
+>>>>>>> .merge_file_a21056
         mnuSuperControle = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
@@ -896,7 +923,9 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuSQLServer3 = new javax.swing.JMenu();
+        mnuMRC6 = new javax.swing.JMenuItem();
         mnuPoligon = new javax.swing.JMenuItem();
+        mnuSBOnline = new javax.swing.JMenuItem();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSysAut = new javax.swing.JMenuItem();
         mnuTelecon = new javax.swing.JMenuItem();
@@ -1866,6 +1895,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuAutocom);
 
+        mnuAutoMac.setText("AutoMac");
+        mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoMacActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuAutoMac);
+
         mnuDSoft.setText("DSoft");
         mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1922,6 +1959,17 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuMercaLite);
 
+<<<<<<< .merge_file_a13148
+=======
+        mnuMSuper.setText("MSuper");
+        mnuMSuper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMSuperActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuMSuper);
+
+>>>>>>> .merge_file_a21056
         mnuNeo.setText("Neo");
         mnuNeo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1946,6 +1994,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(chkSGMaster);
 
+<<<<<<< .merge_file_a13148
         mnuAutoMac.setText("AutoMac");
         mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1954,6 +2003,8 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuAutoMac);
 
+=======
+>>>>>>> .merge_file_a21056
         mnuDatabase.add(mnuFirebird3);
 
         mnuDB2.setText("IBM DB2");
@@ -2266,6 +2317,17 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuMySQL2.add(mnuEptus);
 
+<<<<<<< .merge_file_a13148
+=======
+        mnuLCSistema.setText("LC Sistema");
+        mnuLCSistema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLCSistemaActionPerformed(evt);
+            }
+        });
+        mnuMySQL2.add(mnuLCSistema);
+
+>>>>>>> .merge_file_a21056
         mnuDatabase.add(mnuMySQL2);
 
         mnuOracle.setText("Oracle");
@@ -2760,12 +2822,29 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuPostgres2.add(mnuViggo);
 
+<<<<<<< .merge_file_a13148
         mnuSuperControle.setText("Super Controle");
         mnuSuperControle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuSuperControleActionPerformed(evt);
             }
         });
+=======
+        mnuStockPostgres.setText("Stock");
+        mnuStockPostgres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuStockPostgresActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuStockPostgres);
+
+        mnuSuperControle.setText("Super Controle");
+        mnuSuperControle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSuperControleActionPerformed(evt);
+            }
+        });
+>>>>>>> .merge_file_a21056
         mnuPostgres2.add(mnuSuperControle);
 
         mnuDatabase.add(mnuPostgres2);
@@ -3249,6 +3328,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuSQLServer3.setText("SQL Server 3");
 
+        mnuMRC6.setText("MRC6");
+        mnuMRC6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMRC6ActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuMRC6);
+
         mnuPoligon.setText("Poligon");
         mnuPoligon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3256,6 +3343,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSQLServer3.add(mnuPoligon);
+
+        mnuSBOnline.setText("SBOnline");
+        mnuSBOnline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSBOnlineActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuSBOnline);
 
         mnuSTSistemas_v2.setText("ST Sistemas");
         mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
@@ -4393,7 +4488,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuFGActionPerformed
 
     private void mmnuGestoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mmnuGestoraActionPerformed
-        GestoraGUI.exibir(this);
+        GestoraV2GUI.exibir(this);
     }//GEN-LAST:event_mmnuGestoraActionPerformed
 
     private void mnuIdealSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIdealSoftActionPerformed
@@ -5408,10 +5503,13 @@ public final class MenuGUI extends VRMdiFrame {
         ControlePlusPostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuControlePlusActionPerformed
 
+<<<<<<< .merge_file_a13148
     private void mnuMapeamentoDeLojasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoDeLojasActionPerformed
         ConsultaConfiguracaoBaseDadosGUI.exibir(this);
     }//GEN-LAST:event_mnuMapeamentoDeLojasActionPerformed
 
+=======
+>>>>>>> .merge_file_a21056
     private void mnuEptusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEptusActionPerformed
         EptusGUI.exibir(this);
     }//GEN-LAST:event_mnuEptusActionPerformed
@@ -5432,6 +5530,7 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuStockActionPerformed
         StockGUI.exibir(this);
     }//GEN-LAST:event_mnuStockActionPerformed
+<<<<<<< .merge_file_a13148
 
     private void mnuPrimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPrimeActionPerformed
         // TODO add your handling code here:
@@ -5475,6 +5574,46 @@ public final class MenuGUI extends VRMdiFrame {
         // TODO add your handling code here:
         ConsultaUsuarioGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem16ActionPerformed
+=======
+
+    private void mnuPrimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPrimeActionPerformed
+        // TODO add your handling code here:
+        PrimeGUI.exibir(this);
+    }//GEN-LAST:event_mnuPrimeActionPerformed
+
+    private void mnuAutoMacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoMacActionPerformed
+        AutoMacGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutoMacActionPerformed
+
+    private void mnuSuperControleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSuperControleActionPerformed
+        // TODO add your handling code here:
+        SuperControle_PostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuSuperControleActionPerformed
+
+    private void mnuDTComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDTComActionPerformed
+        DTComPlanilhaGUI.exibir(this);
+    }//GEN-LAST:event_mnuDTComActionPerformed
+
+    private void mnuSBOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSBOnlineActionPerformed
+        SBOnlineGUI.exibir(this);
+    }//GEN-LAST:event_mnuSBOnlineActionPerformed
+
+    private void mnuMSuperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMSuperActionPerformed
+        MSuperGUI.exibir(this);
+    }//GEN-LAST:event_mnuMSuperActionPerformed
+
+    private void mnuMRC6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMRC6ActionPerformed
+        MRC6GUI.exibir(this);
+    }//GEN-LAST:event_mnuMRC6ActionPerformed
+
+    private void mnuLCSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLCSistemaActionPerformed
+        LCSistemaGUI.exibir(this);
+    }//GEN-LAST:event_mnuLCSistemaActionPerformed
+
+    private void mnuStockPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuStockPostgresActionPerformed
+        Stock_PostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuStockPostgresActionPerformed
+>>>>>>> .merge_file_a21056
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5684,6 +5823,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuJanela;
     private javax.swing.JMenuItem mnuJrf;
     private javax.swing.JMenuItem mnuKcms;
+    private javax.swing.JMenuItem mnuLCSistema;
     private javax.swing.JMenuItem mnuLiderNetWork;
     private javax.swing.JMenuItem mnuLince;
     private javax.swing.JMenuItem mnuLinear;
@@ -5694,8 +5834,13 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLoja;
     private javax.swing.JMenuItem mnuLyncis;
+    private javax.swing.JMenuItem mnuMRC6;
     private javax.swing.JMenuItem mnuMSIInfor;
+<<<<<<< .merge_file_a13148
     private javax.swing.JMenuItem mnuMapeamentoDeLojas;
+=======
+    private javax.swing.JMenuItem mnuMSuper;
+>>>>>>> .merge_file_a21056
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
@@ -5741,6 +5886,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
+    private javax.swing.JMenuItem mnuSBOnline;
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenu mnuSQLServer;
     private javax.swing.JMenu mnuSQLServer2;
@@ -5774,6 +5920,10 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSolutionSupera;
     private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuStock;
+<<<<<<< .merge_file_a13148
+=======
+    private javax.swing.JMenuItem mnuStockPostgres;
+>>>>>>> .merge_file_a21056
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;

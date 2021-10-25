@@ -194,10 +194,15 @@ public class LojaDAO {
                 sql.append(" dataultimaentrada, custosemimposto, custocomimposto, custosemimpostoanterior, custocomimpostoanterior, precovenda, precovendaanterior,");
                 sql.append(" precodiaseguinte, estoque, troca, emiteetiqueta, custosemperdasemimposto, custosemperdasemimpostoanterior, customediocomimposto,");
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
-                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao,");
-                sql.append("id_tipocalculoddv");
+                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao, id_tipocalculoddv");
                 if (versao.igualOuMaiorQue(3,17,10)) {
                     sql.append(", id_tipoproduto, fabricacaopropria");
+                }
+                if (versao.igualOuMaiorQue(3, 21)) {
+                    sql.append(", dataprimeiraentrada");
+                }
+                if (versao.igualOuMaiorQue(4)) {
+                    sql.append(", margem, margemminima, margemmaxima ");
                 }
                 sql.append(")");
                 sql.append(" (SELECT id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, null, null, " + (i_loja.copiaCusto ? "custosemimposto" : "0") + ",");
@@ -207,6 +212,14 @@ public class LojaDAO {
                 sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3");
                 if (versao.igualOuMaiorQue(3,17,10)) {
                     sql.append(", 0, false");
+                }
+                if (versao.igualOuMaiorQue(3, 21)) {
+                    sql.append(", dataprimeiraentrada");
+                }
+                if (versao.igualOuMaiorQue(4)) {
+                    sql.append((i_loja.isCopiaMargem() ? ", margem" : ", 0"));
+                    sql.append((i_loja.isCopiaMargem() ? ", margemminima" : ", 0"));
+                    sql.append((i_loja.isCopiaMargem() ? ", margemmaxima" : ", 0"));
                 }
                 sql.append(" from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");
 
@@ -415,6 +428,15 @@ public class LojaDAO {
                 sql.append(" geraconcentrador = " + i_loja.geraConcentrador);
                 sql.append(" WHERE id = " + i_loja.id);
 
+                stm.execute(sql.toString());
+            }
+            
+            if (versao.igualOuMaiorQue(4, 1, 5)) {
+                sql = new StringBuilder();
+                
+                sql.append("insert into contabilidade.grupoeconomicoloja (id_grupoeconomico, id_loja, matriz) "
+                                                                     + "values (1, " + i_loja.id + ", false);");
+                
                 stm.execute(sql.toString());
             }
 

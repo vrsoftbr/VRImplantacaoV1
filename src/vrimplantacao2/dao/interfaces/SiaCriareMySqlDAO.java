@@ -95,6 +95,10 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.PAUTA_FISCAL,
@@ -250,10 +254,10 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	codigo id_familia,\n"
-                    + "	descricao \n"
+                    + "	ID_SIMILARIDADE id_familia,\n"
+                    + "	DESCRICAO \n"
                     + "from\n"
-                    + "	familias"
+                    + "	similaridades s"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -296,10 +300,11 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	(p.QTDEMBALAGEM / 1000) as qtdembalagem, \n"
                     + "	p.PIS pis_entrada, \n"
                     + "	p.PISVENDAS pis_saida, \n"
-                    + "	p.NAT_REC pis_nat_rec, \n"
-                    + "	p.MARKDOWN, \n"
+                  //+ " p.NAT_REC pis_nat_rec, \n"
+                    + " itm_tab_exclusao pis_nat_rec,\n"
+                    + "	est.margematual,\n"
                     + "	p.CEST, \n"
-                    + "	p.familia id_familia,\n"
+                    + "	p.id_similaridade id_familia,\n"
                     + "	est.qtd estoque,\n"
                     + "	est.qtd_maxima estoquemaximo,\n"
                     + "	est.qtd_minima estoqueminino,\n"
@@ -361,7 +366,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCodMercadologico1(rst.getString("GRUPO"));
                     imp.setCodMercadologico2(rst.getString("CATEGORIA"));
                     imp.setCodMercadologico3(rst.getString("FAMILIA"));
-                    imp.setMargem(rst.getDouble("MARKDOWN"));
+                    imp.setMargem(rst.getDouble("margematual"));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setCustoComImposto(rst.getDouble("CUSTO"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
@@ -372,6 +377,11 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPiscofinsNaturezaReceita(rst.getString("PIS_NAT_REC"));
                     imp.setIcmsDebitoId(rst.getString("ICMS"));
                     imp.setIcmsCreditoId(rst.getString("ICMS"));
+                    imp.setIcmsConsumidorId(rst.getString("ICMS"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("ICMS"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("ICMS"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("ICMS"));
+
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
 
                     imp.setEstoque(rst.getDouble("estoque"));

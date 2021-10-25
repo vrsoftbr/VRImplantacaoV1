@@ -809,6 +809,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutocomActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuAutoMac">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="AutoMac"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoMacActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuDSoft">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="DSoft"/>
@@ -865,6 +873,17 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMercaLiteActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< .merge_file_a12196
+=======
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMSuper">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="MSuper"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMSuperActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+>>>>>>> .merge_file_a08144
                         <MenuItem class="javax.swing.JMenuItem" name="mnuNeo">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Neo"/>
@@ -889,6 +908,7 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSGMasterActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< .merge_file_a12196
                         <MenuItem class="javax.swing.JMenuItem" name="mnuAutoMac">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="AutoMac"/>
@@ -897,6 +917,8 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoMacActionPerformed"/>
                           </Events>
                         </MenuItem>
+=======
+>>>>>>> .merge_file_a08144
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuDB2">
@@ -1221,6 +1243,17 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuEptusActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< .merge_file_a12196
+=======
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuLCSistema">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="LC Sistema"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuLCSistemaActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+>>>>>>> .merge_file_a08144
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuOracle">
@@ -1730,11 +1763,27 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuViggoActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< .merge_file_a12196
                         <MenuItem class="javax.swing.JMenuItem" name="mnuSuperControle">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Super Controle"/>
                           </Properties>
                           <Events>
+=======
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuStockPostgres">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Stock"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuStockPostgresActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSuperControle">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Super Controle"/>
+                          </Properties>
+                          <Events>
+>>>>>>> .merge_file_a08144
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSuperControleActionPerformed"/>
                           </Events>
                         </MenuItem>
@@ -2231,12 +2280,28 @@
                         <Property name="text" type="java.lang.String" value="SQL Server 3"/>
                       </Properties>
                       <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMRC6">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="MRC6"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMRC6ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuPoligon">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Poligon"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPoligonActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSBOnline">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="SBOnline"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSBOnlineActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuSTSistemas_v2">

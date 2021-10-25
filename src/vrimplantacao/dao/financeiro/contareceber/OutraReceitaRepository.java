@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.json.JSONObject;
+import vrimplantacao2.dao.cadastro.cliente.ClienteEventualIDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberAnteriorVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberItemAnteriorVO;
@@ -36,19 +37,21 @@ public class OutraReceitaRepository {
 
     public void importar(List<ContaReceberIMP> contas, Set<OpcaoContaReceber> opt) throws Exception {
         
-        provider.setStatus("Contas a Receber...Carregando dados");        
+        provider.setStatus("Contas a Receber...Carregando dados");                
         
         Map<String, Integer> fornecedores = provider.getFornecedores();
         LOG.fine("Fornecedores carregados: " + fornecedores.size());
+        
         Map<String, Integer> eventuais = provider.getEventuais();
-        LOG.fine("Clientes Eventuais carregados: " + fornecedores.size());
+        LOG.fine("Clientes Eventuais carregados: " + eventuais.size());
+        
         Map<String, ContaReceberAnteriorVO> anteriores = provider.getAnteriores();
         LOG.fine("Anteriores carregados: " + anteriores.size());
+        
         MultiMap<String, ContaReceberItemAnteriorVO> itemAnteriores = provider.getItemAnteriores();
-        LOG.fine("Itens anteriores carregados: " + anteriores.size());
+        LOG.fine("Itens anteriores carregados: " + itemAnteriores.size());
         
         provider.setStatus("Contas a Receber...Gravando...", contas.size());
-        
         
         try {
             provider.begin();
@@ -74,6 +77,11 @@ public class OutraReceitaRepository {
                         
                         //Localiza o cliente eventual no VR.
                         if (imp.getIdClienteEventual() != null) {
+                            System.out.println("Eventual: " + imp.getIdClienteEventual() + " - Total Eventual: " + eventuais.size());
+                            if(eventuais.get(imp.getIdClienteEventual()) == null) {
+                                continue;
+                            }
+                            
                             vo.setIdClienteEventual(eventuais.get(imp.getIdClienteEventual()));
                             if (vo.getIdClienteEventual() == 0) {
                                 LOG.severe("Cliente Eventual " + imp.getIdClienteEventual() + " não localizado!");

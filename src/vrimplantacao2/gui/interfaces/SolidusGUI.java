@@ -70,6 +70,7 @@ public class SolidusGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
                 return dao.getLojaOrigem();
             }
 

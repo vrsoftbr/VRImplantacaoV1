@@ -103,6 +103,10 @@ public class ContaPagarIMP {
         return addVencimento(vencimento, valor, TipoPagamento.BOLETO_BANCARIO, numeroParcela);
     }
     
+    public ContaPagarVencimentoIMP addVencimento(Date vencimento, double valor, Date pagamento) {
+        return addVencimento(vencimento, valor, TipoPagamento.BOLETO_BANCARIO, pagamento);
+    }
+    
     public ContaPagarVencimentoIMP addVencimento(Date vencimento, double valor, TipoPagamento tipoPagamento) {
         ContaPagarVencimentoIMP imp = new ContaPagarVencimentoIMP();
         this.getVencimentos().add(imp);
@@ -111,6 +115,7 @@ public class ContaPagarIMP {
         imp.setValor(valor);
         imp.setNumeroParcela(getVencimentos().size());
         imp.setTipoPagamento(tipoPagamento);
+        
         return imp;
     }
     
@@ -122,6 +127,21 @@ public class ContaPagarIMP {
         imp.setValor(valor);
         imp.setNumeroParcela(numeroParcela);
         imp.setTipoPagamento(tipoPagamento);
+        return imp;
+    }
+    
+    public ContaPagarVencimentoIMP addVencimento(Date vencimento, double valor, TipoPagamento tipoPagamento, Date pagamento) {
+        ContaPagarVencimentoIMP imp = new ContaPagarVencimentoIMP();
+        
+        this.getVencimentos().add(imp);
+        imp.setContaPagar(this);
+        imp.setVencimento(vencimento);
+        imp.setDataPagamento(pagamento);
+        imp.setValor(valor);
+        imp.setNumeroParcela(getVencimentos().size());
+        imp.setTipoPagamento(tipoPagamento);
+        imp.setPago(pagamento != null);
+        
         return imp;
     }
 

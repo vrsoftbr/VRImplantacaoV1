@@ -1,10 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,31 +9,40 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.sql.SQLException;
 import java.util.logging.Level;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Map;
 import static vr.core.utils.StringUtils.LOG;
-import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 
-/*
+/**
+ *
  * @author Alan
  */
 public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String txtComplemento;
+
+    private boolean somenteProdutoAtivo = false;
 
     @Override
     public String getSistema() {
@@ -45,6 +51,14 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setComplemento(String complemento) {
         this.txtComplemento = complemento == null ? "" : complemento.trim();
+    }
+    
+    public void setSomenteProdutosAtivos(boolean somenteProdutoAtivo) {
+        this.somenteProdutoAtivo = somenteProdutoAtivo;
+    }
+    
+    public boolean isSomenteProdutoAtivo() {
+        return this.somenteProdutoAtivo;
     }
 
     @Override
@@ -174,7 +188,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
-        List<ProdutoIMP> Result = new ArrayList<>();
+        List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -206,57 +220,89 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	Cest_Prod cest,\n"
                     + "	case when Servico_Prod = 'B' then 'S' else 'N' end balanca,\n"
                     + "	case when Pesavel_Prod = 'N' then 0 else 1 end pesavel,\n"
-                    + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro\n"
+                    + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro,\n"
+                    + " icm.Cod_Classe as idIcms\n"        
                     + "from\n"
                     + "	tbl_produto p\n"
-                    + "join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod"
+                    + "left join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod\n"
+                    + (isSomenteProdutoAtivo() ? " where Status_Prod = 'A'\n" : "")
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(Utils.acertarTexto(rst.getString("unidade")));
+                    
+                    if (!produtosBalanca.isEmpty()) {
 
+                        if (imp.getEan().trim().length() == 4) {
+
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan()));
+
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+                            imp.seteBalanca("S".equals(rst.getString("balanca")));
+                        }                        
+                    } else {
+                        imp.seteBalanca("S".equals(rst.getString("balanca")));
+                    }
+                    
+                    imp.setTipoEmbalagem(Utils.acertarTexto(rst.getString("unidade")));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
-
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-
-                    imp.setIcmsCstSaida(rst.getInt("cstsaida"));
-                    imp.setIcmsAliqSaida(rst.getDouble("aliqsaida"));
-                    imp.setIcmsReducaoSaida(Utils.stringToDouble(rst.getString("redsaida")));
-                    imp.setIcmsCstConsumidor(rst.getInt("cstsaida"));
-                    imp.setIcmsAliqConsumidor(rst.getDouble("aliqsaida"));
-                    imp.setIcmsReducaoConsumidor(Utils.stringToDouble(rst.getString("redsaida")));
-
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
-
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setMargem(rst.getDouble("margem"));
-
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemax"));
-
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.seteBalanca("S".equals(rst.getString("balanca")));
 
-                    Result.add(imp);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    
+                    imp.setIcmsDebitoId(rst.getString("idIcms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("idIcms"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idIcms"));
+                    imp.setIcmsCreditoId(rst.getString("idIcms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
+                    imp.setIcmsConsumidorId(rst.getString("idIcms"));
+                    
+                    /*imp.setIcmsCstSaida(rst.getInt("cstsaida"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliqsaida"));
+                    imp.setIcmsReducaoSaida(Utils.stringToDouble(rst.getString("redsaida")));
+                    imp.setIcmsCstConsumidor(rst.getInt("cstsaida"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("aliqsaida"));
+                    imp.setIcmsReducaoConsumidor(Utils.stringToDouble(rst.getString("redsaida")));*/
+                    result.add(imp);
                 }
             }
         }
-        return Result;
+        return result;
     }
 
     @Override
@@ -478,8 +524,8 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	a.Obs_Lancamento obs\n"
                     + "from\n"
                     + "	tbl_all_lancamento a\n"
-                    + "	left join tbl_all_head b on a.Id_Documento = b.id_Documento\n"
-                    + "	left join tbl_cliente c on a.Cliente_Lancamento = c.Cod_Cliente \n"
+                    + "	join tbl_all_head b on a.Id_Documento = b.id_Documento\n"
+                    + "	join tbl_cliente c on a.Cliente_Lancamento = c.Cod_Cliente \n"
                     + "where\n"
                     + "	Cliente_Lancamento != 0\n"
                     + "	and Situacao_Lancamento = 'A'"
@@ -691,6 +737,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
+                        next.setCustoComImposto(rst.getDouble("custo"));
+                        next.setCustoSemImposto(rst.getDouble("custo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
@@ -715,7 +764,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	i.Quantidade_Produto quantidade,\n"
                     + "	i.Preco_Item precovenda,\n"
                     + "	i.Preco_Total_Item total,\n"
-                    + "	case when i.Status_Cupom = 'C' then 1 else 0 end cancelado,\n"
+                    + " i.Custo_Item as custo, \n"
+                    + " i.Desconto_Item as desconto, \n"
+                    + "	case when i.Item_Cancelado = 'S' then 1 else 0 end cancelado,\n"
                     + "	i.Ecf ecf,\n"
                     + "	i.Data_Emissao data\n"
                     + "from\n"
@@ -726,7 +777,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.Codigo_Prod = i.Cod_Interno_Produto\n"
                     + "where\n"
                     + "	v.Data_Emissao_Cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + " and v.Status_Cupom <> 'C'";
+                    + " and v.Status_Cupom <> 'C' \n"
+                    + " and i.Item_Cancelado <> 'S'";
+            
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

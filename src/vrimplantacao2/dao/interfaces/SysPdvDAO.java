@@ -265,10 +265,6 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         this.dtOfertas = dtOfertas;
     }
 
-    public void setIgnorarEnviaBalanca(boolean ignorarEnviaBalanca) {
-        this.ignorarEnviaBalanca = ignorarEnviaBalanca;
-    }
-
     public void setUtilizarPropesvarNaBalanca(boolean utilizarPropesvarNaBalanca) {
         this.utilizarPropesvarNaBalanca = utilizarPropesvarNaBalanca;
     }
@@ -466,24 +462,13 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCodMercadologico3(rst.getString("merc3"));
                                                         
                             int plu;
-                            
-                            if (ignorarEnviaBalanca) {
-                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                                if ("KG".equals(imp.getTipoEmbalagem())) {
-                                    imp.seteBalanca(true);
-                                } else {
-                                    imp.seteBalanca(rst.getBoolean("e_balanca"));
-                                }
-                                imp.setValidade(Utils.stringToInt(rst.getString("validade")));
-                            }
-
                             if (removerDigitoDaBalanca) {
                                 plu = ProdutoBalancaDAO.TipoConversao.REMOVER_DIGITO.convert(ean.ean);
                             } else {
                                 plu = ProdutoBalancaDAO.TipoConversao.SIMPLES.convert(ean.ean);
                             }
                             final boolean isBalancaNoSysPdv = rst.getBoolean("e_balanca");
-                            
+                                                        
                             if (utilizarPropesvarNaBalanca) {                                
                                 if ("KG".equals(rst.getString("tipoembalagem"))) {
                                     imp.seteBalanca(true);

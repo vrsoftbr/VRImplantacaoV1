@@ -12,6 +12,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.venda.PdvVendaPromocaoPontuacaoVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 
 /**
@@ -544,4 +545,84 @@ public class PdvVendaDAO {
         }
     }
     
+    public void gerarVendaPontuacao(PdvVendaVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            
+            sql.setSchema("pdv");
+            sql.setTableName("venda");
+            
+            sql.put("id_loja", vo.getId_loja());
+            sql.put("numerocupom", vo.getNumeroCupom());
+            sql.put("ecf", vo.getEcf());
+            sql.put("data", vo.getData());
+            sql.put("id_clientepreferencial", vo.getId_clientePreferencial(), 0);
+            sql.put("horainicio", vo.getHoraInicio());
+            sql.put("horatermino", vo.getHoraTermino());
+            sql.put("cancelado", vo.isCancelado());
+            sql.put("subtotalimpressora", vo.getSubTotalImpressora());
+            sql.put("cpf", vo.getCpf());
+            sql.put("contadordoc", vo.getContadorDoc());
+            sql.put("valordesconto", vo.getValorDesconto());
+            sql.put("valoracrescimo", vo.getValorAcrescimo());
+            sql.put("canceladoemvenda", vo.isCanceladoEmVenda());
+            sql.put("numeroserie", vo.getNumeroSerie());
+            sql.put("mfadicional", vo.getMfAdicional());
+            sql.put("modeloimpressora", vo.getModeloImpressora());
+            sql.put("numerousuario", vo.getNumeroUsuario());
+            sql.put("nomecliente", vo.getNomeCliente());
+            sql.put("enderecocliente", vo.getEnderecoCliente());
+            
+            LOG.finer(
+                    "Incluindo a Venda { "
+                    + "ecf:" + vo.getEcf() + ","
+                    + "cupom: " + vo.getNumeroCupom() + ","
+                    + "data:" + SQLUtils.stringSQL(DATE_FORMAT.format(vo.getData())) + ","
+                    + "horainicio:" + SQLUtils.stringSQL(TIME_FORMAT.format(vo.getHoraInicio())) + ","
+                    + "subtotalimpressora: " + String.format("%.2f", vo.getSubTotalImpressora())
+                    + "}"                    
+            );
+            
+            sql.getReturning().add("id");
+            
+            String sqlInsert = sql.getInsert();
+            
+            try (ResultSet rst = stm.executeQuery(sqlInsert)) {
+                if (rst.next()) {
+                    vo.setId(rst.getLong("id"));
+                }
+                LOG.finest(sqlInsert);
+            }
+        }
+    }
+    
+    public void gerarVendaPromocaoPontuacao(PdvVendaPromocaoPontuacaoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            
+            sql.setSchema("pdv");
+            sql.setTableName("vendapromocaopontuacao");
+            
+            sql.put("id_venda", vo.getIdVenda());
+            sql.put("id_promocao", vo.getIdPromocao());
+            sql.put("pontos", vo.getPonto());
+            sql.put("cnpj", vo.getCnpj());
+            sql.put("id_situacaopromocaopontuacao", vo.getIdSituacaoPromocaoPontuacao());
+            sql.put("lancamentomanual", vo.isLancamentoManual());
+            sql.put("id_loja", vo.getIdLoja());
+            sql.put("datacompra", vo.getDataCompra());
+            sql.put("dataexpiracao", vo.getDataExpiracao());
+            
+            sql.getReturning().add("id");
+            
+            String sqlInsert = sql.getInsert();
+            
+            try (ResultSet rst = stm.executeQuery(sqlInsert)) {
+                if (rst.next()) {
+                    vo.setId(rst.getLong("id"));
+                }
+                LOG.finest(sqlInsert);
+            }
+        }
+    }
 }

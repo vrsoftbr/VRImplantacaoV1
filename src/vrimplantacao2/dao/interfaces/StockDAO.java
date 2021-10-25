@@ -11,6 +11,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -22,7 +23,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
- * 
+ *
  * @author Alan
  */
 public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -94,6 +95,20 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.CODIGO_BENEFICIO,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+        ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
 
@@ -172,30 +187,47 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	 proid as id,\n"
-                    + "	 procodbarras as ean,\n"
-                    + "	 pronomproduto as descricao,\n"
-                    + "	 proabrproduto as reduzida,\n"
-                    + "	 prodesunidade as unidade,\n"
-                    + "	 provalprecovenda as precovenda,\n"
-                    + "	 provalcusto as precocusto,\n"
-                    + "	 prolucro as margem,\n"
-                    + "	 proqntminima as estoque_min,\n"
-                    + "	 proqntestoque as estoque,\n"
-                    + "	 proCodDepartamento as merc1,\n"
-                    + "	 proCodDepartamento as merc2,\n"
-                    + "	 proCodDepartamento as merc3,\n"
-                    + "	 propeso as pesobruto,\n"
-                    + "	 prodataalterado as data_alteracao,\n"
-                    + "	 proncm as ncm,\n"
-                    + "  procest as cest,\n"
-                    + "	 proflagbalanca as e_balanca,\n"
-                    + "  proCodTributo as id_icms,\n"
-                    + "  proCST_ENTRADA as pc_entrada,\n"
-                    + "  proCST_SAIDA as pc_saida,\n"
-                    + "	 procodnatreceita as nat_receita"
+                    + "	proid AS id,\n"
+                    + "	procodbarras AS codigobarras,\n"
+                    + "	pronomproduto AS descricaocompleta,\n"
+                    + "	proabrproduto AS descricaoreduzida,\n"
+                    + "	prodesunidade AS unidade,\n"
+                    + "	provalprecovenda AS precovenda,\n"
+                    + "	provalcusto AS custosemimposto,\n"
+                    + "	prolucro AS margem,\n"
+                    + "	proqntminima AS estoqueminimo,\n"
+                    + "	proqntestoque AS estoque,\n"
+                    + "	proCodDepartamento AS cod_mercadologico1,\n"
+                    + " proCodDepartamento AS mercadologico1,\n"
+                    + "	proCodDepartamento AS cod_mercadologico2,\n"
+                    + " proCodDepartamento AS mercadologico2,\n"
+                    + " proCodDepartamento AS cod_mercadologico3,\n"
+                    + " proCodDepartamento AS mercadologico3,\n"
+                    + "	propeso AS pesobruto,\n"
+                    + "	prodataalterado AS dataalteracao,\n"
+                    + "	proncm AS ncm,\n"
+                    + "	procest AS cest,\n"
+                    + "	proflagbalanca AS balanca,\n"
+                    + "	trivalortributacao AS icms_aliquota_saida,\n"
+                    + "	tricstcsosnsaida AS icms_cst_saida,\n"
+                    + "	0 AS icms_reduzido_saida,\n"
+                    + "	trivalortributacao AS icms_aliquota_entrada,\n"
+                    + "	tricstcsosnentrada AS icms_cst_entrada,\n"
+                    + "	0 AS icms_reduzido_entrada,\n"
+                    + "	pc.piscodcst AS piscofins_cst_credito,\n"
+                    + "	pc.piscodcst AS piscofins_cst_debito,\n"
+                    + "	procodnatreceita AS piscofins_natureza_receita\n"
                     + "FROM\n"
-                    + "	 tbprodutos p"
+                    + "	tbprodutos p,\n"
+                    + "	tbGrupos m,\n"
+                    + "	tbtributacoes t,\n"
+                    + "	tbPisCofins pc\n"
+                    + "WHERE\n"
+                    + "	p.procodtributo = t.triid\n"
+                    + "	AND m.depid = p.proCodDepartamento\n"
+                    + "	AND p.proCodPisCofins = pc.pisId\n"
+                    + "ORDER BY\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -203,41 +235,41 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricao")));
-                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("reduzida")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rst.getString("reduzida")));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("descricaoreduzida")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rst.getString("descricaoreduzida")));
 
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setCustoSemImposto(rst.getDouble("precocusto"));
-                    imp.setCustoComImposto(rst.getDouble("precocusto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custosemimposto"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setEstoqueMinimo(Utils.stringToDouble(rst.getString("estoque_min")));
+                    imp.setEstoqueMinimo(Utils.stringToDouble(rst.getString("estoqueminimo")));
                     imp.setEstoque(Utils.stringToDouble(rst.getString("estoque")));
 
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
 
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
 
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota_saida"));
+                    imp.setIcmsCstSaida(rst.getInt("icms_cst_saida"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("icms_reduzido_saida"));
+                    
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota_entrada"));
+                    imp.setIcmsCstEntrada(rst.getInt("icms_cst_entrada"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_reduzido_entrada"));
+                    
+                    imp.seteBalanca(rst.getBoolean("balanca"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(imp.getCodMercadologico1());
-                    imp.setCodMercadologico3(imp.getCodMercadologico1());
-
-                    //imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    //imp.setIcmsDebitoId(rst.getString("id_icms"));
-                    //imp.setIcmsConsumidorId(rst.getString("id_icms"));
-                    
-                    imp.setPiscofinsCstCredito(rst.getString("pc_entrada"));
-                    imp.setPiscofinsCstDebito(rst.getString("pc_saida"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("nat_receita"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
 
                     result.add(imp);
                 }
@@ -275,6 +307,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
+
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
@@ -422,4 +455,5 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
 }

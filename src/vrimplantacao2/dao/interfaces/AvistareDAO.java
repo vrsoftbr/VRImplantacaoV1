@@ -6,14 +6,21 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -23,15 +30,14 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ConveniadoIMP;
-import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
-import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -84,7 +90,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.VOLUME_QTD
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
                 }
         ));
     }
@@ -107,10 +115,10 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     public List<String> getNomeLojaCliente() throws Exception {
         List<String> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
@@ -122,10 +130,10 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -161,82 +169,82 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "with ean as (\n" +
-                    "	select\n" +
-                    "		p.ProdID id_produto,\n" +
-                    "		p.ProdCodBarras1 ean\n" +
-                    "	from\n" +
-                    "		TB_PRODUTO p\n" +
-                    "	where\n" +
-                    "		ltrim(rtrim(coalesce(p.ProdCodBarras1,''))) != ''\n" +
-                    "	union\n" +
-                    "	select\n" +
-                    "		p.ProdID id_produto,\n" +
-                    "		p.ProdCodBarras2 ean\n" +
-                    "	from\n" +
-                    "		TB_PRODUTO p\n" +
-                    "	where\n" +
-                    "		ltrim(rtrim(coalesce(p.ProdCodBarras2,''))) != ''\n" +
-                    "	union\n" +
-                    "	select\n" +
-                    "		p.ProdID id_produto,\n" +
-                    "		p.ProdCodBarras3 ean\n" +
-                    "	from\n" +
-                    "		TB_PRODUTO p\n" +
-                    "	where\n" +
-                    "		ltrim(rtrim(coalesce(p.ProdCodBarras3,''))) != ''\n" +
-                    ")\n" +
-                    "select \n" +
-                    "	p.ProdID as id,\n" +
-                    "	p.ProdCodInterno,\n" +
-                    "	ean.ean,\n" +
-                    "	un.UnSigla as unidade,\n" +
-                    "	p.ProdDescricao as descricao,\n" +
-                    "	case p.ProdStatusID\n" +
-                    "		when 1053 then 0\n" +
-                    "		else 1\n" +
-                    "	end ativo,\n" +
-                    "	p.ProdFabricanteID,\n" +
-                    "	p.ProdFamiliaID,\n" +
-                    "	p.ProdNcm as ncm,\n" +
-                    "	p.ProdCest as cest,\n" +
-                    "	p.ProdPesoBruto as pesobruto,\n" +
-                    "	p.ProdPesoLiquido as pesoliquido,\n" +
-                    "	p.ProdPrecoCompra,\n" +
-                    "	p.ProdPrecoCusto as custo,\n" +
-                    "	p.ProdValorVenda1 as precovenda,\n" +
-                    "	p.ProdEstoqueMin as estoqueminimo,\n" +
-                    "	p.ProdEstoqueMax as estoquemaximo,\n" +
-                    "	est.EstConsAtual as estoque,\n" +
-                    "	p.ProdMargem1 as margem,\n" +
-                    "	p.ProdDtCadastro as datacadastro,\n" +
-                    "	p.ProdEmbalagemQtde as qtdembalagem,\n" +
-                    "	p.ProdClaFisID as tribicms,\n" +
-                    "	pis.CstPisCofinsCodigo as cstpissaida,\n" +
-                    "	pis.CstPisCofinsDescricao,\n" +
-                    "	cofins.CstPisCofinsCodigo as cstpisentrada,\n" +
-                    "	cofins.CstPisCofinsDescricao,\n" +
-                    "	nat.NatRecPisCofinsCodigo as naturezareceita,\n" +
-                    "	nat.NatRecPisCofinsDescricao,\n" +
-                    "	p.ProdCaixaQtde volume\n" +
-                    "from\n" +
-                    "	dbo.TB_PRODUTO p\n" +
-                    "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n" +
-                    "		p.ProdID = est.EstConsProdID\n" +
-                    "	left join ean on\n" +
-                    "		p.ProdID = ean.id_produto\n" +
-                    "	left join dbo.TB_UNIDADE_MEDIDA un on\n" +
-                    "		un.UnID = p.ProdUnidadeMedidaID\n" +
-                    "	left join dbo.TB_CST_PIS_COFINS pis on\n" +
-                    "		pis.CstPisCofinsID = p.ProdCstPisID and\n" +
-                    "		pis.CstPisCofinsOperacaoID = 129\n" +
-                    "	left join dbo.TB_CST_PIS_COFINS cofins on\n" +
-                    "		cofins.CstPisCofinsID = p.ProdCstCofinsCompraID and\n" +
-                    "		cofins.CstPisCofinsOperacaoID = 128\n" +
-                    "	left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on\n" +
-                    "		nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n" +
-                    "order by\n" +
-                    "	p.ProdCodInterno"
+                    "with ean as (\n"
+                    + "	select\n"
+                    + "		p.ProdID id_produto,\n"
+                    + "		p.ProdCodBarras1 ean\n"
+                    + "	from\n"
+                    + "		TB_PRODUTO p\n"
+                    + "	where\n"
+                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras1,''))) != ''\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		p.ProdID id_produto,\n"
+                    + "		p.ProdCodBarras2 ean\n"
+                    + "	from\n"
+                    + "		TB_PRODUTO p\n"
+                    + "	where\n"
+                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras2,''))) != ''\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		p.ProdID id_produto,\n"
+                    + "		p.ProdCodBarras3 ean\n"
+                    + "	from\n"
+                    + "		TB_PRODUTO p\n"
+                    + "	where\n"
+                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras3,''))) != ''\n"
+                    + ")\n"
+                    + "select \n"
+                    + "	p.ProdID as id,\n"
+                    + "	p.ProdCodInterno,\n"
+                    + "	ean.ean,\n"
+                    + "	un.UnSigla as unidade,\n"
+                    + "	p.ProdDescricao as descricao,\n"
+                    + "	case p.ProdStatusID\n"
+                    + "		when 1053 then 0\n"
+                    + "		else 1\n"
+                    + "	end ativo,\n"
+                    + "	p.ProdFabricanteID,\n"
+                    + "	p.ProdFamiliaID,\n"
+                    + "	p.ProdNcm as ncm,\n"
+                    + "	p.ProdCest as cest,\n"
+                    + "	p.ProdPesoBruto as pesobruto,\n"
+                    + "	p.ProdPesoLiquido as pesoliquido,\n"
+                    + "	p.ProdPrecoCompra,\n"
+                    + "	p.ProdPrecoCusto as custo,\n"
+                    + "	p.ProdValorVenda1 as precovenda,\n"
+                    + "	p.ProdEstoqueMin as estoqueminimo,\n"
+                    + "	p.ProdEstoqueMax as estoquemaximo,\n"
+                    + "	est.EstConsAtual as estoque,\n"
+                    + "	p.ProdMargem1 as margem,\n"
+                    + "	p.ProdDtCadastro as datacadastro,\n"
+                    + "	p.ProdEmbalagemQtde as qtdembalagem,\n"
+                    + "	p.ProdClaFisID as tribicms,\n"
+                    + "	pis.CstPisCofinsCodigo as cstpissaida,\n"
+                    + "	pis.CstPisCofinsDescricao,\n"
+                    + "	cofins.CstPisCofinsCodigo as cstpisentrada,\n"
+                    + "	cofins.CstPisCofinsDescricao,\n"
+                    + "	nat.NatRecPisCofinsCodigo as naturezareceita,\n"
+                    + "	nat.NatRecPisCofinsDescricao,\n"
+                    + "	p.ProdCaixaQtde volume\n"
+                    + "from\n"
+                    + "	dbo.TB_PRODUTO p\n"
+                    + "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n"
+                    + "		p.ProdID = est.EstConsProdID\n"
+                    + "	left join ean on\n"
+                    + "		p.ProdID = ean.id_produto\n"
+                    + "	left join dbo.TB_UNIDADE_MEDIDA un on\n"
+                    + "		un.UnID = p.ProdUnidadeMedidaID\n"
+                    + "	left join dbo.TB_CST_PIS_COFINS pis on\n"
+                    + "		pis.CstPisCofinsID = p.ProdCstPisID and\n"
+                    + "		pis.CstPisCofinsOperacaoID = 129\n"
+                    + "	left join dbo.TB_CST_PIS_COFINS cofins on\n"
+                    + "		cofins.CstPisCofinsID = p.ProdCstCofinsCompraID and\n"
+                    + "		cofins.CstPisCofinsOperacaoID = 128\n"
+                    + "	left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on\n"
+                    + "		nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n"
+                    + "order by\n"
+                    + "	p.ProdCodInterno"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -246,8 +254,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);                    
+                    int codigoProduto = Utils.stringToInt(rst.getString("ProdCodInterno"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
                     if (produtoBalanca != null) {
                         imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
@@ -255,14 +263,14 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
                         imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
-                    } else {                        
+                    } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(false);
                         imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -289,7 +297,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rst.getString("tribicms"));
                     imp.setIcmsConsumidorId(rst.getString("tribicms"));
                     imp.setVolume(rst.getDouble("volume"));
-                    
+                    imp.setQtdEmbalagemCotacao(rst.getInt("volume"));
+
                     result.add(imp);
                 }
             }
@@ -303,34 +312,55 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    "select * from (select\n"
+                    + "	p.prodid id,\n"
+                    + "	p.prodcodbarras1 ean,\n"
+                    + "	un.UnSigla as unidade\n"
+                    + "from\n"
+                    + "	tb_produto p\n"
+                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
+                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
+                    + "where\n"
+                    + "	ltrim(rtrim(coalesce(p.prodcodbarras1, ''))) != ''\n"
+                    + "union all \n"
+                    + "select\n"
                     + "	p.ProdID as id,\n"
                     + "	p.ProdCodBarras2 as ean,\n"
                     + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all\n"
-                    + "select \n"
+                    + "from\n"
+                    + "	dbo.TB_PRODUTO p\n"
+                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
+                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
+                    + "union all \n"
+                    + "select\n"
                     + "	p.ProdID as id,\n"
                     + "	p.ProdCodBarras3 as ean,\n"
                     + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all\n"
-                    + "select \n"
+                    + "from\n"
+                    + "	dbo.TB_PRODUTO p\n"
+                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
+                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
+                    + "union all \n"
+                    + "select\n"
                     + "	p.ProdID as id,\n"
                     + "	p.ProdEan14 as ean,\n"
                     + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
+                    + "from\n"
+                    + "	dbo.TB_PRODUTO p\n"
+                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
+                    + "	un.UnID = p.ProdUnidadeMedidaID) ea \n"
+                    + "where \n"
+                    + "	ea.ean is not null"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+
                     result.add(imp);
                 }
             }
@@ -344,51 +374,51 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	f.FornID as id,\n" +
-                    "	f.FornCodInterno,\n" +
-                    "	f.FornDiasEntrega,\n" +
-                    "	pes.PessoaNome as razao,\n" +
-                    "	pes.PessoaFantasia as fantasia,\n" +
-                    "	pes.PessoaCpfCnpj as cnpj,\n" +
-                    "	pes.PessoaIERG as ie_rg,\n" +
-                    "	pes.PessoaIM as inscricaomunicipal,\n" +
-                    "	ende.EndLogradouro as endereco,\n" +
-                    "	ende.EndNumero as numero,\n" +
-                    "	ende.EndComplemento as complemento,\n" +
-                    "	ende.EndBairro as bairro,\n" +
-                    "	ende.EndCEP as cep,\n" +
-                    "	cid.CidNome as municipio,\n" +
-                    "	cid.CidCodigoIBGE as municipio_ibge,\n" +
-                    "	case pes.PessoaSituacaoID\n" +
-                    "		when 51 then 0\n" +
-                    "		else 1\n" +
-                    "	end ativo,\n" +
-                    "	uf.UfSigla as uf,\n" +
-                    "	uf.UfCodigoIBGE as uf_ibge,\n" +
-                    "	pes.PessoaEmail as email,\n" +
-                    "	pes.PessoaSite as site,\n" +
-                    "	pes.PessoaFonePrincipal as telefone,\n" +
-                    "	pes.PessoaFoneCelular as celular,\n" +
-                    "	pes.PessoaFoneFAX as fax,\n" +
-                    "	pes.PessoaFoneOutro as telefone2,\n" +
-                    "	pes.PessoaFonePABX as pabx,\n" +
-                    "	pes.PessoaObservacoes as observacao,\n" +
-                    "	pes.PessoaDtCadastro as datacadastro\n" +
-                    "from\n" +
-                    "	dbo.TB_FORNECEDOR f\n" +
-                    "	join dbo.TB_PESSOA_PFPJ pes on\n" +
-                    "		pes.PessoaID = f.FornID\n" +
-                    "	left join dbo.TB_PESSOA_ENDERECOS pend on\n" +
-                    "		pend.PessoaID = pes.PessoaID\n" +
-                    "	left join dbo.TB_ENDERECO ende on\n" +
-                    "		ende.EndID = pend.PessoaEndID\n" +
-                    "	left join dbo.TB_CIDADE cid on\n" +
-                    "		cid.CidID = ende.EndCidadeID\n" +
-                    "	left join dbo.TB_UF uf on\n" +
-                    "		uf.UfID = cid.CidUfID\n" +
-                    "order by\n" +
-                    "	f.FornID"
+                    "select \n"
+                    + "	f.FornID as id,\n"
+                    + "	f.FornCodInterno,\n"
+                    + "	f.FornDiasEntrega,\n"
+                    + "	pes.PessoaNome as razao,\n"
+                    + "	pes.PessoaFantasia as fantasia,\n"
+                    + "	pes.PessoaCpfCnpj as cnpj,\n"
+                    + "	pes.PessoaIERG as ie_rg,\n"
+                    + "	pes.PessoaIM as inscricaomunicipal,\n"
+                    + "	ende.EndLogradouro as endereco,\n"
+                    + "	ende.EndNumero as numero,\n"
+                    + "	ende.EndComplemento as complemento,\n"
+                    + "	ende.EndBairro as bairro,\n"
+                    + "	ende.EndCEP as cep,\n"
+                    + "	cid.CidNome as municipio,\n"
+                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
+                    + "	case pes.PessoaSituacaoID\n"
+                    + "		when 51 then 0\n"
+                    + "		else 1\n"
+                    + "	end ativo,\n"
+                    + "	uf.UfSigla as uf,\n"
+                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
+                    + "	pes.PessoaEmail as email,\n"
+                    + "	pes.PessoaSite as site,\n"
+                    + "	pes.PessoaFonePrincipal as telefone,\n"
+                    + "	pes.PessoaFoneCelular as celular,\n"
+                    + "	pes.PessoaFoneFAX as fax,\n"
+                    + "	pes.PessoaFoneOutro as telefone2,\n"
+                    + "	pes.PessoaFonePABX as pabx,\n"
+                    + "	pes.PessoaObservacoes as observacao,\n"
+                    + "	pes.PessoaDtCadastro as datacadastro\n"
+                    + "from\n"
+                    + "	dbo.TB_FORNECEDOR f\n"
+                    + "	join dbo.TB_PESSOA_PFPJ pes on\n"
+                    + "		pes.PessoaID = f.FornID\n"
+                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on\n"
+                    + "		pend.PessoaID = pes.PessoaID\n"
+                    + "	left join dbo.TB_ENDERECO ende on\n"
+                    + "		ende.EndID = pend.PessoaEndID\n"
+                    + "	left join dbo.TB_CIDADE cid on\n"
+                    + "		cid.CidID = ende.EndCidadeID\n"
+                    + "	left join dbo.TB_UF uf on\n"
+                    + "		uf.UfID = cid.CidUfID\n"
+                    + "order by\n"
+                    + "	f.FornID"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -471,56 +501,52 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	c.CliID as id,\n" +
-                    "	c.CliCodigoPessoal,\n" +
-                    "	c.CliLimiteTotal as valortotal,\n" +
-                    "	c.CliLimiteSaldo as valorsaldo,\n" +
-                    "	case pes.PessoaSituacaoID\n" +
-                    "		when 51 then 0\n" +
-                    "		else 1\n" +
-                    "	end ativo,\n" +
-                    "	pes.PessoaNome as razao,\n" +
-                    "	pes.PessoaFantasia as fantasia,\n" +
-                    "	pes.PessoaCpfCnpj as cnpj,\n" +
-                    "	pes.PessoaIERG as ie_rg,\n" +
-                    "	pes.PessoaIM as inscricaomunicipal,\n" +
-                    "	ende.EndLogradouro as endereco,\n" +
-                    "	ende.EndNumero as numero,\n" +
-                    "	ende.EndComplemento as complemento,\n" +
-                    "	ende.EndBairro as bairro,\n" +
-                    "	ende.EndCEP as cep,\n" +
-                    "	cid.CidNome as municipio,\n" +
-                    "	cid.CidCodigoIBGE as municipio_ibge,\n" +
-                    "	uf.UfSigla as uf,\n" +
-                    "	uf.UfCodigoIBGE as uf_ibge,\n" +
-                    "	pes.PessoaEmail as email,\n" +
-                    "	pes.PessoaSite as site,\n" +
-                    "	pes.PessoaFonePrincipal as telefone,\n" +
-                    "	pes.PessoaFoneCelular as celular,\n" +
-                    "	pes.PessoaFoneFAX as fax,\n" +
-                    "	pes.PessoaFoneOutro as telefone2,\n" +
-                    "	pes.PessoaFonePABX as pabx,\n" +
-                    "	pes.PessoaObservacoes as observacao,\n" +
-                    "	pes.PessoaDtCadastro as datacadastro\n" +
-                    "from\n" +
-                    "	dbo.TB_CLIENTE c\n" +
-                    "	join dbo.TB_PESSOA_PFPJ pes on\n" +
-                    "		pes.PessoaID = c.CliID\n" +
-                    "	left join dbo.TB_PESSOA_ENDERECOS pend on\n" +
-                    "		pend.PessoaID = pes.PessoaID\n" +
-                    "	left join dbo.TB_ENDERECO ende on\n" +
-                    "		ende.EndID = pend.PessoaEndID\n" +
-                    "	left join dbo.TB_CIDADE cid on\n" +
-                    "		cid.CidID = ende.EndCidadeID\n" +
-                    "	left join dbo.TB_UF uf on\n" +
-                    "		uf.UfID = cid.CidUfID\n" +
-                    "order by\n" +
-                    "	c.CliID"
+                    "select \n"
+                    + "	c.CliID as id,\n"
+                    + "	coalesce(c.CliCodigoPessoal, c.cliId) as CliCodigoPessoal,\n"
+                    + "	c.CliLimiteTotal as valortotal,\n"
+                    + "	c.CliLimiteSaldo as valorsaldo,\n"
+                    + "	case pes.PessoaSituacaoID\n"
+                    + "		when 51 then 0\n"
+                    + "		else 1\n"
+                    + "	end ativo,\n"
+                    + "	pes.PessoaNome as razao,\n"
+                    + "	pes.PessoaFantasia as fantasia,\n"
+                    + "	pes.PessoaCpfCnpj as cnpj,\n"
+                    + "	pes.PessoaIERG as ie_rg,\n"
+                    + "	pes.PessoaIM as inscricaomunicipal,\n"
+                    + "	ende.EndLogradouro as endereco,\n"
+                    + "	ende.EndNumero as numero,\n"
+                    + "	ende.EndComplemento as complemento,\n"
+                    + "	ende.EndBairro as bairro,\n"
+                    + "	ende.EndCEP as cep,\n"
+                    + "	cid.CidNome as municipio,\n"
+                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
+                    + "	uf.UfSigla as uf,\n"
+                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
+                    + "	pes.PessoaEmail as email,\n"
+                    + "	pes.PessoaSite as site,\n"
+                    + "	pes.PessoaFonePrincipal as telefone,\n"
+                    + "	pes.PessoaFoneCelular as celular,\n"
+                    + "	pes.PessoaFoneFAX as fax,\n"
+                    + "	pes.PessoaFoneOutro as telefone2,\n"
+                    + "	pes.PessoaFonePABX as pabx,\n"
+                    + "	pes.PessoaObservacoes as observacao,\n"
+                    + "	pes.PessoaDtCadastro as datacadastro\n"
+                    + "from\n"
+                    + "	dbo.TB_CLIENTE c\n"
+                    + "	join dbo.TB_PESSOA_PFPJ pes on pes.PessoaID = c.CliID\n"
+                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on pend.PessoaID = pes.PessoaID\n"
+                    + "	left join dbo.TB_ENDERECO ende on ende.EndID = pend.PessoaEndID\n"
+                    + "	left join dbo.TB_CIDADE cid on cid.CidID = ende.EndCidadeID\n"
+                    + "	left join dbo.TB_UF uf on uf.UfID = cid.CidUfID\n"
+                    + "order by\n"
+                    + "	c.CliID"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rst.getString("id"));
+                  //imp.setId(rst.getString("id"));                        ID DO CLIENTE, 
+                    imp.setId(rst.getString("CliCodigoPessoal"));       // CODIGO INTERNO CLIENTE
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
@@ -559,55 +585,57 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
         List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
-        
+
         try (
-            Statement stm = ConexaoSqlServer.getConexao().createStatement();
-            ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	t.CliSaldoMovCliID as id_cliente,\n" +
-                    "	sum(t.CliSaldoMovValor) as valor\n" +
-                    "from\n" +
-                    "	TB_CLIENTE_SALDO_MOVIMENTO t\n" +
-                    "where\n" +
-                    "	t.CliSaldoMovNaturezaID = 100\n" +
-                    "group by\n" +
-                    "	t.CliSaldoMovCliID"
-            )
-        ) {
+                Statement stm = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        //+ "	t.CliSaldoMovCliID as id_cliente,\n"
+                        + "     tc.CliCodigoPessoal as id_cliente,\n"          
+                        + "	sum(t.CliSaldoMovValor) as valor\n"
+                        + "from\n"
+                        + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
+                        + "     join TB_CLIENTE tc on tc.CliID =  t.CliSaldoMovCliID\n"        
+                        + "where\n"
+                        + "	t.CliSaldoMovNaturezaID = 100\n"
+                        + "group by\n"
+                        + "	tc.CliCodigoPessoal"
+                )) {
             while (rst.next()) {
                 result.add(new CreditoRotativoPagamentoAgrupadoIMP(
                         rst.getString("id_cliente"),
                         rst.getDouble("valor")
                 ));
-            }            
+            }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	t.CliSaldoMovID as id,\n" +
-                    "	v.VndDtEmissao as emissao,\n" +
-                    "	v.VndNumeroVenda as numerocupom,\n" +
-                    "	v.VndEstacaoID as ecf,\n" +
-                    "	t.CliSaldoMovValor as valor,\n" +
-                    "	t.CliSaldoMovObservacao as observacao,\n" +
-                    "	t.CliSaldoMovCliID as id_cliente\n" +
-                    "from\n" +
-                    "	TB_CLIENTE_SALDO_MOVIMENTO t\n" +
-                    "	join TB_VENDA v on\n" +
-                    "		t.CliSaldoMovOrigemID = v.VndID\n" +
-                    "where\n" +
-                    "	t.CliSaldoMovNaturezaID = 99 and\n" +
-                    "	v.VndDtCancelamento is null\n" +
-                    "order by\n" +
-                    "	t.CliSaldoMovID "
+                    "select\n"
+                    + "	t.CliSaldoMovID as id,\n"
+                    + "	v.VndDtEmissao as emissao,\n"
+                    + "	v.VndNumeroVenda as numerocupom,\n"
+                    + "	v.VndEstacaoID as ecf,\n"
+                    + "	t.CliSaldoMovValor as valor,\n"
+                    + "	t.CliSaldoMovObservacao as observacao,\n"
+                    + "	tc.CliCodigoPessoal as id_cliente\n"
+                  //+ "	t.CliSaldoMovCliID as id_cliente\n"             // ROTATIVO POR ID_CLIENTE
+                    + "from\n"
+                    + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
+                    + "	join TB_VENDA v on t.CliSaldoMovOrigemID = v.VndID\n"
+                    + "	join TB_CLIENTE tc on tc.CliID =  t.CliSaldoMovCliID\n"
+                    + "where\n"
+                    + "	t.CliSaldoMovNaturezaID = 99 and\n"
+                    + "	v.VndDtCancelamento is null\n"
+                    + "order by\n"
+                    + "	t.CliSaldoMovID "
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -622,11 +650,222 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     vencimento.setTime(rst.getDate("emissao"));
                     vencimento.add(GregorianCalendar.DAY_OF_MONTH, 10);
                     imp.setDataVencimento(vencimento.getTime());
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        
+                        String numeroCupom = rst.getString("numerocupom");
+                        
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        
+                        if(numeroCupom != null && numeroCupom.length() > 10) {
+                            numeroCupom = numeroCupom.substring(5, numeroCupom.length());
+                            next.setNumeroCupom(Utils.stringToInt(numeroCupom));
+                        }
+                                                
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setNomeCliente(rst.getString("nome_cliente"));
+                        next.setCpf(rst.getString("cpf_cnpj"));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("emissao"));
+                        String horaInicio = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horatermino");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "SELECT\n"
+                    + "	v.VndNumeroVenda id_venda,\n"
+                    /*+ "	CASE\n"
+                    + "     when d.VndDocNumero is null\n"
+                    + "     then v.VndNumeroVenda\n"
+                    + "     else d.VndDocNumero\n"
+                    + " END numerocupom,\n"*/
+                    + " v.vndnumerovenda numerocupom,\n"
+                    + "	c2.CliCodigoPessoal id_cliente,\n"
+                    + "	c.PessoaNome nome_cliente,\n"
+                    + "	v.VndNfpCpfCnpj cpf_cnpj,\n"
+                    + "	SUBSTRING(e.EstacaoDescricao, 4, 2) ecf,\n"
+                    + "	v.VndDtEmissao emissao,\n"
+                    + "	CAST (VndDtAbertura as time) horainicio,\n"
+                    + "	CAST (VndDtFechamento as time) horatermino,\n"
+                    + "	CASE\n"
+                    + "     when v.VndClienteValor = 0\n"
+                    + "     then v.VndConvenioValor\n"
+                    + "     ELSE v.VndClienteValor\n"
+                    + "	END subtotalimpressora\n"
+                    + "FROM\n"
+                    + "	TB_VENDA v\n"
+                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID\n"
+                    + "LEFT JOIN TB_ESTACAO e on e.EstacaoID = v.VndEstacaoID\n"
+                    + "LEFT JOIN TB_PESSOA_PFPJ c on c.PessoaID = v.VndClienteID\n"
+                    + "LEFT JOIN TB_CLIENTE c2 on c2.CliID = v.VndClienteID\n"
+                    + "WHERE\n"
+                    + " v.VndDtCancelamento is NULL \n"
+                    + "	and v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
+                        next.setSequencia(rst.getInt("nro_item"));
+                        next.setProduto(rst.getString("produto"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "	v.VndNumeroVenda id_venda,\n"
+                    + "	vi.DocBaseItemID id_item,\n"
+                    + "	vi.DocBaseItemSequencia nro_item,\n"
+                    + "	vi.DocBaseItemProdID produto,\n"
+                    + "	un.UnSigla unidade,\n"
+                    + "	case\n"
+                    + "	   when p.ProdCodBarras1 is null then p.ProdCodInterno\n"
+                    + "	   else p.ProdCodBarras1\n"
+                    + "	end as codigobarras,\n"
+                    + "	p.ProdDescricao descricao,\n"
+                    + "	vi.DocBaseItemQuantidade quantidade,\n"
+                    + "	vi.DocBaseItemValorUnitario precovenda,\n"
+                    + "	vi.DocBaseItemValorTotal total\n"
+                    + "from\n"
+                    + "	TB_DOCUMENTO_BASE_ITENS vi\n"
+                    + "left join TB_VENDA v on v.VndDocBaseID = vi.DocBaseItemDocBaseID \n"
+                    + "left join TB_PRODUTO p on p.ProdID = vi.DocBaseItemProdID \n"
+                    //+ "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID \n"
+                    + "left join TB_UNIDADE_MEDIDA un on un.UnID = vi.DocBaseItemUnidadeID \n"
+                    + "WHERE\n"
+                    //+ " d.VndDocNumero is not NULL \n"
+                    + "v.VndDtEmissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "order by 2,1";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }

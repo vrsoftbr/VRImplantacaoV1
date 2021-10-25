@@ -190,7 +190,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
             chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
             chkIcmsConsumidor.setVisible(opt.contains(OpcaoProduto.ICMS_CONSUMIDOR));
-            btnMapaTribut.setVisible(chkICMS.isVisible());
+            btnMapaTribut.setVisible(chkICMS.isVisible()); 
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkCodigoBeneficio.setVisible(opt.contains(OpcaoProduto.CODIGO_BENEFICIO));
@@ -1448,10 +1448,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         addTab("Importação de Produtos", scrollImportação);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-        
-    }//GEN-LAST:event_btnMapaTributActionPerformed
 
     private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
         chkPautaUsarEansMenores.setEnabled(rdbPautaEan.isSelected());

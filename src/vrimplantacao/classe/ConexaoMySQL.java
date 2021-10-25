@@ -34,7 +34,7 @@ public class ConexaoMySQL {
         senha = i_senha;
 
         try {
-            con = DriverManager.getConnection("jdbc:mysql://" + i_ip + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
+            con = DriverManager.getConnection("jdbc:mysql://" + i_ip + ":" + i_porta + "/" + i_database + "?zeroDateTimeBehavior=convertToNull", i_usuario, i_senha);
 
         } catch (Exception ex) {
             if (!ipSec.isEmpty()) {

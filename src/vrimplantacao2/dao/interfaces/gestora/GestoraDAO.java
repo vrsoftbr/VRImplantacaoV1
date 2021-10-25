@@ -4,9 +4,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -15,6 +18,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -35,6 +39,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -52,9 +57,10 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Gestora";
     }
-
+    
     private Date vendaDataIni;
     private Date vendaDataFim;
+    private boolean migrarMargemProduto;
 
     public void setVendaDataIni(Date vendaDataIni) {
         this.vendaDataIni = vendaDataIni;
@@ -62,6 +68,58 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
+    }
+    
+    public boolean isMigrarMargemProduto() {
+        return this.migrarMargemProduto;
+    }
+    
+    public void setMigrarMargemProduto(boolean migrarMargemProduto) {
+        this.migrarMargemProduto = migrarMargemProduto;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.EXCECAO,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA
+        ));
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
@@ -71,13 +129,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	EMP_CODIGO id,\n"
-                    + "	EMP_NOME descricao\n"
+                    + "	EMP_NOME descricao,\n"
+                    + "	EMP_CGC as cnpj \n"
                     + "from\n"
-                    + "	EMPRESA e\n"
-                    + "	"
+                    + "	EMPRESA e order by 1"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao") + " - " + rst.getString("cnpj")));
                 }
             }
         }
@@ -169,21 +227,22 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	  tri_codigo as codigo,\n"
-                    + "	  tri_descricao as descricao,\n"
-                    + "	case \n"
-                    + "     when tri_descricao like 'TRIBUT%' then 00\n"
-                    + "     when tri_descricao like 'RED%' then 20\n"
-                    + "     when tri_descricao like 'ISEN%' then 40\n"
-                    + "     when tri_descricao like 'NAO TRIB%' then 41\n"
-                    + "     when tri_descricao like 'SUBSTI%' then 60\n"
-                    + "	end cst,\n"
-                    + "   tri_aliquota as aliquota,\n"
-                    + "   tri_reducao as reducao\n"
-                    + " from\n"
-                    + "	  tributacao\n"
-                    + " order by\n"
-                    + "	  tri_codigo"
+                    + "    tri_codigo as codigo,\n"
+                    + "    tri_descricao as descricao,\n"
+                    + "    case\n"
+                    + "        when tri_descricao like '%TRIBUT%' then 00\n"
+                    + "        when tri_descricao like '%RED%' then 20\n"
+                    + "        when tri_descricao like '%ISEN%' then 40\n"
+                    + "        when tri_descricao like '%NAO TRIB%' then 41\n"
+                    + "	       when tri_descricao like '%DIFER%' then 51\n"
+                    + "        when tri_descricao like '%SUBSTI%' then 60\n"
+                    + "    end cst,\n"
+                    + "    tri_aliquota as aliquota,\n"
+                    + "    tri_reducao as reducao\n"
+                    + "from\n"
+                    + "tributacao\n"
+                    + "order by\n"
+                    + "3, 4"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"),
@@ -216,7 +275,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.PRO_VALIDADE validade,\n"
                     + "	p.PRO_DESCRICAO descricaocompleta,\n"
                     + "	replace(p.pro_desc_etiqueta, '  ', '') descricaoreduzida,\n"
-                    + "	p.PRO_DESCRICAO descricaocompleta,\n"
+                    + "	p.PRO_DESCRICAO descricaogondola,\n"
                     + "	p.dep_codigo merc1,\n"
                     + "	p.gru_codigo merc2,\n"
                     + "	p.SUB_CODIGO merc3,\n"
@@ -241,6 +300,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	end as icmsCst,\n"
                     + "	t.TRI_ALIQUOTA icmsAliq,\n"
                     + "	t.TRI_REDUCAO icmsRed,\n"
+                    + " t.tri_codigo, \n"        
                     + "	p.PRO_CST_PIS_ENTRADA piscofinsCredito,\n"
                     + "	p.PRO_CST_PIS piscofinsSaida,\n"
                     + "	p.natr_codigo piscofinsNatureza\n"
@@ -258,9 +318,9 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		end qtdEmbalagem\n"
                     + "	from\n"
                     + "		produtos) ean\n"
-                    + "join produtos p on p.PRO_CODIGO = ean.id\n"
-                    + "join GRU_PRODUTOS gp on p.GRU_CODIGO = gp.GRU_CODIGO\n"
-                    + "join SUBGRUPO_PRODUTOS sb on p.SUB_CODIGO = sb.sub_codigo\n"
+                    + "left join produtos p on p.PRO_CODIGO = ean.id\n"
+                    + "left join GRU_PRODUTOS gp on p.GRU_CODIGO = gp.GRU_CODIGO\n"
+                    + "left join SUBGRUPO_PRODUTOS sb on p.SUB_CODIGO = sb.sub_codigo\n"
                     + "left join tributacao t on p.tri_codigo = t.tri_codigo\n"
                     + "order by id"
             )) {
@@ -287,21 +347,30 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    //imp.setMargem(rst.getDouble("p_margem"));
-                    imp.setMargem(rst.getDouble("merc_margem"));
+                    
+                    if (isMigrarMargemProduto()) {
+                        imp.setMargem(rst.getDouble("p_margem"));
+                    } else {
+                        imp.setMargem(rst.getDouble("merc_margem"));
+                    }
+                    
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaoCadastro")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setIcmsCst(rst.getInt("icmsCst"));
-                    imp.setIcmsAliq(rst.getDouble("icmsAliq"));
-                    imp.setIcmsReducao(rst.getDouble("icmsRed"));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofinsCredito")));
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofinsSaida")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofinsNatureza")));
 
+                    imp.setIcmsDebitoId(rst.getString("tri_codigo"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("tri_codigo"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("tri_codigo"));
+                    imp.setIcmsCreditoId(rst.getString("tri_codigo"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("tri_codigo"));
+                    imp.setIcmsConsumidorId(rst.getString("tri_codigo"));
+                    
                     result.add(imp);
                 }
             }
@@ -466,7 +535,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(c.cli_obs1,'') obs2,\n"
                     + "	coalesce(ltrim(rtrim(sta.STA_DESCRICAO)),'') obs3,\n"
                     + "	c.CLI_LIMITE limite,\n"
-                    + "	c.CLI_LIMITE_CHEQ limite_cheque,\n"
+                    + "	-- c.CLI_LIMITE_CHEQ limite_cheque,\n"
                     + "	c.CLI_CONJUGUE conjuge,\n"
                     + "	c.CLI_PAI nomepai,\n"
                     + "	c.CLI_MAE nomemae,\n"
@@ -554,6 +623,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
@@ -618,96 +688,91 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*public void importarCreditoRotativo(int vrLoja) throws Exception {
-     ProgressBar.setStatus("Carregando dados...Receber Cliente...");
-     List<ReceberCreditoRotativoVO> vReceberCliente = carregarReceberCliente();
-     new ReceberCreditoRotativoDAO().salvar(vReceberCliente, vrLoja);
-     }
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
 
-     public void importarCheque(int vrLoja) throws Exception {
-     ProgressBar.setStatus("Carregando dados...Cheque Receber...");
-     List<ReceberChequeVO> vReceberCheque = carregarReceberCheque();
-     new ReceberChequeDAO().salvar2(vReceberCheque, vrLoja);
-     }
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	rc.PRO_CODIGO_RECEITA as id,\n"
+                    + "	p.PRO_DESCRICAO as descricaoreceita,\n"
+                    + "	rc.PRO_CODIGO as idproduto,\n"
+                    + "	p2.PRO_DESCRICAO as descricaoproduto,\n"
+                    + "	rc.REC_QTDE * 1000 as qtdproduto,\n"
+                    + "	rc.REC_QTDE,\n"
+                    + "	coalesce(rc.REC_EMBALAGEM, 1) as qtdembalagemreceita,\n"
+                    + "	rc.REC_STATUS\n"
+                    + "from RECEITA rc\n"
+                    + "join PRODUTOS p on p.PRO_CODIGO = rc.PRO_CODIGO_RECEITA\n"
+                    + "join PRODUTOS p2 on p2.PRO_CODIGO = rc.PRO_CODIGO\n"
+                    + "and rc.REC_STATUS = 'A'\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportsistema(getSistema());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricaoreceita"));
+                    imp.setRendimento(rst.getDouble("qtdembalagemreceita"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setQtdembalagemreceita(rst.getInt("qtdproduto"));
+                    imp.setFator(1);
+                    imp.setFichatecnica("");
+                    
+                    imp.getProdutos().add(rst.getString("idproduto"));
+                    result.add(imp);
+                }
+            }
+        }
 
-     private List<ReceberChequeVO> carregarReceberCheque() throws Exception {
-     List<ReceberChequeVO> result = new ArrayList<>();
-        
-     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n" +
-     "	c.CLI_CPFCGC cpf,\n" +
-     "	ch.CHE_NUMERO numerocheque,\n" +
-     "	ch.CHE_BANCO id_banco,\n" +
-     "	coalesce(ch.CHE_AGENCIA,'') agencia,\n" +
-     "	coalesce(ch.CHE_CONTA,'') conta,\n" +
-     "	ch.CHE_DATA data,\n" +
-     "	ch.CHE_VALOR valor,\n" +
-     "	ch.CHE_DATA datadeposito,\n" +
-     "	c.CLI_RGINS rg,\n" +
-     "	c.CLI_TELEFONE1 telefone,\n" +
-     "	c.CLI_NOME nome,\n" +
-     "	ch.CHE_HISTORICO observacao,\n" +
-     "	coalesce(ch.CHE_STATUS,'') situacao,\n" +
-     "	ch.CHE_CMC7 cm7,\n" +
-     "	ch.CHE_JUROS valorjuros\n" +
-     "from \n" +
-     "	CHEQUE_REC ch\n" +
-     "	join CLIENTES c on ch.CLI_CODIGO = c.CLI_CODIGO"
-     )) {
-     while (rst.next()) {
-     ReceberChequeVO cheq = new ReceberChequeVO();
-     cheq.setCpf(Utils.stringToLong(rst.getString("cpf")));
-     cheq.setNumerocheque(Utils.stringToInt(rst.getString("numerocheque")));
-     cheq.setId_banco(Utils.stringToInt(rst.getString("id_banco")));
-     cheq.setAgencia(rst.getString("agencia"));
-     cheq.setConta(rst.getString("conta"));
-     cheq.setData(rst.getDate("data"));
-     cheq.setValor(rst.getDouble("valor"));
-     cheq.setDatadeposito(cheq.getData());
-     cheq.setRg(rst.getString("rg"));
-     cheq.setTelefone(rst.getString("telefone"));
-     cheq.setNome(rst.getString("nome"));
-     cheq.setObservacao("IMPORTADO VR " + rst.getString("observacao"));
-     switch(rst.getString("situacao").trim()) {
-     case "E": {
-     cheq.setId_tipoalinea(31);
-     cheq.setId_situacaorecebercheque(2);
-     }; break;
-     case "R": {
-     cheq.setId_tipoalinea(0);
-     cheq.setId_situacaorecebercheque(1);
-     ReceberChequeItemVO baixa = new ReceberChequeItemVO();
-     baixa.setValor(cheq.getValor());
-     baixa.setDatabaixa(rst.getDate("data"));
-     baixa.setDatapagamento(rst.getDate("data"));
-     baixa.setObservacao("IMPORTADO VR");
-     baixa.setId_loja(1);
-     cheq.getvBaixa().add(baixa);
-     }; break;
-     case "P": {
-     cheq.setId_tipoalinea(0);
-     cheq.setId_situacaorecebercheque(1);
-     ReceberChequeItemVO baixa = new ReceberChequeItemVO();
-     baixa.setValor(cheq.getValor());
-     baixa.setDatabaixa(rst.getDate("data"));
-     baixa.setDatapagamento(rst.getDate("data"));
-     baixa.setObservacao("IMPORTADO VR");
-     baixa.setId_loja(1);
-     cheq.getvBaixa().add(baixa);
-     }; break;
-     default: {
-     cheq.setId_tipoalinea(0);
-     cheq.setId_situacaorecebercheque(0);
-     }; break;
-     }
-     result.add(cheq);
-     }
-     }
-     }
-        
-     return result;
-     }*/
+        return result;
+    }
+    
+    public List<ContaPagarIMP> getContasAPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	pag.FIN_REGISTRO as id,\n"
+                    + "	pag.FIN_NUMERONOTA as numeronota,\n"
+                    + "	pag.FIN_NUMERODOC as numerodocumento,\n"
+                    + "	pag.FIN_DTEMISSAO as dataemissao,\n"
+                    + "	pag.FIN_VALOR as valor,\n"
+                    + "	pag.FIN_VALORTOTAL as valortotal,\n"
+                    + "	pag.FIN_ACRESCIMO as acrescimo,\n"
+                    + "	pag.FIN_DESCONTO as desconto,\n"
+                    + "	pag.FIN_HISTORICO as observacao,\n"
+                    + "	pag.FIN_DTLANCAMENTO as lancamento,\n"
+                    + "	pag.FOR_CODIGO as idfornecedor,\n"
+                    + "	parc.FINFAT_PARCELA as numeroparcela,\n"
+                    + "	parc.FINFAT_NUMERODOC,\n"
+                    + "	parc.FINFAT_VENCIMENTO as datavencimento,\n"
+                    + "	parc.FINFAT_VALOR as valorparcela,\n"
+                    + "	parc.FINFAT_ACRESCIMO as acrescimoparcela,\n"
+                    + "	parc.FINFAT_JURO as jurosparcela,\n"
+                    + "	parc.FINFAT_DESCONTO as descontoparcela,\n"
+                    + "	parc.FINFAT_VALORTOTAL as valortotalparcela,\n"
+                    + "	parc.FINFAT_VALORPAGO as valorpagoparcela,\n"
+                    + "	parc.FINFAT_OBS as observacaoparcela\n"
+                    + "from FIN_FINANCEIRO pag\n"
+                    + "join FIN_FATURA parc on parc.FIN_REGISTRO = pag.FIN_REGISTRO\n"
+                    + "where pag.EMP_CODIGO = 1\n"
+                    + "and FINFAT_DTPAGAMENTO is null\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> Result = new ArrayList<>();
@@ -753,7 +818,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("valorjuros"));
-                    imp.setBanco(rst.getInt("id_banco"));
+                    
+                    if (rst.getString("id_banco") != null && !rst.getString("id_banco").trim().isEmpty()) {
+                        imp.setBanco(Integer.parseInt(rst.getString("id_banco").trim()));
+                    } else {
+                        imp.setBanco(804);
+                    }
+                    
                     imp.setCmc7(rst.getString("cm7"));
 
                     Result.add(imp);
@@ -763,91 +834,6 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return Result;
     }
 
-    /*public void importarContasAPagar(int idLojaVR) throws Exception {
-     ProgressBar.setStatus("Carregando dados para comparação...");
-
-     List<PagarOutrasDespesasVO> vPagarOutrasDespesas = carregarContasPagarGetWay(idLojaVR, getLojaOrigem());
-
-     ProgressBar.setMaximum(vPagarOutrasDespesas.size());
-
-     PagarOutrasDespesasDAO pagarOutrasDespesasDAO = new PagarOutrasDespesasDAO();
-     pagarOutrasDespesasDAO.salvar(vPagarOutrasDespesas);
-     }
-
-     private List<PagarOutrasDespesasVO> carregarContasPagarGetWay(int idLojaVR, String lojaOrigem) throws Exception {
-     List<PagarOutrasDespesasVO> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "	cp.FOR_CODIGO id_fornecedor,\n"
-     + "	cp.CON_NLCTO numerocdocumento,\n"
-     + "	210 id_tipoentrada,\n"
-     + "	coalesce(cp.CON_EMISSAO, cp.CON_DLCTO) dataemissao,\n"
-     + "	cp.CON_DLCTO dataentrada,\n"
-     + "	cp.CON_VALOR valor,\n"
-     + "	0 id_situacaopagaroutrasdespesas,\n"
-     + "	coalesce(cp.CON_HISTORICO1,'') CON_HISTORICO1,\n"
-     + "	coalesce(cp.CON_HISTORICO2,'') CON_HISTORICO2,\n"
-     + "	coalesce(cp.CON_DEBITO,'') CON_DEBITO, \n"
-     + "	coalesce(cp.CON_CREDITO,'') CON_CREDITO,\n"
-     + "	coalesce(cp.usu_login,'') usu_login,\n"
-     + "	coalesce(cp.CON_BARRA,'') CON_BARRA,\n"
-     + "	coalesce(cp.CON_NDOC,'') CON_NDOC,\n"
-     + "	cp.CON_VECTO vencimento\n"
-     + "from \n"
-     + "	contabil cp\n"
-     + "	join FORNECEDOR f on cp.FOR_CODIGO = f.FOR_CODIGO\n"
-     + "where \n"
-     + "	cp.CON_STATUS = 'X' and cp.EMP_CODIGO = " + getLojaOrigem() + ""
-     )) {
-     while (rst.next()) {
-     PagarOutrasDespesasVO vo = new PagarOutrasDespesasVO();
-
-     vo.setId_loja(idLojaVR);
-     vo.setId_fornecedor(rst.getInt("id_fornecedor"));
-     vo.setNumerodocumento(Utils.stringToInt(rst.getString("numerocdocumento")));
-     vo.setId_tipoentrada(0);
-     vo.setDataemissao(rst.getDate("dataemissao"));
-     vo.setDataentrada(rst.getDate("dataentrada"));
-     vo.setValor(rst.getDouble("valor"));
-     vo.setId_situacaopagaroutrasdespesas(0);
-     String obs = "IMPORTADO VR";
-     if (!"".equals(rst.getString("CON_DEBITO").trim())) {
-     obs += "|DEB: " + Utils.acertarTexto(rst.getString("CON_DEBITO"));
-     }
-     if (!"".equals(rst.getString("CON_CREDITO").trim())) {
-     obs += "|CRED: " + Utils.acertarTexto(rst.getString("CON_CREDITO"));
-     }
-     if (!"".equals(rst.getString("CON_HISTORICO1").trim())) {
-     obs += "|OBS1: " + Utils.acertarTexto(rst.getString("CON_HISTORICO1"));
-     }
-     if (!"".equals(rst.getString("CON_HISTORICO2").trim())) {
-     obs += "|nOBS2: " + Utils.acertarTexto(rst.getString("CON_HISTORICO2"));
-     }
-     if (!"".equals(rst.getString("usu_login").trim())) {
-     obs += "|nCriado por: " + Utils.acertarTexto(rst.getString("usu_login"));
-     }
-     if (!"".equals(rst.getString("CON_BARRA").trim())) {
-     obs += "|Barra: " + Utils.acertarTexto(rst.getString("CON_BARRA"));
-     }
-     if (!"".equals(rst.getString("CON_NDOC").trim())) {
-     obs += "|nNum. Doc: " + Utils.acertarTexto(rst.getString("CON_NDOC"));
-     }
-     vo.setObservacao(Utils.acertarTexto(obs, 280));
-     PagarOutrasDespesasVencimentoVO venc = new PagarOutrasDespesasVencimentoVO();
-     venc.setDatavencimento(rst.getDate("vencimento"));
-     venc.setValor(vo.getValor());
-     vo.getvPagarOutrasDespesasVencimento().add(venc);
-     vo.setId_tipopiscofins(13);
-
-     result.add(vo);
-     }
-     }
-     }
-
-     return result;
-     }*/
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> Result = new ArrayList<>();

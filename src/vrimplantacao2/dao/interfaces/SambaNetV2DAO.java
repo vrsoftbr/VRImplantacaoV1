@@ -29,6 +29,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complemento;
+    public boolean utilizarTabelaParam = false;
+    public String rotativoPDV = "";
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
@@ -83,21 +85,36 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
+        
+        String sqlLoja = "";
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	CODLOJA id,\n"
-                    + "	descricao\n"
-                    + "from\n"
-                    + "	LOJA\n"
-                    + "order by\n"
-                    + "	id"
-            )) {
-                while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
-                }
+            if (utilizarTabelaParam) {
+                
+                sqlLoja = "select\n"
+                        + "	CODLOJA id,\n"
+                        + "	razao descricao\n"
+                        + "from\n"
+                        + "	param\n"
+                        + "order by\n"
+                        + "	id";
+            } else {
+                sqlLoja = "select\n"
+                        + "	CODLOJA id,\n"
+                        + "	descricao\n"
+                        + "from\n"
+                        + "	LOJA\n"
+                        + "order by\n"
+                        + "	id";
             }
+            
+            try (ResultSet rst = stm.executeQuery(sqlLoja)) {
+                    while (rst.next()) {
+                        result.add(new Estabelecimento(
+                                rst.getString("id"),
+                                rst.getString("descricao")));
+                    }
+                }
         }
 
         return result;
@@ -380,7 +397,13 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
                     imp.setId(rst.getString("ID"));
+                    
+                    if(!rotativoPDV.isEmpty()) {
+                        imp.setId(rotativoPDV + "-" + rst.getString("ID"));
+                    }
+
                     imp.setIdCliente(rst.getString("CODCLIE"));
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataVencimento(rst.getDate("DTVENCTO"));
