@@ -209,6 +209,12 @@ public class LojaDAO {
                 stm.execute(copiarPdvBalancaEtiquetaLayout(i_loja).getInsert());
             }
 
+            /* cópia tabela pdv.tecladolayout  e pdv.tecladolayoutfuncao */
+            if (i_loja.isCopiaTecladoLayout()) {
+                copiarPdvTecladoLayout(i_loja);
+                copiarPdvTecladoLayoutFuncao(i_loja);
+            }
+            
             /* cópia da tabela pdv.finalizadoraconfiguracao */
             stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
 

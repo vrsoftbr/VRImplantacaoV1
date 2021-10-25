@@ -35,11 +35,6 @@ public class LojaService {
                 lojaDAO.atualizarLoja(vo);
             } else {
                 lojaDAO.salvarLoja(vo);
-
-                if (vo.isCopiaTecladoLayout()) {
-                    lojaDAO.copiarPdvTecladoLayout(vo);
-                    lojaDAO.copiarPdvTecladoLayoutFuncao(vo);
-                }
             }
             
             provider.commit();
