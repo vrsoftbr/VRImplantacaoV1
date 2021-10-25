@@ -48,9 +48,9 @@ public class AtualizadorServiceTest {
     public void testVerificarSistema() throws Exception {
         AtualizadorDAO atualizadorDAO = mock(AtualizadorDAO.class);
         
-        when(atualizadorDAO.verificarSistema(ESistema.GETWAY)).thenReturn(true);
+        when(atualizadorDAO.verificarSistema(ESistema.SYSPDV)).thenReturn(true);
         
-        assertEquals(true, atualizadorDAO.verificarSistema(ESistema.GETWAY));
+        assertEquals(true, atualizadorDAO.verificarSistema(ESistema.SYSPDV));
     }
     
     @Test
@@ -88,7 +88,7 @@ public class AtualizadorServiceTest {
         
         atualizadorService.salvarSistema();
         
-        Mockito.verify(atualizadorDAO, Mockito.times(1)).salvarSistema(ESistema.GETWAY);
+        Mockito.verify(atualizadorDAO, Mockito.times(1)).salvarSistema(ESistema.SYSPDV);
     }
     
 }

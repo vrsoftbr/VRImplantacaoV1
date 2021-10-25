@@ -2,10 +2,12 @@ package vrimplantacao.gui.cadastro;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2_5.controller.loja.LojaController;
 
 public class LojaCadastroGUI extends VRInternalFrame {
 
@@ -99,7 +101,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.copiaTecladoLayout = chkCopiaTecladoLayout.isSelected();
         oLoja.setCopiaMargem(chkCopiaMargem.isSelected());
 
-        new LojaDAO().salvar(oLoja);
+        new LojaController().salvar(oLoja);
 
         parentFrame.vLoja.add(oLoja);
         cboCopiarLoja.carregar();

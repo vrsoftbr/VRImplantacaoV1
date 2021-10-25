@@ -30,7 +30,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
+public class InterageDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String i_arquivoXLS;
     private String complemento = "";

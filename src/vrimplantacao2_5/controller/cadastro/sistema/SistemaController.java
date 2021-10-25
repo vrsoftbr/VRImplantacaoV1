@@ -40,4 +40,8 @@ public class SistemaController {
         return sistema;
     }
     
+    public List<SistemaVO> getSistema(int idSistema) throws Exception {
+        return sistemaService.getSistema(idSistema);
+    }
+    
 }
