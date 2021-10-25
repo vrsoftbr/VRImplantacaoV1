@@ -443,13 +443,21 @@ public class LojaDAO {
         }
     }
     
+    public class ProximoIdTecladoLayoutVO {
+        public int proximoIdTecladoLayout;
+    }
+    
+    public List<ProximoIdTecladoLayoutVO> proximoIdTecladoLayoutVO = new ArrayList<>();
+    
     public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
         
         List<TecladoLayoutVO> tecladoLayoutVO = getTecladoLayout(i_loja);
-        
+
         try (Statement stm = Conexao.createStatement()) {
             for (TecladoLayoutVO vo : tecladoLayoutVO) {
 
+                ProximoIdTecladoLayoutVO i_idTecladoLayoutVO = new ProximoIdTecladoLayoutVO();
+                
                 int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
 
                 SQLBuilder sqlTecladoLayout = new SQLBuilder();
@@ -460,6 +468,9 @@ public class LojaDAO {
                 sqlTecladoLayout.put("id_loja", i_loja.getId());
                 sqlTecladoLayout.put("descricao", vo.getDescricao());
 
+                i_idTecladoLayoutVO.proximoIdTecladoLayout = proximoIdTecladoLayout;
+                proximoIdTecladoLayoutVO.add(i_idTecladoLayoutVO);
+                
                 stm.execute(sqlTecladoLayout.getInsert());
             }
         }
@@ -485,12 +496,17 @@ public class LojaDAO {
                         + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
                 )) {
                     while (rst.next()) {
-                        TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
-                        vo.setIdTecladoLayout(rst.getInt("idtecladolayout"));
-                        vo.setCodigoRetorno(rst.getInt("codigoretorno"));
-                        vo.setIdFuncao(rst.getInt("id_funcao"));
                         
-                        result.add(vo);
+                        for (ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO : proximoIdTecladoLayoutVO) {
+
+                            TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
+                            vo.setIdTecladoLayout(i_proximoIdTecladoLayoutVO.proximoIdTecladoLayout);
+                            vo.setCodigoRetorno(rst.getInt("codigoretorno"));
+                            vo.setIdFuncao(rst.getInt("id_funcao"));
+
+                            result.add(vo);
+                        
+                        }
                     }
                 }
             }
