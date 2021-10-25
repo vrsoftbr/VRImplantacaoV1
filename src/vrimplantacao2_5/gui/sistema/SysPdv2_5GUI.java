@@ -252,7 +252,6 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
                         dao.setSoAtivos(chkSoAtivos.isSelected());
                         dao.setDtOfertas(txtDtTerminoOferta.getDate());
-                        dao.setIgnorarEnviaBalanca(chkIgnorarEnviaBalanca.isSelected());
                         dao.setUsarOfertasDoEncarte(chkOfertasEncarte.isSelected());
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
