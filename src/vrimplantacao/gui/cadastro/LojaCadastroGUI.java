@@ -97,7 +97,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.copiaCusto = chkCopiaCusto.isSelected();
         oLoja.copiaTecladoLayout = chkCopiaTecladoLayout.isSelected();
 
-        new LojaController().salvarNovo(oLoja);
+        new LojaController().salvar(oLoja);
 
         parentFrame.vLoja.add(oLoja);
         cboCopiarLoja.carregar();

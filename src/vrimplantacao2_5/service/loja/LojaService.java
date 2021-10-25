@@ -26,7 +26,7 @@ public class LojaService {
         this.provider = provider;
     }
     
-    public void salvaNovo(LojaVO vo) throws Exception {
+    public void salvar(LojaVO vo) throws Exception {
         
         try {
             provider.begin();
@@ -34,7 +34,7 @@ public class LojaService {
             if (isLojaExiste(vo)) {
                 lojaDAO.atualizarLoja(vo);
             } else {
-                lojaDAO.salvarLoja(vo);
+                lojaDAO.salvar(vo);
             }
             
             provider.commit();

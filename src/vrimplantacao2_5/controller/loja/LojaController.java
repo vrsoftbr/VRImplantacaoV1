@@ -11,7 +11,7 @@ public class LojaController {
     
     private final LojaService lojaService = new LojaService();
     
-    public void salvarNovo(LojaVO vo) throws Exception {
-        lojaService.salvaNovo(vo);
+    public void salvar(LojaVO vo) throws Exception {
+        lojaService.salvar(vo);
     }
 }
