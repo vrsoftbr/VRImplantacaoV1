@@ -1,7 +1,10 @@
 package vrimplantacao2.services;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import vrframework.classe.Conexao;
+import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.planilhas.ConversorPlanilhaDAO;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.csv.ArquivoCSV;
@@ -30,51 +33,61 @@ public class ConversaoPlanilhaService extends ArquivoCSV {
     }
 
     public void converter() throws Exception {
-        List<StringBuilder> inserts = new ArrayList<>();
         ConversorPlanilhaDAO dao = new ConversorPlanilhaDAO();
         StringBuilder createTable = new StringBuilder();
 
-        dao.converter("drop table if exists implantacao." + getNameTable());
+        try {
+            Conexao.begin();
+            dao.converter("drop table if exists implantacao." + getNameTable());
 
-        createTable.append("create table implantacao." + getNameTable() + "(");
+            createTable.append("create table implantacao." + getNameTable() + "(");
 
-        String format = "";
-        String campos = "";
+            String format = "";
+            String campos = "";
 
-        for (String column : cabecalho) {
-            format = " varchar,\n";
+            for (String column : cabecalho) {
+                format = " varchar,\n";
 
-            createTable.append(column + format);
+                createTable.append(column + format);
 
-            campos += column + ",";
-        }
-
-        dao.converter(createTable.toString().substring(0, createTable.length() - 2) + ");");
-
-        campos = campos.substring(0, campos.length() - 1);
-        
-        StringBuilder insertTable = new StringBuilder();
-        
-        insertTable.append("insert into implantacao." + getNameTable() + " (");
-        insertTable.append(campos + ") values (");        
-        
-        String cmp[] = campos.split(",");
-        
-        for (LinhaArquivo registro : dados) {
-            
-            for (int i = 0; i < cabecalho.size(); i++) {
-                
-                if(i == cabecalho.size() - 1) {
-                    insertTable.append(registro.getString(cmp[i]) + ") ");
-                } else {
-                    insertTable.append(registro.getString(cmp[i]) + ",");
-                }
-                
+                campos += column + ",";
             }
 
-            //String formatted = insertTable.toString().substring(0, insertTable.toString().length() - 1) + "),";
+            dao.converter(createTable.toString().substring(0, createTable.length() - 2) + ");");
+
+            campos = campos.substring(0, campos.length() - 1);
+
+            StringBuilder insertTable = new StringBuilder();
+
+            insertTable.append("insert into implantacao." + getNameTable() + " (");
+            insertTable.append(campos + ") values ");
+
+            String cmp[] = campos.split(",");
+
+            for (LinhaArquivo registro : dados) {
+
+                insertTable.append("(");
+
+                for (int i = 0; i < cabecalho.size(); i++) {
+
+                    if (i == cabecalho.size() - 1) {
+                        insertTable.append("'" + registro.getString(cmp[i]) + "'), ");
+                    } else {
+                        insertTable.append("'" + registro.getString(cmp[i]) + "',");
+                    }
+                }
+            }
+
+            String queryInsert = insertTable.toString().substring(0, insertTable.toString().length() - 2) + ";";
+
+            dao.converter(queryInsert);
+            Conexao.commit();
             
-            System.out.println(insertTable.toString());
+            Util.exibirMensagem("Planilha convertida com sucesso!", "Conversor de Planilha");
+            
+        } catch (SQLException e) {
+            Conexao.rollback();
+            e.printStackTrace();
         }
     }
 }
