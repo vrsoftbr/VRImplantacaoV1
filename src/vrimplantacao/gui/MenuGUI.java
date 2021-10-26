@@ -312,6 +312,7 @@ import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
 import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
+import vrimplantacao2.gui.planilha.ConversaoPlanilhaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 
@@ -925,6 +926,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDelRegistro = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
+        mnuConversaoPlanilha = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -3514,6 +3516,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuAvancadas.add(mnuCorrecaoImpostosDSoft);
 
+        mnuConversaoPlanilha.setText("Conversão de Planilha");
+        mnuConversaoPlanilha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuConversaoPlanilhaActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(mnuConversaoPlanilha);
+
         mnuFerramentas.add(mnuAvancadas);
 
         mnuMenu.add(mnuFerramentas);
@@ -5436,6 +5446,10 @@ public final class MenuGUI extends VRMdiFrame {
         Stock_PostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuStockPostgresActionPerformed
 
+    private void mnuConversaoPlanilhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuConversaoPlanilhaActionPerformed
+        ConversaoPlanilhaGUI.Exibir(this);
+    }//GEN-LAST:event_mnuConversaoPlanilhaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5560,6 +5574,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControlePlus;
     private javax.swing.JMenuItem mnuControll;
+    private javax.swing.JMenuItem mnuConversaoPlanilha;
     private javax.swing.JMenuItem mnuCorrecaoImpostosDSoft;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenuItem mnuCronos20;
