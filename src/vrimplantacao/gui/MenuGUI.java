@@ -279,6 +279,7 @@ import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GestorGUI;
 import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
@@ -707,6 +708,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
         mnuGCom = new javax.swing.JMenuItem();
+        mnuGestor = new javax.swing.JMenuItem();
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
@@ -1836,6 +1838,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuGCom);
+
+        mnuGestor.setText("Gestor");
+        mnuGestor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGestorActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuGestor);
 
         chkGigatron.setText("Gigatron");
         chkGigatron.addActionListener(new java.awt.event.ActionListener() {
@@ -5451,6 +5461,11 @@ public final class MenuGUI extends VRMdiFrame {
         SupermercadoHipermaxGUI.exibir(this);
     }//GEN-LAST:event_mnuSupermercadoHipermaxActionPerformed
 
+    private void mnuGestorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGestorActionPerformed
+        // TODO add your handling code here:
+        GestorGUI.exibir(this);
+    }//GEN-LAST:event_mnuGestorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5623,6 +5638,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuGeneric;
+    private javax.swing.JMenuItem mnuGestor;
     private javax.swing.JMenuItem mnuGestorPDV;
     private javax.swing.JMenuItem mnuGondola;
     private javax.swing.JMenuItem mnuHRTechV1;
