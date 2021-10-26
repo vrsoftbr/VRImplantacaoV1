@@ -1,21 +1,13 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.interfaces.AriusDAO;
@@ -29,15 +21,11 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -45,25 +33,37 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private boolean importarCodigoPrincipal;
-
-    private Date vendaDataInicio;
-    private Date vendaDataTermino;
-    public boolean utilizarSup025 = false;
-
     private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
-
-    public boolean isImportarCodigoPrincipal() {
-        return this.importarCodigoPrincipal;
-    }
-
-    public void setImportarCodigoPrincipal(boolean importarCodigoPrincipal) {
-        this.importarCodigoPrincipal = importarCodigoPrincipal;
-    }
 
     @Override
     public String getSistema() {
         return "WBA";
+    }
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CAST(CODIGO AS integer) AS id,\n"
+                    + "	CGC cpfcnpj,\n"
+                    + "	NOME nomefantasia\n"
+                    + "FROM\n"
+                    + "	FILIAL f \n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    result.add(
+                            new Estabelecimento(
+                                    rst.getString("id"),
+                                    rst.getString("nomefantasia") + "-" + rst.getString("cpfcnpj")
+                            )
+                    );
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -89,29 +89,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " SUP003 AS id,\n"
-                    + " DESCRICAO AS descricao\n"
-                    + "FROM SUP003"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    vResult.add(imp);
-                }
-            }
-        }
-        return vResult;
     }
 
     @Override
@@ -174,32 +151,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO,\n"
-                    + "	CGC cpfcnpj,\n"
-                    + "	NOME nomefantasia\n"
-                    + "FROM\n"
-                    + "	FILIAL f \n"
-                    + "ORDER BY 1"
-            )) {
-                while (rst.next()) {
-                    result.add(
-                            new Estabelecimento(
-                                    rst.getString("codigo"),
-                                    rst.getString("nomefantasia") + "-" + rst.getString("cpfcnpj")
-                            )
-                    );
-                }
-            }
-        }
-        return result;
-    }
-
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -229,6 +180,7 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rst.getString("descmerc2"));
                     imp.setMerc3ID(rst.getString("codmerc3"));
                     imp.setMerc3Descricao(rst.getString("descmerc3"));
+
                     result.add(imp);
                 }
             }
@@ -241,20 +193,14 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n"
-                    + "  p.SUP001 AS idproduto,\n"
-                    + "  cx.DUN AS ean,\n"
-                    + "  c.MULTIPLICADOR AS qtdembalagem\n"
-                    + " FROM SUP081 cx\n"
-                    + " JOIN SUP001 p ON p.SUP001 = cx.SUP001 \n"
-                    + " JOIN SUP009 c ON c.SUP009 = cx.SUP009\n"
-                    + " UNION\n"
-                    + " SELECT\n"
-                    + "	SUP001 idproduto,\n"
-                    + "	EAN,\n"
-                    + "	MULTIPLICADOR qtdembalagem\n"
+                    "SELECT\n"
+                    + "	TRIM(CODIGO) idproduto,\n"
+                    + "	TRIM(CODIGO) ean,\n"
+                    + "	1 AS qtdembalagem,\n"
+                    + "	NOME\n"
                     + "FROM\n"
-                    + "	SUP013\n"
+                    + "	CTPROD\n"
+                    + "WHERE codigo <> ''\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -381,48 +327,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(rst.getString("familiaid"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
                     imp.setPautaFiscalId(rst.getString("idpautafiscal"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ReceitaIMP> getReceitas() throws Exception {
-        List<ReceitaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	p.SUP001 AS id_produtopai,\n"
-                    + "	p.DESCRICAO AS descricao,\n"
-                    + "	r.PRODUTO AS id_produtofilho,\n"
-                    + "	p2.DESCRICAO AS descricaofilho,\n"
-                    + "	r.QUANTIDADE,\n"
-                    + "	(r.QUANTIDADE * 1000) AS qtde,\n"
-                    + "	1 AS rendimento\n"
-                    + "FROM\n"
-                    + "	SUP124 r\n"
-                    + "JOIN SUP001 p ON p.SUP001 = r.SUP001\n"
-                    + "JOIN SUP001 P2 ON p2.SUP001 = r.PRODUTO"
-            )) {
-                while (rst.next()) {
-                    ReceitaIMP imp = new ReceitaIMP();
-
-                    imp.setImportsistema(getSistema());
-                    imp.setImportloja(getLojaOrigem());
-                    imp.setImportid(rst.getString("id_produtopai"));
-                    imp.setIdproduto(rst.getString("id_produtopai"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    imp.setRendimento(rst.getDouble("rendimento"));
-                    imp.setQtdembalagemreceita(rst.getInt("qtde"));
-                    imp.setQtdembalagemproduto(1000);
-                    imp.setFator(1);
-                    imp.setFichatecnica("");
-                    imp.getProdutos().add(rst.getString("id_produtofilho"));
 
                     result.add(imp);
                 }
@@ -591,24 +495,25 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	pf.SUP010 AS idfornecedor,\n"
-                    + "	p.SUP001 AS idproduto,\n"
-                    + "	pf.ULTIMA_COMPRA AS dtalteracao,\n"
-                    + "	pf.REFERENCIA AS codigoexterno\n"
+                    + "	CODIGO id_produto,\n"
+                    + "	FORNECEDOR id_fornecedor,\n"
+                    + "	CODPRODFORNEC codexterno,\n"
+                    + "	QTDEPOREMBALAGEM qtd_embalagem\n"
                     + "FROM\n"
-                    + "	SUP016 pf\n"
-                    + "JOIN SUP001 p ON p.SUP001 = pf.SUP001\n"
+                    + "	CTPROD_CPRITEM\n"
+                    + "WHERE\n"
+                    + "	CODPRODFORNEC IS NOT NULL\n"
+                    + "	AND CODPRODFORNEC <> ''\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setDataAlteracao(rst.getDate("dtalteracao"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    //imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("codexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtd_embalagem"));
 
                     result.add(imp);
                 }
@@ -668,134 +573,59 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-
-        String sqlCliente
-                = "SELECT\n"
-                + "	c.sup024 id,\n"
-                + "	c.razaosocial razao,\n"
-                + "	c.FANTASIA ,\n"
-                + "	c.DTNASCIMENTO as dtnascimento,\n"
-                + "	c.CNPJ_CPF as cpfcnpj,\n"
-                + "	c.INSCRICAO,\n"
-                + "	c.TELEFONE1,\n"
-                + "	c.TELEFONE2,\n"
-                + "	c.CELULAR,\n"
-                + "	c.EMAIL,\n"
-                + "	c.DTCADASTRO as datacadastro,\n"
-                + "	c.DTALTERACAO,\n"
-                + "	c.ENDERECO,\n"
-                + "	c.NUMERO,\n"
-                + "	c.COMPLEMENTO,\n"
-                + "	c.BAIRRO,\n"
-                + "	c.CEP,\n"
-                + "	mun.nome as municipio,\n"
-                + "	mun.uf as uf,\n"
-                + "	c.NOME_PAI as pai,\n"
-                + "	c.NOME_MAE as mae,\n"
-                + "	c.CONJUJE as conjuge,\n"
-                + "	c.OBSERVACAO,\n"
-                + "	CASE WHEN ATIVO = 'S' THEN 1\n"
-                + "	ELSE 0 END AS STATUS\n"
-                + "FROM\n"
-                + "	SUP024 C\n"
-                + "JOIN sup118 Mun ON\n"
-                + "	Mun.sup118 = c.sup118\n"
-                + "ORDER BY 1";
-
-        if (utilizarSup025) {
-            sqlCliente = "SELECT\n"
-                    + "	'D.'||c.sup025 AS  id,\n"
-                    + "	c.nome razao,\n"
-                    + "	c.APELIDO fantasia,\n"
-                    + "	c.NASCIMENTO dtnascimento,\n"
-                    + "	c.CPF cpfcnpj,\n"
-                    + "	c.rg inscricao,\n"
-                    + "	c.TELEFONE1,\n"
-                    + "	c.TELEFONE2,\n"
-                    + "	c.CELULAR,\n"
-                    + "	c.EMAIL,\n"
-                    + "	c.EMISSAO AS datacadastro,\n"
-                    + "	CASE\n"
-                    + "		WHEN c.BLOQUEADO = 'S' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END AS BLOQUEADO,\n"
-                    + "	c.databloq databloqueio,\n"
-                    + "	CASE\n"
-                    + "		WHEN c.CANCELADO = 'S' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END status,\n"
-                    + "	c.OBSERVACAO,\n"
-                    + "	c.PRAZO_PGTO,\n"
-                    + "	c.DIA_VENCTO vencimento,\n"
-                    + "	CASE\n"
-                    + "		WHEN c.CHEQUE_BLOQUEADO = 'S' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END permitechq,\n"
-                    + "	c.ENDERECO,\n"
-                    + "	c.NUMERO,\n"
-                    + "	c.COMPLEMENTO,\n"
-                    + "	c.BAIRRO,\n"
-                    + "	c.CEP,\n"
-                    + "	mun.nome municipio,\n"
-                    + "	mun.uf uf,\n"
-                    + "	c.pai,\n"
-                    + "	c.MAE,\n"
-                    + "	c.CONJUGE,\n"
-                    + "	c.CPFCONJUGE,\n"
-                    + "	c.PROFISSAO,\n"
-                    + "	c.RENDAMENSAL SALARIO,\n"
-                    + "	c.LIMITE valorlimite\n"
-                    + "FROM\n"
-                    + "	SUP025 C\n"
-                    + "JOIN sup118 Mun ON Mun.sup118 = c.sup118\n"
-                    + "ORDER BY 1";
-        }
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(sqlCliente)) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	codigo id,\n"
+                    + "	nome,\n"
+                    + "	cnpj,\n"
+                    + "	CASE\n"
+                    + "		WHEN RG IS NULL THEN IE\n"
+                    + "		ELSE rg\n"
+                    + "	END rg_ie,\n"
+                    + "	ender endereco,\n"
+                    + "	numero,\n"
+                    + "	compl,\n"
+                    + "	bairro,\n"
+                    + "	cidade,	\n"
+                    + "	estado,\n"
+                    + "	cep,\n"
+                    + "	celular,\n"
+                    + "	email,\n"
+                    + "	BLOQUEIO,\n"
+                    + "	CASE COALESCE(INATIVO,0) WHEN 0 THEN 1 ELSE 0 END ativo,\n"
+                    + "	DATA data_cadastro,\n"
+                    + "	LIMITE,\n"
+                    + "	PROFISSAO\n"
+                    + "FROM\n"
+                    + "	sigcad"
+            )) {
+
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
-
-                    imp.setDataNascimento(rs.getDate("dtnascimento"));
-
-                    imp.setCnpj(rs.getString("cpfcnpj"));
-                    imp.setInscricaoestadual(rs.getString("inscricao"));
-
-                    imp.setTelefone(rs.getString("telefone1"));
-                    imp.setFax(rs.getString("telefone2"));
-                    imp.setCelular(rs.getString("celular"));
-                    imp.setEmail(rs.getString("email"));
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setAtivo(rs.getBoolean("status"));
-                    imp.setObservacao(rs.getString("OBSERVACAO"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setFantasia(imp.getRazao());
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("rg_ie"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setComplemento(rs.getString("compl"));
                     imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setMunicipio(rs.getString("municipio"));
-                    imp.setUf(rs.getString("uf"));
 
-                    imp.setNomePai(rs.getString("pai"));
-                    imp.setNomeMae(rs.getString("mae"));
-                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
 
-                    if (utilizarSup025) {
-                        imp.setCargo(rs.getString("profissao"));
-                        imp.setSalario(rs.getDouble("salario"));
-                        imp.setValorLimite(rs.getDouble("valorlimite"));
-                        imp.setBloqueado(rs.getBoolean("bloqueado"));
-                        imp.setDataBloqueio(rs.getDate("databloqueio"));
-                        imp.setPrazoPagamento(rs.getInt("prazo_pgto"));
-                        imp.setDiaVencimento(rs.getInt("vencimento"));
-                        imp.setPermiteCheque(rs.getBoolean("permitechq"));
-                    }
+                    imp.setBloqueado(rs.getBoolean("bloqueio"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setCargo(rs.getString("profissao"));
 
                     result.add(imp);
                 }
@@ -807,59 +637,13 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-
-        String rotativoCliente = "SELECT\n"
-                + "	d.SUP043 AS id,\n"
-                + "	c.SUP024 AS clienteid,\n"
-                + "	d.DUPLICATA AS numerocupom,\n"
-                + "	d.PARCIAL,\n"
-                + "	d.EMISSAO AS dataemissao,\n"
-                + "	d.VENCIMENTO AS dataevencimento,\n"
-                + "	d.DATA_PGTO,\n"
-                + "	d.VALOR,\n"
-                + "	d.VALOR_PAGO,\n"
-                + "	d.JUROS as juros,\n"
-                + "	d.DESCONTO,\n"
-                + "	d.ACRESCIMO,\n"
-                + "	d.OBSERVACAO as obs\n"
-                + "FROM\n"
-                + "	SUP043 d\n"
-                + "JOIN SUP024 c ON c.SUP024 = d.SUP024\n"
-                + "WHERE\n"
-                + "	d.VALOR_PAGO = 0\n"
-                + "	AND\n"
-                + " d.SUP029 <> 638\n"
-                + "	AND\n"
-                + "	d.SUP999 = " + getLojaOrigem() + " -- Num. Loja";
-
-        if (utilizarSup025) {
-            rotativoCliente = "SELECT \n"
-                    + " r.SUP026 AS id,\n"
-                    + " 'D.'||c.SUP025 AS clienteid,\n"
-                    + " r.CUPOM AS numerocupom,\n"
-                    + " r.DATA AS dataemissao,\n"
-                    + " r.DATAVENC AS dataevencimento,\n"
-                    + " r.DATA_PGTO,\n"
-                    + " r.VALOR,\n"
-                    + " r.VALOR_PAGO,\n"
-                    + " r.VALOR_DESC,\n"
-                    + " r.JUROS,\n"
-                    + " r.TOTAL_JUROS,\n"
-                    + " 'IMP' AS OBS\n"
-                    + "FROM SUP026 r\n"
-                    + "JOIN SUP025 c ON c.SUP025 = r.SUP025 \n"
-                    + "WHERE \n"
-                    + " r.VALOR_PAGO = 0\n"
-                    + " AND \n"
-                    + " r.VALOR > 0\n"
-                    + " AND \n"
-                    + " r.SUP999 = " + getLojaOrigem() + " -- Num. Loja";
-        }
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(rotativoCliente)) {
+            try (ResultSet rs = stm.executeQuery(
+                    ""
+            )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
                     imp.setValor(rs.getDouble("valor"));
@@ -874,208 +658,5 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
-
-    public void setVendaDataInicio(Date vendaDataInicio) {
-        this.vendaDataInicio = vendaDataInicio;
-    }
-
-    public void setVendaDataTermino(Date vendaDataTermino) {
-        this.vendaDataTermino = vendaDataTermino;
-    }
-
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(Utils.stringToInt(getLojaOrigem()), vendaDataInicio, vendaDataTermino);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(Utils.stringToInt(getLojaOrigem()), vendaDataInicio, vendaDataTermino);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
-
-        private Statement stm;
-        private ResultSet rst;
-        private final String sql;
-
-        public VendaIterator(int origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = ConexaoFirebird.getConexao().createStatement();
-            this.sql
-                    = "SELECT\n"
-                    + "	v.SUP184 AS id,\n"
-                    + "	v.COO AS numerocupom,\n"
-                    + "	s.ECF_NUMERO AS ecf,\n"
-                    + "	v.ECF_SERIE AS numeroserie,\n"
-                    + "	v.DATA,\n"
-                    + "	CASE\n"
-                    + "		WHEN v.CANCELADO = 'N' THEN 0\n"
-                    + "		ELSE 1\n"
-                    + "	END AS cancelado,\n"
-                    + "	v.CNPJ_CPF AS cpf,\n"
-                    + "	v.HORAI AS horainicio,\n"
-                    + "	v.HORAF AS horafim,\n"
-                    + "	v.TOTAL AS valor\n"
-                    + "FROM\n"
-                    + "	SUP184 v\n"
-                    + "LEFT JOIN SUP050 s ON s.ECF_SERIE = v.ECF_SERIE\n"
-                    + "WHERE\n"
-                    + "  v.DATA >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "	AND\n"
-                    + "  v.DATA <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
-                    + "	AND\n"
-                    + "  v.SUP999 = " + origem + "\n"
-                    + "ORDER BY 1";
-            this.stm.setFetchSize(10000);
-            this.rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            try {
-                return !rst.isClosed() && !rst.isLast();
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        @Override
-        public VendaIMP next() {
-            try {
-                if (rst.next()) {
-                    VendaIMP imp = new VendaIMP();
-                    imp.setId(rst.getString("id"));
-                    imp.setNumeroCupom(Utils.stringToInt(imp.getId()));
-                    imp.setEcf(rst.getInt("ecf"));
-                    imp.setData(rst.getDate("data"));
-
-                    String horaInicio = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                    String horaTermino = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horafim");
-
-                    imp.setHoraInicio(TIMESTAMP.parse(horaInicio));
-                    imp.setHoraTermino(TIMESTAMP.parse(horaTermino));
-                    imp.setCancelado(rst.getBoolean("cancelado"));
-                    imp.setSubTotalImpressora(rst.getDouble("valor"));
-                    imp.setCpf(rst.getString("cpf"));
-                    imp.setNumeroSerie(rst.getString("numeroserie"));
-
-                    return imp;
-                } else {
-                    rst.close();
-                    stm.close();
-                    return null;
-                }
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, "Erro no next()", ex);
-                throw new RuntimeException(ex);
-            } catch (ParseException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            return null;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Não suportado.");
-        }
-    }
-
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
-        private Statement stm;
-        private ResultSet rst;
-        private String sql;
-
-        public VendaItemIterator(int origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = ConexaoFirebird.getConexao().createStatement();
-            this.sql
-                    = "SELECT\n"
-                    + "	v.SUP155 AS id,\n"
-                    + " vc.sup184 idvenda,\n"
-                    + "	v.ITEM AS sequencia,\n"
-                    + "	v.COO AS numerocupom,\n"
-                    + "	vc.COO,\n"
-                    + "	v.ECFSERIE AS ecf,\n"
-                    + "	v.DATA,\n"
-                    + "	v.SUP001 AS produtoid,\n"
-                    + "	p.EAN AS ean,\n"
-                    + "	v.QUANTIDADE AS qtde,\n"
-                    + "	CASE\n"
-                    + "		WHEN v.CANCELADO = 'N' THEN 0\n"
-                    + "		ELSE 1\n"
-                    + "	END AS cancelado,\n"
-                    + "	v.DESCONTO,\n"
-                    + "	v.ACRESCIMO,\n"
-                    + "	v.TOTAL AS valor,\n"
-                    + "	tr.DESCRICAO AS unidade,\n"
-                    + "	v.CST_ICMS AS cst,\n"
-                    + "	v.VL_ICMS AS aliquota\n"
-                    + "FROM\n"
-                    + "	SUP155 v\n"
-                    + "LEFT JOIN SUP184 vc ON v.SUP184 = vc.SUP184\n"
-                    + "LEFT JOIN SUP001 p ON p.SUP001 = v.SUP001\n"
-                    + "LEFT JOIN SUP009 tr ON tr.SUP009 = p.SUP009_VENDA\n"
-                    + "WHERE\n"
-                    + "  v.DATA >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "	AND\n"
-                    + "  v.DATA <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
-                    + "	AND\n"
-                    + "   v.SUP999 = " + origem + "\n"
-                    + "ORDER BY 1";
-            this.stm.setFetchSize(10000);
-            this.rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            try {
-                return !rst.isClosed() && !rst.isLast();
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        @Override
-        public VendaItemIMP next() {
-            try {
-                if (rst.next()) {
-                    VendaItemIMP imp = new VendaItemIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setVenda(rst.getString("idvenda"));
-                    imp.setSequencia(rst.getInt("sequencia"));
-                    imp.setProduto(rst.getString("produtoid"));
-                    imp.setQuantidade(rst.getDouble("qtde"));
-                    imp.setPrecoVenda(rst.getDouble("valor"));
-                    imp.setValorDesconto(rst.getDouble("desconto"));
-                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
-                    imp.setCodigoBarras(rst.getString("ean"));
-                    imp.setUnidadeMedida(rst.getString("unidade"));
-                    imp.setIcmsCst(rst.getInt("cst"));
-                    imp.setIcmsAliq(rst.getDouble("aliquota"));
-                    imp.setCancelado(rst.getBoolean("cancelado"));
-
-                    return imp;
-                } else {
-                    rst.close();
-                    stm.close();
-                    return null;
-                }
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, "Erro no next()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Não suportado.");
-        }
     }
 }

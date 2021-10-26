@@ -14,7 +14,6 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.WBADAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -32,7 +31,6 @@ public class WBAGUI extends VRInternalFrame {
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private int vTipoVenda = -1;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -44,7 +42,6 @@ public class WBAGUI extends VRInternalFrame {
         txtSenhaFirebird.setText(params.getWithNull("masterkey", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
-        vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
     
     private void gravarParametros() throws Exception {
@@ -177,7 +174,6 @@ public class WBAGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    dao.utilizarSup025 = chkUtlizaSup025.isSelected();
                     
                     switch (tab.getSelectedIndex()) {
                         case 0:
@@ -206,13 +202,6 @@ public class WBAGUI extends VRInternalFrame {
                                 importador.unificarClientePreferencial();
                             }
                             break;
-                        case 5:
-                            if (chkPdvVendas.isSelected()) {
-                                dao.setVendaDataInicio(txtDtIInicioVenda.getDate());
-                                dao.setVendaDataTermino(txtDtTerminoVenda.getDate());
-                                
-                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                            }
                         default:
                             break;
                     }
@@ -273,9 +262,6 @@ public class WBAGUI extends VRInternalFrame {
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
-        chkUtlizaSup025 = new vrframework.bean.checkBox.VRCheckBox();
         tabVendas = new javax.swing.JPanel();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
@@ -429,33 +415,6 @@ public class WBAGUI extends VRInternalFrame {
         );
 
         tab.addTab("Unificação", tabUnificacao);
-
-        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
-
-        chkUtlizaSup025.setText("Utiliza Tabela SUP025 para Cliente");
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(366, Short.MAX_VALUE))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(292, Short.MAX_VALUE))
-        );
-
-        tab.addTab("Especiais", vRPanel1);
 
         chkPdvVendas.setText("Vendas (PDV)");
         chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
@@ -720,9 +679,7 @@ public class WBAGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
-    private vrframework.bean.checkBox.VRCheckBox chkUtlizaSup025;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JPanel jPanel1;
@@ -752,7 +709,6 @@ public class WBAGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo2;
