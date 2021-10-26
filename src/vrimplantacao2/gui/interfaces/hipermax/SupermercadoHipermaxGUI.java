@@ -165,6 +165,10 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
+                    } else {
+                        if (cbxUnifProdutos.isSelected()) {
+                            importador.unificarProdutos();
+                        }
                     }
 
                     ProgressBar.dispose();
@@ -194,6 +198,8 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        jPanel1 = new javax.swing.JPanel();
+        cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -209,6 +215,27 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
         tabParametros.addTab("Produtos", tabProdutos);
 
         tabs.addTab("Importação", tabParametros);
+
+        org.openide.awt.Mnemonics.setLocalizedText(cbxUnifProdutos, "Unificar produtos (Somente EANs válidos)");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(337, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(278, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Unificação", jPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, "Migrar");
@@ -297,11 +324,13 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;

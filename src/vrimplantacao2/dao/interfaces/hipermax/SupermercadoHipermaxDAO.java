@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -240,6 +241,32 @@ public class SupermercadoHipermaxDAO extends InterfaceDAO {
                     imp.setIcmsReducaoConsumidor(0);
                     
                     result.add(imp);                    
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	trim(codigo) as codigo,\n"
+                    + "	trim(gtin) as ean,\n"
+                    + "	trim(tipoembalagem) as tipoembalagem\n"
+                    + "from implantacao.produtos_hipermax"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setEan(rst.getString("ean")); 
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    result.add(imp);
                 }
             }
         }
