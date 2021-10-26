@@ -530,6 +530,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN sm_cd_mo_movimentador B ON a.movimentador = B.COD\n"
                     + "WHERE \n"
                     + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
+                    + " AND a.historico NOT LIKE 'M. de Estoque%'\n"
                     + "	AND B.tipo like '%0%'\n"
                     + "	AND cr.BAIXA IS NULL"
             )) {
