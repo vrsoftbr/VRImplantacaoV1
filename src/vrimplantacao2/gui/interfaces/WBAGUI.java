@@ -75,6 +75,7 @@ public class WBAGUI extends VRInternalFrame {
         carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             
