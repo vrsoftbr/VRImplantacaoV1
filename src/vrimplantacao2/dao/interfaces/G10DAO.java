@@ -438,7 +438,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n" +
+                    "select\n" +
                     "	d.id importId,\n" +
                     "	coalesce(pj.razaosocial, pf.nome) razao,\n" +
                     "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n" +
@@ -458,21 +458,20 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.cep,\n" +
                     "	d.datacadastro datacadastro,\n" +
                     "	pj.obs observacao\n" +
-                    " from \n" +
+                    "from \n" +
                     "	dados d\n" +
-                    "	join fornecedor f on\n" +
-                    "		d.id = f.id\n" +
-                    "	left join dadospessoafisica pf on\n" +
+                    "join dadosvinculo f on\n" +
+                    "		d.id = f.dadosid  and vinculoid=4\n" +
+                    "left join dadospessoafisica pf on\n" +
                     "		d.id = pf.id\n" +
-                    "	left join dadospessoajuridica pj on\n" +
+                    "left join dadospessoajuridica pj on\n" +
                     "		d.id = pj.id\n" +
-                    "	left join endereco e on\n" +
+                    "left join endereco e on\n" +
                     "		e.dadosid = d.id\n" +
-                    "	left join cidade cd on\n" +
+                    "left join cidade cd on\n" +
                     "		e.cidade::integer = cd.id\n" +
-                    " order by 1"
+                    "order by 1"
             )) {
-
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());

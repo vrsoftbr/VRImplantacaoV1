@@ -279,6 +279,7 @@ import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GestorGUI;
 import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
@@ -310,8 +311,10 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
+import vrimplantacao2.gui.interfaces.hipermax.SupermercadoHipermaxGUI;
 import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
+import vrimplantacao2.gui.planilha.ConversaoPlanilhaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 
@@ -706,6 +709,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
         mnuGCom = new javax.swing.JMenuItem();
+        mnuGestor = new javax.swing.JMenuItem();
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
@@ -910,6 +914,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPlanilhaVr = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
+        mnuSupermercadoHipermax = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         mnuContaPagar = new javax.swing.JMenuItem();
         mnuVRPdv = new javax.swing.JMenuItem();
@@ -925,6 +930,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDelRegistro = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
+        mnuConversaoPlanilha = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -1834,6 +1840,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuGCom);
+
+        mnuGestor.setText("Gestor");
+        mnuGestor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGestorActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuGestor);
 
         chkGigatron.setText("Gigatron");
         chkGigatron.addActionListener(new java.awt.event.ActionListener() {
@@ -3408,6 +3422,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuEspeciais.add(jMenuItem12);
 
+        mnuSupermercadoHipermax.setText("Migração Supermercado Hipermax");
+        mnuSupermercadoHipermax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSupermercadoHipermaxActionPerformed(evt);
+            }
+        });
+        mnuEspeciais.add(mnuSupermercadoHipermax);
+
         mnuImpSistema.add(mnuEspeciais);
 
         mnuAcertarIdsProdutos.setText("Acertar Ids Produtos");
@@ -3513,6 +3535,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuAvancadas.add(mnuCorrecaoImpostosDSoft);
+
+        mnuConversaoPlanilha.setText("Conversão de Planilha");
+        mnuConversaoPlanilha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuConversaoPlanilhaActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(mnuConversaoPlanilha);
 
         mnuFerramentas.add(mnuAvancadas);
 
@@ -5436,6 +5466,21 @@ public final class MenuGUI extends VRMdiFrame {
         Stock_PostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuStockPostgresActionPerformed
 
+    private void mnuSupermercadoHipermaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSupermercadoHipermaxActionPerformed
+        // TODO add your handling code here:
+        SupermercadoHipermaxGUI.exibir(this);
+    }//GEN-LAST:event_mnuSupermercadoHipermaxActionPerformed
+
+    private void mnuGestorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGestorActionPerformed
+        // TODO add your handling code here:
+        GestorGUI.exibir(this);
+    }//GEN-LAST:event_mnuGestorActionPerformed
+
+    private void mnuConversaoPlanilhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuConversaoPlanilhaActionPerformed
+        ConversaoPlanilhaGUI.Exibir(this);
+    }//GEN-LAST:event_mnuConversaoPlanilhaActionPerformed
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5560,6 +5605,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControlePlus;
     private javax.swing.JMenuItem mnuControll;
+    private javax.swing.JMenuItem mnuConversaoPlanilha;
     private javax.swing.JMenuItem mnuCorrecaoImpostosDSoft;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenuItem mnuCronos20;
@@ -5608,6 +5654,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuGeneric;
+    private javax.swing.JMenuItem mnuGestor;
     private javax.swing.JMenuItem mnuGestorPDV;
     private javax.swing.JMenuItem mnuGondola;
     private javax.swing.JMenuItem mnuHRTechV1;
@@ -5733,6 +5780,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;
+    private javax.swing.JMenuItem mnuSupermercadoHipermax;
     private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysAut;
     private javax.swing.JMenuItem mnuSysmoFirebird;

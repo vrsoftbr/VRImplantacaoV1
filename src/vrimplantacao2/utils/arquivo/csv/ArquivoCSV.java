@@ -101,7 +101,7 @@ public class ArquivoCSV extends AbstractArquivo {
         }
     }
     
-    public static class CSVException extends Exception{
+    public static class CSVException extends Exception{ 
 
         public CSVException() {
         }

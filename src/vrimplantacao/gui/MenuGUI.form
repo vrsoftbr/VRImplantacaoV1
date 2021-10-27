@@ -780,6 +780,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuGComActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuGestor">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Gestor"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuGestorActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="chkGigatron">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Gigatron"/>
@@ -2401,6 +2409,14 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem12ActionPerformed"/>
                       </Events>
                     </MenuItem>
+                    <MenuItem class="javax.swing.JMenuItem" name="mnuSupermercadoHipermax">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Migra&#xe7;&#xe3;o Supermercado Hipermax"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSupermercadoHipermaxActionPerformed"/>
+                      </Events>
+                    </MenuItem>
                   </SubComponents>
                 </Menu>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuAcertarIdsProdutos">
@@ -2519,6 +2535,14 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCorrecaoImpostosDSoftActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mnuConversaoPlanilha">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Convers&#xe3;o de Planilha"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuConversaoPlanilhaActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>
