@@ -112,7 +112,7 @@ public class SolidoGUI extends VRInternalFrame {
         this.setMaximum(false);
     }
 
-    public void validarDadosAcessoPostgres() throws Exception {
+    public void validarDadosAcessoFirebird() throws Exception {
         if (txtHostFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
         }
@@ -139,6 +139,7 @@ public class SolidoGUI extends VRInternalFrame {
                         null
                 ));
             }
+            
             if (!txtMVCUPOM.getArquivo().isEmpty()) {
                 dao.setMvcupom(ConexaoFirebird.getNewConnection(
                         txtHostFirebird.getText(),
@@ -878,7 +879,7 @@ public class SolidoGUI extends VRInternalFrame {
                 connSQL.close();
             }
 
-            validarDadosAcessoPostgres();
+            validarDadosAcessoFirebird();
             btnConectarFirebird.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {

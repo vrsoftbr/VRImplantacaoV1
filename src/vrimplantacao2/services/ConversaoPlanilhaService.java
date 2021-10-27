@@ -1,8 +1,6 @@
 package vrimplantacao2.services;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.planilhas.ConversorPlanilhaDAO;
@@ -18,7 +16,10 @@ public class ConversaoPlanilhaService extends ArquivoCSV {
     private String nameTable = "";
     private String arquivo;
 
-    public ConversaoPlanilhaService(String arquivo, char delimiter, boolean quoteString, char stringQuote) throws Exception {
+    public ConversaoPlanilhaService(String arquivo, 
+                char delimiter, 
+                boolean quoteString, 
+                char stringQuote) throws Exception {
         super(arquivo, delimiter, quoteString, stringQuote);
 
         this.arquivo = arquivo;

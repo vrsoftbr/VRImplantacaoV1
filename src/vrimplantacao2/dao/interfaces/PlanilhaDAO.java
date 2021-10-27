@@ -1290,10 +1290,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
 
-        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        Arquivo oferta = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
 
         ProgressBar.setStatus("Carregando ofertas...");
-        for (LinhaArquivo linha : inventario) {
+        for (LinhaArquivo linha : oferta) {
             OfertaIMP imp = new OfertaIMP();
 
             imp.setIdProduto(linha.getString("id"));
