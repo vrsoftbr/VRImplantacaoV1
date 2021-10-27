@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -47,7 +48,26 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendaDataInicio;
     private Date vendaDataTermino;
 
-    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
+    private Connection bancovendas;
+    private Connection bancoretaguarda;
+
+    private static final Logger LOG = Logger.getLogger(MobilityDAO.class.getName());
+
+    public Connection getBancovendas() {
+        return bancovendas;
+    }
+
+    public void setBancovendas(Connection bancovendas) {
+        this.bancovendas = bancovendas;
+    }
+
+    public Connection getBancoretaguarda() {
+        return bancoretaguarda;
+    }
+
+    public void setBancoretaguarda(Connection bancoretaguarda) {
+        this.bancoretaguarda = bancoretaguarda;
+    }
 
     @Override
     public String getSistema() {
@@ -95,7 +115,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select id, s_nome_fantasia fantasia from configuracoes"
             )) {
@@ -110,7 +130,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    id,\n"
@@ -133,7 +153,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     " SELECT \n"
                     + "	DISTINCT\n"
@@ -175,7 +195,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	ID,\n"
@@ -203,7 +223,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + "   p.id,\n"
@@ -327,14 +347,19 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    p.codigo_interno id,\n"
-                    + "    s_codigo ean\n"
-                    + "from\n"
-                    + "    cod_auxiliares c\n"
-                    + "join produtos p on c.id_produto = p.id"
+                    "SELECT\n"
+                    + "	p.codigo_interno AS id,\n"
+                    + "	s_codigo AS ean\n"
+                    + "FROM\n"
+                    + "	cod_auxiliares c JOIN produtos p ON c.id_produto = p.id\n"
+                    + "UNION\n"
+                    + "SELECT\n"
+                    + "	codigo_interno AS id,\n"
+                    + "	codigo_barras AS ean\n"
+                    + "FROM\n"
+                    + "	PRODUTOS"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -354,7 +379,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    i_numero id,\n"
@@ -480,7 +505,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    pf.id,\n"
@@ -519,7 +544,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    id,\n"
@@ -601,7 +626,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             StringBuilder builder = new StringBuilder();
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
@@ -648,7 +673,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancoretaguarda.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + " icp.id as id,\n"
@@ -705,12 +730,12 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+        return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino, bancovendas);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+        return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino, bancovendas);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -719,25 +744,27 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private final String sql;
 
-        public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = ConexaoOracle.createStatement();
+        public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino, Connection con) throws Exception {
+            this.stm = con.createStatement();
             this.sql
                     = "SELECT\n"
-                    + "	id AS id,\n"
-                    + "	S_COO AS numerocupom,\n"
-                    + "	rpad(S_NUMERO_FABRICACAO,2) AS ecf,\n"
-                    + "	D_DATA_INICIO_EMISSAO AS DATA,\n"
-                    + "	S_HORA AS hora,\n"
+                    + "	R04.id AS id,\n"
+                    + "	R04.S_COO AS numerocupom,\n"
+                    + "	R04.S_NUMERO_FABRICACAO,\n"
+                    + "	r.S_ECF AS ecf,\n"
+                    + "	R04.D_DATA_INICIO_EMISSAO AS DATA,\n"
+                    + "	R04.S_HORA AS hora,\n"
                     + "	CASE\n"
-                    + "		WHEN S_INDICADOR_CANCELAMENTO = 'N' THEN 0\n"
+                    + "		WHEN R04.S_INDICADOR_CANCELAMENTO = 'N' THEN 0\n"
                     + "		ELSE 1\n"
                     + "	END AS cancelado\n"
                     + "FROM\n"
                     + "	R04\n"
+                    + "	LEFT JOIN R01 r ON r.id = R04.ID_R01\n"
                     + "WHERE\n"
-                    + "	D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "	R04.D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
                     + "	AND\n"
-                    + " D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
+                    + " R04.D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
 
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
@@ -784,7 +811,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
@@ -792,14 +819,14 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private String sql;
 
-        public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = ConexaoOracle.createStatement();
+        public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino, Connection con) throws Exception {
+            this.stm = con.createStatement();
             this.sql
                     = "SELECT\n"
                     + "	R05.id AS id,\n"
                     + "	R04.id AS idvenda,\n"
                     + "	R05.S_COO AS numerocupom,\n"
-                    + "	R05.S_NUMERO_FABRICACAO AS ecf,\n"
+                    + "	R01.S_ECF AS ecf,\n"
                     + "	R05.S_NUM_ITEM AS sequencia,\n"
                     + "	R04.D_DATA_INICIO_EMISSAO AS DATA,\n"
                     + "	R04.S_HORA AS hora,\n"
@@ -815,11 +842,11 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " FROM\n"
                     + "	R05\n"
                     + " JOIN R04 ON	R04.id = R05.id_R04\n"
+                    + " LEFT JOIN R01 ON R01.id = R05.id_R01\n"
                     + " WHERE\n"
-                    + "    R04.D_DATA_INICIO_EMISSAO >= '2021-10-07'\n"
+                    + "    R04.D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
                     + "	AND\n"
-                    + "    R04.D_DATA_INICIO_EMISSAO <= '2021-10-07'\n"
-                    + "    ORDER BY 1";
+                    + "    R04.D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
         }
@@ -879,7 +906,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSequencia(rst.getInt("sequencia"));
                     imp.setVenda(rst.getString("idvenda"));
                     imp.setCodigoBarras(rst.getString("ean"));
-                    imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
+                    imp.setDescricaoReduzida(rst.getString("ecf"));
                     imp.setQuantidade(rst.getDouble("qtde"));
                     imp.setPrecoVenda(rst.getDouble("valor"));
                     imp.setValorDesconto(rst.getDouble("desconto"));
