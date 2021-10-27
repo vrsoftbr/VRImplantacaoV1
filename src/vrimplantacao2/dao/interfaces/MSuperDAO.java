@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import com.informix.util.stringUtil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -50,11 +49,13 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date vendaDataInicio;
     private Date vendaDataTermino;
-    private Date cpDataInicio;
-    private Date cpDataTermino;
+    private Date dtInicioContasPagar;
+    private Date dtFimContasPagar;
+    private Date dtInicioRotativo;
+    private Date dtFimRotativo;
     public boolean utilizarSup025 = false;
-    public boolean cpBaixadas = false;
-    public boolean rtBaixadosSup025 = false;
+    public boolean apenasBaixadosContasPagar = false;
+    public boolean apenasBaixadosRotativo = false;
 
     private static final Logger LOG = Logger.getLogger(MSuperDAO.class.getName());
 
@@ -67,7 +68,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     public boolean isContaPagarBaixada() {
-        return cpBaixadas;
+        return apenasBaixadosContasPagar;
     }
 
     @Override
@@ -653,11 +654,11 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     public void setCpDataInicio(Date cpDataInicio) {
-        this.cpDataInicio = cpDataInicio;
+        this.dtInicioContasPagar = cpDataInicio;
     }
 
     public void setCpDataTermino(Date cpDataTermino) {
-        this.cpDataTermino = cpDataTermino;
+        this.dtFimContasPagar = cpDataTermino;
     }
 
     @Override
@@ -693,7 +694,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                 + " AND\n"
                 + " cp.VALOR > 0\n";
 
-        if (cpBaixadas) {
+        if (apenasBaixadosContasPagar) {
             sqlFornecedorPagar
                     = "SELECT\n"
                     + "	cp.SUP020 AS id,\n"
@@ -721,9 +722,9 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " cp.VALOR_PGTO > 0 \n"
                     + " AND cp.VALOR > 0 \n"
                     + "	AND \n"
-                    + "	cp.EMISSAO >= '" + DATE_FORMAT.format(cpDataInicio) + "'\n"
+                    + "	cp.EMISSAO >= '" + DATE_FORMAT.format(dtInicioContasPagar) + "'\n"
                     + "	AND\n"
-                    + " cp.EMISSAO <= '" + DATE_FORMAT.format(cpDataTermino) + "'\n";
+                    + " cp.EMISSAO <= '" + DATE_FORMAT.format(dtFimContasPagar) + "'\n";
         }
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -737,27 +738,20 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    //imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor"));
                     imp.setObservacao(rs.getString("obs"));
                     imp.setValor(rs.getDouble("valor"));
 
-                    if (cpBaixadas) {
+                    if (apenasBaixadosContasPagar) {
                         imp.addVencimento(
                                 rs.getDate("datavencimento"),
                                 imp.getValor(),
                                 rs.getDate("databaixa")).
-                                setObservacao("numerodocumento "
-                                        + rs.getString("numerodocumento").trim()
-                                        + " - "
-                                        + rs.getString("situacao") + " - DESCONTO: " + rs.getDouble("desconto"));
+                                setObservacao(rs.getString("obs") + " - PAGO");
                     } else {
                         imp.addVencimento(
                                 rs.getDate("datavencimento"),
                                 imp.getValor()).
-                                setObservacao("numerodocumento "
-                                        + rs.getString("numerodocumento").trim()
-                                        + " - "
-                                        + rs.getString("situacao") + " - DESCONTO: " + rs.getDouble("desconto"));
+                                setObservacao(rs.getString("obs"));
                     }
 
                     result.add(imp);
@@ -949,19 +943,22 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " r.TOTAL_JUROS,\n"
                     + " 'IMP' AS OBS\n"
                     + "FROM SUP026 r\n"
-                    + "JOIN SUP025 c ON c.SUP025 = r.SUP025 \n"
-                    + "WHERE \n"
-                    + " r.VALOR_PAGO = 0\n"
+                    + "JOIN SUP025 c ON c.SUP025 = r.SUP025\n"
+                    + "WHERE\n"
+                    + (apenasBaixadosRotativo ? "r.VALOR_PAGO > 0 AND r.DATA between '" + 
+                            DATE_FORMAT.format(dtInicioRotativo) + "' and '" + 
+                            DATE_FORMAT.format(dtFimRotativo) + "'\n" : "r.VALOR_PAGO = 0\n")
                     + " AND \n"
                     + " r.VALOR > 0\n"
                     + " AND \n"
-                    + " r.SUP999 = " + getLojaOrigem() + " ";
+                    + " r.SUP999 = " + getLojaOrigem();
         }
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(rotativoCliente)) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
                     imp.setValor(rs.getDouble("valor"));
@@ -971,6 +968,10 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("dataevencimento"));
                     imp.setObservacao(rs.getString("obs"));
 
+                    if (apenasBaixadosRotativo) {
+                        imp.addPagamento(imp.getId(), imp.getValor(), 0, 0, rs.getDate("DATA_PGTO"), imp.getObservacao() + " - PAGO");
+                    }
+                    
                     result.add(imp);
                 }
             }
@@ -1181,5 +1182,21 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Não suportado.");
         }
+    }
+
+    public Date getDtInicioRotativo() {
+        return dtInicioRotativo;
+    }
+
+    public void setDtInicioRotativo(Date dtInicioRotativo) {
+        this.dtInicioRotativo = dtInicioRotativo;
+    }
+
+    public Date getDtFimRotativo() {
+        return dtFimRotativo;
+    }
+
+    public void setDtFimRotativo(Date dtFimRotativo) {
+        this.dtFimRotativo = dtFimRotativo;
     }
 }

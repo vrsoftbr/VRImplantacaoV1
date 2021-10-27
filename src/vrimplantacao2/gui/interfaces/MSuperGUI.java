@@ -23,18 +23,18 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class MSuperGUI extends VRInternalFrame {
-    
+
     private static final String NOME_SISTEMA = "MSuper";
     private static final String SERVIDOR_SQL = "Firebird";
     private static MSuperGUI instance;
-    
+
     private final MSuperDAO dao = new MSuperDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private int vTipoVenda = -1;
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, NOME_SISTEMA);
@@ -47,7 +47,7 @@ public class MSuperGUI extends VRInternalFrame {
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, NOME_SISTEMA);
@@ -68,47 +68,47 @@ public class MSuperGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private MSuperGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         this.title = "Importação " + NOME_SISTEMA;
-        
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        
+
         carregarParametros();
-        
+
         tabProdutos.setOpcoesDisponiveis(dao);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
-            
+
             @Override
             public MapaTributoProvider getProvider() {
                 return dao;
             }
-            
+
             @Override
             public String getSistema() {
                 return dao.getSistema();
             }
-            
+
             @Override
             public String getLoja() {
                 dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
                 return dao.getLojaOrigem();
             }
-            
+
             @Override
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
-    
+
     public void validarDadosAcessoPostgres() throws Exception {
         if (txtHostFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
@@ -116,23 +116,23 @@ public class MSuperGUI extends VRInternalFrame {
         if (txtBancoDadosFirebird.getArquivo().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL);
         }
-        
+
         if (txtSenhaFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL);
         }
-        
+
         if (txtUsuarioFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
-        
+
         connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(),
                 txtBancoDadosFirebird.getArquivo(), txtUsuarioFirebird.getText(), txtSenhaFirebird.getText());
-        
+
         carregarLojaVR();
         carregarLojaCliente();
         gravarParametros();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -146,7 +146,7 @@ public class MSuperGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -160,33 +160,39 @@ public class MSuperGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
-            
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
+
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
+
                     Importador importador = new Importador(dao);
+                    
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
                     dao.utilizarSup025 = chkUtlizaSup025.isSelected();
+                    dao.apenasBaixadosContasPagar = chkCPBaixados.isSelected();
+                    dao.apenasBaixadosRotativo = chkRTBaixados.isSelected();
+
+                    if (chkRTBaixados.isSelected()) {
+                        dao.setDtInicioRotativo(txtDtIInicioRtSup025.getDate());
+                        dao.setDtFimRotativo(txtDtTerminoRtSup025.getDate());
+                    }
                     
-                    if(dao.cpBaixadas = chkCPBaixados.isSelected()){
-                               dao.setCpDataInicio(txtDtIInicioCp.getDate());
-                               dao.setCpDataTermino(txtDtTerminoCp.getDate());
-                               
-                               importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                            }
-                                                                                
+                    if (chkCPBaixados.isSelected()) {
+                        dao.setCpDataInicio(txtDtIInicioCp.getDate());
+                        dao.setCpDataTermino(txtDtTerminoCp.getDate());
+                    }
+
                     switch (tab.getSelectedIndex()) {
                         case 0:
                             tabProdutos.setImportador(importador);
@@ -218,19 +224,19 @@ public class MSuperGUI extends VRInternalFrame {
                             if (chkPdvVendas.isSelected()) {
                                 dao.setVendaDataInicio(txtDtIInicioVenda.getDate());
                                 dao.setVendaDataTermino(txtDtTerminoVenda.getDate());
-                                
+
                                 importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                             }
                         default:
                             break;
-                        
+
                     }
                     gravarParametros();
-                    
+
                     ProgressBar.dispose();
-                    
+
                     Util.exibirMensagem("Importação " + NOME_SISTEMA + " realizada com sucesso!", getTitle());
-                    
+
                     connSQL.close();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
@@ -238,17 +244,17 @@ public class MSuperGUI extends VRInternalFrame {
                 }
             }
         };
-        
+
         thread.start();
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new MSuperGUI(i_mdiFrame);
             }
-            
+
             instance.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
@@ -256,7 +262,7 @@ public class MSuperGUI extends VRInternalFrame {
             i_mdiFrame.setDefaultCursor();
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -317,20 +323,20 @@ public class MSuperGUI extends VRInternalFrame {
         setResizable(true);
         setTitle("Importação MSuper");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -475,18 +481,19 @@ public class MSuperGUI extends VRInternalFrame {
                     .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addGap(38, 38, 38)
                         .addComponent(chkRTBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDtIInicioRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(204, Short.MAX_VALUE))
+                        .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(142, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -495,19 +502,17 @@ public class MSuperGUI extends VRInternalFrame {
                 .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(21, 21, 21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkRTBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtDtIInicioRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(203, Short.MAX_VALUE))
+                    .addComponent(txtDtIInicioRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(232, Short.MAX_VALUE))
         );
 
         tab.addTab("Especiais", vRPanel1);
@@ -710,10 +715,10 @@ public class MSuperGUI extends VRInternalFrame {
         try {
             this.setWaitCursor();
             importarTabelas();
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
-            
+
         } finally {
             this.setDefaultCursor();
         }
@@ -734,17 +739,17 @@ public class MSuperGUI extends VRInternalFrame {
     private void btnConectarFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarFirebirdActionPerformed
         try {
             this.setWaitCursor();
-            
+
             if (connSQL != null) {
                 connSQL.close();
             }
-            
+
             validarDadosAcessoPostgres();
             btnConectarFirebird.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
-            
+
         } finally {
             this.setDefaultCursor();
         }
