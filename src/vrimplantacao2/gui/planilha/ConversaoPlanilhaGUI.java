@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.planilha;
 
-import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
