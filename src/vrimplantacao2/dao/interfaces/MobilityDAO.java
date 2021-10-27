@@ -43,7 +43,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarSomenteBalanca = false;
-    
+
     private Date vendaDataInicio;
     private Date vendaDataTermino;
 
@@ -329,17 +329,12 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"select\n" +
-                     "    p.codigo_interno id,\n" +
-                     "    s_codigo ean\n" +
-                     "from\n" +
-                     "    cod_auxiliares c\n" +
-                     "join produtos p on c.id_produto = p.id"*/
-                    " select\n"
-                    + "     codigo_interno id,\n"
-                    + "     codigo_barras ean\n"
-                    + " from produtos\n"
-                    + "     order by 1"
+                    "select\n"
+                    + "    p.codigo_interno id,\n"
+                    + "    s_codigo ean\n"
+                    + "from\n"
+                    + "    cod_auxiliares c\n"
+                    + "join produtos p on c.id_produto = p.id"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -562,7 +557,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rs.getString("id"));
+                    imp.setId(rs.getString("numero"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setAtivo(rs.getInt("ativo") == 1);
                     imp.setEndereco(rs.getString("endereco"));
@@ -611,7 +606,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
                     + " cv.id AS id,\n"
-                    + " cl.id AS clienteid,\n"
+                    + " cl.numero AS clienteid,\n"
+                    + " cl.id,\n"
                     + " cl.nome AS nome,\n"
                     + " cv.s_cupom AS numerocupom,\n"
                     + " cv.f_debito AS valor,\n"
@@ -689,7 +685,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setVencimento(rs.getDate("datavencimento"));
+                    imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor"));
                     imp.setObservacao(rs.getString("obs"));
 
                     result.add(imp);
@@ -698,7 +694,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     public void setVendaDataInicio(Date vendaDataInicio) {
         this.vendaDataInicio = vendaDataInicio;
     }
@@ -706,7 +702,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataTermino(Date vendaDataTermino) {
         this.vendaDataTermino = vendaDataTermino;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
@@ -726,7 +722,23 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
             this.stm = ConexaoOracle.createStatement();
             this.sql
-                    = "";
+                    = "SELECT\n"
+                    + "	id AS id,\n"
+                    + "	S_COO AS numerocupom,\n"
+                    + "	rpad(S_NUMERO_FABRICACAO,2) AS ecf,\n"
+                    + "	D_DATA_INICIO_EMISSAO AS DATA,\n"
+                    + "	S_HORA AS hora,\n"
+                    + "	CASE\n"
+                    + "		WHEN S_INDICADOR_CANCELAMENTO = 'N' THEN 0\n"
+                    + "		ELSE 1\n"
+                    + "	END AS cancelado\n"
+                    + "FROM\n"
+                    + "	R04\n"
+                    + "WHERE\n"
+                    + "	D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "	AND\n"
+                    + " D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
+
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
         }
@@ -750,17 +762,9 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rst.getInt("numerocupom"));
                     imp.setEcf(rst.getInt("ecf"));
                     imp.setData(rst.getDate("data"));
-                    imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
                     imp.setHoraInicio(rst.getDate("data"));
                     imp.setHoraTermino(rst.getDate("data"));
                     imp.setCancelado(rst.getBoolean("cancelado"));
-                    imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                    imp.setCpf(rst.getString("cpf"));
-                    imp.setNumeroSerie(rst.getString("numeroserie"));
-                    imp.setModeloImpressora(rst.getString("modeloimpressora"));
-                    imp.setNomeCliente(rst.getString("nomecliente"));
-                    imp.setEnderecoCliente(rst.getString("enderecocliente"));
-                    imp.setChaveNfCe(rst.getString("chavenfce"));
 
                     return imp;
                 } else {
@@ -791,7 +795,31 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
             this.stm = ConexaoOracle.createStatement();
             this.sql
-                    = "";
+                    = "SELECT\n"
+                    + "	R05.id AS id,\n"
+                    + "	R04.id AS idvenda,\n"
+                    + "	R05.S_COO AS numerocupom,\n"
+                    + "	R05.S_NUMERO_FABRICACAO AS ecf,\n"
+                    + "	R05.S_NUM_ITEM AS sequencia,\n"
+                    + "	R04.D_DATA_INICIO_EMISSAO AS DATA,\n"
+                    + "	R04.S_HORA AS hora,\n"
+                    + "	R05.R_QUANTIDADE AS qtde,\n"
+                    + "	R05.S_UNIDADE AS unidade,\n"
+                    + "	R05.S_CODIGO_PRODUTO AS ean,\n"
+                    + "	R05.R_VALOR_UNITARIO AS valor,\n"
+                    + "	R05.R_VALOR_TOTAL_LIQUIDO AS valor2,\n"
+                    + "	R05.R_DESCONTO_ITEM AS desconto,\n"
+                    + "	R05.R_ACRESCIMO_ITEM AS acrescimo,\n"
+                    + "	R05.R_TAXA_ALIQUOTA AS aliquota,\n"
+                    + "	R05.S_ST AS cst\n"
+                    + " FROM\n"
+                    + "	R05\n"
+                    + " JOIN R04 ON	R04.id = R05.id_R04\n"
+                    + " WHERE\n"
+                    + "    R04.D_DATA_INICIO_EMISSAO >= '2021-10-07'\n"
+                    + "	AND\n"
+                    + "    R04.D_DATA_INICIO_EMISSAO <= '2021-10-07'\n"
+                    + "    ORDER BY 1";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
         }
@@ -806,6 +834,41 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        public void obterAliquota(VendaItemIMP item, String icms, String st) throws SQLException {
+            /*
+             0700   7.00    ALIQUOTA 07%
+             1200   12.00   ALIQUOTA 12%
+             1800   18.00   ALIQUOTA 18%
+             2500   25.00   ALIQUOTA 25%
+             1100   11.00   ALIQUOTA 11%
+             I      0.00    ISENTO
+             F      0.00    SUBST TRIBUTARIA
+             N      0.00    NAO INCIDENTE
+             */
+            int cst;
+            double aliq = 0;
+            switch (st) {
+                case "N":
+                    cst = 41;
+                    aliq = 0;
+                    break;
+                case "T":
+                    if ("18".equals(icms)) {
+                        aliq = 18;
+                    } else if ("12".equals(icms)) {
+                        aliq = 12;
+                    }
+                    cst = 0;
+                    break;
+                default:
+                    cst = 40;
+                    aliq = 0;
+                    break;
+            }
+            item.setIcmsCst(cst);
+            item.setIcmsAliq(aliq);
+        }
+
         @Override
         public VendaItemIMP next() {
             try {
@@ -814,17 +877,16 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setSequencia(rst.getInt("sequencia"));
-                    imp.setVenda(rst.getString("venda"));
-                    imp.setProduto(rst.getString("produto"));
+                    imp.setVenda(rst.getString("idvenda"));
+                    imp.setCodigoBarras(rst.getString("ean"));
                     imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
                     imp.setQuantidade(rst.getDouble("qtde"));
                     imp.setPrecoVenda(rst.getDouble("valor"));
                     imp.setValorDesconto(rst.getDouble("desconto"));
                     imp.setValorAcrescimo(rst.getDouble("acrescimo"));
-                    imp.setCodigoBarras(rst.getString("ean"));
                     imp.setUnidadeMedida(rst.getString("unidade"));
-                    imp.setIcmsCst(rst.getInt("cst"));
-                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+
+                    obterAliquota(imp, rst.getString("aliquota"), rst.getString("cst"));
 
                     return imp;
                 } else {

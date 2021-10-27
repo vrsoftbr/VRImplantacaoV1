@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.MSuperDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -179,6 +180,13 @@ public class MSuperGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     dao.utilizarSup025 = chkUtlizaSup025.isSelected();
                     
+                    if(dao.cpBaixadas = chkCPBaixados.isSelected()){
+                               dao.setCpDataInicio(txtDtIInicioCp.getDate());
+                               dao.setCpDataTermino(txtDtTerminoCp.getDate());
+                               
+                               importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                            }
+                                                                                
                     switch (tab.getSelectedIndex()) {
                         case 0:
                             tabProdutos.setImportador(importador);
@@ -215,6 +223,7 @@ public class MSuperGUI extends VRInternalFrame {
                             }
                         default:
                             break;
+                        
                     }
                     gravarParametros();
                     
@@ -276,6 +285,12 @@ public class MSuperGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
         chkUtlizaSup025 = new vrframework.bean.checkBox.VRCheckBox();
+        chkCPBaixados = new vrframework.bean.checkBox.VRCheckBox();
+        chkRTBaixados = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtIInicioCp = new org.jdesktop.swingx.JXDatePicker();
+        txtDtTerminoCp = new org.jdesktop.swingx.JXDatePicker();
+        txtDtIInicioRtSup025 = new org.jdesktop.swingx.JXDatePicker();
+        txtDtTerminoRtSup025 = new org.jdesktop.swingx.JXDatePicker();
         tabVendas = new javax.swing.JPanel();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
@@ -434,6 +449,22 @@ public class MSuperGUI extends VRInternalFrame {
 
         chkUtlizaSup025.setText("Utiliza Tabela SUP025 para Cliente");
 
+        chkCPBaixados.setText("Importar Contas a Pagar Baixadas");
+        chkCPBaixados.setEnabled(true);
+        chkCPBaixados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCPBaixadosActionPerformed(evt);
+            }
+        });
+
+        chkRTBaixados.setText("Importar Rotativo Baixadas SUP025");
+        chkRTBaixados.setEnabled(true);
+        chkRTBaixados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkRTBaixadosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -442,8 +473,20 @@ public class MSuperGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(366, Short.MAX_VALUE))
+                    .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkRTBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtDtIInicioRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(204, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -452,7 +495,19 @@ public class MSuperGUI extends VRInternalFrame {
                 .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUtlizaSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(292, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCPBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(21, 21, 21)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkRTBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDtIInicioRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDtTerminoRtSup025, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(203, Short.MAX_VALUE))
         );
 
         tab.addTab("Especiais", vRPanel1);
@@ -712,6 +767,14 @@ public class MSuperGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_chkPdvVendasActionPerformed
 
+    private void chkCPBaixadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCPBaixadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCPBaixadosActionPerformed
+
+    private void chkRTBaixadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRTBaixadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkRTBaixadosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -721,7 +784,9 @@ public class MSuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
+    private vrframework.bean.checkBox.VRCheckBox chkCPBaixados;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private vrframework.bean.checkBox.VRCheckBox chkRTBaixados;
     private vrframework.bean.checkBox.VRCheckBox chkUtlizaSup025;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
@@ -737,7 +802,11 @@ public class MSuperGUI extends VRInternalFrame {
     private javax.swing.JPanel tabVendas;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
     private vrframework.bean.textField.VRTextField txtComplemento;
+    private org.jdesktop.swingx.JXDatePicker txtDtIInicioCp;
+    private org.jdesktop.swingx.JXDatePicker txtDtIInicioRtSup025;
     private org.jdesktop.swingx.JXDatePicker txtDtIInicioVenda;
+    private org.jdesktop.swingx.JXDatePicker txtDtTerminoCp;
+    private org.jdesktop.swingx.JXDatePicker txtDtTerminoRtSup025;
     private org.jdesktop.swingx.JXDatePicker txtDtTerminoVenda;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
     private vrframework.bean.textField.VRTextField txtPortaFirebird;

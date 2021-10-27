@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import com.informix.util.stringUtil;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,7 +19,6 @@ import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -50,9 +50,13 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date vendaDataInicio;
     private Date vendaDataTermino;
+    private Date cpDataInicio;
+    private Date cpDataTermino;
     public boolean utilizarSup025 = false;
+    public boolean cpBaixadas = false;
+    public boolean rtBaixadosSup025 = false;
 
-    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(MSuperDAO.class.getName());
 
     public boolean isImportarCodigoPrincipal() {
         return this.importarCodigoPrincipal;
@@ -60,6 +64,10 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setImportarCodigoPrincipal(boolean importarCodigoPrincipal) {
         this.importarCodigoPrincipal = importarCodigoPrincipal;
+    }
+
+    public boolean isContaPagarBaixada() {
+        return cpBaixadas;
     }
 
     @Override
@@ -488,7 +496,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "SELECT\n"
+                    "SELECT\n"
                     + "	f.sup010 id,\n"
                     + "	f.razaosocial razao,\n"
                     + "	f.fantasia,\n"
@@ -553,15 +561,14 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("email"));
 
                     if (rst.getString("telefone2") != null && !rst.getString("telefone2").isEmpty()) {
-                            
+
                         imp.addContato(
-                            rst.getString("nomecontato"), 
-                            rst.getString("telefone2"), 
-                            null, 
-                            TipoContato.COMERCIAL, 
-                            null);
+                                rst.getString("nomecontato"),
+                                rst.getString("telefone2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null);
                     }
-                    
 
                     result.add(imp);
                 }
@@ -645,12 +652,50 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    public void setCpDataInicio(Date cpDataInicio) {
+        this.cpDataInicio = cpDataInicio;
+    }
+
+    public void setCpDataTermino(Date cpDataTermino) {
+        this.cpDataTermino = cpDataTermino;
+    }
+
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
+
+        String sqlFornecedorPagar
+                = "SELECT\n"
+                + "	cp.SUP020 AS id,\n"
+                + "	fr.SUP010 AS idfornecedor,\n"
+                + "	cp.SUP999 AS loja,\n"
+                + "	fr.CGC AS cnpj,\n"
+                + "	cp.DUPLICATA AS numerodocumento,\n"
+                + "	cp.EMISSAO AS dataemissao,\n"
+                + "	cp.DATA_ENTRADA AS dataentrada,\n"
+                + "	cp.VALOR as valor,\n"
+                + "	cp.DATA_PGTO AS databaixa,\n"
+                + "	cp.VALOR_PGTO AS valorpago,\n"
+                + "	cp.VALOR_DESCONTAR AS descontar,\n"
+                + "	cp.DESCONTO AS desconto,\n"
+                + "	cp.OBSERVACAO as obs,\n"
+                + "	cp.VENCIMENTO as datavencimento,\n"
+                + "	CASE WHEN cp.VALOR_PGTO > 0 THEN 'PAGO'\n"
+                + "	ELSE 'ABERTO'\n"
+                + "	END AS situacao\n"
+                + "FROM\n"
+                + "	SUP020 cp\n"
+                + "JOIN SUP010 fr ON fr.SUP010 = cp.SUP010\n"
+                + "WHERE\n"
+                + "	cp.SUP999 =  " + getLojaOrigem() + "\n"
+                + "	AND\n"
+                + " cp.VALOR_PGTO = 0\n"
+                + " AND\n"
+                + " cp.VALOR > 0\n";
+
+        if (cpBaixadas) {
+            sqlFornecedorPagar
+                    = "SELECT\n"
                     + "	cp.SUP020 AS id,\n"
                     + "	fr.SUP010 AS idfornecedor,\n"
                     + "	cp.SUP999 AS loja,\n"
@@ -658,21 +703,31 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cp.DUPLICATA AS numerodocumento,\n"
                     + "	cp.EMISSAO AS dataemissao,\n"
                     + "	cp.DATA_ENTRADA AS dataentrada,\n"
-                    + "	cp.DATALANCAMENTO,\n"
-                    + "	cp.HORALANCAMENTO,\n"
                     + "	cp.VALOR as valor,\n"
-                    + "	cp.VALOR_PGTO,\n"
-                    + "	cp.VALOR_DESCONTAR,\n"
+                    + "	cp.DATA_PGTO AS databaixa,\n"
+                    + "	cp.VALOR_PGTO AS valorpago,\n"
+                    + "	cp.VALOR_DESCONTAR AS descontar,\n"
+                    + "	cp.DESCONTO AS desconto,\n"
                     + "	cp.OBSERVACAO as obs,\n"
-                    + "	cp.VENCIMENTO as datavencimento\n"
+                    + "	cp.VENCIMENTO as datavencimento,\n"
+                    + "	CASE WHEN cp.VALOR_PGTO > 0 THEN 'PAGO'\n"
+                    + "	ELSE 'ABERTO'\n"
+                    + "	END AS situacao\n"
                     + "FROM\n"
                     + "	SUP020 cp\n"
                     + "JOIN SUP010 fr ON fr.SUP010 = cp.SUP010\n"
                     + "WHERE\n"
-                    + "	cp.SUP999 = " + getLojaOrigem() + "\n --(Num.Loja)"
-                    + " AND\n"
-                    + "	cp.VALOR_PGTO = 0"
-            )) {
+                    + "	cp.SUP999 =  " + getLojaOrigem() + " AND \n"
+                    + " cp.VALOR_PGTO > 0 \n"
+                    + " AND cp.VALOR > 0 \n"
+                    + "	AND \n"
+                    + "	cp.EMISSAO >= '" + DATE_FORMAT.format(cpDataInicio) + "'\n"
+                    + "	AND\n"
+                    + " cp.EMISSAO <= '" + DATE_FORMAT.format(cpDataTermino) + "'\n";
+        }
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sqlFornecedorPagar)) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
@@ -682,9 +737,28 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setVencimento(rs.getDate("datavencimento"));
+                    //imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor"));
                     imp.setObservacao(rs.getString("obs"));
+                    imp.setValor(rs.getDouble("valor"));
+
+                    if (cpBaixadas) {
+                        imp.addVencimento(
+                                rs.getDate("datavencimento"),
+                                imp.getValor(),
+                                rs.getDate("databaixa")).
+                                setObservacao("numerodocumento "
+                                        + rs.getString("numerodocumento").trim()
+                                        + " - "
+                                        + rs.getString("situacao") + " - DESCONTO: " + rs.getDouble("desconto"));
+                    } else {
+                        imp.addVencimento(
+                                rs.getDate("datavencimento"),
+                                imp.getValor()).
+                                setObservacao("numerodocumento "
+                                        + rs.getString("numerodocumento").trim()
+                                        + " - "
+                                        + rs.getString("situacao") + " - DESCONTO: " + rs.getDouble("desconto"));
+                    }
 
                     result.add(imp);
                 }
@@ -881,7 +955,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " AND \n"
                     + " r.VALOR > 0\n"
                     + " AND \n"
-                    + " r.SUP999 = " + getLojaOrigem() + " -- Num. Loja";
+                    + " r.SUP999 = " + getLojaOrigem() + " ";
         }
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {

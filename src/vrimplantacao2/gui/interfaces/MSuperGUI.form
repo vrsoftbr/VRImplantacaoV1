@@ -290,8 +290,22 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="chkAjustarDigitoVerificador" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUtlizaSup025" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkCPBaixados" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="txtDtIInicioCp" min="-2" pref="92" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtDtTerminoCp" min="-2" pref="92" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkRTBaixados" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="txtDtIInicioRtSup025" min="-2" pref="92" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtDtTerminoRtSup025" min="-2" pref="92" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="366" max="32767" attributes="0"/>
+                      <EmptySpace pref="204" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -302,7 +316,23 @@
                       <Component id="chkAjustarDigitoVerificador" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUtlizaSup025" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="292" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkCPBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                              <Component id="txtDtIInicioCp" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtTerminoCp" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkRTBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                              <Component id="txtDtIInicioRtSup025" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtTerminoRtSup025" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace pref="203" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -317,6 +347,36 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Utiliza Tabela SUP025 para Cliente"/>
               </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCPBaixados">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Importar Contas a Pagar Baixadas"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkCPBaixadosActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRTBaixados">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Importar Rotativo Baixadas SUP025"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRTBaixadosActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioCp">
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoCp">
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioRtSup025">
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoRtSup025">
             </Component>
           </SubComponents>
         </Container>
