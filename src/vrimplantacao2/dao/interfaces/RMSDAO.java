@@ -46,8 +46,11 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -1150,7 +1153,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
@@ -1319,44 +1322,51 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
-    }*/
+    }
 
-    @Override
+    /*
+        Há duas tabelas para serem importadas no RMS
+        Tabela "aa2cclir" é referente títulos de recebimentos de diversas fontes, que não sejam do crédito rotativo
+        Tabela "cad_cliente" é referente ao crédito rotativo e convênios do cliente
+        É necessário realizar a unificação das tabelas, pois há casos de um mesmo cliente estar cadastrado nas duas
+        tabelas. O método getClientes() comentado acima, é para a unificação da tabela cad_cliente.
+    */
+    /*@Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
         String aa2cclir = "SELECT \n"
-                    + "	     TIP.tip_cgc_cpf Cgc_cpf, \n"
-                    + "      TIP.tip_codigo Codigo, \n"
-                    + "      TIP.tip_digito Digito, \n"        
-                    + "	     TIP.tip_razao_social Razao_social, \n"
-                    + "      TIP.tip_nome_fantasia Nome_fantasia,  \n"
+                    + "	     TIP.tip_cgc_cpf Cgc_cpf,\n"
+                    + "      TIP.tip_codigo Codigo,\n"
+                    + "      TIP.tip_digito Digito,\n"        
+                    + "	     TIP.tip_razao_social Razao_social,\n"
+                    + "      TIP.tip_nome_fantasia Nome_fantasia,\n"
                     + "	     TIP.tip_endereco Endereco, \n"
-                    + "      TIP.tip_bairro Bairro, \n"
-                    + "      TIP.tip_cidade Cidade,  \n"
-                    + "	     TIP.tip_estado Estado, \n"
-                    + "      TIP.tip_cep Cep, \n"
-                    + "      TIP.tip_natureza Natureza,  \n"
-                    + "	     TIP.tip_data_cad Data_cad, \n"
+                    + "      TIP.tip_bairro Bairro,\n"
+                    + "      TIP.tip_cidade Cidade,\n"
+                    + "	     TIP.tip_estado Estado,\n"
+                    + "      TIP.tip_cep Cep,\n"
+                    + "      TIP.tip_natureza Natureza,\n"
+                    + "	     TIP.tip_data_cad Data_cad,\n"
                     + "      TIP.tip_fax_ddd Fax_ddd, \n"
                     + "      TIP.tip_fax_num Fax_num,  \n"
                     + "      TIP.tip_fone_ddd Fone_ddd, \n"
                     + "      TIP.tip_fone_num Fone_num, \n"
                     + "      TIP.tip_fis_jur Fis_jur,  \n"
-                    + "	     TIP.tip_insc_est_ident Insc_est_ident, \n"
-                    + "      TIP.tip_regiao  Regiao,  \n"
-                    + "	     TIP.tip_divisao Divisao, \n"
-                    + "      TIP.tip_distrito Distrito, \n"
-                    + "      CLI.cli_contato Contato_principal,  \n"
-                    + "	     CLI.cli_cod_vend Vendedor,  \n"
-                    + "	     CLI.cli_situacao Status, \n"
+                    + "	     TIP.tip_insc_est_ident Insc_est_ident,\n"
+                    + "      TIP.tip_regiao  Regiao,\n"
+                    + "	     TIP.tip_divisao Divisao,\n"
+                    + "      TIP.tip_distrito Distrito,\n"
+                    + "      CLI.cli_contato Contato_principal,\n"
+                    + "	     CLI.cli_cod_vend Vendedor,\n"
+                    + "	     CLI.cli_situacao Status,\n"
                     + "      CLI.cli_limite_cred,\n"
-                    + "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n"
-                    + "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n"
-                    + "				FROM   aa2cempr  \n"
-                    + "				WHERE emp_codigo = TIP.tip_empresa) AND tab_acesso = Rpad( \n"
-                    + "				To_char(SYSDATE, 'YYMMDD'), 10, ' ')), 2) Limite_cred,  \n"
-                    + "	     Nvl(por_banco, 0) banco,  \n"
+                    + "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000\n"
+                    + "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite\n"
+                    + "				FROM   aa2cempr\n"
+                    + "				WHERE emp_codigo = TIP.tip_empresa) AND tab_acesso = Rpad(\n"
+                    + "				To_char(SYSDATE, 'YYMMDD'), 10, ' ')), 2) Limite_cred,\n"
+                    + "	     Nvl(por_banco, 0) banco,\n"
                     + "	     Decode(cli.cli_situacao, 'A', 'ATIVO',\n"
                     + "	     Decode(cli.cli_situacao, 'I', 'INATIVO',\n"
                     + "	     Decode(cli.cli_situacao, 'C', 'CANCELADO',\n"
@@ -1364,20 +1374,20 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	     'ATIVO'))))\n"
                     + "	     SIGLA_STATUS,\n"
                     + "	     Nvl(dtip_cod_municipio, 0) COD_MUNI\n"
-                    + "FROM   \n"
-                    + "      aa2cclir CLI, \n"
-                    + "      aa2ctipo TIP, \n"
-                    + "      final_cliente FIN, \n"
-                    + "      aa1rport, \n"
-                    + "      aa1dtipo \n"
-                    + "WHERE  \n"
-                    + "      TIP.tip_cgc_cpf >= 0 \n"
-                    + "      AND TIP.tip_codigo >= 0 \n"
-                    + "      AND TIP.tip_digito >= 0 \n"
-                    + "      AND TIP.tip_codigo = CLI.cli_codigo(+) \n"
-                    + "      AND TIP.tip_digito = CLI.cli_digito(+) \n"
-                    + "      AND FIN.cli_codigo(+) = CLI.cli_codigo \n"
-                    + "      AND por_portador (+) = cli.cli_port \n"
+                    + "FROM\n"
+                    + "      aa2cclir CLI,\n"
+                    + "      aa2ctipo TIP,\n"
+                    + "      final_cliente FIN,\n"
+                    + "      aa1rport,\n"
+                    + "      aa1dtipo\n"
+                    + "WHERE\n"
+                    + "      TIP.tip_cgc_cpf >= 0\n"
+                    + "      AND TIP.tip_codigo >= 0\n"
+                    + "      AND TIP.tip_digito >= 0\n"
+                    + "      AND TIP.tip_codigo = CLI.cli_codigo(+)\n"
+                    + "      AND TIP.tip_digito = CLI.cli_digito(+)\n"
+                    + "      AND FIN.cli_codigo(+) = CLI.cli_codigo\n"
+                    + "      AND por_portador (+) = cli.cli_port\n"
                     + "      AND dtip_codigo (+) = tip_codigo\n"
                     + "      and tip.tip_loj_cli in ('C','R','V','L')";
         
@@ -1430,7 +1440,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
     
     public void importarPagamentoRotativo() throws Exception {
         Conexao.begin();
@@ -2750,6 +2760,17 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 case "F":
                     cst = 60;
                     aliq = 0;
+                    break;
+                case "1330":
+                    cst = 0;
+                    aliq = 13.3;
+                    break;
+                case "0550":
+                    cst = 0;
+                    aliq = 5.5;
+                case "0414":
+                    cst = 0;
+                    aliq = 4.14;
                     break;
                 default:
                     cst = 40;
