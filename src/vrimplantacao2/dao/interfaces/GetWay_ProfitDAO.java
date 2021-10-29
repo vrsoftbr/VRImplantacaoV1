@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.table.AbstractTableModel;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -91,6 +90,9 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean utilizaMetodoAjustaAliquota = false;
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean removerCodigoCliente = false;
+    
+    private Set<Integer> TipoDocumentoRotativo;
+    private Set<Integer> TipoDocumentoCheque;    
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -1862,6 +1864,16 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            
+            StringBuilder builder = new StringBuilder();
+            
+            for (Iterator<Integer> iterator = this.TipoDocumentoRotativo.iterator(); iterator.hasNext();) {
+                builder.append(iterator.next());
+                if (iterator.hasNext()) {
+                    builder.append(",");
+                }
+            }
+            
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
                     + "CODRECEBER AS ID, "
@@ -1879,7 +1891,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "RECEBER "
                     + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
                     + "where UPPER(SITUACAO) = 'AB' "
-                    + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
+                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
                     + "order by DTEMISSAO"
             )) {
@@ -1910,6 +1922,16 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                        
+            StringBuilder builder = new StringBuilder();
+            
+            for (Iterator<Integer> iterator = this.TipoDocumentoCheque.iterator(); iterator.hasNext();) {
+                builder.append(iterator.next());
+                if (iterator.hasNext()) {
+                    builder.append(",");
+                }
+            }
+            
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
                     + "CODRECEBER AS ID, "
@@ -1937,7 +1959,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "CLIENTES.CODCLIE = RECEBER.CODCLIE "
                     + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                    + "and RECEBER.CODTIPODOCUMENTO IN (" + v_tipoDocumentoCheque + ") "
+                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") "
                     + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
