@@ -11,11 +11,11 @@ import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.Global;
-import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.gui.FiltroGUI;
 import vrimplantacao.vo.OrdenacaoConsultaVO;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2_5.controller.loja.LojaController;
 
 public class LojaConsultaGUI extends VRInternalFrame {
 
@@ -69,7 +69,7 @@ public class LojaConsultaGUI extends VRInternalFrame {
         oFiltro.setOrdenacao(formFiltro.getOrdenacao());
         oFiltro.setLimite(formFiltro.getLimite());
 
-        vLoja = new LojaDAO().consultar(oFiltro);
+        vLoja = new LojaController().consultar(oFiltro);
 
         exibirConsulta();
 

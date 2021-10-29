@@ -1,7 +1,9 @@
 package vrimplantacao2_5.service.loja;
 
+import java.util.List;
 import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.provider.ConexaoProvider;
 
@@ -48,6 +50,14 @@ public class LojaService {
     
     private boolean isLojaExiste(LojaVO vo) throws Exception {
         return lojaDAO.isLojaExiste(vo);
+    }
+    
+    public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
+        return lojaDAO.consultar(i_filtro);
+    }
+    
+    public LojaVO carregar(int i_id) throws Exception {
+        return lojaDAO.carregar(i_id);
     }
     
     private String getTitle() {

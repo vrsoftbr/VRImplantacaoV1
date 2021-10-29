@@ -2,10 +2,8 @@ package vrimplantacao.gui.cadastro;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.controller.loja.LojaController;
 
@@ -45,7 +43,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
     }
 
     public void carregar(int i_id) throws Exception {
-        oLoja = new LojaDAO().carregar(i_id);
+        oLoja = new LojaController().carregar(i_id);
 
         txtCodigo.setText(Util.formatNumber(oLoja.id, 6));
         txtDescricao.setText(oLoja.descricao);
