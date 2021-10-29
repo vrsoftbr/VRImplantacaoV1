@@ -68,6 +68,7 @@ public class WBAGUI extends VRInternalFrame {
     private WBAGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
+        ConexaoFirebird.encoding = "WIN1252";
         this.title = "Importação " + NOME_SISTEMA;
         
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
@@ -75,8 +76,7 @@ public class WBAGUI extends VRInternalFrame {
         carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(dao);
-        tabClientes.setOpcoesDisponiveis(dao);
-        
+               
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             
             @Override

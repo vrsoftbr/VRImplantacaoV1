@@ -12,7 +12,6 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -69,7 +68,25 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	DISTINCT\n"
+                    + "	CAST (CASE\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%F%' THEN '60'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%I%' THEN '40'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%N%' THEN '41'\n"
+                    + "		WHEN i.NF_CODICMS IS NULL THEN '40'\n"
+                    + "		WHEN i.NF_CODICMS = '' AND p.ICMS > 0 THEN '00'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS > 0 THEN '20'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS = 0 THEN '00' \n"
+                    + "		ELSE 40\n"
+                    + "	END AS integer) AS CST,\n"
+                    + "	p.ICMS AS ALIQ,\n"
+                    + "	p.REDUZICMS RED\n"
+                    + "FROM\n"
+                    + "	CTPROD p\n"
+                    + "LEFT JOIN\n"
+                    + "	WBA_CTPROD i ON\n"
+                    + "	p.CODIGO = i.CODIGO"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -142,17 +159,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
-    public Set<OpcaoCliente> getOpcoesDisponiveisClientes() {
-        return new HashSet<>(Arrays.asList(
-                OpcaoCliente.RAZAO,
-                OpcaoCliente.ENDERECO,
-                OpcaoCliente.NUMERO,
-                OpcaoCliente.BAIRRO,
-                OpcaoCliente.MUNICIPIO,
-                OpcaoCliente.UF
-        ));
-    }
-    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -177,11 +183,11 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
 
                     imp.setMerc1ID(rst.getString("codmerc1"));
-                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc1Descricao(Utils.acertarTexto(rst.getString("descmerc1")));
                     imp.setMerc2ID(rst.getString("codmerc2"));
-                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc2Descricao(Utils.acertarTexto(rst.getString("descmerc2")));
                     imp.setMerc3ID(rst.getString("codmerc3"));
-                    imp.setMerc3Descricao(rst.getString("descmerc3"));
+                    imp.setMerc3Descricao(Utils.acertarTexto(rst.getString("descmerc3")));
 
                     result.add(imp);
                 }
@@ -226,45 +232,69 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	p.CODIGO id,\n"
+                    + "	p.CODIGO ean,\n"
+                    + "	p.NOME descricaocompleta,\n"
+                    + "	COALESCE (p.UNIDADE,'UN') unidade,\n"
+                    + "	p.DATA_CT data_cadastro,\n"
+                    + "	p.DTATUALIZ data_alteracao,\n"
+                    + "	p.CUSTO custocomimposto,\n"
+                    + "	p.CUSTO custosemimposto,\n"
+                    + "	p.ESTMINIMO estoquemin,\n"
+                    + "e.estoque_fisico estoque,"
+                    + "	p.ICMS icmsaliq,\n"
+                    + "	p.REDUZICMS icmsred,\n"
+                    + "	p.MARGEMFIXA margem,\n"
+                    + "	p.NF_CFISCAL ncm,\n"
+                    + "	CASE \n"
+                    + "	  WHEN p.PESAVEL = 'S' THEN 1\n"
+                    + "   ELSE 0\n"
+                    + "	END e_balanca,\n"
+                    + "	p.PRECOVENDA,\n"
+                    + "	p.SETOR merc1,\n"
+                    + "	p.SETOR merc2,\n"
+                    + "	p.SETOR merc3,\n"
+                    + "	p.PESO pesobruto,\n"
+                    + "	CASE COALESCE(p.INATIVO,0) WHEN 0 THEN 1 ELSE 0 END situacaocadastro\n"
+                    + "FROM\n"
+                    + "	CTPROD p\n"
+                    + "	LEFT JOIN CTPROD_FILIAL i ON p.CODIGO = i.CODIGO \n"
+                    + " LEFT JOIN CTPROD_ESTOQUE e ON e.CODIGO = p.CODIGO AND i.FILIAL = e.FILIAL\n"
+                    + "WHERE\n"
+                    + "	i.FILIAL = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("codigo"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-
-                    imp.setIcmsDebitoId(rst.getString("idaliquota"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("idaliquota"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idaliquota"));
-                    imp.setIcmsCreditoId(rst.getString("idaliquota"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("idaliquota"));
-                    imp.setIcmsConsumidorId(rst.getString("idaliquota"));
-                    imp.setIdFamiliaProduto(rst.getString("familiaid"));
-                    imp.setPiscofinsCstDebito(rst.getString("cstpis"));
-                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));
-
+                    
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setPesoBruto(rst.getInt("pesobruto"));
+                                                            
                     result.add(imp);
                 }
             }
