@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
@@ -101,6 +102,21 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         chkPesquisarKG.setSelected(params.getBool(SISTEMA, "PESQUISAR_KG_DESCRICAO"));
         chkUtilizarEmbalagemCompra.setSelected(params.getBool(SISTEMA, "UTILIZAR_EMBALAGEM_DE_COMPRA"));
         chkCopiarIcmsDebitoNaEntrada.setSelected(params.getBool(SISTEMA, "COPIAR_ICMS_DEBITO"));
+        
+        String strRotativoSelecionado = params.getWithNull("", SISTEMA, "ROTATIVO_SELECT");
+        this.rotativoSelecionado.clear();
+        for (String id : strRotativoSelecionado.split("\\|")) {
+            if (!"".equals(id)) {
+                this.rotativoSelecionado.add(Integer.parseInt(id));
+            }
+        }
+        String strChequeSelecionado = params.getWithNull("", SISTEMA, "CHEQUE_SELECT");
+        this.chequeSelecionado.clear();
+        for (String id : strChequeSelecionado.split("\\|")) {
+            if (!"".equals(id)) {
+                this.chequeSelecionado.add(Integer.parseInt(id));
+            }
+        }        
     }
 
     private void gravarParametros() throws Exception {
@@ -115,6 +131,29 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         params.put((txtDataFimOferta.getDate() != null ? new java.sql.Date(txtDataFimOferta.getDate().getTime()) : null), SISTEMA, "DATA_FIM_OFERTA");
         params.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), SISTEMA, "COPIAR_ICMS_DEBITO");
 
+        pnlConn.atualizarParametros();
+        
+        {
+            StringBuilder builder = new StringBuilder();
+            for (Iterator<Integer> iterator = this.rotativoSelecionado.iterator(); iterator.hasNext();) {
+                builder.append(iterator.next());
+                if (iterator.hasNext()) {
+                    builder.append("|");
+                }
+            }
+            params.put(builder.toString(), SISTEMA, "ROTATIVO_SELECT");
+        }
+        {
+            StringBuilder builder = new StringBuilder();
+            for (Iterator<Integer> iterator = this.chequeSelecionado.iterator(); iterator.hasNext();) {
+                builder.append(iterator.next());
+                if (iterator.hasNext()) {
+                    builder.append("|");
+                }
+            }
+            params.put(builder.toString(), SISTEMA, "CHEQUE_SELECT");
+        }
+        
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
