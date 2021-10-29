@@ -1,9 +1,17 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Frame;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -15,8 +23,13 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO;
+import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO.TipoDocumentoRecord;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
@@ -27,8 +40,52 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private GetWay_ProfitDAO dao = new GetWay_ProfitDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
+    
+    private Set<Integer> rotativoSelecionado = new HashSet<>();
+    private Set<Integer> chequeSelecionado = new HashSet<>();    
 
+    private TipoDocumentoTableModel rotativoModel = new TipoDocumentoTableModel(new ArrayList<TipoDocumentoRecord>());
+    private TipoDocumentoTableModel chequeModel = new TipoDocumentoTableModel(new ArrayList<TipoDocumentoRecord>());
+    
     private void carregarTipoDocumento() throws Exception {
+        this.rotativoModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
+        
+        for (TipoDocumentoRecord t : this.rotativoModel.getItens()) {
+            t.selected = rotativoSelecionado.contains(t.id);
+        }
+        
+        this.rotativoModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TipoDocumentoRecord item = rotativoModel.getItens().get(e.getLastRow());
+                
+                if (item.selected) {
+                    rotativoSelecionado.add(item.id);
+                } else {
+                    rotativoSelecionado.remove(item.id);
+                }
+            }        
+        });
+        
+        tblRotativo.setModel(this.rotativoModel);
+        
+        this.chequeModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
+        
+        for (TipoDocumentoRecord f : this.chequeModel.getItens()) {
+            f.selected = chequeSelecionado.contains(f.id);
+        }
+        this.chequeModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TipoDocumentoRecord item = chequeModel.getItens().get(e.getLastRow());
+                if (item.selected) {
+                    chequeSelecionado.add(item.id);
+                } else {
+                    chequeSelecionado.remove(item.id);
+                }
+            }
+        });
+        tblCheque.setModel(this.chequeModel);        
     }
 
     private void carregarParametros() throws Exception {
@@ -72,6 +129,44 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
         this.title = "Importação " + SISTEMA;
 
+        pnlConn.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                tabProdutos.btnMapaTribut.setEnabled(true);
+                carregarTipoDocumento();
+                gravarParametros();
+            }
+        });
+        
+        pnlConn.setSistema(ESistema.GETWAY);
+        pnlConn.getNomeConexao();
+        
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                dao.setComplemento(pnlConn.getComplemento());
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+        
         carregarParametros();
 
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
@@ -246,12 +341,12 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         chkUsarMargemSobreVenda = new vrframework.bean.checkBox.VRCheckBox();
         tabConvenio1 = new javax.swing.JPanel();
         scrollRotativo = new javax.swing.JScrollPane();
-        tblTipoDocumentoRotativo = new vrframework.bean.table.VRTable();
+        tblRotativo = new vrframework.bean.table.VRTable();
         vRLabel1 = new vr.view.components.label.VRLabel();
         jPanel1 = new javax.swing.JPanel();
         vRLabel2 = new vr.view.components.label.VRLabel();
         scrollRotativo1 = new javax.swing.JScrollPane();
-        tblTipoDocumentoCheque = new vrframework.bean.table.VRTable();
+        tblCheque = new vrframework.bean.table.VRTable();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -276,6 +371,11 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalancaUnificacao = new vrframework.bean.checkBox.VRCheckBox();
+        try {
+            pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
+        } catch (java.lang.Exception e1) {
+            e1.printStackTrace();
+        }
 
         setTitle("Importação GetWay");
         setToolTipText("");
@@ -434,7 +534,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
         pnlParementosSistema.addTab("Produtos", vRPanel10);
 
-        tblTipoDocumentoRotativo.setModel(new javax.swing.table.DefaultTableModel(
+        tblRotativo.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -445,7 +545,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        scrollRotativo.setViewportView(tblTipoDocumentoRotativo);
+        scrollRotativo.setViewportView(tblRotativo);
 
         vRLabel1.setText("Tipo Documento Rotativo");
         vRLabel1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
@@ -479,7 +579,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         vRLabel2.setText("Tipo Documento Cheque");
         vRLabel2.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
 
-        tblTipoDocumentoCheque.setModel(new javax.swing.table.DefaultTableModel(
+        tblCheque.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -490,7 +590,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        scrollRotativo1.setViewportView(tblTipoDocumentoCheque);
+        scrollRotativo1.setViewportView(tblCheque);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -566,8 +666,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         vRPanel9Layout.setVerticalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
-                .addGap(150, 150, 150))
+                .addComponent(tabFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 67, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", vRPanel9);
@@ -780,15 +880,18 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(153, 153, 153)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, 211, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -869,6 +972,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
+    private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.tabbedPane.VRTabbedPane pnlParementosSistema;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private javax.swing.JScrollPane scrollRotativo;
@@ -882,8 +986,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabVendas;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private vrframework.bean.table.VRTable tblTipoDocumentoCheque;
-    private vrframework.bean.table.VRTable tblTipoDocumentoRotativo;
+    private vrframework.bean.table.VRTable tblCheque;
+    private vrframework.bean.table.VRTable tblRotativo;
     private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
     private vr.view.components.label.VRLabel vRLabel1;
     private vr.view.components.label.VRLabel vRLabel2;
@@ -895,5 +999,82 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.panel.VRPanel vRPanel9;
     // End of variables declaration//GEN-END:variables
+
+}
+
+class TipoDocumentoTableModel extends AbstractTableModel {
+
+    private final List<GetWay_ProfitDAO.TipoDocumentoRecord> itens;
+
+    public List<GetWay_ProfitDAO.TipoDocumentoRecord> getItens() {
+        return itens;
+    }
+
+    public TipoDocumentoTableModel(List<GetWay_ProfitDAO.TipoDocumentoRecord> itens) {
+        this.itens = itens;
+    }
+
+    @Override
+    public int getRowCount() {
+        return this.itens.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 3;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        GetWay_ProfitDAO.TipoDocumentoRecord f = this.itens.get(rowIndex);
+        switch (columnIndex) {
+            case 0:
+                return f.selected;
+            case 1:
+                return f.id;
+            case 2:
+                return f.descricao;
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (columnIndex == 0) {
+            GetWay_ProfitDAO.TipoDocumentoRecord item = this.itens.get(rowIndex);
+            item.selected = (boolean) aValue;
+            fireTableCellUpdated(rowIndex, columnIndex);
+        }
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 0;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        switch (columnIndex) {
+            case 0:
+                return Boolean.class;
+            default:
+                return super.getColumnClass(columnIndex);
+        }
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        switch (columnIndex) {
+            case 0:
+                return "-";
+            case 1:
+                return "Código";
+            case 2:
+                return "Descrição";
+            default:
+                return null;
+        }
+    }
 
 }
