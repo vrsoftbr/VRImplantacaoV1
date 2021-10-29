@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
@@ -74,12 +76,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;
     public boolean v_usar_arquivoBalanca;
-    public boolean v_usar_arquivoBalancaUnificacao;
+    public boolean v_usar_arquivoBalancaUnificacao;        
+    public boolean usarQtdEmbDoProduto = false;    
     public boolean usarMargemBruta = false;
-
-    public boolean usarQtdEmbDoProduto = false;
-    public boolean usaMargemLiquidaPraticada = false;
-    public boolean usaMargemSobreVenda = false;
+    public boolean usaMargemLiquidaPraticada = false;    
+    public boolean usaMargemSobreVenda = false;    
     private boolean desconsiderarSetorBalanca = false;
     private boolean pesquisarKGnaDescricao;
     private boolean utilizarEmbalagemDeCompra = false;
@@ -108,6 +109,65 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         return "GetWay" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.EXCECAO,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.MAPA_TRIBUTACAO
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
+    }
+    
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -1932,6 +1992,37 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         return result;
     }
 
+    public static class TipoDocumentoRecord {
+        
+        public int id;
+        public String descricao;
+        public boolean selected = false;
+
+        public TipoDocumentoRecord(int id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+
+    }
+    
+    public List<TipoDocumentoRecord> getTipoDocumentoReceber() throws Exception {
+        List<TipoDocumentoRecord> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select CODTIPODOCUMENTO, DESCRICAO from TIPODOCUMENTO order by CODTIPODOCUMENTO"
+            )) {
+                while (rst.next()) {
+                    result.add(new TipoDocumentoRecord(
+                            rst.getInt("CODTIPODOCUMENTO"),
+                            rst.getString("CODTIPODOCUMENTO") + " - "
+                            + rst.getString("DESCRICAO")));
+                }
+            }
+        }
+        return result;
+    }   
+    
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> vResult = new ArrayList<>();

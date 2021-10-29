@@ -346,6 +346,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkCargo = new vrframework.bean.checkBox.VRCheckBox();
         chkDataAdmissao = new vrframework.bean.checkBox.VRCheckBox();
         chkSalario = new vrframework.bean.checkBox.VRCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        pnlDados1 = new vrframework.bean.panel.VRPanel();
+        jLabel12 = new javax.swing.JLabel();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         tabCreditoRotativo = new javax.swing.JPanel();
         pnlCreditoRotativo = new vrframework.bean.panel.VRPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -354,10 +358,6 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         pnlCheque = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        jPanel1 = new javax.swing.JPanel();
-        pnlDados1 = new vrframework.bean.panel.VRPanel();
-        jLabel12 = new javax.swing.JLabel();
-        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -398,7 +398,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(351, Short.MAX_VALUE))
+                .addContainerGap(387, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -743,6 +743,51 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         addTab("Importação de Cliente Preferencial", scrollImportação);
 
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "DADOS");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkClienteEventual, "Cliente Eventual");
+        chkClienteEventual.setEnabled(true);
+
+        javax.swing.GroupLayout pnlDados1Layout = new javax.swing.GroupLayout(pnlDados1);
+        pnlDados1.setLayout(pnlDados1Layout);
+        pnlDados1Layout.setHorizontalGroup(
+            pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados1Layout.createSequentialGroup()
+                .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDados1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel12))
+                    .addGroup(pnlDados1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(641, Short.MAX_VALUE))
+        );
+        pnlDados1Layout.setVerticalGroup(
+            pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados1Layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlDados1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(pnlDados1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 327, Short.MAX_VALUE))
+        );
+
+        addTab("Importação Cliente Eventual", jPanel1);
+
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "CREDITO ROTATIVO");
 
@@ -830,64 +875,6 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(pnlCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 327, Short.MAX_VALUE))
         );
-
-        addTab("Receber Cheque", tabCheque);
-
-        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "DADOS");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkClienteEventual, "Cliente Eventual");
-        chkClienteEventual.setEnabled(true);
-
-        javax.swing.GroupLayout pnlDados1Layout = new javax.swing.GroupLayout(pnlDados1);
-        pnlDados1.setLayout(pnlDados1Layout);
-        pnlDados1Layout.setHorizontalGroup(
-            pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDados1Layout.createSequentialGroup()
-                .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlDados1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel12))
-                    .addGroup(pnlDados1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(620, Short.MAX_VALUE))
-        );
-        pnlDados1Layout.setVerticalGroup(
-            pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDados1Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(jLabel12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlDados1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(11, 11, 11))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlDados1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(316, Short.MAX_VALUE))
-        );
-
-        addTab("Importação Cliente Eventual", jPanel1);
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "CREDITO ROTATIVO");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Receber Crédito Rotativo");
-        chkCreditoRotativo.setEnabled(true);
-
 
         addTab("Receber Cheque", tabCheque);
 
