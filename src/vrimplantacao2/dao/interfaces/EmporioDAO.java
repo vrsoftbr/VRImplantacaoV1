@@ -82,6 +82,7 @@ public class EmporioDAO extends InterfaceDAO {
                     "    and ie.customer_sku_type_key in (8)\n" +
                     "  left join customer_address ca on c.customer_key = ca.customer_key\n" +        
                     (isClienteSomentePontos() ? "where st.customer_points > 0\n" : "") +                
+                    "    and ie.customer_sku_typ00e_key in (8)\n" +
                     "order by\n" +
                     "  id"
             )) {

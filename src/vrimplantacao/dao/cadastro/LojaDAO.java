@@ -692,4 +692,36 @@ public class LojaDAO {
         }
         return result;
     }
+    
+    public List<LojaVO> getLojasVRMapeada() throws Exception {
+        List<LojaVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	l.id,\n" +
+                    "	l.descricao,\n" +
+                    "	f.nomefantasia,\n" +
+                    "	f.razaosocial\n" +
+                    "from\n" +
+                    "	loja l\n" +
+                    "inner join fornecedor f on\n" +
+                    "	l.id_fornecedor = f.id\n" +
+                    "where\n" +
+                    "	l.id_situacaocadastro = 1 and \n" +
+                    "	l.id not in (select distinct id_lojadestino from implantacao2_5.conexaoloja)\n" +
+                    "order by\n" +
+                    "	l.id")) {
+                while (rs.next()) {
+                    LojaVO vo = new LojaVO();
+                    
+                    vo.setId(rs.getInt("id"));
+                    vo.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(vo);
+                }
+            }
+        }
+        return result;
+    }
 }

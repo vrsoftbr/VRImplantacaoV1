@@ -427,7 +427,7 @@ public class ProdutoAnteriorVO {
     private double icmsReducaoEntradaForaEstado = -1;
     private Date dataHoraAlteracao;
     private Date dataCadastro;
-    
+    private int idConexao = 0;
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(
         new Factory<ProdutoAnteriorEanVO>() {
@@ -655,4 +655,12 @@ public class ProdutoAnteriorVO {
     public void setObsImportacao(String obsImportacao) {
         this.obsImportacao = obsImportacao;
     }
+
+    public int getIdConexao() {
+        return idConexao;
+    }
+
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }    
 }

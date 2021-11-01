@@ -27,76 +27,90 @@ public class MapaLojaGUI extends VRDialog {
     private ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = null;
     private MapaLojaController mapaLojaController = null;
     private MigracaoSistemasController migracaoSistemasController;
-    
+
     /**
      * Creates new form MapaLojaGUI
+     *
      * @throws java.lang.Exception
      */
     public MapaLojaGUI() throws Exception {
         initComponents();
     }
-    
+
     public void setConfiguracao() throws Exception {
         centralizarForm();
         setResizable(false);
         setModal(true);
         setTitle("Mapa de Loja");
-        
+
         configuracaoBancoLojaVO = new ConfiguracaoBancoLojaVO();
         migracaoSistemasController = new MigracaoSistemasController();
-        
+
         carregarLojaVR();
         carregarLojaOrigem();
     }
-    
+
     private void carregarLojaOrigem() throws Exception {
         cboLojaOrigem.setModel(new DefaultComboBoxModel());
 
         List<Estabelecimento> lojas = migracaoSistemasController.
-                                        getLojasOrigem(MigracaoSistemasController.getIdSistema(), 
-                                                            MigracaoSistemasController.getIdBancoDados());
-        
+                getLojasOrigem(MigracaoSistemasController.getIdSistema(),
+                        MigracaoSistemasController.getIdBancoDados());
+
         for (Estabelecimento loja : lojas) {
             cboLojaOrigem.addItem(new ItemComboVO(loja.cnpj, loja.razao));
         }
     }
-    
-    private void carregarLojaVR() {
+
+    private void carregarLojaVR() throws Exception {
         cboLojaVR.setModel(new DefaultComboBoxModel());
-        
-        for (LojaVO oLoja : mapaLojaController.getLojaVR()) {
-            cboLojaVR.addItem(new ItemComboVO(oLoja.id, oLoja.descricao));
+
+        List<LojaVO> lojas = mapaLojaController.getLojaVR();
+
+        if (lojas.size() > 0) {
+            for (LojaVO oLoja : lojas) {
+                cboLojaVR.addItem(new ItemComboVO(oLoja.id, oLoja.descricao));
+            }
+        } else {
+            Util.exibirMensagem("Lojas do VR já mapeadas!\nVerique mapeamento de conexão anterior!", this.getTitle());
         }
+
     }
-    
+
     public void setConfiguracaoConexao(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         this.configuracaoBancoVO = configuracaoBancoVO;
     }
-    
+
     public void setMapaLojaController(MapaLojaController mapaLojaController) {
         this.mapaLojaController = mapaLojaController;
     }
-    
+
     @Override
     public void salvar() throws Exception {
-         configuracaoBancoLojaVO.setIdLojaOrigem(((ItemComboVO) cboLojaOrigem.getSelectedItem()).idString);
-         configuracaoBancoLojaVO.setIdLojaVR(cboLojaVR.getId());
-         configuracaoBancoLojaVO.setLojaMatriz(chkMatriz.isSelected());
-         configuracaoBancoVO.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);
-         
-         mapaLojaController.salvar(configuracaoBancoVO);
-         
-         if (configuracaoBancoLojaVO.getId() != 0) {
-             try {
+        configuracaoBancoLojaVO.setIdLojaOrigem(((ItemComboVO) cboLojaOrigem.getSelectedItem()).idString);
+        
+        if(cboLojaVR.getId() == -1) {
+            Util.exibirMensagem("Loja VR não pode ser vazia!", this.getTitle());
+            return;
+        }
+        
+        configuracaoBancoLojaVO.setIdLojaVR(cboLojaVR.getId());
+        configuracaoBancoLojaVO.setLojaMatriz(chkMatriz.isSelected());
+        configuracaoBancoVO.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);
+
+        mapaLojaController.salvar(configuracaoBancoVO);
+
+        if (configuracaoBancoLojaVO.getId() != 0) {
+            try {
                 mapaLojaController.consultaLojaMapeada(configuracaoBancoVO.getId());
-                
+
                 Util.exibirMensagem("Loja Mapeada com sucesso!", getTitle());
                 this.setVisible(false);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Exceptions.printStackTrace(ex);
             }
-         }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -285,7 +299,7 @@ public class MapaLojaGUI extends VRDialog {
     private vrframework.bean.label.VRLabel lblLojaOrigem;
     private vrframework.bean.label.VRLabel lblLojaVR;
     // End of variables declaration//GEN-END:variables
-    
+
     private void exibirCadastroLoja() {
         try {
             this.setWaitCursor();

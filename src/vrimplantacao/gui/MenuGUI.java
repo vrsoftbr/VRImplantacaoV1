@@ -325,6 +325,7 @@ import vrimplantacao2_5.gui.cadastro.usuario.ConsultaUsuarioGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
+import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -4744,7 +4745,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuInfoMacStoreActionPerformed
 
     private void mnuHipcomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHipcomActionPerformed
-        HipcomGUI.exibir(this);
+        Hipcom2_5GUI.exibir(this);
     }//GEN-LAST:event_mnuHipcomActionPerformed
 
     private void mnuParametros1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuParametros1ActionPerformed
