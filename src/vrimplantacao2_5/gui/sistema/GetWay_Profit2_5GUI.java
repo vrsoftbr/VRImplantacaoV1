@@ -251,8 +251,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
-            String idLojaCliente;
-            String lojaMesmoId;
             DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
             String strVendaDataInicio = "";
             String strVendaDataFim = "";
@@ -273,7 +271,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     dao.copiarDescricaoCompletaParaGondola = chkCopiaDescComplGondola.isSelected();
 
                     Importador importador = new Importador(dao);
-                    importador.setLojaOrigem(idLojaCliente);
+                    importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(idLojaVR);
 
                     dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
