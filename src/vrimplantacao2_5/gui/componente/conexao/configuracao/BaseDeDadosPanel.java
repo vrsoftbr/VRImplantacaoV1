@@ -33,6 +33,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     public ConfiguracaoBaseDadosVO cfgVO = null;
     private ConfiguracaoBancoLojaVO configuracaoLojaVO = null;
     private ESistema sistema;
+    public int idConexao = 0;
 
     /**
      * Creates new form ConfiguracaoBaseDados
@@ -67,6 +68,10 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         conexoes = controller.consultar(sistema.getId());
         
+        if (conexoes.size() == 0) {
+            throw new VRException("Nenhuma conexão cadastrada para o sistema informado!");
+        }
+        
         for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
             String complemento = (configuracaoVO.getComplemento() != null && 
                             !configuracaoVO.getComplemento().isEmpty()) ?
@@ -87,6 +92,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         cboOrigem.setModel(new DefaultComboBoxModel());
 
         lojas = controller.getLojaMapeada(cboConexao.getId());
+        this.idConexao = cboConexao.getId();
 
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
@@ -158,14 +164,15 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         Parametros params = Parametros.get();
 
         final String SISTEMA = cfgVO.getSistema().getNome();
+        final String ENGINE = cfgVO.getBancoDados().getNome();
         
-        params.put(cfgVO.getHost(), SISTEMA, "FIREBIRD", "HOST");
-        params.put(cfgVO.getSchema(), SISTEMA, "FIREBIRD", "DATABASE");
-        params.put(cfgVO.getPorta(), SISTEMA, "FIREBIRD", "PORTA");
-        params.put(cfgVO.getUsuario(), SISTEMA, "FIREBIRD", "USUARIO");
-        params.put(cfgVO.getSenha(), SISTEMA, "FIREBIRD", "SENHA");
-        params.put(cfgVO.getSistema().getNome(), SISTEMA, "FIREBIRD", "SISTEMA");
-        params.put(cfgVO.getBancoDados().getNome(), SISTEMA, "FIREBIRD", "ENGINE");
+        params.put(cfgVO.getHost(), SISTEMA, ENGINE, "HOST");
+        params.put(cfgVO.getSchema(), SISTEMA, ENGINE, "DATABASE");
+        params.put(cfgVO.getPorta(), SISTEMA, ENGINE, "PORTA");
+        params.put(cfgVO.getUsuario(), SISTEMA, ENGINE, "USUARIO");
+        params.put(cfgVO.getSenha(), SISTEMA, ENGINE, "SENHA");
+        params.put(cfgVO.getSistema().getNome(), SISTEMA, ENGINE, "SISTEMA");
+        
         params.salvar();
     }
 

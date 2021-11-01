@@ -36,7 +36,7 @@ public class MapaLojaService {
         List<LojaVO> lojas = null;
 
         try {
-            lojas = lojaDAO.carregar();
+            lojas = lojaDAO.getLojasVRMapeada();
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

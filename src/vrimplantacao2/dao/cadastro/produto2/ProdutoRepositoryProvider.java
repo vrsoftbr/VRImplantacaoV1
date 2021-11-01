@@ -60,6 +60,7 @@ import vrimplantacao2.vo.enums.PisCofinsVO;
  */
 public class ProdutoRepositoryProvider {
     
+    private int idConexao = 0;
     private String sistema;
     private String loja;
     private int lojaVR;
@@ -80,6 +81,14 @@ public class ProdutoRepositoryProvider {
         }
     }
 
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }
+    
+    public int getIdConexao() {
+        return idConexao;
+    }
+    
     public String getSistema() {
         return sistema;
     }
@@ -91,7 +100,7 @@ public class ProdutoRepositoryProvider {
     public int getLojaVR() {
         return lojaVR;
     }
-
+    
     public void setSistema(String sistema) {
         this.sistema = sistema;
     }

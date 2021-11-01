@@ -41,6 +41,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.service.migracao.ProdutoService;
 
 /**
  *
@@ -158,9 +159,11 @@ public class ProdutoRepository {
                                 if (idStack.isIdCadastrado(id)) {
                                     anterior = converterImpEmAnterior(imp);
                                     ProdutoVO produtoVO = new ProdutoVO();
+                                    
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
                                     anterior.setDataHora(dataHoraImportacao);
+                                    
                                     provider.anterior().salvar(anterior);
                                     notificar();
                                     continue;
@@ -192,6 +195,7 @@ public class ProdutoRepository {
                         anterior.setCodigoAtual(prod);
                         anterior.setDataHora(dataHoraImportacao);
                         anterior.setObsImportacao("PRODUTO NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString());
+                        anterior.setIdConexao(this.provider.getIdConexao());
 
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
@@ -252,6 +256,31 @@ public class ProdutoRepository {
             provider.rollback();
             LOG.log(Level.SEVERE, "Erro ao importar os produtos", e);
             throw e;
+        }
+    }
+    
+    public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
+        ProdutoService produtoService = new ProdutoService();
+        
+        int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
+                registros = produtoService.verificaRegistro();
+        
+        if(registros > 0 && idConexao == 0) {
+            unificar(produtos);
+        } else {
+            boolean existeConexao = produtoService.
+                        verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
+            
+            boolean lojaJaMigrada = produtoService.
+                        verificaMultilojaMigrada(getLoja(), getSistema(), this.provider.getIdConexao());
+            
+            if(registros > 0 && existeConexao && !lojaJaMigrada) {
+                String lojaModelo = produtoService.getLojaModelo(this.provider.getIdConexao(), getSistema());
+                
+                produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
+            }
+            
+            salvar(produtos);
         }
     }
 
@@ -533,7 +562,7 @@ public class ProdutoRepository {
                 this.naoTransformarEANemUN = true;
             }
 
-            setNotify("Gravando os produtos...", organizados.size());
+            setNotify("Gravando os produtos (unificação)...", organizados.size());
             for (ProdutoIMP imp : organizados) {
                 processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
@@ -1013,6 +1042,7 @@ public class ProdutoRepository {
             ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
             anterior.setCodigoAtual(codigoAtual);
             anterior.setDataHora(dataHoraImportacao);
+            anterior.setIdConexao(this.provider.getIdConexao());
 
             if (anterior.getCodigoAtual() == null) {
                 obsImportacao = "PRODUTO NAO LOCALIZADO NA UNIFICACAO";
@@ -1568,6 +1598,7 @@ public class ProdutoRepository {
      */
     public ProdutoAnteriorVO converterImpEmAnterior(ProdutoIMP imp) {
         ProdutoAnteriorVO destino = new ProdutoAnteriorVO();
+        
         destino.setImportSistema(imp.getImportSistema());
         destino.setImportLoja(imp.getImportLoja());
         destino.setImportId(imp.getImportId());
