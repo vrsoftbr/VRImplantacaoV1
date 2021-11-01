@@ -236,33 +236,44 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.CODIGO id,\n"
                     + "	p.CODIGO ean,\n"
                     + "	p.NOME descricaocompleta,\n"
-                    + "	COALESCE (p.UNIDADE,'UN') unidade,\n"
+                    + "	COALESCE (p.UNIDADE,'UN') UNIDADE,\n"
                     + "	p.DATA_CT data_cadastro,\n"
                     + "	p.DTATUALIZ data_alteracao,\n"
                     + "	p.CUSTO custocomimposto,\n"
                     + "	p.CUSTO custosemimposto,\n"
                     + "	p.ESTMINIMO estoquemin,\n"
-                    + "e.estoque_fisico estoque,"
+                    + "	e.estoque_fisico estoque,\n"
+                    + "	CAST (CASE\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%F%' THEN '60'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%I%' THEN '40'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%N%' THEN '41'\n"
+                    + "		WHEN i.NF_CODICMS IS NULL THEN '40'\n"
+                    + "		WHEN i.NF_CODICMS = '' AND p.ICMS > 0 THEN '00'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS > 0 THEN '20'\n"
+                    + "		WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS = 0 THEN '00' \n"
+                    + "		ELSE 40\n"
+                    + "	END AS integer) AS CST,\n"
                     + "	p.ICMS icmsaliq,\n"
                     + "	p.REDUZICMS icmsred,\n"
                     + "	p.MARGEMFIXA margem,\n"
                     + "	p.NF_CFISCAL ncm,\n"
                     + "	CASE \n"
-                    + "	  WHEN p.PESAVEL = 'S' THEN 1\n"
-                    + "   ELSE 0\n"
+                    + "		WHEN p.PESAVEL = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
                     + "	END e_balanca,\n"
                     + "	p.PRECOVENDA,\n"
                     + "	p.SETOR merc1,\n"
                     + "	p.SETOR merc2,\n"
                     + "	p.SETOR merc3,\n"
                     + "	p.PESO pesobruto,\n"
-                    + "	CASE COALESCE(p.INATIVO,0) WHEN 0 THEN 1 ELSE 0 END situacaocadastro\n"
+                    + "	CASE COALESCE(p.INATIVO,0) WHEN 0 THEN 1 ELSE 0 END situacaodastro\n"
                     + "FROM\n"
                     + "	CTPROD p\n"
-                    + "	LEFT JOIN CTPROD_FILIAL i ON p.CODIGO = i.CODIGO \n"
-                    + " LEFT JOIN CTPROD_ESTOQUE e ON e.CODIGO = p.CODIGO AND i.FILIAL = e.FILIAL\n"
+                    + "	LEFT JOIN CTPROD_FILIAL f ON p.CODIGO = f.CODIGO\n"
+                    + "	LEFT JOIN CTPROD_ESTOQUE e ON e.CODIGO = p.CODIGO AND f.FILIAL = e.FILIAL\n"
+                    + "	LEFT JOIN WBA_CTPROD i ON p.CODIGO = i.CODIGO\n"
                     + "WHERE\n"
-                    + "	i.FILIAL = " + getLojaOrigem() + ""
+                    + "	f.FILIAL = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -275,7 +286,7 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    
+
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
@@ -284,17 +295,21 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setNcm(rst.getString("ncm"));
+
+                    imp.setIcmsCstSaida(rst.getInt("cst"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icmsaliq"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("icmsred"));
                     
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    
+
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
-                    
+
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setPesoBruto(rst.getInt("pesobruto"));
-                                                            
+
                     result.add(imp);
                 }
             }
