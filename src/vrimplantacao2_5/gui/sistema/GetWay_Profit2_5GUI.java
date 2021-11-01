@@ -250,7 +250,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
-            int idLojaVR;
             DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
             String strVendaDataInicio = "";
             String strVendaDataFim = "";
@@ -262,8 +261,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-
                     dao.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
                     dao.usarMargemBruta = chkUsarMargemBruta.isSelected();
                     dao.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
@@ -272,7 +269,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
-                    importador.setLojaVR(idLojaVR);
+                    importador.setLojaVR(pnlConn.getLojaVR());
 
                     dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
                     dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
