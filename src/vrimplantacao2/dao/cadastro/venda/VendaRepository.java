@@ -514,6 +514,7 @@ public class VendaRepository {
         List<VendaItemIMP> produtos = provider.getProdutosVendidos();
         boolean haDivergencia = false;
         Set<String> produtosNaoEncontrados = new HashSet<>();
+        int produtoPadrao = Parametros.get().getItemVendaPadrao();
         
         for (VendaItemIMP impItem: produtos) {
             PdvVendaItemVO item = converter(impItem, false);
@@ -534,6 +535,9 @@ public class VendaRepository {
             }
             if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL)) {
                 produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
+            }
+            if ( produto == null && produtoPadrao != 0) {
+                produto = produtoPadrao;
             }
             if ( produto == null ) {                
                 final boolean produtoNaoEncontradoAnteriormente = !produtosNaoEncontrados.contains(impItem.getProduto());

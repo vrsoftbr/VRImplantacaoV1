@@ -220,7 +220,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when Servico_Prod = 'B' then 'S' else 'N' end balanca,\n"
                     + "	case when Pesavel_Prod = 'N' then 0 else 1 end pesavel,\n"
                     + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro,\n"
-                    + " icm.Cod_Classe as idIcms\n"        
+                    + " icm.Cod_Classe as idIcms\n"
                     + "from\n"
                     + "	tbl_produto p\n"
                     + "left join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod\n"
@@ -686,7 +686,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tbl_all_head v\n"
                     + "	left join tbl_cliente c on v.Cod_Cliente = c.Cod_Cliente \n"
                     + "where\n"
-                    + "	Data_Emissao_Cupom between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "	Data_Emissao_Cupom >= '" + strDataInicio + "' and Data_Emissao_Cupom <= '" + strDataTermino + "'\n"
                     + " and v.Status_Cupom <> 'C'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -775,7 +775,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tbl_produto p on\n"
                     + "	p.Codigo_Prod = i.Cod_Interno_Produto\n"
                     + "where\n"
-                    + "	v.Data_Emissao_Cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	v.Data_Emissao_Cupom >= '" + VendaIterator.FORMAT.format(dataInicio) + "' and v.Data_Emissao_Cupom <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + " and v.Status_Cupom <> 'C' \n"
                     + " and i.Item_Cancelado <> 'S'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

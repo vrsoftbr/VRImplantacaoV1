@@ -31,23 +31,23 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	Registro id,\n" +
-                    "	cast(Registro as varchar(10)) + ' - ' + CGC + ' - ' + Empresa descricao\n" +
-                    "from \n" +
-                    "	empresa\n" +
-                    "order by\n" +
-                    "	1"
+                    "select    \n"
+                    + "    	Registro id,    \n"
+                    + "    	cast(l.Registro as varchar(10)) + ' - ' + l.CGC + ' - ' + l.Fantasia descricao    \n"
+                    + "    from     \n"
+                    + "    	Integrar_Lojas l    \n"
+                    + "    order by    \n"
+                    + "    	1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
                 }
             }
         }
-        
+
         return result;
     }
 
