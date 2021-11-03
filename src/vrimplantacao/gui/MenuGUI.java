@@ -734,14 +734,11 @@ public final class MenuGUI extends VRMdiFrame {
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
-        mnuNeo = new javax.swing.JMenuItem();
-        mnuPlenus = new javax.swing.JMenuItem();
-        chkSGMaster = new javax.swing.JMenuItem();
-        mnuAutoMac = new javax.swing.JMenuItem();
         mnuMSuper = new javax.swing.JMenuItem();
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuAutoMac1 = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -848,8 +845,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
-        mnuStockPostgres = new javax.swing.JMenuItem();
         mnuSuperControle = new javax.swing.JMenuItem();
+        mnuStockPostgres = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         mnuSQLServer = new javax.swing.JMenu();
@@ -1980,13 +1977,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(chkSGMaster);
 
-        mnuAutoMac.setText("AutoMac");
-        mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
+        mnuAutoMac1.setText("AutoMac");
+        mnuAutoMac1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuAutoMacActionPerformed(evt);
             }
         });
-        mnuFirebird3.add(mnuAutoMac);
+        mnuFirebird3.add(mnuAutoMac1);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -2808,6 +2805,7 @@ public final class MenuGUI extends VRMdiFrame {
                 mnuSuperControleActionPerformed(evt);
             }
         });
+        mnuPostgres2.add(mnuSuperControle);
 
         mnuStockPostgres.setText("Stock");
         mnuStockPostgres.addActionListener(new java.awt.event.ActionListener() {
@@ -2816,15 +2814,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuStockPostgres);
-
-        mnuSuperControle.setText("Super Controle");
-        mnuSuperControle.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSuperControleActionPerformed(evt);
-            }
-        });
-
-        mnuPostgres2.add(mnuSuperControle);
 
         mnuDatabase.add(mnuPostgres2);
 
@@ -5514,12 +5503,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuAutoMacActionPerformed(java.awt.event.ActionEvent evt) {                                           
         AutoMacGUI.exibir(this);
-    }                                          
-
-    private void mnuSuperControleActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
-        SuperControle_PostgresGUI.exibir(this);
-    }                                                
+    }                                                                                         
 
     private void mnuDTComActionPerformed(java.awt.event.ActionEvent evt) {                                         
         DTComPlanilhaGUI.exibir(this);
@@ -5569,6 +5553,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuStockPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuStockPostgresActionPerformed
         Stock_PostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuStockPostgresActionPerformed
+
+    private void mnuSuperControleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSuperControleActionPerformed
+        SuperControle_PostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuSuperControleActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5676,6 +5664,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;
     private javax.swing.JMenuItem mnuAutoMac;
+    private javax.swing.JMenuItem mnuAutoMac1;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenuItem mnuAutocom;
@@ -5791,8 +5780,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMRC6;
     private javax.swing.JMenuItem mnuMSIInfor;
-    private javax.swing.JMenuItem mnuMapeamentoDeLojas;
     private javax.swing.JMenuItem mnuMSuper;
+    private javax.swing.JMenuItem mnuMapeamentoDeLojas;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
