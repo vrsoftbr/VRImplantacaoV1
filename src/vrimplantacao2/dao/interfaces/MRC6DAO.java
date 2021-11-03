@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -30,10 +29,13 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -169,87 +171,49 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + " prod.Familiaid as codmerc1,\n"
+                    + " merc1.descricao as descmerc1,\n"
+                    + " prod.Grupoid as codmerc2,\n"
+                    + " merc2.descricao as descmerc2,\n"
+                    + " prod.Subgrupoid as codmerc3,\n"
+                    + " merc3.descricao as descmerc3\n"
+                    + "from produtos prod\n"
+                    + "join produtosgrupos merc1 on merc1.codigo = prod.Familiaid\n"
+                    + "join produtosgrupos merc2 on merc2.codigo = prod.Grupoid\n"
+                    + "join produtosgrupos merc3 on merc3.codigo = prod.Subgrupoid\n"
+                    + "order by 1,3,5"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setMerc1ID(rst.getString("codmerc1"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc2ID(rst.getString("codmerc2"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc3ID(rst.getString("codmerc3"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "with ean as (\n"
-                    + "	select\n"
-                    + "		p.ProdID id_produto,\n"
-                    + "		p.ProdCodBarras1 ean\n"
-                    + "	from\n"
-                    + "		TB_PRODUTO p\n"
-                    + "	where\n"
-                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras1,''))) != ''\n"
-                    + "	union\n"
-                    + "	select\n"
-                    + "		p.ProdID id_produto,\n"
-                    + "		p.ProdCodBarras2 ean\n"
-                    + "	from\n"
-                    + "		TB_PRODUTO p\n"
-                    + "	where\n"
-                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras2,''))) != ''\n"
-                    + "	union\n"
-                    + "	select\n"
-                    + "		p.ProdID id_produto,\n"
-                    + "		p.ProdCodBarras3 ean\n"
-                    + "	from\n"
-                    + "		TB_PRODUTO p\n"
-                    + "	where\n"
-                    + "		ltrim(rtrim(coalesce(p.ProdCodBarras3,''))) != ''\n"
-                    + ")\n"
-                    + "select \n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodInterno,\n"
-                    + "	ean.ean,\n"
-                    + "	un.UnSigla as unidade,\n"
-                    + "	p.ProdDescricao as descricao,\n"
-                    + "	case p.ProdStatusID\n"
-                    + "		when 1053 then 0\n"
-                    + "		else 1\n"
-                    + "	end ativo,\n"
-                    + "	p.ProdFabricanteID,\n"
-                    + "	p.ProdFamiliaID,\n"
-                    + "	p.ProdNcm as ncm,\n"
-                    + "	p.ProdCest as cest,\n"
-                    + "	p.ProdPesoBruto as pesobruto,\n"
-                    + "	p.ProdPesoLiquido as pesoliquido,\n"
-                    + "	p.ProdPrecoCompra,\n"
-                    + "	p.ProdPrecoCusto as custo,\n"
-                    + "	p.ProdValorVenda1 as precovenda,\n"
-                    + "	p.ProdEstoqueMin as estoqueminimo,\n"
-                    + "	p.ProdEstoqueMax as estoquemaximo,\n"
-                    + "	est.EstConsAtual as estoque,\n"
-                    + "	p.ProdMargem1 as margem,\n"
-                    + "	p.ProdDtCadastro as datacadastro,\n"
-                    + "	p.ProdEmbalagemQtde as qtdembalagem,\n"
-                    + "	p.ProdClaFisID as tribicms,\n"
-                    + "	pis.CstPisCofinsCodigo as cstpissaida,\n"
-                    + "	pis.CstPisCofinsDescricao,\n"
-                    + "	cofins.CstPisCofinsCodigo as cstpisentrada,\n"
-                    + "	cofins.CstPisCofinsDescricao,\n"
-                    + "	nat.NatRecPisCofinsCodigo as naturezareceita,\n"
-                    + "	nat.NatRecPisCofinsDescricao,\n"
-                    + "	p.ProdCaixaQtde volume\n"
-                    + "from\n"
-                    + "	dbo.TB_PRODUTO p\n"
-                    + "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n"
-                    + "		p.ProdID = est.EstConsProdID\n"
-                    + "	left join ean on\n"
-                    + "		p.ProdID = ean.id_produto\n"
-                    + "	left join dbo.TB_UNIDADE_MEDIDA un on\n"
-                    + "		un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "	left join dbo.TB_CST_PIS_COFINS pis on\n"
-                    + "		pis.CstPisCofinsID = p.ProdCstPisID and\n"
-                    + "		pis.CstPisCofinsOperacaoID = 129\n"
-                    + "	left join dbo.TB_CST_PIS_COFINS cofins on\n"
-                    + "		cofins.CstPisCofinsID = p.ProdCstCofinsCompraID and\n"
-                    + "		cofins.CstPisCofinsOperacaoID = 128\n"
-                    + "	left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on\n"
-                    + "		nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n"
-                    + "order by\n"
-                    + "	p.ProdCodInterno"
+                    ""
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -378,51 +342,29 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	f.FornID as id,\n"
-                    + "	f.FornCodInterno,\n"
-                    + "	f.FornDiasEntrega,\n"
-                    + "	pes.PessoaNome as razao,\n"
-                    + "	pes.PessoaFantasia as fantasia,\n"
-                    + "	pes.PessoaCpfCnpj as cnpj,\n"
-                    + "	pes.PessoaIERG as ie_rg,\n"
-                    + "	pes.PessoaIM as inscricaomunicipal,\n"
-                    + "	ende.EndLogradouro as endereco,\n"
-                    + "	ende.EndNumero as numero,\n"
-                    + "	ende.EndComplemento as complemento,\n"
-                    + "	ende.EndBairro as bairro,\n"
-                    + "	ende.EndCEP as cep,\n"
-                    + "	cid.CidNome as municipio,\n"
-                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
-                    + "	case pes.PessoaSituacaoID\n"
-                    + "		when 51 then 0\n"
-                    + "		else 1\n"
-                    + "	end ativo,\n"
-                    + "	uf.UfSigla as uf,\n"
-                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
-                    + "	pes.PessoaEmail as email,\n"
-                    + "	pes.PessoaSite as site,\n"
-                    + "	pes.PessoaFonePrincipal as telefone,\n"
-                    + "	pes.PessoaFoneCelular as celular,\n"
-                    + "	pes.PessoaFoneFAX as fax,\n"
-                    + "	pes.PessoaFoneOutro as telefone2,\n"
-                    + "	pes.PessoaFonePABX as pabx,\n"
-                    + "	pes.PessoaObservacoes as observacao,\n"
-                    + "	pes.PessoaDtCadastro as datacadastro\n"
+                    "select\n"
+                    + "	f.codigo as id,\n"
+                    + "	f.nome as razao,\n"
+                    + "	f.nomefantasia as fantasia,\n"
+                    + "	f.cnpj,\n"
+                    + "	f.inscrest as ie_rg,\n"
+                    + "	f.inscrmunicipal,\n"
+                    + "	f.endereco,\n"
+                    + "	f.complemento,\n"
+                    + "	f.bairro,\n"
+                    + "	c.cidade,\n"
+                    + "	f.desativado as status,\n"
+                    + "	c.codigoibge,\n"
+                    + "	f.cep,\n"
+                    + "	c.estado,\n"
+                    + "	f.telefone1,\n"
+                    + "	f.telefone2,\n"
+                    + "	f.dtcadastro,\n"
+                    + "	f.email\n"
                     + "from\n"
-                    + "	dbo.TB_FORNECEDOR f\n"
-                    + "	join dbo.TB_PESSOA_PFPJ pes on\n"
-                    + "		pes.PessoaID = f.FornID\n"
-                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on\n"
-                    + "		pend.PessoaID = pes.PessoaID\n"
-                    + "	left join dbo.TB_ENDERECO ende on\n"
-                    + "		ende.EndID = pend.PessoaEndID\n"
-                    + "	left join dbo.TB_CIDADE cid on\n"
-                    + "		cid.CidID = ende.EndCidadeID\n"
-                    + "	left join dbo.TB_UF uf on\n"
-                    + "		uf.UfID = cid.CidUfID\n"
-                    + "order by\n"
-                    + "	f.FornID"
+                    + "	fornecedores f\n"
+                    + "join cidades c on c.codigo = f.cidadeID\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -435,34 +377,23 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("ie_rg"));
                     imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("municipio"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
-                    imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setAtivo(rst.getBoolean("status"));
+                    imp.setIbge_municipio(rst.getInt("codigoibge"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setUf(rst.getString("uf"));
-                    imp.setIbge_uf(rst.getInt("uf_ibge"));
-                    imp.setTel_principal(rst.getString("telefone"));
-                    imp.setDatacadastro(rst.getDate("datacadastro"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTel_principal(rst.getString("telefone1"));
+                    imp.setDatacadastro(rst.getDate("dtcadastro"));
 
                     if ((rst.getString("email") != null)
                             && (!rst.getString("email").trim().isEmpty())) {
                         imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.NFE);
                     }
-                    if ((rst.getString("celular") != null)
-                            && (!rst.getString("celular").trim().isEmpty())) {
-                        imp.addCelular("CELULAR", rst.getString("celular"));
-                    }
                     if ((rst.getString("telefone2") != null)
                             && (!rst.getString("telefone2").trim().isEmpty())) {
                         imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
-                    }
-                    if ((rst.getString("fax") != null)
-                            && (!rst.getString("fax").trim().isEmpty())) {
-                        imp.addTelefone("FAX", rst.getString("fax"));
                     }
 
                     result.add(imp);
@@ -478,12 +409,14 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	ProdFornFornID as idfornecedor,\n"
-                    + "	ProdFornProdID as idproduto,\n"
-                    + "	ProdFornCodigo as codigoexterno\n"
-                    + "from dbo.TB_PRODUTO_FORNECEDOR\n"
-                    + "order by 1"
+                    "select\n"
+                    + "	pf.fornecedorID as idfornecedor,\n"
+                    + "	pf.produtoID as idproduto,\n"
+                    + "	p.referencia as codigoexterno\n"
+                    + " from\n"
+                    + "	produtosfornecedores pf\n"
+                    + " join produtos p on p.codigo = pf.produtoID\n"
+                    + " join fornecedores f on f.codigo = pf.fornecedorID"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -505,52 +438,47 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	c.CliID as id,\n"
-                    + "	c.CliCodigoPessoal,\n"
-                    + "	c.CliLimiteTotal as valortotal,\n"
-                    + "	c.CliLimiteSaldo as valorsaldo,\n"
-                    + "	case pes.PessoaSituacaoID\n"
-                    + "		when 51 then 0\n"
-                    + "		else 1\n"
-                    + "	end ativo,\n"
-                    + "	pes.PessoaNome as razao,\n"
-                    + "	pes.PessoaFantasia as fantasia,\n"
-                    + "	pes.PessoaCpfCnpj as cnpj,\n"
-                    + "	pes.PessoaIERG as ie_rg,\n"
-                    + "	pes.PessoaIM as inscricaomunicipal,\n"
-                    + "	ende.EndLogradouro as endereco,\n"
-                    + "	ende.EndNumero as numero,\n"
-                    + "	ende.EndComplemento as complemento,\n"
-                    + "	ende.EndBairro as bairro,\n"
-                    + "	ende.EndCEP as cep,\n"
-                    + "	cid.CidNome as municipio,\n"
-                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
-                    + "	uf.UfSigla as uf,\n"
-                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
-                    + "	pes.PessoaEmail as email,\n"
-                    + "	pes.PessoaSite as site,\n"
-                    + "	pes.PessoaFonePrincipal as telefone,\n"
-                    + "	pes.PessoaFoneCelular as celular,\n"
-                    + "	pes.PessoaFoneFAX as fax,\n"
-                    + "	pes.PessoaFoneOutro as telefone2,\n"
-                    + "	pes.PessoaFonePABX as pabx,\n"
-                    + "	pes.PessoaObservacoes as observacao,\n"
-                    + "	pes.PessoaDtCadastro as datacadastro\n"
+                    "select\n"
+                    + "	a.codigo as id,\n"
+                    + "	b.descricao,\n"
+                    + "	a.cnpj,\n"
+                    + "	a.inscrest as ie_rg,\n"
+                    + "	a.nome as razao,\n"
+                    + "	a.nomefantasia as fantasia,\n"
+                    + "	case\n"
+                    + "		when a.ativoinativo = 'A' then 1\n"
+                    + "		else 0\n"
+                    + "	end as status,\n"
+                    + "	a.dtativoinativo,\n"
+                    + "	a.endereco,\n"
+                    + "	a.complemento,\n"
+                    + "	a.bairro,\n"
+                    + "	c.codigoibge,\n"
+                    + "	c.estado as uf,\n"
+                    + "	c.cidade,\n"
+                    + "	a.cep,\n"
+                    + "	a.estadocivil,\n"
+                    + "	a.dtcadastro,\n"
+                    + "	a.sexo,\n"
+                    + "	a.limitecredito,\n"
+                    + "	a.naoliberarcredito,\n"
+                    + "	a.telefone1,\n"
+                    + "	a.telefone2,\n"
+                    + "	a.celular,\n"
+                    + "	a.email,\n"
+                    + "	a.fax,\n"
+                    + "	a.enderecoc,\n"
+                    + "	a.complementoc,\n"
+                    + "	a.bairroc,\n"
+                    + "	d.codigoibge,\n"
+                    + "	d.estado as c_uf,\n"
+                    + "	d.cidade as c_cidade,\n"
+                    + "	a.cepc\n"
                     + "from\n"
-                    + "	dbo.TB_CLIENTE c\n"
-                    + "	join dbo.TB_PESSOA_PFPJ pes on\n"
-                    + "		pes.PessoaID = c.CliID\n"
-                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on\n"
-                    + "		pend.PessoaID = pes.PessoaID\n"
-                    + "	left join dbo.TB_ENDERECO ende on\n"
-                    + "		ende.EndID = pend.PessoaEndID\n"
-                    + "	left join dbo.TB_CIDADE cid on\n"
-                    + "		cid.CidID = ende.EndCidadeID\n"
-                    + "	left join dbo.TB_UF uf on\n"
-                    + "		uf.UfID = cid.CidUfID\n"
-                    + "order by\n"
-                    + "	c.CliID"
+                    + "	clientes a\n"
+                    + "join clientesgrupos b on b.codigo = a.grupoID\n"
+                    + "left join cidades c on c.codigo = a.cidadeid\n"
+                    + "left join cidades d on d.codigo = a.cidadecID;"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -559,24 +487,30 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
-                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("municipio"));
-                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setMunicipioIBGE(rst.getInt("codigoibge"));
                     imp.setUf(rst.getString("uf"));
-                    imp.setUfIBGE(rst.getInt("uf_ibge"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setAtivo(rst.getBoolean("status"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("email"));
                     imp.setObservacao(rst.getString("observacao"));
-                    imp.setValorLimite(rst.getDouble("valortotal"));
+                    imp.setValorLimite(rst.getDouble("limitecredito"));
+                    imp.setPermiteCreditoRotativo(rst.getBoolean("naoliberarcredito"));
+
+                    imp.setCobrancaBairro(rst.getString("bairroc"));
+                    imp.setCobrancaCep(rst.getString("cepc"));
+                    imp.setEndereco(rst.getString("enderecoc"));
+                    imp.setCobrancaMunicipio(rst.getString("c_cidade"));
+                    imp.setCobrancaUf(rst.getString("c_uf"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("codigoibge"));
+                    imp.setCobrancaComplemento(rst.getString("complementoc"));
 
                     if ((rst.getString("telefone2") != null)
                             && (!rst.getString("telefone2").trim().isEmpty())) {
@@ -591,30 +525,43 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
-        List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  dupliad.duplicatainfoadicionalID as id,\n"
+                    + "  dup.duplicata as numerodocumento,\n"
+                    + "  dupliad.valor as valor,\n"
+                    + "  dup.clientefornecedorID as fornecedorid,\n"
+                    + "  dupliad.dt\n"
+                    + "  dup.dtcadastro as emissao,\n"
+                    + "  dup.dtvencimento as vencimento,\n"
+                    + "  dup.descricao as obs,\n"
+                    + "  dup.numerodocumento\n"
+                    + " from duplicatasinfoadicionais dupliad\n"
+                    + " join duplicatas dup on dup.codigo = dupliad.codigoID \n"
+                    + " where \n"
+                    + "  dup.flagclientefornecedor = 'F'\n"
+                    + " and\n"
+                    + "  dup.dtbaixa is null \n"
+                    + " and\n"
+                    + "  dupliad.dtefetivopagamento is null"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("fornecedorid"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setVencimento(rst.getDate("vencimento"));
 
-        try (
-                Statement stm = ConexaoSqlServer.getConexao().createStatement();
-                ResultSet rst = stm.executeQuery(
-                        "select\n"
-                        + "	t.CliSaldoMovCliID as id_cliente,\n"
-                        + "	sum(t.CliSaldoMovValor) as valor\n"
-                        + "from\n"
-                        + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
-                        + "where\n"
-                        + "	t.CliSaldoMovNaturezaID = 100\n"
-                        + "group by\n"
-                        + "	t.CliSaldoMovCliID"
-                )) {
-            while (rst.next()) {
-                result.add(new CreditoRotativoPagamentoAgrupadoIMP(
-                        rst.getString("id_cliente"),
-                        rst.getDouble("valor")
-                ));
+                    result.add(imp);
+                }
             }
         }
-
         return result;
     }
 
@@ -624,23 +571,25 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	t.CliSaldoMovID as id,\n"
-                    + "	v.VndDtEmissao as emissao,\n"
-                    + "	v.VndNumeroVenda as numerocupom,\n"
-                    + "	v.VndEstacaoID as ecf,\n"
-                    + "	t.CliSaldoMovValor as valor,\n"
-                    + "	t.CliSaldoMovObservacao as observacao,\n"
-                    + "	t.CliSaldoMovCliID as id_cliente\n"
-                    + "from\n"
-                    + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
-                    + "	join TB_VENDA v on\n"
-                    + "		t.CliSaldoMovOrigemID = v.VndID\n"
-                    + "where\n"
-                    + "	t.CliSaldoMovNaturezaID = 99 and\n"
-                    + "	v.VndDtCancelamento is null\n"
-                    + "order by\n"
-                    + "	t.CliSaldoMovID "
+                    "select \n"
+                    + "  dupliad.duplicatainfoadicionalID as id,\n"
+                    + "  dup.duplicata as numerocupom,\n"
+                    + "  dup.computername as ecf,\n"
+                    + "  dup.parcela as parcela,\n"
+                    + "  dupliad.valor as valor,\n"
+                    + "  dup.clientefornecedorID as clienteid,\n"
+                    + "  dup.dtcadastro as emissao,\n"
+                    + "  dup.dtvencimento as vencimento,\n"
+                    + "  dup.descricao as obs,\n"
+                    + "  dup.numerodocumento\n"
+                    + " from duplicatasinfoadicionais dupliad\n"
+                    + " join duplicatas dup on dup.codigo = dupliad.codigoID \n"
+                    + " where \n"
+                    + " dup.flagclientefornecedor = 'C'\n"
+                    + " and\n"
+                    + " dup.dtbaixa is null \n"
+                    + " and\n"
+                    + " dupliad.dtefetivopagamento is null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -651,10 +600,8 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setIdCliente(rst.getString("id_cliente"));
-                    GregorianCalendar vencimento = new GregorianCalendar();
-                    vencimento.setTime(rst.getDate("emissao"));
-                    vencimento.add(GregorianCalendar.DAY_OF_MONTH, 10);
-                    imp.setDataVencimento(vencimento.getTime());
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setObservacao(rst.getString("obs"));
 
                     result.add(imp);
                 }
