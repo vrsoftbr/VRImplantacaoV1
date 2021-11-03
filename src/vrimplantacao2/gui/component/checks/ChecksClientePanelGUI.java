@@ -3,6 +3,7 @@ package vrimplantacao2.gui.component.checks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao2.dao.cadastro.ItuInfoDAO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -960,6 +961,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
     public void carregarParametros(Parametros params, String... keys) {
         
+    }
+
+    public void setOpcoesDisponiveis(ItuInfoDAO dao) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

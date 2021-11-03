@@ -1661,14 +1661,6 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuControlePlusActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuItuInfo">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="ItuInfo"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuItuInfoActionPerformed"/>
-                          </Events>
-                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuPrime">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Prime"/>
