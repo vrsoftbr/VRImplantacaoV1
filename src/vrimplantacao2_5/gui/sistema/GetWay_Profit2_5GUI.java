@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -18,10 +17,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO;
 import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO.TipoDocumentoRecord;
@@ -154,11 +150,11 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             params.put(builder.toString(), SISTEMA, "CHEQUE_SELECT");
         }
         
-        ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
-        if (vr != null) {
-            params.put(vr.id, SISTEMA, "LOJA_VR");
-            vLojaVR = vr.id;
+        if (pnlConn != null) {
+            params.put(pnlConn.getLojaVR(), SISTEMA, "LOJA_VR");
+            vLojaVR = pnlConn.getLojaVR();
         }
+        
         params.salvar();
     }
 
@@ -219,20 +215,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     public void carregarLojaCliente() throws Exception {
     }
 
-    public void carregarLojaVR() throws Exception {
-        cmbLojaVR.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
-        for (LojaVO oLoja : new LojaDAO().carregar()) {
-            cmbLojaVR.addItem(new ItemComboVO(oLoja.id, oLoja.descricao));
-            if (oLoja.id == vLojaVR) {
-                index = cont;
-            }
-            cont++;
-        }
-        cmbLojaVR.setSelectedIndex(index);
-    }
-
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();
@@ -250,7 +232,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
-            int idLojaVR;
             DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
             String strVendaDataInicio = "";
             String strVendaDataFim = "";
@@ -262,8 +243,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-
                     dao.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
                     dao.usarMargemBruta = chkUsarMargemBruta.isSelected();
                     dao.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
@@ -272,7 +251,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
-                    importador.setLojaVR(idLojaVR);
+                    importador.setLojaVR(pnlConn.getLojaVR());
 
                     dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
                     dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
@@ -354,8 +333,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
-        jLabel1 = new javax.swing.JLabel();
-        cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new javax.swing.JPanel();
@@ -428,31 +405,17 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             }
         });
 
-        jLabel1.setText("Loja:");
-
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         vRPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -925,7 +888,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, 211, Short.MAX_VALUE)
+                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -1002,10 +965,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemSobreVenda;
     private vrframework.bean.checkBox.VRCheckBox chkUsarQtdCotacaoProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUtilizarEmbalagemCompra;
-    private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
