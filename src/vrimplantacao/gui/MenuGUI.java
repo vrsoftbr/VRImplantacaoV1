@@ -284,6 +284,7 @@ import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.ItuInfoGUI;
 import vrimplantacao2.gui.interfaces.LCSistemaGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MRC6GUI;
@@ -819,6 +820,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAthos = new javax.swing.JMenuItem();
         mnuCervantes = new javax.swing.JMenuItem();
         mnuControlePlus = new javax.swing.JMenuItem();
+        mnuItuInfo = new javax.swing.JMenuItem();
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
@@ -2691,6 +2693,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuControlePlus);
+
+        mnuItuInfo.setText("ItuInfo");
+        mnuItuInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuItuInfoActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuItuInfo);
 
         mnuPrime.setText("Prime");
         mnuPrime.addActionListener(new java.awt.event.ActionListener() {
@@ -5451,6 +5461,10 @@ public final class MenuGUI extends VRMdiFrame {
         WBAGUI.exibir(this);
     }//GEN-LAST:event_mnuWBAActionPerformed
 
+    private void mnuItuInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuItuInfoActionPerformed
+        ItuInfoGUI.exibir(this);
+    }//GEN-LAST:event_mnuItuInfoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5646,6 +5660,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
     private javax.swing.JMenuItem mnuInventer;
+    private javax.swing.JMenuItem mnuItuInfo;
     private javax.swing.JMenuItem mnuJM2Online;
     private javax.swing.JMenuItem mnuJacsys;
     private javax.swing.JMenu mnuJanela;

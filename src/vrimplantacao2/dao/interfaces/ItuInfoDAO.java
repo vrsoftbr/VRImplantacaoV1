@@ -26,6 +26,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+
     @Override
     public String getSistema() {
         return "ItuInfo";
@@ -119,27 +125,42 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	triid as id,\n"
-                    + "	tridestributo as descricao,\n"
-                    + "	tricstcsosnsaida as csticms,\n"
-                    + "	trivalortributacao as aliquotaicms,\n"
-                    + "	0 as reducaoicms\n"
-                    + "FROM\n"
-                    + "	tbtributacoes"
+                    "select\n"
+                    + "	distinct\n"
+                    + "	case  \n"
+                    + "		when indiceicms = '' then 0\n"
+                    + "		when indiceicms like '%0%' then 0\n"
+                    + "		when indiceicms like 'FF-%' then 60\n"
+                    + "		when indiceicms like 'NN-%' then 41\n"
+                    + "		else 40\n"
+                    + "	end cst_icms,\n"
+                    + "	tributoe aliq_icms,\n"
+                    + " 0 as red_icms,"
+                    + "	case\n"
+                    + "		when indiceicms = '' then 0\n"
+                    + "		when indiceicms like '%0%' then 0\n"
+                    + "		when indiceicms like 'FF-%' then 60\n"
+                    + "		when indiceicms like 'NN-%' then 41\n"
+                    + "		else 40\n"
+                    + "	end || '-' || tributoe || '-' || '0' as descricao\n"
+                    + "from\n"
+                    + "	produtos p\n"
+                    + "where\n"
+                    + "	tributoe is not null\n"
+                    + "order by 3"
             )) {
                 while (rs.next()) {
                     String id = getAliquotaKey(
-                            rs.getString("csticms"),
-                            rs.getDouble("aliquotaicms"),
-                            rs.getDouble("reducaoicms")
+                            rs.getString("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms")
                     );
                     result.add(new MapaTributoIMP(
                             id,
                             id,
-                            Utils.stringToInt(rs.getString("csticms")),
-                            rs.getDouble("aliquotaicms"),
-                            rs.getDouble("reducaoicms")
+                            Utils.stringToInt(rs.getString("cst_icms")),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms")
                     ));
                 }
             }
@@ -210,83 +231,71 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	proid AS id,\n"
-                    + "	procodbarras AS codigobarras,\n"
-                    + "	pronomproduto AS descricaocompleta,\n"
-                    + "	proabrproduto AS descricaoreduzida,\n"
-                    + "	prodesunidade AS unidade,\n"
-                    + "	provalprecovenda AS precovenda,\n"
-                    + "	provalcusto AS custosemimposto,\n"
-                    + " provalcusto AS custocomimposto,\n"
-                    + "	prolucro AS margem,\n"
-                    + "	proqntminima AS estoqueminimo,\n"
-                    + "	proqntestoque AS estoque,\n"
-                    + "	proCodDepartamento AS cod_mercadologico1,\n"
-                    + "	proCodDepartamento AS cod_mercadologico2,\n"
-                    + " proCodDepartamento AS cod_mercadologico3,\n"
-                    + "	propeso AS pesobruto,\n"
-                    + "	prodataalterado AS dataalteracao,\n"
-                    + "	proncm AS ncm,\n"
-                    + "	procest AS cest,\n"
-                    + "	proflagbalanca AS balanca,\n"
-                    + "	procodtributo as icms_credito_id,\n"
-                    + "	procodtributo as icms_credito_foraestado_id,\n"
-                    + "	procodtributo as icms_debito_id,\n"
-                    + "	procodtributo as icms_debito_foraestado_id,\n"
-                    + "	procodtributo as icms_debito_foraestadonf_id,\n"
-                    + "	procodtributo as icms_consumidor_id,\n"
-                    + "	p.procst_entrada AS piscofins_cst_credito,\n"
-                    + "	p.procst_saida AS piscofins_cst_debito,\n"
-                    + "	procodnatreceita AS piscofins_natureza_receita,\n"
-                    + " tricstcsosnsaida as csticms,\n"
-                    + "	trivalortributacao as aliquotaicms,\n"
-                    + " 0 reducaoicms\n"
-                    + "FROM\n"
-                    + "	tbprodutos p,\n"
-                    + "	tbGrupos m,\n"
-                    + "	tbtributacoes t,\n"
-                    + "	tbPisCofins pc\n"
-                    + "WHERE\n"
-                    + "	p.procodtributo = t.triid\n"
-                    + "	AND m.depid = p.proCodDepartamento\n"
-                    + "	AND p.proCodPisCofins = pc.pisId\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	id,\n"
+                    + "	codigobarra,\n"
+                    + "	produto as descricao,\n"
+                    + "	case\n"
+                    + "	  when mgv5 = 1 then 'KG'\n"
+                    + "	  else 'UN'\n"
+                    + "	end unidade,\n"
+                    + "	vrcompra as custosemimposto,\n"
+                    + "	vrcompra as custocomimposto,\n"
+                    + "	vrvenda as precovenda,\n"
+                    + " lucro margem,"
+                    + "	codigosetor as mercadologico1,\n"
+                    + "	codigosetor as mercadologico2,\n"
+                    + "	codigosetor as mercadologico3,\n"
+                    + "	estoqueminimo,\n"
+                    + "	estoqueatual as estoque,\n"
+                    + "	mgv5 as e_balanca,\n"
+                    + "	ncm,\n"
+                    + "	cest,\n"
+                    + "	case \n"
+                    + "	  when indiceicms = '' then 0\n"
+                    + "	  when indiceicms like '%0%' then 0\n"
+                    + "	  when indiceicms like 'FF-%' then 60\n"
+                    + "	  when indiceicms like 'NN-%' then 41\n"
+                    + "	  else 40\n"
+                    + "	end cst_icms,\n"
+                    + "	tributoe aliq_icms,\n"
+                    + "	0 red_icms\n"
+                    + "from\n"
+                    + "	produtos\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setEan(rst.getString("codigobarra"));
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setMargem(rst.getDouble("margem"));
+                    
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
-
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setEstoque(Utils.stringToDouble(rst.getString("estoque")));
+                    
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.seteBalanca(rst.getBoolean("balanca"));
-
-                    imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_credito"));
-                    imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
-
+                                       
                     String idIcms = getAliquotaKey(
-                            rst.getString("csticms"),
-                            rst.getDouble("aliquotaicms"),
-                            rst.getDouble("reducaoicms")
+                            rst.getString("cst_icms"),
+                            rst.getDouble("aliq_icms"),
+                            rst.getDouble("red_icms")
                     );
 
                     imp.setIcmsDebitoId(idIcms);
@@ -321,7 +330,7 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdeembalagem"));
