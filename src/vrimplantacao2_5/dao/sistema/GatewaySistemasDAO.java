@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -143,7 +144,48 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "FROM FORNECEDORES f \n"
                     + "ORDER BY 1"
             )) {
-
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    
+                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty()) {
+                        imp.setCnpj_cpf(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj_cpf(rst.getString("cpf"));
+                    }
+                    
+                    if (rst.getString("ie_rg") != null && !rst.getString("ie_rg").trim().isEmpty()) {
+                        imp.setIe_rg(rst.getString("ie_rg"));
+                    } else {
+                        imp.setIe_rg(rst.getString("rg"));
+                    }
+                    
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    
+                    if (rst.getString("celular") != null && !rst.getString("celular").trim().isEmpty()) {
+                        imp.addCelular("CELULAR", rst.getString("celular"));
+                    }
+                    if (rst.getString("fax") != null && !rst.getString("fax").trim().isEmpty()) {
+                        imp.addTelefone("FAX", rst.getString("Fax"));
+                    }
+                    if (rst.getString("email") != null && !rst.getString("email").trim().isEmpty()) {
+                        imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                    }
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
