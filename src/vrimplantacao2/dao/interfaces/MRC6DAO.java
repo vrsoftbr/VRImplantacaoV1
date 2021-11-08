@@ -30,9 +30,7 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -147,13 +145,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	ClaFisID as id,\n"
-                    + "	ClaFisDescricao as descricao,\n"
-                    + "	ClaFisIcmsAliquota as aliquota,\n"
-                    + "	ClaFisIcmsReducao as reducao\n"
-                    + "from dbo.TB_CLASSIFICACAO_FISCAL\n"
-                    + "order by 1"
+                    ""
             )) {
                 while (rst.next()) {
 
@@ -280,45 +272,15 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select * from (select\n"
-                    + "	p.prodid id,\n"
-                    + "	p.prodcodbarras1 ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from\n"
-                    + "	tb_produto p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
-                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "where\n"
-                    + "	ltrim(rtrim(coalesce(p.prodcodbarras1, ''))) != ''\n"
-                    + "union all \n"
-                    + "select\n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodBarras2 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from\n"
-                    + "	dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
-                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all \n"
-                    + "select\n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodBarras3 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from\n"
-                    + "	dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
-                    + "	un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all \n"
-                    + "select\n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdEan14 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from\n"
-                    + "	dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on\n"
-                    + "	un.UnID = p.ProdUnidadeMedidaID) ea \n"
-                    + "where \n"
-                    + "	ea.ean is not null"
+                    "select \n"
+                    + " codigo as id,\n"
+                    + " codigodebarrasdun14 as ean\n"
+                    + " 'CX' as unidade\n"
+                    + " from produtos\n"
+                    + " where \n"
+                    + "  codigodebarrasdun14 is not NULL \n"
+                    + " and \n"
+                    + "  codigodebarrasdun14 <> ''"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
