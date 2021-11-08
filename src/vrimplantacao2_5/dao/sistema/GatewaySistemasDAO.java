@@ -74,7 +74,29 @@ public class GatewaySistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + "	f.CODIGO AS id,\n"
+                    + "	f.nome AS razao,\n"
+                    + "	COALESCE(f.FANTASIA, f.NOME) AS fantasia,\n"
+                    + "	f.CNPJ AS cnpj,\n"
+                    + "	f.IE AS ie_rg,\n"
+                    + "	f.CPF AS cpf,\n"
+                    + "	f.RG AS rg,\n"
+                    + "	f.ENDERECO AS enderenco,\n"
+                    + "	f.NUMERO AS numero,\n"
+                    + "	f.COMPLEMENTO AS complemento,\n"
+                    + "	f.BAIRRO AS bairro,\n"
+                    + "	f.CEP AS cep,\n"
+                    + "	f.UF AS uf,\n"
+                    + "	f.CIDADE AS municipio,\n"
+                    + "	f.COD_CIDADE AS muinicioibge,\n"
+                    + "	f.TELEFONE AS telefone,\n"
+                    + "	f.CELULAR AS celular,\n"
+                    + "	f.FAX AS fax,\n"
+                    + "	f.EMAIL AS email,\n"
+                    + "	f.SITE AS site\n"
+                    + "FROM FORNECEDORES f \n"
+                    + "ORDER BY 1"
             )) {
 
             }
@@ -88,7 +110,38 @@ public class GatewaySistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + "	c.CODIGO AS id,\n"
+                    + "	c.NOME AS razao,\n"
+                    + "	COALESCE(c.FANTASIA, c.NOME) AS fantasia,\n"
+                    + "	c.CNPJ AS cnpj,\n"
+                    + "	c.IE AS inscricaoestadual,\n"
+                    + "	c.CPF AS cpf,\n"
+                    + "	c.RG AS rg,\n"
+                    + "	c.ATIVO AS ativo,\n"
+                    + "	c.ENDERECO AS endereco,\n"
+                    + "	c.NUMERO AS numero,\n"
+                    + "	c.COMPLEMENTO AS complemento,\n"
+                    + "	c.BAIRRO AS bairro,\n"
+                    + "	c.CEP AS cep,\n"
+                    + "	c.UF AS uf,\n"
+                    + "	c.CIDADE AS municipio,\n"
+                    + "	c.COD_CIDADE AS municipioibge,\n"
+                    + "	c.TELEFONE AS telefone,\n"
+                    + "	c.CELULAR AS celular,\n"
+                    + "	c.FAX AS fax,\n"
+                    + "	c.EMAIL AS email,\n"
+                    + "	c.OBSERVACOES AS obs,\n"
+                    + "	c.NOME_MAE AS nomemae,\n"
+                    + "	c.NOME_PAI AS nomepai,\n"
+                    + "	c.CONJUGUE AS nomeconjuge,\n"
+                    + "	c.PROFISSAO AS cargo,\n"
+                    + "	c.NASCIMENTO AS datanascimento,\n"
+                    + "	c.LIMITE_CREDITO AS valorlimite,\n"
+                    + "	c.DATA_CADASTRO AS datacadastro,\n"
+                    + "	c.BLOQUEADO AS bloqueado\n"
+                    + "FROM CLIENTES c \n"
+                    + "ORDER BY 1"
             )) {
 
             }
