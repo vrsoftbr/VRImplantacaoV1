@@ -75,6 +75,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
@@ -230,10 +231,51 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "FROM CLIENTES c \n"
                     + "ORDER BY 1"
             )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    
+                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty()) {
+                        imp.setCnpj(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj(rst.getString("cpf"));
+                    }
 
+                    if (rst.getString("inscricaoestadual") != null && !rst.getString("inscricaoestadual").trim().isEmpty()) {
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    } else {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    }
+                    
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));                    
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setBloqueado(rst.getInt("bloqueado") == 1);
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setNomeConjuge(rst.getString("nomeconjuge"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));                   
+                    imp.setDataNascimento(rst.getDate("datanascimento"));                    
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setObservacao(rst.getString("obs"));
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
     }
-
 }
