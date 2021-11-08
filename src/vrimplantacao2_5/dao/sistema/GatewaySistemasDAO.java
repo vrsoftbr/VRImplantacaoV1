@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -86,28 +87,28 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
                     imp.setPiscofinsCstCredito(rst.getString("cstcofins"));
-                    
+
                     imp.setIcmsCstSaida(rst.getInt("cst"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("reducao"));                    
+                    imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao"));
                     imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducao"));
-                    
+
                     imp.setIcmsCstEntrada(rst.getInt("cst"));
                     imp.setIcmsAliqEntrada(rst.getDouble("icms"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("reducao"));
                     imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms"));
                     imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
-                    
+
                     imp.setIcmsCstConsumidor(rst.getInt("cst"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("icms"));
                     imp.setIcmsReducaoConsumidor(rst.getDouble("reducao"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -152,19 +153,19 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    
+
                     if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty()) {
                         imp.setCnpj_cpf(rst.getString("cnpj"));
                     } else {
                         imp.setCnpj_cpf(rst.getString("cpf"));
                     }
-                    
+
                     if (rst.getString("ie_rg") != null && !rst.getString("ie_rg").trim().isEmpty()) {
                         imp.setIe_rg(rst.getString("ie_rg"));
                     } else {
                         imp.setIe_rg(rst.getString("rg"));
                     }
-                    
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -174,7 +175,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setTel_principal(rst.getString("telefone"));
-                    
+
                     if (rst.getString("celular") != null && !rst.getString("celular").trim().isEmpty()) {
                         imp.addCelular("CELULAR", rst.getString("celular"));
                     }
@@ -184,7 +185,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     if (rst.getString("email") != null && !rst.getString("email").trim().isEmpty()) {
                         imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
                     }
-                    
+
                     result.add(imp);
                 }
             }
@@ -236,7 +237,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    
+
                     if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty()) {
                         imp.setCnpj(rst.getString("cnpj"));
                     } else {
@@ -248,7 +249,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     } else {
                         imp.setInscricaoestadual(rst.getString("rg"));
                     }
-                    
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -256,7 +257,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setMunicipioIBGE(rst.getInt("municipioibge"));
                     imp.setUf(rst.getString("uf"));
-                    imp.setCep(rst.getString("cep"));                    
+                    imp.setCep(rst.getString("cep"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setAtivo(rst.getInt("ativo") == 1);
                     imp.setBloqueado(rst.getInt("bloqueado") == 1);
@@ -264,12 +265,51 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setNomeMae(rst.getString("nomemae"));
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
                     imp.setCargo(rst.getString("cargo"));
-                    imp.setValorLimite(rst.getDouble("valorlimite"));                   
-                    imp.setDataNascimento(rst.getDate("datanascimento"));                    
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setFax(rst.getString("fax"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setEmail(rst.getString("email"));
+                    imp.setObservacao(rst.getString("obs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	r.CODIGO AS id,\n"
+                    + "	substring(r.DOCUMENTO FROM 4) AS numerodocumento,\n"
+                    + "	r.EMISSAO AS dataemissao,\n"
+                    + "	r.VENCIMENTO AS datavencimento,\n"
+                    + "	r.CLIENTE AS idcliente,\n"
+                    + "	r.CAIXA AS ecf,\n"
+                    + " r.VALOR as valor, \n"        
+                    + "	r.DESCRICAO AS obs\n"
+                    + "FROM RECEBER r\n"
+                    + "WHERE r.CLIENTE IS NOT NULL\n"
+                    + "AND r.CONVENIO IS NULL\n"
+                    + "AND r.VALOR_RECEBIDO  < VALOR\n"
+                    + "AND r.RECEBIMENTO IS NULL "
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setNumeroCupom(rst.getString("numerodocumento"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("obs"));
                     
                     result.add(imp);
