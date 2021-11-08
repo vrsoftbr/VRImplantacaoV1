@@ -41,8 +41,8 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	e.ATIVO AS situacaocadastro,\n"
                     + "	e.NOME AS descricaocompleta,\n"
                     + "	e.QTD AS estoque,\n"
-                    + "	e.QTD_MAXIMA AS estoquemaxima,\n"
-                    + "	e.QTD_MINIMA AS estoqueminima,\n"
+                    + "	e.QTD_MAXIMA AS estoquemaximo,\n"
+                    + "	e.QTD_MINIMA AS estoqueminimo,\n"
                     + "	e.PRECO_CUSTO AS custo,\n"
                     + "	e.PRECO_VENDA AS precovenda,\n"
                     + "	e.PESO_BRUTO AS pesobruto,\n"
@@ -59,10 +59,55 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	et.ALIQ_FCP AS fcp\n"
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON et.CODIGO = e.CODIGO\n"
-                    + "WHERE e.BARRAS = '7891000100103'\n"
                     + "ORDER BY 1"
             )) {
-
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cstpis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstcofins"));
+                    
+                    imp.setIcmsCstSaida(rst.getInt("cst"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("reducao"));                    
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducao"));
+                    
+                    imp.setIcmsCstEntrada(rst.getInt("cst"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("reducao"));
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
+                    
+                    imp.setIcmsCstConsumidor(rst.getInt("cst"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("icms"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducao"));
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
