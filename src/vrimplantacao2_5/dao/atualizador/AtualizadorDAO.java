@@ -5,6 +5,7 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
+import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
 
 /**
@@ -42,7 +43,7 @@ public class AtualizadorDAO {
             stm.execute("CREATE SCHEMA IF NOT EXISTS implantacao2_5");
         }
     }
-    
+
     public void criarConstraint() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -79,7 +80,7 @@ public class AtualizadorDAO {
                     + "	id serial PRIMARY KEY NOT NULL,\n"
                     + "	id_sistema INTEGER NOT NULL,\n"
                     + "	id_bancodados INTEGER NOT NULL,\n"
-                    + "	nomeschema VARCHAR(60),\n"
+                    + "	nomeschema VARCHAR(200),\n"
                     + "	usuario VARCHAR(30),\n"
                     + "	senha VARCHAR(30),\n"
                     + " porta INTEGER, \n"
@@ -122,6 +123,21 @@ public class AtualizadorDAO {
                     + "	lojamatriz BOOLEAN,\n"
                     + "	CONSTRAINT fk_if_conexao FOREIGN KEY (id_conexao)\n"
                     + "		REFERENCES implantacao2_5.conexao(id)\n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.sistemabancodadosscripts (\n"
+                    + "    id serial PRIMARY KEY NOT NULL,\n"
+                    + "    id_sistema integer NOT NULL,\n"
+                    + "    id_bancodados integer NOT NULL,\n"
+                    + "    script_getlojas text COLLATE pg_catalog.\"default\",\n"
+                    + "    CONSTRAINT un_sistema_bancodados_scripts UNIQUE (id_sistema, id_bancodados),\n"
+                    + "    CONSTRAINT fk_id_bancodados FOREIGN KEY (id_bancodados)\n"
+                    + "        REFERENCES implantacao2_5.bancodados (id) MATCH SIMPLE\n"
+                    + "        ON UPDATE NO ACTION\n"
+                    + "        ON DELETE NO ACTION,\n"
+                    + "    CONSTRAINT fk_id_sistema FOREIGN KEY (id_sistema)\n"
+                    + "        REFERENCES implantacao2_5.sistema (id) MATCH SIMPLE\n"
+                    + "        ON UPDATE NO ACTION\n"
+                    + "        ON DELETE NO ACTION\n"
                     + ");"
             );
         }
@@ -153,10 +169,10 @@ public class AtualizadorDAO {
             stm.execute("DELETE FROM implantacao2_5.sistemabancodados;");
         }
     }
-    
+
     public void salvarSistemaBancoDados(ESistemaBancoDados eSistemaBancoDados) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute(                    
+            stm.execute(
                     "INSERT INTO implantacao2_5.sistemabancodados ("
                     + "id_sistema, "
                     + "id_bancodados, "
@@ -174,6 +190,28 @@ public class AtualizadorDAO {
                     + "'" + eSistemaBancoDados.getSenha() + "', "
                     + "'" + eSistemaBancoDados.getNomeSchema() + "', "
                     + eSistemaBancoDados.getPorta() + ");"
+            );
+        }
+    }
+
+    public void deletarScriptGetLojaOrigemSistemas() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("DELETE FROM implantacao2_5.sistemabancodadosscripts");
+        }
+    }
+    
+    public void salvarScriptGetLojaOrigemSistemas(EScriptLojaOrigemSistema eScriptLojaOrigemSistema) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "INSERT INTO implantacao2_5.sistemabancodadosscripts("
+                    + "id_sistema, "
+                    + "id_bancodados, "
+                    + "script_getlojas"
+                    + ")\n"
+                    + "VALUES ("
+                    + eScriptLojaOrigemSistema.getIdSistema() + ", "
+                    + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
+                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');"
             );
         }
     }

@@ -128,7 +128,6 @@ import vrimplantacao2.dao.interfaces.PlenoKWDAO;
 import vrimplantacao2.dao.interfaces.PlenusDAO;
 import vrimplantacao2.dao.interfaces.PoligonDAO;
 import vrimplantacao2.dao.interfaces.PomaresDAO;
-import vrimplantacao2.dao.interfaces.ProsuperDAO;
 import vrimplantacao2.dao.interfaces.ProtonDAO;
 import vrimplantacao2.dao.interfaces.PwGestorDAO;
 import vrimplantacao2.dao.interfaces.PwsDAO;
@@ -199,6 +198,7 @@ import vrimplantacao2.dao.interfaces.WmsiDAO;
 import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
+import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 
 /**
  *
@@ -402,7 +402,8 @@ public enum ESistema {
     ZOOMBOX(194, "ZOOMBOX", new ZoomboxDAO()),
     ZPF(195, "ZPF", new ZpfDAO()),
     LINEAR(196, "LINEAR", new LinearDAO()),
-    ARIUS(197, "ARIUS", new AriusDAO());
+    ARIUS(197, "ARIUS", new AriusDAO()),
+    GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
 
     private int id;
