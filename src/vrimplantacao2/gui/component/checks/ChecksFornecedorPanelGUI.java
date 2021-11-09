@@ -2,6 +2,7 @@ package vrimplantacao2.gui.component.checks;
 
 import java.util.HashSet;
 import java.util.Set;
+import vrimplantacao2.dao.cadastro.ItuInfoDAO;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -723,6 +724,10 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
     public void carregarParametros(Parametros params, String... keys) {
         
+    }
+
+    public void setOpcoesDisponiveis(ItuInfoDAO dao) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

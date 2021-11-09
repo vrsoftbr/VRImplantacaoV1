@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao2.dao.cadastro.ItuInfoDAO;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -1654,6 +1655,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkResetarCodigoBalanca.setSelected(parametros.getBool(concat(params, "RESETAR_BALANCA")));
         chkResetarIdsNormais.setSelected(parametros.getBool(concat(params, "RESETAR_NORMAIS")));
         
+    }
+
+    public void setOpcoesDisponiveis(ItuInfoDAO dao) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     public class ProdutoPanelImportador {
