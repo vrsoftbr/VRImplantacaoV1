@@ -93,10 +93,14 @@ public class AtualizadorService {
         }
     }
     
+    public void criarConstraint() throws Exception {
+        this.atualizadorDAO.criarConstraint();
+    }
+    
     public void criarEstrutura2_5() throws Exception {
         this.criarSchema();
         this.criarTabelas();
-        atualizadorDAO.criarConstraint();
+        this.criarConstraint();
         this.salvarBancoDados();
         this.salvarSistema();
         this.deletarSistemaBancoDados();
