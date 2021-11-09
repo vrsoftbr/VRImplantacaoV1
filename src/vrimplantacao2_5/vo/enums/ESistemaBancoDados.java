@@ -248,6 +248,10 @@ public enum ESistemaBancoDados {
         return this.usuario;
     }
     
+    public String getSenha() {
+        return this.senha;
+    }
+    
     public int getPorta() {
         return this.porta;
     }

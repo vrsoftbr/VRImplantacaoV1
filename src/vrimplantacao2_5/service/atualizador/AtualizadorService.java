@@ -10,6 +10,7 @@ import java.util.List;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
 
 public class AtualizadorService {
 
@@ -73,15 +74,17 @@ public class AtualizadorService {
         }        
     }
     
-    public void salvarSistemaBancoDados() throws Exception {
-        this.atualizadorDAO.salvarSistemaBancoDados();
+    public void salvarSistemaBancoDados() throws Exception {        
+        for (ESistemaBancoDados eSistemaBancoDados : ESistemaBancoDados.values()) {
+            this.atualizadorDAO.salvarSistemaBancoDados(eSistemaBancoDados);
+        }
     }
     
     public void criarEstrutura2_5() throws Exception {
-        this.atualizadorDAO.criarSchema();
-        this.atualizadorDAO.criarTabelas();
+        this.criarSchema();
+        this.criarTabelas();
         this.salvarBancoDados();
         this.salvarSistema();
-        this.atualizadorDAO.salvarSistemaBancoDados();
+        this.salvarSistemaBancoDados();
     }
 }
