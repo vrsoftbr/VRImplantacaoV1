@@ -8,6 +8,8 @@ package vrimplantacao2_5.service.atualizador;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
+import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
@@ -74,9 +76,16 @@ public class AtualizadorService {
         }        
     }
     
-    public void salvarSistemaBancoDados() throws Exception {        
+    public void salvarSistemaBancoDados() throws Exception {
+        boolean existeSistema, existeBancoDados;
+
         for (ESistemaBancoDados eSistemaBancoDados : ESistemaBancoDados.values()) {
-            this.atualizadorDAO.salvarSistemaBancoDados(eSistemaBancoDados);
+            existeSistema = new SistemaDAO().existeSistema(eSistemaBancoDados.getNomeSistema());
+            existeBancoDados = new BancoDadosDAO().existeBancoDados(eSistemaBancoDados.getNomeBancoDados());
+
+            if (existeSistema && existeBancoDados) {
+                this.atualizadorDAO.salvarSistemaBancoDados(eSistemaBancoDados);
+            }
         }
     }
     

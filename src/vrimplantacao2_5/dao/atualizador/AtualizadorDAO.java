@@ -5,6 +5,8 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
+import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
 
 /**
@@ -63,6 +65,7 @@ public class AtualizadorDAO {
                     + "	nomeschema VARCHAR(60),\n"
                     + "	usuario VARCHAR(30),\n"
                     + "	senha VARCHAR(30),\n"
+                    + " porta INTEGER, \n"
                     + "	CONSTRAINT fk_id_sistema FOREIGN KEY (id_sistema)\n"
                     + "		REFERENCES implantacao2_5.sistema (id),\n"
                     + "	CONSTRAINT fk_id_bancodados FOREIGN KEY (id_bancodados)\n"
