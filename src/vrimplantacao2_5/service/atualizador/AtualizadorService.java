@@ -76,6 +76,10 @@ public class AtualizadorService {
         }        
     }
     
+    public void deletarSistemaBancoDados() throws Exception {
+        this.atualizadorDAO.deletarSistemaBancoDados();
+    }
+    
     public void salvarSistemaBancoDados() throws Exception {
         boolean existeSistema, existeBancoDados;
 
@@ -92,8 +96,10 @@ public class AtualizadorService {
     public void criarEstrutura2_5() throws Exception {
         this.criarSchema();
         this.criarTabelas();
+        atualizadorDAO.criarConstraint();
         this.salvarBancoDados();
         this.salvarSistema();
+        this.deletarSistemaBancoDados();
         this.salvarSistemaBancoDados();
     }
 }

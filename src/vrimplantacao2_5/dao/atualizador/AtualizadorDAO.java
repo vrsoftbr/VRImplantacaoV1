@@ -5,8 +5,6 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
-import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
-import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
 
 /**
@@ -42,6 +40,25 @@ public class AtualizadorDAO {
     public void criarSchema() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS implantacao2_5");
+        }
+    }
+    
+    public void criarConstraint() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "distinct conname "
+                    + "from pg_catalog.pg_constraint "
+                    + "WHERE conname = 'fk_id_lojadestino'"
+            )) {
+                if (!rst.next()) {
+                    stm.execute(
+                            "ALTER TABLE implantacao2_5.conexaoloja \n"
+                            + "ADD CONSTRAINT fk_id_lojadestino \n"
+                            + "FOREIGN KEY (id_lojadestino) REFERENCES loja(id);"
+                    );
+                }
+            }
         }
     }
 
@@ -106,10 +123,6 @@ public class AtualizadorDAO {
                     + "	CONSTRAINT fk_if_conexao FOREIGN KEY (id_conexao)\n"
                     + "		REFERENCES implantacao2_5.conexao(id)\n"
                     + ");"
-                    + "\n"
-                    + "ALTER TABLE implantacao2_5.conexaoloja \n"
-                    + "ADD CONSTRAINT fk_id_lojadestino \n"
-                    + "FOREIGN KEY (id_lojadestino) REFERENCES loja(id);"
             );
         }
     }
@@ -135,11 +148,16 @@ public class AtualizadorDAO {
         }
     }
 
+    public void deletarSistemaBancoDados() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("DELETE FROM implantacao2_5.sistemabancodados;");
+        }
+    }
+    
     public void salvarSistemaBancoDados(ESistemaBancoDados eSistemaBancoDados) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute(
-                    "DELETE FROM implantacao2_5.sistemabancodados;"
-                    + "INSERT INTO implantacao2_5.sistemabancodados ("
+            stm.execute(                    
+                    "INSERT INTO implantacao2_5.sistemabancodados ("
                     + "id_sistema, "
                     + "id_bancodados, "
                     + "usuario, "
