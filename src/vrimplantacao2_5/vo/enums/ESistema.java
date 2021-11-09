@@ -128,6 +128,7 @@ import vrimplantacao2.dao.interfaces.PlenoKWDAO;
 import vrimplantacao2.dao.interfaces.PlenusDAO;
 import vrimplantacao2.dao.interfaces.PoligonDAO;
 import vrimplantacao2.dao.interfaces.PomaresDAO;
+import vrimplantacao2.dao.interfaces.ProsuperDAO;
 import vrimplantacao2.dao.interfaces.ProtonDAO;
 import vrimplantacao2.dao.interfaces.PwGestorDAO;
 import vrimplantacao2.dao.interfaces.PwsDAO;

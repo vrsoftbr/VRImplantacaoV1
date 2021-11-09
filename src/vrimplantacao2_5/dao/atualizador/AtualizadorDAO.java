@@ -17,7 +17,7 @@ public class AtualizadorDAO {
             try (ResultSet rs = stm.executeQuery(
                     "select nome \n"
                     + "from implantacao2_5.bancodados \n"
-                    + "where nome = '" + eBancoDados + "'"
+                    + "where nome = '" + eBancoDados.getNome() + "'"
             )) {
                 return rs.next();
             }
@@ -29,7 +29,7 @@ public class AtualizadorDAO {
             try (ResultSet rs = stm.executeQuery(
                     "select nome \n"
                     + "from implantacao2_5.sistema \n"
-                    + "where nome = '" + eSistema + "'"
+                    + "where nome = '" + eSistema.getNome() + "'"
             )) {
                 return rs.next();
             }
@@ -46,12 +46,12 @@ public class AtualizadorDAO {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "CREATE TABLE IF NOT EXISTS implantacao2_5.bancodados(\n"
-                    + "	id serial PRIMARY KEY NOT NULL,\n"
+                    + "	id integer PRIMARY KEY NOT NULL,\n"
                     + "	nome VARCHAR(60) NOT NULL\n"
                     + ");"
                     + "\n"
                     + "CREATE TABLE IF NOT EXISTS implantacao2_5.sistema(\n"
-                    + "	id serial PRIMARY KEY NOT NULL,\n"
+                    + "	id integer PRIMARY KEY NOT NULL,\n"
                     + "	nome VARCHAR(60) NOT NULL\n"
                     + ");\n"
                     + "\n"
@@ -102,67 +102,81 @@ public class AtualizadorDAO {
                     + "	CONSTRAINT fk_if_conexao FOREIGN KEY (id_conexao)\n"
                     + "		REFERENCES implantacao2_5.conexao(id)\n"
                     + ");"
+                    + "\n"
+                    + "ALTER TABLE implantacao2_5.conexaoloja \n"
+                    + "ADD CONSTRAINT fk_id_lojadestino \n"
+                    + "FOREIGN KEY (id_lojadestino) REFERENCES loja(id);"
             );
         }
     }
 
     public void salvarBancoDados(EBancoDados eBancoDados) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + eBancoDados + "');");
+            stm.execute(
+                    "INSERT INTO implantacao2_5.bancodados (id, nome) \n"
+                    + "VALUES (\n"
+                    + eBancoDados.getId() + ", \n"
+                    + "'" + eBancoDados.getNome() + "'\n"
+                    + ");");
         }
     }
 
     public void salvarSistema(ESistema eSistema) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + eSistema + "')");
+            stm.execute("INSERT INTO implantacao2_5.sistema (id, nome) \n"
+                    + "VALUES (\n"
+                    + eSistema.getId() + ", \n"
+                    + "'" + eSistema.getNome() + "'\n"
+                    + ")");
         }
     }
 
     public void salvarSistemaBancoDados() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            
             stm.execute(
                     "DELETE FROM implantacao2_5.sistemabancodados; \n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ACCESYS'),\n"
+                    + "	 WHERE nome = '" + ESistema.ACCESYS + "'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'SQLSERVER'));\n"
+                    + "	 WHERE nome = '" + EBancoDados.SQLSERVER + "'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ACOM'),\n"
+                    + "	 WHERE nome = '"+ESistema.ACOM+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'SQLSERVER'));\n"
+                    + "	 WHERE nome = '"+EBancoDados.SQLSERVER+"'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ALPHASYS'),\n"
+                    + "	 WHERE nome = '"+ESistema.ALPHASYS+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'FIREBIRD'));\n"
+                    + "	 WHERE nome = '"+EBancoDados.FIREBIRD+"'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'APOLLO'),\n"
+                    + "	 WHERE nome = '"+ESistema.APOLLO+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'ORACLE'));\n"
+                    + "	 WHERE nome = '"+EBancoDados.ORACLE+"'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ARIUS'),\n"
+                    + "	 WHERE nome = '"+ESistema.ARIUS+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'ORACLE'), 'PROREG', 'automa', null);\n"
+                    + "	 WHERE nome = '"+EBancoDados.ORACLE+"'), 'PROREG', 'automa', null);\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ARTSYSTEM'),\n"
+                    + "	 WHERE nome = '"+ESistema.ARTSYSTEM+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'SQLSERVER'));\n"
+                    + "	 WHERE nome = '"+EBancoDados.SQLSERVER+"'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
-                    + "	 WHERE nome = 'ASEFE'),\n"
+                    + "	 WHERE nome = '"+ESistema.ASEFE+"'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'SQLSERVER'));\n"
+                    + "	 WHERE nome = '"+EBancoDados.SQLSERVER+"'));\n"
                     + "\n"
                     + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"

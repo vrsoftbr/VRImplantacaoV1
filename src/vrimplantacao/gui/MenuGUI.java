@@ -152,7 +152,6 @@ import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
 import vrimplantacao2.gui.interfaces.HerculesIntCashGUI;
-import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
 import vrimplantacao2.gui.interfaces.IQSistemasGUI;
@@ -294,9 +293,6 @@ import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.PrimeGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
-import vrimplantacao2.gui.interfaces.SGMasterGUI;
-import vrimplantacao2.gui.interfaces.SicGUI;
-import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
@@ -316,6 +312,7 @@ import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import vrimplantacao2_5.gui.cadastro.bancodados.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.cadastro.sistema.ConsultaSistemaGUI;
@@ -405,6 +402,8 @@ public final class MenuGUI extends VRMdiFrame {
     public VRBusca txtBusca = null;
 
     private LoginGUI loginFrame = null;
+    
+    private AtualizadorController atualizadorController = null;
 
     public MenuGUI(LoginGUI i_loginFrame) throws Exception {
         initComponents();
@@ -424,8 +423,15 @@ public final class MenuGUI extends VRMdiFrame {
         if (Global.getIdUnidade() != 1) {
             mnuCadastro2_5.setVisible(false);
         }
+        
+        criarEstrutura2_5();
     }
 
+    private void criarEstrutura2_5() throws Exception {
+        atualizadorController = new AtualizadorController();
+        atualizadorController.criarEstrutura2_5();
+    }
+    
     @Override
     public void atualizarRodape() throws Exception {
         

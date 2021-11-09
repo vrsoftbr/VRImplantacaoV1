@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -28,6 +29,25 @@ public class GatewaySistemasDAO extends InterfaceDAO {
         return "Gateway Sistemas";
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	l.COD_EMPRESA AS id, \n"
+                    + "	(l.NOME||' - '||l.CNPJ) AS empresa \n"
+                    + "FROM EMITENTE l \n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("empresa")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();

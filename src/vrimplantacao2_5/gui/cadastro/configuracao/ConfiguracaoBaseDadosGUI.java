@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -39,7 +38,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private SelecaoLojaGUI migracaoGUI = null;
 
     private ConfiguracaoBaseDadosController controller = null;
-    private AtualizadorController atualizadorController = null;
     private MapaLojaController mapaController = null;
 
     private ConfiguracaoPanel painelDeConexaoDinamico;
@@ -55,18 +53,12 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         super(menuGUI);
         initComponents();
         
-        criarEstrutura2_5();
         this.parentFrame = menuGUI;
         setConfiguracao();
         
         migracaoSistemasController = new MigracaoSistemasController();
     }
     
-    private void criarEstrutura2_5() throws Exception {
-        atualizadorController = new AtualizadorController();
-        atualizadorController.criarEstrutura2_5();
-    }
-
     private void setConfiguracao() throws Exception {
         centralizarForm();
         setTitle("Configuração de Base de Dados");
