@@ -16,6 +16,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -214,6 +215,40 @@ public class GatewaySistemasDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "     ea.COD_FORNECEDOR AS idfornecedor,\n"
+                    + "     f.NOME AS descricaofornecedor,\n"
+                    + "     ea.CODIGO AS idproduto,\n"
+                    + "     p.NOME AS descricaoproduto,\n"
+                    + "     ea.COD_FABRICANTE AS codigoexterno,\n"
+                    + "     ea.DATA_CADASTRO AS dataalteracao\n"
+                    + "FROM EST_ADICIONAIS ea\n"
+                    + "JOIN ESTOQUE p ON p.CODIGO = ea.CODIGO \n"
+                    + "JOIN FORNECEDORES f ON f.CODIGO = ea.COD_FORNECEDOR \n"
+                    + "	AND ea.COD_FORNECEDOR != ''\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
@@ -299,7 +334,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
         }
         return result;
     }
-
+    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
