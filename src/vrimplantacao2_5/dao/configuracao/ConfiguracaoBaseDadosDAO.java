@@ -176,6 +176,7 @@ public class ConfiguracaoBaseDadosDAO {
                     + "	c.id,\n"
                     + "	id_conexao,\n"
                     + "	id_lojaorigem,\n"
+                    + " substring(ljo.descricao, 5) as descricaolojadestino,"
                     + "	id_lojadestino,\n"
                     + "	l.descricao destino,\n"
                     + "	id_situacaomigracao,\n"
@@ -184,6 +185,7 @@ public class ConfiguracaoBaseDadosDAO {
                     + "from\n"
                     + "	implantacao2_5.conexaoloja c\n"
                     + "join public.loja l on c.id_lojadestino = l.id\n"
+                    + "join implantacao2_5.lojaorigem ljo on ljo.id = c.id_lojaorigem\n"        
                     + "where\n"
                     + "	id_conexao = " + idConexao)) {
                 while (rs.next()) {
@@ -191,6 +193,7 @@ public class ConfiguracaoBaseDadosDAO {
 
                     mapaLojaVO.setId(rs.getInt("id"));
                     mapaLojaVO.setIdLojaOrigem(rs.getString("id_lojaorigem"));
+                    mapaLojaVO.setDescricaoLojaOrigem(rs.getString("descricaolojadestino"));
                     mapaLojaVO.setIdLojaVR(rs.getInt("id_lojadestino"));
                     mapaLojaVO.setDescricaoVR(rs.getString("destino"));
                     mapaLojaVO.setLojaMatriz(rs.getBoolean("lojamatriz"));

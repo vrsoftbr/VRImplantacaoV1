@@ -61,9 +61,9 @@ public class SelecaoLojaGUI extends VRDialog {
         lojas = controller.getLojaMapeada(cboConexao.getId());
         
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
-            cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(), 
-                                              configuracaoLojaVO.getIdLojaOrigem() + " - " + 
-                                              (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
+            cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
+                    configuracaoLojaVO.getIdLojaOrigem() + " - " + configuracaoLojaVO.getDescricaoLojaOrigem() + " - "
+                    + (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
         }
     }
     

@@ -75,10 +75,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         List<VRColumnTable> column = new ArrayList();
 
         column.add(new VRColumnTable("Matriz", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Origem", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Loja Origem", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("VR", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Loja VR", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Código Loja Origem", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Descrição Loja Origem", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Código Loja VR", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Descrição Loja VR", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Cadastro", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Situação", true, SwingConstants.LEFT, false, null));
 
@@ -217,9 +217,9 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         int i = 0;
         for (ConfiguracaoBancoLojaVO lj : lojas) {
-            dados[i][0] = lj.isLojaMatriz() ? "MATRIZ" : "FILIAL";
+            dados[i][0] = lj.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL";
             dados[i][1] = lj.getIdLojaOrigem();
-            dados[i][2] = cboSistema.getDescricao();
+            dados[i][2] = lj.getDescricaoLojaOrigem();
             dados[i][3] = lj.getIdLojaVR();
             dados[i][4] = lj.getDescricaoVR();
             dados[i][5] = Util.formatDataGUI(lj.getDataCadastro());
