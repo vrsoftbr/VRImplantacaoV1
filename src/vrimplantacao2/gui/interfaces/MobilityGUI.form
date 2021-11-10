@@ -65,10 +65,10 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="tab" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRTabbedPane1" alignment="0" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
+                  <Component id="tab" alignment="0" pref="855" max="32767" attributes="0"/>
+                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRTabbedPane1" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -193,7 +193,7 @@
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="483" max="32767" attributes="0"/>
+                      <EmptySpace pref="642" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -290,7 +290,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="431" max="32767" attributes="0"/>
+                          <EmptySpace pref="592" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -373,7 +373,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="506" max="32767" attributes="0"/>
+                          <EmptySpace pref="738" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -410,7 +410,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="544" max="32767" attributes="0"/>
+                          <EmptySpace pref="778" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -447,7 +447,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlDadosDataVenda" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="306" max="32767" attributes="0"/>
+                          <EmptySpace pref="543" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -565,7 +565,7 @@
                           <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="315" max="32767" attributes="0"/>
+                      <EmptySpace pref="545" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -629,36 +629,10 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtHostFirebird" min="-2" pref="100" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtBancoDadosFirebird" min="-2" pref="250" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace pref="43" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtBancoDadosFirebirdVendas" min="-2" pref="250" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuarioFirebird" min="-2" pref="88" max="-2" attributes="0"/>
-                                  <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSenhaFirebird" min="-2" pref="84" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="txtPortaFirebird" min="-2" pref="45" max="-2" attributes="0"/>
@@ -673,10 +647,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
+                                  <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -684,8 +655,34 @@
                                   </Group>
                               </Group>
                           </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtHostFirebird" min="-2" pref="100" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtBancoDadosFirebird" min="-2" pref="250" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtBancoDadosFirebirdVendas" min="-2" pref="250" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="txtUsuarioFirebird" min="-2" pref="119" max="-2" attributes="0"/>
+                                  <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtSenhaFirebird" min="-2" pref="84" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -694,11 +691,13 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="2" attributes="0">
-                                  <Component id="vRLabel5" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="vRLabel4" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="vRLabel3" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="vRLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="2" attributes="0">
+                                      <Component id="vRLabel5" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel3" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="vRLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="2" attributes="0">

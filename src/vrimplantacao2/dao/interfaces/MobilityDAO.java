@@ -758,11 +758,13 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	END AS cancelado\n"
                     + "FROM\n"
                     + "	R04\n"
-                    + "	LEFT JOIN R01 r ON r.id = R04.ID_R01\n"
+                    + "	JOIN R01 r ON r.id = R04.ID_R01\n"
                     + "WHERE\n"
                     + "	R04.D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
                     + "	AND\n"
-                    + " R04.D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
+                    + " R04.D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'"
+                    + " AND\n"
+                    + " R04.R_SUB_TOTAL_DOCUMENTO > 0";
 
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
@@ -840,11 +842,12 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " FROM\n"
                     + "	R05\n"
                     + " JOIN R04 ON	R04.id = R05.id_R04\n"
-                    + " LEFT JOIN R01 ON R01.id = R05.id_R01\n"
+                    + " JOIN R01 ON R01.id = R05.id_R01\n"
                     + " WHERE\n"
                     + "    R04.D_DATA_INICIO_EMISSAO >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
                     + "	AND\n"
                     + "    R04.D_DATA_INICIO_EMISSAO <= '" + DATE_FORMAT.format(vendaDataTermino) + "'";
+        
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
         }
