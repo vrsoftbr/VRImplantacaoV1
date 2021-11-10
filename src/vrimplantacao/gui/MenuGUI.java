@@ -267,6 +267,7 @@ import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.AutoMacGUI;
 import vrimplantacao2.gui.interfaces.AutocomGUI;
+import vrimplantacao2.gui.interfaces.BomSoftGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.ControlePlusPostgresGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
@@ -708,6 +709,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFirebird3 = new javax.swing.JMenu();
         mnuAutocom = new javax.swing.JMenuItem();
         mnuAutoMac = new javax.swing.JMenuItem();
+        mnuBomSoft = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
@@ -1813,6 +1815,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuAutoMac);
+
+        mnuBomSoft.setText("BomSoft");
+        mnuBomSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBomSoftActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuBomSoft);
 
         mnuDSoft.setText("DSoft");
         mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
@@ -5509,6 +5519,11 @@ public final class MenuGUI extends VRMdiFrame {
         ItuInfoGUI.exibir(this);
     }//GEN-LAST:event_mnuItuInfoActionPerformed
 
+    private void mnuBomSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuBomSoftActionPerformed
+        // TODO add your handling code here:
+        BomSoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuBomSoftActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5617,6 +5632,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuAvistate;
     private javax.swing.JMenuItem mnuBase;
+    private javax.swing.JMenuItem mnuBomSoft;
     private javax.swing.JMenuItem mnuBrainSoft;
     private javax.swing.JMenuItem mnuBrajanGestores;
     private javax.swing.JMenuItem mnuCFSoftSiaECF;
