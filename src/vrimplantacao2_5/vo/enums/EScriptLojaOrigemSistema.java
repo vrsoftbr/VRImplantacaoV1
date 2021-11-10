@@ -11,8 +11,10 @@ package vrimplantacao2_5.vo.enums;
  */
 public enum EScriptLojaOrigemSistema {
 
-    GATEWAYSISTEMAS(198, 5, 
-        "SELECT l.COD_EMPRESA AS id, (l.NOME||'' - ''||l.CNPJ) AS descricao FROM EMITENTE l ORDER BY 1");
+    GATEWAYSISTEMAS(198, 5,
+            "SELECT l.COD_EMPRESA AS id, "
+            + "(l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao "
+            + "FROM EMITENTE l ORDER BY 1");
     
     private int idSistema;
     private int idBancoDados;

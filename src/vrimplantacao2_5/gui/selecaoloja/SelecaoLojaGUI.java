@@ -63,7 +63,7 @@ public class SelecaoLojaGUI extends VRDialog {
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(), 
                                               configuracaoLojaVO.getIdLojaOrigem() + " - " + 
-                                              (configuracaoLojaVO.isLojaMatriz() ? "MATRIZ" : "FILIAL")));
+                                              (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
         }
     }
     

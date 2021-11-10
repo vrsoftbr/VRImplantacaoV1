@@ -59,6 +59,7 @@ public class MapaLojaService {
                     setSituacaoMigracao(ESituacaoMigracao.CONFIGURANDO);
 
             configuracaoDAO.inserirLoja(configuracaoBancoVO);
+            configuracaoDAO.inserirLojaOrigem(configuracaoBancoVO);
 
         }
     }

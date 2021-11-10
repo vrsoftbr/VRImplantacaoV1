@@ -11,6 +11,7 @@ public class ConfiguracaoBancoLojaVO {
     
     private int id;
     private String idLojaOrigem;
+    private String descricaoLojaOrigem;
     private int idLojaVR;
     private String descricaoVR;
     private Date dataCadastro;
@@ -71,5 +72,13 @@ public class ConfiguracaoBancoLojaVO {
 
     public void setLojaMatriz(boolean lojaMatriz) {
         this.lojaMatriz = lojaMatriz;
+    }
+    
+    public String getDescricaoLojaOrigem() {
+        return this.descricaoLojaOrigem;
+    }
+    
+    public void setDescricaoLojaOrigem(String descricaoLojaOrigem) {
+        this.descricaoLojaOrigem = descricaoLojaOrigem;
     }
 }

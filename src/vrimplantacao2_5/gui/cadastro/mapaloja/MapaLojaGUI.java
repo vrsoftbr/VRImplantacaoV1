@@ -96,7 +96,8 @@ public class MapaLojaGUI extends VRDialog {
         
         configuracaoBancoLojaVO.setIdLojaVR(cboLojaVR.getId());
         configuracaoBancoLojaVO.setLojaMatriz(chkMatriz.isSelected());
-        configuracaoBancoVO.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);
+        configuracaoBancoLojaVO.setDescricaoLojaOrigem(cboLojaOrigem.getDescricao());
+        configuracaoBancoVO.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);        
 
         mapaLojaController.salvar(configuracaoBancoVO);
 

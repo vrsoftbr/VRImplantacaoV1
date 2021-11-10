@@ -52,13 +52,15 @@ public class ConfiguracaoBaseDadosDAO {
 
         sql.setTableName("conexao");
         sql.setSchema("implantacao2_5");
-
+        
+        String schema = conexaoVO.getSchema().replace("\\", "/");
+        
         sql.put("host", conexaoVO.getHost());
         sql.put("porta", conexaoVO.getPorta());
         sql.put("usuario", conexaoVO.getUsuario());
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
-        sql.put("nomeschema", conexaoVO.getSchema());
+        sql.put("nomeschema", schema);
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
         sql.put("complemento", conexaoVO.getComplemento());
@@ -98,6 +100,24 @@ public class ConfiguracaoBaseDadosDAO {
         }
     }
 
+    public void inserirLojaOrigem(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+
+        sql.setSchema("implantacao2_5");
+        sql.setTableName("lojaorigem");
+
+        sql.put("id", conexaoVO.getConfiguracaoBancoLoja().getIdLojaOrigem());
+        sql.put("descricao", conexaoVO.getConfiguracaoBancoLoja().getDescricaoLojaOrigem());
+        sql.put("mixprincipal", conexaoVO.getConfiguracaoBancoLoja().isLojaMatriz());
+        sql.put("id_conexaoloja", conexaoVO.getConfiguracaoBancoLoja().getId());
+
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql.getInsert());
+            }
+        }
+    }
+    
     public String verificaLojaMatriz(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         String retorno = "";
 
@@ -188,7 +208,9 @@ public class ConfiguracaoBaseDadosDAO {
 
     public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from implantacao2_5.conexaoloja where id = "
+            stm.execute("delete from implantacao2_5.lojaorigem where id_conexaoloja = "
+                    + configuracaoBancoLojaVO.getId() + "; \n"
+                    + "delete from implantacao2_5.conexaoloja where id = "
                     + configuracaoBancoLojaVO.getId());
         }
     }
