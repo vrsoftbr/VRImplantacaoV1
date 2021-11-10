@@ -44,6 +44,12 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         initComponents();
         desabilitarBotaoConectar();
         setDadosConexao("");
+        
+        if (conexao != null) {
+            System.out.println("conexão");
+        } else {
+            System.out.println("sem conexão");
+        }
     }
 
     private void setConfiguracao() throws Exception {
