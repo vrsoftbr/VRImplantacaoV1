@@ -88,6 +88,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.dao.interfaces.WBADAO;
 import vrimplantacao2.gui.SuperControle_PostgresGUI;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
@@ -266,6 +267,7 @@ import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.AutoMacGUI;
 import vrimplantacao2.gui.interfaces.AutocomGUI;
+import vrimplantacao2.gui.interfaces.BomSoftGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.ControlePlusPostgresGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
@@ -284,6 +286,7 @@ import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.ItuInfoGUI;
 import vrimplantacao2.gui.interfaces.LCSistemaGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MRC6GUI;
@@ -303,6 +306,7 @@ import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
+import vrimplantacao2.gui.interfaces.WBAGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -705,6 +709,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFirebird3 = new javax.swing.JMenu();
         mnuAutocom = new javax.swing.JMenuItem();
         mnuAutoMac = new javax.swing.JMenuItem();
+        mnuBomSoft = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
@@ -717,6 +722,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuWBA = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -820,6 +826,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAthos = new javax.swing.JMenuItem();
         mnuCervantes = new javax.swing.JMenuItem();
         mnuControlePlus = new javax.swing.JMenuItem();
+        mnuItuInfo = new javax.swing.JMenuItem();
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
@@ -1809,6 +1816,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuAutoMac);
 
+        mnuBomSoft.setText("BomSoft");
+        mnuBomSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBomSoftActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuBomSoft);
+
         mnuDSoft.setText("DSoft");
         mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1904,6 +1919,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
+
+        mnuWBA.setText("WBA");
+        mnuWBA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWBAActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuWBA);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -2694,6 +2717,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuControlePlus);
+
+        mnuItuInfo.setText("ItuInfo");
+        mnuItuInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuItuInfoActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuItuInfo);
 
         mnuPrime.setText("Prime");
         mnuPrime.addActionListener(new java.awt.event.ActionListener() {
@@ -5480,6 +5511,18 @@ public final class MenuGUI extends VRMdiFrame {
         ConversaoPlanilhaGUI.Exibir(this);
     }//GEN-LAST:event_mnuConversaoPlanilhaActionPerformed
 
+    private void mnuWBAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWBAActionPerformed
+        WBAGUI.exibir(this);
+    }//GEN-LAST:event_mnuWBAActionPerformed
+
+    private void mnuItuInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuItuInfoActionPerformed
+        ItuInfoGUI.exibir(this);
+    }//GEN-LAST:event_mnuItuInfoActionPerformed
+
+    private void mnuBomSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuBomSoftActionPerformed
+        // TODO add your handling code here:
+        BomSoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuBomSoftActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5589,6 +5632,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuAvistate;
     private javax.swing.JMenuItem mnuBase;
+    private javax.swing.JMenuItem mnuBomSoft;
     private javax.swing.JMenuItem mnuBrainSoft;
     private javax.swing.JMenuItem mnuBrajanGestores;
     private javax.swing.JMenuItem mnuCFSoftSiaECF;
@@ -5678,6 +5722,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
     private javax.swing.JMenuItem mnuInventer;
+    private javax.swing.JMenuItem mnuItuInfo;
     private javax.swing.JMenuItem mnuJM2Online;
     private javax.swing.JMenuItem mnuJacsys;
     private javax.swing.JMenu mnuJanela;
@@ -5803,6 +5848,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuVisualMix;
     private javax.swing.JMenuItem mnuW2A;
+    private javax.swing.JMenuItem mnuWBA;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWinNexus;
     private javax.swing.JMenuItem mnuWinthor_PcSistemas;

@@ -19,6 +19,7 @@ import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.FamiliaProdutoDAO;
+import vrimplantacao2.dao.cadastro.ItuInfoDAO;
 import vrimplantacao2.dao.cadastro.MercadologicoDAO;
 import vrimplantacao2.dao.cadastro.cheque.ChequeRepository;
 import vrimplantacao2.dao.cadastro.cheque.ChequeRepositoryProvider;
@@ -129,6 +130,10 @@ public class Importador {
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
+    }
+
+    public Importador(ItuInfoDAO dao) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public void setInterfaceDAO(InterfaceDAO interfaceDAO) {
