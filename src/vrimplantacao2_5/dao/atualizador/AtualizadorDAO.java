@@ -146,7 +146,8 @@ public class AtualizadorDAO {
                     + "     id_conexaoloja INTEGER,\n"
                     + "     CONSTRAINT fk_id_conexaoloja FOREIGN KEY (id_conexaoloja)\n"
                     + "        REFERENCES implantacao2_5.conexaoloja (id)\n"
-                    + ");"
+                    + ");\n"
+                    + "ALTER TABLE implantacao.codant_produto ADD COLUMN IF NOT EXISTS id_conexao INTEGER;"
             );
         }
     }

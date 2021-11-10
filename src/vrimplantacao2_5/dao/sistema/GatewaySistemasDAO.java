@@ -109,7 +109,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
                     imp.setPiscofinsCstCredito(rst.getString("cstcofins"));
 
-                    imp.setIcmsCstSaida(rst.getInt("cst"));
+                    /*imp.setIcmsCstSaida(rst.getInt("cst"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
@@ -128,7 +128,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
 
                     imp.setIcmsCstConsumidor(rst.getInt("cst"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("icms"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducao"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducao"));*/
 
                     result.add(imp);
                 }
@@ -158,7 +158,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	f.CEP AS cep,\n"
                     + "	f.UF AS uf,\n"
                     + "	f.CIDADE AS municipio,\n"
-                    + "	f.COD_CIDADE AS muinicioibge,\n"
+                    + "	f.COD_CIDADE AS municipioibge,\n"
                     + "	f.TELEFONE AS telefone,\n"
                     + "	f.CELULAR AS celular,\n"
                     + "	f.FAX AS fax,\n"
