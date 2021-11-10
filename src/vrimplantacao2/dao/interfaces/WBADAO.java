@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -29,7 +28,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(WBADAO.class.getName());
 
     @Override
     public String getSistema() {

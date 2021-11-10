@@ -620,7 +620,6 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numcupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
 
                         next.setData(rst.getDate("data"));
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
@@ -740,25 +739,6 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "group by \n"
                     + "	p.codigobarra ,i.vrunit, i.vrtotal, p.mgv5 \n"
                     + "order by 1,3";
-                    /*"select\n"
-                    + "	v.id id_venda,\n"
-                    + "	i.id id_item,\n"
-                    + "	i.item nroitem,\n"
-                    + "	p.id produto,\n"
-                    + "	p.codigobarra,\n"
-                    + "	p.produto descricao,\n"
-                    + "	case when p.mgv5 = 0 then 'UN' else 'KG' end unidade,\n"
-                    + "	i.qtde quantidade,\n"
-                    + " i.vrunit precovenda,\n"
-                    + "	i.vrtotal total,\n"
-                    + "	i.excluido cancelado\n"
-                    + "from\n"
-                    + "	cupom i\n"
-                    + "	left join caixa v on v.descricao = i.codigo::varchar and v.codigoloja = i.loja \n"
-                    + "	left join produtos p on i.produto = p.codigobarra \n"
-                    + "where\n"
-                    + "	 v.codigoloja = " + idLojaCliente + "\n"
-                    + "	and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
