@@ -96,7 +96,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
-                    configuracaoLojaVO.getIdLojaOrigem() + " - "
+                    configuracaoLojaVO.getIdLojaOrigem() + " - " + configuracaoLojaVO.getDescricaoLojaOrigem() + " - "
                     + (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
         }
     }
