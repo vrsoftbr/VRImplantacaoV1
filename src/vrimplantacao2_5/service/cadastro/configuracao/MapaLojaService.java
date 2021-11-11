@@ -141,4 +141,8 @@ public class MapaLojaService {
             throw new VRException("Processo de migração iniciado, não é possível excluir a loja mapeada!");
         }
     }
+    
+    public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao) throws Exception {
+        configuracaoDAO.alterarSituacaoMigracao(idLojaOrigem, idLojaVR, situacaoMigracao);
+    }
 }

@@ -45,4 +45,8 @@ public class MapaLojaController {
     public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
         mapaLojaService.excluirLojaMapeada(configuracaoBancoLojaVO);
     }
+    
+    public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao) throws Exception {
+        mapaLojaService.alterarSituacaoMigracao(idLojaOrigem, idLojaVR, situacaoMigracao);
+    }
 }

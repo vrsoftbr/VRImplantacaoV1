@@ -298,4 +298,21 @@ public class ConfiguracaoBaseDadosDAO {
 
         return retorno;
     }
+    
+    public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        
+        sql.setSchema("implantacao2_5");
+        sql.setTableName("conexaoloja");
+        
+        sql.put("id_situacaomigracao", situacaoMigracao);
+        
+        sql.setWhere("id_lojaorigem = '" + idLojaOrigem+ "' and id_lojadestino = " + idLojaVR);
+        
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
 }

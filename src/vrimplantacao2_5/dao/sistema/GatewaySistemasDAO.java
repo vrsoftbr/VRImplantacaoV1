@@ -8,10 +8,15 @@ package vrimplantacao2_5.dao.sistema;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -24,13 +29,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Desenvolvimento
  */
-public class GatewaySistemasDAO extends InterfaceDAO {
+public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider{
 
     @Override
     public String getSistema() {
         return "Gateway Sistemas";
     }
-
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -50,6 +55,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
@@ -81,6 +87,54 @@ public class GatewaySistemasDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                }
+        ));
     }
     
     @Override
@@ -115,7 +169,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	et.PIS_ST AS cstpis,\n"
                     + "	et.COFINS_ST AS cstcofins,\n"
                     + "	et.ALIQ_FCP AS fcp,\n"
-                    + " (et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS idIcms"        
+                    + " (et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS idIcms\n"        
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"

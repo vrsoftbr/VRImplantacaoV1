@@ -1,5 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Frame;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -7,21 +8,27 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "Gateway Sistemas";
+    private static final String SISTEMA = ESistema.GATEWAYSISTEMAS.getNome();
     private static GatewaySistemas2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = new GatewaySistemasDAO();
+    private MapaLojaController mapaLojaController = null;
+    private boolean importou = false;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        
         tabProdutos.carregarParametros(params, SISTEMA);
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -29,37 +36,38 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-
-        tabProdutos.gravarParametros(params, SISTEMA);
-        pnlConn.atualizarParametros();
         
-        if (pnlConn != null) {
-            params.put(pnlConn.getLojaVR(), SISTEMA, "LOJA_VR");
-            vLojaVR = pnlConn.getLojaVR();
-        }
+        tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(pnlConn.getHost(), SISTEMA, "HOST");
+        params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
+        params.put(pnlConn.getPorta(), SISTEMA, "PORTA");
+        params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
+        params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
+
+        pnlConn.atualizarParametros();
         
         params.salvar();
     }
 
-    private GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private void alterarSituacaoMigracao() throws Exception {
+        String lojaOrigem = pnlConn.getLojaOrigem();
+        int lojaVR = pnlConn.getLojaVR();
+        
+        mapaLojaController = new MapaLojaController();
+        
+        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2);
+    }
+    
+    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-
-        pnlConn.setOnConectar(new ConexaoEvent() {
-            @Override
-            public void executar() throws Exception {
-                tabProdutos.btnMapaTribut.setEnabled(true);
-                gravarParametros();
-            }
-        });
-        
-        pnlConn.setSistema(ESistema.GETWAY);
-        pnlConn.getNomeConexao();
+       
+        carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(dao);
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -68,7 +76,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                dao.setComplemento(pnlConn.getComplemento());
                 return dao.getSistema();
             }
 
@@ -82,15 +89,23 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-        });*/
+        });
         
-        carregarParametros();
+        pnlConn.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                tabProdutos.btnMapaTribut.setEnabled(true);
+                gravarParametros();
+            }
+        });
+        
+        pnlConn.setSistema(ESistema.GATEWAYSISTEMAS);
+        pnlConn.getNomeConexao();
 
+        //tabs.remove(0);
+        
         centralizarForm();
         this.setMaximum(false);
-    }
-
-    public void carregarLojaCliente() throws Exception {
     }
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
@@ -124,6 +139,11 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
+                    importador.setIdConexao(pnlConn.idConexao);
+                    
+                    tabProdutos.setImportador(importador);
+                    tabFornecedores.setImportador(importador);
+                    tabClientes.setImportador(importador);
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:
@@ -157,15 +177,17 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                         default:
                             break;
                     }
-
-                    gravarParametros();
-
+                    
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                     
-                } catch (Exception ex) {
+                    importou = true;
+                    
+                } catch (Exception ex) {                    
                     ProgressBar.dispose();
+                    ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
+                    importou = false;
                 }
             }
         };
@@ -369,9 +391,9 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -384,6 +406,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         try {
             this.setWaitCursor();
             importarTabelas();
+            
+            /*if (this.importou) {
+                alterarSituacaoMigracao();
+            }*/
 
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
