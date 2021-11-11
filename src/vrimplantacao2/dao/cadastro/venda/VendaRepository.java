@@ -239,8 +239,8 @@ public class VendaRepository {
                                 produto = produtoPadrao;
                             }
                             if ( produto == null ) {
-                                throw new NullPointerException("Algum produto deveria ter sido ser encontrado!\n"
-                                        + "Verifique o codigo de barras!: " + impItem.getCodigoBarras());
+                                throw new NullPointerException("Algum produto deveria ter sido encontrado!\n"
+                                        + "Verifique o codigo de barras: " + impItem.getCodigoBarras());
                             } else {
                                 item.setId_produto(produto);
                             }
