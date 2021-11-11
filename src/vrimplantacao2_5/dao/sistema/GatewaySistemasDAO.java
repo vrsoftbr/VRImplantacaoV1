@@ -16,6 +16,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -48,6 +49,39 @@ public class GatewaySistemasDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + "	(et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS id,\n"
+                    + "	et.ST AS cst,\n"
+                    + "	et.ICMS AS icms,\n"
+                    + "	et.REDUCAO AS reducao,\n"
+                    + "	et.ALIQ_FCP AS fcp\n"
+                    + "FROM ESTOQUE e\n"
+                    + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("id"),
+                            rst.getString("id"),
+                            rst.getInt("cst"),
+                            Double.parseDouble(rst.getString("icms").replace(",", ".")),
+                            rst.getDouble("reducao"),
+                            rst.getDouble("fcp"),
+                            false,
+                            0
+                        )
+                    );
+                }
+            }
+        }
+        return result;
+    }
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -68,20 +102,23 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	e.QTD_MINIMA AS estoqueminimo,\n"
                     + "	e.PRECO_CUSTO AS custo,\n"
                     + "	e.PRECO_VENDA AS precovenda,\n"
+                    + " es.LUCRO_VENDA AS margem,\n"
                     + "	e.PESO_BRUTO AS pesobruto,\n"
-                    + "	e.PESO_LIQUIDO AS pesoliquido,\n"
+                    + "	e.PESO_LIQUIDO AS pesoliquido,\n" 
                     + "	e.NCM,\n"
-                    + "	et.CEST AS cest,	\n"
+                    + "	et.CEST AS cest,\n"
                     + "	et.TIPO_TRIBUTACAO,\n"
                     + "	et.ST AS cst,\n"
                     + "	et.ICMS AS icms,\n"
                     + "	et.REDUCAO AS reducao,\n"
                     + "	et.MVA AS mva,\n"
                     + "	et.PIS_ST AS cstpis,\n"
-                    + "	et.COFINS_ST AS cstcofins,	\n"
-                    + "	et.ALIQ_FCP AS fcp\n"
+                    + "	et.COFINS_ST AS cstcofins,\n"
+                    + "	et.ALIQ_FCP AS fcp,\n"
+                    + " (et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS idIcms"        
                     + "FROM ESTOQUE e\n"
-                    + "LEFT JOIN EST_TRIBUTACAO et ON et.CODIGO = e.CODIGO\n"
+                    + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
+                    + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -104,32 +141,19 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
                     imp.setPiscofinsCstCredito(rst.getString("cstcofins"));
 
-                    /*imp.setIcmsCstSaida(rst.getInt("cst"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
-                    imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
-                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms"));
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao"));
-                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducao"));
-
-                    imp.setIcmsCstEntrada(rst.getInt("cst"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("reducao"));
-                    imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
-                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
-
-                    imp.setIcmsCstConsumidor(rst.getInt("cst"));
-                    imp.setIcmsAliqConsumidor(rst.getDouble("icms"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducao"));*/
-
+                    imp.setIcmsDebitoId(rst.getString("idIcms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("idIcms"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idIcms"));
+                    imp.setIcmsCreditoId(rst.getString("idIcms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
+                    imp.setIcmsConsumidorId(rst.getString("idIcms"));
+                    
                     result.add(imp);
                 }
             }
@@ -234,20 +258,28 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    result.add(imp);
+                    
+                    String[] codigosExternos = rst.getString("codigoexterno").split("\\|");
+                    
+                    for (int i = 0; i < codigosExternos.length; i++) {
+                        
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setIdProduto(rst.getString("idproduto"));
+                        imp.setIdFornecedor(rst.getString("idfornecedor"));
+                        imp.setCodigoExterno(codigosExternos[i].trim());
+                        imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                        
+                        result.add(imp);                        
+                    }                    
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -334,7 +366,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
@@ -348,7 +380,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     + "	r.VENCIMENTO AS datavencimento,\n"
                     + "	r.CLIENTE AS idcliente,\n"
                     + "	r.CAIXA AS ecf,\n"
-                    + " r.VALOR as valor, \n"        
+                    + " r.VALOR as valor, \n"
                     + "	r.DESCRICAO AS obs\n"
                     + "FROM RECEBER r\n"
                     + "WHERE r.CLIENTE IS NOT NULL\n"
@@ -366,7 +398,7 @@ public class GatewaySistemasDAO extends InterfaceDAO {
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("obs"));
-                    
+
                     result.add(imp);
                 }
             }

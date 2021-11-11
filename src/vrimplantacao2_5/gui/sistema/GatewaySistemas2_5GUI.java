@@ -269,14 +269,14 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         vRPanel9Layout.setHorizontalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
-                .addGap(89, 89, 89))
+                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(207, 207, 207))
         );
         vRPanel9Layout.setVerticalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 67, Short.MAX_VALUE))
+                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(13, 13, 13))
         );
 
         tabImportacao.addTab("Fornecedores", vRPanel9);
