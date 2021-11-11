@@ -29,13 +29,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Desenvolvimento
  */
-public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider{
+public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "Gateway Sistemas";
     }
-    
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                             rst.getDouble("fcp"),
                             false,
                             0
-                        )
+                    )
                     );
                 }
             }
@@ -132,11 +132,11 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -158,7 +158,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	e.PRECO_VENDA AS precovenda,\n"
                     + " es.LUCRO_VENDA AS margem,\n"
                     + "	e.PESO_BRUTO AS pesobruto,\n"
-                    + "	e.PESO_LIQUIDO AS pesoliquido,\n" 
+                    + "	e.PESO_LIQUIDO AS pesoliquido,\n"
                     + "	e.NCM,\n"
                     + "	et.CEST AS cest,\n"
                     + "	et.TIPO_TRIBUTACAO,\n"
@@ -169,7 +169,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	et.PIS_ST AS cstpis,\n"
                     + "	et.COFINS_ST AS cstcofins,\n"
                     + "	et.ALIQ_FCP AS fcp,\n"
-                    + " (et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS idIcms\n"        
+                    + " (et.ST||'-'||et.ICMS||'-'||et.REDUCAO||'-'||et.ALIQ_FCP) AS idIcms\n"
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
@@ -180,7 +180,23 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
+
+                    if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
+
+                        if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
+
+                            imp.setEan(rst.getString("ean").trim().substring(1));
+                        } else {
+                            imp.setEan(rst.getString("ean"));
+                        }
+                    }
+
+                    if ("Balan".equals(rst.getString("tipo")) || "Peso".equals(rst.getString("tipo"))) {
+                        imp.seteBalanca(true);
+                    } else {
+                        imp.seteBalanca(false);
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -207,7 +223,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setIcmsCreditoId(rst.getString("idIcms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
                     imp.setIcmsConsumidorId(rst.getString("idIcms"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -312,22 +328,22 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
-                    
+
                     String[] codigosExternos = rst.getString("codigoexterno").split("\\|");
-                    
+
                     for (int i = 0; i < codigosExternos.length; i++) {
-                        
+
                         ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                        
+
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setIdProduto(rst.getString("idproduto"));
                         imp.setIdFornecedor(rst.getString("idfornecedor"));
                         imp.setCodigoExterno(codigosExternos[i].trim());
                         imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                        
-                        result.add(imp);                        
-                    }                    
+
+                        result.add(imp);
+                    }
                 }
             }
         }
