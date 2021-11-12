@@ -22,6 +22,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -96,7 +97,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
@@ -135,6 +136,42 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT DISTINCT \n"
+                    + "	g.CODIGO AS merc1,\n"
+                    + "	g.DESCRICAO AS desc_merc1,\n"
+                    + "	COALESCE(e.SUB_GRUPO, 1) AS merc2,\n"
+                    + "	COALESCE(g2.DESCRICAO, g.DESCRICAO) AS desc_merc2,\n"
+                    + "	'1' AS merc3,\n"
+                    + "	COALESCE(g2.DESCRICAO, g.DESCRICAO) AS desc_merc3\n"
+                    + "FROM ESTOQUE e\n"
+                    + "LEFT JOIN GRUPOS g ON e.GRUPO = g.CODIGO\n"
+                    + "LEFT JOIN GRUPOS g2 ON e.SUB_GRUPO = g2.CODIGO\n"
+                    + "WHERE e.GRUPO IS NOT NULL\n"
+                    + "ORDER BY 1, 3"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("desc_merc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("desc_merc3"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
