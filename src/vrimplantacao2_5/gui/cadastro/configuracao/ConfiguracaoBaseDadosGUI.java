@@ -256,6 +256,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             Util.exibirMensagem("Loja excluída com sucesso!", getTitle());
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, title);
         }
     }
 

@@ -13,6 +13,7 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 
@@ -24,6 +25,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = new GatewaySistemasDAO();
     private MapaLojaController mapaLojaController = null;
+    private ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null ;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -51,9 +53,11 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         String lojaOrigem = pnlConn.getLojaOrigem();
         int lojaVR = pnlConn.getLojaVR();
         
-        mapaLojaController = new MapaLojaController();
+        configuracaoBaseDadosGUI = new ConfiguracaoBaseDadosGUI(mdiFrame);
         
-        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2);
+        mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
+        
+        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
     
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -177,6 +181,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     }
                     
                     gravarParametros();
+                    alterarSituacaoMigracao();
                     
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
