@@ -326,6 +326,7 @@ import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -5194,7 +5195,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuLiderNetWorkActionPerformed
 
     private void mnuVRToVRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVRToVRActionPerformed
-        VRToVRGUI.exibir(this);
+        VRToVR2_5GUI.exibir(this);
     }//GEN-LAST:event_mnuVRToVRActionPerformed
 
     private void mnuRKSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRKSoftwareActionPerformed
