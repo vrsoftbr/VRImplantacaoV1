@@ -24,7 +24,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = new GatewaySistemasDAO();
     private MapaLojaController mapaLojaController = null;
-    private boolean importou = false;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -35,8 +34,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     }
 
     private void gravarParametros() throws Exception {
-        Parametros params = Parametros.get();
-        
+        Parametros params = Parametros.get();        
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(pnlConn.getHost(), SISTEMA, "HOST");
         params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
@@ -178,16 +176,15 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                             break;
                     }
                     
+                    gravarParametros();
+                    
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    importou = true;
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
                     ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
-                    importou = false;
                 }
             }
         };
@@ -407,10 +404,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             this.setWaitCursor();
             importarTabelas();
             
-            /*if (this.importou) {
-                alterarSituacaoMigracao();
-            }*/
-
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 

@@ -92,7 +92,7 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements Config
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Senha:");
 
         btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnConectar, "Conectar");
+        org.openide.awt.Mnemonics.setLocalizedText(btnConectar, "Testar Conectar");
         btnConectar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConectarActionPerformed(evt);
@@ -204,8 +204,6 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements Config
                     .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)))
         );
-
-        getAccessibleContext().setAccessibleName("Conexão PostgreSQL");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed

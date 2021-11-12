@@ -21,6 +21,8 @@ public class ConfiguracaoBaseDadosDAO {
     public void inserir(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
+        String schema = conexaoVO.getSchema().replace("\\", "/");
+        
         sql.setTableName("conexao");
         sql.setSchema("implantacao2_5");
 
@@ -29,7 +31,7 @@ public class ConfiguracaoBaseDadosDAO {
         sql.put("usuario", conexaoVO.getUsuario());
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
-        sql.put("nomeschema", conexaoVO.getSchema());
+        sql.put("nomeschema", schema);
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
         sql.put("complemento", conexaoVO.getComplemento());

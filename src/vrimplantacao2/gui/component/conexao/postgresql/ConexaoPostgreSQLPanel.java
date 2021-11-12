@@ -190,8 +190,6 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
                     .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)))
         );
-
-        getAccessibleContext().setAccessibleName("Conexão PostgreSQL");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
