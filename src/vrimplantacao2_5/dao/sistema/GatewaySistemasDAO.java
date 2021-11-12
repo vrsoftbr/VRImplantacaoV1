@@ -188,6 +188,9 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	e.UND_V  AS tipoembalagem,\n"
                     + "	e.ATIVO AS situacaocadastro,\n"
                     + "	e.NOME AS descricaocompleta,\n"
+                    + " e.GRUPO as mercadologico1, \n"
+                    + " e.SUB_GRUPO as mercadologico2, \n"
+                    + " '1' as mercadologico3, \n"        
                     + "	e.QTD AS estoque,\n"
                     + "	e.QTD_MAXIMA AS estoquemaximo,\n"
                     + "	e.QTD_MINIMA AS estoqueminimo,\n"
@@ -241,6 +244,9 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
