@@ -95,6 +95,10 @@ public class UnidadeService {
         
         return result;
     }
+
+    public int getProximoId() throws Exception {
+        return unidadeDAO.getProximoId();
+    }
     
     private String getTitle() {
         return "Cadastro Unidade";

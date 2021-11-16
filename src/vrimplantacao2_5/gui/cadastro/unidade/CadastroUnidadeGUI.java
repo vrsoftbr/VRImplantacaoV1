@@ -54,6 +54,7 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
     public void salvar() throws Exception {
         UnidadeVO vo = new UnidadeVO();
         
+        vo.setId(unidadeController.getProximoId());
         vo.setNome(txtNomeUnidade.getText().trim());
         vo.setIdMunicipio(cboMunicipio.getId());
         vo.setIdEstado(cboUF.getId());
@@ -70,7 +71,7 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
             consultaUnidadeGUI.controller.consultar(null);
 
             try {
-                Util.exibirMensagem("Unidade VR salva com sucesso!", getTitle());
+                Util.exibirMensagem("Unidade salva com sucesso!", getTitle());
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, getTitle());
             }

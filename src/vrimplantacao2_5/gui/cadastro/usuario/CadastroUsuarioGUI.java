@@ -49,6 +49,7 @@ public class CadastroUsuarioGUI extends VRInternalFrame {
     public void salvar() throws Exception {
         UsuarioVO vo = new UsuarioVO();
         
+        vo.setId(usuarioController.getProximoId());
         vo.setNome(txtNome.getText().trim());
         vo.setLogin(txtLogin.getText().trim());
         vo.setSenha(txtSenha.getText().trim());

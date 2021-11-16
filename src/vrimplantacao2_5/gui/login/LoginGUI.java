@@ -16,6 +16,7 @@ import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.gui.MenuGUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
 import vrimplantacao2_5.controller.cadastro.usuario.UsuarioController;
 import vrimplantacao2_5.vo.cadastro.UnidadeVO;
@@ -26,6 +27,7 @@ public class LoginGUI extends VRDialog {
     private UsuarioVO oUsuario = null;
     private VRMdiFrame mdiFrame = null;
     private List<DadosConexaoPostgreSQL> vEmpresa = null;
+    private AtualizadorController atualizadorController = null;
         
     /* Classes da versão 2.5 */
     UnidadeController unidadeController = new UnidadeController();
@@ -36,6 +38,8 @@ public class LoginGUI extends VRDialog {
         initComponents();
 
         centralizarForm();
+        
+        criarEstrutura2_5();
 
         getUnidades();
 
@@ -44,6 +48,11 @@ public class LoginGUI extends VRDialog {
         this.setModal(true);
     }
 
+    private void criarEstrutura2_5() throws Exception {
+        atualizadorController = new AtualizadorController();
+        atualizadorController.criarEstrutura2_5();
+    }
+    
     private void getUnidades() throws Exception {
         cboUnidade.setModel(new DefaultComboBoxModel());
         

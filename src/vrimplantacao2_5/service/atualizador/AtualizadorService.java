@@ -112,6 +112,8 @@ public class AtualizadorService {
         this.criarSchema();
         this.criarTabelas();
         this.criarConstraint();
+        atualizadorDAO.inserirUnidade();
+        atualizadorDAO.inserirUsuario();
         this.salvarBancoDados();
         this.salvarSistema();
         this.deletarSistemaBancoDados();

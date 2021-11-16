@@ -423,15 +423,8 @@ public final class MenuGUI extends VRMdiFrame {
         if (Global.getIdUnidade() != 1) {
             mnuCadastro2_5.setVisible(false);
         }
-        
-        criarEstrutura2_5();
     }
 
-    private void criarEstrutura2_5() throws Exception {
-        atualizadorController = new AtualizadorController();
-        atualizadorController.criarEstrutura2_5();
-    }
-    
     @Override
     public void atualizarRodape() throws Exception {
         

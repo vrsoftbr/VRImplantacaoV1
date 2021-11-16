@@ -66,7 +66,35 @@ public class AtualizadorDAO {
     public void criarTabelas() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "CREATE TABLE IF NOT EXISTS implantacao2_5.bancodados(\n"
+                    "CREATE TABLE IF NOT EXISTS implantacao2_5.unidade \n"
+                    + "(\n"
+                    + "    id integer PRIMARY KEY NOT NULL,\n"
+                    + "    nome character varying(60) NOT NULL, \n"
+                    + "    id_municipio integer NOT NULL,\n"
+                    + "    id_estado integer NOT NULL,\n"
+                    + "    CONSTRAINT un_unidade UNIQUE (nome, id_municipio, id_estado),\n"
+                    + "    CONSTRAINT fk_id_estado FOREIGN KEY (id_estado)\n"
+                    + "        REFERENCES public.estado (id) MATCH SIMPLE\n"
+                    + "        ON UPDATE NO ACTION\n"
+                    + "        ON DELETE NO ACTION,\n"
+                    + "    CONSTRAINT fk_id_municipio FOREIGN KEY (id_municipio)\n"
+                    + "        REFERENCES public.municipio (id) MATCH SIMPLE\n"
+                    + "        ON UPDATE NO ACTION\n"
+                    + "        ON DELETE NO ACTION\n"
+                    + ");"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.usuario\n" 
+                    + "(\n"
+                    + "    id integer PRIMARY KEY NOT NULL,\n"
+                    + "    nome character varying(30) NOT NULL,\n"
+                    + "    login character varying(30) NOT NULL,\n"
+                    + "    senha character varying(30) NOT NULL,\n"
+                    + "    id_unidade integer NOT NULL,\n"
+                    + "    CONSTRAINT fk_id_unidade FOREIGN KEY (id_unidade)\n"
+                    + "        REFERENCES implantacao2_5.unidade (id) MATCH SIMPLE\n"
+                    + "        ON UPDATE NO ACTION\n"
+                    + "        ON DELETE NO ACTION\n"
+                    + ");"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.bancodados(\n"
                     + "     id integer PRIMARY KEY NOT NULL,\n"
                     + "     nome VARCHAR(60) NOT NULL\n"
                     + ");"
@@ -222,6 +250,25 @@ public class AtualizadorDAO {
                     + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
                     + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');"
             );
+        }
+    }
+    
+    public void inserirUnidade() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
+                    + "DELETE FROM implantacao2_5.unidade \n;"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) "
+                    + "VALUES (1, 'VR MATRIZ', 3526902, 35);");
+        }
+    }
+
+    public void inserirUsuario() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', 1); \n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', 1); \n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', 1); \n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGER', 'ZIRDA123', 1);");
         }
     }
 }
