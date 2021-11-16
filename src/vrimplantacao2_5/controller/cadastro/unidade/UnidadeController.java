@@ -43,4 +43,8 @@ public class UnidadeController {
     public List<UnidadeVO> getUnidades() throws Exception {
         return this.unidadeVO = unidadeService.getUnidades();
     }
+    
+    public int getProximoId() throws Exception {
+        return unidadeService.getProximoId();
+    }
 }

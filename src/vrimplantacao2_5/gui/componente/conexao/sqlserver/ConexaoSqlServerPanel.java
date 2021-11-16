@@ -93,7 +93,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel implements Configu
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Senha:");
 
         btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnConectar, "Conectar");
+        org.openide.awt.Mnemonics.setLocalizedText(btnConectar, "Testar Conectar");
         btnConectar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConectarActionPerformed(evt);

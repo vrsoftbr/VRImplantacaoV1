@@ -99,6 +99,10 @@ public class SistemaService {
         return result;
     }
     
+    public int getProximoId() throws Exception {
+        return sistemaDAO.getProximoId();
+    }
+    
     private String getTitle() {
         return "Cadastro Sistema";
     }    

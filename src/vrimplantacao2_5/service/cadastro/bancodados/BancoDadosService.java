@@ -98,6 +98,10 @@ public class BancoDadosService {
         return result;
     }
     
+    public int getProximoId() throws Exception {
+        return bancoDadosDAO.getProximoId();
+    }
+    
     private String getTitle() {
         return "Cadastro Banco de Dados";
     }    

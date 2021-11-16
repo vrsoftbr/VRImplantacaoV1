@@ -44,6 +44,12 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         initComponents();
         desabilitarBotaoConectar();
         setDadosConexao("");
+        
+        if (conexao != null) {
+            System.out.println("conexão");
+        } else {
+            System.out.println("sem conexão");
+        }
     }
 
     private void setConfiguracao() throws Exception {
@@ -96,8 +102,8 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
-                    configuracaoLojaVO.getIdLojaOrigem() + " - "
-                    + (configuracaoLojaVO.isLojaMatriz() ? "MATRIZ" : "FILIAL")));
+                    configuracaoLojaVO.getIdLojaOrigem() + " - " + configuracaoLojaVO.getDescricaoLojaOrigem() + " - "
+                    + (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
         }
     }
 

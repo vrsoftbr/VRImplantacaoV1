@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -39,7 +38,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private SelecaoLojaGUI migracaoGUI = null;
 
     private ConfiguracaoBaseDadosController controller = null;
-    private AtualizadorController atualizadorController = null;
     private MapaLojaController mapaController = null;
 
     private ConfiguracaoPanel painelDeConexaoDinamico;
@@ -55,18 +53,12 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         super(menuGUI);
         initComponents();
         
-        criarEstrutura2_5();
         this.parentFrame = menuGUI;
         setConfiguracao();
         
         migracaoSistemasController = new MigracaoSistemasController();
     }
     
-    private void criarEstrutura2_5() throws Exception {
-        atualizadorController = new AtualizadorController();
-        atualizadorController.criarEstrutura2_5();
-    }
-
     private void setConfiguracao() throws Exception {
         centralizarForm();
         setTitle("Configuração de Base de Dados");
@@ -83,10 +75,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         List<VRColumnTable> column = new ArrayList();
 
         column.add(new VRColumnTable("Matriz", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Origem", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Loja Origem", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("VR", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Loja VR", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Código Loja Origem", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Descrição Loja Origem", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Código Loja VR", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Descrição Loja VR", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Cadastro", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Situação", true, SwingConstants.LEFT, false, null));
 
@@ -225,9 +217,9 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         int i = 0;
         for (ConfiguracaoBancoLojaVO lj : lojas) {
-            dados[i][0] = lj.isLojaMatriz() ? "MATRIZ" : "FILIAL";
+            dados[i][0] = lj.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL";
             dados[i][1] = lj.getIdLojaOrigem();
-            dados[i][2] = cboSistema.getDescricao();
+            dados[i][2] = lj.getDescricaoLojaOrigem();
             dados[i][3] = lj.getIdLojaVR();
             dados[i][4] = lj.getDescricaoVR();
             dados[i][5] = Util.formatDataGUI(lj.getDataCadastro());
@@ -264,6 +256,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             Util.exibirMensagem("Loja excluída com sucesso!", getTitle());
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, title);
         }
     }
 
@@ -405,35 +398,33 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(lblSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                            .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(319, 319, 319)
-                        .addComponent(lblComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(67, 67, 67))))
+                                    .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))))
+                    .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -461,10 +452,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 .addGap(6, 6, 6)
                 .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(15, 15, 15))
         );
 
         tabConexao.getAccessibleContext().setAccessibleName("Painel de Conexão");

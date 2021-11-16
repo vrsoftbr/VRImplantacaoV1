@@ -14,6 +14,20 @@ import vrimplantacao2.utils.sql.SQLBuilder;
  */
 public class SistemaDAO {
 
+    public int getProximoId() throws Exception {
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COALESCE(MAX(id), 0) + 1 id FROM implantacao2_5.sistema"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+            }
+        }
+        return 0;
+    }
+    
     public List getSistema() throws Exception {
         List<SistemaVO> result = new ArrayList<>();
 
@@ -60,22 +74,40 @@ public class SistemaDAO {
         return result;
     }
 
+    public List<SistemaVO> getSistema(String nomeSistema) throws Exception {
+        List<SistemaVO> result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id, \n"
+                    + "nome \n"
+                    + "from implantacao2_5.sistema \n"
+                    + "where nome = '" + nomeSistema + "'"
+            )) {
+                if (rst.next()) {
+                    SistemaVO vo = new SistemaVO();
+                    vo.setId(rst.getInt("id"));
+                    vo.setNome(rst.getString("nome"));
+                    result.add(vo);
+                }
+            }            
+        }
+        return result;
+    }
+    
     public void inserir(SistemaVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("implantacao2_5");
         sql.setTableName("sistema");
 
+        sql.put("id", vo.getId());
         sql.put("nome", vo.getNome());
 
         sql.getReturning().add("id");
 
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }
+                stm.execute(sql.getInsert());
             }
         }
     }
@@ -103,6 +135,18 @@ public class SistemaDAO {
                     "select nome\n"
                     + "from implantacao2_5.sistema\n"
                     + "where nome = '" + nome + "'"
+            )) {
+                return rst.next();
+            }
+        }
+    }    
+
+    public boolean existeSistema(int id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select nome\n"
+                    + "from implantacao2_5.sistema\n"
+                    + "where id = " + id + ""
             )) {
                 return rst.next();
             }

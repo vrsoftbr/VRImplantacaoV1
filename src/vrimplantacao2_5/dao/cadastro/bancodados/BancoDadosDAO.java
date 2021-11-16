@@ -14,6 +14,20 @@ import vrimplantacao2.utils.sql.SQLBuilder;
  */
 public class BancoDadosDAO {
 
+    public int getProximoId() throws Exception {
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COALESCE(MAX(id), 0) + 1 id FROM implantacao2_5.bancodados"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+            }
+        }
+        return 0;
+    }
+    
     public List getBancoDadosPorSistema(int idSistema) throws Exception {
         List<BancoDadosVO> result = new ArrayList<>();
 
@@ -90,17 +104,12 @@ public class BancoDadosDAO {
         sql.setSchema("implantacao2_5");
         sql.setTableName("bancodados");
 
+        sql.put("id", vo.getId());
         sql.put("nome", vo.getNome());
         
-        sql.getReturning().add("id");
-
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }                
+                stm.execute(sql.getInsert());
             }
         }
     }
@@ -134,6 +143,18 @@ public class BancoDadosDAO {
         }
     }
 
+    public boolean existeBancoDados(int id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select nome\n"
+                    + "from implantacao2_5.bancodados\n"
+                    + "where id = " + id
+            )) {
+                return rst.next();
+            }
+        }
+    }
+    
     public List<BancoDadosVO> consultar(String nome) throws Exception {
         List<BancoDadosVO> result = new ArrayList<>();
 

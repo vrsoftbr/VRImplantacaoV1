@@ -47,7 +47,7 @@ public class ConfiguracaoBaseDadosVO {
     }
 
     public void setSchema(String schema) {
-        this.schema = schema;
+        this.schema = schema.replace("'\'", "/");
     }
 
     public String getUsuario() {

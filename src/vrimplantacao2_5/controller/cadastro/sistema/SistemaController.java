@@ -43,5 +43,8 @@ public class SistemaController {
     public List<SistemaVO> getSistema(int idSistema) throws Exception {
         return sistemaService.getSistema(idSistema);
     }
-    
+
+    public int getProximoId() throws Exception {
+        return sistemaService.getProximoId();
+    }
 }

@@ -43,4 +43,8 @@ public class UsuarioController {
     public List<UsuarioVO> getUsuarios() {
         return usuarioVO;
     }
+    
+    public int getProximoId() throws Exception {
+        return usuarioService.getProximoId();
+    }
 }

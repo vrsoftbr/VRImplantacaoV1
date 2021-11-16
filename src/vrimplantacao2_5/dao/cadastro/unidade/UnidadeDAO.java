@@ -103,19 +103,14 @@ public class UnidadeDAO {
         sql.setSchema("implantacao2_5");
         sql.setTableName("unidade");
 
+        sql.put("id", vo.getId());
         sql.put("nome", vo.getNome());
         sql.put("id_municipio", vo.getIdMunicipio());
         sql.put("id_estado", vo.getIdEstado());
 
-        sql.getReturning().add("id");
-
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }
+                stm.execute(sql.getInsert());
             }
         }
     }
@@ -153,4 +148,19 @@ public class UnidadeDAO {
             }
         }
     }
+    
+    public int getProximoId() throws Exception {
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COALESCE(MAX(id), 0) + 1 id FROM implantacao2_5.unidade"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+            }
+        }
+        return 0;
+    }
+    
 }

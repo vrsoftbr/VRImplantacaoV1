@@ -104,20 +104,15 @@ public class UsuarioDAO {
         sql.setSchema("implantacao2_5");
         sql.setTableName("usuario");
 
+        sql.put("id", vo.getId());
         sql.put("nome", vo.getNome());
         sql.put("login", vo.getLogin());
         sql.put("senha", vo.getSenha());
         sql.put("id_unidade", vo.getIdUnidade());
 
-        sql.getReturning().add("id");
-
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }
+                stm.execute(sql.getInsert());
             }
         }
     }
@@ -184,4 +179,19 @@ public class UsuarioDAO {
         }
         return result;
     }
+    
+    public int getProximoId() throws Exception {
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COALESCE(MAX(id), 0) + 1 id FROM implantacao2_5.usuario"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+            }
+        }
+        return 0;
+    }
+    
 }

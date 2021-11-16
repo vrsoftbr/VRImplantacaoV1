@@ -47,6 +47,7 @@ public class CadastroSistemaGUI extends VRInternalFrame {
         }
 
         SistemaVO vo = new SistemaVO();
+        vo.setId(sistemaController.getProximoId());
         vo.setNome(txtNomeSistema.getText().trim());
 
         if (txtCodigo.getText().trim().isEmpty()) {

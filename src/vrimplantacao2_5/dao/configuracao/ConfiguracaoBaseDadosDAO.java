@@ -21,6 +21,8 @@ public class ConfiguracaoBaseDadosDAO {
     public void inserir(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
+        String schema = conexaoVO.getSchema().replace("\\", "/");
+        
         sql.setTableName("conexao");
         sql.setSchema("implantacao2_5");
 
@@ -29,7 +31,7 @@ public class ConfiguracaoBaseDadosDAO {
         sql.put("usuario", conexaoVO.getUsuario());
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
-        sql.put("nomeschema", conexaoVO.getSchema());
+        sql.put("nomeschema", schema);
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
         sql.put("complemento", conexaoVO.getComplemento());
@@ -52,13 +54,15 @@ public class ConfiguracaoBaseDadosDAO {
 
         sql.setTableName("conexao");
         sql.setSchema("implantacao2_5");
-
+        
+        String schema = conexaoVO.getSchema().replace("\\", "/");
+        
         sql.put("host", conexaoVO.getHost());
         sql.put("porta", conexaoVO.getPorta());
         sql.put("usuario", conexaoVO.getUsuario());
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
-        sql.put("nomeschema", conexaoVO.getSchema());
+        sql.put("nomeschema", schema);
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
         sql.put("complemento", conexaoVO.getComplemento());
@@ -98,6 +102,24 @@ public class ConfiguracaoBaseDadosDAO {
         }
     }
 
+    public void inserirLojaOrigem(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+
+        sql.setSchema("implantacao2_5");
+        sql.setTableName("lojaorigem");
+
+        sql.put("id", conexaoVO.getConfiguracaoBancoLoja().getIdLojaOrigem());
+        sql.put("descricao", conexaoVO.getConfiguracaoBancoLoja().getDescricaoLojaOrigem());
+        sql.put("mixprincipal", conexaoVO.getConfiguracaoBancoLoja().isLojaMatriz());
+        sql.put("id_conexaoloja", conexaoVO.getConfiguracaoBancoLoja().getId());
+
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql.getInsert());
+            }
+        }
+    }
+    
     public String verificaLojaMatriz(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         String retorno = "";
 
@@ -156,6 +178,7 @@ public class ConfiguracaoBaseDadosDAO {
                     + "	c.id,\n"
                     + "	id_conexao,\n"
                     + "	id_lojaorigem,\n"
+                    + " substring(ljo.descricao, 5) as descricaolojadestino,"
                     + "	id_lojadestino,\n"
                     + "	l.descricao destino,\n"
                     + "	id_situacaomigracao,\n"
@@ -164,6 +187,7 @@ public class ConfiguracaoBaseDadosDAO {
                     + "from\n"
                     + "	implantacao2_5.conexaoloja c\n"
                     + "join public.loja l on c.id_lojadestino = l.id\n"
+                    + "join implantacao2_5.lojaorigem ljo on ljo.id = c.id_lojaorigem\n"        
                     + "where\n"
                     + "	id_conexao = " + idConexao)) {
                 while (rs.next()) {
@@ -171,6 +195,7 @@ public class ConfiguracaoBaseDadosDAO {
 
                     mapaLojaVO.setId(rs.getInt("id"));
                     mapaLojaVO.setIdLojaOrigem(rs.getString("id_lojaorigem"));
+                    mapaLojaVO.setDescricaoLojaOrigem(rs.getString("descricaolojadestino"));
                     mapaLojaVO.setIdLojaVR(rs.getInt("id_lojadestino"));
                     mapaLojaVO.setDescricaoVR(rs.getString("destino"));
                     mapaLojaVO.setLojaMatriz(rs.getBoolean("lojamatriz"));
@@ -188,7 +213,9 @@ public class ConfiguracaoBaseDadosDAO {
 
     public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from implantacao2_5.conexaoloja where id = "
+            stm.execute("delete from implantacao2_5.lojaorigem where id_conexaoloja = "
+                    + configuracaoBancoLojaVO.getId() + "; \n"
+                    + "delete from implantacao2_5.conexaoloja where id = "
                     + configuracaoBancoLojaVO.getId());
         }
     }
@@ -272,5 +299,22 @@ public class ConfiguracaoBaseDadosDAO {
         }
 
         return retorno;
+    }
+    
+    public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        
+        sql.setSchema("implantacao2_5");
+        sql.setTableName("conexaoloja");
+        
+        sql.put("id_situacaomigracao", situacaoMigracao);
+        
+        sql.setWhere("id_lojaorigem = '" + idLojaOrigem+ "' and id_lojadestino = " + idLojaVR);
+        
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql.getUpdate());
+            }
+        }
     }
 }

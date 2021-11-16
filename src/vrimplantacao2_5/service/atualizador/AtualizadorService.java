@@ -8,8 +8,12 @@ package vrimplantacao2_5.service.atualizador;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
+import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
+import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
 
 public class AtualizadorService {
 
@@ -73,15 +77,48 @@ public class AtualizadorService {
         }        
     }
     
+    public void deletarSistemaBancoDados() throws Exception {
+        this.atualizadorDAO.deletarSistemaBancoDados();
+    }
+    
     public void salvarSistemaBancoDados() throws Exception {
-        this.atualizadorDAO.salvarSistemaBancoDados();
+        boolean existeSistema, existeBancoDados;
+
+        for (ESistemaBancoDados eSistemaBancoDados : ESistemaBancoDados.values()) {
+            existeSistema = new SistemaDAO().existeSistema(eSistemaBancoDados.getNomeSistema());
+            existeBancoDados = new BancoDadosDAO().existeBancoDados(eSistemaBancoDados.getNomeBancoDados());
+
+            if (existeSistema && existeBancoDados) {
+                this.atualizadorDAO.salvarSistemaBancoDados(eSistemaBancoDados);
+            }
+        }
+    }
+    
+    public void salvarScriptGetLojaOrigemSistemas() throws Exception {
+        for (EScriptLojaOrigemSistema eScriptLojaOrigemSistema : EScriptLojaOrigemSistema.values()) {
+            this.atualizadorDAO.salvarScriptGetLojaOrigemSistemas(eScriptLojaOrigemSistema);
+        }
+    }
+
+    public void deletarScriptGetLojaOrigemSistemas() throws Exception {
+        this.atualizadorDAO.deletarScriptGetLojaOrigemSistemas();
+    }
+    
+    public void criarConstraint() throws Exception {
+        this.atualizadorDAO.criarConstraint();
     }
     
     public void criarEstrutura2_5() throws Exception {
-        this.atualizadorDAO.criarSchema();
-        this.atualizadorDAO.criarTabelas();
+        this.criarSchema();
+        this.criarTabelas();
+        this.criarConstraint();
+        atualizadorDAO.inserirUnidade();
+        atualizadorDAO.inserirUsuario();
         this.salvarBancoDados();
         this.salvarSistema();
-        this.atualizadorDAO.salvarSistemaBancoDados();
+        this.deletarSistemaBancoDados();
+        this.salvarSistemaBancoDados();
+        this.deletarScriptGetLojaOrigemSistemas();
+        this.salvarScriptGetLojaOrigemSistemas();
     }
 }

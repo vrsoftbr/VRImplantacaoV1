@@ -38,5 +38,9 @@ public class BancoDadosController {
     
     public List<BancoDadosVO> getBancoDados() {
         return bancoDados;
-    }    
+    }
+    
+    public int getProximoId() throws Exception {
+        return bancoDadosService.getProximoId();
+    }
 }

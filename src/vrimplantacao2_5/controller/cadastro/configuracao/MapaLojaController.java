@@ -17,7 +17,7 @@ public class MapaLojaController {
     private ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private List<ConfiguracaoBancoLojaVO> lojasMapeadas = null;
     
-    public MapaLojaController() {}
+    public MapaLojaController() throws Exception {}
 
     public MapaLojaController(ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI) {
         this.mapaLojaService = new MapaLojaService();
@@ -44,5 +44,10 @@ public class MapaLojaController {
     
     public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
         mapaLojaService.excluirLojaMapeada(configuracaoBancoLojaVO);
+    }
+    
+    public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao, int idConexao) throws Exception {
+        mapaLojaService.alterarSituacaoMigracao(idLojaOrigem, idLojaVR, situacaoMigracao);
+        //this.consultaLojaMapeada(idConexao);
     }
 }

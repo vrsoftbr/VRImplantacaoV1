@@ -88,5 +88,9 @@ public class UsuarioService {
         }
         
         return result;
-    }    
+    }
+    
+    public int getProximoId() throws Exception {
+        return usuarioDAO.getProximoId();
+    }
 }
