@@ -24,6 +24,7 @@ import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
+import vrimplantacao2_5.observer.migrador.Migrador;
 
 /**
  *
@@ -210,7 +211,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
 
-    public void consultaConfiguracaoLoja() throws Exception {
+    public void consultaConfiguracaoLoja() throws Exception {        
         List<ConfiguracaoBancoLojaVO> lojas = mapaController.getLojaMapeada();
 
         Object[][] dados = new Object[lojas.size()][7];
