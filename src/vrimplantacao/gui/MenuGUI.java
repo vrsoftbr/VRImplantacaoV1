@@ -118,7 +118,7 @@ import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
 import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CerebroGUI;
-import vrimplantacao2.gui.interfaces.CgaGUI;
+import vrimplantacao2.gui.interfaces.Dobes_CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
@@ -326,7 +326,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     public LojaConsultaGUI formLojaConsulta = null;
     public VRSoftwareGUI formMigracaoVR = null;
-    public CgaGUI formImportarCga = null;
+    public Dobes_CgaGUI formImportarCga = null;
     public MilenioGUI formImportarMilenio = null;
     public JMasterGUI formImportarJMaster = null;    
     public GetWay_ProfitGUI formImportarGetWay = null;
@@ -3680,7 +3680,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSistemaLoginActionPerformed
 
     private void jMenuItemCGAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCGAActionPerformed
-        CgaGUI.exibir(this);
+        Dobes_CgaGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemCGAActionPerformed
 
     private void jMenuItemMilenioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMilenioActionPerformed
