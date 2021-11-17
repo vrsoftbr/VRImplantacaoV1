@@ -299,6 +299,7 @@ import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.PrimeGUI;
+import vrimplantacao2.gui.interfaces.Provenco_TentaculoGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
@@ -722,6 +723,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuTentaculo = new javax.swing.JMenuItem();
         mnuWBA = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
@@ -1919,6 +1921,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
+
+        mnuTentaculo.setText("Tentaculo");
+        mnuTentaculo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTentaculoActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuTentaculo);
 
         mnuWBA.setText("WBA");
         mnuWBA.addActionListener(new java.awt.event.ActionListener() {
@@ -5524,6 +5534,10 @@ public final class MenuGUI extends VRMdiFrame {
         BomSoftGUI.exibir(this);
     }//GEN-LAST:event_mnuBomSoftActionPerformed
 
+    private void mnuTentaculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTentaculoActionPerformed
+        Provenco_TentaculoGUI.exibir(this);
+    }//GEN-LAST:event_mnuTentaculoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5832,6 +5846,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTecnosoft;
     private javax.swing.JMenuItem mnuTelecon;
+    private javax.swing.JMenuItem mnuTentaculo;
     private javax.swing.JMenuItem mnuTga;
     private javax.swing.JMenuItem mnuThotau;
     private javax.swing.JMenuItem mnuTpaRootac;

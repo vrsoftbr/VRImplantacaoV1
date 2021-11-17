@@ -291,15 +291,12 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(0);
                     }
 
-                    String idIcmsDebito/*, IdIcmsCredito*/;
+                    String idIcmsDebito;
                     idIcmsDebito = rst.getString("icms_cst") + "-" + rst.getString("icms_aliq") + "-" + rst.getString("icms_red");
-                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
-
+                    
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
-                    //imp.setIcmsCreditoId(IdIcmsCredito);
-                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
 
                     result.add(imp);
