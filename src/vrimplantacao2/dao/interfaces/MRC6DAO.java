@@ -31,6 +31,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -54,9 +55,8 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-                    OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
@@ -163,23 +163,47 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + " fam.codigo as id,\n"
+                    + " fam.descricao as descricao\n"
+                    + "from produtos prod\n"
+                    + "join produtosgrupos fam on fam.codigo = prod.Familiaid\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct \n"
-                    + " prod.Familiaid as codmerc1,\n"
+                    "select distinct\n"
+                    + " prod.Grupoid as codmerc1,\n"
                     + " merc1.descricao as descmerc1,\n"
-                    + " prod.Grupoid as codmerc2,\n"
+                    + " prod.Subgrupoid as codmerc2,\n"
                     + " merc2.descricao as descmerc2,\n"
                     + " prod.Subgrupoid as codmerc3,\n"
-                    + " merc3.descricao as descmerc3\n"
+                    + " merc2.descricao as descmerc3\n"
                     + "from produtos prod\n"
-                    + "join produtosgrupos merc1 on merc1.codigo = prod.Familiaid\n"
-                    + "join produtosgrupos merc2 on merc2.codigo = prod.Grupoid\n"
-                    + "join produtosgrupos merc3 on merc3.codigo = prod.Subgrupoid\n"
-                    + "order by 1,3,5"
+                    + "left join produtosgrupos merc1 on merc1.codigo = prod.Grupoid\n"
+                    + "left join produtosgrupos merc2 on merc2.codigo = prod.Subgrupoid\n"
+                    + "order by 1,3,5;"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -337,7 +361,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie_rg"));
-                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setInsc_municipal(rst.getString("inscrmunicipal"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
@@ -457,12 +481,12 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setAtivo(rst.getBoolean("status"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataCadastro(rst.getDate("dtcadastro"));
+                    imp.setTelefone(rst.getString("telefone1"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    //imp.setObservacao(rst.getString("observacao"));
                     imp.setValorLimite(rst.getDouble("limitecredito"));
                     imp.setPermiteCreditoRotativo(rst.getBoolean("naoliberarcredito"));
 
@@ -560,8 +584,8 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.setObservacao(rst.getString("observacao"));
-                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setIdCliente(rst.getString("clienteid"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setObservacao(rst.getString("obs"));
 
