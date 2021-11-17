@@ -189,7 +189,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	e.ATIVO AS situacaocadastro,\n"
                     + "	e.NOME AS descricaocompleta,\n"
                     + " e.GRUPO as mercadologico1, \n"
-                    + " e.SUB_GRUPO as mercadologico2, \n"
+                    + " coalesce(e.SUB_GRUPO, '1') as mercadologico2, \n"
                     + " '1' as mercadologico3, \n"        
                     + "	e.QTD AS estoque,\n"
                     + "	e.QTD_MAXIMA AS estoquemaximo,\n"
