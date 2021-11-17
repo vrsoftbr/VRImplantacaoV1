@@ -97,6 +97,8 @@ public class ProdutoDAO {
                         //automacao.setProduto(anterior.getCodigoAtual());
                         //Produtoprovider.automacao().salvar(automacao);
                         automacaoDAO.salvar(imp, anterior);
+                    } else {
+                        automacaoDAO.salvarEANAnterior(imp, anterior);
                     }
                     //if (ean13 > 999999) {
                     //  automacaoDAO.salvar(imp, anterior);  

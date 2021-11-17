@@ -190,7 +190,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	e.NOME AS descricaocompleta,\n"
                     + " e.GRUPO as mercadologico1, \n"
                     + " coalesce(e.SUB_GRUPO, '1') as mercadologico2, \n"
-                    + " '1' as mercadologico3, \n"        
+                    + " '1' as mercadologico3, \n"
                     + "	e.QTD AS estoque,\n"
                     + "	e.QTD_MAXIMA AS estoquemaximo,\n"
                     + "	e.QTD_MINIMA AS estoqueminimo,\n"
@@ -267,6 +267,33 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
                     imp.setIcmsConsumidorId(rst.getString("idIcms"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	e.CODIGO  AS id,\n"
+                    + "	e.BARRAS  AS ean,\n"
+                    + "	e.UND_V  AS tipoembalagem\n"
+                    + "FROM ESTOQUE e\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     result.add(imp);
                 }
             }

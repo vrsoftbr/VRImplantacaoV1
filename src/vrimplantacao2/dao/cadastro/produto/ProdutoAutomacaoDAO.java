@@ -140,6 +140,35 @@ public class ProdutoAutomacaoDAO {
         }
     }
 
+    public void salvarEANAnterior(ProdutoIMP imp, ProdutoAnteriorVO anterior) throws Exception {
+        ProdutoVO produto = anterior.getCodigoAtual();
+
+        if (produto == null) {
+            System.out.println("IMPID: " + anterior.getImportId() + " NAO ENCONTRADO!");
+        } else {
+            ProdutoAnteriorEanVO antEan = anterior.getEans().make(
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId(),
+                    imp.getEan()
+            );
+
+            antEan.setEan(imp.getEan());
+            antEan.setQtdEmbalagem(imp.getQtdEmbalagem());
+            antEan.setTipoEmbalagem(imp.getTipoEmbalagem());
+            antEan.setValor(imp.getPrecovenda());
+
+            if (!eanAnteriorDAO.getEansAnteriores().containsKey(
+                    antEan.getImportSistema(),
+                    antEan.getImportLoja(),
+                    antEan.getImportId(),
+                    antEan.getEan()
+            )) {
+                eanAnteriorDAO.salvar(antEan);
+            }
+        }
+    }
+    
     private final ProdutoAnteriorEanDAO eanAnteriorDAO = new ProdutoAnteriorEanDAO();
 
     /**
