@@ -669,6 +669,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             rst = stm.executeQuery(sql);
         }
 
+        
         @Override
         public boolean hasNext() {
             obterNext();
