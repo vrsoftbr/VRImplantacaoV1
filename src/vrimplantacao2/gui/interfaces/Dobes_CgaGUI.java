@@ -12,7 +12,7 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao2.dao.interfaces.CgaDAO;
+import vrimplantacao2.dao.interfaces.Dobes_CgaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -25,11 +25,11 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 
 import vrimplantacao2.parametro.Parametros;
 
-public class CgaGUI extends VRInternalFrame implements ConexaoEvent {
+public class Dobes_CgaGUI extends VRInternalFrame implements ConexaoEvent {
 
     private static final String SISTEMA = "Cga";
     private static final String SERVIDOR_SQL = "Firebird";
-    private static CgaGUI instance;
+    private static Dobes_CgaGUI instance;
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -59,7 +59,7 @@ public class CgaGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private CgaDAO cgaDAO = new CgaDAO();
+    private Dobes_CgaDAO cgaDAO = new Dobes_CgaDAO();
     private ConexaoFirebird connFirebird = new ConexaoFirebird();
 
     @Override
@@ -70,7 +70,7 @@ public class CgaGUI extends VRInternalFrame implements ConexaoEvent {
         btnMapaTrib.setEnabled(true);
     }
     
-    private CgaGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private Dobes_CgaGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "WIN1252";        
@@ -143,7 +143,7 @@ public class CgaGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new CgaGUI(i_mdiFrame);
+                instance = new Dobes_CgaGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

@@ -34,7 +34,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
+public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complSistema = "";
 
