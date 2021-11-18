@@ -44,6 +44,9 @@ public class SG2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         tabProdutos.setOpcoesDisponiveis(sgDAO);
+        tabFornecedores.setOpcoesDisponiveis(sgDAO);
+        tabClientes.setOpcoesDisponiveis(sgDAO);
+        
         tabProdutos.tabParametros.add(pnlParametrosAdicionais);
         tabProdutos.btnMapaTribut.setVisible(false);
         
