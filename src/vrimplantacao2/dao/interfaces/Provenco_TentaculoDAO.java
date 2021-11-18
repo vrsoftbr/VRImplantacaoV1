@@ -46,20 +46,21 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "    icm.vendacsf1 AS cst_saida,\n"
-                    + "    icm.vendaicms1 AS aliquota_saida,\n"
-                    + "    icm.vendareducao1 AS reducao_saida\n"
-                    + "FROM TESTPRODUTOGERAL pg\n"
-                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                    "SELECT\n"
+                    + "	CODITR id,\n"
+                    + "    NOMETR descricao,\n"
+                    + "    CODICST cst_saida,\n"
+                    + "    PERC_ICM aliquota_saida,\n"
+                    + "    PERC_RED reducao_saida\n"
+                    + "FROM\n"
+                    + "	TRIBUTA TR\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
-                    String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
+                    //String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
                     result.add(new MapaTributoIMP(
-                            id,
-                            id,
+                            rs.getString("id"),
+                            rs.getString("descricao"),
                             rs.getInt("cst_saida"),
                             rs.getDouble("aliquota_saida"),
                             rs.getDouble("reducao_saida")
@@ -185,7 +186,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	m1.CODISET m1,\n"
-                    + "	m1.NOMESET m1desc,	\n"
+                    + "	m1.NOMESET m1desc,\n"
                     + "	m2.CODIGRU m2,\n"
                     + "	m2.NOMEGRU m2desc,\n"
                     + "	m3.CODISGR m3,\n"
@@ -282,7 +283,6 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rst = stm.executeQuery(
                     ""
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -324,12 +324,6 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
 
-                    if (rst.getString("referencia") != null && !rst.getString("referencia").trim().isEmpty()) {
-                        if (!rst.getString("descricaocompleta").contains(rst.getString("referencia").trim())) {
-                            imp.setDescricaoCompleta(rst.getString("descricao") + " " + rst.getString("referencia"));
-                        }
-                    }
-
                     result.add(imp);
                 }
             }
@@ -358,7 +352,6 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	FOR_CEP cep,\n"
                     + "	FOR_FONE telefone,\n"
                     + " FOR_EMAIL email,\n"
-                    //+ " FOR_FAX fax,\n"
                     + "	FOR_CONTATO contato,\n"
                     + "	FOR_OBSERV observacao\n"
                     + "FROM\n"
@@ -377,7 +370,6 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
-                    //imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
