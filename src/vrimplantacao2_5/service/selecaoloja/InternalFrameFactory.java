@@ -5,6 +5,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrimplantacao2_5.gui.migracao2_5.Migracao2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
@@ -41,6 +42,8 @@ public abstract class InternalFrameFactory {
                 break;
             case GATEWAYSISTEMAS:
                 internalFrame = new GatewaySistemas2_5GUI(frame);
+            case SG:
+                internalFrame = new SG2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;                

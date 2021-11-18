@@ -34,7 +34,7 @@
                           <Component id="lblLojaOrigem" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="lblLojaVR" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="284" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="401" max="32767" attributes="0"/>
                   </Group>
                   <Component id="txtLojaVR" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">

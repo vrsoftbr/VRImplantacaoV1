@@ -155,6 +155,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_VRMASTER(182, "VRMASTER", 11, "POSTGRESQL", "vr", "postgres", "VrPost@Server", 8745),
     POSTGRESQL_WEBSAQ(188, "WEBSAQ", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_ZOOMBOX(194, "ZOOMBOX", 11, "POSTGRESQL", "", "", "", 5432),
+    POSTGRESQL_SG(199, "SG", 11, "POSTGRESQL", "cardoso_dbf", "postgres", "VrPost@Server", 5432),
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ARTSYSTEM(6, "ARTSYSTEM", 13, "SQLSERVER", "", "", "", 1433),

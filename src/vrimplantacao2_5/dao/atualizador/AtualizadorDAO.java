@@ -238,9 +238,8 @@ public class AtualizadorDAO {
     }
     
     public void salvarScriptGetLojaOrigemSistemas(EScriptLojaOrigemSistema eScriptLojaOrigemSistema) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(
-                    "INSERT INTO implantacao2_5.sistemabancodadosscripts("
+        
+        String sql = "INSERT INTO implantacao2_5.sistemabancodadosscripts("
                     + "id_sistema, "
                     + "id_bancodados, "
                     + "script_getlojas"
@@ -248,8 +247,10 @@ public class AtualizadorDAO {
                     + "VALUES ("
                     + eScriptLojaOrigemSistema.getIdSistema() + ", "
                     + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
-                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');"
-            );
+                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
+        
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql);
         }
     }
     

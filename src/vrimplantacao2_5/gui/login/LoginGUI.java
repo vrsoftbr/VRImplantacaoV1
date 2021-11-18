@@ -1,6 +1,5 @@
 package vrimplantacao2_5.gui.login;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import vr.core.collection.Properties;
@@ -14,7 +13,6 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.gui.MenuGUI;
-import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.vo.enums;
 
 /**
@@ -14,7 +9,13 @@ public enum EScriptLojaOrigemSistema {
     GATEWAYSISTEMAS(198, 5,
             "SELECT l.COD_EMPRESA AS id, "
             + "(l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao "
-            + "FROM EMITENTE l ORDER BY 1");
+            + "FROM EMITENTE l ORDER BY 1"),
+    SG(199, 11, 
+            "select " +
+            "codfil99 id, " +
+            "cgcfil99 || '' - '' || apelido99 descricao " +
+            "from " +
+            "cadfil");
     
     private int idSistema;
     private int idBancoDados;

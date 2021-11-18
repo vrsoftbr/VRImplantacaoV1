@@ -140,6 +140,7 @@ public class App {
             callLogin(properties);
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             SplashScreen.dispose();
             Util.exibirMensagemErro(ex, "Atenção");
         }
