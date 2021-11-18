@@ -407,4 +407,21 @@ public class ProdutoDAO {
         }
         return result;
     }
+    
+    public void salvarLojaVirtual(ProdutoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtolojavirtual");
+
+            sql.put("id_produto", vo.getId());
+            sql.put("descricao", vo.getDescricaoCompleta());
+            sql.put("id_tipoorigemimagem", 1);
+
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+    }
 }

@@ -136,7 +136,8 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
         lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/disponivel_12.png")));
 
-        setDadosConexao("SISTEMA " + cfgVO.getSistema().getNome() + " - BANCO " + cfgVO.getBancoDados().getNome());
+        setDadosConexao("SISTEMA " + cfgVO.getSistema().getNome() + 
+                " - BANCO " + cfgVO.getBancoDados().getNome());
 
         atualizarParametros();
 

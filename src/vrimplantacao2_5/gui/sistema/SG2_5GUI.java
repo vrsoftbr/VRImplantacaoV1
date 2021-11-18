@@ -1,13 +1,15 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Frame;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.dao.sistema.SGDAO;
-import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class SG2_5GUI extends VRInternalFrame {    
@@ -22,20 +24,6 @@ public class SG2_5GUI extends VRInternalFrame {
         tabProdutos.carregarParametros(params, SISTEMA);
     }
     
-    private void gravarParametros() throws Exception {
-        Parametros params = Parametros.get();
-        tabProdutos.gravarParametros(params, SISTEMA);
-        params.put(pnlConn.getHost(), SISTEMA, "HOST");
-        params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
-        params.put(pnlConn.getPorta(), SISTEMA, "PORTA");
-        params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
-        params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
-
-        pnlConn.atualizarParametros();
-        
-        params.salvar();
-    }
-    
     public SG2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -46,15 +34,28 @@ public class SG2_5GUI extends VRInternalFrame {
         tabProdutos.setOpcoesDisponiveis(sgDAO);
         tabFornecedores.setOpcoesDisponiveis(sgDAO);
         tabClientes.setOpcoesDisponiveis(sgDAO);
+        tabProdutos.btnMapaTribut.setEnabled(false);
         
-        tabProdutos.tabParametros.add(pnlParametrosAdicionais);
-        tabProdutos.btnMapaTribut.setVisible(false);
-        
-        pnlConn.setOnConectar(new ConexaoEvent() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
-            public void executar() throws Exception {
-                tabProdutos.btnMapaTribut.setEnabled(true);
-                gravarParametros();
+            public MapaTributoProvider getProvider() {
+                return sgDAO;
+            }
+
+            @Override
+            public String getSistema() {
+                return sgDAO.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                sgDAO.setLojaOrigem(pnlConn.getLojaOrigem());
+                return sgDAO.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
             }
         });
         
@@ -63,6 +64,20 @@ public class SG2_5GUI extends VRInternalFrame {
         
         centralizarForm();
         this.setMaximum(false);  
+    }
+    
+    private void gravarParametros() throws Exception {
+        Parametros params = Parametros.get();        
+        tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(pnlConn.getHost(), SISTEMA, "HOST");
+        params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
+        params.put(pnlConn.getPorta(), SISTEMA, "PORTA");
+        params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
+        params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
+
+        pnlConn.atualizarParametros();
+        
+        params.salvar();
     }
     
     public void importarTabelas() throws Exception {
@@ -80,9 +95,14 @@ public class SG2_5GUI extends VRInternalFrame {
                     idLojaCliente = pnlConn.getLojaOrigem();
                     
                     Importador importador = new Importador(sgDAO);
+                    
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
+                    importador.setIdConexao(pnlConn.idConexao);
+                    
                     tabProdutos.setImportador(importador);
+                    tabFornecedores.setImportador(importador);
+                    tabClientes.setImportador(importador);
                     
                     if (tabMenu.getSelectedIndex() == 0) {
                         tabProdutos.executarImportacao();
@@ -90,7 +110,7 @@ public class SG2_5GUI extends VRInternalFrame {
                         tabClientes.executarImportacao();
                     }
                     
-                    gravarParametros();
+                    pnlConn.atualizarParametros();
                     
                     ProgressBar.dispose();
 
@@ -126,13 +146,6 @@ public class SG2_5GUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        grbPriorizarPreco = new javax.swing.ButtonGroup();
-        pnlParametrosAdicionais = new vr.view.components.panel.VRPanel();
-        rbnTabelaFormacaoPrecoProduto = new vr.view.components.radiobutton.VRRadioButton();
-        rbnTabelaPreco = new vr.view.components.radiobutton.VRRadioButton();
-        vRLabel9 = new vrframework.bean.label.VRLabel();
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
@@ -140,58 +153,12 @@ public class SG2_5GUI extends VRInternalFrame {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
             e1.printStackTrace();
         }
-
-        grbPriorizarPreco.add(rbnTabelaFormacaoPrecoProduto);
-        rbnTabelaFormacaoPrecoProduto.setSelected(true);
-        rbnTabelaFormacaoPrecoProduto.setText("FormacaoPrecoProduto");
-        rbnTabelaFormacaoPrecoProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbnTabelaFormacaoPrecoProdutoActionPerformed(evt);
-            }
-        });
-
-        grbPriorizarPreco.add(rbnTabelaPreco);
-        rbnTabelaPreco.setText("Preço");
-        rbnTabelaPreco.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbnTabelaPrecoActionPerformed(evt);
-            }
-        });
-
-        vRLabel9.setText("Escolha a tabela para gerar o preço");
-        vRLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-
-        javax.swing.GroupLayout pnlParametrosAdicionaisLayout = new javax.swing.GroupLayout(pnlParametrosAdicionais);
-        pnlParametrosAdicionais.setLayout(pnlParametrosAdicionaisLayout);
-        pnlParametrosAdicionaisLayout.setHorizontalGroup(
-            pnlParametrosAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlParametrosAdicionaisLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlParametrosAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(pnlParametrosAdicionaisLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(pnlParametrosAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rbnTabelaFormacaoPrecoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rbnTabelaPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        pnlParametrosAdicionaisLayout.setVerticalGroup(
-            pnlParametrosAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlParametrosAdicionaisLayout.createSequentialGroup()
-                .addGap(4, 4, 4)
-                .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(rbnTabelaFormacaoPrecoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rbnTabelaPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         setTitle("SG");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -241,6 +208,7 @@ public class SG2_5GUI extends VRInternalFrame {
         tabImportacao.addTab("Clientes", tabClientes);
 
         tabMenu.addTab("Importação", tabImportacao);
+        tabMenu.addTab("Balança", pnlBalanca);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -259,13 +227,11 @@ public class SG2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("SG");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -275,7 +241,6 @@ public class SG2_5GUI extends VRInternalFrame {
             this.setWaitCursor();
             gravarParametros();
             importarTabelas();
-
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 
@@ -288,29 +253,15 @@ public class SG2_5GUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
-    private void rbnTabelaFormacaoPrecoProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbnTabelaFormacaoPrecoProdutoActionPerformed
-
-    }//GEN-LAST:event_rbnTabelaFormacaoPrecoProdutoActionPerformed
-
-    private void rbnTabelaPrecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbnTabelaPrecoActionPerformed
-
-    }//GEN-LAST:event_rbnTabelaPrecoActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup grbPriorizarPreco;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
-    private vr.view.components.panel.VRPanel pnlParametrosAdicionais;
-    private vr.view.components.radiobutton.VRRadioButton rbnTabelaFormacaoPrecoProduto;
-    private vr.view.components.radiobutton.VRRadioButton rbnTabelaPreco;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
-    private vrframework.bean.label.VRLabel vRLabel9;
     // End of variables declaration//GEN-END:variables
 }

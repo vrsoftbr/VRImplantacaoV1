@@ -170,6 +170,10 @@ public class ProdutoRepositoryProvider {
     public void salvar(ProdutoVO prod) throws Exception {
         produtoDAO.salvar(prod);
     }
+    
+    public void salvarLojaVirtual(ProdutoVO prod) throws Exception {
+        produtoDAO.salvarLojaVirtual(prod);
+    }
 
     public void atualizar(ProdutoVO prod, Set<OpcaoProduto> opt) throws Exception {
         produtoDAO.atualizar(prod, opt);
