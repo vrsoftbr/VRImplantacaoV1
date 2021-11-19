@@ -37,6 +37,12 @@ public class MapaLojaController {
         
         configuracaoBaseDadosGUI.consultaConfiguracaoLoja();
     }
+
+    public void atualizarConsultarLojaMapeada(int idConexao) throws Exception {
+        lojasMapeadas = mapaLojaService.getLojaMapeada(idConexao);
+        
+        configuracaoBaseDadosGUI.atualizarConsultaConfiguracaoLoja(idConexao);
+    }
     
     public List<ConfiguracaoBancoLojaVO> getLojaMapeada() {
         return lojasMapeadas;
@@ -48,6 +54,6 @@ public class MapaLojaController {
     
     public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao, int idConexao) throws Exception {
         mapaLojaService.alterarSituacaoMigracao(idLojaOrigem, idLojaVR, situacaoMigracao);
-        //this.consultaLojaMapeada(idConexao);
+        this.atualizarConsultarLojaMapeada(idConexao);
     }
 }

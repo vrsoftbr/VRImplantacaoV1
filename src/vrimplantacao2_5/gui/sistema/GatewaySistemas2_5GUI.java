@@ -25,7 +25,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = new GatewaySistemasDAO();
     private MapaLojaController mapaLojaController = null;
-    private ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null ;
+    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -53,20 +53,22 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         String lojaOrigem = pnlConn.getLojaOrigem();
         int lojaVR = pnlConn.getLojaVR();
         
-        configuracaoBaseDadosGUI = new ConfiguracaoBaseDadosGUI(mdiFrame);
-        
         mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
         
         mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
     
-    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-       
+        
+        configuracaoBaseDadosGUI = baseDadosGui;
+        
         carregarParametros();
+        
+        tabProdutos.btnMapaTribut.setEnabled(false);
         
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
@@ -114,7 +116,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new GatewaySistemas2_5GUI(i_mdiFrame);
+                instance = new GatewaySistemas2_5GUI(i_mdiFrame, null);
             }
 
             instance.setVisible(true);
@@ -180,10 +182,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                             break;
                     }
                     
-                    gravarParametros();
-                    alterarSituacaoMigracao();
+                    gravarParametros();                    
                     
                     ProgressBar.dispose();
+                    
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                     
                 } catch (Exception ex) {                    
@@ -194,7 +196,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             }
         };
 
-        thread.start();
+        thread.start();        
     }
 
     @SuppressWarnings("unchecked")
@@ -228,6 +230,28 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
         setTitle("Importação Gateway Sistemas");
         setToolTipText("");
+        addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameClosing(evt);
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+        });
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentHidden(java.awt.event.ComponentEvent evt) {
+                formComponentHidden(evt);
+            }
+        });
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -407,6 +431,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
+            
             importarTabelas();
             
         } catch (Exception ex) {
@@ -416,6 +441,15 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
+
+    private void formComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentHidden
+       
+        
+    }//GEN-LAST:event_formComponentHidden
+
+    private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formInternalFrameClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;

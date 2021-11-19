@@ -10,6 +10,7 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao2_5.controller.selecaoloja.SelecaoLojaController;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.enums.ESistema;
@@ -24,12 +25,22 @@ public class SelecaoLojaGUI extends VRDialog {
     private SelecaoLojaController controller = null;
     private List<ConfiguracaoBancoLojaVO> lojas = null;
     private List<ConfiguracaoBaseDadosVO> conexoes = null;
+    public ConfiguracaoBaseDadosGUI baseDadosGUI = null;
     
     /**
      * Creates new form MigracaoGUI
      * @throws java.lang.Exception
      */
     public SelecaoLojaGUI() throws Exception {
+        initComponents();
+        
+        setConfiguracao();
+        
+    }
+    
+    public SelecaoLojaGUI(ConfiguracaoBaseDadosGUI baseDadosGUI) throws Exception {
+        this.baseDadosGUI = baseDadosGUI;
+        
         initComponents();
         
         setConfiguracao();
@@ -91,6 +102,20 @@ public class SelecaoLojaGUI extends VRDialog {
         internalFrame.setVisible(true);
     }
 
+    private void construirInternalFrame(ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+        ConfiguracaoBaseDadosVO configuracaoVO = conexoes.get(cboConexao.getSelectedIndex());
+        ESistema eSistema = ESistema.getById(configuracaoVO.getSistema().getId());
+        
+        VRInternalFrame internalFrame = controller.construirInternalFrame(eSistema, parentFrame, baseDadosGui);
+        
+        if (internalFrame == null) {
+            throw new VRException("Nenhuma tela encontrada para o sistema informado!");
+        }
+        
+        this.setVisible(false);
+        internalFrame.setVisible(true);
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -180,7 +205,7 @@ public class SelecaoLojaGUI extends VRDialog {
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
         try {
-            construirInternalFrame();
+            construirInternalFrame(this.baseDadosGUI);
         } catch (Exception ex) {
             ex.printStackTrace();
             Util.exibirMensagemErro(ex, "Seleção de Loja");

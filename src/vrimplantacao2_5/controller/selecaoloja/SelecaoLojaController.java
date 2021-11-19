@@ -3,6 +3,7 @@ package vrimplantacao2_5.controller.selecaoloja;
 import java.util.List;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.selecaoloja.SelecaoLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
@@ -34,5 +35,9 @@ public class SelecaoLojaController {
     
     public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
         return service.construirInternalFrame(sistema, frame);
+    }
+    
+    public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+        return service.construirInternalFrame(sistema, frame, baseDadosGui);
     }
 }

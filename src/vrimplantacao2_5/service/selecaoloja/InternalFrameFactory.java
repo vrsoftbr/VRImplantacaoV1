@@ -2,7 +2,7 @@ package vrimplantacao2_5.service.selecaoloja;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrimplantacao2_5.gui.migracao2_5.Migracao2_5GUI;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
@@ -40,7 +40,7 @@ public abstract class InternalFrameFactory {
                 internalFrame = new Hipcom2_5GUI(frame);
                 break;
             case GATEWAYSISTEMAS:
-                internalFrame = new GatewaySistemas2_5GUI(frame);
+                internalFrame = new GatewaySistemas2_5GUI(frame, null);
                 break;
             default:
                 internalFrame = null;                
@@ -48,4 +48,40 @@ public abstract class InternalFrameFactory {
 
         return internalFrame;
     }
+    
+    /**
+     * Build da interface GUI do sistema selecionado
+     * @param sistema Sistema informado na conexão
+     * @param frame MenuGUI
+     * @param baseDadosGui ConfiguracaoBaseDadoGUI
+     * @return VRInternalFrame desejado
+     * @throws Exception 
+     */
+    
+    public static VRInternalFrame getInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+        VRInternalFrame internalFrame;
+
+        switch (sistema) {
+            case SYSPDV:
+                internalFrame = new SysPdv2_5GUI(frame);
+                break;
+            case UNIPLUS:
+                internalFrame = new Uniplus2_5GUI(frame);
+                break;
+            case VRMASTER:
+                internalFrame = new VRToVR2_5GUI(frame);
+                break;
+            case HIPCOM:
+                internalFrame = new Hipcom2_5GUI(frame);
+                break;
+            case GATEWAYSISTEMAS:
+                internalFrame = new GatewaySistemas2_5GUI(frame, baseDadosGui);
+                break;
+            default:
+                internalFrame = null;                
+        }
+
+        return internalFrame;
+    }
+    
 }
