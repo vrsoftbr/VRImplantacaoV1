@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
-import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -798,7 +797,6 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
 
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -818,12 +816,12 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.ecf,\n"
                     + "	v.data data,\n"
                     + "	v.hora_gravacao horainicio,\n"
-                    + "	v.hora horatermino,\n"
-                    + "	v.vlr_liquido subtotalimpressora\n"
+                    + "	v.hora horatermino\n"
                     + "FROM\n"
                     + "	SM_MV_PDV_CB_CUP v\n"
                     + "WHERE\n"
                     + "	v.empresa = " + idLojaCliente + "\n"
+                    + " and modelo is not null\n"
                     + "	AND v.data BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "ORDER BY 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -872,7 +870,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
 
                     }
                 }
@@ -894,7 +892,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DSC descricao,\n"
                     + "	vi.QUANTIDADE,\n"
                     + "	vi.VLR_UNT precovenda,\n"
-                    + "	vi.VALOR_REAL total\n"
+                    + " (vi.vlr_ad*-1) desconto\n"
                     + "FROM\n"
                     + "	SM_MV_PDV_IT_CUP vi\n"
                     + "JOIN SM_MV_PDV_CB_CUP v\n"
@@ -906,6 +904,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN SM_CD_ES_PRODUTO p ON p.COD = vi.PRODUTO \n"
                     + "WHERE\n"
                     + "	v.EMPRESA = " + idLojaCliente + "\n"
+                    + " and v.modelo is not null and vi.ic <> 1\n"
                     + "	AND v.DATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
