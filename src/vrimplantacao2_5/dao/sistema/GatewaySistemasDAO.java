@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -31,6 +34,25 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Desenvolvimento
  */
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    private boolean temArquivoBalanca = false;
+    private boolean produtosBalancaIniciaCom20 = false;
+
+    public boolean getTemArquivoBalanca() {
+        return this.temArquivoBalanca;
+    }
+
+    public boolean getProdutosBalancaIniciaCom20() {
+        return this.produtosBalancaIniciaCom20;
+    }
+
+    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
+        this.temArquivoBalanca = temArquivoBalanca;
+    }
+
+    public void setProdutosBalancaIniciaCom20(boolean produtosBalancaIniciaCom20) {
+        this.produtosBalancaIniciaCom20 = produtosBalancaIniciaCom20;
+    }
 
     @Override
     public String getSistema() {
@@ -215,26 +237,53 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
                     + "ORDER BY 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
+                    if (getProdutosBalancaIniciaCom20()) {
+                        if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
-                        if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
+                            if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
 
-                            imp.setEan(rst.getString("ean").trim().substring(1));
-                        } else {
-                            imp.setEan(rst.getString("ean"));
+                                imp.setEan(rst.getString("ean").trim().substring(1));
+                            } else {
+                                imp.setEan(rst.getString("ean"));
+                            }
                         }
+                    } else {
+                        imp.setEan(rst.getString("ean"));
                     }
 
-                    if ("Balan".equals(rst.getString("tipo")) || "Peso".equals(rst.getString("tipo"))) {
-                        imp.seteBalanca(true);
+                    if (getTemArquivoBalanca()) {
+
+                        ProdutoBalancaVO produtoBalanca;
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(imp.getEan());
+
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+
                     } else {
-                        imp.seteBalanca(false);
+                        if ("Balan".equals(rst.getString("tipo")) || "Peso".equals(rst.getString("tipo"))) {
+                            imp.seteBalanca(true);
+                        } else {
+                            imp.seteBalanca(false);
+                        }
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
