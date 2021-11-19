@@ -112,8 +112,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         pnlConn.setSistema(ESistema.GATEWAYSISTEMAS);
         pnlConn.getNomeConexao();
-
-        //tabs.remove(0);
         
         centralizarForm();
         this.setMaximum(false);
