@@ -34,8 +34,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         tabProdutos.carregarParametros(params, SISTEMA);
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
-        chkProdTemArquivoBalanca.setSelected(params.getBool("TEM ARQUIVO DE BALANCA"));
-        chkProdutoBalancaIniciaCom20.setSelected(params.getBool("PRODUTO DE BALANCA INICIA COM 20"));
+        chkProdTemArquivoBalanca.setSelected(params.getBool(SISTEMA, "TEM ARQUIVO DE BALANCA"));
+        chkProdutoBalancaIniciaCom20.setSelected(params.getBool(SISTEMA, "PRODUTO DE BALANCA INICIA COM 20"));
     }
 
     private void gravarParametros() throws Exception {
