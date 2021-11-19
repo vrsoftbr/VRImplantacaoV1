@@ -17,6 +17,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -356,6 +357,51 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
                     imp.setEmail(rs.getString("email"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	c.lansai60 id,\n" +
+                    "	cp.codcli10 id_cliente,\n" +
+                    "	cp.cgccpf10 cnpj,\n" +
+                    "	cp.razsoc10 razao,\n" +
+                    "	c.numdoc60 documento,\n" +
+                    "	c.datemis60 emissao,\n" +
+                    "	c.datvenc60 vencimento,\n" +
+                    "	c.valor60 valor,\n" +
+                    "	c.valrec60 valorecebido,\n" +
+                    "	c.datrec60 recebimento,\n" +
+                    "	c.jurosrec60 juros,\n" +
+                    "	c.observ60 observacao,\n" +
+                    "	c.clifor60 tipo\n" +
+                    "from \n" +
+                    "	conrec c\n" +
+                    "inner join clipdv cp on c.codcli60 = cp.codcli10\n" +
+                    "where \n" +
+                    "	c.codfil60 = " + getLojaOrigem() + " and\n" +
+                    "   c.datrec60 is null")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setNumeroCupom(rs.getString("documento"));
                     
                     result.add(imp);
                 }
