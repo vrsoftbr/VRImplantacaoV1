@@ -35,7 +35,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     public static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private static MapaLojaGUI mapaLojaGUI = null;
-    private SelecaoLojaGUI migracaoGUI = null;
+    private SelecaoLojaGUI migracaoGUI = new SelecaoLojaGUI();
 
     private ConfiguracaoBaseDadosController controller = null;
     private MapaLojaController mapaController = null;
@@ -44,6 +44,9 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
 
     private MigracaoSistemasController migracaoSistemasController = null;
+    
+    private int idConexao;
+    
     /**
      * Creates new form ConfiguracaoPrincipalGUI
      * @param menuGUI
@@ -210,7 +213,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
 
-    public void consultaConfiguracaoLoja() throws Exception {
+    public void consultaConfiguracaoLoja() throws Exception {        
         List<ConfiguracaoBancoLojaVO> lojas = mapaController.getLojaMapeada();
 
         Object[][] dados = new Object[lojas.size()][7];
@@ -237,6 +240,20 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
 
+    public void atualizarConsultaConfiguracaoLoja(int idConexao) {
+        
+        try {
+            this.idConexao = idConexao;
+            
+            mapaController.consultaLojaMapeada(idConexao);
+            
+            this.repaint();
+            
+        } catch (Exception ex ) {
+            Util.exibirMensagemErro(ex, title);
+        }
+    }
+    
     @Override
     public void excluir() {
         try {
@@ -358,7 +375,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -571,7 +588,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     public void exibirSelecaoLoja() {
         try {
             if (migracaoGUI == null || !migracaoGUI.isActive()) {
-                migracaoGUI = new SelecaoLojaGUI();
+                migracaoGUI = new SelecaoLojaGUI(this);
             }
 
             migracaoGUI.parentFrame = this.parentFrame;

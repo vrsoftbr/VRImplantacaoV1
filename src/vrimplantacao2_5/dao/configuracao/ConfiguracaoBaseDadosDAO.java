@@ -202,6 +202,7 @@ public class ConfiguracaoBaseDadosDAO {
                     mapaLojaVO.setSituacaoMigracao(ESituacaoMigracao.
                             getById(rs.getInt("id_situacaomigracao")));
                     mapaLojaVO.setDataCadastro(rs.getDate("datacadastro"));
+                    mapaLojaVO.setIdConexao(rs.getInt("id_conexao"));
 
                     result.add(mapaLojaVO);
                 }

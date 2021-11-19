@@ -5,6 +5,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
 import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.enums.ESistema;
@@ -56,4 +57,9 @@ public class SelecaoLojaService {
     public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
         return InternalFrameFactory.getInternalFrame(sistema, frame);
     }
+    
+    public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+        return InternalFrameFactory.getInternalFrame(sistema, frame, baseDadosGui);
+    }
+    
 }
