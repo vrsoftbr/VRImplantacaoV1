@@ -37,6 +37,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
 
     private boolean temArquivoBalanca = false;
     private boolean produtosBalancaIniciaCom20 = false;
+    private boolean migrarProdutosAtivos = false;
 
     public boolean getTemArquivoBalanca() {
         return this.temArquivoBalanca;
@@ -46,12 +47,20 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
         return this.produtosBalancaIniciaCom20;
     }
 
+    public boolean getMigrarProdutosAtivos() {
+        return this.migrarProdutosAtivos;
+    }
+
     public void setTemArquivoBalanca(boolean temArquivoBalanca) {
         this.temArquivoBalanca = temArquivoBalanca;
     }
 
     public void setProdutosBalancaIniciaCom20(boolean produtosBalancaIniciaCom20) {
         this.produtosBalancaIniciaCom20 = produtosBalancaIniciaCom20;
+    }
+
+    public void setMigrarProdutosAtivo(boolean migrarProdutosAtivos) {
+        this.migrarProdutosAtivos = migrarProdutosAtivos;
     }
 
     @Override
@@ -235,6 +244,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
+                    + (getMigrarProdutosAtivos() ? " WHERE e.ATIVO = 1\n" : "")
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
