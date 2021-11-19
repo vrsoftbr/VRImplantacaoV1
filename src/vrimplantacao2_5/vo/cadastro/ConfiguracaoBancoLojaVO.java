@@ -17,6 +17,7 @@ public class ConfiguracaoBancoLojaVO {
     private Date dataCadastro;
     private ESituacaoMigracao situacaoMigracao;
     private boolean lojaMatriz;
+    private int idConexao;
 
     public int getId() {
         return id;
@@ -80,5 +81,13 @@ public class ConfiguracaoBancoLojaVO {
     
     public void setDescricaoLojaOrigem(String descricaoLojaOrigem) {
         this.descricaoLojaOrigem = descricaoLojaOrigem;
+    }
+    
+    public int getIdConexao() {
+        return this.idConexao;
+    }
+    
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
     }
 }
