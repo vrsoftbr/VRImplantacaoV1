@@ -16,6 +16,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -299,6 +300,62 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	c.codcli10 id,\n" +
+                    "	c.razsoc10 razao,\n" +
+                    "	c.nomefan10,\n" +
+                    "	c.cgccpf10 cnpj,\n" +
+                    "	c.insccli10 ie,\n" +
+                    "	c.endcli10 endereco,\n" +
+                    "	c.numendcl10 numero,\n" +
+                    "	c.bairro10 bairro,\n" +
+                    "	c.cepcli10 cep,\n" +
+                    "	m.codibge ibge_municipio,\n" +
+                    "	m.nome municipio,\n" +
+                    "	m.uf,\n" +
+                    "	c.fonecli10 telefone,\n" +
+                    "	c.celcli10 celular,\n" +
+                    "	c.datacad10 cadastro,\n" +
+                    "	c.limcompr10 valorlimite,\n" +
+                    "	c.situacao10 situacao,\n" +
+                    "	c.emailcli10 email\n" +
+                    "from \n" +
+                    "	clipdv c\n" +
+                    "left join tabmun m on c.codmunic10 = m.codigo")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("nomefan10"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setMunicipioIBGE(rs.getInt("ibge_municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setValorLimite(rs.getDouble("valorlimite"));
+                    imp.setEmail(rs.getString("email"));
                     
                     result.add(imp);
                 }
