@@ -26,6 +26,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private GatewaySistemasDAO dao = new GatewaySistemasDAO();
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
+    private Thread thread = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -128,7 +129,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
-        Thread thread = new Thread() {
+        thread = new Thread() {
             DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
             String strVendaDataInicio = "";
             String strVendaDataFim = "";
@@ -188,6 +189,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                     
+                    alterarSituacaoMigracao();
+                    
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
                     ex.printStackTrace();
@@ -196,7 +199,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             }
         };
 
-        thread.start();        
+        thread.start();
+        //thread.join();
     }
 
     @SuppressWarnings("unchecked")
