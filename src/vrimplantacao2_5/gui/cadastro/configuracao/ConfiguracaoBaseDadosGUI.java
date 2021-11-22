@@ -303,8 +303,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         lblBD = new vrframework.bean.label.VRLabel();
         cboBD = new vrframework.bean.comboBox.VRComboBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
-        btnMapear = new vrframework.bean.button.VRButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         tblLoja = new vrframework.bean.tableEx.VRTableEx();
+        btnMapear = new vrframework.bean.button.VRButton();
         btnExcluirLoja = new vrframework.bean.button.VRButton();
         btnSalvar = new vrframework.bean.button.VRButton();
         tabConexao = new vrframework.bean.tabbedPane.VRTabbedPane();
@@ -333,7 +335,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             }
         });
 
-        pnlLoja.setBorder(javax.swing.BorderFactory.createTitledBorder("Loja"));
+        pnlLoja.setBorder(javax.swing.BorderFactory.createTitledBorder("Loja / Opções De Migração"));
 
         btnMapear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/configurar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMapear, "Mapear Loja");
@@ -352,31 +354,48 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 546, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(0, 0, Short.MAX_VALUE)))
+                    .addContainerGap()))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 155, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        jTabbedPane1.addTab("Mapeamento de Lojas", jPanel1);
+
         javax.swing.GroupLayout pnlLojaLayout = new javax.swing.GroupLayout(pnlLoja);
         pnlLoja.setLayout(pnlLojaLayout);
         pnlLojaLayout.setHorizontalGroup(
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLojaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(pnlLojaLayout.createSequentialGroup()
-                        .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+            .addComponent(jTabbedPane1)
         );
         pnlLojaLayout.setVerticalGroup(
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLojaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jTabbedPane1)
         );
 
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
@@ -511,8 +530,16 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnDicaActionPerformed
 
+    private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
+        exibirSelecaoLoja();
+    }//GEN-LAST:event_btnProximoActionPerformed
+
+    private void btnExcluirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirLojaActionPerformed
+        excluir();
+    }//GEN-LAST:event_btnExcluirLojaActionPerformed
+
     private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
-        
+
         try {
             selecionarBancoDados();
             selecionarSistema();
@@ -520,16 +547,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
         }
-        
+
     }//GEN-LAST:event_btnMapearActionPerformed
-
-    private void btnExcluirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirLojaActionPerformed
-        excluir();
-    }//GEN-LAST:event_btnExcluirLojaActionPerformed
-
-    private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
-        exibirSelecaoLoja();
-    }//GEN-LAST:event_btnProximoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -540,6 +559,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnSalvar;
     private vrframework.bean.comboBox.VRComboBox cboBD;
     private vrframework.bean.comboBox.VRComboBox cboSistema;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private vrframework.bean.label.VRLabel lblBD;
     private vrframework.bean.label.VRLabel lblComplemento;
     private vrframework.bean.label.VRLabel lblNomeCon;
