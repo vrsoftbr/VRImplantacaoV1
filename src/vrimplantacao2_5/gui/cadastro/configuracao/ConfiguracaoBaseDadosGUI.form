@@ -136,7 +136,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Loja / Op&#xe7;&#xf5;es De Migra&#xe7;&#xe3;o"/>
+            <TitledBorder title="Mapeamento de Lojas / Op&#xe7;&#xf5;es De Migra&#xe7;&#xe3;o"/>
           </Border>
         </Property>
       </Properties>
@@ -170,7 +170,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="546" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="548" max="32767" attributes="0"/>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -231,6 +231,99 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExcluirLojaActionPerformed"/>
                   </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel2">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Op&#xe7;&#xf5;es de Migra&#xe7;&#xe3;o">
+                    <Property name="tabTitle" type="java.lang.String" value="Op&#xe7;&#xf5;es de Migra&#xe7;&#xe3;o"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkOptMigrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarContasPagar" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarClientesPreferenciais" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="104" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkOptMigrarProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarClientesPreferenciais" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkOptMigrarFornecedores" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarReceberCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkOptMigrarProdutosFornecedores" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarReceberCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="48" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Produtos"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFornecedores">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Fornecedores"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutosFornecedores">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Produtos Fornecedores"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarContasPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Contas &#xe0; Pagar (Fornecedor)"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCreditoRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Receber Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarClientesPreferenciais">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Clientes Preferenciais"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCheque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Receber Cheque"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
