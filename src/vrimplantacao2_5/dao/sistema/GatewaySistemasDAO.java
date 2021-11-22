@@ -38,6 +38,13 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
     private boolean temArquivoBalanca = false;
     private boolean produtosBalancaIniciaCom20 = false;
     private boolean migrarProdutosAtivos = false;
+    
+    private boolean migrarMercadologicos = false;
+    private boolean migrarProdutos = false;
+    private boolean migrarFornecedores = false;
+    private boolean migrarProdutosFornecedores = false;
+    private boolean migrarClientesPreferenciais = false;
+    private boolean migrarReceberCreditoRotativo = false;
 
     public boolean getTemArquivoBalanca() {
         return this.temArquivoBalanca;
