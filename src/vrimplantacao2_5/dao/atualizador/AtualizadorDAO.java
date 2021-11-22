@@ -45,7 +45,7 @@ public class AtualizadorDAO {
     }
 
     public void criarConstraint() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = Conexao.createStatement()) { 
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "distinct conname "

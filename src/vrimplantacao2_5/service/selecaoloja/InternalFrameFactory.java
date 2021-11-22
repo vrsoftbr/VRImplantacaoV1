@@ -81,6 +81,9 @@ public abstract class InternalFrameFactory {
             case GATEWAYSISTEMAS:
                 internalFrame = new GatewaySistemas2_5GUI(frame, baseDadosGui);
                 break;
+            case SG:
+                internalFrame = new SG2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;                
         }

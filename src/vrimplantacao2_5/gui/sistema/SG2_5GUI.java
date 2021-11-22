@@ -12,22 +12,22 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class SG2_5GUI extends VRInternalFrame {    
-    
+public class SG2_5GUI extends VRInternalFrame {
+
     private static final String SISTEMA = ESistema.SG.getNome();
     private static SG2_5GUI instance;
-    
+
     private final SGDAO sgDAO = new SGDAO();
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
-    
+
     public SG2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
@@ -35,7 +35,7 @@ public class SG2_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(sgDAO);
         tabClientes.setOpcoesDisponiveis(sgDAO);
         tabProdutos.btnMapaTribut.setEnabled(false);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
@@ -58,16 +58,16 @@ public class SG2_5GUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
-        
+
         pnlConn.setSistema(ESistema.SG);
         pnlConn.getNomeConexao();
-        
+
         centralizarForm();
-        this.setMaximum(false);  
+        this.setMaximum(false);
     }
-    
+
     private void gravarParametros() throws Exception {
-        Parametros params = Parametros.get();        
+        Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(pnlConn.getHost(), SISTEMA, "HOST");
         params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
@@ -76,46 +76,56 @@ public class SG2_5GUI extends VRInternalFrame {
         params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
 
         pnlConn.atualizarParametros();
-        
+
         params.salvar();
     }
-    
+
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
             String lojaMesmoID;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
-                    ProgressBar.setCancel(true);                   
-                    
-                    idLojaVR = pnlConn.getLojaVR();                                        
+                    ProgressBar.setCancel(true);
+
+                    idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
-                    
+
                     Importador importador = new Importador(sgDAO);
-                    
+
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
-                    
+
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
+
                     if (tabMenu.getSelectedIndex() == 0) {
-                        tabProdutos.executarImportacao();
-                        tabFornecedores.executarImportacao();
-                        tabClientes.executarImportacao();
+                        switch (tabImportacao.getSelectedIndex()) {
+                            case 0:
+                                tabProdutos.executarImportacao();
+                                break;
+                            case 1:
+                                tabFornecedores.executarImportacao();
+                                break;
+                            case 2:
+                                tabClientes.executarImportacao();
+                                break;
+                            default: break;
+                        }
                     }
-                    
+
                     pnlConn.atualizarParametros();
-                    
+
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
+
                     pnlConn.fecharConexao();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
@@ -126,10 +136,10 @@ public class SG2_5GUI extends VRInternalFrame {
 
         thread.start();
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new SG2_5GUI(i_mdiFrame);
             }

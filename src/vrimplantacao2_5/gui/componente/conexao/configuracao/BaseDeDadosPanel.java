@@ -169,7 +169,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
-
+        
         final String SISTEMA = cfgVO.getSistema().getNome();
         final String ENGINE = cfgVO.getBancoDados().getNome();
         
