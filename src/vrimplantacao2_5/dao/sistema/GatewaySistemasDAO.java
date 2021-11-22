@@ -17,6 +17,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -28,6 +29,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 /**
  *
@@ -35,41 +37,14 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private boolean temArquivoBalanca = false;
-    private boolean produtosBalancaIniciaCom20 = false;
-    private boolean migrarProdutosAtivos = false;
+    public GatewaySistemasVO gatewaySistemasVO = null;
     
-    private boolean migrarMercadologicos = false;
-    private boolean migrarProdutos = false;
-    private boolean migrarFornecedores = false;
-    private boolean migrarProdutosFornecedores = false;
-    private boolean migrarClientesPreferenciais = false;
-    private boolean migrarReceberCreditoRotativo = false;
-
-    public boolean getTemArquivoBalanca() {
-        return this.temArquivoBalanca;
+    public GatewaySistemasDAO() {}
+    
+    public GatewaySistemasDAO(GatewaySistemasVO gatewaySistemasVO) {
+        this.gatewaySistemasVO = gatewaySistemasVO;
     }
-
-    public boolean getProdutosBalancaIniciaCom20() {
-        return this.produtosBalancaIniciaCom20;
-    }
-
-    public boolean getMigrarProdutosAtivos() {
-        return this.migrarProdutosAtivos;
-    }
-
-    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
-        this.temArquivoBalanca = temArquivoBalanca;
-    }
-
-    public void setProdutosBalancaIniciaCom20(boolean produtosBalancaIniciaCom20) {
-        this.produtosBalancaIniciaCom20 = produtosBalancaIniciaCom20;
-    }
-
-    public void setMigrarProdutosAtivo(boolean migrarProdutosAtivos) {
-        this.migrarProdutosAtivos = migrarProdutosAtivos;
-    }
-
+    
     @Override
     public String getSistema() {
         return "Gateway Sistemas";
@@ -251,7 +226,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
-                    + (getMigrarProdutosAtivos() ? " WHERE e.ATIVO = 1\n" : "")
+                    + (gatewaySistemasVO.getMigrarProdutosAtivos() ? " WHERE e.ATIVO = 1\n" : "")
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -261,7 +236,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    if (getProdutosBalancaIniciaCom20()) {
+                    if (gatewaySistemasVO.getProdutosBalancaIniciaCom20()) {
                         if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
                             if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
@@ -275,7 +250,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setEan(rst.getString("ean"));
                     }
 
-                    if (getTemArquivoBalanca()) {
+                    if (gatewaySistemasVO.getTemArquivoBalanca()) {
 
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;

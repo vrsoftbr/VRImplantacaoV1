@@ -16,6 +16,7 @@ import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
@@ -23,7 +24,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private static GatewaySistemas2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private GatewaySistemasDAO dao = new GatewaySistemasDAO();
+    private GatewaySistemasDAO dao = null;
+    private GatewaySistemasVO gatewaySistemasVO = new GatewaySistemasVO();
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private Thread thread = null;
@@ -64,6 +66,30 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
+
+    private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
+        
+        GatewaySistemasVO vo = new GatewaySistemasVO();
+        
+        Parametros params = Parametros.get();
+        vo.setMigrarMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
+        vo.setMigrarFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
+        vo.setMigrarProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
+        vo.setMigrarFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
+        vo.setMigrarProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
+        vo.setMigrarContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
+        vo.setMigrarClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
+        vo.setMigrarClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
+        vo.setMigrarReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
+        vo.setMigrarReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));
+        vo.setMigrarVendas(params.getBool("OPCAO MIGRACAO", "MIGRAR VENDAS"));
+        
+        vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
+        vo.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
+        vo.setMigrarProdutosAtivo(chkProdImportarProdutosAtivos.isSelected());
+        
+        return vo;        
+    }
     
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
@@ -74,9 +100,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         configuracaoBaseDadosGUI = baseDadosGui;
         
         carregarParametros();
+
+        dao = new GatewaySistemasDAO(carregarOpcaoesMigracaoSistema());
         
-        tabProdutos.btnMapaTribut.setEnabled(false);
-        
+        tabProdutos.btnMapaTribut.setEnabled(false);        
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -149,10 +176,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
-
-                    dao.setTemArquivoBalanca(chkTemArquivoBalancaUnificacao.isSelected());
-                    dao.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
-                    dao.setMigrarProdutosAtivo(chkProdImportarProdutosAtivos.isSelected());
+                    
+                    gatewaySistemasVO.setTemArquivoBalanca(chkTemArquivoBalancaUnificacao.isSelected());
+                    gatewaySistemasVO.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
+                    gatewaySistemasVO.setMigrarProdutosAtivo(chkProdImportarProdutosAtivos.isSelected());
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
