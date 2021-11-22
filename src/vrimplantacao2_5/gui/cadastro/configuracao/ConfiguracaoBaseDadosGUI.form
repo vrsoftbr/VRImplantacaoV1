@@ -144,7 +144,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jTabbedPane1" alignment="0" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" alignment="0" pref="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -170,7 +170,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="548" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="546" max="32767" attributes="0"/>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -190,7 +190,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="155" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="175" max="32767" attributes="0"/>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -199,7 +199,7 @@
                                   <Component id="btnExcluirLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="tblLoja" pref="102" max="32767" attributes="0"/>
+                              <Component id="tblLoja" pref="122" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -249,42 +249,59 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkOptMigrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarContasPagar" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkOptMigrarFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkOptMigrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkOptMigrarMercadologicos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkOptMigrarFamiliasProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace min="-2" pref="79" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkOptMigrarClientesPreferenciais" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <Component id="chkOptMigrarProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="238" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarClientesPreferenciais" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="104" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkOptMigrarProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarMercadologicos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkOptMigrarClientesPreferenciais" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkOptMigrarFornecedores" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarReceberCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkOptMigrarProdutosFornecedores" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarFamiliasProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkOptMigrarReceberCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkOptMigrarProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOptMigrarReceberCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarFornecedores" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarProdutosFornecedores" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="48" max="32767" attributes="0"/>
+                          <EmptySpace pref="18" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -323,6 +340,16 @@
                 <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Migrar Receber Cheque"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarMercadologicos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Mercadol&#xf3;gicos"/>
+                  </Properties>
+                </Component>
+                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFamiliasProdutos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Migrar Fam&#xed;lias Produto"/>
                   </Properties>
                 </Component>
               </SubComponents>
