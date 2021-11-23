@@ -346,7 +346,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkCargo = new vrframework.bean.checkBox.VRCheckBox();
         chkDataAdmissao = new vrframework.bean.checkBox.VRCheckBox();
         chkSalario = new vrframework.bean.checkBox.VRCheckBox();
-        jPanel1 = new javax.swing.JPanel();
+        tabClienteEventual = new javax.swing.JPanel();
         pnlDados1 = new vrframework.bean.panel.VRPanel();
         jLabel12 = new javax.swing.JLabel();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -773,20 +773,20 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout tabClienteEventualLayout = new javax.swing.GroupLayout(tabClienteEventual);
+        tabClienteEventual.setLayout(tabClienteEventualLayout);
+        tabClienteEventualLayout.setHorizontalGroup(
+            tabClienteEventualLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlDados1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        tabClienteEventualLayout.setVerticalGroup(
+            tabClienteEventualLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteEventualLayout.createSequentialGroup()
                 .addComponent(pnlDados1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 327, Short.MAX_VALUE))
         );
 
-        addTab("Importação Cliente Eventual", jPanel1);
+        addTab("Importação Cliente Eventual", tabClienteEventual);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "CREDITO ROTATIVO");
@@ -934,7 +934,6 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
-    public javax.swing.JPanel jPanel1;
     public vrframework.bean.panel.VRPanel pnlCheque;
     public vrframework.bean.panel.VRPanel pnlContato;
     public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
@@ -945,6 +944,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlEndereco;
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JPanel tabCheque;
+    public javax.swing.JPanel tabClienteEventual;
     public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
