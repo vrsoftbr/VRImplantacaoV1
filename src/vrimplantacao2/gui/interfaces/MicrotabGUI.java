@@ -24,7 +24,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class MicrotabGUI extends VRInternalFrame {
 
-    private static final String NOME_SISTEMA = "MSuper";
+    private static final String NOME_SISTEMA = "Microtab";
     private static final String SERVIDOR_SQL = "Firebird";
     private static MicrotabGUI instance;
 
@@ -179,19 +179,6 @@ public class MicrotabGUI extends VRInternalFrame {
                     
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    dao.utilizarSup025 = chkUtlizaSup025.isSelected();
-                    dao.apenasBaixadosContasPagar = chkCPBaixados.isSelected();
-                    dao.apenasBaixadosRotativo = chkRTBaixados.isSelected();
-
-                    if (chkRTBaixados.isSelected()) {
-                        dao.setDtInicioRotativo(txtDtIInicioRtSup025.getDate());
-                        dao.setDtFimRotativo(txtDtTerminoRtSup025.getDate());
-                    }
-                    
-                    if (chkCPBaixados.isSelected()) {
-                        dao.setCpDataInicio(txtDtIInicioCp.getDate());
-                        dao.setCpDataTermino(txtDtTerminoCp.getDate());
-                    }
 
                     switch (tab.getSelectedIndex()) {
                         case 0:
@@ -222,10 +209,10 @@ public class MicrotabGUI extends VRInternalFrame {
                             break;
                         case 5:
                             if (chkPdvVendas.isSelected()) {
-                                dao.setVendaDataInicio(txtDtIInicioVenda.getDate());
-                                dao.setVendaDataTermino(txtDtTerminoVenda.getDate());
+                                //dao.setVendaDataInicio(txtDtIInicioVenda.getDate());
+                                //dao.setVendaDataTermino(txtDtTerminoVenda.getDate());
 
-                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                                //importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                             }
                         default:
                             break;
