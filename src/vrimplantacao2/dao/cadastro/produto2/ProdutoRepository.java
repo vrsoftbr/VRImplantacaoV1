@@ -209,8 +209,10 @@ public class ProdutoRepository {
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
                         
-                        if(prod.getDescricaoCompleta() != null && prod.getDescricaoCompleta().length() >= 3) {
-                            provider.salvarLojaVirtual(prod);
+                        if(prod.getDescricaoCompleta() != null && 
+                                prod.getDescricaoCompleta().length() >= 3 && 
+                                    ean > 999999) {
+                            provider.salvarLojaVirtual(prod, ean);
                         }
 
                         if (aliquota.getBeneficio() != 0) {

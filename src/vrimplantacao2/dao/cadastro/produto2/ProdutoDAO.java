@@ -408,7 +408,7 @@ public class ProdutoDAO {
         return result;
     }
     
-    public void salvarLojaVirtual(ProdutoVO vo) throws Exception {
+    public void salvarLojaVirtual(ProdutoVO vo, long ean) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produtolojavirtual");
@@ -417,6 +417,10 @@ public class ProdutoDAO {
             sql.put("descricao", vo.getDescricaoCompleta());
             sql.put("id_tipoorigemimagem", 1);
 
+            if(versao.maiorQue(3, 21)) {
+                sql.put("codigobarras", ean);
+            }
+            
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
