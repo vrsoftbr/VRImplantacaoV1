@@ -15,38 +15,38 @@ public enum EOpcoesMigracaoSistema {
 
     private int idSistema;
     private int idBanco;
-    private boolean migrarFamiliaProduto;
-    private boolean migrarMercadologico;
-    private boolean migrarProduto;
-    private boolean migrarFornecedor;
-    private boolean migrarProdutoFornecedor;
-    private boolean migrarClientePreferencial;
-    private boolean migrarClienteEventual;
-    private boolean migrarCreditoRotativo;
-    private boolean migrarCheque;
-    private boolean migrarVenda;
-    private boolean migrarContasPagar;
+    private boolean habilitarMigracaoFamiliaProduto;
+    private boolean habilitarMigracaoMercadologico;
+    private boolean habilitarMigracaoProduto;
+    private boolean habilitarMigracaoFornecedor;
+    private boolean habilitarMigracaoProdutoFornecedor;
+    private boolean habilitarMigracaoClientePreferencial;
+    private boolean habilitarMigracaoClienteEventual;
+    private boolean habilitarMigracaoCreditoRotativo;
+    private boolean habilitarMigracaoCheque;
+    private boolean habilitarMigracaoVenda;
+    private boolean habilitarMigracaoContasPagar;
 
     EOpcoesMigracaoSistema(int idSistema, int idBanco,
-            boolean migrarFamiliaProduto, boolean migrarMercadologico,
-            boolean migrarProduto, boolean migrarFornecedor,
-            boolean migrarProdutoFornecedor, boolean migrarClientePreferencial,
-            boolean migrarClienteEventual, boolean migrarCreditoRotativo,
-            boolean migrarCheque, boolean migrarVenda, boolean migrarContasPagar) {
+            boolean habilitarMigracaoFamiliaProduto, boolean habilitarMigracaoMercadologico,
+            boolean habilitarMigracaoProduto, boolean habilitarMigracaoFornecedor,
+            boolean habilitarMigracaoProdutoFornecedor, boolean habilitarMigracaoClientePreferencial,
+            boolean habilitarMigracaoClienteEventual, boolean habilitarMigracaoCreditoRotativo,
+            boolean habilitarMigracaoCheque, boolean habilitarMigracaoVenda, boolean habilitarMigracaoContasPagar) {
 
         this.idSistema = idSistema;
         this.idBanco = idBanco;
-        this.migrarFamiliaProduto = migrarFamiliaProduto;
-        this.migrarMercadologico = migrarMercadologico;
-        this.migrarProduto = migrarProduto;
-        this.migrarFornecedor = migrarFornecedor;
-        this.migrarProdutoFornecedor = migrarProdutoFornecedor;
-        this.migrarClientePreferencial = migrarClientePreferencial;
-        this.migrarClienteEventual = migrarClienteEventual;
-        this.migrarCreditoRotativo = migrarCreditoRotativo;
-        this.migrarCheque = migrarCheque;
-        this.migrarVenda = migrarVenda;
-        this.migrarContasPagar = migrarContasPagar;
+        this.habilitarMigracaoFamiliaProduto = habilitarMigracaoFamiliaProduto;
+        this.habilitarMigracaoMercadologico = habilitarMigracaoMercadologico;
+        this.habilitarMigracaoProduto = habilitarMigracaoProduto;
+        this.habilitarMigracaoFornecedor = habilitarMigracaoFornecedor;
+        this.habilitarMigracaoProdutoFornecedor = habilitarMigracaoProdutoFornecedor;
+        this.habilitarMigracaoClientePreferencial = habilitarMigracaoClientePreferencial;
+        this.habilitarMigracaoClienteEventual = habilitarMigracaoClienteEventual;
+        this.habilitarMigracaoCreditoRotativo = habilitarMigracaoCreditoRotativo;
+        this.habilitarMigracaoCheque = habilitarMigracaoCheque;
+        this.habilitarMigracaoVenda = habilitarMigracaoVenda;
+        this.habilitarMigracaoContasPagar = habilitarMigracaoContasPagar;
     }
 
     public int getIdSistema() {
@@ -65,92 +65,92 @@ public enum EOpcoesMigracaoSistema {
         this.idBanco = idBanco;
     }
 
-    public boolean isMigrarFamiliaProduto() {
-        return migrarFamiliaProduto;
+    public boolean isHabilitarMigracaoFamiliaProduto() {
+        return habilitarMigracaoFamiliaProduto;
     }
 
-    public void setMigrarFamiliaProduto(boolean migrarFamiliaProduto) {
-        this.migrarFamiliaProduto = migrarFamiliaProduto;
+    public void setHabilitarMigracaoFamiliaProduto(boolean habilitarMigracaoFamiliaProduto) {
+        this.habilitarMigracaoFamiliaProduto = habilitarMigracaoFamiliaProduto;
     }
 
-    public boolean isMigrarMercadologico() {
-        return migrarMercadologico;
+    public boolean isHabilitarMigracaoMercadologico() {
+        return habilitarMigracaoMercadologico;
     }
 
-    public void setMigrarMercadologico(boolean migrarMercadologico) {
-        this.migrarMercadologico = migrarMercadologico;
+    public void setHabilitarMigracaoMercadologico(boolean habilitarMigracaoMercadologico) {
+        this.habilitarMigracaoMercadologico = habilitarMigracaoMercadologico;
     }
 
-    public boolean isMigrarProduto() {
-        return migrarProduto;
+    public boolean isHabilitarMigracaoProduto() {
+        return habilitarMigracaoProduto;
     }
 
-    public void setMigrarProduto(boolean migrarProduto) {
-        this.migrarProduto = migrarProduto;
+    public void setHabilitarMigracaoProduto(boolean habilitarMigracaoProduto) {
+        this.habilitarMigracaoProduto = habilitarMigracaoProduto;
     }
 
-    public boolean isMigrarFornecedor() {
-        return migrarFornecedor;
+    public boolean isHabilitarMigracaoFornecedor() {
+        return habilitarMigracaoFornecedor;
     }
 
-    public void setMigrarFornecedor(boolean migrarFornecedor) {
-        this.migrarFornecedor = migrarFornecedor;
+    public void setHabilitarMigracaoFornecedor(boolean habilitarMigracaoFornecedor) {
+        this.habilitarMigracaoFornecedor = habilitarMigracaoFornecedor;
     }
 
-    public boolean isMigrarProdutoFornecedor() {
-        return migrarProdutoFornecedor;
+    public boolean isHabilitarMigracaoProdutoFornecedor() {
+        return habilitarMigracaoProdutoFornecedor;
     }
 
-    public void setMigrarProdutoFornecedor(boolean migrarProdutoFornecedor) {
-        this.migrarProdutoFornecedor = migrarProdutoFornecedor;
+    public void setHabilitarMigracaoProdutoFornecedor(boolean habilitarMigracaoProdutoFornecedor) {
+        this.habilitarMigracaoProdutoFornecedor = habilitarMigracaoProdutoFornecedor;
     }
 
-    public boolean isMigrarClientePreferencial() {
-        return migrarClientePreferencial;
+    public boolean isHabilitarMigracaoClientePreferencial() {
+        return habilitarMigracaoClientePreferencial;
     }
 
-    public void setMigrarClientePreferencial(boolean migrarClientePreferencial) {
-        this.migrarClientePreferencial = migrarClientePreferencial;
+    public void setHabilitarMigracaoClientePreferencial(boolean habilitarMigracaoClientePreferencial) {
+        this.habilitarMigracaoClientePreferencial = habilitarMigracaoClientePreferencial;
     }
 
-    public boolean isMigrarClienteEventual() {
-        return migrarClienteEventual;
+    public boolean isHabilitarMigracaoClienteEventual() {
+        return habilitarMigracaoClienteEventual;
     }
 
-    public void setMigrarClienteEventual(boolean migrarClienteEventual) {
-        this.migrarClienteEventual = migrarClienteEventual;
+    public void setHabilitarMigracaoClienteEventual(boolean habilitarMigracaoClienteEventual) {
+        this.habilitarMigracaoClienteEventual = habilitarMigracaoClienteEventual;
     }
 
-    public boolean isMigrarCreditoRotativo() {
-        return migrarCreditoRotativo;
+    public boolean isHabilitarMigracaoCreditoRotativo() {
+        return habilitarMigracaoCreditoRotativo;
     }
 
-    public void setMigrarCreditoRotativo(boolean migrarCreditoRotativo) {
-        this.migrarCreditoRotativo = migrarCreditoRotativo;
+    public void setHabilitarMigracaoCreditoRotativo(boolean habilitarMigracaoCreditoRotativo) {
+        this.habilitarMigracaoCreditoRotativo = habilitarMigracaoCreditoRotativo;
     }
 
-    public boolean isMigrarCheque() {
-        return migrarCheque;
+    public boolean isHabilitarMigracaoCheque() {
+        return habilitarMigracaoCheque;
     }
 
-    public void setMigrarCheque(boolean migrarCheque) {
-        this.migrarCheque = migrarCheque;
+    public void setHabilitarMigracaoCheque(boolean habilitarMigracaoCheque) {
+        this.habilitarMigracaoCheque = habilitarMigracaoCheque;
     }
 
-    public boolean isMigrarVenda() {
-        return migrarVenda;
+    public boolean isHabilitarMigracaoVenda() {
+        return habilitarMigracaoVenda;
     }
 
-    public void setMigrarVenda(boolean migrarVenda) {
-        this.migrarVenda = migrarVenda;
+    public void setHabilitarMigracaoVenda(boolean habilitarMigracaoVenda) {
+        this.habilitarMigracaoVenda = habilitarMigracaoVenda;
     }
 
-    public boolean isMigrarContasPagar() {
-        return migrarContasPagar;
+    public boolean isHabilitarMigracaoContasPagar() {
+        return habilitarMigracaoContasPagar;
     }
 
-    public void setMigrarContasPagar(boolean migrarContasPagar) {
-        this.migrarContasPagar = migrarContasPagar;
+    public void setHabilitarMigracaoContasPagar(boolean habilitarMigracaoContasPagar) {
+        this.habilitarMigracaoContasPagar = habilitarMigracaoContasPagar;
     }
 
     public static EOpcoesMigracaoSistema getByIdSistemaBanco(int idSistema, int idBanco) {

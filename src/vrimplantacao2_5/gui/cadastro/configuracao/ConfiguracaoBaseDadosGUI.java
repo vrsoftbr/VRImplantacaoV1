@@ -63,7 +63,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         
         migracaoSistemasController = new MigracaoSistemasController();
         
-        carregarOpcoesMigracao();
+        pnlChecksOpcoesMigracao.carregarOpcoesMigracao();
     }
     
     private void setConfiguracao() throws Exception {
@@ -158,19 +158,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         EOpcoesMigracaoSistema optMigracao = EOpcoesMigracaoSistema.getByIdSistemaBanco(cboSistema.getId(), cboBD.getId());
         
-        if (optMigracao != null) {
-            chkOptMigrarFamiliasProdutos.setEnabled(optMigracao.isMigrarFamiliaProduto());
-            chkOptMigrarMercadologicos.setEnabled(optMigracao.isMigrarMercadologico());
-            chkOptMigrarProdutos.setEnabled(optMigracao.isMigrarProduto());
-            chkOptMigrarFornecedores.setEnabled(optMigracao.isMigrarFornecedor());
-            chkOptMigrarProdutosFornecedores.setEnabled(optMigracao.isMigrarProdutoFornecedor());
-            chkOptMigrarClientesPreferenciais.setEnabled(optMigracao.isMigrarClientePreferencial());
-            chkOptMigrarClientesEventuais.setEnabled(optMigracao.isMigrarClienteEventual());
-            chkOptMigrarReceberCreditoRotativo.setEnabled(optMigracao.isMigrarCreditoRotativo());
-            chkOptMigrarReceberCheque.setEnabled(optMigracao.isMigrarCheque());
-            chkOptMigrarVendas.setEnabled(optMigracao.isMigrarVenda());
-            chkOptMigrarContasPagar.setEnabled(optMigracao.isMigrarContasPagar());
-        }
+        pnlChecksOpcoesMigracao.habiltarOpcaoesMigracao(optMigracao);
         
         habilitarBotaoSalvar();
     }
@@ -329,17 +317,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         btnMapear = new vrframework.bean.button.VRButton();
         btnExcluirLoja = new vrframework.bean.button.VRButton();
         jPanel2 = new javax.swing.JPanel();
-        chkOptMigrarProdutos = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarFornecedores = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarProdutosFornecedores = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarContasPagar = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarVendas = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarClientesPreferenciais = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarReceberCheque = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarMercadologicos = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarFamiliasProdutos = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarReceberCreditoRotativo = new vr.view.components.checkbox.VRCheckBox();
-        chkOptMigrarClientesEventuais = new vr.view.components.checkbox.VRCheckBox();
+        pnlChecksOpcoesMigracao = new vrimplantacao2_5.gui.componente.checks.migracao.ChecksOpcoesMigracao();
         btnSalvar = new vrframework.bean.button.VRButton();
         tabConexao = new vrframework.bean.tabbedPane.VRTabbedPane();
         btnDica = new vrframework.bean.button.VRButton();
@@ -390,7 +368,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 640, Short.MAX_VALUE)
+            .addGap(0, 604, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -405,7 +383,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 175, Short.MAX_VALUE)
+            .addGap(0, 165, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -413,85 +391,25 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                         .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                    .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
         jTabbedPane1.addTab("Mapeamento de Lojas", jPanel1);
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarProdutos, "Migrar Produtos");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarFornecedores, "Migrar Fornecedores");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarProdutosFornecedores, "Migrar Produtos Fornecedores");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarContasPagar, "Migrar Contas à Pagar (Fornecedor)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarVendas, "Migrar Vendas");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarClientesPreferenciais, "Migrar Clientes Preferenciais");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarReceberCheque, "Migrar Receber Cheque");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarMercadologicos, "Migrar Mercadológicos");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarFamiliasProdutos, "Migrar Famílias Produto");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarReceberCreditoRotativo, "Migrar Receber Crédito Rotativo");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkOptMigrarClientesEventuais, "Migrar Clientes Eventuais");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(chkOptMigrarMercadologicos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(87, 87, 87)
-                        .addComponent(chkOptMigrarClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkOptMigrarContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkOptMigrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarProdutosFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarFamiliasProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(43, 43, 43)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkOptMigrarClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarReceberCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkOptMigrarReceberCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(199, 199, 199))
+                .addComponent(pnlChecksOpcoesMigracao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(5, 5, 5))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(7, 7, 7)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkOptMigrarMercadologicos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkOptMigrarClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkOptMigrarFamiliasProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkOptMigrarClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(chkOptMigrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(chkOptMigrarFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkOptMigrarProdutosFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(chkOptMigrarReceberCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(chkOptMigrarReceberCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkOptMigrarVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, 0)
-                .addComponent(chkOptMigrarContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(pnlChecksOpcoesMigracao, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Opções de Migração", jPanel2);
@@ -597,8 +515,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 .addGap(6, 6, 6)
                 .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
@@ -640,12 +558,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnDicaActionPerformed
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
+
+        pnlChecksOpcoesMigracao.gravarOpcoesMigracao();
         exibirSelecaoLoja();
-        try {
-            gravarOpcoesMigracao();
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
+        
     }//GEN-LAST:event_btnProximoActionPerformed
 
     private void btnExcluirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirLojaActionPerformed
@@ -673,17 +589,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnSalvar;
     private vrframework.bean.comboBox.VRComboBox cboBD;
     private vrframework.bean.comboBox.VRComboBox cboSistema;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarClientesEventuais;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarClientesPreferenciais;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarContasPagar;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarFamiliasProdutos;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarFornecedores;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarMercadologicos;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarProdutos;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarProdutosFornecedores;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarReceberCheque;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarReceberCreditoRotativo;
-    private vr.view.components.checkbox.VRCheckBox chkOptMigrarVendas;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -691,6 +596,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel lblComplemento;
     private vrframework.bean.label.VRLabel lblNomeCon;
     private vrframework.bean.label.VRLabel lblSistema;
+    private vrimplantacao2_5.gui.componente.checks.migracao.ChecksOpcoesMigracao pnlChecksOpcoesMigracao;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.tabbedPane.VRTabbedPane tabConexao;
     private vrframework.bean.tableEx.VRTableEx tblLoja;
@@ -744,37 +650,5 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Seleção de Loja");
         }
-    }
-    
-    private void gravarOpcoesMigracao() throws Exception {
-        Parametros params = Parametros.get();        
-        params.put(chkOptMigrarMercadologicos.isSelected(), "OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS");
-        params.put(chkOptMigrarFamiliasProdutos.isSelected(), "OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO");
-        params.put(chkOptMigrarProdutos.isSelected(), "OPCAO MIGRACAO", "MIGRAR PRODUTOS");
-        params.put(chkOptMigrarFornecedores.isSelected(), "OPCAO MIGRACAO", "MIGRAR FORNECEDORES");
-        params.put(chkOptMigrarProdutosFornecedores.isSelected(), "OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES");
-        params.put(chkOptMigrarContasPagar.isSelected(), "OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR");
-        params.put(chkOptMigrarClientesPreferenciais.isSelected(), "OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS");
-        params.put(chkOptMigrarClientesEventuais.isSelected(), "OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS");
-        params.put(chkOptMigrarReceberCreditoRotativo.isSelected(), "OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO");
-        params.put(chkOptMigrarReceberCheque.isSelected(), "OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE");
-        params.put(chkOptMigrarVendas.isSelected(), "OPCAO MIGRACAO", "MIGRAR VENDAS");
-        
-        params.salvar();
-    }
-    
-    public void carregarOpcoesMigracao() throws Exception {
-        Parametros params = Parametros.get();
-        chkOptMigrarMercadologicos.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
-        chkOptMigrarFamiliasProdutos.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
-        chkOptMigrarProdutos.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
-        chkOptMigrarFornecedores.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        chkOptMigrarProdutosFornecedores.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        chkOptMigrarContasPagar.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
-        chkOptMigrarClientesPreferenciais.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
-        chkOptMigrarClientesEventuais.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
-        chkOptMigrarReceberCreditoRotativo.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
-        chkOptMigrarReceberCheque.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));
-        chkOptMigrarVendas.setSelected(params.getBool("OPCAO MIGRACAO", "MIGRAR VENDAS"));
-    }
+    }    
 }

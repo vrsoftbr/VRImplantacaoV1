@@ -467,7 +467,7 @@ public enum OpcaoProduto {
         result.add(PRODUTOS);
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
-        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
 
         return result;
     }
@@ -480,7 +480,7 @@ public enum OpcaoProduto {
         result.add(PRODUTOS);
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
-        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         result.addAll(getInfoAdicional());
         result.addAll(getComplementos());
         result.addAll(getTributos());

@@ -17,7 +17,6 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -107,16 +106,15 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
-                    OpcaoProduto.FAMILIA,
-                    OpcaoProduto.FAMILIA_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,                    
+                    gatewaySistemasVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA : null,
+                    gatewaySistemasVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA_PRODUTO : null,
+                    gatewaySistemasVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO_PRODUTO : null,
+                    gatewaySistemasVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO : null,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                     OpcaoProduto.PESAVEL,
@@ -133,7 +131,6 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.NCM,
                     OpcaoProduto.CEST,
                     OpcaoProduto.PIS_COFINS,
-                    OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
                     OpcaoProduto.ICMS_SAIDA,
                     OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
@@ -141,11 +138,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.ICMS_ENTRADA,
                     OpcaoProduto.ICMS_CONSUMIDOR,
                     OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
-                    OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));

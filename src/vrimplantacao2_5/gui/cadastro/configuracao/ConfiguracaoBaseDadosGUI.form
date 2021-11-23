@@ -92,9 +92,9 @@
               <Component id="tabConexao" min="-2" pref="146" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="pnlLoja" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="btnProximo" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="15" pref="15" max="-2" attributes="0"/>
           </Group>
@@ -170,7 +170,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="640" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="604" max="32767" attributes="0"/>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -190,7 +190,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="175" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="165" max="32767" attributes="0"/>
                       <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -199,7 +199,7 @@
                                   <Component id="btnExcluirLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="tblLoja" pref="122" max="32767" attributes="0"/>
+                              <Component id="tblLoja" pref="112" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -246,124 +246,23 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkOptMigrarMercadologicos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="87" pref="87" max="-2" attributes="0"/>
-                                  <Component id="chkOptMigrarClientesPreferenciais" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkOptMigrarProdutos" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarFornecedores" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarFamiliasProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkOptMigrarClientesEventuais" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarReceberCheque" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarVendas" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                          <EmptySpace min="-2" pref="199" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="pnlChecksOpcoesMigracao" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkOptMigrarMercadologicos" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarClientesPreferenciais" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkOptMigrarFamiliasProdutos" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkOptMigrarClientesEventuais" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkOptMigrarProdutos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                                  <Component id="chkOptMigrarFornecedores" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkOptMigrarProdutosFornecedores" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                                  <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkOptMigrarVendas" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                          <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="pnlChecksOpcoesMigracao" min="-2" pref="165" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Produtos"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFornecedores">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Fornecedores"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutosFornecedores">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Produtos Fornecedores"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarContasPagar">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Contas &#xe0; Pagar (Fornecedor)"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarVendas">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Vendas"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarClientesPreferenciais">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Clientes Preferenciais"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCheque">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Receber Cheque"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarMercadologicos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Mercadol&#xf3;gicos"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFamiliasProdutos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Fam&#xed;lias Produto"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCreditoRotativo">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Receber Cr&#xe9;dito Rotativo"/>
-                  </Properties>
-                </Component>
-                <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarClientesEventuais">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Migrar Clientes Eventuais"/>
-                  </Properties>
+                <Component class="vrimplantacao2_5.gui.componente.checks.migracao.ChecksOpcoesMigracao" name="pnlChecksOpcoesMigracao">
                 </Component>
               </SubComponents>
             </Container>

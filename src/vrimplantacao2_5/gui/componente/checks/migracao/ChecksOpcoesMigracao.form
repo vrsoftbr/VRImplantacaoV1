@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="chkOptMigrarContasPagar" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkOptMigrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarFamiliasProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarMercadologicos" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkOptMigrarClientesPreferenciais" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarClientesEventuais" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarReceberCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOptMigrarVendas" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace pref="28" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="chkOptMigrarMercadologicos" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="chkOptMigrarClientesPreferenciais" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="chkOptMigrarFamiliasProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="chkOptMigrarClientesEventuais" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="chkOptMigrarProdutos" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                      <Component id="chkOptMigrarFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                      <Component id="chkOptMigrarProdutosFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
+                      <Component id="chkOptMigrarContasPagar" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="chkOptMigrarReceberCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkOptMigrarReceberCheque" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkOptMigrarVendas" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace pref="18" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarMercadologicos">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarMercadologicos.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFamiliasProdutos">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarFamiliasProdutos.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutos">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarProdutos.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarFornecedores">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarFornecedores.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarProdutosFornecedores">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarProdutosFornecedores.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarContasPagar">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarContasPagar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarVendas">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarVendas.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCreditoRotativo">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarReceberCreditoRotativo.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarClientesEventuais">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarClientesEventuais.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarClientesPreferenciais">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarClientesPreferenciais.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="chkOptMigrarReceberCheque">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="vrimplantacao2_5/gui/componente/checks/migracao/Bundle.properties" key="ChecksOpcoesMigracao.chkOptMigrarReceberCheque.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

@@ -9,17 +9,17 @@ public class GatewaySistemasVO {
     private boolean temArquivoBalanca = false;
     private boolean produtosBalancaIniciaCom20 = false;
     private boolean migrarProdutosAtivos = false;   
-    private boolean migrarFamiliaProduto = false;
-    private boolean migrarMercadologicos = false;
-    private boolean migrarProdutos = false;
-    private boolean migrarFornecedores = false;
-    private boolean migrarProdutosFornecedores = false;
-    private boolean migrarClientesPreferenciais = false;
-    private boolean migrarClientesEventuais = false;
-    private boolean migrarReceberCreditoRotativo = false;
-    private boolean migrarReceberCheque = false;
-    private boolean migrarVendas = false;
-    private boolean migrarContasPagar = false;
+    private boolean habilitarMigracaoFamiliaProduto = false;
+    private boolean habilitarMigracaoMercadologicos = false;
+    private boolean habilitarMigracaoProdutos = false;
+    private boolean habilitarMigracaoFornecedores = false;
+    private boolean habilitarMigracaoProdutosFornecedores = false;
+    private boolean habilitarMigracaoClientesPreferenciais = false;
+    private boolean habilitarMigracaoClientesEventuais = false;
+    private boolean habilitarMigracaoReceberCreditoRotativo = false;
+    private boolean habilitarMigracaoReceberCheque = false;
+    private boolean habilitarMigracaoVendas = false;
+    private boolean habilitarMigracaoContasPagar = false;
 
     public boolean getTemArquivoBalanca() {
         return this.temArquivoBalanca;
@@ -45,92 +45,92 @@ public class GatewaySistemasVO {
         this.migrarProdutosAtivos = migrarProdutosAtivos;
     }
     
-    public boolean isMigrarFamiliaProduto() {
-        return this.migrarFamiliaProduto;
+    public boolean isHabilitarMigracaoFamiliaProduto() {
+        return this.habilitarMigracaoFamiliaProduto;
     }
     
-    public void setMigrarFamiliaProduto(boolean migrarFamiliaProduto) {
-        this.migrarFamiliaProduto = migrarFamiliaProduto;
+    public void setHabilitarMigracaoFamiliaProduto(boolean habilitarMigracaoFamiliaProduto) {
+        this.habilitarMigracaoFamiliaProduto = habilitarMigracaoFamiliaProduto;
     }
     
-    public boolean isMigrarMercadologicos() {
-        return this.migrarMercadologicos;
+    public boolean isHabilitarMigracaoMercadologicos() {
+        return this.habilitarMigracaoMercadologicos;
     }
     
-    public void setMigrarMercadologicos(boolean migrarMercadologico) {
-        this.migrarMercadologicos = migrarMercadologico;
+    public void setHabilitarMigracaoMercadologicos(boolean habilitarMigracaoMercadologico) {
+        this.habilitarMigracaoMercadologicos = habilitarMigracaoMercadologico;
     }
     
-    public boolean isMigrarProdutos() {
-        return this.migrarProdutos;
+    public boolean isHabilitarMigracaoProdutos() {
+        return this.habilitarMigracaoProdutos;
     }
     
-    public void setMigrarProdutos(boolean migrarProduto) {
-        this.migrarProdutos = migrarProduto;
+    public void setHabilitarMigracaoProdutos(boolean habilitarMigracaoProduto) {
+        this.habilitarMigracaoProdutos = habilitarMigracaoProduto;
     }
     
-    public boolean isMigrarFornecedores() {
-        return this.migrarFornecedores;
+    public boolean isHabilitarMigracaoFornecedores() {
+        return this.habilitarMigracaoFornecedores;
     }
     
-    public void setMigrarFornecedores(boolean migrarFornecedor) {
-        this.migrarFornecedores = migrarFornecedor;
+    public void setHabilitarMigracaoFornecedores(boolean habilitarMigracaoFornecedor) {
+        this.habilitarMigracaoFornecedores = habilitarMigracaoFornecedor;
     }
     
-    public boolean isMigrarProdutosFornecedores() {
-        return this.migrarProdutosFornecedores;
+    public boolean isHabilitarMigracaoProdutosFornecedores() {
+        return this.habilitarMigracaoProdutosFornecedores;
     }
     
-    public void setMigrarProdutosFornecedores(boolean migrarProdutoFornecedor) {
-        this.migrarProdutosFornecedores = migrarProdutoFornecedor;
+    public void setHabilitarMigracaoProdutosFornecedores(boolean habilitarMigracaoProdutoFornecedor) {
+        this.habilitarMigracaoProdutosFornecedores = habilitarMigracaoProdutoFornecedor;
     }
     
-    public boolean isMigrarClientesPreferenciais() {
-        return this.migrarClientesPreferenciais;
+    public boolean isHabilitarMigracaoClientesPreferenciais() {
+        return this.habilitarMigracaoClientesPreferenciais;
     }
     
-    public void setMigrarClientesPreferenciais(boolean migrarClientePreferencial) {
-        this.migrarClientesPreferenciais = migrarClientePreferencial;
+    public void setHabilitarMigracaoClientesPreferenciais(boolean habilitarMigracaoClientePreferencial) {
+        this.habilitarMigracaoClientesPreferenciais = habilitarMigracaoClientePreferencial;
     }
     
-    public boolean isMigrarClientesEventuais() {
-        return this.migrarClientesEventuais;
+    public boolean isHabilitarMigracaoClientesEventuais() {
+        return this.habilitarMigracaoClientesEventuais;
     }
     
-    public void setMigrarClientesEventuais(boolean migrarClienteEventual) {
-        this.migrarClientesEventuais = migrarClienteEventual;
+    public void setHabilitarMigracaoClientesEventuais(boolean habilitarMigracaoClienteEventual) {
+        this.habilitarMigracaoClientesEventuais = habilitarMigracaoClienteEventual;
     }
     
-    public boolean isMigrarReceberCreditoRotativo() {
-        return this.migrarReceberCreditoRotativo;
+    public boolean isHabilitarMigracaoReceberCreditoRotativo() {
+        return this.habilitarMigracaoReceberCreditoRotativo;
     }
     
-    public void setMigrarReceberCreditoRotativo(boolean migrarReceberCreditoRotativo) {
-        this.migrarReceberCreditoRotativo = migrarReceberCreditoRotativo;
+    public void setHabilitarMigracaoReceberCreditoRotativo(boolean habilitarMigracaoReceberCreditoRotativo) {
+        this.habilitarMigracaoReceberCreditoRotativo = habilitarMigracaoReceberCreditoRotativo;
     }
     
-    public boolean isMigrarReceberCheque() {
-        return this.migrarReceberCheque;
+    public boolean isHabilitarMigracaoReceberCheque() {
+        return this.habilitarMigracaoReceberCheque;
     }
     
-    public void setMigrarReceberCheque(boolean migrarReceberCheque) {
-        this.migrarReceberCheque = migrarReceberCheque;
+    public void setHabilitarMigracaoReceberCheque(boolean habilitarMigracaoReceberCheque) {
+        this.habilitarMigracaoReceberCheque = habilitarMigracaoReceberCheque;
     }
     
-    public boolean isMigrarVendas() {
-        return this.migrarVendas;
+    public boolean isHabilitarMigracaoVendas() {
+        return this.habilitarMigracaoVendas;
     }
     
-    public void setMigrarVendas(boolean migrarVenda) {
-        this.migrarVendas = migrarVenda;
+    public void setHabilitarMigracaoVendas(boolean habilitarMigracaoVenda) {
+        this.habilitarMigracaoVendas = habilitarMigracaoVenda;
     }
     
-    public boolean isMigrarContasPagar() {
-        return this.migrarContasPagar;
+    public boolean isHabilitarMigracaoContasPagar() {
+        return this.habilitarMigracaoContasPagar;
     }
     
-    public void setMigrarContasPagar(boolean migrarContaPagar) {
-        this.migrarContasPagar = migrarContaPagar;
+    public void setHabilitarMigracaoContasPagar(boolean habilitarMigracaoContaPagar) {
+        this.habilitarMigracaoContasPagar = habilitarMigracaoContaPagar;
     }
     
 }
