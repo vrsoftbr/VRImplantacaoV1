@@ -293,6 +293,7 @@ import vrimplantacao2.gui.interfaces.MRC6GUI;
 import vrimplantacao2.gui.interfaces.MSuperGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
+import vrimplantacao2.gui.interfaces.MicrotabGUI;
 import vrimplantacao2.gui.interfaces.NeoGUI;
 import vrimplantacao2.gui.interfaces.PhoenixGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
@@ -718,6 +719,7 @@ public final class MenuGUI extends VRMdiFrame {
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuMicrotab = new javax.swing.JMenuItem();
         mnuMSuper = new javax.swing.JMenuItem();
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
@@ -1887,6 +1889,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuMercaLite);
+
+        mnuMicrotab.setText("Microtab");
+        mnuMicrotab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMicrotabActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuMicrotab);
 
         mnuMSuper.setText("MSuper");
         mnuMSuper.addActionListener(new java.awt.event.ActionListener() {
@@ -5524,6 +5534,11 @@ public final class MenuGUI extends VRMdiFrame {
         BomSoftGUI.exibir(this);
     }//GEN-LAST:event_mnuBomSoftActionPerformed
 
+    private void mnuMicrotabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMicrotabActionPerformed
+        // TODO add your handling code here:
+        MicrotabGUI.exibir(this);
+    }//GEN-LAST:event_mnuMicrotabActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5747,6 +5762,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMercaLite;
     private javax.swing.JMenuItem mnuMerceariaSene;
+    private javax.swing.JMenuItem mnuMicrotab;
     private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
