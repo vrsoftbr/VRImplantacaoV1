@@ -1,14 +1,16 @@
-package vrimplantacao2_5.vo.sistema;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package vrimplantacao2_5.vo.checks.migracao;
 
 /**
  *
  * @author Desenvolvimento
  */
-public class GatewaySistemasVO {
-
-    private boolean temArquivoBalanca = false;
-    private boolean produtosBalancaIniciaCom20 = false;
-    private boolean migrarProdutosAtivos = false;   
+public class OpcoesMigracaoVO {
+    
     private boolean habilitarMigracaoFamiliaProduto = false;
     private boolean habilitarMigracaoMercadologicos = false;
     private boolean habilitarMigracaoProdutos = false;
@@ -21,30 +23,6 @@ public class GatewaySistemasVO {
     private boolean habilitarMigracaoVendas = false;
     private boolean habilitarMigracaoContasPagar = false;
 
-    public boolean getTemArquivoBalanca() {
-        return this.temArquivoBalanca;
-    }
-
-    public boolean getProdutosBalancaIniciaCom20() {
-        return this.produtosBalancaIniciaCom20;
-    }
-
-    public boolean getMigrarProdutosAtivos() {
-        return this.migrarProdutosAtivos;
-    }
-
-    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
-        this.temArquivoBalanca = temArquivoBalanca;
-    }
-
-    public void setProdutosBalancaIniciaCom20(boolean produtosBalancaIniciaCom20) {
-        this.produtosBalancaIniciaCom20 = produtosBalancaIniciaCom20;
-    }
-
-    public void setMigrarProdutosAtivo(boolean migrarProdutosAtivos) {
-        this.migrarProdutosAtivos = migrarProdutosAtivos;
-    }
-    
     public boolean isHabilitarMigracaoFamiliaProduto() {
         return this.habilitarMigracaoFamiliaProduto;
     }
@@ -131,6 +109,5 @@ public class GatewaySistemasVO {
     
     public void setHabilitarMigracaoContasPagar(boolean habilitarMigracaoContaPagar) {
         this.habilitarMigracaoContasPagar = habilitarMigracaoContaPagar;
-    }
-    
+    }    
 }

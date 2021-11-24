@@ -16,7 +16,7 @@ import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
-import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
+import vrimplantacao2_5.vo.sistema.ParamsGatewaySistemasVO;
 
 public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
@@ -25,7 +25,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = null;
-    private GatewaySistemasVO gatewaySistemasVO = new GatewaySistemasVO();
+    private ParamsGatewaySistemasVO gatewaySistemasVO = new ParamsGatewaySistemasVO();
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private Thread thread = null;
@@ -67,55 +67,13 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
 
-    private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
-        
-        Parametros params = Parametros.get();
-        gatewaySistemasVO.setHabilitarMigracaoMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
-        gatewaySistemasVO.setHabilitarMigracaoFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
-        gatewaySistemasVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
-        gatewaySistemasVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        gatewaySistemasVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        gatewaySistemasVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
-        gatewaySistemasVO.setHabilitarMigracaoClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
-        gatewaySistemasVO.setHabilitarMigracaoClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
-        gatewaySistemasVO.setHabilitarMigracaoReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
-        gatewaySistemasVO.setHabilitarMigracaoReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));
-        gatewaySistemasVO.setHabilitarMigracaoVendas(params.getBool("OPCAO MIGRACAO", "MIGRAR VENDAS"));
+    private ParamsGatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         gatewaySistemasVO.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
         gatewaySistemasVO.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
         gatewaySistemasVO.setMigrarProdutosAtivo(chkProdImportarProdutosAtivos.isSelected());
         
         return gatewaySistemasVO;        
-    }
-    
-    private void habilitarTabsMigracao() {
-    
-        if (!gatewaySistemasVO.isHabilitarMigracaoFornecedores()) {
-            tabFornecedores.remove(tabFornecedores.tabImportacao);
-        }
-        if (!gatewaySistemasVO.isHabilitarMigracaoProdutosFornecedores()) {
-            tabFornecedores.remove(tabFornecedores.pnlProdForn);
-        }
-        if (!gatewaySistemasVO.isHabilitarMigracaoContasPagar()) {
-            tabFornecedores.remove(tabFornecedores.pnlContaPagar);
-        }
-        
-        if (!gatewaySistemasVO.isHabilitarMigracaoClientesPreferenciais()) {
-            tabClientes.remove(tabClientes.tabImportacao);
-        }
-        if (!gatewaySistemasVO.isHabilitarMigracaoClientesEventuais()) {
-            tabClientes.remove(tabClientes.tabClienteEventual);
-        }
-        if (!gatewaySistemasVO.isHabilitarMigracaoReceberCreditoRotativo()) {
-            tabClientes.remove(tabClientes.tabCreditoRotativo);
-        }
-        if (!gatewaySistemasVO.isHabilitarMigracaoReceberCheque()) {
-            tabClientes.remove(tabClientes.tabCheque);
-        }
-        
-        tabFornecedores.revalidate();
-        tabFornecedores.repaint();
     }
     
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
@@ -128,12 +86,15 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         carregarParametros();
 
-        dao = new GatewaySistemasDAO(carregarOpcaoesMigracaoSistema());
-        
-        habilitarTabsMigracao();
-        
-        tabProdutos.btnMapaTribut.setEnabled(false);        
+        dao = new GatewaySistemasDAO(carregarOpcaoesMigracaoSistema(), 
+                tabFornecedores.carregarOpcoesMigracao()
+        );        
+          
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        
+        
+        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override

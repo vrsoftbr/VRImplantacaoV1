@@ -17,6 +17,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -28,7 +29,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
+import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
+import vrimplantacao2_5.vo.sistema.ParamsGatewaySistemasVO;
 
 /**
  *
@@ -36,12 +38,77 @@ import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
  */
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public GatewaySistemasVO gatewaySistemasVO = null;
+    public ParamsGatewaySistemasVO gatewaySistemasVO = null;
+    public OpcoesMigracaoVO opcoesMigracaoVO = null;
     
     public GatewaySistemasDAO() {}
     
-    public GatewaySistemasDAO(GatewaySistemasVO gatewaySistemasVO) {
+    public GatewaySistemasDAO(ParamsGatewaySistemasVO gatewaySistemasVO, OpcoesMigracaoVO opcoesMigracaoVO) {
         this.gatewaySistemasVO = gatewaySistemasVO;
+        this.opcoesMigracaoVO = opcoesMigracaoVO;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,                    
+                    opcoesMigracaoVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA : null,
+                    opcoesMigracaoVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA_PRODUTO : null,
+                    opcoesMigracaoVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO_PRODUTO : null,
+                    opcoesMigracaoVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO : null,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.MAPA_TRIBUTACAO
+                }
+        ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.NUMERO,
+                OpcaoFornecedor.COMPLEMENTO,
+                OpcaoFornecedor.BAIRRO,
+                OpcaoFornecedor.MUNICIPIO,
+                OpcaoFornecedor.UF,
+                OpcaoFornecedor.CEP,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
     }
     
     @Override
@@ -100,48 +167,6 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
             }
         }
         return result;
-    }
-
-    @Override
-    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        return new HashSet<>(Arrays.asList(
-                new OpcaoProduto[]{
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,                    
-                    gatewaySistemasVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA : null,
-                    gatewaySistemasVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA_PRODUTO : null,
-                    gatewaySistemasVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO_PRODUTO : null,
-                    gatewaySistemasVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO : null,
-                    OpcaoProduto.PRODUTOS,
-                    OpcaoProduto.EAN,
-                    OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.PESAVEL,
-                    OpcaoProduto.VALIDADE,
-                    OpcaoProduto.DESC_COMPLETA,
-                    OpcaoProduto.DESC_GONDOLA,
-                    OpcaoProduto.DESC_REDUZIDA,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.PRECO,
-                    OpcaoProduto.CUSTO,
-                    OpcaoProduto.ESTOQUE,
-                    OpcaoProduto.ATIVO,
-                    OpcaoProduto.NCM,
-                    OpcaoProduto.CEST,
-                    OpcaoProduto.PIS_COFINS,
-                    OpcaoProduto.ICMS,
-                    OpcaoProduto.ICMS_SAIDA,
-                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
-                    OpcaoProduto.ICMS_SAIDA_NF,
-                    OpcaoProduto.ICMS_ENTRADA,
-                    OpcaoProduto.ICMS_CONSUMIDOR,
-                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
-                    OpcaoProduto.MARGEM,
-                    OpcaoProduto.MAPA_TRIBUTACAO
-                }
-        ));
     }
 
     @Override
