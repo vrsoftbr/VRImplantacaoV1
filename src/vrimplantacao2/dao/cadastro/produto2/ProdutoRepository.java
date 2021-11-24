@@ -208,6 +208,12 @@ public class ProdutoRepository {
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
+                        
+                        if(prod.getDescricaoCompleta()!= null && 
+                                prod.getDescricaoCompleta().length() >= 3 && 
+                                    ean > 999999){
+                            provider.salvarLojaVirtual(prod, ean);
+                        }
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");

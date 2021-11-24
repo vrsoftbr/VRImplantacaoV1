@@ -215,6 +215,28 @@ public class ProdutoDAO {
             }
         }
     }
+    
+    public void salvarLojaVirtual(ProdutoVO vo, long ean) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtolojavirtual");
+
+            sql.put("descricao", vo.getDescricaoCompleta());
+            sql.put("id_produto", vo.getId());
+            sql.put("id_tipoorigemimagem", 1);
+            
+            if(versao.maiorQue(3,21)){
+                
+                sql.put("codigobarras", ean);
+            }
+            
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+    }
 
     /**
      * Executa um update na tabela produtos.
