@@ -888,7 +888,7 @@ public class GestorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vi.ITEM nroitem, \n"
                     + "	vi.PRODUTO,\n"
                     + "	p.PD_UNIDADE unidade,\n"
-                    + "	vi.PRODUTO_BARRAS codigobarras,\n"
+                    + " substring(vi.PRODUTO_BARRAS from 1 for 14) codigobarras,\n"
                     + "	p.DSC descricao,\n"
                     + "	vi.QUANTIDADE,\n"
                     + "	vi.VLR_UNT precovenda,\n"
