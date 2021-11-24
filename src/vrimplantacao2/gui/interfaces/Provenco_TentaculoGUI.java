@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -13,6 +14,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Provenco_TentaculoDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -43,6 +45,8 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
+        edtDtVendaIni.setDate(params.getDate(NOME_SISTEMA, "VENDAS_INI"));
+        edtDtVendaFim.setDate(params.getDate(NOME_SISTEMA, "VENDAS_FIM"));
     }
 
     private void gravarParametros() throws Exception {
@@ -53,6 +57,8 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
+        params.put(edtDtVendaIni.getDate(), NOME_SISTEMA, "VENDAS_INI");
+        params.put(edtDtVendaFim.getDate(), NOME_SISTEMA, "VENDAS_FIM");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
@@ -180,7 +186,6 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                         case 0:
                             tabProdutos.setImportador(importador);
                             tabProdutos.executarImportacao();
-                            break;
                         case 1:
                             tabFornecedores.setImportador(importador);
                             tabFornecedores.executarImportacao();
@@ -198,6 +203,12 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                                 importador.unificarProdutoFornecedor();
                             }   if (cbxUnifCliPreferencial.isSelected()) {
                                 importador.unificarClientePreferencial();
+                            }   break;
+                        case 4:
+                            if (chkPdvVendas.isSelected()) {
+                                dao.setVendaDataIni(edtDtVendaIni.getDate());
+                                dao.setVendaDataFim(edtDtVendaFim.getDate());
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
                             }   break;
                         default:
                             break;
@@ -259,8 +270,12 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
+        tabVendas = new vrframework.bean.panel.VRPanel();
+        pnlVendas = new vrframework.bean.panel.VRPanel();
+        pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
+        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioFirebird = new vrframework.bean.textField.VRTextField();
@@ -411,26 +426,82 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
         tab.addTab("Unificação", tabUnificacao);
 
-        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
+        pnlVendas.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
 
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(364, Short.MAX_VALUE))
+        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaIniActionPerformed(evt);
+            }
+        });
+
+        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaFimActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlPdvVendaDatasLayout = new javax.swing.GroupLayout(pnlPdvVendaDatas);
+        pnlPdvVendaDatas.setLayout(pnlPdvVendaDatasLayout);
+        pnlPdvVendaDatasLayout.setHorizontalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
         );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(319, Short.MAX_VALUE))
+        pnlPdvVendaDatasLayout.setVerticalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        tab.addTab("Especiais", vRPanel1);
+        chkPdvVendas.setEnabled(true);
+        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPdvVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlVendasLayout = new javax.swing.GroupLayout(pnlVendas);
+        pnlVendas.setLayout(pnlVendasLayout);
+        pnlVendasLayout.setHorizontalGroup(
+            pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(290, Short.MAX_VALUE))
+        );
+        pnlVendasLayout.setVerticalGroup(
+            pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
+        tabVendas.setLayout(tabVendasLayout);
+        tabVendasLayout.setHorizontalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlVendas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabVendasLayout.setVerticalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(266, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Vendas", tabVendas);
 
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -645,6 +716,22 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
     }//GEN-LAST:event_txtComplementoKeyReleased
 
+    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkPdvVendasActionPerformed
+
+    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
+        if (edtDtVendaFim.getDate() == null) {
+            edtDtVendaFim.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaFimActionPerformed
+
+    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
+        if (edtDtVendaIni.getDate() == null) {
+            edtDtVendaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaIniActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -653,18 +740,23 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
+    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JPanel jPanel1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private vrframework.bean.panel.VRPanel pnlFornecedor;
+    private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
+    private vrframework.bean.panel.VRPanel pnlVendas;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
+    private vrframework.bean.panel.VRPanel tabVendas;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
@@ -680,7 +772,6 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo2;

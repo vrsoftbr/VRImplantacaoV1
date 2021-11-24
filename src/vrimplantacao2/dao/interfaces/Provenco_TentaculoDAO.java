@@ -1,24 +1,26 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,8 +29,11 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -57,36 +62,12 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
-                    //String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
                             rs.getInt("cst_saida"),
                             rs.getDouble("aliquota_saida"),
                             rs.getDouble("reducao_saida")
-                    )
-                    );
-                }
-            }
-
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "    icm.compracsf AS cst_entrada,\n"
-                    + "    icm.compraicms AS aliquota_entrada,\n"
-                    + "    icm.comprareducao AS reducao_entrada\n"
-                    + "FROM TESTPRODUTOGERAL pg\n"
-                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
-            )) {
-                while (rs.next()) {
-                    String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
-                    result.add(new MapaTributoIMP(
-                            id,
-                            id,
-                            rs.getInt("cst_entrada"),
-                            rs.getDouble("aliquota_entrada"),
-                            rs.getDouble("reducao_entrada")
                     )
                     );
                 }
@@ -185,12 +166,12 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	m1.CODISET m1,\n"
-                    + "	m1.NOMESET m1desc,\n"
-                    + "	m2.CODIGRU m2,\n"
-                    + "	m2.NOMEGRU m2desc,\n"
-                    + "	m3.CODISGR m3,\n"
-                    + "	m3.NOMESGR m3desc\n"
+                    + "	m1.CODISET merc1,\n"
+                    + "	m1.NOMESET desc_merc1,\n"
+                    + "	m2.CODIGRU merc2,\n"
+                    + "	m2.NOMEGRU desc_merc2,\n"
+                    + "	m3.CODISGR merc3,\n"
+                    + "	m3.NOMESGR desc_merc3\n"
                     + "FROM\n"
                     + "	GRUPOS m2\n"
                     + "JOIN SETORES m1 ON m1.CODISET = m2.CODISET\n"
@@ -201,12 +182,13 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("desc_merc1"));
                     imp.setMerc2ID(rst.getString("merc2"));
                     imp.setMerc2Descricao(rst.getString("desc_merc2"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("desc_merc3"));
 
                     result.add(imp);
                 }
@@ -250,7 +232,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.CODIPRO idproduto,\n"
-                    + "	ean.COD_BARR ean,\n"
+                    + "	ean.COD_BARR||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS EAN,\n"
                     + "	QTD_UNI qtdembalagem,\n"
                     + "	e.ABRE_EMB tipoembalagem\n"
                     + "FROM\n"
@@ -263,10 +245,11 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
 
                     result.add(imp);
                 }
@@ -281,48 +264,126 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	p.CODIPRO idproduto,\n"
+                    + "	ean.COD_BARR||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS EAN,\n"
+                    + "	(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS digito,\n"
+                    + "	DESCRICAO descricaocompleta,\n"
+                    + "	DESCRI_AB descricaoreduzida,\n"
+                    + "	un.ABRE_EMB tipoembalagem,\n"
+                    + "	ean.QTD_UNI qtdembalagem,\n"
+                    + "	PESO_BRU pesobruto,\n"
+                    + "	PESO_LIQ pesoliquido,	\n"
+                    + "	CASE WHEN balanca = 'S' THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	CODIFAM familia,\n"
+                    + "	CODIGRU merc1,\n"
+                    + "	CODISGR merc2,\n"
+                    + "	CODINCM ncm,\n"
+                    + "	p.CEST cest,\n"
+                    + "	p.PERC_LUC margem,\n"
+                    + "	pl.UC_CUSTO_C custocomimposto,\n"
+                    + "	pl.UC_CUSTO_S custosemimposto,\n"
+                    + "	pr.PREVE precovenda,\n"
+                    + "	COALESCE (p.ESTOMIN,0) estmin,\n"
+                    + "	p.ESTOMAX estmax,\n"
+                    + "	t.CODICST cst_saida,\n"
+                    + "	t.PERC_ICM aliq_saida,\n"
+                    + "	t.PERC_RED red_saida,\n"
+                    + "	DATA_ALTERA data_alteracao\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "	LEFT JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "	LEFT JOIN EMBALAG un ON un.CODIEMB = p.CODIEMB_V\n"
+                    + "	LEFT JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO  AND pr.AGP_CODIGO = p.CODILF\n"
+                    + "	LEFT JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF \n"
+                    + "	LEFT JOIN TRIBUTA_LOJAS i ON i.CODIPRO = p.CODIPRO\n"
+                    + "	LEFT JOIN TRIBUTA t ON t.CODITR = i.CODITRC\n"
+                    + "WHERE\n"
+                    + "	CODILF = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
+
+                    imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setCodMercadologico1(rst.getString("mercaologico1"));
-                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    //imp.setCodMercadologico3(rst.getString("mercadologico3"));
+
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
+                    imp.setEstoqueMinimo(rst.getDouble("estmin"));
+                    imp.setEstoqueMaximo(rst.getDouble("estmax"));
+                    //imp.setEstoque(rst.getDouble("estoque"));
+
+                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
+                    //imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
 
                     String idIcmsDebito, IdIcmsCredito;
 
-                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliquota_saida") + "-" + rst.getString("reducao_saida");
-                    IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliq_saida") + "-" + rst.getString("red_saida");
+                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
-                    imp.setIcmsCreditoId(IdIcmsCredito);
-                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    //imp.setIcmsCreditoId(IdIcmsCredito);
+                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	o.CODIPRO id_produto,\n"
+                    + "	DTINPRO data_ini,\n"
+                    + "	DTFIPRO data_fim,\n"
+                    + "	PRECO_PRO precooferta,\n"
+                    + "	pr.PREVE preconormal\n"
+                    + "FROM\n"
+                    + "	PROMOCOES o\n"
+                    + "	LEFT JOIN PRODUTOS p ON p.CODIPRO = o.CODIPRO \n"
+                    + "	LEFT JOIN PRECOS_LOJAS pr ON pr.CODIPRO = p.CODIPRO AND pr.AGP_CODIGO = o.EMP_CODIGO \n"
+                    + "WHERE\n"
+                    + "	o.EMP_CODIGO = " + getLojaOrigem() + "\n"
+                    + "	AND DTFIPRO >= 'now'"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(rst.getDate("dataini"));
+                    imp.setDataFim(rst.getDate("data_ini"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setPrecoNormal(rst.getDouble("preconormal"));
 
                     result.add(imp);
                 }
@@ -363,6 +424,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -408,6 +470,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
@@ -556,6 +619,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
                     imp.setValor(rs.getDouble("valor"));
@@ -570,5 +634,196 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             }
         }
         return result;
+    }
+
+    private Date vendaDataIni;
+    private Date vendaDataFim;
+
+    public void setVendaDataIni(Date vendaDataIni) {
+        this.vendaDataIni = vendaDataIni;
+    }
+
+    public void setVendaDataFim(Date vendaDataFim) {
+        this.vendaDataFim = vendaDataFim;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new Provenco_TentaculoDAO.VendaIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new Provenco_TentaculoDAO.VendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setSubTotalImpressora(rst.getDouble("total"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "SELECT\n"
+                    + "	REPLACE((MOV_LOJA || MOV_COO || MOV_PDV || MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
+                    + "	MOV_LOJA loja,\n"
+                    + "	MOV_PDV pdv,\n"
+                    + "	MOV_ECF ecf,\n"
+                    + "	MOV_COO numerocupom,\n"
+                    + "	MOV_DT_MOVIMENTO data,\n"
+                    + " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) as hora,\n"
+                    + "	trunc (sum(MOV_VLR_TOTAL),2) total,\n"
+                    + "	sum(MOV_DESCONTO_CUPOM) desconto,\n"
+                    + "	sum(MOV_ACRESCIMO_CUPOM) acrescimo\n"
+                    + "FROM\n"
+                    + "	TB_PDV_MOVOUTRA\n"
+                    + "WHERE\n"
+                    + "	PRO_ID IS NOT NULL\n"
+                    + "	AND	MOV_LOJA = " + idLojaCliente + "\n"
+                    + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "GROUP BY 1,2,3,4,5,6";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
+                        next.setSequencia(rst.getInt("nroitem"));
+                        next.setProduto(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n"
+                    + "	REPLACE(v.EMPRESA||v.DATA||v.PDV||v.ECF||v.CUPOM,'-','') as id_venda,\n"
+                    + "	REPLACE(vi.EMPRESA || vi.DATA || vi.PDV || vi.ECF || vi.CUPOM || vi.PRODUTO || vi.ITEM, '-', '') AS id_item,\n"
+                    + "	vi.ITEM nroitem, \n"
+                    + "	vi.PRODUTO,\n"
+                    + "	p.PD_UNIDADE unidade,\n"
+                    + "	vi.PRODUTO_BARRAS codigobarras,\n"
+                    + "	p.DSC descricao,\n"
+                    + "	vi.QUANTIDADE,\n"
+                    + "	vi.VLR_UNT precovenda,\n"
+                    + "	vi.VALOR_REAL total\n"
+                    + "FROM\n"
+                    + "	SM_MV_PDV_IT_CUP vi\n"
+                    + "JOIN SM_MV_PDV_CB_CUP v\n"
+                    + "	ON v.CUPOM = vi.CUPOM \n"
+                    + "	  AND v.EMPRESA = vi.EMPRESA\n"
+                    + "	  AND v.DATA = vi.DATA\n"
+                    + "	  AND v.PDV = vi.PDV\n"
+                    + "	  AND v.ECF = vi.ECF\n"
+                    + "JOIN SM_CD_ES_PRODUTO p ON p.COD = vi.PRODUTO \n"
+                    + "WHERE\n"
+                    + "	v.EMPRESA = " + idLojaCliente + "\n"
+                    + "	AND v.DATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "ORDER BY 1,3";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }
