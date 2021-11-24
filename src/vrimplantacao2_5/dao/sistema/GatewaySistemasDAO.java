@@ -53,7 +53,8 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,                    
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS,
                     opcoesMigracaoVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA : null,
                     opcoesMigracaoVO.isHabilitarMigracaoFamiliaProduto() ? OpcaoProduto.FAMILIA_PRODUTO : null,
                     opcoesMigracaoVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO_PRODUTO : null,
@@ -93,6 +94,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.RAZAO_SOCIAL,
                 OpcaoFornecedor.NOME_FANTASIA,
@@ -106,8 +108,10 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                 OpcaoFornecedor.UF,
                 OpcaoFornecedor.CEP,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.DATA_CADASTRO,
                 OpcaoFornecedor.TELEFONE,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.CONTATOS,
+                opcoesMigracaoVO.isHabilitarMigracaoProdutosFornecedores() ? OpcaoFornecedor.PRODUTO_FORNECEDOR : null
         ));
     }
     
@@ -386,7 +390,8 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	f.CELULAR AS celular,\n"
                     + "	f.FAX AS fax,\n"
                     + "	f.EMAIL AS email,\n"
-                    + "	f.SITE AS site\n"
+                    + "	f.SITE AS site,\n"
+                    + " f.ATIVO AS ativo\n"        
                     + "FROM FORNECEDORES f \n"
                     + "ORDER BY 1"
             )) {
@@ -410,6 +415,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setIe_rg(rst.getString("rg"));
                     }
 
+                    imp.setAtivo(rst.getInt("ativo") == 1);
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
