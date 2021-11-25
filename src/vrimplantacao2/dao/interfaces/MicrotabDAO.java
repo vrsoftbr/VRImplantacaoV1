@@ -337,7 +337,14 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	ID_FORNECEDOR idfornecedor,\n"
+                    + "	ID idproduto,\n"
+                    + "	DT_ALTERA dtalteracao\n"
+                    + "FROM\n"
+                    + "	PRODUTO\n"
+                    + "WHERE\n"
+                    + "	ID_FORNECEDOR IS NOT NULL;"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -346,7 +353,56 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setDataAlteracao(rst.getDate("dtalteracao"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ID,\n"
+                    + "	TIPO,\n"
+                    + "	DATA_CAD data_cadastro,\n"
+                    + "	NOME razao,\n"
+                    + "	ENDERECO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + "	UF,\n"
+                    + "	CEP,\n"
+                    + "	CNPJ_CPF cpfcnpj,\n"
+                    + "	INSC_EST_RG inscestrg,\n"
+                    + "	TELEFONE,\n"
+                    + "	CELULAR,\n"
+                    + "	EMAIL email,\n"
+                    + "	LIMITE limite_credito,\n"
+                    + "	OBS\n"
+                    + "FROM\n"
+                    + "	CLIENTES"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    imp.setInscricaoestadual("inscestrg");
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setValorLimite(rs.getDouble("limite_credito"));
+                    imp.setEmail(rs.getString("email"));
 
                     result.add(imp);
                 }
