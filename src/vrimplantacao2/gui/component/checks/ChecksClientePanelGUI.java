@@ -1,12 +1,14 @@
 package vrimplantacao2.gui.component.checks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
@@ -23,6 +25,18 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.removeAll();
         tabCheque.removeAll();
 
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
+            chkImportarCliPreferencialAtivo.setVisible(true);
+        } else {
+            chkImportarCliPreferencialAtivo.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
+            chkImportarCliEventualAtivo.setVisible(true);
+        } else {
+            chkImportarCliEventualAtivo.setVisible(true);
+        }
+                
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -125,6 +139,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             tabImportacao.add(pnlDadosEmpresa);
         } else {
             pnlDadosEmpresa.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {            
+            chkClienteEventual.setVisible(true);
+        } else {
+            this.remove(tabClienteEventual);
         }
         
         if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
@@ -1013,12 +1033,19 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
 
-    public void gravarParametros(Parametros params, String... keys) {
-        
+    private String[] concat(String[] params, String novo) {
+        params = Arrays.copyOf(params, params.length + 1);
+        params[params.length - 1] = novo;
+        return params;
     }
 
-    public void carregarParametros(Parametros params, String... keys) {
-        
+    public void gravarParametros(Parametros parametros, String... params) {
+        parametros.put(chkImportarCliEventualAtivo.isSelected(), concat(params, "SOMENTE_EVENTUAIS_ATIVO"));
+        parametros.put(chkImportarCliPreferencialAtivo.isSelected(), concat(params, "SOMENTE_PREFERENCIAIS_ATIVO"));
     }
 
+    public void carregarParametros(Parametros parametros, String... params) {
+        chkImportarCliEventualAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_EVENTUAIS_ATIVO")));
+        chkImportarCliPreferencialAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_PREFERENCIAIS_ATIVO")));
+    }
 }

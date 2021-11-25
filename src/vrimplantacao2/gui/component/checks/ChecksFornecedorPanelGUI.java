@@ -13,8 +13,7 @@ import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
     public Importador importador;
-    private Set<OpcaoFornecedor> opt = OpcaoFornecedor.getPadrao();
-    OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
+    private Set<OpcaoFornecedor> opt = OpcaoFornecedor.getPadrao();    
 
     public void setImportador(Importador importador) {
         this.importador = importador;
@@ -782,32 +781,5 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
     public void carregarParametros(Parametros parametros, String... params) {
         chkImportarSomenteAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_FORNECEDORES_ATIVOS")));
-    }
-    
-    public OpcoesMigracaoVO carregarOpcoesMigracao() {        
-        
-        Parametros params = Parametros.get();
-        
-        opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
-        
-        return opcoesMigracaoVO;        
-    }
-    
-    public void habilitarDesabilitarOpcoesMigracao() {
-        
-        if (!opcoesMigracaoVO.isHabilitarMigracaoFornecedores()) {
-            this.remove(tabImportacao);
-        }
-        if (!opcoesMigracaoVO.isHabilitarMigracaoProdutosFornecedores()) {
-            this.remove(pnlProdForn);
-        }
-        if (!opcoesMigracaoVO.isHabilitarMigracaoContasPagar()) {
-            this.remove(pnlContaPagar);
-        }
-        
-        this.revalidate();
-    }
-
+    }    
 }

@@ -17,6 +17,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -113,6 +114,39 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                 OpcaoFornecedor.CONTATOS,
                 opcoesMigracaoVO.isHabilitarMigracaoProdutosFornecedores() ? OpcaoFornecedor.PRODUTO_FORNECEDOR : null
         ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.NOME_PAI,
+                OpcaoCliente.NOME_MAE,
+                OpcaoCliente.NOME_CONJUGE,
+                OpcaoCliente.CARGO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.OBSERVACOES,
+                opcoesMigracaoVO.isHabilitarMigracaoReceberCreditoRotativo() ? OpcaoCliente.RECEBER_CREDITOROTATIVO : null,
+                opcoesMigracaoVO.isHabilitarMigracaoClientesEventuais() ? OpcaoCliente.CLIENTE_EVENTUAL : null
+        ));        
     }
     
     @Override
