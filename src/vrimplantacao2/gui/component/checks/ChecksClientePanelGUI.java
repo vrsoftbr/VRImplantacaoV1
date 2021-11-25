@@ -299,6 +299,11 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         btgPautaFiscal = new javax.swing.ButtonGroup();
         vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
+        tabParametros = new javax.swing.JPanel();
+        pnlDados2 = new vrframework.bean.panel.VRPanel();
+        jLabel13 = new javax.swing.JLabel();
+        chkImportarCliPreferencialAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkImportarCliEventualAtivo = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlDados = new vrframework.bean.panel.VRPanel();
@@ -362,6 +367,59 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
         setName("tabMain"); // NOI18N
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "PARÂMETROS");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliPreferencialAtivo, "Importar Clientes Preferneciais Ativos");
+        chkImportarCliPreferencialAtivo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliEventualAtivo, "Importar Clientes Eventuais Ativos");
+        chkImportarCliEventualAtivo.setEnabled(true);
+
+        javax.swing.GroupLayout pnlDados2Layout = new javax.swing.GroupLayout(pnlDados2);
+        pnlDados2.setLayout(pnlDados2Layout);
+        pnlDados2Layout.setHorizontalGroup(
+            pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados2Layout.createSequentialGroup()
+                .addGroup(pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDados2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel13))
+                    .addGroup(pnlDados2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDados2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(537, Short.MAX_VALUE))
+        );
+        pnlDados2Layout.setVerticalGroup(
+            pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados2Layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
+        tabParametros.setLayout(tabParametrosLayout);
+        tabParametrosLayout.setHorizontalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlDados2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabParametrosLayout.setVerticalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametrosLayout.createSequentialGroup()
+                .addComponent(pnlDados2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 304, Short.MAX_VALUE))
+        );
+
+        addTab("Parâmetros", tabParametros);
 
         scrollImportação.setBorder(null);
 
@@ -908,6 +966,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
     public vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
+    public vrframework.bean.checkBox.VRCheckBox chkImportarCliEventualAtivo;
+    public vrframework.bean.checkBox.VRCheckBox chkImportarCliPreferencialAtivo;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
     public vrframework.bean.checkBox.VRCheckBox chkNome;
@@ -929,6 +989,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
+    public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
@@ -939,6 +1000,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDados1;
+    public vrframework.bean.panel.VRPanel pnlDados2;
     public vrframework.bean.panel.VRPanel pnlDadosComplementares;
     public vrframework.bean.panel.VRPanel pnlDadosEmpresa;
     public vrframework.bean.panel.VRPanel pnlEndereco;
@@ -947,6 +1009,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JPanel tabClienteEventual;
     public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
+    public javax.swing.JPanel tabParametros;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
 
