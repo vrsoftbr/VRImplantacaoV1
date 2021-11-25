@@ -117,7 +117,7 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="vrimplantacao2.gui.component.checks.ChecksClientePanelGUI" name="tabClientes">
+            <Container class="javax.swing.JPanel" name="tabCli">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Clientes">
@@ -125,7 +125,34 @@
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
-            </Component>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="scpClientes" pref="587" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="scpClientes" alignment="0" pref="230" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JScrollPane" name="scpClientes">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="vrimplantacao2.gui.component.checks.ChecksClientePanelGUI" name="tabClientes">
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">

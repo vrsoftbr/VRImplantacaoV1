@@ -162,6 +162,8 @@ public class SG2_5GUI extends VRInternalFrame {
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
+        tabCli = new javax.swing.JPanel();
+        scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
@@ -215,7 +217,24 @@ public class SG2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Produtos", tabProdutos);
         tabImportacao.addTab("Fornecedores", tabFornecedores);
-        tabImportacao.addTab("Clientes", tabClientes);
+
+        scpClientes.setViewportView(tabClientes);
+
+        javax.swing.GroupLayout tabCliLayout = new javax.swing.GroupLayout(tabCli);
+        tabCli.setLayout(tabCliLayout);
+        tabCliLayout.setHorizontalGroup(
+            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabCliLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabCliLayout.setVerticalGroup(
+            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+        );
+
+        tabImportacao.addTab("Clientes", tabCli);
 
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
@@ -268,6 +287,8 @@ public class SG2_5GUI extends VRInternalFrame {
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
+    private javax.swing.JScrollPane scpClientes;
+    private javax.swing.JPanel tabCli;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;

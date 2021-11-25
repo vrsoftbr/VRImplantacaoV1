@@ -97,6 +97,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -332,11 +334,12 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.fonecli10 telefone,\n" +
                     "	c.celcli10 celular,\n" +
                     "	c.datacad10 cadastro,\n" +
+                    "	c.datanasc10 nascimento,\n" +
                     "	c.limcompr10 valorlimite,\n" +
                     "	c.situacao10 situacao,\n" +
                     "	c.emailcli10 email\n" +
                     "from \n" +
-                    "	clipdv c\n" +
+                    "	cadcli c\n" +
                     "left join tabmun m on c.codmunic10 = m.codigo")) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -355,6 +358,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
                     imp.setEmail(rs.getString("email"));
                     
@@ -388,7 +392,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.clifor60 tipo\n" +
                     "from \n" +
                     "	conrec c\n" +
-                    "inner join clipdv cp on c.codcli60 = cp.codcli10\n" +
+                    "inner join cadcli cp on c.codcli60 = cp.codcli10\n" +
                     "where \n" +
                     "	c.codfil60 = " + getLojaOrigem() + " and\n" +
                     "   c.datrec60 is null")) {
