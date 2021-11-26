@@ -397,7 +397,7 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setCnpj(rs.getString("cpfcnpj"));
-                    imp.setInscricaoestadual("inscestrg");
+                    imp.setInscricaoestadual(rs.getString("inscestrg"));
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
