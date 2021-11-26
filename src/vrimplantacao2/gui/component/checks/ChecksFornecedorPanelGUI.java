@@ -8,7 +8,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
+import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
@@ -118,6 +118,105 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         tabImportacao.repaint();
     }
 
+    public void setOpcoesDisponiveis(InterfaceController controller) {
+        this.opt = controller.getOpcoesDisponiveisFornecedor();
+        tabImportacao.removeAll();
+        
+        if (opt.contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS)) {
+            chkImportarSomenteAtivos.setVisible(true);
+        } else {
+            chkImportarSomenteAtivos.setVisible(false);
+        }
+                
+        if (opt.contains(OpcaoFornecedor.DADOS)
+                || opt.contains(OpcaoFornecedor.RAZAO_SOCIAL)
+                || opt.contains(OpcaoFornecedor.NOME_FANTASIA)
+                || opt.contains(OpcaoFornecedor.CNPJ_CPF)
+                || opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL)
+                || opt.contains(OpcaoFornecedor.INSCRICAO_MUNICIPAL)) {
+
+            chkFornecedor.setVisible(opt.contains(OpcaoFornecedor.DADOS));
+            chkRazao.setVisible(opt.contains(OpcaoFornecedor.RAZAO_SOCIAL));
+            chkFantasia.setVisible(opt.contains(OpcaoFornecedor.NOME_FANTASIA));
+            chkCnpj.setVisible(opt.contains(OpcaoFornecedor.CNPJ_CPF));
+            chkIE.setVisible(opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL));
+            chkIM.setVisible(opt.contains(OpcaoFornecedor.INSCRICAO_MUNICIPAL));
+
+            tabImportacao.add(pnlDados);
+        }
+        
+        if (opt.contains(OpcaoFornecedor.ENDERECO)
+                || opt.contains(OpcaoFornecedor.NUMERO)
+                || opt.contains(OpcaoFornecedor.COMPLEMENTO)
+                || opt.contains(OpcaoFornecedor.BAIRRO)
+                || opt.contains(OpcaoFornecedor.MUNICIPIO)
+                || opt.contains(OpcaoFornecedor.UF)
+                || opt.contains(OpcaoFornecedor.CEP)) {
+
+            chkEndereco.setVisible(opt.contains(OpcaoFornecedor.ENDERECO));
+            chkNumero.setVisible(opt.contains(OpcaoFornecedor.NUMERO));
+            chkComplemento.setVisible(opt.contains(OpcaoFornecedor.COMPLEMENTO));
+            chkBairro.setVisible(opt.contains(OpcaoFornecedor.BAIRRO));
+            chkMunicipio.setVisible(opt.contains(OpcaoFornecedor.MUNICIPIO));
+            chkMunicipioIbge.setVisible(opt.contains(OpcaoFornecedor.MUNICIPIO));
+            chkUf.setVisible(opt.contains(OpcaoFornecedor.UF));
+            chkUfIbge.setVisible(opt.contains(OpcaoFornecedor.UF));
+            chkCep.setVisible(opt.contains(OpcaoFornecedor.CEP));
+
+            tabImportacao.add(pnlEndereco);
+        } else {
+            pnlEndereco.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoFornecedor.TELEFONE)
+                || opt.contains(OpcaoFornecedor.CONTATOS)) {
+
+            chkTelefone.setVisible(opt.contains(OpcaoFornecedor.TELEFONE));
+            chkContatoAdicional.setVisible(opt.contains(OpcaoFornecedor.CONTATOS));
+
+            tabImportacao.add(pnlContato);
+        } else {
+            pnlContato.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)
+                || opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO)
+                || opt.contains(OpcaoFornecedor.PRAZO_FORNECEDOR)
+                || opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO)
+                || opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)
+                || opt.contains(OpcaoFornecedor.OBSERVACAO)) {
+
+            chkDataCadastro.setVisible(opt.contains(OpcaoFornecedor.DATA_CADASTRO));
+            chkSituacaoCadastro.setVisible(opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO));
+            chkPrazoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRAZO_FORNECEDOR));
+            chkCondicaoPagamento.setVisible(opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO));
+            chkIndicadorIE.setVisible(opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE));
+            chkObservacao.setVisible(opt.contains(OpcaoFornecedor.OBSERVACAO));
+
+            tabImportacao.add(pnlDadosComplementares);
+        } else {
+            pnlDadosComplementares.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR)) {
+            chkProdutoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR));
+        } else {
+            pnlProdutoFornecedor.setVisible(false);
+            this.remove(pnlProdForn);
+        }
+        
+        if (opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR)) {
+            chkPagarFornecedor.setVisible(opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR));
+        } else {
+            this.remove(pnlContaPagar);
+            pnlContasPagar.setVisible(false);
+        }
+        
+        
+        tabImportacao.revalidate();
+        tabImportacao.repaint();
+    }
+    
     public Set<OpcaoFornecedor> getOpcoesDisponiveis() {
         return opt;
     }

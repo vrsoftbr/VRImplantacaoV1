@@ -8,7 +8,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
+import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
@@ -168,6 +168,155 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCheque.revalidate();
     }
 
+    public void setOpcoesDisponiveis(InterfaceController controller) {
+        this.opt = controller.getOpcoesDisponiveisCliente();
+        tabImportacao.removeAll();
+        tabCreditoRotativo.removeAll();
+        tabCheque.removeAll();
+
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
+            chkImportarCliPreferencialAtivo.setVisible(true);
+        } else {
+            chkImportarCliPreferencialAtivo.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
+            chkImportarCliEventualAtivo.setVisible(true);
+        } else {
+            chkImportarCliEventualAtivo.setVisible(true);
+        }
+                
+        if (opt.contains(OpcaoCliente.DADOS)
+                || opt.contains(OpcaoCliente.RAZAO)
+                || opt.contains(OpcaoCliente.FANTASIA)
+                || opt.contains(OpcaoCliente.CNPJ)
+                || opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
+
+            chkClientePreferencial.setVisible(opt.contains(OpcaoCliente.DADOS));
+            chkClienteEventual.setVisible(opt.contains(OpcaoCliente.DADOS));
+            chkNome.setVisible(opt.contains(OpcaoCliente.RAZAO));
+            chkCnpj.setVisible(opt.contains(OpcaoCliente.CNPJ));
+            chkIE.setVisible(opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL));
+
+            tabImportacao.add(pnlDados);
+        } else {
+            pnlDados.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.ENDERECO)
+                || opt.contains(OpcaoCliente.NUMERO)
+                || opt.contains(OpcaoCliente.COMPLEMENTO)
+                || opt.contains(OpcaoCliente.BAIRRO)
+                || opt.contains(OpcaoCliente.MUNICIPIO)
+                || opt.contains(OpcaoCliente.UF)
+                || opt.contains(OpcaoCliente.CEP)) {
+
+            chkEndereco.setVisible(opt.contains(OpcaoCliente.ENDERECO));
+            chkNumero.setVisible(opt.contains(OpcaoCliente.NUMERO));
+            chkComplemento.setVisible(opt.contains(OpcaoCliente.COMPLEMENTO));
+            chkBairro.setVisible(opt.contains(OpcaoCliente.BAIRRO));
+            chkMunicipio.setVisible(opt.contains(OpcaoCliente.MUNICIPIO));
+            chkMunicipioIbge.setVisible(opt.contains(OpcaoCliente.MUNICIPIO));
+            chkUf.setVisible(opt.contains(OpcaoCliente.UF));
+            chkUfIbge.setVisible(opt.contains(OpcaoCliente.UF));
+            chkCep.setVisible(opt.contains(OpcaoCliente.CEP));
+
+            tabImportacao.add(pnlEndereco);
+        } else {
+            pnlEndereco.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.TELEFONE)
+                || opt.contains(OpcaoCliente.CELULAR)
+                || opt.contains(OpcaoCliente.EMAIL)
+                || opt.contains(OpcaoCliente.CONTATOS)) {
+
+            chkTelefone.setVisible(opt.contains(OpcaoCliente.TELEFONE));
+            chkCelular.setVisible(opt.contains(OpcaoCliente.CELULAR));
+            chkEmail.setVisible(opt.contains(OpcaoCliente.EMAIL));
+            chkContatoAdicional.setVisible(opt.contains(OpcaoCliente.CONTATOS));
+
+            tabImportacao.add(pnlContato);
+        } else {
+            pnlContato.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.DATA_CADASTRO)
+                || opt.contains(OpcaoCliente.SITUACAO_CADASTRO)
+                || opt.contains(OpcaoCliente.BLOQUEADO)
+                || opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)
+                || opt.contains(OpcaoCliente.PERMITE_CHEQUE)
+                || opt.contains(OpcaoCliente.VALOR_LIMITE)
+                || opt.contains(OpcaoCliente.NOME_PAI)
+                || opt.contains(OpcaoCliente.NOME_MAE)
+                || opt.contains(OpcaoCliente.NOME_CONJUGE)
+                || opt.contains(OpcaoCliente.DATA_NASCIMENTO)
+                || opt.contains(OpcaoCliente.OBSERVACOES)
+                || opt.contains(OpcaoCliente.OBSERVACOES2)) {
+
+            chkDataCadastro.setVisible(opt.contains(OpcaoCliente.DATA_CADASTRO));
+            chkSituacaoCadastro.setVisible(opt.contains(OpcaoCliente.SITUACAO_CADASTRO));
+            chkBloqueado.setVisible(opt.contains(OpcaoCliente.BLOQUEADO));
+            chkPermiteCreditoRotativo.setVisible(opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO));
+            chkPermiteCheque.setVisible(opt.contains(OpcaoCliente.PERMITE_CHEQUE));
+            chkValorLimite.setVisible(opt.contains(OpcaoCliente.VALOR_LIMITE));
+            chkNomePai.setVisible(opt.contains(OpcaoCliente.NOME_PAI));
+            chkNomeMae.setVisible(opt.contains(OpcaoCliente.NOME_MAE));
+            chkNomeConjuge.setVisible(opt.contains(OpcaoCliente.NOME_CONJUGE));
+            chkDataNascimento.setVisible(opt.contains(OpcaoCliente.DATA_NASCIMENTO));
+            chkObservacao.setVisible(opt.contains(OpcaoCliente.OBSERVACOES));
+            chkObservacao2.setVisible(opt.contains(OpcaoCliente.OBSERVACOES2));
+            chkSexo.setVisible(opt.contains(OpcaoCliente.SEXO));
+            chkEstadoCivil.setVisible(opt.contains(OpcaoCliente.ESTADO_CIVIL));
+
+            tabImportacao.add(pnlDadosComplementares);
+
+        } else {
+            pnlDadosComplementares.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.EMPRESA)
+                || opt.contains(OpcaoCliente.CARGO)
+                || opt.contains(OpcaoCliente.DATA_ADMISSAO)
+                || opt.contains(OpcaoCliente.SALARIO)) {
+
+            chkEmpresa.setVisible(opt.contains(OpcaoCliente.EMPRESA));
+            chkCargo.setVisible(opt.contains(OpcaoCliente.CARGO));
+            chkDataAdmissao.setVisible(opt.contains(OpcaoCliente.DATA_ADMISSAO));
+            chkSalario.setVisible(opt.contains(OpcaoCliente.SALARIO));
+
+            tabImportacao.add(pnlDadosEmpresa);
+        } else {
+            pnlDadosEmpresa.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {            
+            chkClienteEventual.setVisible(true);
+        } else {
+            this.remove(tabClienteEventual);
+        }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
+            chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
+        } else {
+            pnlCreditoRotativo.setVisible(false);
+            this.remove(tabCreditoRotativo);
+        }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
+            chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
+            tabCheque.add(pnlCheque);
+        } else {
+            pnlCheque.setVisible(false);
+            this.remove(tabCheque);
+        }
+
+        tabImportacao.revalidate();
+        tabCreditoRotativo.revalidate();
+        tabCheque.revalidate();
+    }
+    
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
         return opt;
     }

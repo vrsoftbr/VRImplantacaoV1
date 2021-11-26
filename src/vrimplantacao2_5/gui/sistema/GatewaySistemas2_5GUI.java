@@ -12,12 +12,13 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
+import vrimplantacao2_5.controller.sistema.GatewaySistemasController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
-import vrimplantacao2_5.vo.sistema.ParamsGatewaySistemasVO;
+import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
@@ -26,7 +27,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = null;
-    private ParamsGatewaySistemasVO gatewaySistemasVO = new ParamsGatewaySistemasVO();
+    private GatewaySistemasVO gatewaySistemasVO = new GatewaySistemasVO();
+    private GatewaySistemasController gatewaySistemasController = null;
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private Thread thread = null;
@@ -66,7 +68,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
 
-    private ParamsGatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
+    private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         gatewaySistemasVO.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
         gatewaySistemasVO.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
@@ -102,11 +104,14 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         carregarParametros();
 
-        dao = new GatewaySistemasDAO(carregarOpcaoesMigracaoSistema(), carregarOpcoesMigracao());        
+        gatewaySistemasController = new GatewaySistemasController(
+                carregarOpcaoesMigracaoSistema(), carregarOpcoesMigracao());
         
-        tabProdutos.setOpcoesDisponiveis(dao);                
-        tabFornecedores.setOpcoesDisponiveis(dao);
-        tabClientes.setOpcoesDisponiveis(dao);        
+        dao = new GatewaySistemasDAO();        
+        
+        tabProdutos.setOpcoesDisponiveis(gatewaySistemasController);                
+        tabFornecedores.setOpcoesDisponiveis(gatewaySistemasController);
+        tabClientes.setOpcoesDisponiveis(gatewaySistemasController);        
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
