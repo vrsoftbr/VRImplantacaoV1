@@ -234,13 +234,19 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.CODIPRO idproduto,\n"
-                    + "	ean.COD_BARR||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS EAN,\n"
+                    + "	CASE \n"
+                    + "	  WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
+                    + "	  THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
+                    + "	  ELSE CAST(ean.COD_BARR AS bigint)\n"
+                    + "	END ean,\n"
                     + "	QTD_UNI qtdembalagem,\n"
                     + "	e.ABRE_EMB tipoembalagem\n"
                     + "FROM\n"
                     + "	COD_BARR ean\n"
-                    + "	JOIN PRODUTOS p ON p.CODIPRO = ean.CODIPRO \n"
-                    + "	JOIN EMBALAG e ON e.CODIEMB = p.CODIEMB_V\n"
+                    + "JOIN PRODUTOS p ON\n"
+                    + "	p.CODIPRO = ean.CODIPRO\n"
+                    + "JOIN EMBALAG e ON\n"
+                    + "	e.CODIEMB = p.CODIEMB_V\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -268,7 +274,11 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.CODIPRO idproduto,\n"
-                    + "	ean.COD_BARR||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS EAN,\n"
+                    + "	CASE \n"
+                    + "	  WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
+                    + "	  THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
+                    + "	  ELSE ean.COD_BARR\n"
+                    + "	END ean,\n"
                     + "	(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS digito,\n"
                     + "	DESCRICAO descricaocompleta,\n"
                     + "	DESCRI_AB descricaoreduzida,\n"
@@ -342,7 +352,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     //imp.setEstoque(rst.getDouble("estoque"));
 
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    //imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
 
                     String idIcmsDebito;//, IdIcmsCredito;
 
@@ -666,17 +676,32 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	REPLACE(NUMELAN||NUMEDO,'/','') id,\n"
+                    + "	NUMEDO numerocupom,\n"
+                    + "	cr.CLI_CODIGO codcli,\n"
+                    + "	c.CLI_CGC cpfcnpj,\n"
+                    + "	PDV_NUMECAI ecf,\n"
+                    + "	CR_VALORPA valor,\n"
+                    + "	CR_DATAEM emissao,\n"
+                    + "	CR_DATAVE vencimento\n"
+                    + "FROM\n"
+                    + "	CR cr\n"
+                    + "	JOIN CLIENTES c ON c.CLI_CODIGO = cr.CLI_CODIGO \n"
+                    + "WHERE\n"
+                    + "	EMP_CODIGO = " + getLojaOrigem() + "\n"
+                    + "	AND cr_datare is null\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
-                    imp.setValor(rs.getDouble("valor"));
                     imp.setIdCliente(rs.getString("codcli"));
-                    imp.setCnpjCliente(Utils.formataNumero(rs.getString("cnpjcliente")));
+                    imp.setCnpjCliente(Utils.formataNumero(rs.getString("cpfcnpj")));
                     imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
 
@@ -689,8 +714,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
     /*
         DEV DE VENDAS INTERROMPIDO, NÃO TESTADAS AINDA
-    */
-    
+     */
     private Date vendaDataIni;
     private Date vendaDataFim;
 
