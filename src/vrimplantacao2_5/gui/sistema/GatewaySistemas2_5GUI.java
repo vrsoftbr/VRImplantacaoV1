@@ -1,8 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -27,11 +25,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = null;
-    private GatewaySistemasVO gatewaySistemasVO = new GatewaySistemasVO();
-    private GatewaySistemasController gatewaySistemasController = null;
+    private GatewaySistemasVO vo = new GatewaySistemasVO();
+    private GatewaySistemasController controller = null;
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
-    private Thread thread = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -70,10 +67,10 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
     private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
         
-        gatewaySistemasVO.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
-        gatewaySistemasVO.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
+        vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
+        vo.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
         
-        return gatewaySistemasVO;        
+        return vo;        
     }
     
     public OpcoesMigracaoVO carregarOpcoesMigracao() {        
@@ -92,7 +89,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         return opcoesMigracaoVO;        
     }
-
     
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
@@ -104,14 +100,13 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         carregarParametros();
 
-        gatewaySistemasController = new GatewaySistemasController(
-                carregarOpcaoesMigracaoSistema(), carregarOpcoesMigracao());
+        dao = new GatewaySistemasDAO();
         
-        dao = new GatewaySistemasDAO();        
+        controller = new GatewaySistemasController(carregarOpcoesMigracao(), dao);
         
-        tabProdutos.setOpcoesDisponiveis(gatewaySistemasController);                
-        tabFornecedores.setOpcoesDisponiveis(gatewaySistemasController);
-        tabClientes.setOpcoesDisponiveis(gatewaySistemasController);        
+        tabProdutos.setOpcoesDisponiveis(controller);                
+        tabFornecedores.setOpcoesDisponiveis(controller);
+        tabClientes.setOpcoesDisponiveis(controller);        
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -122,13 +117,14 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return dao.getSistema();
+                controller.setComplementoSistema(pnlConn.getComplemento());
+                return controller.getSistema();
             }
 
             @Override
             public String getLoja() {
-                dao.setLojaOrigem(pnlConn.getLojaOrigem());
-                return dao.getLojaOrigem();
+                controller.setLojaOrigem(pnlConn.getLojaOrigem());
+                return controller.getLojaOrigem();
             }
 
             @Override
@@ -168,11 +164,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
-        thread = new Thread() {
-            DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-            String strVendaDataInicio = "";
-            String strVendaDataFim = "";
-            java.sql.Date vendaDataInicio, vendaDataFim;
+        Thread thread = new Thread() {
 
             @Override
             public void run() {
@@ -180,10 +172,12 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    Importador importador = new Importador(dao);
+                    Importador importador = new Importador(controller);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
+
+                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema(), importador.getLojaOrigem());
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
@@ -239,7 +233,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         };
 
         thread.start();
-        //thread.join();
     }
 
     @SuppressWarnings("unchecked")

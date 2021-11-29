@@ -24,18 +24,34 @@ public class GatewaySistemasController extends InterfaceController {
 
     public OpcoesMigracaoVO opcoesMigracaoVO = null;
     public GatewaySistemasDAO dao = null;
+    private String complementoSistema = "";
+    private final String SISTEMA = "Gateway Sistemas";
     
     public GatewaySistemasController() {}
     
-    public GatewaySistemasController(GatewaySistemasVO gatewaySistemasVO, 
-            OpcoesMigracaoVO opcoesMigracaoVO) {
-        
-        dao = new GatewaySistemasDAO();
-        dao.gatewaySistemasVO = gatewaySistemasVO;
-        
-        this.opcoesMigracaoVO = opcoesMigracaoVO;        
+    public GatewaySistemasController(OpcoesMigracaoVO opcoesMigracaoVO, GatewaySistemasDAO dao) {        
+        this.opcoesMigracaoVO = opcoesMigracaoVO;
+        this.dao = dao;
     }
 
+    @Override
+    public String getSistema() {
+        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
+    }
+    
+    public String getComplementoSistema() {
+        return this.complementoSistema;
+    }
+    
+    public void setComplementoSistema(String complementoSistema) {
+        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
+    }
+    
+    public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO, String lojaOrigem) {        
+        dao.gatewaySistemasVO = gatewaySistemasVO;
+        dao.setLojaCliente(lojaOrigem);
+    }
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -133,6 +149,6 @@ public class GatewaySistemasController extends InterfaceController {
                 OpcaoCliente.OBSERVACOES,
                 opcoesMigracaoVO.isHabilitarMigracaoReceberCreditoRotativo() ? OpcaoCliente.RECEBER_CREDITOROTATIVO : null,
                 opcoesMigracaoVO.isHabilitarMigracaoClientesEventuais() ? OpcaoCliente.CLIENTE_EVENTUAL : null
-        ));        
+        ));
     }
 }

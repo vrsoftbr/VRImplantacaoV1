@@ -33,6 +33,15 @@ import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public GatewaySistemasVO gatewaySistemasVO = null;
+    private String lojaCliente;
+    
+    public String getLojaCliente() {
+        return this.lojaCliente;
+    }
+    
+    public void setLojaCliente(String lojaCliente) {
+        this.lojaCliente = lojaCliente;
+    }
         
     @Override
     public String getSistema() {

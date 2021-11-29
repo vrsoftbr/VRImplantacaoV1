@@ -116,12 +116,14 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 public class Importador {
 
     private static final Logger LOG = Logger.getLogger(Importador.class.getName());
 
     private InterfaceDAO interfaceDAO;
+    private InterfaceController interfaceController;
     private int lojaVR = 1;
     private int idConexao = 0;
     private boolean importarIndividualLoja = false;
@@ -131,6 +133,10 @@ public class Importador {
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
     }
+    
+    public Importador(InterfaceController interfaceController) {
+        this.interfaceController = interfaceController;
+    }
 
     public void setInterfaceDAO(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -138,6 +144,14 @@ public class Importador {
 
     public InterfaceDAO getInterfaceDAO() {
         return interfaceDAO;
+    }
+    
+    public void setInterfaceController(InterfaceController interfaceController) {
+        this.interfaceController = interfaceController;
+    }
+    
+    public InterfaceController getInterfaceController() {
+        return this.interfaceController;
     }
 
     public int getIdConexao() {
