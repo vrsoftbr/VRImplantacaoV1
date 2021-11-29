@@ -133,9 +133,6 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO
-        //OpcaoProduto.RECEITA,
-        //OpcaoProduto.PAUTA_FISCAL,
-        //OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
     }
 
@@ -149,7 +146,6 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
-        //OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
 
