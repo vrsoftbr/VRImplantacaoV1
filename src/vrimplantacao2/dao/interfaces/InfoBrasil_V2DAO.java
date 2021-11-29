@@ -8,9 +8,13 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -37,6 +41,45 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
         }
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.NCM
+        ));
+    }
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -177,7 +220,7 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
                     imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
                     imp.setIcmsCstSaidaForaEstado(cstIcms);
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_reducao"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_reducao"));                    
                     imp.setIcmsCstSaidaForaEstadoNF(cstIcms);
                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
                     imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_reducao"));
@@ -418,7 +461,6 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
                     + "    r.rec_doc,\n"
                     + "    r.rec_valor,\n"
                     + "    r.rec_observacoes,\n"
-                    + "    r.rec_obs,\n"
                     + "    r.rec_datavenc\n"
                     + "from\n"
                     + "   contasreceber r\n"
@@ -438,7 +480,7 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
                     imp.setDataVencimento(rst.getDate("rec_datavenc"));
                     imp.setNumeroCupom(rst.getString("rec_doc"));
                     imp.setValor(rst.getDouble("rec_valor"));
-                    imp.setObservacao(rst.getString("rec_obs") == null ? rst.getString("rec_observacoes") : rst.getString("rec_obs"));
+                    imp.setObservacao(rst.getString("rec_observacoes"));
                     result.add(imp);
                 }
             }
