@@ -9,7 +9,7 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao2.dao.interfaces.InfoBrasilDAO;
+import vrimplantacao2.dao.interfaces.InfoBrasil_V2DAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -23,7 +23,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
     private static final String SISTEMA = "InfoBrasil";
     private static final String SERVIDOR_SQL = "Firebird";
     private static InfoBrasilGUI instance;
-    private InfoBrasilDAO dao = new InfoBrasilDAO();
+    private InfoBrasil_V2DAO dao = new InfoBrasil_V2DAO();
     private ConexaoFirebird connFirebird = new ConexaoFirebird();
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
