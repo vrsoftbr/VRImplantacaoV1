@@ -40,6 +40,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
+        tabProdutos.gravarParametros(params, SISTEMA);
         params.put(txtComplSistema.getText(), SISTEMA, "COMPL_SISTEMA");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
