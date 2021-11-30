@@ -55,7 +55,6 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.PESAVEL,
-                OpcaoProduto.VALIDADE,
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.DESC_REDUZIDA,
@@ -138,7 +137,7 @@ public class InfoBrasil_V2DAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "   p.pro_codigo id,\n"
-                    + "   p.pro_codigo ean,\n"
+                    + "   COALESCE(p.PRO_CODIGOBAR, p.pro_codigo) ean,\n"
                     + "   p.pro_descricao descricaocompleta,\n"
                     + "   p.pro_descfiscal descricaoreduzida,\n"
                     + "   p.pro_descricao descricaogondola,\n"
