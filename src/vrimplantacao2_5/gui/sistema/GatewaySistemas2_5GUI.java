@@ -79,6 +79,9 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
         
+        opcoesMigracaoVO.setHabilitarMigracaoFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
+        opcoesMigracaoVO.setHabilitarMigracaoMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
+        opcoesMigracaoVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
         opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
         opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
         opcoesMigracaoVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
