@@ -265,7 +265,7 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.SETOR merc2,\n"
                     + "	p.SETOR merc3,\n"
                     + "	p.PESO pesobruto,\n"
-                    + "	CASE COALESCE(p.INATIVO,0) WHEN 0 THEN 1 ELSE 0 END situacaodastro\n"
+                    + "	CASE COALESCE(p.INATIVO,0) WHEN 'S' THEN 0 ELSE 1 END situacaocadastro\n"
                     + "FROM\n"
                     + "	CTPROD p\n"
                     + "	LEFT JOIN CTPROD_FILIAL f ON p.CODIGO = f.CODIGO\n"
