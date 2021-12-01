@@ -198,6 +198,10 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             pnlDadosComplementares.setVisible(false);
         }
         
+        if (!opt.contains(OpcaoFornecedor.DADOS)) {
+            this.remove(scrollImportação);
+        }
+        
         if (opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR)) {
             chkProdutoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR));
         } else {
@@ -328,7 +332,6 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         tabParametros = new javax.swing.JPanel();
         pnlParametros = new vrframework.bean.panel.VRPanel();
-        jLabel10 = new javax.swing.JLabel();
         chkImportarSomenteAtivos = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
@@ -382,9 +385,6 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         pnlParametros.setBorder(null);
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "PARÂMETROS");
-
         org.openide.awt.Mnemonics.setLocalizedText(chkImportarSomenteAtivos, "Importar somente ativos");
         chkImportarSomenteAtivos.setEnabled(true);
 
@@ -393,23 +393,16 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         pnlParametrosLayout.setHorizontalGroup(
             pnlParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlParametrosLayout.createSequentialGroup()
-                .addGroup(pnlParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlParametrosLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel10))
-                    .addGroup(pnlParametrosLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chkImportarSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(chkImportarSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(554, Short.MAX_VALUE))
         );
         pnlParametrosLayout.setVerticalGroup(
             pnlParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlParametrosLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(chkImportarSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
@@ -847,7 +840,6 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
-    public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
