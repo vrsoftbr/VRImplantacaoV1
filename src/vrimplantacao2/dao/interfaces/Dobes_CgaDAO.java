@@ -8,8 +8,11 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.OfertaDAO;
@@ -18,6 +21,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.OfertaVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -98,6 +102,45 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,}
+        ));
     }
 
     @Override
@@ -645,16 +688,21 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ret016.\"ALIQDesc\",\n"
                     + "ret016.\"ALIQNFPerc\",\n"
                     + "ret016.\"ALIQRedNF\",\n"
-                    + "ret016.\"ALIQPerc\"\n"
+                    + "ret016.\"ALIQPerc\",\n"
+                    + "CASE WHEN ret016.\"ALIQRedNF\" > 0 THEN 20\n"
+                    + "ELSE 0 END cst\n"
                     + "from ret016\n"
-                    + "order by ret016.\"ALIQCod\" asc"
+                    + "order by ret016.\"ALIQCod\" ASC"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("ALIQCod"),
                             rs.getString("ALIQDesc")
                             + " ALIQ. " + rs.getString("ALIQNFPerc")
-                            + " RED. " + rs.getString("ALIQRedNF")));
+                            + " RED. " + rs.getString("ALIQRedNF"),
+                            rs.getInt("cst"),
+                            rs.getFloat("ALIQNFPerc"),
+                            rs.getFloat("ALIQRedNF")));
                 }
             }
         }
