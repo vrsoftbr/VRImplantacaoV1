@@ -175,7 +175,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    Importador importador = new Importador(controller);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);

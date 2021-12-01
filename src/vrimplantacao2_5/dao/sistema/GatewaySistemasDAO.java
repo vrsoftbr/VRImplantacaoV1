@@ -185,7 +185,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    if (gatewaySistemasVO.getProdutosBalancaIniciaCom20()) {
+                    if (gatewaySistemasVO.isProdutosBalancaIniciaCom20()) {
                         if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
                             if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
@@ -199,26 +199,39 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setEan(rst.getString("ean"));
                     }
 
-                    if (gatewaySistemasVO.getTemArquivoBalanca()) {
+                    if (gatewaySistemasVO.isTemArquivoBalanca()) {
+                        if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan());
+                            if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
 
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
+                                imp.setEan(rst.getString("ean").trim().substring(1));
+                            } else {
+                                imp.setEan(rst.getString("ean"));
+                            }
                         }
 
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        if (imp.getEan() != null && !imp.getEan().trim().isEmpty()) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan());
+
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         } else {
                             imp.setValidade(0);
                             imp.seteBalanca(false);
                         }
-
                     } else {
                         if ("Balan".equals(rst.getString("tipo")) || "Peso".equals(rst.getString("tipo"))) {
                             imp.seteBalanca(true);

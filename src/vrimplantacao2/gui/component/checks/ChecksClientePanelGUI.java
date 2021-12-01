@@ -141,7 +141,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlDadosEmpresa.setVisible(false);
         }
         
-        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {            
+        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
             chkClienteEventual.setVisible(true);
         } else {
             this.remove(tabClienteEventual);

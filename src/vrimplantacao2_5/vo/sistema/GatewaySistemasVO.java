@@ -9,11 +9,11 @@ public class GatewaySistemasVO {
     private boolean temArquivoBalanca = false;
     private boolean produtosBalancaIniciaCom20 = false;
 
-    public boolean getTemArquivoBalanca() {
+    public boolean isTemArquivoBalanca() {
         return this.temArquivoBalanca;
     }
 
-    public boolean getProdutosBalancaIniciaCom20() {
+    public boolean isProdutosBalancaIniciaCom20() {
         return this.produtosBalancaIniciaCom20;
     }
 
