@@ -290,7 +290,8 @@ public class AriusGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis();
+                            //importador.importarMercadologicoPorNiveis();
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {
