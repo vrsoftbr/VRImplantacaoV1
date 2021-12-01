@@ -1100,72 +1100,71 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.createStatement()) {
             if (importarDeClientes) {
                 try (ResultSet rst = stm.executeQuery(
-                        "WITH LIM AS\n"
-                        + "(SELECT\n"
-                        + "	cliente,\n"
-                        + "	sum(limite) somalimite\n"
-                        + "FROM clientes_limites\n"
-                        + "GROUP BY cliente ORDER BY 1)\n"
-                        + "SELECT\n"
-                        + "	c.id,\n"
-                        + "	c.cnpj_cpf,\n"
-                        + "	c.inscricao_rg,\n"
-                        + "	c.orgao_publico,\n"
-                        + "	c.datahora_cadastro datacadastro,\n"
-                        + "	c.descritivo razao,\n"
-                        + "	c.fantasia,\n"
-                        + "	c.situacao AS bloqueado,\n"
-                        + "	c.endereco,\n"
-                        + "	c.numero,\n"
-                        + "	c.complemento,\n"
-                        + "	c.bairro,\n"
-                        + "	c.cidade,\n"
-                        + "	c.estado,\n"
-                        + "	c.cod_ibge municipio_ibge,\n"
-                        + "	c.cep,\n"
-                        + "	c.estado_civil,\n"
-                        + "	c.data_nascimento,\n"
-                        + "	CASE c.sexo WHEN 1 THEN 0 ELSE 1 END sexo,\n"
-                        + "	c.empresacad,\n"
-                        + "	c.telefoneemp,\n"
-                        + "	c.data_admissao,\n"
-                        + "	c.cargo,\n"
-                        + "	c.salario,\n"
-                        + "	somalimite limite,\n"
-                        + "	c.conjugue,\n"
-                        + "	c.pai,\n"
-                        + "	c.mae,\n"
-                        + "	c.observacao,\n"
-                        + "	c.dias_vencto,\n"
-                        + "	c.telefone1,\n"
-                        + "	c.telefone2,\n"
-                        + "	c.email,\n"
-                        + "	c.fax,\n"
-                        + "	c.telefone_cobranca,\n"
-                        + "	c.endereco_c,\n"
-                        + "	c.numero_c,\n"
-                        + "	c.complemento_c,\n"
-                        + "	c.bairro_c,\n"
-                        + "	c.cidade_c,\n"
-                        + "	c.estado_c,\n"
-                        + "	c.cep_c,\n"
-                        + "	c.inscricao_municipal,\n"
-                        + "	decode(c.empresa_convenio, '', 3, c.empresa_convenio) AS empresa_convenio,\n"
-                        + "CASE\n"
-                        + "		c.estado_civil WHEN 0 THEN 'SOLTEIRO'\n"
-                        + "		WHEN 1 THEN 'CASADO'\n"
-                        + "		WHEN 2 THEN 'DIVORCIADO'\n"
-                        + "		WHEN 3 THEN 'VIUVO'\n"
-                        + "		WHEN 4 THEN 'AMASIADO'\n"
-                        + "	END estadocivil\n"
-                        + "FROM\n"
-                        + "	clientes c\n"
-                        + "	JOIN LIM ON LIM.CLIENTE = C.ID\n"
-                        + "WHERE\n"
-                        + "	upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n"
-                        + "ORDER BY\n"
-                        + "	ID\n"
-                        + "	"
+                        "WITH LIM AS\n" +
+                        "(SELECT\n" +
+                        "	cliente,\n" +
+                        "	sum(limite) somalimite\n" +
+                        "FROM clientes_limites\n" +
+                        "GROUP BY cliente ORDER BY 1)\n" +
+                        "SELECT\n" +
+                        "	c.id,\n" +
+                        "	c.cnpj_cpf,\n" +
+                        "	c.inscricao_rg,\n" +
+                        "	c.orgao_publico,\n" +
+                        "	c.datahora_cadastro datacadastro,\n" +
+                        "	c.descritivo razao,\n" +
+                        "	c.fantasia,\n" +
+                        "	c.situacao AS bloqueado,\n" +
+                        "	c.endereco,\n" +
+                        "	c.numero,\n" +
+                        "	c.complemento,\n" +
+                        "	c.bairro,\n" +
+                        "	c.cidade,\n" +
+                        "	c.estado,\n" +
+                        "	c.cod_ibge municipio_ibge,\n" +
+                        "	c.cep,\n" +
+                        "	c.estado_civil,\n" +
+                        "	c.data_nascimento,\n" +
+                        "	CASE c.sexo WHEN 1 THEN 0 ELSE 1 END sexo,\n" +
+                        "	c.empresacad,\n" +
+                        "	c.telefoneemp,\n" +
+                        "	c.data_admissao,\n" +
+                        "	c.cargo,\n" +
+                        "	c.salario,\n" +
+                        "	COALESCE (somalimite,0) limite,\n" +
+                        "	c.conjugue,\n" +
+                        "	c.pai,\n" +
+                        "	c.mae,\n" +
+                        "	c.observacao,\n" +
+                        "	c.dias_vencto,\n" +
+                        "	c.telefone1,\n" +
+                        "	c.telefone2,\n" +
+                        "	c.email,\n" +
+                        "	c.fax,\n" +
+                        "	c.telefone_cobranca,\n" +
+                        "	c.endereco_c,\n" +
+                        "	c.numero_c,\n" +
+                        "	c.complemento_c,\n" +
+                        "	c.bairro_c,\n" +
+                        "	c.cidade_c,\n" +
+                        "	c.estado_c,\n" +
+                        "	c.cep_c,\n" +
+                        "	c.inscricao_municipal,\n" +
+                        "	decode(c.empresa_convenio, '', 3, c.empresa_convenio) AS empresa_convenio,\n" +
+                        "CASE\n" +
+                        "		c.estado_civil WHEN 0 THEN 'SOLTEIRO'\n" +
+                        "		WHEN 1 THEN 'CASADO'\n" +
+                        "		WHEN 2 THEN 'DIVORCIADO'\n" +
+                        "		WHEN 3 THEN 'VIUVO'\n" +
+                        "		WHEN 4 THEN 'AMASIADO'\n" +
+                        "	END estadocivil\n" +
+                        "FROM\n" +
+                        "	clientes c\n" +
+                        "	LEFT JOIN LIM ON LIM.CLIENTE = C.ID\n" +
+                        "WHERE\n" +
+                        "	upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n" +
+                        "ORDER BY\n" +
+                        "	ID"
                 )) {
                     while (rst.next()) {
 
