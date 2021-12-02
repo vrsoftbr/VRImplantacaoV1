@@ -15,7 +15,11 @@ public enum EScriptLojaOrigemSistema {
             "codfil99 id, " +
             "cgcfil99 || '' - '' || apelido99 descricao " +
             "from " +
-            "cadfil");
+            "cadfil"),
+    HIPCOM(74, 8, "select "
+            + "lojcod as id, "
+            + "concat(lojcod,'' - '', lojfantas) descricao, "
+            + "lojcnpj from hiploj order by 1");
     
     private int idSistema;
     private int idBancoDados;
