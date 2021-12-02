@@ -152,8 +152,9 @@
                                       </Group>
                                       <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkImportarSomenteProdutosAtivos" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkForcarUnificacao" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="195" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="249" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -188,7 +189,9 @@
                                   <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkImportarSomenteProdutosAtivos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkForcarUnificacao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -263,6 +266,12 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarSomenteProdutosAtivos">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Importar somente produtos ativos"/>
+                    <Property name="toolTipText" type="java.lang.String" value="N&#xe3;o importa os produtos marcados como inativos no sistema antigo."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarUnificacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="For&#xe7;ar Unifica&#xe7;&#xe3;o"/>
                     <Property name="toolTipText" type="java.lang.String" value="N&#xe3;o importa os produtos marcados como inativos no sistema antigo."/>
                   </Properties>
                 </Component>

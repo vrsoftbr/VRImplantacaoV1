@@ -59,6 +59,7 @@ public class ProdutoRepository {
     private boolean copiarIcmsDebitoParaCredito = false;
     private boolean manterDescricao = false;
     public boolean importarSomenteLoja = false;
+    private boolean forcarUnificacao = false;
 
     private Map<String, Entry<String, Integer>> divisoes;
 
@@ -81,6 +82,14 @@ public class ProdutoRepository {
 
     public Set<OpcaoProduto> getOpcoes() {
         return provider.getOpcoes();
+    }
+    
+    public boolean isForcarUnificacao() {
+        return this.forcarUnificacao;
+    }
+    
+    public void setForcarUnificacao(boolean forcarUnificacao) {
+        this.forcarUnificacao = forcarUnificacao;
     }
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
@@ -265,26 +274,32 @@ public class ProdutoRepository {
     
     public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
         ProdutoService produtoService = new ProdutoService();
+        forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
         
         int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                 registros = produtoService.verificaRegistro();
-        
-        if(registros > 0 && idConexao == 0) {
+                
+        if (this.forcarUnificacao) {
             unificar(produtos);
         } else {
-            boolean existeConexao = produtoService.
+            
+            if (registros > 0 && idConexao == 0) {
+                unificar(produtos);
+            } else {
+                boolean existeConexao = produtoService.
                         verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
-            
-            boolean lojaJaMigrada = produtoService.
+
+                boolean lojaJaMigrada = produtoService.
                         verificaMultilojaMigrada(getLoja(), getSistema(), this.provider.getIdConexao());
-            
-            if(registros > 0 && existeConexao && !lojaJaMigrada) {
-                String lojaModelo = produtoService.getLojaModelo(this.provider.getIdConexao(), getSistema());
-                
-                produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
+
+                if (registros > 0 && existeConexao && !lojaJaMigrada) {
+                    String lojaModelo = produtoService.getLojaModelo(this.provider.getIdConexao(), getSistema());
+
+                    produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
+                }
+
+                salvar(produtos);
             }
-            
-            salvar(produtos);
         }
     }
 

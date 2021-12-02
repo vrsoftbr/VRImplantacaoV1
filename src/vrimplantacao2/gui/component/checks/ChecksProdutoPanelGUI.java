@@ -580,6 +580,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkForcarPrecoCusto = new vrframework.bean.checkBox.VRCheckBox();
         chkAtualizarSomenteIncluidosUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         chkImportarSomenteProdutosAtivos = new vrframework.bean.checkBox.VRCheckBox();
+        chkForcarUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -778,6 +779,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkImportarSomenteProdutosAtivos, "Importar somente produtos ativos");
         chkImportarSomenteProdutosAtivos.setToolTipText("Não importa os produtos marcados como inativos no sistema antigo.");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkForcarUnificacao, "Forçar Unificação");
+        chkForcarUnificacao.setToolTipText("Não importa os produtos marcados como inativos no sistema antigo.");
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -804,8 +808,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 195, Short.MAX_VALUE))))
+                            .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 249, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -833,7 +838,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 8, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         tabParametros.add(pnlOptProduto);
@@ -1718,6 +1725,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkFamilia;
     public vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkForcarPrecoCusto;
+    public vrframework.bean.checkBox.VRCheckBox chkForcarUnificacao;
     public vrframework.bean.checkBox.VRCheckBox chkICMS;
     public vrframework.bean.checkBox.VRCheckBox chkIcmsConsumidor;
     public vrframework.bean.checkBox.VRCheckBox chkIcmsCredito;
@@ -1850,6 +1858,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         parametros.put(chkImportarSomenteProdutosAtivos.isSelected(), concat(params, "SOMENTES_PRODUTOS_ATIVOS" ));
         parametros.put(chkManterEANsMenores.isSelected(), concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS" ));
         parametros.put(chkManterDescricaoProduto.isSelected(), concat(params, "MANTER_DESCRICAO_PRODUTO"));
+        parametros.put(chkForcarUnificacao.isSelected(), concat(params, "FORCAR UNIFICACAO"));
         
         if (rdbPautaIdPauta.isSelected()) {
             parametros.put(1, concat(params, "PAUTA_OPCAO" ));
@@ -1874,6 +1883,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkImportarSomenteProdutosAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_PRODUTOS_ATIVOS" )));
         chkManterEANsMenores.setSelected(parametros.getBool(concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS")));
         chkManterDescricaoProduto.setSelected(parametros.getBool(concat(params, "MANTER_DESCRICAO_PRODUTO")));
+        chkForcarUnificacao.setSelected(parametros.getBool("FORCAR UNIFICACAO"));
         
         switch (parametros.getInt(concat(params, "PAUTA_OPCAO" ))) {
             case 2: rdbPautaIdProduto.setSelected(true); break;
@@ -1922,6 +1932,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkImportarSomenteProdutosAtivos.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
+                }
+                if (chkForcarUnificacao.isSelected()) {
+                    opt.add(OpcaoProduto.FORCAR_UNIFICACAO);
                 }
                 opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));

@@ -453,7 +453,11 @@ public enum OpcaoProduto {
     /***
      * Força a atualização de custo mesmo que o usuário já os tenha alterado.
      */
-    FORCAR_ATUALIZACAO;
+    FORCAR_ATUALIZACAO,
+    /***
+     * Forçar unficação de produtos, sem passar pela migração normal.
+     */
+    FORCAR_UNIFICACAO;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

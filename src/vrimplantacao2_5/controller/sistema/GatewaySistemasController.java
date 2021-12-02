@@ -56,6 +56,7 @@ public class GatewaySistemasController extends InterfaceController {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.FORCAR_UNIFICACAO : null,
                     opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_MANTER_BALANCA : null,
                     opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS : null,
                     opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS : null,
