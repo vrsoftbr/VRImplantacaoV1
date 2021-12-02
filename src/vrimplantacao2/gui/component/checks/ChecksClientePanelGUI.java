@@ -1,12 +1,14 @@
 package vrimplantacao2.gui.component.checks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
@@ -23,6 +25,18 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.removeAll();
         tabCheque.removeAll();
 
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
+            chkImportarCliPreferencialAtivo.setVisible(true);
+        } else {
+            chkImportarCliPreferencialAtivo.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
+            chkImportarCliEventualAtivo.setVisible(true);
+        } else {
+            chkImportarCliEventualAtivo.setVisible(false);
+        }
+                
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -127,6 +141,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlDadosEmpresa.setVisible(false);
         }
         
+        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
+            chkClienteEventual.setVisible(true);
+        } else {
+            this.remove(tabClienteEventual);
+        }
+        
         if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
             tabCreditoRotativo.add(pnlCreditoRotativo);
@@ -148,6 +168,159 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCheque.revalidate();
     }
 
+    public void setOpcoesDisponiveis(InterfaceController controller) {
+        this.opt = controller.getOpcoesDisponiveisCliente();
+        tabImportacao.removeAll();
+        tabCreditoRotativo.removeAll();
+        tabCheque.removeAll();
+
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
+            chkImportarCliPreferencialAtivo.setVisible(true);
+        } else {
+            chkImportarCliPreferencialAtivo.setVisible(false);
+        }
+        
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
+            chkImportarCliEventualAtivo.setVisible(true);
+        } else {
+            chkImportarCliEventualAtivo.setVisible(false);
+        }
+                
+        if (opt.contains(OpcaoCliente.DADOS)
+                || opt.contains(OpcaoCliente.RAZAO)
+                || opt.contains(OpcaoCliente.FANTASIA)
+                || opt.contains(OpcaoCliente.CNPJ)
+                || opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
+
+            chkClientePreferencial.setVisible(opt.contains(OpcaoCliente.DADOS));
+            chkClienteEventual.setVisible(opt.contains(OpcaoCliente.DADOS));
+            chkNome.setVisible(opt.contains(OpcaoCliente.RAZAO));
+            chkCnpj.setVisible(opt.contains(OpcaoCliente.CNPJ));
+            chkIE.setVisible(opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL));
+
+            tabImportacao.add(pnlDados);
+        } else {
+            pnlDados.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.ENDERECO)
+                || opt.contains(OpcaoCliente.NUMERO)
+                || opt.contains(OpcaoCliente.COMPLEMENTO)
+                || opt.contains(OpcaoCliente.BAIRRO)
+                || opt.contains(OpcaoCliente.MUNICIPIO)
+                || opt.contains(OpcaoCliente.UF)
+                || opt.contains(OpcaoCliente.CEP)) {
+
+            chkEndereco.setVisible(opt.contains(OpcaoCliente.ENDERECO));
+            chkNumero.setVisible(opt.contains(OpcaoCliente.NUMERO));
+            chkComplemento.setVisible(opt.contains(OpcaoCliente.COMPLEMENTO));
+            chkBairro.setVisible(opt.contains(OpcaoCliente.BAIRRO));
+            chkMunicipio.setVisible(opt.contains(OpcaoCliente.MUNICIPIO));
+            chkMunicipioIbge.setVisible(opt.contains(OpcaoCliente.MUNICIPIO));
+            chkUf.setVisible(opt.contains(OpcaoCliente.UF));
+            chkUfIbge.setVisible(opt.contains(OpcaoCliente.UF));
+            chkCep.setVisible(opt.contains(OpcaoCliente.CEP));
+
+            tabImportacao.add(pnlEndereco);
+        } else {
+            pnlEndereco.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.TELEFONE)
+                || opt.contains(OpcaoCliente.CELULAR)
+                || opt.contains(OpcaoCliente.EMAIL)
+                || opt.contains(OpcaoCliente.CONTATOS)) {
+
+            chkTelefone.setVisible(opt.contains(OpcaoCliente.TELEFONE));
+            chkCelular.setVisible(opt.contains(OpcaoCliente.CELULAR));
+            chkEmail.setVisible(opt.contains(OpcaoCliente.EMAIL));
+            chkContatoAdicional.setVisible(opt.contains(OpcaoCliente.CONTATOS));
+
+            tabImportacao.add(pnlContato);
+        } else {
+            pnlContato.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.DATA_CADASTRO)
+                || opt.contains(OpcaoCliente.SITUACAO_CADASTRO)
+                || opt.contains(OpcaoCliente.BLOQUEADO)
+                || opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)
+                || opt.contains(OpcaoCliente.PERMITE_CHEQUE)
+                || opt.contains(OpcaoCliente.VALOR_LIMITE)
+                || opt.contains(OpcaoCliente.NOME_PAI)
+                || opt.contains(OpcaoCliente.NOME_MAE)
+                || opt.contains(OpcaoCliente.NOME_CONJUGE)
+                || opt.contains(OpcaoCliente.DATA_NASCIMENTO)
+                || opt.contains(OpcaoCliente.OBSERVACOES)
+                || opt.contains(OpcaoCliente.OBSERVACOES2)) {
+
+            chkDataCadastro.setVisible(opt.contains(OpcaoCliente.DATA_CADASTRO));
+            chkSituacaoCadastro.setVisible(opt.contains(OpcaoCliente.SITUACAO_CADASTRO));
+            chkBloqueado.setVisible(opt.contains(OpcaoCliente.BLOQUEADO));
+            chkPermiteCreditoRotativo.setVisible(opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO));
+            chkPermiteCheque.setVisible(opt.contains(OpcaoCliente.PERMITE_CHEQUE));
+            chkValorLimite.setVisible(opt.contains(OpcaoCliente.VALOR_LIMITE));
+            chkNomePai.setVisible(opt.contains(OpcaoCliente.NOME_PAI));
+            chkNomeMae.setVisible(opt.contains(OpcaoCliente.NOME_MAE));
+            chkNomeConjuge.setVisible(opt.contains(OpcaoCliente.NOME_CONJUGE));
+            chkDataNascimento.setVisible(opt.contains(OpcaoCliente.DATA_NASCIMENTO));
+            chkObservacao.setVisible(opt.contains(OpcaoCliente.OBSERVACOES));
+            chkObservacao2.setVisible(opt.contains(OpcaoCliente.OBSERVACOES2));
+            chkSexo.setVisible(opt.contains(OpcaoCliente.SEXO));
+            chkEstadoCivil.setVisible(opt.contains(OpcaoCliente.ESTADO_CIVIL));
+
+            tabImportacao.add(pnlDadosComplementares);
+
+        } else {
+            pnlDadosComplementares.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.EMPRESA)
+                || opt.contains(OpcaoCliente.CARGO)
+                || opt.contains(OpcaoCliente.DATA_ADMISSAO)
+                || opt.contains(OpcaoCliente.SALARIO)) {
+
+            chkEmpresa.setVisible(opt.contains(OpcaoCliente.EMPRESA));
+            chkCargo.setVisible(opt.contains(OpcaoCliente.CARGO));
+            chkDataAdmissao.setVisible(opt.contains(OpcaoCliente.DATA_ADMISSAO));
+            chkSalario.setVisible(opt.contains(OpcaoCliente.SALARIO));
+
+            tabImportacao.add(pnlDadosEmpresa);
+        } else {
+            pnlDadosEmpresa.setVisible(false);
+        }
+        
+        if (!opt.contains(OpcaoCliente.DADOS)) {
+            this.remove(scrollImportação);
+        }
+        
+        if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
+            chkClienteEventual.setVisible(true);
+        } else {
+            this.remove(tabClienteEventual);
+        }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {
+            chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
+        } else {
+            pnlCreditoRotativo.setVisible(false);
+            this.remove(tabCreditoRotativo);
+        }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
+            chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
+            tabCheque.add(pnlCheque);
+        } else {
+            pnlCheque.setVisible(false);
+            this.remove(tabCheque);
+        }
+
+        tabImportacao.revalidate();
+        tabCreditoRotativo.revalidate();
+        tabCheque.revalidate();
+    }
+    
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
         return opt;
     }
@@ -299,6 +472,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         btgPautaFiscal = new javax.swing.ButtonGroup();
         vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
+        tabParametros = new javax.swing.JPanel();
+        pnlDados2 = new vrframework.bean.panel.VRPanel();
+        chkImportarCliPreferencialAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkImportarCliEventualAtivo = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlDados = new vrframework.bean.panel.VRPanel();
@@ -346,7 +523,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkCargo = new vrframework.bean.checkBox.VRCheckBox();
         chkDataAdmissao = new vrframework.bean.checkBox.VRCheckBox();
         chkSalario = new vrframework.bean.checkBox.VRCheckBox();
-        jPanel1 = new javax.swing.JPanel();
+        tabClienteEventual = new javax.swing.JPanel();
         pnlDados1 = new vrframework.bean.panel.VRPanel();
         jLabel12 = new javax.swing.JLabel();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -362,6 +539,51 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
         setName("tabMain"); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliPreferencialAtivo, "Importar Clientes Preferneciais Ativos");
+        chkImportarCliPreferencialAtivo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliEventualAtivo, "Importar Clientes Eventuais Ativos");
+        chkImportarCliEventualAtivo.setEnabled(true);
+
+        javax.swing.GroupLayout pnlDados2Layout = new javax.swing.GroupLayout(pnlDados2);
+        pnlDados2.setLayout(pnlDados2Layout);
+        pnlDados2Layout.setHorizontalGroup(
+            pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados2Layout.createSequentialGroup()
+                .addGroup(pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDados2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDados2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(537, Short.MAX_VALUE))
+        );
+        pnlDados2Layout.setVerticalGroup(
+            pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDados2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
+        tabParametros.setLayout(tabParametrosLayout);
+        tabParametrosLayout.setHorizontalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlDados2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabParametrosLayout.setVerticalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametrosLayout.createSequentialGroup()
+                .addComponent(pnlDados2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 304, Short.MAX_VALUE))
+        );
+
+        addTab("Parâmetros", tabParametros);
 
         scrollImportação.setBorder(null);
 
@@ -773,20 +995,20 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout tabClienteEventualLayout = new javax.swing.GroupLayout(tabClienteEventual);
+        tabClienteEventual.setLayout(tabClienteEventualLayout);
+        tabClienteEventualLayout.setHorizontalGroup(
+            tabClienteEventualLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlDados1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        tabClienteEventualLayout.setVerticalGroup(
+            tabClienteEventualLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteEventualLayout.createSequentialGroup()
                 .addComponent(pnlDados1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 327, Short.MAX_VALUE))
         );
 
-        addTab("Importação Cliente Eventual", jPanel1);
+        addTab("Importação Cliente Eventual", tabClienteEventual);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "CREDITO ROTATIVO");
@@ -908,6 +1130,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
     public vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
+    public vrframework.bean.checkBox.VRCheckBox chkImportarCliEventualAtivo;
+    public vrframework.bean.checkBox.VRCheckBox chkImportarCliPreferencialAtivo;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
     public vrframework.bean.checkBox.VRCheckBox chkNome;
@@ -934,28 +1158,37 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
-    public javax.swing.JPanel jPanel1;
     public vrframework.bean.panel.VRPanel pnlCheque;
     public vrframework.bean.panel.VRPanel pnlContato;
     public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDados1;
+    public vrframework.bean.panel.VRPanel pnlDados2;
     public vrframework.bean.panel.VRPanel pnlDadosComplementares;
     public vrframework.bean.panel.VRPanel pnlDadosEmpresa;
     public vrframework.bean.panel.VRPanel pnlEndereco;
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JPanel tabCheque;
+    public javax.swing.JPanel tabClienteEventual;
     public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
+    public javax.swing.JPanel tabParametros;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
 
-    public void gravarParametros(Parametros params, String... keys) {
-        
+    private String[] concat(String[] params, String novo) {
+        params = Arrays.copyOf(params, params.length + 1);
+        params[params.length - 1] = novo;
+        return params;
     }
 
-    public void carregarParametros(Parametros params, String... keys) {
-        
+    public void gravarParametros(Parametros parametros, String... params) {
+        parametros.put(chkImportarCliEventualAtivo.isSelected(), concat(params, "SOMENTE_EVENTUAIS_ATIVO"));
+        parametros.put(chkImportarCliPreferencialAtivo.isSelected(), concat(params, "SOMENTE_PREFERENCIAIS_ATIVO"));
     }
 
+    public void carregarParametros(Parametros parametros, String... params) {
+        chkImportarCliEventualAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_EVENTUAIS_ATIVO")));
+        chkImportarCliPreferencialAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_PREFERENCIAIS_ATIVO")));
+    }
 }

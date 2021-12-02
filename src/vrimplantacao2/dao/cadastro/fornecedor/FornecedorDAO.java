@@ -720,6 +720,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)) {
                     incluirTipoIndicadorIE(vo, sql);
                 }
+                if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)) {
+                    sql.put("datacadastro", vo.getDataCadastro());
+                }
                 sql.setWhere("id = " + vo.getId());
                 
                 if (!sql.isEmpty()) {

@@ -8,16 +8,12 @@ package vrimplantacao2_5.dao.sistema;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -28,6 +24,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 /**
  *
@@ -35,34 +32,17 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private boolean temArquivoBalanca = false;
-    private boolean produtosBalancaIniciaCom20 = false;
-    private boolean migrarProdutosAtivos = false;
-
-    public boolean getTemArquivoBalanca() {
-        return this.temArquivoBalanca;
+    public GatewaySistemasVO gatewaySistemasVO = null;
+    private String lojaCliente;
+    
+    public String getLojaCliente() {
+        return this.lojaCliente;
     }
-
-    public boolean getProdutosBalancaIniciaCom20() {
-        return this.produtosBalancaIniciaCom20;
+    
+    public void setLojaCliente(String lojaCliente) {
+        this.lojaCliente = lojaCliente;
     }
-
-    public boolean getMigrarProdutosAtivos() {
-        return this.migrarProdutosAtivos;
-    }
-
-    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
-        this.temArquivoBalanca = temArquivoBalanca;
-    }
-
-    public void setProdutosBalancaIniciaCom20(boolean produtosBalancaIniciaCom20) {
-        this.produtosBalancaIniciaCom20 = produtosBalancaIniciaCom20;
-    }
-
-    public void setMigrarProdutosAtivo(boolean migrarProdutosAtivos) {
-        this.migrarProdutosAtivos = migrarProdutosAtivos;
-    }
-
+        
     @Override
     public String getSistema() {
         return "Gateway Sistemas";
@@ -119,54 +99,6 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
             }
         }
         return result;
-    }
-
-    @Override
-    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        return new HashSet<>(Arrays.asList(
-                new OpcaoProduto[]{
-                    OpcaoProduto.FAMILIA,
-                    OpcaoProduto.FAMILIA_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                    OpcaoProduto.PRODUTOS,
-                    OpcaoProduto.EAN,
-                    OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.DATA_CADASTRO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.PESAVEL,
-                    OpcaoProduto.VALIDADE,
-                    OpcaoProduto.DESC_COMPLETA,
-                    OpcaoProduto.DESC_GONDOLA,
-                    OpcaoProduto.DESC_REDUZIDA,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.PRECO,
-                    OpcaoProduto.CUSTO,
-                    OpcaoProduto.ESTOQUE,
-                    OpcaoProduto.ATIVO,
-                    OpcaoProduto.NCM,
-                    OpcaoProduto.CEST,
-                    OpcaoProduto.PIS_COFINS,
-                    OpcaoProduto.NATUREZA_RECEITA,
-                    OpcaoProduto.ICMS,
-                    OpcaoProduto.ICMS_SAIDA,
-                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
-                    OpcaoProduto.ICMS_SAIDA_NF,
-                    OpcaoProduto.ICMS_ENTRADA,
-                    OpcaoProduto.ICMS_CONSUMIDOR,
-                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
-                    OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.EXCECAO,
-                    OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO
-                }
-        ));
     }
 
     @Override
@@ -244,7 +176,6 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "FROM ESTOQUE e\n"
                     + "LEFT JOIN EST_TRIBUTACAO et ON e.CODIGO = et.CODIGO\n"
                     + "LEFT JOIN EST_SIMULADOR es ON e.CODIGO = es.CODIGO\n"
-                    + (getMigrarProdutosAtivos() ? " WHERE e.ATIVO = 1\n" : "")
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -254,7 +185,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    if (getProdutosBalancaIniciaCom20()) {
+                    if (gatewaySistemasVO.isProdutosBalancaIniciaCom20()) {
                         if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
                             if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
@@ -268,26 +199,39 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setEan(rst.getString("ean"));
                     }
 
-                    if (getTemArquivoBalanca()) {
+                    if (gatewaySistemasVO.isTemArquivoBalanca()) {
+                        if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
 
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan());
+                            if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
 
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
+                                imp.setEan(rst.getString("ean").trim().substring(1));
+                            } else {
+                                imp.setEan(rst.getString("ean"));
+                            }
                         }
 
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        if (imp.getEan() != null && !imp.getEan().trim().isEmpty()) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan());
+
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         } else {
                             imp.setValidade(0);
                             imp.seteBalanca(false);
                         }
-
                     } else {
                         if ("Balan".equals(rst.getString("tipo")) || "Peso".equals(rst.getString("tipo"))) {
                             imp.seteBalanca(true);
@@ -386,7 +330,8 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	f.CELULAR AS celular,\n"
                     + "	f.FAX AS fax,\n"
                     + "	f.EMAIL AS email,\n"
-                    + "	f.SITE AS site\n"
+                    + "	f.SITE AS site,\n"
+                    + " f.ATIVO AS ativo\n"        
                     + "FROM FORNECEDORES f \n"
                     + "ORDER BY 1"
             )) {
@@ -410,6 +355,7 @@ public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setIe_rg(rst.getString("rg"));
                     }
 
+                    imp.setAtivo(rst.getInt("ativo") == 1);
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));

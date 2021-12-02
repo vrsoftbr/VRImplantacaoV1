@@ -1,8 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -12,10 +10,13 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
+import vrimplantacao2_5.controller.sistema.GatewaySistemasController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
@@ -23,10 +24,11 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private static GatewaySistemas2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private GatewaySistemasDAO dao = new GatewaySistemasDAO();
+    private GatewaySistemasDAO dao = null;
+    private GatewaySistemasVO vo = new GatewaySistemasVO();
+    private GatewaySistemasController controller = null;
     private MapaLojaController mapaLojaController = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
-    private Thread thread = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -36,7 +38,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         chkProdTemArquivoBalanca.setSelected(params.getBool(SISTEMA, "TEM ARQUIVO DE BALANCA"));
         chkProdProdutoBalancaIniciaCom20.setSelected(params.getBool(SISTEMA, "PRODUTO DE BALANCA INICIA COM 20"));
-        chkProdImportarProdutosAtivos.setSelected(params.getBool(SISTEMA, "IMPORTAR PRODUTOS ATIVOS"));
     }
 
     private void gravarParametros() throws Exception {
@@ -49,7 +50,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
         params.put(chkProdTemArquivoBalanca.isSelected(), SISTEMA, "TEM ARQUIVO DE BALANCA");
         params.put(chkProdProdutoBalancaIniciaCom20.isSelected(), SISTEMA, "PRODUTO DE BALANCA INICIA COM 20");
-        params.put(chkProdImportarProdutosAtivos.isSelected(), SISTEMA, "IMPORTAR PRODUTOS ATIVOS");
 
         pnlConn.atualizarParametros();
         
@@ -64,6 +64,34 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
     }
+
+    private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
+        
+        vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
+        vo.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
+        
+        return vo;        
+    }
+    
+    public OpcoesMigracaoVO carregarOpcoesMigracao() {        
+        
+        Parametros params = Parametros.get();
+        
+        OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
+        
+        opcoesMigracaoVO.setHabilitarMigracaoFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
+        opcoesMigracaoVO.setHabilitarMigracaoMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
+        opcoesMigracaoVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
+        opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
+        opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
+        opcoesMigracaoVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
+        opcoesMigracaoVO.setHabilitarMigracaoClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
+        opcoesMigracaoVO.setHabilitarMigracaoClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
+        opcoesMigracaoVO.setHabilitarMigracaoReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
+        opcoesMigracaoVO.setHabilitarMigracaoReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));        
+        
+        return opcoesMigracaoVO;        
+    }
     
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
@@ -74,10 +102,15 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         configuracaoBaseDadosGUI = baseDadosGui;
         
         carregarParametros();
+
+        dao = new GatewaySistemasDAO();
         
-        tabProdutos.btnMapaTribut.setEnabled(false);
+        controller = new GatewaySistemasController(carregarOpcoesMigracao(), dao);
         
-        tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setOpcoesDisponiveis(controller);                
+        tabFornecedores.setOpcoesDisponiveis(controller);
+        tabClientes.setOpcoesDisponiveis(controller);        
+        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
@@ -87,13 +120,14 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return dao.getSistema();
+                controller.setComplementoSistema(pnlConn.getComplemento());
+                return controller.getSistema();
             }
 
             @Override
             public String getLoja() {
-                dao.setLojaOrigem(pnlConn.getLojaOrigem());
-                return dao.getLojaOrigem();
+                controller.setLojaOrigem(pnlConn.getLojaOrigem());
+                return controller.getLojaOrigem();
             }
 
             @Override
@@ -133,11 +167,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
-        thread = new Thread() {
-            DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-            String strVendaDataInicio = "";
-            String strVendaDataFim = "";
-            java.sql.Date vendaDataInicio, vendaDataFim;
+        Thread thread = new Thread() {
 
             @Override
             public void run() {
@@ -150,9 +180,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    dao.setTemArquivoBalanca(chkTemArquivoBalancaUnificacao.isSelected());
-                    dao.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
-                    dao.setMigrarProdutosAtivo(chkProdImportarProdutosAtivos.isSelected());
+                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema(), importador.getLojaOrigem());
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
@@ -208,7 +236,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         };
 
         thread.start();
-        //thread.join();
     }
 
     @SuppressWarnings("unchecked")
@@ -224,7 +251,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         chkProdTemArquivoBalanca = new vr.view.components.checkbox.VRCheckBox();
         chkProdProdutoBalancaIniciaCom20 = new vr.view.components.checkbox.VRCheckBox();
-        chkProdImportarProdutosAtivos = new vr.view.components.checkbox.VRCheckBox();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -300,8 +326,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
         chkProdProdutoBalancaIniciaCom20.setText("Produtos de Balança iniciam com \"20\"");
 
-        chkProdImportarProdutosAtivos.setText("Importar Produtos Ativos");
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -310,8 +334,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkProdTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdProdutoBalancaIniciaCom20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdImportarProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkProdProdutoBalancaIniciaCom20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(528, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -321,9 +344,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                 .addComponent(chkProdTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdProdutoBalancaIniciaCom20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdImportarProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Produtos", jPanel2);
@@ -489,12 +510,12 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(2, 2, 2))
         );
 
         pack();
@@ -525,7 +546,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private vr.view.components.checkbox.VRCheckBox chkProdImportarProdutosAtivos;
     private vr.view.components.checkbox.VRCheckBox chkProdProdutoBalancaIniciaCom20;
     private vr.view.components.checkbox.VRCheckBox chkProdTemArquivoBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalancaUnificacao;

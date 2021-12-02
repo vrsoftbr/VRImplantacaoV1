@@ -55,6 +55,7 @@ public enum OpcaoFornecedor {
     TIPO_INDICADOR_IE,
     PRODUTO_FORNECEDOR,
     IMPORTAR_SOMENTE_ATIVOS,
+    DATA_CADASTRO,
     PAGAR_FORNECEDOR;
     //TODO: SUFRAMA
     //TODO: DATACADASTRO
@@ -101,6 +102,7 @@ public enum OpcaoFornecedor {
     
     public static Set<OpcaoFornecedor> getDadosComplementares() {
         return new HashSet<>(Arrays.asList(
+                DATA_CADASTRO,
                 SITUACAO_CADASTRO,
                 PRAZO_FORNECEDOR,
                 CONDICAO_PAGAMENTO,

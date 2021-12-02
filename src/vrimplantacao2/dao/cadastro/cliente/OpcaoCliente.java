@@ -83,7 +83,10 @@ public enum OpcaoCliente {
     NOME_MAE,
     NOME_CONJUGE,
     RECEBER_CREDITOROTATIVO,
-    RECEBER_CHEQUE;
+    RECEBER_CHEQUE,
+    CLIENTE_EVENTUAL,
+    IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+    IMPORTAR_SOMENTE_ATIVO_EVENTUAL;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
@@ -138,6 +141,12 @@ public enum OpcaoCliente {
                 CELULAR,
                 EMAIL,
                 CONTATOS
+        ));
+    }
+    
+    public static Set<OpcaoCliente> getClienteEventual() {
+        return new HashSet<>(Arrays.asList(
+                CLIENTE_EVENTUAL
         ));
     }
     

@@ -14,6 +14,7 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 /**
  *
@@ -300,6 +301,237 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         
     }
 
+    public void setOpcoesDisponiveis(InterfaceController controller) {
+        this.opt = controller.getOpcoesDisponiveisProdutos();
+        tabImportacao.removeAll();
+        tabParametros.removeAll();
+                
+        chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+        chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
+        chkManterEANsMenores.setVisible(opt.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+        chkManterDescricaoProduto.setVisible(opt.contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO));
+                
+        if (
+                opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
+                opt.contains(OpcaoProduto.MERCADOLOGICO) ||
+                opt.contains(OpcaoProduto.FAMILIA) ||
+                opt.contains(OpcaoProduto.FAMILIA_PRODUTO)
+        ) {
+            chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO) || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
+            chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
+            chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
+            chkManterCodigoMercadologico.setVisible(opt.contains(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO));
+            
+            if (chkMercadologico.isVisible()) {
+                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));                
+                if (
+                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL) ||
+                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR) ||
+                        opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)
+                ) {
+                    tabParametros.add(pnlOptMercadologico);
+                }
+            }
+            
+            chkFamilia.setVisible(opt.contains(OpcaoProduto.FAMILIA));
+            chkFamiliaProduto.setVisible(opt.contains(OpcaoProduto.FAMILIA_PRODUTO));
+            tabImportacao.add(pnlImpMercadologico);            
+        }
+        
+        if (
+                opt.contains(OpcaoProduto.PRODUTOS) ||
+                opt.contains(OpcaoProduto.EAN) ||
+                opt.contains(OpcaoProduto.EAN_EM_BRANCO)
+        ) {
+            chkProdutos.setVisible(opt.contains(OpcaoProduto.PRODUTOS));
+            if (opt.contains(OpcaoProduto.PRODUTOS)) {
+                tabParametros.add(pnlOptProduto);
+            }
+            chkProdutosBalanca.setVisible(opt.contains(OpcaoProduto.PRODUTOS_BALANCA));
+            chkEAN.setVisible(opt.contains(OpcaoProduto.EAN));
+            chkEANemBranco.setVisible(opt.contains(OpcaoProduto.EAN_EM_BRANCO));
+            tabImportacao.add(pnlImpProduto);
+        }
+               
+        if (
+                opt.contains(OpcaoProduto.PRECO) ||
+                opt.contains(OpcaoProduto.CUSTO) ||
+                opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) ||
+                opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) ||
+                opt.contains(OpcaoProduto.ESTOQUE) ||
+                opt.contains(OpcaoProduto.ESTOQUE_MINIMO) ||
+                opt.contains(OpcaoProduto.ESTOQUE_MAXIMO) ||
+                opt.contains(OpcaoProduto.ATIVO) ||
+                opt.contains(OpcaoProduto.DESCONTINUADO) ||
+                opt.contains(OpcaoProduto.ATACADO) ||
+                opt.contains(OpcaoProduto.OFERTA) ||
+                opt.contains(OpcaoProduto.MARGEM) ||
+                opt.contains(OpcaoProduto.TIPO_PRODUTO) ||
+                opt.contains(OpcaoProduto.FABRICANTE) ||
+                opt.contains(OpcaoProduto.FABRICACAO_PROPRIA) ||
+                opt.contains(OpcaoProduto.NORMA_REPOSICAO)
+        ) {
+            chkPreco.setVisible(opt.contains(OpcaoProduto.PRECO));
+            chkCusto.setVisible(opt.contains(OpcaoProduto.CUSTO));
+            chkCustoComImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO));
+            chkCustoSemImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO));
+            chkEstoque.setVisible(opt.contains(OpcaoProduto.ESTOQUE));
+            chkEstoqueTroca.setVisible(opt.contains(OpcaoProduto.TROCA));
+            chkEstoqueMinimo.setVisible(opt.contains(OpcaoProduto.ESTOQUE_MINIMO));
+            chkEstoqueMaximo.setVisible(opt.contains(OpcaoProduto.ESTOQUE_MAXIMO));
+            chkSituacaoCadastro.setVisible(opt.contains(OpcaoProduto.ATIVO));
+            chkDescontinuado.setVisible(opt.contains(OpcaoProduto.DESCONTINUADO));
+            chkAtacado.setVisible(opt.contains(OpcaoProduto.ATACADO));
+            chkVrAtacado.setVisible(opt.contains(OpcaoProduto.VR_ATACADO));
+            chkMargemMinima.setVisible(opt.contains(OpcaoProduto.MARGEM_MINIMA));
+            chkMargemMaxima.setVisible(opt.contains(OpcaoProduto.MARGEM_MAXIMA));
+            chkMargem.setVisible(opt.contains(OpcaoProduto.MARGEM));
+            chkOferta.setVisible(opt.contains(OpcaoProduto.OFERTA));
+            chkTipoProduto.setVisible(opt.contains(OpcaoProduto.TIPO_PRODUTO));
+            chkFabricacaoPropria.setVisible(opt.contains(OpcaoProduto.FABRICACAO_PROPRIA));
+            chkFabricante.setVisible(opt.contains(OpcaoProduto.FABRICANTE));
+            chkNormaReposicao.setVisible(opt.contains(OpcaoProduto.NORMA_REPOSICAO));
+            chkSecao.setVisible(opt.contains(OpcaoProduto.SECAO));
+            chkPrateleira.setVisible(opt.contains(OpcaoProduto.PRATELEIRA));
+            chkTeclaAssociada.setVisible(opt.contains(OpcaoProduto.TECLA_ASSOCIADA));
+            tabImportacao.add(pnlImpCompl);
+        }
+        
+        if (
+                opt.contains(OpcaoProduto.PIS_COFINS) ||
+                opt.contains(OpcaoProduto.NATUREZA_RECEITA) ||
+                opt.contains(OpcaoProduto.ICMS_LOJA) ||
+                opt.contains(OpcaoProduto.ICMS) ||
+                opt.contains(OpcaoProduto.ICMS_SAIDA) ||
+                opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) ||
+                opt.contains(OpcaoProduto.ICMS_ENTRADA) ||
+                opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) ||
+                opt.contains(OpcaoProduto.ICMS_CONSUMIDOR) ||
+                opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA) ||
+                opt.contains(OpcaoProduto.NCM) ||
+                opt.contains(OpcaoProduto.CEST) ||
+                opt.contains(OpcaoProduto.CODIGO_BENEFICIO) 
+        ) {
+            chkPisCofins.setVisible(opt.contains(OpcaoProduto.PIS_COFINS));
+            chkNatReceita.setVisible(opt.contains(OpcaoProduto.NATUREZA_RECEITA));
+            chkIcmsLoja.setVisible(opt.contains(OpcaoProduto.ICMS_LOJA));
+            chkICMS.setVisible(opt.contains(OpcaoProduto.ICMS));
+            chkIcmsDebito.setVisible(opt.contains(OpcaoProduto.ICMS_SAIDA));
+            chkIcmsDebitoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO));
+            chkIcmsDebitoForaEstadoNF.setVisible(opt.contains(OpcaoProduto.ICMS_SAIDA_NF));
+            chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
+            chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
+            chkIcmsConsumidor.setVisible(opt.contains(OpcaoProduto.ICMS_CONSUMIDOR));
+            btnMapaTribut.setVisible(chkICMS.isVisible()); 
+            chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
+            chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
+            chkCodigoBeneficio.setVisible(opt.contains(OpcaoProduto.CODIGO_BENEFICIO));
+            chkCopiarIcmsDebitoNaEntrada.setVisible(opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO));
+            tabImportacao.add(pnlImpTributacao);
+            if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
+                tabParametros.add(pnlOptPautaFiscal);
+            }
+            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)||
+                    opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
+                tabParametros.add(pnlOptIcms);
+            }
+        }
+        
+        if (
+                opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO) ||
+                opt.contains(OpcaoProduto.PAUTA_FISCAL)
+                ) {
+            
+            chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
+            chkPautaFiscalProduto.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsCredito.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsCreditoForaEst.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsDebito.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsDebitoForaEst.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsIva.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsIvaAjustado.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkPfIcmsTipoIva.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            tabImportacao.add(pnlImpPautaFiscal);
+        }
+        
+        if (
+                opt.contains(OpcaoProduto.DESC_COMPLETA) ||
+                opt.contains(OpcaoProduto.DESC_REDUZIDA) ||
+                opt.contains(OpcaoProduto.DESC_GONDOLA) ||
+                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) ||
+                opt.contains(OpcaoProduto.VALIDADE) ||
+                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN) ||
+                opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO) ||
+                opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN) ||
+                opt.contains(OpcaoProduto.SUGESTAO_PEDIDO) ||
+                opt.contains(OpcaoProduto.SUGESTAO_COTACAO) ||
+                opt.contains(OpcaoProduto.VENDA_PDV) ||
+                opt.contains(OpcaoProduto.PESO_BRUTO) ||
+                opt.contains(OpcaoProduto.PESO_LIQUIDO) ||
+                opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM) ||
+                opt.contains(OpcaoProduto.VOLUME_QTD) ||
+                opt.contains(OpcaoProduto.VENDA_CONTROLADA)
+        ) {
+            chkDescCompleta.setVisible(opt.contains(OpcaoProduto.DESC_COMPLETA));
+            chkDescReduzida.setVisible(opt.contains(OpcaoProduto.DESC_REDUZIDA));
+            chkDescGondola.setVisible(opt.contains(OpcaoProduto.DESC_GONDOLA));
+            chkTipoEmbalagemProd.setVisible(opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO));
+            chkValidade.setVisible(opt.contains(OpcaoProduto.VALIDADE));
+            chkTipoEmbalagemEAN.setVisible(opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN));
+            chkQtdEmbalagemProd.setVisible(opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO));
+            chkQtdEmbalagemEAN.setVisible(opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN));
+            chkSugestaoPedido.setVisible(opt.contains(OpcaoProduto.SUGESTAO_PEDIDO));
+            chkSugestaoCotacao.setVisible(opt.contains(OpcaoProduto.SUGESTAO_COTACAO));
+            chkVendaPdv.setVisible(opt.contains(OpcaoProduto.VENDA_PDV));
+            chkPesoBruto.setVisible(opt.contains(OpcaoProduto.PESO_BRUTO));
+            chkPesoLiquido.setVisible(opt.contains(OpcaoProduto.PESO_LIQUIDO));
+            chkVolumeEmbalagem.setVisible(opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM));
+            chkVolumeQtd.setVisible(opt.contains(OpcaoProduto.VOLUME_QTD));
+            chkVendaControlada.setVisible(opt.contains(OpcaoProduto.VENDA_CONTROLADA));
+            chkDataCadastro.setVisible(opt.contains(OpcaoProduto.DATA_CADASTRO));
+            tabImportacao.add(pnlImpInfoAdic);
+        }
+        
+        if (
+                opt.contains(OpcaoProduto.ASSOCIADO) ||
+                opt.contains(OpcaoProduto.COMPRADOR) ||
+                opt.contains(OpcaoProduto.COMPRADOR_PRODUTO) ||
+                opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
+                opt.contains(OpcaoProduto.INVENTARIO) ||
+                opt.contains(OpcaoProduto.NUTRICIONAL) ||
+                opt.contains(OpcaoProduto.RECEITA) ||
+                opt.contains(OpcaoProduto.DIVISAO) ||
+                opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
+        ) {
+            chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
+            if (chkAssociado.isVisible()) {
+                chkInverterAssociado.setVisible(chkAssociado.isVisible());
+                tabParametros.add(pnlOptAssociado);
+            }
+            chkComprador.setVisible(opt.contains(OpcaoProduto.COMPRADOR));
+            chkCompradorProduto.setVisible(opt.contains(OpcaoProduto.COMPRADOR_PRODUTO));
+            chkReceitaToledo.setVisible(opt.contains(OpcaoProduto.RECEITA_BALANCA));
+            chkReceitaFilizola.setVisible(opt.contains(OpcaoProduto.RECEITA_BALANCA));
+            chkNutricionalToledo.setVisible(opt.contains(OpcaoProduto.NUTRICIONAL));
+            chkNutricionalFilizola.setVisible(opt.contains(OpcaoProduto.NUTRICIONAL));
+            chkInventario.setVisible(opt.contains(OpcaoProduto.INVENTARIO));
+            chkReceitaProduto.setVisible(opt.contains(OpcaoProduto.RECEITA));
+            chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
+            chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
+            chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
+            if (
+                    chkNutricionalFilizola.isVisible() || 
+                    chkNutricionalToledo.isVisible()
+                    ) {
+                tabParametros.add(pnlOptOptNutricional);
+            }
+            tabImportacao.add(pnlImpOutrosDados);
+        }
+        tabParametros.add(pnlResetarIds);
+        tabImportacao.revalidate();
+        
+    }
+    
     public Set<OpcaoProduto> getOpcoesDisponiveis() {
         return opt;
     }
@@ -348,6 +580,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkForcarPrecoCusto = new vrframework.bean.checkBox.VRCheckBox();
         chkAtualizarSomenteIncluidosUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         chkImportarSomenteProdutosAtivos = new vrframework.bean.checkBox.VRCheckBox();
+        chkForcarUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -546,6 +779,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkImportarSomenteProdutosAtivos, "Importar somente produtos ativos");
         chkImportarSomenteProdutosAtivos.setToolTipText("Não importa os produtos marcados como inativos no sistema antigo.");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkForcarUnificacao, "Forçar Unificação");
+        chkForcarUnificacao.setToolTipText("Não importa os produtos marcados como inativos no sistema antigo.");
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -572,8 +808,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 195, Short.MAX_VALUE))))
+                            .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 249, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -601,7 +838,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 8, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         tabParametros.add(pnlOptProduto);
@@ -1486,6 +1725,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkFamilia;
     public vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkForcarPrecoCusto;
+    public vrframework.bean.checkBox.VRCheckBox chkForcarUnificacao;
     public vrframework.bean.checkBox.VRCheckBox chkICMS;
     public vrframework.bean.checkBox.VRCheckBox chkIcmsConsumidor;
     public vrframework.bean.checkBox.VRCheckBox chkIcmsCredito;
@@ -1618,6 +1858,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         parametros.put(chkImportarSomenteProdutosAtivos.isSelected(), concat(params, "SOMENTES_PRODUTOS_ATIVOS" ));
         parametros.put(chkManterEANsMenores.isSelected(), concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS" ));
         parametros.put(chkManterDescricaoProduto.isSelected(), concat(params, "MANTER_DESCRICAO_PRODUTO"));
+        parametros.put(chkForcarUnificacao.isSelected(), concat(params, "FORCAR UNIFICACAO"));
         
         if (rdbPautaIdPauta.isSelected()) {
             parametros.put(1, concat(params, "PAUTA_OPCAO" ));
@@ -1642,6 +1883,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkImportarSomenteProdutosAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_PRODUTOS_ATIVOS" )));
         chkManterEANsMenores.setSelected(parametros.getBool(concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS")));
         chkManterDescricaoProduto.setSelected(parametros.getBool(concat(params, "MANTER_DESCRICAO_PRODUTO")));
+        chkForcarUnificacao.setSelected(parametros.getBool("FORCAR UNIFICACAO"));
         
         switch (parametros.getInt(concat(params, "PAUTA_OPCAO" ))) {
             case 2: rdbPautaIdProduto.setSelected(true); break;
@@ -1690,6 +1932,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkImportarSomenteProdutosAtivos.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
+                }
+                if (chkForcarUnificacao.isSelected()) {
+                    opt.add(OpcaoProduto.FORCAR_UNIFICACAO);
                 }
                 opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));

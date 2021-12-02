@@ -453,7 +453,11 @@ public enum OpcaoProduto {
     /***
      * Força a atualização de custo mesmo que o usuário já os tenha alterado.
      */
-    FORCAR_ATUALIZACAO;
+    FORCAR_ATUALIZACAO,
+    /***
+     * Forçar unficação de produtos, sem passar pela migração normal.
+     */
+    FORCAR_UNIFICACAO;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
@@ -467,7 +471,7 @@ public enum OpcaoProduto {
         result.add(PRODUTOS);
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
-        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
 
         return result;
     }
@@ -480,7 +484,7 @@ public enum OpcaoProduto {
         result.add(PRODUTOS);
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
-        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         result.addAll(getInfoAdicional());
         result.addAll(getComplementos());
         result.addAll(getTributos());

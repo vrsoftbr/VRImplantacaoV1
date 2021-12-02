@@ -42,12 +42,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="pnlConn" pref="220" max="32767" attributes="0"/>
+              <Component id="pnlConn" pref="222" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="267" max="32767" attributes="0"/>
-              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+              <Component id="jScrollPane2" pref="269" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -144,7 +144,6 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkProdTemArquivoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkProdProdutoBalancaIniciaCom20" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkProdImportarProdutosAtivos" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace pref="528" max="32767" attributes="0"/>
                               </Group>
@@ -157,9 +156,7 @@
                                   <Component id="chkProdTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkProdProdutoBalancaIniciaCom20" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkProdImportarProdutosAtivos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="112" max="32767" attributes="0"/>
+                                  <EmptySpace pref="137" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -173,11 +170,6 @@
                         <Component class="vr.view.components.checkbox.VRCheckBox" name="chkProdProdutoBalancaIniciaCom20">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Produtos de Balan&#xe7;a iniciam com &quot;20&quot;"/>
-                          </Properties>
-                        </Component>
-                        <Component class="vr.view.components.checkbox.VRCheckBox" name="chkProdImportarProdutosAtivos">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Importar Produtos Ativos"/>
                           </Properties>
                         </Component>
                       </SubComponents>
