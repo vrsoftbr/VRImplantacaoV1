@@ -145,16 +145,21 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + " situacaotributariatributacaoID as id,\n"
+                    + " descricao,\n"
+                    + " situacaotributariatributacaoID as cst\n"
+                    + "from \n"
+                    + " situacaotributariatributacao"
             )) {
                 while (rst.next()) {
 
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
                             rst.getString("descricao"),
+                            rst.getInt("cst"),
                             0,
-                            rst.getDouble("aliquota"),
-                            rst.getDouble("reducao")
+                            0
                     ));
                 }
             }
@@ -229,7 +234,35 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select distinct\n"
+                    + " prod.codigo id,\n"
+                    + "	prod.produto descricao,\n"
+                    + "	prod.codigodebarras ean,\n"
+                    + "	prod.familiaID familiaid,\n"
+                    + "	prod.grupoID merc1 ,\n"
+                    + "	prod.subgrupoID merc2,\n"
+                    + "	prod.subgrupoID merc3,\n"
+                    + "	prod.precocusto custo,\n"
+                    + "	prod.precotabela precovenda,\n"
+                    + "	prod.peso pesoliquido,\n"
+                    + "	prod.pesobruto pesobruto,\n"
+                    + "	prod.tipo tipo,\n"
+                    + "	prod.validade validade,\n"
+                    + "	prod.dtcadastro datacadastro,\n"
+                    + "	est.estoquereal estoque,\n"
+                    + "	prod.exibir ativo,\n"
+                    + "	prod.situacaotributariaorigemID,\n"
+                    + "	replace(prod.classificacaoID, '.', '') as ncm,\n"
+                    + "	tax.codigocest as cest,\n"
+                    + "	coalesce(tax.comerciosituacaotributariatributacaoID,\n"
+                    + "	0) as cst,\n"
+                    + "	coalesce(tax.comerciosituacaotributariatributacaoID,\n"
+                    + "	0) as idaliquota\n"
+                    + "from\n"
+                    + "	produtos prod\n"
+                    + "left join estoque est on est.produtoID = prod.codigo\n"
+                    + "left join taxasicms tax on tax.produtoid = prod.codigo\n"
+                    + "order by 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -238,50 +271,30 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-
-                    int codigoProduto = Utils.stringToInt(rst.getString("ProdCodInterno"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
-
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } else {
-                        imp.setEan(rst.getString("ean"));
-                        imp.seteBalanca(false);
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.setValidade(0);
-                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    }
-
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setIdFamiliaProduto(rst.getString("familiaid"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setTipoProduto(rst.getString("tipo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
-                    imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                    imp.setIcmsDebitoId(rst.getString("tribicms"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("tribicms"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("tribicms"));
-                    imp.setIcmsCreditoId(rst.getString("tribicms"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("tribicms"));
-                    imp.setIcmsConsumidorId(rst.getString("tribicms"));
-                    imp.setVolume(rst.getDouble("volume"));
+                    imp.setIcmsDebitoId(rst.getString("idaliquota"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("idaliquota"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idaliquota"));
+                    imp.setIcmsCreditoId(rst.getString("idaliquota"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("idaliquota"));
+                    imp.setIcmsConsumidorId(rst.getString("idaliquota"));
 
                     result.add(imp);
                 }
@@ -298,7 +311,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + " codigo as id,\n"
-                    + " codigodebarrasdun14 as ean\n"
+                    + " codigodebarrasdun14 as ean,\n"
                     + " 'CX' as unidade\n"
                     + " from produtos\n"
                     + " where \n"
@@ -516,23 +529,24 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "  dupliad.duplicatainfoadicionalID as id,\n"
-                    + "  dup.duplicata as numerodocumento,\n"
-                    + "  dupliad.valor as valor,\n"
-                    + "  dup.clientefornecedorID as fornecedorid,\n"
-                    + "  dupliad.dt\n"
-                    + "  dup.dtcadastro as emissao,\n"
-                    + "  dup.dtvencimento as vencimento,\n"
-                    + "  dup.descricao as obs,\n"
-                    + "  dup.numerodocumento\n"
-                    + " from duplicatasinfoadicionais dupliad\n"
-                    + " join duplicatas dup on dup.codigo = dupliad.codigoID \n"
-                    + " where \n"
-                    + "  dup.flagclientefornecedor = 'F'\n"
-                    + " and\n"
-                    + "  dup.dtbaixa is null \n"
-                    + " and\n"
-                    + "  dupliad.dtefetivopagamento is null"
+                    + " dupliad.duplicatainfoadicionalID as id,\n"
+                    + " dup.duplicata as numerodocumento,\n"
+                    + " dupliad.valor as valor,\n"
+                    + " dup.clientefornecedorID as fornecedorid,\n"
+                    + " dup.dtcadastro as emissao,\n"
+                    + " dup.dtvencimento as vencimento,\n"
+                    + " dup.descricao as obs,\n"
+                    + " dup.numerodocumento\n"
+                    + "from duplicatasinfoadicionais dupliad\n"
+                    + "join duplicatas dup on dup.codigo = dupliad.codigoID \n"
+                    + "where \n"
+                    + "dup.flagclientefornecedor = 'F'\n"
+                    + "and\n"
+                    + "dup.dtbaixa is null \n"
+                    + "and\n"
+                    + "dupliad.dtefetivopagamento is null\n"
+                    + "and\n"
+                    + "dup.tipo In ('P','E','T','M')"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -558,24 +572,26 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "  dupliad.duplicatainfoadicionalID as id,\n"
-                    + "  dup.duplicata as numerocupom,\n"
-                    + "  dup.computername as ecf,\n"
-                    + "  dup.parcela as parcela,\n"
-                    + "  dupliad.valor as valor,\n"
-                    + "  dup.clientefornecedorID as clienteid,\n"
-                    + "  dup.dtcadastro as emissao,\n"
-                    + "  dup.dtvencimento as vencimento,\n"
-                    + "  dup.descricao as obs,\n"
-                    + "  dup.numerodocumento\n"
-                    + " from duplicatasinfoadicionais dupliad\n"
-                    + " join duplicatas dup on dup.codigo = dupliad.codigoID \n"
-                    + " where \n"
-                    + " dup.flagclientefornecedor = 'C'\n"
-                    + " and\n"
-                    + " dup.dtbaixa is null \n"
-                    + " and\n"
-                    + " dupliad.dtefetivopagamento is null"
+                    + " dupliad.duplicatainfoadicionalID as id,\n"
+                    + " dup.duplicata as numerocupom,\n"
+                    + " dup.computername as ecf,\n"
+                    + " dup.parcela as parcela,\n"
+                    + " dupliad.valor as valor,\n"
+                    + " dup.clientefornecedorID as clienteid,\n"
+                    + " dup.dtcadastro as emissao,\n"
+                    + " dup.dtvencimento as vencimento,\n"
+                    + " dup.descricao as obs,\n"
+                    + " dup.numerodocumento\n"
+                    + "from duplicatasinfoadicionais dupliad\n"
+                    + "join duplicatas dup on dup.codigo = dupliad.codigoID \n"
+                    + "where \n"
+                    + "dup.flagclientefornecedor = 'C'\n"
+                    + "and\n"
+                    + "dup.dtbaixa is null \n"
+                    + "and\n"
+                    + "dupliad.dtefetivopagamento is null\n"
+                    + "and\n"
+                    + "dup.tipo In ('R','S','V','O')"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
