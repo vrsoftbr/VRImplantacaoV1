@@ -411,7 +411,7 @@ public class Importador {
         provider.setOpcoes(opt);
         provider.setIdConexao(getIdConexao());
         FornecedorRepository rep = new FornecedorRepository(provider);
-        rep.salvar(fornecedores);
+        rep.salvar2_5(fornecedores);
     }
 
     /**
@@ -445,7 +445,7 @@ public class Importador {
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
-
+    
     /**
      * Importa os códigos de barras atacado dos produtos.
      *

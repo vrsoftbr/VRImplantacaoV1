@@ -44,7 +44,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="pnlParametros" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="269" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="259" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -60,9 +60,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkImportarSomenteAtivos" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkImportarSomenteAtivos" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkForcarUnificacao" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace pref="554" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -72,7 +75,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkImportarSomenteAtivos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="22" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkForcarUnificacao" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="9" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -81,6 +86,14 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarSomenteAtivos">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Importar somente ativos"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarUnificacao">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="For&#xe7;ar Unifica&#xe7;&#xe3;o"/>
                 <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="true" type="code"/>
                 </Property>

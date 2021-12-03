@@ -35,6 +35,7 @@ public class FornecedorRepository {
 
     private FornecedorRepositoryProvider provider;
     private MultiMap<String, Integer> contatos;
+    private boolean forcarUnificacao = false;
 
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
@@ -42,26 +43,32 @@ public class FornecedorRepository {
     
     public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
         FornecedorService fornecedorService = new FornecedorService();
+        this.forcarUnificacao = provider.getOpcoes().contains(OpcaoFornecedor.FORCAR_UNIFICACAO);
         
         int idConexao = fornecedorService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = fornecedorService.verificaRegistro();
-        
-        if (registro > 0 && idConexao == 0) {
+
+        if (this.forcarUnificacao) {
             unificar(fornecedores);
         } else {
-            boolean existeConexao = fornecedorService.
-                    verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
-            
-            boolean lojaMigrada = fornecedorService.
-                    verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
-            
-            if (registro > 0 && existeConexao && !lojaMigrada) {
-                String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-                
-                fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+
+            if (registro > 0 && idConexao == 0) {
+                unificar(fornecedores);
+            } else {
+                boolean existeConexao = fornecedorService.
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                boolean lojaMigrada = fornecedorService.
+                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                if (registro > 0 && existeConexao && !lojaMigrada) {
+                    String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+
+                    fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+                }
+
+                salvar(fornecedores);
             }
-            
-            salvar(fornecedores);
         }
     }
     
