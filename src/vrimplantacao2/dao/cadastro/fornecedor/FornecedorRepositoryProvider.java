@@ -19,7 +19,8 @@ import vrimplantacao2.vo.cadastro.local.MunicipioVO;
  * @author Leandro
  */
 public class FornecedorRepositoryProvider {
-    
+
+    private int idConexao = 0;
     private String sistema;
     private String lojaOrigem;
     private int lojaVR;
@@ -49,6 +50,30 @@ public class FornecedorRepositoryProvider {
         this.fornecedorPrazoPedido = new FornecedorPrazoPedidoDAO();
     }
 
+    public FornecedorRepositoryProvider(String sistema, String lojaOrigem, int lojaVR, int idConexao) throws Exception {
+        this.idConexao = idConexao;
+        this.sistema = sistema;
+        this.lojaOrigem = lojaOrigem;
+        this.lojaVR = lojaVR;
+        this.fornecedorDAO = new FornecedorDAO();
+        this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
+        this.fornecedorContatoDAO = new FornecedorContatoDAO();
+        this.anterioresDAO = new FornecedorAnteriorDAO();
+        this.municipioDAO = new MunicipioDAO();
+        this.pagamentoDAO = new FornecedorPagamentoDAO();
+        this.fornecedorPrazoDAO = new FornecedorPrazoDAO();
+        this.fornecedorPagamenDAO = new FornecedorPagamentoDAO();
+        this.fornecedorPrazoPedido = new FornecedorPrazoPedidoDAO();
+    }
+    
+    public int getIdConexao() {
+        return this.idConexao;
+    }
+    
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }
+    
     public void setOpcoes(Set<OpcaoFornecedor> opcoes) {
         this.opcoes = opcoes;
     }

@@ -23,6 +23,7 @@ import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2_5.service.migracao.FornecedorService;
 
 /**
  *
@@ -38,7 +39,32 @@ public class FornecedorRepository {
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
     }
-
+    
+    public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
+        FornecedorService fornecedorService = new FornecedorService();
+        
+        int idConexao = fornecedorService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
+                registro = fornecedorService.verificaRegistro();
+        
+        if (registro > 0 && idConexao == 0) {
+            unificar(fornecedores);
+        } else {
+            boolean existeConexao = fornecedorService.
+                    verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+            
+            boolean lojaMigrada = fornecedorService.
+                    verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+            
+            if (registro > 0 && existeConexao && !lojaMigrada) {
+                String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+                
+                fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+            }
+            
+            salvar(fornecedores);
+        }
+    }
+    
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;

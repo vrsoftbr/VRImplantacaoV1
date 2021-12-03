@@ -409,6 +409,7 @@ public class Importador {
                 getLojaVR()
         );
         provider.setOpcoes(opt);
+        provider.setIdConexao(getIdConexao());
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.salvar(fornecedores);
     }
