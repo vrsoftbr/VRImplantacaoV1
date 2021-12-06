@@ -11,8 +11,9 @@ package vrimplantacao2_5.vo.enums;
  */
 public enum EOpcoesMigracaoSistema {
 
-    GATEWAYSISTEMAS(198, 5, false, true, true, true, true, true, false, true, false, false, false);
-
+    GATEWAYSISTEMAS(198, 5, false, true, true, true, true, true, false, true, false, false, false),
+    AVISTARE(16, 13, false, false, true, true, true, true, true, true, true, true, false);
+    
     private int idSistema;
     private int idBanco;
     private boolean habilitarMigracaoFamiliaProduto;

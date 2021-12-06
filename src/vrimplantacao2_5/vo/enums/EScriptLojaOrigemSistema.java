@@ -19,7 +19,11 @@ public enum EScriptLojaOrigemSistema {
     HIPCOM(74, 8, "select "
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
-            + "lojcnpj from hiploj order by 1");
+            + "lojcnpj from hiploj order by 1"),
+    AVISTARE(16, 13, "select distinct\n"
+            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
+            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') as descricao\n"
+            + "from dbo.TB_CONFIG");
     
     private int idSistema;
     private int idBancoDados;
