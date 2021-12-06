@@ -9,13 +9,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -754,7 +753,6 @@ public class CerebroDAO extends InterfaceDAO {
                     + "c.entrega_estado,\n"
                     + "c.entrega_cep,\n"
                     + "c.entrega_telefone,\n"
-                    + "c.cod_banco,\n"
                     + "c.num_agencia,\n"
                     + "c.numagencia_dv,\n"
                     + "c.num_conta,\n"
@@ -882,6 +880,64 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setIdCliente(rst.getString("codigo_cliente"));
                     imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "     c.sequencial_cheque id,\n"
+                    + "     cl.cpf_cnpj cnpjcpf,\n"
+                    + "     c.numero_cheque numerocheque,\n"
+                    + "     c.numero_banco id_banco,\n"
+                    + "     c.numero_agencia agencia,\n"
+                    + "     c.numero_conta conta,\n"
+                    + "     c.data_emissao data,\n"
+                    + "     c.data_deposito datadeposito,\n"
+                    + "     c.sequencial_caixa numerocupom,\n"
+                    + "     1 ecf,\n"
+                    + "     c.valor valor,\n"
+                    + "     cl.rg rg,\n"
+                    + "     cl.telefone1 telefone,\n"
+                    + "     cl.descricao nome,\n"
+                    + "     c.observacao observacao,\n"
+                    + "     'N' baixado,\n"
+                    + "     '' cmc7,\n"
+                    + "     0 alinea,\n"
+                    + "     0 valorjuros,\n"
+                    + "     0 valoracrescimo,\n"
+                    + "     'S' aprazo\n"
+                    + "from cheques c\n"
+                    + "join clientes cl on c.codigo_cliente = cl.codigo_cliente"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cnpjcpf"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setBanco(rst.getInt("id_banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setDate(rst.getDate("data"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setAlinea(rst.getInt("alinea"));
+                    imp.setValorJuros(rst.getDouble("valorjuros"));
+                    imp.setValorAcrescimo(rst.getDouble("valoracrescimo"));
                     result.add(imp);
                 }
             }
