@@ -364,7 +364,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setIdProduto(rst.getString("id_produto"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setCodigoExterno(rst.getString("cod_externo"));
 
                     result.add(imp);
                 }
