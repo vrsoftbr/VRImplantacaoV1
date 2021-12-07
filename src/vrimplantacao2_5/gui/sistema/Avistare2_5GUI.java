@@ -175,7 +175,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    controller.setAvistare(carregarOpcaoesMigracaoSistema(), importador.getLojaOrigem());
+                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
@@ -218,7 +218,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                     
-                    alterarSituacaoMigracao();
+                    //alterarSituacaoMigracao();
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();

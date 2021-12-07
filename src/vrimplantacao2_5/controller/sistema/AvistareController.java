@@ -47,9 +47,8 @@ public class AvistareController extends InterfaceController {
         this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
-    public void setAvistare(AvistareVO avistareVO, String lojaOrigem) {
+    public void setAvistare(AvistareVO avistareVO) {
         dao.avistareVO = avistareVO;
-        dao.setLojaCliente(lojaOrigem);
     }
     
     @Override
@@ -58,6 +57,9 @@ public class AvistareController extends InterfaceController {
                 new OpcaoProduto[]{
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
@@ -146,7 +148,8 @@ public class AvistareController extends InterfaceController {
                 OpcaoCliente.OBSERVACOES,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CONTATOS,
-                OpcaoCliente.CLIENTE_EVENTUAL
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 }

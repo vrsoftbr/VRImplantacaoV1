@@ -180,7 +180,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema(), importador.getLojaOrigem());
+                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema());
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);

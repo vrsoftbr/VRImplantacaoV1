@@ -47,9 +47,8 @@ public class GatewaySistemasController extends InterfaceController {
         this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
-    public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO, String lojaOrigem) {        
+    public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO) {
         dao.gatewaySistemasVO = gatewaySistemasVO;
-        dao.setLojaCliente(lojaOrigem);
     }
     
     @Override

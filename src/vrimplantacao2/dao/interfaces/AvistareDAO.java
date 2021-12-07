@@ -32,6 +32,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -45,15 +46,6 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
 public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public AvistareVO avistareVO = null;
-    private String lojaCliente;
-    
-    public String getLojaCliente() {
-        return this.lojaCliente;
-    }
-    
-    public void setLojaCliente(String lojaCliente) {
-        this.lojaCliente = lojaCliente;
-    }
     
     @Override
     public String getSistema() {
@@ -127,6 +119,35 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	ProdFamID as merc1,\n"
+                    + "	ProdFamDescricao as desc_merc1\n"
+                    + "from TB_FAMILIA_PRODUTOS\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
+                    imp.setMerc2ID("1");
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());                    
+                    result.add(imp);
+                }                
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -159,7 +180,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + ")\n"
                     + "select \n"
                     + "	p.ProdID as id,\n"
-                    + "	coalesce(p.ProdCodInterno, p.ProdID) as ProdCodInterno,\n"
+                    + "	p.ProdCodInterno,\n"
                     + "	ean.ean,\n"
                     + "	un.UnSigla as unidade,\n"
                     + "	p.ProdDescricao as descricao,\n"
@@ -189,7 +210,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cofins.CstPisCofinsDescricao,\n"
                     + "	nat.NatRecPisCofinsCodigo as naturezareceita,\n"
                     + "	nat.NatRecPisCofinsDescricao,\n"
-                    + "	p.ProdCaixaQtde volume\n"
+                    + "	p.ProdCaixaQtde volume,\n"
+                    + " p.ProdFamiliaId as mercadologico1 \n"        
                     + "from\n"
                     + "	dbo.TB_PRODUTO p\n"
                     + "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n"
@@ -247,6 +269,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
