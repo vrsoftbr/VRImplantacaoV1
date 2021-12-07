@@ -611,7 +611,7 @@ public class FornecedorAnteriorDAO {
                     "	implantacao.codant_fornecedor\n" +
                     "where \n" +
                     "	importsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "   importloja = " + SQLUtils.stringSQL(lojaOrigem) + "and\n" +        
+                    "   importloja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n" +        
                     "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     lojaJaMigrada = true;
