@@ -22,7 +22,8 @@ public enum EScriptLojaOrigemSistema {
             + "lojcnpj from hiploj order by 1"),
     AVISTARE(16, 13, "select distinct\n"
             + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
-            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') as descricao\n"
+            + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
+            + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
             + "from dbo.TB_CONFIG");
     
     private int idSistema;

@@ -319,17 +319,11 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkUnifProdutos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                  <Component id="chkTemArquivoBalancaUnificacao" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkUnifFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="653" max="32767" attributes="0"/>
+                          <EmptySpace pref="738" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -337,34 +331,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkUnifProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkTemArquivoBalancaUnificacao" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkUnifFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkUnifProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="396" max="32767" attributes="0"/>
+                          <EmptySpace pref="442" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Produtos (Somente com EAN v&#xe1;lido)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifFornecedor">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Fornecedor (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutoFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produto Fornecedor (Somente com CPF/CNPJ)"/>
@@ -378,11 +355,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClienteEventual">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Eventual (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalancaUnificacao">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
                   </Properties>
                 </Component>
               </SubComponents>
