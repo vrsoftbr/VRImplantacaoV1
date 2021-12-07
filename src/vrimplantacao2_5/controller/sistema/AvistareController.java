@@ -8,6 +8,8 @@ package vrimplantacao2_5.controller.sistema;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
@@ -89,5 +91,62 @@ public class AvistareController extends InterfaceController {
                     OpcaoProduto.TIPO_EMBALAGEM_EAN
                 }
         ));
-    }    
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {        
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.NUMERO,
+                OpcaoFornecedor.COMPLEMENTO,
+                OpcaoFornecedor.BAIRRO,
+                OpcaoFornecedor.MUNICIPIO,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.CEP,
+                OpcaoFornecedor.UF,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.EMAIL,
+                OpcaoFornecedor.CELULAR,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+                OpcaoCliente.DADOS,
+                OpcaoCliente.RAZAO,
+                OpcaoCliente.FANTASIA,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.CLIENTE_EVENTUAL
+        ));
+    }
 }

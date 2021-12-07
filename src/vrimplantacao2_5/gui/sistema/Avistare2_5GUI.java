@@ -103,8 +103,8 @@ public class Avistare2_5GUI extends VRInternalFrame {
         controller = new AvistareController(carregarOpcoesMigracao(), dao);
         
         tabProdutos.setOpcoesDisponiveis(controller);                
-        tabFornecedores.setOpcoesDisponiveis(dao);
-        tabClientes.setOpcoesDisponiveis(dao);        
+        tabFornecedores.setOpcoesDisponiveis(controller);
+        tabClientes.setOpcoesDisponiveis(controller);        
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -121,8 +121,8 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
-                dao.setLojaOrigem(pnlConn.getLojaOrigem());
-                return dao.getLojaOrigem();
+                controller.setLojaOrigem(pnlConn.getLojaOrigem());
+                return controller.getLojaOrigem();
             }
 
             @Override
