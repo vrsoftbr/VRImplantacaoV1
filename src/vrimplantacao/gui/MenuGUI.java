@@ -300,12 +300,14 @@ import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.PrimeGUI;
+import vrimplantacao2.gui.interfaces.Provenco_TentaculoGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
+import vrimplantacao2.gui.interfaces.SygmaGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WBAGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -724,6 +726,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuSygma = new javax.swing.JMenuItem();
+        mnuTentaculo = new javax.swing.JMenuItem();
         mnuWBA = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
@@ -1929,6 +1933,22 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
+
+        mnuSygma.setText("Sygma");
+        mnuSygma.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSygmaActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuSygma);
+
+        mnuTentaculo.setText("Tentaculo");
+        mnuTentaculo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTentaculoActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuTentaculo);
 
         mnuWBA.setText("WBA");
         mnuWBA.addActionListener(new java.awt.event.ActionListener() {
@@ -5539,6 +5559,14 @@ public final class MenuGUI extends VRMdiFrame {
         MicrotabGUI.exibir(this);
     }//GEN-LAST:event_mnuMicrotabActionPerformed
 
+    private void mnuTentaculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTentaculoActionPerformed
+        Provenco_TentaculoGUI.exibir(this);
+    }//GEN-LAST:event_mnuTentaculoActionPerformed
+
+    private void mnuSygmaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSygmaActionPerformed
+        SygmaGUI.exibir(this);
+    }//GEN-LAST:event_mnuSygmaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5842,12 +5870,14 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSupermercadoHipermax;
+    private javax.swing.JMenuItem mnuSygma;
     private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysAut;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTecnosoft;
     private javax.swing.JMenuItem mnuTelecon;
+    private javax.swing.JMenuItem mnuTentaculo;
     private javax.swing.JMenuItem mnuTga;
     private javax.swing.JMenuItem mnuThotau;
     private javax.swing.JMenuItem mnuTpaRootac;

@@ -860,6 +860,22 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSGMasterActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSygma">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sygma"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSygmaActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuTentaculo">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tentaculo"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuTentaculoActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuWBA">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="WBA"/>
