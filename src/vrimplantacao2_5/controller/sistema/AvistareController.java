@@ -13,7 +13,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.sistema.AvistareVO;
 
 /**
@@ -22,16 +21,14 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
  */
 public class AvistareController extends InterfaceController {
 
-    private OpcoesMigracaoVO opcoesMigracaoVO = null;
     private AvistareDAO dao = null;
     private final String SISTEMA = "Avistare";
     private String complementoSistema = "";
     
     public AvistareController() {}
     
-    public AvistareController(OpcoesMigracaoVO opcoesMigracaoVO, AvistareDAO dao) {
+    public AvistareController(AvistareDAO dao) {
         this.dao = dao;
-        this.opcoesMigracaoVO = opcoesMigracaoVO;
     }
     
     @Override
@@ -55,6 +52,8 @@ public class AvistareController extends InterfaceController {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    OpcaoProduto.FORCAR_ATUALIZACAO,
+                    OpcaoProduto.FORCAR_UNIFICACAO,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
@@ -98,6 +97,7 @@ public class AvistareController extends InterfaceController {
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {        
         return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.FORCAR_UNIFICACAO,
                 OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.RAZAO_SOCIAL,
@@ -126,8 +126,8 @@ public class AvistareController extends InterfaceController {
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
-                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+                OpcaoCliente.FORCAR_UNIFICACAO,
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO,
                 OpcaoCliente.DADOS,
                 OpcaoCliente.RAZAO,
                 OpcaoCliente.FANTASIA,

@@ -8,6 +8,7 @@ public class FornecedorAnteriorVO {
     private String cnpjCpf;
     private String razao;
     private String fantasia;
+    private int idConexao;
 
     public String getImportSistema() {
         return importSistema;
@@ -71,5 +72,13 @@ public class FornecedorAnteriorVO {
             getImportLoja(),
             getImportId()
         };
+    }
+    
+    public int getIdConexao() {
+        return this.idConexao;
+    }
+    
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
     }
 }

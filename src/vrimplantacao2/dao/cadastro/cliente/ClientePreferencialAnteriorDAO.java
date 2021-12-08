@@ -80,6 +80,8 @@ public class ClientePreferencialAnteriorDAO {
             sql.put("nome", anterior.getNome());
             sql.put("forcarGravacao", anterior.isForcarGravacao());
             
+            sql.put("id_conexao", anterior.getIdConexao());
+            
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
@@ -267,9 +269,9 @@ public class ClientePreferencialAnteriorDAO {
                     "select \n" +
                     "	id_conexao \n" +
                     "from \n" +
-                    "	implantacao.codant_fornecedor\n" +
+                    "	implantacao.codant_clientepreferencial\n" +
                     "where \n" +
-                    "	importsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
+                    "	sistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
                     "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     conexao = true;

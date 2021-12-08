@@ -1,7 +1,6 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
 import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -33,6 +32,8 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2_5.service.migracao.ClienteEventualService;
+import vrimplantacao2_5.service.migracao.ClientePreferencialService;
 
 /**
  * Repositório do Cliente para efetuar a importação de Eventuais e
@@ -45,11 +46,73 @@ public class ClienteRepository {
     private static final Logger LOG = Logger.getLogger(ClienteRepository.class.getName());
 
     private ClienteRepositoryProvider provider;
+    private boolean forcarUnificacao = false;
 
     public ClienteRepository(ClienteRepositoryProvider provider) throws Exception {
         this.provider = provider;
     }
 
+    public void salvarClientePreferencial2_5(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
+        ClientePreferencialService clienteService = new ClientePreferencialService();
+        this.forcarUnificacao = opt.contains(OpcaoCliente.FORCAR_UNIFICACAO);
+
+        int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
+                registro = clienteService.verificaRegistro();
+
+        if (this.forcarUnificacao) {
+            unificarClientePreferencial(clientes, opt);
+        } else {
+            if (registro > 0 && idConexao == 0) {
+                unificarClientePreferencial(clientes, opt);
+            } else {
+                boolean existeConexao = clienteService.
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                boolean lojaMigrada = clienteService.
+                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                if (registro > 0 && existeConexao && !lojaMigrada) {
+                    String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+
+                    clienteService.copiarCodantClientePreferencial(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+                }
+
+                importarClientePreferencial(clientes, opt);
+            }
+        }
+    }
+    
+    public void salvarClienteEventual2_5(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
+        ClienteEventualService clienteService = new ClienteEventualService();
+        this.forcarUnificacao = opt.contains(OpcaoCliente.FORCAR_UNIFICACAO);
+        
+        int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
+                registro = clienteService.verificaRegistro();
+        
+        if (this.forcarUnificacao) {
+            unificarClienteEventual(clientes, opt);
+        } else {
+
+            if (registro > 0 && idConexao == 0) {
+                unificarClienteEventual(clientes, opt);
+            } else {
+                boolean existeConexao = clienteService.
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                boolean lojaMigrada = clienteService.
+                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                if (registro > 0 && existeConexao && !lojaMigrada) {
+                    String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+
+                    clienteService.copiarCodantClienteEventual(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+                }
+
+                importarClienteEventual(clientes, opt);
+            }
+        }
+    }
+    
     public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
 
         int iniciarEm = 1;
@@ -66,7 +129,7 @@ public class ClienteRepository {
         if (parametroValidos) {
 
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);
+            clientes = organizarListagem(clientes, opt);
             System.gc();
 
             this.provider.begin();
@@ -116,6 +179,7 @@ public class ClienteRepository {
 
                         anterior = converterClientePreferencialAnterior(imp);
                         anterior.setCodigoAtual(cliente);
+                        anterior.setIdConexao(provider.getIdConexao());
 
                         //Grava as informações
                         gravarClientePreferencial(cliente);
@@ -346,7 +410,7 @@ public class ClienteRepository {
         if (parametroValidos) {
 
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);
+            clientes = organizarListagem(clientes, opt);
             System.gc();
 
             if (opt.isEmpty() || (opt.size() == 1 && opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO))) {
@@ -400,6 +464,7 @@ public class ClienteRepository {
 
                             anterior = converterClienteEventualAnterior(imp);
                             anterior.setCodigoAtual(cliente);
+                            anterior.setIdConexao(provider.getIdConexao());
 
                             //Grava as informações
                             gravarClienteEventual(cliente);
@@ -465,6 +530,63 @@ public class ClienteRepository {
         }
     }
 
+    public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) {
+        LOG.fine("Organizando a listagem dos clientes");
+
+        List<ClienteIMP> result = new ArrayList<>();
+        Map<String, ClienteIMP> validos = new LinkedHashMap<>();
+        Map<String, ClienteIMP> invalidos = new LinkedHashMap<>();
+        
+        boolean importarSomenteAtivos = opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO);
+
+        clientes.forEach((imp) -> {
+            //Verifica se o ID é válido para organizar a listagem;
+            
+            if (importarSomenteAtivos) { // Verificar se será migado somente clientes ativos
+                if (imp.isAtivo()) {
+                    try {
+                        long id = Long.parseLong(imp.getId());
+
+                        if (id > 0 && id <= 999999) {
+                            validos.put(imp.getId(), imp);
+                        } else {
+                            invalidos.put(imp.getId(), imp);
+                        }
+                    } catch (NumberFormatException e) {
+                        invalidos.put(imp.getId(), imp);
+                    }
+                }
+            } else {
+                try {
+                    long id = Long.parseLong(imp.getId());
+
+                    if (id > 0 && id <= 999999) {
+                        validos.put(imp.getId(), imp);
+                    } else {
+                        invalidos.put(imp.getId(), imp);
+                    }
+                } catch (NumberFormatException e) {
+                    invalidos.put(imp.getId(), imp);
+                }
+            }
+        });
+
+        /**
+         * Unifica os resultados, colocando primeiro os clientes com IDs válidos
+         * e depois os inválidos que receberão um novo id posteriormente.
+         */
+        result.addAll(validos.values());
+        result.addAll(invalidos.values());
+
+        LOG.fine("Quantidade de registros validos: " + validos.size() + ", inválidos: " + invalidos.size());
+
+        //Liberar memória
+        validos.clear();
+        invalidos.clear();
+
+        return result;
+    }
+    
     public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes) {
 
         LOG.fine("Organizando a listagem dos clientes");
@@ -732,7 +854,7 @@ public class ClienteRepository {
         if (parametroValidos) {
 
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);
+            clientes = organizarListagem(clientes, opt);
             System.gc();
 
             this.provider.begin();
@@ -801,6 +923,7 @@ public class ClienteRepository {
 
                         anterior = converterClientePreferencialAnterior(imp);
                         anterior.setCodigoAtual(cliente);
+                        anterior.setIdConexao(provider.getIdConexao());
 
                         //Grava as informações
                         gravarClientePreferencial(cliente);
@@ -857,7 +980,7 @@ public class ClienteRepository {
         if (parametroValidos) {
 
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);
+            clientes = organizarListagem(clientes, opt);
             System.gc();
 
             this.provider.begin();
@@ -926,6 +1049,7 @@ public class ClienteRepository {
 
                         anterior = converterClienteEventualAnterior(imp);
                         anterior.setCodigoAtual(cliente);
+                        anterior.setIdConexao(provider.getIdConexao());
 
                         //Grava as informações
                         gravarClienteEventual(cliente);

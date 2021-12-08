@@ -152,6 +152,8 @@ public class FornecedorAnteriorDAO {
                 sql.put("razao", vo.getRazao());
                 sql.put("fantasia", vo.getFantasia());
                 
+                sql.put("id_conexao", vo.getIdConexao());
+                
                 stm.execute(sql.getInsert());
             }
     }

@@ -86,7 +86,9 @@ public enum OpcaoCliente {
     RECEBER_CHEQUE,
     CLIENTE_EVENTUAL,
     IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
-    IMPORTAR_SOMENTE_ATIVO_EVENTUAL;
+    IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
+    IMPORTAR_SOMENTE_ATIVO,
+    FORCAR_UNIFICACAO;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

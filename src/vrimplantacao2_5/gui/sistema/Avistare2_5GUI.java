@@ -14,7 +14,6 @@ import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.controller.sistema.AvistareController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.sistema.AvistareVO;
 
@@ -70,24 +69,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
         return vo;        
     }
     
-    public OpcoesMigracaoVO carregarOpcoesMigracao() {        
-        
-        Parametros params = Parametros.get();
-        
-        OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
-        
-        opcoesMigracaoVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
-        opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));
-        opcoesMigracaoVO.setHabilitarMigracaoVendas(params.getBool("OPCAO MIGRACAO", "MIGRAR VENDAS"));
-        
-        return opcoesMigracaoVO;        
-    }
-    
     public Avistare2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -100,7 +81,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
         dao = new AvistareDAO();
         
-        controller = new AvistareController(carregarOpcoesMigracao(), dao);
+        controller = new AvistareController(dao);
         
         tabProdutos.setOpcoesDisponiveis(controller);                
         tabFornecedores.setOpcoesDisponiveis(controller);

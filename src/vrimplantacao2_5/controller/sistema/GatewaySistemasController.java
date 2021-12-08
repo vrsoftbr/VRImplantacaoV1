@@ -13,7 +13,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
 /**
@@ -22,15 +21,13 @@ import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
  */
 public class GatewaySistemasController extends InterfaceController {
 
-    public OpcoesMigracaoVO opcoesMigracaoVO = null;
     public GatewaySistemasDAO dao = null;
     private String complementoSistema = "";
     private final String SISTEMA = "Gateway Sistemas";
     
     public GatewaySistemasController() {}
     
-    public GatewaySistemasController(OpcoesMigracaoVO opcoesMigracaoVO, GatewaySistemasDAO dao) {        
-        this.opcoesMigracaoVO = opcoesMigracaoVO;
+    public GatewaySistemasController(GatewaySistemasDAO dao) {                
         this.dao = dao;
     }
 
@@ -55,40 +52,40 @@ public class GatewaySistemasController extends InterfaceController {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.FORCAR_UNIFICACAO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_MANTER_BALANCA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO_PRODUTO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoMercadologicos() ? OpcaoProduto.MERCADOLOGICO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.PRODUTOS : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.EAN : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.EAN_EM_BRANCO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.TIPO_EMBALAGEM_EAN : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.TIPO_EMBALAGEM_PRODUTO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.PESAVEL : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.VALIDADE : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.DESC_COMPLETA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.DESC_GONDOLA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.DESC_REDUZIDA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ESTOQUE_MAXIMO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ESTOQUE_MINIMO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.PRECO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.CUSTO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ESTOQUE : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ATIVO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.NCM : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.CEST : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.PIS_COFINS : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_SAIDA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_SAIDA_FORA_ESTADO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_SAIDA_NF : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_ENTRADA : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_CONSUMIDOR : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.MARGEM : null,
-                    opcoesMigracaoVO.isHabilitarMigracaoProdutos() ? OpcaoProduto.MAPA_TRIBUTACAO : null
+                    OpcaoProduto.FORCAR_UNIFICACAO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
@@ -96,57 +93,57 @@ public class GatewaySistemasController extends InterfaceController {
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.DADOS : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.RAZAO_SOCIAL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.NOME_FANTASIA : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.CNPJ_CPF : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.INSCRICAO_ESTADUAL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.ENDERECO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.NUMERO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.COMPLEMENTO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.BAIRRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.MUNICIPIO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.UF : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.CEP : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.SITUACAO_CADASTRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.DATA_CADASTRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.TELEFONE : null,
-                opcoesMigracaoVO.isHabilitarMigracaoFornecedores() ? OpcaoFornecedor.CONTATOS : null,
-                opcoesMigracaoVO.isHabilitarMigracaoProdutosFornecedores() ? OpcaoFornecedor.PRODUTO_FORNECEDOR : null
+                OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.NUMERO,
+                OpcaoFornecedor.COMPLEMENTO,
+                OpcaoFornecedor.BAIRRO,
+                OpcaoFornecedor.MUNICIPIO,
+                OpcaoFornecedor.UF,
+                OpcaoFornecedor.CEP,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
     
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                opcoesMigracaoVO.isHabilitarMigracaoClientesEventuais() ? OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.DADOS : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.CNPJ : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.INSCRICAO_ESTADUAL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.ENDERECO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.NUMERO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.COMPLEMENTO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.BAIRRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.MUNICIPIO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.UF : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.CEP : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.DATA_CADASTRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.SITUACAO_CADASTRO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.BLOQUEADO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.NOME_PAI : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.NOME_MAE : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.NOME_CONJUGE : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.CARGO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.VALOR_LIMITE : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.DATA_NASCIMENTO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.TELEFONE : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.CELULAR : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.EMAIL : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesPreferenciais() ? OpcaoCliente.OBSERVACOES : null,
-                opcoesMigracaoVO.isHabilitarMigracaoReceberCreditoRotativo() ? OpcaoCliente.RECEBER_CREDITOROTATIVO : null,
-                opcoesMigracaoVO.isHabilitarMigracaoClientesEventuais() ? OpcaoCliente.CLIENTE_EVENTUAL : null
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.NOME_PAI,
+                OpcaoCliente.NOME_MAE,
+                OpcaoCliente.NOME_CONJUGE,
+                OpcaoCliente.CARGO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL
         ));
     }
 }

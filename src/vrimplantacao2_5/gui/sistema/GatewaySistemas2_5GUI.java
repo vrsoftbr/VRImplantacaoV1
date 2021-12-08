@@ -14,7 +14,6 @@ import vrimplantacao2_5.controller.sistema.GatewaySistemasController;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
@@ -73,26 +72,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         return vo;        
     }
     
-    public OpcoesMigracaoVO carregarOpcoesMigracao() {        
-        
-        Parametros params = Parametros.get();
-        
-        OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
-        
-        opcoesMigracaoVO.setHabilitarMigracaoFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
-        opcoesMigracaoVO.setHabilitarMigracaoMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
-        opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));        
-        
-        return opcoesMigracaoVO;        
-    }
-    
     public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -105,7 +84,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
         dao = new GatewaySistemasDAO();
         
-        controller = new GatewaySistemasController(carregarOpcoesMigracao(), dao);
+        controller = new GatewaySistemasController(dao);
         
         tabProdutos.setOpcoesDisponiveis(controller);                
         tabFornecedores.setOpcoesDisponiveis(controller);

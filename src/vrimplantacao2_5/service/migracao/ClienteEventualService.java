@@ -5,28 +5,28 @@
  */
 package vrimplantacao2_5.service.migracao;
 
-import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
+import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 
 /**
  *
  * @author Lucas Santos
  */
-public class ClientePreferencialService {
-
-    private ClientePreferencialAnteriorDAO clienteAnteriorDAO;
-
-    public ClientePreferencialService() {
-        this.clienteAnteriorDAO = new ClientePreferencialAnteriorDAO();
+public class ClienteEventualService {
+    
+    private ClienteEventualAnteriorDAO clienteAnteriorDAO;
+    
+    public ClienteEventualService() {
+        this.clienteAnteriorDAO = new ClienteEventualAnteriorDAO();
     }
     
-    public ClientePreferencialService(ClientePreferencialAnteriorDAO clienteAnteriorDAO) {
+    public ClienteEventualService(ClienteEventualAnteriorDAO clienteAnteriorDAO) {
         this.clienteAnteriorDAO = clienteAnteriorDAO;
     }
     
     public int existeConexaoMigrada(int idConexao, String sistema) throws Exception {
         return this.clienteAnteriorDAO.getConexaoMigrada(idConexao, sistema);
     }
-    
+
     public int verificaRegistro() throws Exception {
         return this.clienteAnteriorDAO.verificaRegistro();
     }
@@ -35,10 +35,10 @@ public class ClientePreferencialService {
         return this.clienteAnteriorDAO.verificaMigracaoMultiloja(lojaOrigem, sistema, idConexao);
     }
     
-    public void copiarCodantClientePreferencial(String sistema, String lojaModelo, String lojaNova) throws Exception {
-        this.clienteAnteriorDAO.copiarCodantClientePreferencial(sistema, lojaModelo, lojaNova);
+    public void copiarCodantClienteEventual(String sistema, String lojaModelo, String lojaNova) throws Exception {
+        this.clienteAnteriorDAO.copiarCodantClienteEventual(sistema, lojaModelo, lojaNova);
     }
-
+    
     public String getLojaModelo(int idConexao, String sistema) throws Exception {
         return this.clienteAnteriorDAO.getLojaModelo(idConexao, sistema);
     }
