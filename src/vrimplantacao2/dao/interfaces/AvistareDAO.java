@@ -11,7 +11,6 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -21,10 +20,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
@@ -34,10 +32,12 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.vo.sistema.AvistareVO;
 
 /**
  *
@@ -45,56 +45,11 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public AvistareVO avistareVO = null;
+    
     @Override
     public String getSistema() {
         return "Avistare";
-    }
-
-    @Override
-    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        return new HashSet<>(Arrays.asList(
-                new OpcaoProduto[]{
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-                    OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
-                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                    OpcaoProduto.FAMILIA_PRODUTO,
-                    OpcaoProduto.FAMILIA,
-                    OpcaoProduto.PRODUTOS,
-                    OpcaoProduto.EAN,
-                    OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.DATA_CADASTRO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
-                    OpcaoProduto.QTD_EMBALAGEM_EAN,
-                    OpcaoProduto.PESAVEL,
-                    OpcaoProduto.VALIDADE,
-                    OpcaoProduto.DESC_COMPLETA,
-                    OpcaoProduto.DESC_GONDOLA,
-                    OpcaoProduto.DESC_REDUZIDA,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.PRECO,
-                    OpcaoProduto.CUSTO,
-                    OpcaoProduto.CUSTO_COM_IMPOSTO,
-                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.ESTOQUE,
-                    OpcaoProduto.ATIVO,
-                    OpcaoProduto.NCM,
-                    OpcaoProduto.CEST,
-                    OpcaoProduto.PIS_COFINS,
-                    OpcaoProduto.NATUREZA_RECEITA,
-                    OpcaoProduto.ICMS,
-                    OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,
-                    OpcaoProduto.VOLUME_QTD,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
-                }
-        ));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -164,6 +119,35 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	ProdFamID as merc1,\n"
+                    + "	ProdFamDescricao as desc_merc1\n"
+                    + "from TB_FAMILIA_PRODUTOS\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
+                    imp.setMerc2ID("1");
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());                    
+                    result.add(imp);
+                }                
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -226,7 +210,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cofins.CstPisCofinsDescricao,\n"
                     + "	nat.NatRecPisCofinsCodigo as naturezareceita,\n"
                     + "	nat.NatRecPisCofinsDescricao,\n"
-                    + "	p.ProdCaixaQtde volume\n"
+                    + "	p.ProdCaixaQtde volume,\n"
+                    + " p.ProdFamiliaId as mercadologico1 \n"        
                     + "from\n"
                     + "	dbo.TB_PRODUTO p\n"
                     + "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n"
@@ -254,21 +239,28 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    int codigoProduto = Utils.stringToInt(rst.getString("ProdCodInterno"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+                    if (avistareVO.isTemArquivoBalanca()) {
+                        int codigoProduto = Utils.stringToInt(rst.getString("ProdCodInterno"), -2);
+                        ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } else {
+                        if (produtoBalanca != null) {
+                            imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                            imp.setValidade(produtoBalanca.getValidade());
+                            imp.setQtdEmbalagem(1);
+                        } else {
+                            imp.setEan(rst.getString("ean"));
+                            imp.seteBalanca(false);
+                            imp.setTipoEmbalagem(rst.getString("unidade"));
+                            imp.setValidade(0);
+                            imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        }
+                    } else {                        
                         imp.setEan(rst.getString("ean"));
-                        imp.seteBalanca(false);
                         imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.setValidade(0);
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setValidade(0);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
@@ -277,6 +269,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());

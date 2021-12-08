@@ -31,6 +31,7 @@ import vrimplantacao2.vo.cadastro.local.MunicipioVO;
  */
 public class ClienteRepositoryProvider {
     
+    private int idConexao;
     private String sistema;
     private String lojaOrigem;
     private int lojaVR;
@@ -72,6 +73,14 @@ public class ClienteRepositoryProvider {
         }
     }
 
+    public int getIdConexao() {
+        return this.idConexao;
+    }
+    
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }
+    
     public void setSistema(String sistema) {
         this.sistema = sistema;
     }
@@ -286,7 +295,6 @@ public class ClienteRepositoryProvider {
 
         public void incluirTelefoneFood(int id, Long telefone) throws Exception {
             clienteFoodTelefoneDao.incluirTelefone(id, telefone);
-        }
-        
+        }        
     }
 }

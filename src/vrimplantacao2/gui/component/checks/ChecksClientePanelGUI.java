@@ -25,16 +25,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.removeAll();
         tabCheque.removeAll();
 
-        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
-            chkImportarCliPreferencialAtivo.setVisible(true);
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO)) {
+            chkImportarClienteAtivo.setVisible(true);
         } else {
-            chkImportarCliPreferencialAtivo.setVisible(false);
-        }
-        
-        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
-            chkImportarCliEventualAtivo.setVisible(true);
-        } else {
-            chkImportarCliEventualAtivo.setVisible(false);
+            chkImportarClienteAtivo.setVisible(false);
         }
                 
         if (opt.contains(OpcaoCliente.DADOS)
@@ -174,18 +168,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.removeAll();
         tabCheque.removeAll();
 
-        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL)) {
-            chkImportarCliPreferencialAtivo.setVisible(true);
+        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO)) {
+            chkImportarClienteAtivo.setVisible(true);
         } else {
-            chkImportarCliPreferencialAtivo.setVisible(false);
+            chkImportarClienteAtivo.setVisible(false);
         }
         
-        if (opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL)) {
-            chkImportarCliEventualAtivo.setVisible(true);
-        } else {
-            chkImportarCliEventualAtivo.setVisible(false);
-        }
-                
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -335,117 +323,123 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
     public void importar() throws Exception {
 
+        List<OpcaoCliente> opcao = new ArrayList<>();
+
+        if (chkForcarUnificacao.isSelected()) {
+            opcao.add(OpcaoCliente.FORCAR_UNIFICACAO);
+        }
+        
+        if (chkImportarClienteAtivo.isSelected()) {
+            opcao.add(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO);
+        }
+        
         if (chkClientePreferencial.isSelected()) {
-            importador.importarClientePreferencial();
+            importador.importarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
 
         if (chkClienteEventual.isSelected()) {
-            importador.importarClienteEventual();
+            importador.importarClienteEventual(opcao.toArray(new OpcaoCliente[]{}));
         }
         
-        {
-            List<OpcaoCliente> opcao = new ArrayList<>();
+        if (chkNome.isSelected()) {
+            opcao.add(OpcaoCliente.RAZAO);
+        }
+        if (chkCnpj.isSelected()) {
+            opcao.add(OpcaoCliente.CNPJ);
+        }
+        if (chkIE.isSelected()) {
+            opcao.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+        }
+        if (chkEndereco.isSelected()) {
+            opcao.add(OpcaoCliente.ENDERECO);
+        }
+        if (chkNumero.isSelected()) {
+            opcao.add(OpcaoCliente.NUMERO);
+        }
+        if (chkComplemento.isSelected()) {
+            opcao.add(OpcaoCliente.COMPLEMENTO);
+        }
+        if (chkBairro.isSelected()) {
+            opcao.add(OpcaoCliente.BAIRRO);
+        }
+        if (chkMunicipio.isSelected() || chkMunicipioIbge.isSelected()) {
+            opcao.add(OpcaoCliente.MUNICIPIO);
+        }
+        if (chkUf.isSelected() || chkUfIbge.isSelected()) {
+            opcao.add(OpcaoCliente.UF);
+        }
+        if (chkCep.isSelected()) {
+            opcao.add(OpcaoCliente.CEP);
+        }
+        if (chkTelefone.isSelected()) {
+            opcao.add(OpcaoCliente.TELEFONE);
+        }
+        if (chkCelular.isSelected()) {
+            opcao.add(OpcaoCliente.CELULAR);
+        }
+        if (chkEmail.isSelected()) {
+            opcao.add(OpcaoCliente.EMAIL);
+        }
+        if (chkContatoAdicional.isSelected()) {
+            opcao.add(OpcaoCliente.CONTATOS);
+        }
+        if (chkDataCadastro.isSelected()) {
+            opcao.add(OpcaoCliente.DATA_CADASTRO);
+        }
+        if (chkSituacaoCadastro.isSelected()) {
+            opcao.add(OpcaoCliente.SITUACAO_CADASTRO);
+        }
+        if (chkBloqueado.isSelected()) {
+            opcao.add(OpcaoCliente.BLOQUEADO);
+        }
+        if (chkPermiteCreditoRotativo.isSelected()) {
+            opcao.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
+        }
+        if (chkPermiteCheque.isSelected()) {
+            opcao.add(OpcaoCliente.PERMITE_CHEQUE);
+        }
+        if (chkValorLimite.isSelected()) {
+            opcao.add(OpcaoCliente.VALOR_LIMITE);
+        }
+        if (chkObservacao.isSelected()) {
+            opcao.add(OpcaoCliente.OBSERVACOES);
+        }
+        if (chkObservacao2.isSelected()) {
+            opcao.add(OpcaoCliente.OBSERVACOES2);
+        }
+        if (chkNomePai.isSelected()) {
+            opcao.add(OpcaoCliente.NOME_PAI);
+        }
+        if (chkNomeMae.isSelected()) {
+            opcao.add(OpcaoCliente.NOME_MAE);
+        }
+        if (chkNomeConjuge.isSelected()) {
+            opcao.add(OpcaoCliente.NOME_CONJUGE);
+        }
+        if (chkDataNascimento.isSelected()) {
+            opcao.add(OpcaoCliente.DATA_NASCIMENTO);
+        }
+        if (chkEmpresa.isSelected()) {
+            opcao.add(OpcaoCliente.EMPRESA);
+        }
+        if (chkCargo.isSelected()) {
+            opcao.add(OpcaoCliente.CARGO);
+        }
+        if (chkDataAdmissao.isSelected()) {
+            opcao.add(OpcaoCliente.DATA_ADMISSAO);
+        }
+        if (chkSalario.isSelected()) {
+            opcao.add(OpcaoCliente.SALARIO);
+        }
+        if (chkSexo.isSelected()) {
+            opcao.add(OpcaoCliente.SEXO);
+        }
+        if (chkEstadoCivil.isSelected()) {
+            opcao.add(OpcaoCliente.ESTADO_CIVIL);
+        }
 
-            if (chkNome.isSelected()) {
-                opcao.add(OpcaoCliente.RAZAO);
-            }
-            if (chkCnpj.isSelected()) {
-                opcao.add(OpcaoCliente.CNPJ);
-            }
-            if (chkIE.isSelected()) {
-                opcao.add(OpcaoCliente.INSCRICAO_ESTADUAL);
-            }
-            if (chkEndereco.isSelected()) {
-                opcao.add(OpcaoCliente.ENDERECO);
-            }
-            if (chkNumero.isSelected()) {
-                opcao.add(OpcaoCliente.NUMERO);
-            }
-            if (chkComplemento.isSelected()) {
-                opcao.add(OpcaoCliente.COMPLEMENTO);
-            }
-            if (chkBairro.isSelected()) {
-                opcao.add(OpcaoCliente.BAIRRO);
-            }
-            if (chkMunicipio.isSelected() || chkMunicipioIbge.isSelected()) {
-                opcao.add(OpcaoCliente.MUNICIPIO);
-            }
-            if (chkUf.isSelected() || chkUfIbge.isSelected()) {
-                opcao.add(OpcaoCliente.UF);
-            }
-            if (chkCep.isSelected()) {
-                opcao.add(OpcaoCliente.CEP);
-            }
-            if (chkTelefone.isSelected()) {
-                opcao.add(OpcaoCliente.TELEFONE);
-            }
-            if (chkCelular.isSelected()) {
-                opcao.add(OpcaoCliente.CELULAR);
-            }
-            if (chkEmail.isSelected()) {
-                opcao.add(OpcaoCliente.EMAIL);
-            }
-            if (chkContatoAdicional.isSelected()) {
-                opcao.add(OpcaoCliente.CONTATOS);
-            }
-            if (chkDataCadastro.isSelected()) {
-                opcao.add(OpcaoCliente.DATA_CADASTRO);
-            }
-            if (chkSituacaoCadastro.isSelected()) {
-                opcao.add(OpcaoCliente.SITUACAO_CADASTRO);
-            }
-            if (chkBloqueado.isSelected()) {
-                opcao.add(OpcaoCliente.BLOQUEADO);
-            }
-            if (chkPermiteCreditoRotativo.isSelected()) {
-                opcao.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
-            }
-            if (chkPermiteCheque.isSelected()) {
-                opcao.add(OpcaoCliente.PERMITE_CHEQUE);
-            }
-            if (chkValorLimite.isSelected()) {
-                opcao.add(OpcaoCliente.VALOR_LIMITE);
-            }
-            if (chkObservacao.isSelected()) {
-                opcao.add(OpcaoCliente.OBSERVACOES);
-            }
-            if (chkObservacao2.isSelected()) {
-                opcao.add(OpcaoCliente.OBSERVACOES2);
-            }
-            if (chkNomePai.isSelected()) {
-                opcao.add(OpcaoCliente.NOME_PAI);
-            }
-            if (chkNomeMae.isSelected()) {
-                opcao.add(OpcaoCliente.NOME_MAE);
-            }
-            if (chkNomeConjuge.isSelected()) {
-                opcao.add(OpcaoCliente.NOME_CONJUGE);
-            }
-            if (chkDataNascimento.isSelected()) {
-                opcao.add(OpcaoCliente.DATA_NASCIMENTO);
-            }
-            if (chkEmpresa.isSelected()) {
-                opcao.add(OpcaoCliente.EMPRESA);
-            }
-            if (chkCargo.isSelected()) {
-                opcao.add(OpcaoCliente.CARGO);
-            }
-            if (chkDataAdmissao.isSelected()) {
-                opcao.add(OpcaoCliente.DATA_ADMISSAO);
-            }
-            if (chkSalario.isSelected()) {
-                opcao.add(OpcaoCliente.SALARIO);
-            }
-            if (chkSexo.isSelected()) {
-                opcao.add(OpcaoCliente.SEXO);
-            }
-            if (chkEstadoCivil.isSelected()) {
-                opcao.add(OpcaoCliente.ESTADO_CIVIL);
-            }
-
-            if (!opcao.isEmpty()) {
-                importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
-            }
+        if (!opcao.isEmpty()) {
+            importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
         
         if (chkCreditoRotativo.isSelected()) {
@@ -474,8 +468,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
         tabParametros = new javax.swing.JPanel();
         pnlDados2 = new vrframework.bean.panel.VRPanel();
-        chkImportarCliPreferencialAtivo = new vrframework.bean.checkBox.VRCheckBox();
-        chkImportarCliEventualAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkImportarClienteAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkForcarUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlDados = new vrframework.bean.panel.VRPanel();
@@ -540,34 +534,31 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         setName("tabMain"); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliPreferencialAtivo, "Importar Clientes Preferneciais Ativos");
-        chkImportarCliPreferencialAtivo.setEnabled(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkImportarClienteAtivo, "Importar Clientes Ativos");
+        chkImportarClienteAtivo.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkImportarCliEventualAtivo, "Importar Clientes Eventuais Ativos");
-        chkImportarCliEventualAtivo.setEnabled(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkForcarUnificacao, "Forçar Unificação");
+        chkForcarUnificacao.setEnabled(true);
 
         javax.swing.GroupLayout pnlDados2Layout = new javax.swing.GroupLayout(pnlDados2);
         pnlDados2.setLayout(pnlDados2Layout);
         pnlDados2Layout.setHorizontalGroup(
             pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDados2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlDados2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlDados2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(537, Short.MAX_VALUE))
+                    .addComponent(chkImportarClienteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(603, Short.MAX_VALUE))
         );
         pnlDados2Layout.setVerticalGroup(
             pnlDados2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDados2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkImportarCliPreferencialAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkImportarClienteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkImportarCliEventualAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
@@ -580,7 +571,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametrosLayout.createSequentialGroup()
                 .addComponent(pnlDados2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 304, Short.MAX_VALUE))
+                .addGap(0, 319, Short.MAX_VALUE))
         );
 
         addTab("Parâmetros", tabParametros);
@@ -1129,9 +1120,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkEmpresa;
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
     public vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
+    public vrframework.bean.checkBox.VRCheckBox chkForcarUnificacao;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
-    public vrframework.bean.checkBox.VRCheckBox chkImportarCliEventualAtivo;
-    public vrframework.bean.checkBox.VRCheckBox chkImportarCliPreferencialAtivo;
+    public vrframework.bean.checkBox.VRCheckBox chkImportarClienteAtivo;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
     public vrframework.bean.checkBox.VRCheckBox chkNome;
@@ -1183,12 +1174,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     }
 
     public void gravarParametros(Parametros parametros, String... params) {
-        parametros.put(chkImportarCliEventualAtivo.isSelected(), concat(params, "SOMENTE_EVENTUAIS_ATIVO"));
-        parametros.put(chkImportarCliPreferencialAtivo.isSelected(), concat(params, "SOMENTE_PREFERENCIAIS_ATIVO"));
+        parametros.put(chkImportarClienteAtivo.isSelected(), concat(params, "SOMENTE_CLIENTES_ATIVO"));
     }
 
     public void carregarParametros(Parametros parametros, String... params) {
-        chkImportarCliEventualAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_EVENTUAIS_ATIVO")));
-        chkImportarCliPreferencialAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_PREFERENCIAIS_ATIVO")));
+        chkImportarClienteAtivo.setSelected(parametros.getBool(concat(params, "SOMENTE_CLIENTES_ATIVO")));
     }
 }

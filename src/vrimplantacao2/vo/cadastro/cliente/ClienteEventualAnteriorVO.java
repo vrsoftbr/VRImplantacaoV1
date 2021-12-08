@@ -15,6 +15,7 @@ public class ClienteEventualAnteriorVO {
     private String ie;
     private String nome;
     private boolean forcarGravacao = false;
+    private int idConexao;
 
     public void setSistema(String sistema) {
         this.sistema = sistema;
@@ -87,5 +88,12 @@ public class ClienteEventualAnteriorVO {
     public boolean isForcarGravacao() {
         return forcarGravacao;
     }
+
+    public int getIdConexao() {
+        return this.idConexao;
+    }
     
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }
 }

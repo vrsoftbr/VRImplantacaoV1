@@ -539,10 +539,9 @@ public class Importador {
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        
+        provider.setIdConexao(getIdConexao());
         ClienteRepository rep = new ClienteRepository(provider);
-        
-        rep.importarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
+        rep.salvarClientePreferencial2_5(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     public void importarClientePontuacao() throws Exception {
@@ -575,9 +574,10 @@ public class Importador {
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        provider.setIdConexao(getIdConexao());
         
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
+        rep.salvarClienteEventual2_5(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     /**

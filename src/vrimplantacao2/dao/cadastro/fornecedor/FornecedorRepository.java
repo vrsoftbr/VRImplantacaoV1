@@ -130,6 +130,7 @@ public class FornecedorRepository {
 
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo);
+                    anterior.setIdConexao(provider.getIdConexao());
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
                             anterior,
@@ -337,6 +338,7 @@ public class FornecedorRepository {
 
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo);
+                    anterior.setIdConexao(provider.getIdConexao());
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
                             anterior,

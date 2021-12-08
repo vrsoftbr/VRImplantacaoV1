@@ -25,7 +25,12 @@ public enum EScriptLojaOrigemSistema {
             "	id,\n" +
             "	nome || '' - '' || cnpj as descricao\n" +
             "from \n" +
-            "	filial");
+            "	filial"),
+    AVISTARE(16, 13, "select distinct\n"
+            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
+            + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
+            + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
+            + "from dbo.TB_CONFIG");
     
     private int idSistema;
     private int idBancoDados;

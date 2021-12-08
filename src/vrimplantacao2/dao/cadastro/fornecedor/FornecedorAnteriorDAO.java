@@ -152,6 +152,8 @@ public class FornecedorAnteriorDAO {
                 sql.put("razao", vo.getRazao());
                 sql.put("fantasia", vo.getFantasia());
                 
+                sql.put("id_conexao", vo.getIdConexao());
+                
                 stm.execute(sql.getInsert());
             }
     }
@@ -611,7 +613,7 @@ public class FornecedorAnteriorDAO {
                     "	implantacao.codant_fornecedor\n" +
                     "where \n" +
                     "	importsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "   importloja = " + SQLUtils.stringSQL(lojaOrigem) + "and\n" +        
+                    "   importloja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n" +        
                     "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     lojaJaMigrada = true;

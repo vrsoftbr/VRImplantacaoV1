@@ -3,6 +3,7 @@ package vrimplantacao2_5.service.selecaoloja;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
+import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
@@ -46,6 +47,9 @@ public abstract class InternalFrameFactory {
             case SG:
                 internalFrame = new SG2_5GUI(frame);
                 break;
+            case AVISTARE:
+                internalFrame = new Avistare2_5GUI(frame, null);
+                break;
             default:
                 internalFrame = null;                
         }
@@ -83,6 +87,9 @@ public abstract class InternalFrameFactory {
                 break;
             case SG:
                 internalFrame = new SG2_5GUI(frame);
+                break;
+            case AVISTARE:
+                internalFrame = new Avistare2_5GUI(frame, null);
                 break;
             default:
                 internalFrame = null;                
