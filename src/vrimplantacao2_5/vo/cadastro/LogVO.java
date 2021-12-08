@@ -1,7 +1,6 @@
 package vrimplantacao2_5.vo.cadastro;
 
-import java.sql.Date;
-import org.joda.time.LocalDateTime;
+import java.util.Date;
 
 /**
  *
@@ -11,10 +10,10 @@ public class LogVO {
     
     private int id;
     private int idUsuario;
-    private Date dataHora;
-    private LocalDateTime dataHoraTime;
+    private String dataHoraTime;
     private int idTipoOperacao;
-
+    private int idLoja;
+    
     public int getId() {
         return id;
     }
@@ -31,12 +30,12 @@ public class LogVO {
         this.idUsuario = idUsuario;
     }
 
-    public Date getDataHora() {
-        return dataHora;
+    public String getDataHoraTime() {
+        return dataHoraTime;
     }
 
-    public void setDataHora(Date dataHora) {
-        this.dataHora = dataHora;
+    public void setDataHoraTime(String dataHoraTime) {
+        this.dataHoraTime = dataHoraTime;
     }
 
     public int getIdTipoOperacao() {
@@ -47,12 +46,11 @@ public class LogVO {
         this.idTipoOperacao = idTipoOperacao;
     }
 
-    public LocalDateTime getDataHoraTime() {
-        return dataHoraTime;
+    public int getIdLoja() {
+        return idLoja;
     }
 
-    public void setDataHoraTime(LocalDateTime dataHoraTime) {
-        this.dataHoraTime = dataHoraTime;
+    public void setIdLoja(int idLoja) {
+        this.idLoja = idLoja;
     }
-    
 }

@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -126,12 +127,12 @@ public class FornecedorRepository {
                 provider.next();
             }
             
-            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
-                    Global.getIdUsuario(),
-                    dataHoraImportacao);
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
 
             provider.commit();
         } catch (Exception e) {
@@ -335,12 +336,12 @@ public class FornecedorRepository {
                 provider.next();
             }
 
-            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //Executa log de operação
             logController.executar(EOperacao.UNIFICAR_FORNECEDOR.getId(),
-                    Global.getIdUsuario(),
-                    dataHoraImportacao);
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
                     
             provider.commit();
         } catch (Exception e) {

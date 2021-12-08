@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.financeiro.creditorotativo;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -208,13 +209,11 @@ public class CreditoRotativoRepository {
             }
             
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
-            String dataString = sdf.format(Utils.getDataAtual());
 
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_CREDITO_ROTATIVO.getId(),
-                    Global.getIdUsuario(),
-                    Utils.convertStringToDate("yyyy-MM-dd HH:mm:ss", dataString));
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
 
             provider.commit();
         } catch (Exception e) {

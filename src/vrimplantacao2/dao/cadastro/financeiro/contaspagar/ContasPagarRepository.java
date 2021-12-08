@@ -232,12 +232,12 @@ public class ContasPagarRepository {
             }
             System.out.println("Contagem: " + cont);
             
-            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_PAGAR_FORNECEDOR.getId(),
-                    Global.getIdUsuario(),
-                    dataHoraImportacao);
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
             
             provider.commit();
         } catch (Exception e) {

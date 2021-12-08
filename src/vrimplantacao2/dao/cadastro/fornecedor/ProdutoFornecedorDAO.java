@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -562,12 +564,12 @@ public class ProdutoFornecedorDAO {
                 ProgressBar.next();
             }
             
-            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_PRODUTO_FORNECEDOR.getId(),
-                    Global.getIdUsuario(),
-                    dataHoraImportacao);
+                    sdf.format(new Date()),
+                    getIdLojaVR());
             
             Conexao.commit();
         } catch (Exception e) {

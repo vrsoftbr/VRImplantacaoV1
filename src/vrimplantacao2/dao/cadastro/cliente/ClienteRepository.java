@@ -144,12 +144,12 @@ public class ClienteRepository {
                     provider.notificar();
                 }
 
-                java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 //Executa log de operação
                 logController.executar(EOperacao.SALVAR_CLIENTE_PREFERENCIAL.getId(),
-                        Global.getIdUsuario(),
-                        dataHoraImportacao);
+                        sdf.format(new Date()),
+                        provider.getLojaVR());
 
                 this.provider.commit();
 
@@ -838,12 +838,12 @@ public class ClienteRepository {
                     provider.notificar();
                 }
 
-                java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 //Executa log de operação
                 logController.executar(EOperacao.UNIFICAR_CLIENTE_PREFERENCIAL.getId(),
-                        Global.getIdUsuario(),
-                        dataHoraImportacao);
+                        sdf.format(new Date()),
+                        provider.getLojaVR());
 
                 this.provider.commit();
 

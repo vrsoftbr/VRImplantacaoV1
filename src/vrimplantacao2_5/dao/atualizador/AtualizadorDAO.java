@@ -7,6 +7,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
+import vrimplantacao2_5.vo.enums.EUnidade;
 
 /**
  *
@@ -38,6 +39,21 @@ public class AtualizadorDAO {
         }
     }
 
+    public int verificarLogUsuario() throws Exception {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct id_usuario from implantacao2_5.operacao"
+            )) {
+                if (rs.next()) {
+                    return rs.getInt("id_usuario");
+                }
+            }
+        }
+
+        return 0;
+    }
+
     public void criarSchema() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS implantacao2_5");
@@ -45,7 +61,7 @@ public class AtualizadorDAO {
     }
 
     public void criarConstraint() throws Exception {
-        try (Statement stm = Conexao.createStatement()) { 
+        try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "distinct conname "
@@ -82,7 +98,7 @@ public class AtualizadorDAO {
                     + "        ON UPDATE NO ACTION\n"
                     + "        ON DELETE NO ACTION\n"
                     + ");"
-                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.usuario\n" 
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.usuario\n"
                     + "(\n"
                     + "    id integer PRIMARY KEY NOT NULL,\n"
                     + "    nome character varying(30) NOT NULL,\n"
@@ -236,28 +252,28 @@ public class AtualizadorDAO {
             stm.execute("DELETE FROM implantacao2_5.sistemabancodadosscripts");
         }
     }
-    
+
     public void salvarScriptGetLojaOrigemSistemas(EScriptLojaOrigemSistema eScriptLojaOrigemSistema) throws Exception {
-        
+
         String sql = "INSERT INTO implantacao2_5.sistemabancodadosscripts("
-                    + "id_sistema, "
-                    + "id_bancodados, "
-                    + "script_getlojas"
-                    + ")\n"
-                    + "VALUES ("
-                    + eScriptLojaOrigemSistema.getIdSistema() + ", "
-                    + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
-                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
-        
+                + "id_sistema, "
+                + "id_bancodados, "
+                + "script_getlojas"
+                + ")\n"
+                + "VALUES ("
+                + eScriptLojaOrigemSistema.getIdSistema() + ", "
+                + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
+                + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
+
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(sql);
         }
     }
-    
+
     public void inserirUnidade() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
-                    + "DELETE FROM implantacao2_5.unidade \n;"
+            stm.execute("DELETE FROM implantacao2_5.usuario;\n"
+                    + "DELETE FROM implantacao2_5.unidade\n;"
                     + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) "
                     + "VALUES (1, 'VR MATRIZ', 3526902, 35);");
         }
@@ -265,11 +281,11 @@ public class AtualizadorDAO {
 
     public void inserirUsuario() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGER', 'ZIRDA123', 1);");
+            stm.execute("DELETE FROM implantacao2_5.usuario;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
         }
     }
 }
