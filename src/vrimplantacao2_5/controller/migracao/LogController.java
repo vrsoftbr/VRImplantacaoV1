@@ -1,6 +1,5 @@
 package vrimplantacao2_5.controller.migracao;
 
-import org.joda.time.LocalDateTime;
 import vrimplantacao2_5.service.migracao.LogService;
 import vrimplantacao2_5.vo.cadastro.LogVO;
 

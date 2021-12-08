@@ -18,8 +18,7 @@ public class LogDAO {
             sql.setTableName("implantacao2_5.operacao");
             
             sql.put("id_usuario", logVO.getIdUsuario());
-            //sql.put("datahora", logVO.getDataHora());
-            sql.put("datahora", logVO.getDataHoraTime());
+            sql.put("datahora", logVO.getDataHora());
             sql.put("id_tipooperacao", logVO.getIdTipoOperacao());
             
             stm.execute(sql.getInsert());
