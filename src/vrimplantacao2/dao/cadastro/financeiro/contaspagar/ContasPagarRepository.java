@@ -21,6 +21,9 @@ import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.enums.SituacaoPagarOutrasDespesas;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -32,9 +35,11 @@ public class ContasPagarRepository {
 
     private final ContasPagarProvider provider;
     private boolean importarOutrasDespesas;
+    private final LogController logController;
 
     public ContasPagarRepository(ContasPagarProvider provider) {
         this.provider = provider;
+        this.logController = new LogController();
     }
 
     public void salvar(List<ContaPagarIMP> contas, OpcaoContaPagar... opcoes) throws Exception {
@@ -226,6 +231,14 @@ public class ContasPagarRepository {
                 provider.notificar();
             }
             System.out.println("Contagem: " + cont);
+            
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_PAGAR_FORNECEDOR.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+            
             provider.commit();
         } catch (Exception e) {
             provider.rollback();

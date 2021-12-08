@@ -41,7 +41,11 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.service.migracao.ProdutoService;
+import vrimplantacao2_5.vo.cadastro.LogVO;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -52,6 +56,7 @@ public class ProdutoRepository {
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
 
     private final ProdutoRepositoryProvider provider;
+    private final LogController logController;
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private boolean naoTransformarEANemUN = false;
@@ -65,6 +70,7 @@ public class ProdutoRepository {
     public ProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.divisoes = provider.getDivisoesAnteriores();
+        this.logController = new LogController();
     }
 
     public String getSistema() {
@@ -159,11 +165,11 @@ public class ProdutoRepository {
                                 if (idStack.isIdCadastrado(id)) {
                                     anterior = converterImpEmAnterior(imp);
                                     ProdutoVO produtoVO = new ProdutoVO();
-                                    
+
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
                                     anterior.setDataHora(dataHoraImportacao);
-                                    
+
                                     provider.anterior().salvar(anterior);
                                     notificar();
                                     continue;
@@ -208,10 +214,10 @@ public class ProdutoRepository {
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
-                        
-                        if(prod.getDescricaoCompleta() != null && 
-                                prod.getDescricaoCompleta().length() >= 3 && 
-                                    ean > 999999) {
+
+                        if (prod.getDescricaoCompleta() != null
+                                && prod.getDescricaoCompleta().length() >= 3
+                                && ean > 999999) {
                             provider.salvarLojaVirtual(prod, ean);
                         }
 
@@ -257,6 +263,12 @@ public class ProdutoRepository {
                     provider.complemento().copiarProdutoComplemento(getLojaVR(), loja.getId());
                 }
             }
+
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_PRODUTO.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -264,28 +276,28 @@ public class ProdutoRepository {
             throw e;
         }
     }
-    
+
     public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
         ProdutoService produtoService = new ProdutoService();
-        
+
         int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                 registros = produtoService.verificaRegistro();
-        
-        if(registros > 0 && idConexao == 0) {
+
+        if (registros > 0 && idConexao == 0) {
             unificar(produtos);
         } else {
             boolean existeConexao = produtoService.
-                        verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
-            
+                    verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
+
             boolean lojaJaMigrada = produtoService.
-                        verificaMultilojaMigrada(getLoja(), getSistema(), this.provider.getIdConexao());
-            
-            if(registros > 0 && existeConexao && !lojaJaMigrada) {
+                    verificaMultilojaMigrada(getLoja(), getSistema(), this.provider.getIdConexao());
+
+            if (registros > 0 && existeConexao && !lojaJaMigrada) {
                 String lojaModelo = produtoService.getLojaModelo(this.provider.getIdConexao(), getSistema());
-                
+
                 produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
             }
-            
+
             salvar(produtos);
         }
     }
@@ -515,9 +527,36 @@ public class ProdutoRepository {
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().gerarLogDeImportacaoDeEstoque();
+
+                    //Executa log de operação
+                    logController.executar(EOperacao.ATUALIZAR_ESTOQUE.getId(),
+                            Global.getIdUsuario(),
+                            dataHoraImportacao);
                 }
+                
                 if (optSimples.contains(OpcaoProduto.TROCA)) {
                     provider.complemento().gerarLogDeTroca();
+                }
+
+                if (optSimples.contains(OpcaoProduto.PRECO)) {
+                    //Executa log de operação
+                    logController.executar(EOperacao.ATUALIZAR_PRECO.getId(),
+                            Global.getIdUsuario(),
+                            dataHoraImportacao);
+                }
+
+                if (optSimples.contains(OpcaoProduto.CUSTO)) {
+                    //Executa log de operação
+                    logController.executar(EOperacao.ATUALIZAR_CUSTO.getId(),
+                            Global.getIdUsuario(),
+                            dataHoraImportacao);
+                }
+
+                if (optSimples.contains(OpcaoProduto.ICMS)) {
+                    //Executa log de operação
+                    logController.executar(EOperacao.ATUALIZAR_ICMS.getId(),
+                            Global.getIdUsuario(),
+                            dataHoraImportacao);
                 }
 
                 provider.commit();
@@ -572,6 +611,12 @@ public class ProdutoRepository {
             for (ProdutoIMP imp : organizados) {
                 processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
+
+            //Executa log de operação
+            logController.executar(EOperacao.UNIFICAR_PRODUTO.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -1604,7 +1649,7 @@ public class ProdutoRepository {
      */
     public ProdutoAnteriorVO converterImpEmAnterior(ProdutoIMP imp) {
         ProdutoAnteriorVO destino = new ProdutoAnteriorVO();
-        
+
         destino.setImportSistema(imp.getImportSistema());
         destino.setImportLoja(imp.getImportLoja());
         destino.setImportId(imp.getImportId());

@@ -15,7 +15,13 @@ public enum EScriptLojaOrigemSistema {
             "codfil99 id, " +
             "cgcfil99 || '' - '' || apelido99 descricao " +
             "from " +
-            "cadfil");
+            "cadfil"),
+    UNIPLUS(179, 11, 
+            "select \n" +
+            "	id,\n" +
+            "	nome || '' - '' || cnpj as descricao\n" +
+            "from \n" +
+            "	filial");
     
     private int idSistema;
     private int idBancoDados;

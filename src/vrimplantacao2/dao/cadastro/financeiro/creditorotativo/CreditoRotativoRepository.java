@@ -19,20 +19,26 @@ import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoVO;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * Repositório para executar operações com o crédito rotativo;
+ *
  * @author Leandro
  */
 public class CreditoRotativoRepository {
-    
+
     private static final Logger LOG = Logger.getLogger(CreditoRotativoRepository.class.getName());
-    
+
     private CreditoRotativoProvider provider;
+    private final LogController logController;
 
     public CreditoRotativoRepository(CreditoRotativoProvider provider) {
         this.provider = provider;
-    }   
+        this.logController = new LogController();
+    }
 
     public void unificarCreditoRotativo(List<CreditoRotativoIMP> rotativo) throws Exception {
         provider.setStatus("Crédito Rotativo...(Unificação)...Carregando dados");
@@ -44,20 +50,20 @@ public class CreditoRotativoRepository {
 
             Map<String, CreditoRotativoAnteriorVO> anteriores = provider.getAnteriores();
             MultiMap<String, CreditoRotativoItemAnteriorVO> baixas = provider.getBaixasAnteriores();
-            
+
             provider.setStatus("Crédito Rotativo...(Unificação)...Gravando", filtrados.size());
             for (CreditoRotativoIMP imp : filtrados.values()) {
                 CreditoRotativoAnteriorVO anterior = anteriores.get(
                         imp.getId()
                 );
-                
+
                 if (imp.getCnpjCliente().length() >= 9) {
 
                     int idCliente = new ClientePreferencialDAO().getId(Long.parseLong(imp.getCnpjCliente()));
 
                     if (anterior == null) {
                         anterior = converterRotativoAnterior(imp);
-                        if (idCliente > 0) {                            
+                        if (idCliente > 0) {
                             CreditoRotativoVO cred = converterRotativo(imp);
                             cred.setId_clientePreferencial(idCliente);
                             provider.gravarRotativo(cred);
@@ -69,7 +75,7 @@ public class CreditoRotativoRepository {
                                 anterior
                         );
                     }
-                    
+
                     //Gravando as baixas
                     for (CreditoRotativoItemIMP impParc : imp.getPagamentos()) {
                         CreditoRotativoItemAnteriorVO parcAnt = baixas.get(
@@ -109,7 +115,7 @@ public class CreditoRotativoRepository {
             throw ex;
         }
     }
-    
+
     public void importarCreditoRotativo(List<CreditoRotativoIMP> rotativo) throws Exception {
         provider.setStatus("Importando crédito rotativo...Carregando dados");
         provider.begin();
@@ -117,14 +123,14 @@ public class CreditoRotativoRepository {
             Map<String, CreditoRotativoIMP> filtrados = filtrarRotativo(rotativo);
             rotativo.clear();
             System.gc();
-            
+
             Map<String, CreditoRotativoAnteriorVO> anteriores = provider.getAnteriores();
             MultiMap<String, CreditoRotativoItemAnteriorVO> baixas = provider.getBaixasAnteriores();
             MultiMap<String, ClientePreferencialAnteriorVO> clientes = provider.getClientesAnteriores();
             MultiMap<String, CreditoRotativoVO> getCreditoRotativo;
-            
+
             provider.setStatus("Importando crédito rotativo...Gravando", filtrados.size());
-            for (CreditoRotativoIMP imp: filtrados.values()) {
+            for (CreditoRotativoIMP imp : filtrados.values()) {
                 CreditoRotativoAnteriorVO anterior = anteriores.get(
                         imp.getId()
                 );
@@ -133,7 +139,7 @@ public class CreditoRotativoRepository {
                         provider.getLoja(),
                         imp.getIdCliente()
                 );
-                
+
                 if (anterior == null) {
                     anterior = converterRotativoAnterior(imp);
                     if (preferencial != null && preferencial.getCodigoAtual() != null) {
@@ -142,7 +148,7 @@ public class CreditoRotativoRepository {
 
                         provider.gravarRotativo(cred);
                         anterior.setCodigoAtual(cred);
-                        
+
                         /*getCreditoRotativo = provider.getCreditoRotativo(
                                 provider.getLojaVR(), 
                                 cred.getId_clientePreferencial(), 
@@ -162,11 +168,11 @@ public class CreditoRotativoRepository {
                             imp.getId(),
                             anterior
                     );
-                }               
-                
+                }
+
                 if (anterior.getCodigoAtual() != null) {
                     //Gravando as baixas
-                    for (CreditoRotativoItemIMP impParc: imp.getPagamentos()) {
+                    for (CreditoRotativoItemIMP impParc : imp.getPagamentos()) {
                         CreditoRotativoItemAnteriorVO parcAnt = baixas.get(
                                 provider.getSistema(),
                                 provider.getLoja(),
@@ -191,16 +197,23 @@ public class CreditoRotativoRepository {
                                     impParc.getId()
                             );
                         }
-                    }                    
+                    }
                 }
                 if (anterior.getCodigoAtual() != null) {
                     provider.verificarBaixado(anterior.getCodigoAtual().getId());
                 }
-                
+
                 provider.setStatus();
             }
             
-            
+            java.sql.Date dataHoraImportacao = Utils.convertStringToDate("yyyy-MM-dd HH:mm:ss",
+                    String.valueOf(Utils.getDataAtual()));
+
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_CREDITO_ROTATIVO.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -210,10 +223,10 @@ public class CreditoRotativoRepository {
 
     public Map<String, CreditoRotativoIMP> filtrarRotativo(List<CreditoRotativoIMP> rotativo) {
         Map<String, CreditoRotativoIMP> result = new LinkedHashMap<>();
-        for (CreditoRotativoIMP imp: rotativo) {
+        for (CreditoRotativoIMP imp : rotativo) {
             result.put(imp.getId(), imp);
             Map<String, CreditoRotativoItemIMP> pags = new LinkedHashMap<>();
-            for (CreditoRotativoItemIMP pag: imp.getPagamentos()) {
+            for (CreditoRotativoItemIMP pag : imp.getPagamentos()) {
                 pags.put(pag.getId(), pag);
             }
             imp.getPagamentos().clear();
@@ -224,7 +237,7 @@ public class CreditoRotativoRepository {
 
     public CreditoRotativoVO converterRotativo(CreditoRotativoIMP imp) {
         CreditoRotativoVO vo = new CreditoRotativoVO();
-        
+
         /*if (imp.getIdCliente() != null && imp.getIdCliente().matches("[0-9]*")) {
             vo.setId_clientePreferencial(Integer.parseInt(imp.getIdCliente()));
         }*/
@@ -240,7 +253,7 @@ public class CreditoRotativoRepository {
         vo.setValorMulta(imp.getMulta());
         return vo;
     }
-    
+
     public CreditoRotativoAnteriorVO converterRotativoAnterior(CreditoRotativoIMP imp) {
         CreditoRotativoAnteriorVO ant = new CreditoRotativoAnteriorVO();
         ant.setSistema(provider.getSistema());
@@ -267,7 +280,7 @@ public class CreditoRotativoRepository {
 
     public CreditoRotativoItemVO converterCreditoRotativoItem(CreditoRotativoItemIMP impParc) {
         CreditoRotativoItemVO vo = new CreditoRotativoItemVO();
-        
+
         vo.setDataPagamento(impParc.getDataPagamento());
         vo.setDatabaixa(impParc.getDataPagamento());
         vo.setId_loja(provider.getLojaVR());
@@ -280,47 +293,46 @@ public class CreditoRotativoRepository {
         vo.setAgencia(impParc.getAgencia());
         vo.setConta(impParc.getConta());
         vo.setId_tipoRecebimento(impParc.getId_tiporecebimento());
-        
+
         return vo;
     }
 
     public void salvarPagamentosAgrupados(List<CreditoRotativoPagamentoAgrupadoIMP> pags, OpcaoCreditoRotativo... opcoes) throws Exception {
-        
+
         Set<OpcaoCreditoRotativo> opt = new HashSet<>(Arrays.asList(opcoes));
-        
+
         provider.setStatus("Importando pagamentos (agrupados)...Carregando dados");
-        
+
         Map<String, Double> somado = agruparPagamentos(pags);
         pags.clear();
         System.gc();
-        
+
         Map<String, CreditoRotativoAnteriorVO> rotativosAnteriores = provider.getTodoCreditoRotativoAnterior();
         MultiMap<String, CreditoRotativoItemAnteriorVO> baixasAnteriores = provider.getTodaBaixaAnterior();
         Map<Integer, Double> baixas = provider.getBaixas();
-        
+
         System.gc();
-                
+
         try {
             provider.begin();
-            
-            
+
             int total = rotativosAnteriores.size();
             int contadorAtual = 0;
             int contadorAuxiliar = 0;
-            
+
             provider.setStatus("Importando pagamentos (agrupados)...Gravando " + contadorAtual + "/" + total);
-            
+
             //Retorno TODOS os crédito importados de todas as lojas deste cliente.
-            for (CreditoRotativoAnteriorVO rotativoAnterior: rotativosAnteriores.values()) {
+            for (CreditoRotativoAnteriorVO rotativoAnterior : rotativosAnteriores.values()) {
                 //Se o código anterior do rotativo tiver código atual, continua.
                 if (rotativoAnterior.getCodigoAtual() != null) {
-                    
+
                     CreditoRotativoVO rotativo = rotativoAnterior.getCodigoAtual();
                     Double pagoNaOrigem = somado.get(rotativoAnterior.getIdCliente());
                     Double totalBaixado = baixas.get(rotativo.getId());
-                    
+
                     if (pagoNaOrigem != null) {
-                    
+
                         CreditoRotativoItemAnteriorVO baixaAnterior = baixasAnteriores.get(
                                 provider.getSistema(),
                                 provider.getLoja(),
@@ -328,7 +340,7 @@ public class CreditoRotativoRepository {
                                 rotativoAnterior.getId()
                         );
                         //Se este pagamento não foi importado, executa a importação.
-                        if (baixaAnterior == null) {                             
+                        if (baixaAnterior == null) {
 
                             if (totalBaixado == null) {
                                 totalBaixado = 0d;
@@ -343,7 +355,7 @@ public class CreditoRotativoRepository {
                                 if (pagoNaOrigem < totalABaixar) {
                                     valorPagamento = pagoNaOrigem;
                                     pagoNaOrigem = 0d;
-                                } else {                                
+                                } else {
                                     valorPagamento = totalABaixar;
                                     pagoNaOrigem = pagoNaOrigem - totalABaixar;
                                 }
@@ -397,27 +409,27 @@ public class CreditoRotativoRepository {
                 } else {
                     LOG.warning("Crédito Rotativo '" + rotativoAnterior.getId() + "' não importado no VR");
                 }
-                
+
                 contadorAuxiliar++;
                 contadorAtual++;
-                
+
                 if (contadorAuxiliar >= 1000) {
                     contadorAuxiliar = 0;
                     provider.setStatus("Importando pagamentos (agrupados)...Gravando " + contadorAtual + "/" + total);
                 }
-            }         
-            
+            }
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
-        
+
     }
 
     public Map<String, Double> agruparPagamentos(List<CreditoRotativoPagamentoAgrupadoIMP> pags) {
         Map<String, Double> result = new HashMap<>();
-        for (CreditoRotativoPagamentoAgrupadoIMP imp: pags) {
+        for (CreditoRotativoPagamentoAgrupadoIMP imp : pags) {
             Double valor = result.get(imp.getIdCliente());
             if (valor != null) {
                 valor += imp.getValor();
@@ -428,6 +440,5 @@ public class CreditoRotativoRepository {
         }
         return result;
     }
-    
-    
+
 }

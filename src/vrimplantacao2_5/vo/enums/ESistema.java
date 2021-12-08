@@ -286,7 +286,7 @@ public enum ESistema {
     IQSISTEMAS(77, "IQSISTEMAS", new IQSistemasDAO()),
     ISERVER(78, "ISERVER", new IServerDAO()),
     INFOBRASIL(79, "INFOBRASIL", new InfoBrasilDAO()),
-    INFOMAC(80, "INFOMAC", new InfoMacDAO()),
+    //INFOMAC(80, "INFOMAC", new InfoMacDAO()),
     INOVA(81, "INOVA", new InovaDAO()),
     INTELLICASH(82, "INTELLICASH", new IntelliCashDAO()),
     INTELLICON(83, "INTELLICON", new IntelliconDAO()),
