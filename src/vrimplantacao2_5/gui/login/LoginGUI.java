@@ -79,6 +79,7 @@ public class LoginGUI extends VRDialog {
         List<UsuarioVO> usuarioVO = usuarioController.autenticar(vo);
         
         usuarioVO.stream().map((usuario) -> {
+            Global.setIdUsuario(usuario.getId());
             Global.setNomeUsuario(usuario.getNome());
             return usuario;
         }).map((usuario) -> {

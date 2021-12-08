@@ -23,6 +23,9 @@ import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -34,9 +37,11 @@ public class FornecedorRepository {
 
     private FornecedorRepositoryProvider provider;
     private MultiMap<String, Integer> contatos;
+    private final LogController logController;
 
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
+        this.logController = new LogController();
     }
 
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
@@ -120,6 +125,13 @@ public class FornecedorRepository {
 
                 provider.next();
             }
+            
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
 
             provider.commit();
         } catch (Exception e) {
@@ -323,6 +335,13 @@ public class FornecedorRepository {
                 provider.next();
             }
 
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            
+            //Executa log de operação
+            logController.executar(EOperacao.UNIFICAR_FORNECEDOR.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+                    
             provider.commit();
         } catch (Exception e) {
             provider.rollback();

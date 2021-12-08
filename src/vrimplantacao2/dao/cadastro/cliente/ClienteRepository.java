@@ -33,6 +33,9 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * Repositório do Cliente para efetuar a importação de Eventuais e
@@ -45,9 +48,11 @@ public class ClienteRepository {
     private static final Logger LOG = Logger.getLogger(ClienteRepository.class.getName());
 
     private ClienteRepositoryProvider provider;
+    private final LogController logController;
 
     public ClienteRepository(ClienteRepositoryProvider provider) throws Exception {
         this.provider = provider;
+        this.logController = new LogController();
     }
 
     public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
@@ -138,6 +143,14 @@ public class ClienteRepository {
                     }
                     provider.notificar();
                 }
+
+                java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+
+                //Executa log de operação
+                logController.executar(EOperacao.SALVAR_CLIENTE_PREFERENCIAL.getId(),
+                        Global.getIdUsuario(),
+                        dataHoraImportacao);
+
                 this.provider.commit();
 
                 System.gc();
@@ -824,6 +837,14 @@ public class ClienteRepository {
 
                     provider.notificar();
                 }
+
+                java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+
+                //Executa log de operação
+                logController.executar(EOperacao.UNIFICAR_CLIENTE_PREFERENCIAL.getId(),
+                        Global.getIdUsuario(),
+                        dataHoraImportacao);
+
                 this.provider.commit();
 
                 System.gc();
@@ -1214,7 +1235,7 @@ public class ClienteRepository {
         PdvVendaDAO vendaDAO = new PdvVendaDAO();
         PdvVendaItemDAO vendaItemDAO = new PdvVendaItemDAO(provider.getSistema(), provider.getLojaOrigem());
         ClientePreferencialAnteriorDAO clienteAnteriorDAO = new ClientePreferencialAnteriorDAO();
-        
+
         clienteAnteriorDAO.createTablePontuacao();
         clienteAnteriorDAO.deletarPontuacao();
 
@@ -1332,13 +1353,13 @@ public class ClienteRepository {
                         //Gerar Venda Promoção Pontuação
                         vendaDAO.gerarVendaPromocaoPontuacao(pontuacaoVO);
                         numeroCupom++;
-                        
+
                         pontuacaoAnteriorVO.setSistema(provider.getSistema());
                         pontuacaoAnteriorVO.setLoja(provider.getLojaOrigem());
                         pontuacaoAnteriorVO.setId(String.valueOf(cliente.getId()));
                         pontuacaoAnteriorVO.setNome(imp.getRazao());
                         pontuacaoAnteriorVO.setPonto((int) imp.getPonto());
-                        
+
                         //Gravar Código anterior
                         clienteAnteriorDAO.salvarPontuacao(pontuacaoAnteriorVO, vendaVO.getId());
                     }

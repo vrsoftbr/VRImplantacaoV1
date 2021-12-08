@@ -19,7 +19,13 @@ public enum EScriptLojaOrigemSistema {
     HIPCOM(74, 8, "select "
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
-            + "lojcnpj from hiploj order by 1");
+            + "lojcnpj from hiploj order by 1"),
+    UNIPLUS(179, 11, 
+            "select \n" +
+            "	id,\n" +
+            "	nome || '' - '' || cnpj as descricao\n" +
+            "from \n" +
+            "	filial");
     
     private int idSistema;
     private int idBancoDados;

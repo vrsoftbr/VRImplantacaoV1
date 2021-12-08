@@ -22,6 +22,9 @@ import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorCodigoExternoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * @author Leandro
@@ -33,6 +36,8 @@ public class ProdutoFornecedorDAO {
     private int idLojaVR = -1;
     private String importLoja = "";
     private String importSistema = "";
+    
+    private final LogController logController = new LogController();
 
     public void setIdLojaVR(int idLojaVR) {
         this.idLojaVR = idLojaVR;
@@ -556,6 +561,14 @@ public class ProdutoFornecedorDAO {
                 }
                 ProgressBar.next();
             }
+            
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_PRODUTO_FORNECEDOR.getId(),
+                    Global.getIdUsuario(),
+                    dataHoraImportacao);
+            
             Conexao.commit();
         } catch (Exception e) {
             Conexao.rollback();

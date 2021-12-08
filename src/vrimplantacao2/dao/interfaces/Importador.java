@@ -422,7 +422,9 @@ public class Importador {
     public void importarProdutoFornecedor(OpcaoProdutoFornecedor... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores...");
         List<ProdutoFornecedorIMP> produtos = getInterfaceDAO().getProdutosFornecedores();
+        
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
+        
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
@@ -530,11 +532,15 @@ public class Importador {
     public void importarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesPreferenciais();
+        
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        
         ClienteRepository rep = new ClienteRepository(provider);
+        
         rep.importarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
