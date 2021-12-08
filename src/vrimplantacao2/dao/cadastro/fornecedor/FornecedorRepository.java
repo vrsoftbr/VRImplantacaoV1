@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,6 +25,9 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2_5.service.migracao.FornecedorService;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -37,8 +41,11 @@ public class FornecedorRepository {
     private MultiMap<String, Integer> contatos;
     private boolean forcarUnificacao = false;
 
+    private final LogController logController;
+
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
+        this.logController = new LogController();
     }
     
     public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
@@ -153,6 +160,13 @@ public class FornecedorRepository {
 
                 provider.next();
             }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
 
             provider.commit();
         } catch (Exception e) {
@@ -356,6 +370,13 @@ public class FornecedorRepository {
                 provider.next();
             }
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.UNIFICAR_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
+                    
             provider.commit();
         } catch (Exception e) {
             provider.rollback();

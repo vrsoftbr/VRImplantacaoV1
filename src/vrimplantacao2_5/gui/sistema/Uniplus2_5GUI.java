@@ -13,13 +13,13 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class Uniplus2_5GUI extends VRInternalFrame {    
-    
+public class Uniplus2_5GUI extends VRInternalFrame {
+
     private static final String SISTEMA = ESistema.UNIPLUS.getNome();
     private static Uniplus2_5GUI instance;
-    
+
     private final UniplusDAO uniplusDAO = new UniplusDAO();
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
@@ -27,11 +27,15 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 TabelaPreco.getByOrdinal(params.getInt(0, SISTEMA, "TABELA_PRECO"))
         );
         switch (uniplusDAO.getTabelaPreco()) {
-            case TABELA_PRECO: rbnTabelaPreco.setSelected(true); break;
-            default: rbnTabelaFormacaoPrecoProduto.setSelected(true); break;
+            case TABELA_PRECO:
+                rbnTabelaPreco.setSelected(true);
+                break;
+            default:
+                rbnTabelaFormacaoPrecoProduto.setSelected(true);
+                break;
         }
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
@@ -45,21 +49,21 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         params.put(chkNewEan.isSelected(), SISTEMA, "PREFIXO_MAIS_CODIGO");
 
         pnlConn.atualizarParametros();
-        
+
         params.salvar();
     }
-    
+
     public Uniplus2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
         tabProdutos.setOpcoesDisponiveis(uniplusDAO);
         tabProdutos.tabParametros.add(pnlParametrosAdicionais);
         tabProdutos.btnMapaTribut.setVisible(false);
-        
+
         pnlConn.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
@@ -67,88 +71,101 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 gravarParametros();
             }
         });
-        
+
         pnlConn.setSistema(ESistema.UNIPLUS);
         pnlConn.getNomeConexao();
-        
+
         centralizarForm();
-        this.setMaximum(false);  
+        this.setMaximum(false);
     }
-    
+
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
+
             int idLojaVR, balanca;
             String idLojaCliente;
             String lojaMesmoID;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
-                    ProgressBar.setCancel(true);                   
-                    
-                    idLojaVR = pnlConn.getLojaVR();                                        
+                    ProgressBar.setCancel(true);
+
+                    idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
-                
+
                     uniplusDAO.setComplemento(pnlConn.getComplemento());
                     uniplusDAO.DUN14Atacado = chkDUN14Atacado.isSelected();
                     uniplusDAO.NewEan = chkNewEan.isSelected();
                     uniplusDAO.ProdutoFornecedorNotas = chkProdutoNota.isSelected();
-                    
+
                     Importador importador = new Importador(uniplusDAO);
+
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    tabProdutos.setImportador(importador);
-                    
-                    if (tab.getSelectedIndex() == 0) {
-                        tabProdutos.executarImportacao();
+                    importador.setIdConexao(pnlConn.idConexao);
 
-                        if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor();
-                        }
-                        if (chkProdutoFornecedor.isSelected()) {
-                            importador.importarProdutoFornecedor();
-                        }
-                        if (chkContasAPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }
-                        if (chkClientePreferencial.isSelected()) {                            
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
-                        }
-                        if (chkClienteEventual.isSelected()) {                            
-                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
-                        }                        
-                        if (chkLimite.isSelected()) {
-                            importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
-                        }                        
-                        if(chkRotativo.isSelected()){
-                            importador.importarCreditoRotativo();
-                        }
-                        if (chkCheque.isSelected()) {
-                            importador.importarCheque();
+                    tabProdutos.setImportador(importador);
+
+                    if (tab.getSelectedIndex() == 0) {
+                        switch (tabImportacao.getSelectedIndex()) {
+                            case 0:
+                                tabProdutos.executarImportacao();
+                                break;
+                            case 1:
+                                if (chkFornecedor.isSelected()) {
+                                    importador.importarFornecedor();
+                                }
+                                if (chkProdutoFornecedor.isSelected()) {
+                                    importador.importarProdutoFornecedor();
+                                }
+                                if (chkContasAPagar.isSelected()) {
+                                    importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                                }
+                                break;
+                            case 2:
+                                if (chkClientePreferencial.isSelected()) {
+                                    importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                                }
+                                if (chkClienteEventual.isSelected()) {
+                                    importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                                }
+                                if (chkLimite.isSelected()) {
+                                    importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
+                                }
+                                if (chkRotativo.isSelected()) {
+                                    importador.importarCreditoRotativo();
+                                }
+                                if (chkCheque.isSelected()) {
+                                    importador.importarCheque();
+                                }
+                            default:
+                                break;
                         }
                     } else if (tab.getSelectedIndex() == 1) {
-                        if (cbxUnifProdutos.isSelected()) {  
+                        if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }
-                        if (cbxUnifFornecedores.isSelected()) {  
+                        if (cbxUnifFornecedores.isSelected()) {
                             importador.unificarFornecedor();
                         }
-                        if (cbxUnifProdutoForn.isSelected()) {  
+                        if (cbxUnifProdutoForn.isSelected()) {
                             importador.unificarProdutoFornecedor();
                         }
-                        if (cbxUnifCliPreferencial.isSelected()) {  
+                        if (cbxUnifCliPreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
                         }
-                        if (cbxUnifCliEventual.isSelected()) {  
+                        if (cbxUnifCliEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
-                    }                    
+                    }
                     gravarParametros();
-                    
+
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
+
                     pnlConn.fecharConexao();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
@@ -159,10 +176,10 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         thread.start();
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new Uniplus2_5GUI(i_mdiFrame);
             }
@@ -186,7 +203,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         vRLabel9 = new vrframework.bean.label.VRLabel();
         buttonGroup1 = new javax.swing.ButtonGroup();
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
-        vRPanel3 = new vrframework.bean.panel.VRPanel();
+        pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
@@ -296,16 +313,16 @@ public class Uniplus2_5GUI extends VRInternalFrame {
             }
         });
 
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
+        pnlMigrar.setLayout(pnlMigrarLayout);
+        pnlMigrarLayout.setHorizontalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        pnlMigrarLayout.setVerticalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
@@ -347,12 +364,10 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(297, Short.MAX_VALUE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(451, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -360,12 +375,12 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(102, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
@@ -532,7 +547,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -543,7 +558,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -569,11 +584,11 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     }//GEN-LAST:event_onClose
 
     private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
-        
+
     }//GEN-LAST:event_chkClienteEventualActionPerformed
 
     private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
-        
+
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
     private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
@@ -621,6 +636,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private javax.swing.ButtonGroup grbPriorizarPreco;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
+    private vrframework.bean.panel.VRPanel pnlMigrar;
     private vrframework.bean.panel.VRPanel pnlParam;
     private vr.view.components.panel.VRPanel pnlParametrosAdicionais;
     private vr.view.components.radiobutton.VRRadioButton rbnTabelaFormacaoPrecoProduto;
@@ -635,6 +651,5 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
     private vrframework.bean.label.VRLabel vRLabel9;
-    private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 }

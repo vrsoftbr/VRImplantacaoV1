@@ -4,7 +4,6 @@ package vrimplantacao2_5.service.atualizador;
  *
  * @author Desenvolvimento
  */
-
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
@@ -40,11 +39,11 @@ public class AtualizadorService {
         }
         return result;
     }
-    
+
     public boolean verificarSistema(ESistema eSistema) throws Exception {
         return this.atualizadorDAO.verificarSistema(eSistema);
     }
-    
+
     public List<ESistema> getSistema() throws Exception {
         List<ESistema> result = new ArrayList<>();
         for (ESistema eSistema : ESistema.values()) {
@@ -54,7 +53,7 @@ public class AtualizadorService {
         }
         return result;
     }
-    
+
     public void criarSchema() throws Exception {
         this.atualizadorDAO.criarSchema();
     }
@@ -62,25 +61,25 @@ public class AtualizadorService {
     public void criarTabelas() throws Exception {
         this.atualizadorDAO.criarTabelas();
     }
-    
+
     public void salvarBancoDados() throws Exception {
         List<EBancoDados> eBancoDados = getBancoDados();
         for (EBancoDados eBancoDado : eBancoDados) {
             this.atualizadorDAO.salvarBancoDados(eBancoDado);
-        }        
+        }
     }
-    
+
     public void salvarSistema() throws Exception {
         List<ESistema> eSistemas = getSistema();
         for (ESistema eSistema : eSistemas) {
             this.atualizadorDAO.salvarSistema(eSistema);
-        }        
+        }
     }
-    
+
     public void deletarSistemaBancoDados() throws Exception {
         this.atualizadorDAO.deletarSistemaBancoDados();
     }
-    
+
     public void salvarSistemaBancoDados() throws Exception {
         boolean existeSistema, existeBancoDados;
 
@@ -93,7 +92,7 @@ public class AtualizadorService {
             }
         }
     }
-    
+
     public void salvarScriptGetLojaOrigemSistemas() throws Exception {
         for (EScriptLojaOrigemSistema eScriptLojaOrigemSistema : EScriptLojaOrigemSistema.values()) {
             this.atualizadorDAO.salvarScriptGetLojaOrigemSistemas(eScriptLojaOrigemSistema);
@@ -103,17 +102,21 @@ public class AtualizadorService {
     public void deletarScriptGetLojaOrigemSistemas() throws Exception {
         this.atualizadorDAO.deletarScriptGetLojaOrigemSistemas();
     }
-    
+
     public void criarConstraint() throws Exception {
         this.atualizadorDAO.criarConstraint();
     }
-    
+
     public void criarEstrutura2_5() throws Exception {
         this.criarSchema();
         this.criarTabelas();
         this.criarConstraint();
-        atualizadorDAO.inserirUnidade();
-        atualizadorDAO.inserirUsuario();
+
+        if (atualizadorDAO.verificarLogUsuario() == 0) {
+            atualizadorDAO.inserirUnidade();
+            atualizadorDAO.inserirUsuario();
+        }
+
         this.salvarBancoDados();
         this.salvarSistema();
         this.deletarSistemaBancoDados();
