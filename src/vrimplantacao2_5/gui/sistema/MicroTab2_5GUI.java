@@ -16,10 +16,10 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class MicroTab2_5GUI1 extends VRInternalFrame {
+public class MicroTab2_5GUI extends VRInternalFrame {
 
     private static final String SISTEMA = ESistema.MICROTAB.getNome();
-    private static MicroTab2_5GUI1 instance;
+    private static MicroTab2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private MicroTabDAO dao = null;
@@ -78,7 +78,7 @@ public class MicroTab2_5GUI1 extends VRInternalFrame {
         return opcoesMigracaoVO;        
     }
     
-    public MicroTab2_5GUI1(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+    public MicroTab2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -107,7 +107,7 @@ public class MicroTab2_5GUI1 extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new MicroTab2_5GUI1(i_mdiFrame, null);
+                instance = new MicroTab2_5GUI(i_mdiFrame, null);
             }
 
             instance.setVisible(true);
