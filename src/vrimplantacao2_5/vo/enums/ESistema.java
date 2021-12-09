@@ -79,7 +79,7 @@ import vrimplantacao2.dao.interfaces.GondolaDAO;
 import vrimplantacao2.dao.interfaces.GuiaSistemasDAO;
 import vrimplantacao2.dao.interfaces.HRTechDAO;
 import vrimplantacao2.dao.interfaces.HerculesIntCashDAO;
-import vrimplantacao2.dao.interfaces.HipcomDAO;
+import vrimplantacao2_5.dao.sistema.HipcomDAO;
 import vrimplantacao2.dao.interfaces.HiperDAO;
 import vrimplantacao2.dao.interfaces.ICommerceDAO;
 import vrimplantacao2.dao.interfaces.IQSistemasDAO;
