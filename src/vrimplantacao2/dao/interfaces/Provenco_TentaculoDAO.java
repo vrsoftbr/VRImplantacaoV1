@@ -152,8 +152,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 while (rst.next()) {
                     result.add(
                             new Estabelecimento(
-                                    rst.getString("codigo"),
-                                    rst.getString("fantasia") + "-" + rst.getString("cnpj")
+                                    rst.getString("codigo"), rst.getString("fantasia") + "-" + rst.getString("cnpj")
                             )
                     );
                 }
@@ -713,7 +712,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
     /*
         DEV DE VENDAS INTERROMPIDO, NÃO TESTADAS AINDA
-     */
+    */
     private Date vendaDataIni;
     private Date vendaDataFim;
 
