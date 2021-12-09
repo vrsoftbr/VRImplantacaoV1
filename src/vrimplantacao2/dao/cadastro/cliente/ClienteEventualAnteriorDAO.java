@@ -63,6 +63,8 @@ public class ClienteEventualAnteriorDAO {
             sql.put("nome", anterior.getNome());
             sql.put("forcarGravacao", anterior.isForcarGravacao());
             
+            sql.put("id_conexao", anterior.getIdConexao());
+            
             stm.execute(sql.getInsert());
         }
     }

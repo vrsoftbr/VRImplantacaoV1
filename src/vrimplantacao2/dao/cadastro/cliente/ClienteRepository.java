@@ -456,43 +456,41 @@ public class ClienteRepository {
 
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
                     if (anterior == null) {
-                        if (opt.contains(OpcaoCliente.DADOS)) {
-                            //Trata o cnpj
-                            long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
-                            //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
-                            if (cnpjCadastrados.containsKey(cnpj)) {
-                                cnpj = -2;
-                            }
-
-                            //Obtem um ID válido.                    
-                            int id = ids.obterID(reiniciarID ? "A" : imp.getId());
-
-                            if (cnpj < 0) {
-                                cnpj = id;
-                            }
-
-                            //Converte os dados.
-                            cliente = converterClienteEventual(imp);
-                            cliente.setId(id);
-                            cliente.setCnpj(cnpj);
-
-                            anterior = converterClienteEventualAnterior(imp);
-                            anterior.setCodigoAtual(cliente);
-                            anterior.setIdConexao(provider.getIdConexao());
-
-                            //Grava as informações
-                            gravarClienteEventual(cliente);
-                            gravarClienteEventualAnterior(anterior);
-
-                            //Incluindo o produto nas listagens
-                            cnpjCadastrados.put(cnpj, id);
-                            anteriores.put(
-                                    anterior,
-                                    provider.getSistema(),
-                                    provider.getLojaOrigem(),
-                                    imp.getId()
-                            );
+                        //Trata o cnpj
+                        long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
+                        //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
+                        if (cnpjCadastrados.containsKey(cnpj)) {
+                            cnpj = -2;
                         }
+
+                        //Obtem um ID válido.                    
+                        int id = ids.obterID(reiniciarID ? "A" : imp.getId());
+
+                        if (cnpj < 0) {
+                            cnpj = id;
+                        }
+
+                        //Converte os dados.
+                        cliente = converterClienteEventual(imp);
+                        cliente.setId(id);
+                        cliente.setCnpj(cnpj);
+
+                        anterior = converterClienteEventualAnterior(imp);
+                        anterior.setCodigoAtual(cliente);
+                        anterior.setIdConexao(provider.getIdConexao());
+
+                        //Grava as informações
+                        gravarClienteEventual(cliente);
+                        gravarClienteEventualAnterior(anterior);
+
+                        //Incluindo o produto nas listagens
+                        cnpjCadastrados.put(cnpj, id);
+                        anteriores.put(
+                                anterior,
+                                provider.getSistema(),
+                                provider.getLojaOrigem(),
+                                imp.getId()
+                        );
                     } else {
                         cliente = anterior.getCodigoAtual();
                     }
@@ -510,7 +508,6 @@ public class ClienteRepository {
                 this.provider.rollback();
                 throw e;
             }
-
         }
     }
 
