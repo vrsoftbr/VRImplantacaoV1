@@ -139,7 +139,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,}
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.FORCAR_ATUALIZACAO,}
         ));
     }
 
