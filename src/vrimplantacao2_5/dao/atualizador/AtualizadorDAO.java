@@ -5,8 +5,10 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
+import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
+import vrimplantacao2_5.vo.enums.ETipoOperacao;
 import vrimplantacao2_5.vo.enums.EUnidade;
 
 /**
@@ -195,6 +197,29 @@ public class AtualizadorDAO {
                     + "ALTER TABLE implantacao.codant_fornecedor ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
                     + "ALTER TABLE implantacao.codant_clientepreferencial ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
                     + "ALTER TABLE implantacao.codant_clienteeventual ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.metodo \n"
+                    + "(\n"
+                    + "	id INTEGER NOT NULL PRIMARY KEY,\n"
+                    + "	descricao CHARACTER VARYING (60) NOT NULL \n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.tipooperacao \n"
+                    + "(\n"
+                    + "     id INTEGER NOT NULL PRIMARY KEY,\n"
+                    + "     descricao CHARACTER VARYING(60) NULL NULL,\n"
+                    + "     id_metodo INTEGER NOT NULL,\n"
+                    + "     CONSTRAINT fk_metodo FOREIGN KEY (id_metodo) REFERENCES implantacao2_5.metodo(id)\n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.operacao \n"
+                    + "(\n"
+                    + "     id serial NOT NULL PRIMARY KEY, \n"
+                    + "     id_usuario INTEGER NOT NULL,\n"
+                    + "     datahora TIMESTAMP NOT NULL,\n"
+                    + "     id_tipooperacao INTEGER NOT NULL,\n"
+                    + "     id_loja INTEGER NOT NULL,\n"
+                    + "     CONSTRAINT fk_usuario FOREIGN KEY (id_usuario) REFERENCES implantacao2_5.usuario(id),\n"
+                    + "     CONSTRAINT fk_tipooperacao FOREIGN KEY (id_tipooperacao) REFERENCES implantacao2_5.tipooperacao(id),\n"
+                    + "     CONSTRAINT fk_loja FOREIGN KEY (id_loja) REFERENCES public.loja(id)\n"
+                    + ");"
             );
         }
     }
@@ -289,6 +314,40 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
+        }
+    }
+    
+    public void salvarMetodo(EMetodo eMetodo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id FROM implantacao2_5.metodo where descricao = '" + eMetodo.getDescricao() + "'"
+            )) {
+                if (!rst.next()) {
+                    stm.execute("INSERT INTO implantacao2_5.metodo (id, descricao) "
+                            + "VALUES "
+                            + "(" + eMetodo.getId() + ", '" + eMetodo.getDescricao() + "');");
+                }
+            }
+        }
+    }
+    
+    public void salvarTipoOperacao(ETipoOperacao eTipoOperacao) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id from implantacao2_5.tipooperacao \n"
+                    + "where descricao = '" + eTipoOperacao.getDescricao() + "' \n"
+                    + "and id_metodo = " + eTipoOperacao.getIdMetodo()
+            )) {
+                if (!rst.next()) {
+                    stm.execute("INSERT INTO implantacao2_5.tipooperacao( \n"
+                            + "id, descricao, id_metodo) \n"
+                            + "VALUES "
+                            + "("
+                            + eTipoOperacao.getId() + ", "
+                            + "'" + eTipoOperacao.getDescricao() + "', "
+                            + eTipoOperacao.getIdMetodo() + ");");
+                }
+            }
         }
     }
 }

@@ -10,9 +10,11 @@ import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
 import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
+import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
+import vrimplantacao2_5.vo.enums.ETipoOperacao;
 
 public class AtualizadorService {
 
@@ -107,6 +109,18 @@ public class AtualizadorService {
         this.atualizadorDAO.criarConstraint();
     }
 
+    public void salvarMetodo() throws Exception {
+        for (EMetodo eMetodo : EMetodo.values()) {
+            this.atualizadorDAO.salvarMetodo(eMetodo);
+        }
+    }
+    
+    public void salvarTipoOperacao() throws Exception {
+        for (ETipoOperacao eTipoOperacao : ETipoOperacao.values()) {
+            this.atualizadorDAO.salvarTipoOperacao(eTipoOperacao);
+        }
+    }
+    
     public void criarEstrutura2_5() throws Exception {
         this.criarSchema();
         this.criarTabelas();
@@ -123,5 +137,7 @@ public class AtualizadorService {
         this.salvarSistemaBancoDados();
         this.deletarScriptGetLojaOrigemSistemas();
         this.salvarScriptGetLojaOrigemSistemas();
+        this.salvarMetodo();
+        this.salvarTipoOperacao();
     }
 }
