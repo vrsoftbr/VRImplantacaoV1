@@ -11,16 +11,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -38,10 +34,6 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String getLojaCliente() {
         return this.lojaCliente;
-    }
-
-    public void setLojaCliente(String LojaCliente) {
-        this.lojaCliente = lojaCliente;
     }
 
     @Override
@@ -100,27 +92,6 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
-    }
-
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    " SELECT \n"
-                    + "  1 codigo,\n"
-                    + "  'Loja 01' nomefantasia\n"
-                    + " FROM CONFIG"
-            )) {
-                while (rst.next()) {
-                    result.add(new Estabelecimento(
-                            rst.getString("codigo"),
-                            rst.getString("nomefantasia")
-                    ));
-                }
-            }
-        }
-        return result;
     }
 
     @Override
@@ -248,29 +219,6 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(rst.getString("ID_ALIQUOTA"));
 
                     result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    result.add(imp);
-
                 }
             }
         }
