@@ -9,15 +9,15 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.SGDAO;
+import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class MRC62_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.SG.getNome();
+    private static final String SISTEMA = ESistema.MRC6.getNome();
     private static MRC62_5GUI instance;
 
-    private final SGDAO sgDAO = new SGDAO();
+    private final MRC6DAO dao = new MRC6DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -31,26 +31,26 @@ public class MRC62_5GUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
-        tabProdutos.setOpcoesDisponiveis(sgDAO);
-        tabFornecedores.setOpcoesDisponiveis(sgDAO);
-        tabClientes.setOpcoesDisponiveis(sgDAO);
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return sgDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                return sgDAO.getSistema();
+                return dao.getSistema();
             }
 
             @Override
             public String getLoja() {
-                sgDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return sgDAO.getLojaOrigem();
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -59,7 +59,7 @@ public class MRC62_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.SG);
+        pnlConn.setSistema(ESistema.MRC6);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -95,7 +95,7 @@ public class MRC62_5GUI extends VRInternalFrame {
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
-                    Importador importador = new Importador(sgDAO);
+                    Importador importador = new Importador(dao);
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());

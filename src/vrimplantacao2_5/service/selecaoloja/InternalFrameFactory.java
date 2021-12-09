@@ -5,6 +5,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
@@ -51,6 +52,9 @@ public abstract class InternalFrameFactory {
             case MICROTAB:
                 internalFrame = new MicroTab2_5GUI(frame, null);
                 break;
+            case MRC6:
+                internalFrame = new MRC62_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -91,6 +95,9 @@ public abstract class InternalFrameFactory {
                 break;
             case MICROTAB:
                 internalFrame = new MicroTab2_5GUI(frame, baseDadosGui);
+                break;
+            case MRC6:
+                internalFrame = new MRC62_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

@@ -23,7 +23,13 @@ public enum EScriptLojaOrigemSistema {
     MICROTAB(201, 5, "SELECT "
             + " 1 as id,"
             + " ''Loja_01'' descricao"
-            + " FROM CONFIG");
+            + " FROM CONFIG"),
+    MRC6(202, 13, "select"
+            + " codigo as id, "
+            + " nome as descricao,"
+            + " cnpj "
+            + " from "
+            + " entidades");
 
     private int idSistema;
     private int idBancoDados;
