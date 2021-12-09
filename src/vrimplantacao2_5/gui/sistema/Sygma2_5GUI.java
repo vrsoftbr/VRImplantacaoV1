@@ -59,7 +59,7 @@ public class Sygma2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.SG);
+        pnlConn.setSistema(ESistema.SYGMA);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -172,7 +172,7 @@ public class Sygma2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("SG");
+        setTitle("Sygma");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

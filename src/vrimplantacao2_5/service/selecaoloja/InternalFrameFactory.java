@@ -88,11 +88,13 @@ public abstract class InternalFrameFactory {
             case SG:
                 internalFrame = new SG2_5GUI(frame);
                 break;
+            case SYGMA:
+                internalFrame = new Sygma2_5GUI(frame);
+                break;
             default:
-                internalFrame = null;                
+                internalFrame = null;
         }
 
         return internalFrame;
     }
-    
 }

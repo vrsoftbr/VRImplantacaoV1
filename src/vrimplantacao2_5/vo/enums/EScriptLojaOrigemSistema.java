@@ -20,12 +20,11 @@ public enum EScriptLojaOrigemSistema {
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
-    SYGMA(200,5, "select distinct \n"
-            + "	1 as id,\n"
-            + "	val_parametro fantasia,\n"
-            + "	(select val_parametro from tparametro t where ordem_parametro = 1003) cnpj\n"
-            + "from tparametro t\n"
-            + "	where ordem_parametro = 1002");
+    SYGMA(200,5, "select "
+            + "1 as id, "
+            + "val_parametro descricao "
+            + "from tparametro t "
+            + "where ordem_parametro = 1002");
     
     private int idSistema;
     private int idBancoDados;
