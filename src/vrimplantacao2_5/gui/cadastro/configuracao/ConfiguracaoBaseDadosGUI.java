@@ -468,7 +468,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                .addComponent(tabConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
                 .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -521,11 +521,19 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnProximoActionPerformed
 
     private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
-        // TODO add your handling code here:
+
+        try {
+            selecionarBancoDados();
+            selecionarSistema();
+            exibirMapaLoja();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        }
     }//GEN-LAST:event_btnMapearActionPerformed
 
     private void btnExcluirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirLojaActionPerformed
         // TODO add your handling code here:
+        excluir();
     }//GEN-LAST:event_btnExcluirLojaActionPerformed
 
 

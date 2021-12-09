@@ -89,7 +89,7 @@
                   <Component id="cboSistema" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabConexao" pref="146" max="32767" attributes="0"/>
+              <Component id="tabConexao" min="-2" pref="148" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
