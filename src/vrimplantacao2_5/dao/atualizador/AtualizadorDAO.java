@@ -5,8 +5,11 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
+import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
+import vrimplantacao2_5.vo.enums.ETipoOperacao;
+import vrimplantacao2_5.vo.enums.EUnidade;
 
 /**
  *
@@ -38,6 +41,21 @@ public class AtualizadorDAO {
         }
     }
 
+    public int verificarLogUsuario() throws Exception {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct id_usuario from implantacao2_5.operacao"
+            )) {
+                if (rs.next()) {
+                    return rs.getInt("id_usuario");
+                }
+            }
+        }
+
+        return 0;
+    }
+
     public void criarSchema() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS implantacao2_5");
@@ -45,7 +63,7 @@ public class AtualizadorDAO {
     }
 
     public void criarConstraint() throws Exception {
-        try (Statement stm = Conexao.createStatement()) { 
+        try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "distinct conname "
@@ -82,7 +100,7 @@ public class AtualizadorDAO {
                     + "        ON UPDATE NO ACTION\n"
                     + "        ON DELETE NO ACTION\n"
                     + ");"
-                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.usuario\n" 
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.usuario\n"
                     + "(\n"
                     + "    id integer PRIMARY KEY NOT NULL,\n"
                     + "    nome character varying(30) NOT NULL,\n"
@@ -175,7 +193,33 @@ public class AtualizadorDAO {
                     + "     CONSTRAINT fk_id_conexaoloja FOREIGN KEY (id_conexaoloja)\n"
                     + "        REFERENCES implantacao2_5.conexaoloja (id)\n"
                     + ");\n"
-                    + "ALTER TABLE implantacao.codant_produto ADD COLUMN IF NOT EXISTS id_conexao INTEGER;"
+                    + "ALTER TABLE implantacao.codant_produto ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
+                    + "ALTER TABLE implantacao.codant_fornecedor ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
+                    + "ALTER TABLE implantacao.codant_clientepreferencial ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
+                    + "ALTER TABLE implantacao.codant_clienteeventual ADD COLUMN IF NOT EXISTS id_conexao INTEGER;\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.metodo \n"
+                    + "(\n"
+                    + "	id INTEGER NOT NULL PRIMARY KEY,\n"
+                    + "	descricao CHARACTER VARYING (60) NOT NULL \n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.tipooperacao \n"
+                    + "(\n"
+                    + "     id INTEGER NOT NULL PRIMARY KEY,\n"
+                    + "     descricao CHARACTER VARYING(60) NULL NULL,\n"
+                    + "     id_metodo INTEGER NOT NULL,\n"
+                    + "     CONSTRAINT fk_metodo FOREIGN KEY (id_metodo) REFERENCES implantacao2_5.metodo(id)\n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.operacao \n"
+                    + "(\n"
+                    + "     id serial NOT NULL PRIMARY KEY, \n"
+                    + "     id_usuario INTEGER NOT NULL,\n"
+                    + "     datahora TIMESTAMP NOT NULL,\n"
+                    + "     id_tipooperacao INTEGER NOT NULL,\n"
+                    + "     id_loja INTEGER NOT NULL,\n"
+                    + "     CONSTRAINT fk_usuario FOREIGN KEY (id_usuario) REFERENCES implantacao2_5.usuario(id),\n"
+                    + "     CONSTRAINT fk_tipooperacao FOREIGN KEY (id_tipooperacao) REFERENCES implantacao2_5.tipooperacao(id),\n"
+                    + "     CONSTRAINT fk_loja FOREIGN KEY (id_loja) REFERENCES public.loja(id)\n"
+                    + ");"
             );
         }
     }
@@ -236,28 +280,28 @@ public class AtualizadorDAO {
             stm.execute("DELETE FROM implantacao2_5.sistemabancodadosscripts");
         }
     }
-    
+
     public void salvarScriptGetLojaOrigemSistemas(EScriptLojaOrigemSistema eScriptLojaOrigemSistema) throws Exception {
-        
+
         String sql = "INSERT INTO implantacao2_5.sistemabancodadosscripts("
-                    + "id_sistema, "
-                    + "id_bancodados, "
-                    + "script_getlojas"
-                    + ")\n"
-                    + "VALUES ("
-                    + eScriptLojaOrigemSistema.getIdSistema() + ", "
-                    + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
-                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
-        
+                + "id_sistema, "
+                + "id_bancodados, "
+                + "script_getlojas"
+                + ")\n"
+                + "VALUES ("
+                + eScriptLojaOrigemSistema.getIdSistema() + ", "
+                + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
+                + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
+
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(sql);
         }
     }
-    
+
     public void inserirUnidade() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
-                    + "DELETE FROM implantacao2_5.unidade \n;"
+            stm.execute("DELETE FROM implantacao2_5.usuario;\n"
+                    + "DELETE FROM implantacao2_5.unidade\n;"
                     + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) "
                     + "VALUES (1, 'VR MATRIZ', 3526902, 35);");
         }
@@ -265,11 +309,45 @@ public class AtualizadorDAO {
 
     public void inserirUsuario() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.usuario; \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', 1); \n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGER', 'ZIRDA123', 1);");
+            stm.execute("DELETE FROM implantacao2_5.usuario;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
+        }
+    }
+    
+    public void salvarMetodo(EMetodo eMetodo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id FROM implantacao2_5.metodo where descricao = '" + eMetodo.getDescricao() + "'"
+            )) {
+                if (!rst.next()) {
+                    stm.execute("INSERT INTO implantacao2_5.metodo (id, descricao) "
+                            + "VALUES "
+                            + "(" + eMetodo.getId() + ", '" + eMetodo.getDescricao() + "');");
+                }
+            }
+        }
+    }
+    
+    public void salvarTipoOperacao(ETipoOperacao eTipoOperacao) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id from implantacao2_5.tipooperacao \n"
+                    + "where descricao = '" + eTipoOperacao.getDescricao() + "' \n"
+                    + "and id_metodo = " + eTipoOperacao.getIdMetodo()
+            )) {
+                if (!rst.next()) {
+                    stm.execute("INSERT INTO implantacao2_5.tipooperacao( \n"
+                            + "id, descricao, id_metodo) \n"
+                            + "VALUES "
+                            + "("
+                            + eTipoOperacao.getId() + ", "
+                            + "'" + eTipoOperacao.getDescricao() + "', "
+                            + eTipoOperacao.getIdMetodo() + ");");
+                }
+            }
         }
     }
 }

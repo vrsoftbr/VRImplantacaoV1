@@ -395,7 +395,7 @@ public class ProdutoAnteriorVO {
     private boolean novo = false;
     private String codigoSped = "";
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
-    private Date dataHora;
+    private String dataHora;
     private String obsImportacao = "";
     
     private String icmsDebitoId = "";
@@ -640,11 +640,11 @@ public class ProdutoAnteriorVO {
         this.situacaoCadastro = situacaoCadastro;
     }
 
-    public Date getDataHora() {
+    public String getDataHora() {
         return dataHora;
     }
 
-    public void setDataHora(Date dataHora) {
+    public void setDataHora(String dataHora) {
         this.dataHora = dataHora;
     }
 

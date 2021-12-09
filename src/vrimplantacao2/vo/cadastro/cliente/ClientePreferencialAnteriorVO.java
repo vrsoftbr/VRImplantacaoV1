@@ -17,6 +17,7 @@ public class ClientePreferencialAnteriorVO {
     private String nome;
     private boolean forcarGravacao = false;
     private int ponto;
+    private int idConexao;
 
     public String getSistema() {
         return sistema;
@@ -89,5 +90,12 @@ public class ClientePreferencialAnteriorVO {
     public void setPonto(int ponto) {
         this.ponto = ponto;
     }
+
+    public int getIdConexao() {
+        return this.idConexao;
+    }
     
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }
 }

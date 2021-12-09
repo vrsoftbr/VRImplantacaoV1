@@ -409,8 +409,9 @@ public class Importador {
                 getLojaVR()
         );
         provider.setOpcoes(opt);
+        provider.setIdConexao(getIdConexao());
         FornecedorRepository rep = new FornecedorRepository(provider);
-        rep.salvar(fornecedores);
+        rep.salvar2_5(fornecedores);
     }
 
     /**
@@ -422,7 +423,9 @@ public class Importador {
     public void importarProdutoFornecedor(OpcaoProdutoFornecedor... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores...");
         List<ProdutoFornecedorIMP> produtos = getInterfaceDAO().getProdutosFornecedores();
+        
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
+        
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
@@ -444,7 +447,7 @@ public class Importador {
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
-
+    
     /**
      * Importa os códigos de barras atacado dos produtos.
      *
@@ -530,12 +533,15 @@ public class Importador {
     public void importarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesPreferenciais();
+        
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        provider.setIdConexao(getIdConexao());
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.importarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
+        rep.salvarClientePreferencial2_5(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     public void importarClientePontuacao() throws Exception {
@@ -568,9 +574,10 @@ public class Importador {
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        provider.setIdConexao(getIdConexao());
         
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
+        rep.salvarClienteEventual2_5(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     /**

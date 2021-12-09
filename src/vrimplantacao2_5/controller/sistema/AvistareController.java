@@ -11,26 +11,26 @@ import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
-import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
-import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
+import vrimplantacao2_5.vo.sistema.AvistareVO;
 
 /**
  *
  * @author Desenvolvimento
  */
-public class GatewaySistemasController extends InterfaceController {
+public class AvistareController extends InterfaceController {
 
-    public GatewaySistemasDAO dao = null;
+    private AvistareDAO dao = null;
+    private final String SISTEMA = "Avistare";
     private String complementoSistema = "";
-    private final String SISTEMA = "Gateway Sistemas";
     
-    public GatewaySistemasController() {}
+    public AvistareController() {}
     
-    public GatewaySistemasController(GatewaySistemasDAO dao) {                
+    public AvistareController(AvistareDAO dao) {
         this.dao = dao;
     }
-
+    
     @Override
     public String getSistema() {
         return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
@@ -44,37 +44,40 @@ public class GatewaySistemasController extends InterfaceController {
         this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
-    public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO) {
-        dao.gatewaySistemasVO = gatewaySistemasVO;
+    public void setAvistare(AvistareVO avistareVO) {
+        dao.avistareVO = avistareVO;
     }
     
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    OpcaoProduto.FORCAR_ATUALIZACAO,
                     OpcaoProduto.FORCAR_UNIFICACAO,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                    OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS,
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.PESAVEL,
-                    OpcaoProduto.VALIDADE,
-                    OpcaoProduto.DESC_COMPLETA,
-                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_COMPLETA,                    
                     OpcaoProduto.DESC_REDUZIDA,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.PRECO,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.PESO_BRUTO,
+                    OpcaoProduto.PESO_LIQUIDO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.MARGEM,
                     OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.PRECO,
                     OpcaoProduto.ESTOQUE,
-                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
                     OpcaoProduto.NCM,
+                    OpcaoProduto.ATIVO,
                     OpcaoProduto.CEST,
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.ICMS,
@@ -82,33 +85,39 @@ public class GatewaySistemasController extends InterfaceController {
                     OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                     OpcaoProduto.ICMS_SAIDA_NF,
                     OpcaoProduto.ICMS_ENTRADA,
-                    OpcaoProduto.ICMS_CONSUMIDOR,
                     OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
-                    OpcaoProduto.MARGEM,
-                    OpcaoProduto.MAPA_TRIBUTACAO
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN
                 }
         ));
     }
-
+    
     @Override
-    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {        
         return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.FORCAR_UNIFICACAO,
                 OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.RAZAO_SOCIAL,
                 OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.NUMERO,
                 OpcaoFornecedor.COMPLEMENTO,
                 OpcaoFornecedor.BAIRRO,
                 OpcaoFornecedor.MUNICIPIO,
-                OpcaoFornecedor.UF,
-                OpcaoFornecedor.CEP,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.CEP,
+                OpcaoFornecedor.UF,
                 OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.EMAIL,
+                OpcaoFornecedor.CELULAR,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
@@ -117,9 +126,11 @@ public class GatewaySistemasController extends InterfaceController {
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
-                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
+                OpcaoCliente.FORCAR_UNIFICACAO,
+                OpcaoCliente.IMPORTAR_SOMENTE_ATIVO,
                 OpcaoCliente.DADOS,
+                OpcaoCliente.RAZAO,
+                OpcaoCliente.FANTASIA,
                 OpcaoCliente.CNPJ,
                 OpcaoCliente.INSCRICAO_ESTADUAL,
                 OpcaoCliente.ENDERECO,
@@ -129,21 +140,16 @@ public class GatewaySistemasController extends InterfaceController {
                 OpcaoCliente.MUNICIPIO,
                 OpcaoCliente.UF,
                 OpcaoCliente.CEP,
-                OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.SITUACAO_CADASTRO,
-                OpcaoCliente.BLOQUEADO,
-                OpcaoCliente.NOME_PAI,
-                OpcaoCliente.NOME_MAE,
-                OpcaoCliente.NOME_CONJUGE,
-                OpcaoCliente.CARGO,
-                OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.CELULAR,
                 OpcaoCliente.EMAIL,
                 OpcaoCliente.OBSERVACOES,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO,
-                OpcaoCliente.CLIENTE_EVENTUAL
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 }

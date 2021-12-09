@@ -318,17 +318,21 @@ public class UniplusDAO extends InterfaceDAO {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
                     imp.setIdFamiliaProduto(rs.getString("codigofamilia"));
 
-                    imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? 
+                            SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
 
                     ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rs.getString("ean")));
+                    
                     if (bal == null) {
                         imp.setEan(rs.getString("ean"));
                         imp.seteBalanca(rs.getBoolean("pesavel"));

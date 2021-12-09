@@ -24,7 +24,19 @@ public enum EScriptLojaOrigemSistema {
             + "1 as id, "
             + "val_parametro descricao "
             + "from tparametro t "
-            + "where ordem_parametro = 1002");
+            + "where ordem_parametro = 1002"),
+    UNIPLUS(179, 11, 
+            "select \n" +
+            "	id,\n" +
+            "	nome || '' - '' || cnpj as descricao\n" +
+            "from \n" +
+            "	filial"),
+    AVISTARE(16, 13, "select distinct\n"
+            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
+            + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
+            + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
+            + "from dbo.TB_CONFIG");
+
     
     private int idSistema;
     private int idBancoDados;
@@ -38,7 +50,7 @@ public enum EScriptLojaOrigemSistema {
 
     public int getIdSistema() {
         return this.idSistema;
-    }
+    }    
 
     public int getIdBancoDados() {
         return this.idBancoDados;

@@ -1,6 +1,7 @@
 package vrimplantacao2_5.service.migracao;
 
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
 
 /**
  *
@@ -9,13 +10,20 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 public class ProdutoService {
 
     private ProdutoAnteriorDAO produtoAnteriorDAO;
+    private ConfiguracaoBaseDadosDAO cfgDAO;
     
     public ProdutoService() {
         produtoAnteriorDAO = new ProdutoAnteriorDAO();
+        cfgDAO = new ConfiguracaoBaseDadosDAO();
     }
 
     public ProdutoService(ProdutoAnteriorDAO produtoAnteriorDAO) {
         this.produtoAnteriorDAO = produtoAnteriorDAO;
+    }
+    
+    public ProdutoService(ProdutoAnteriorDAO produtoAnteriorDAO, ConfiguracaoBaseDadosDAO cfgDAO) {
+        this.produtoAnteriorDAO = produtoAnteriorDAO;
+        this.cfgDAO = cfgDAO;
     }
     
     public int existeConexaoMigrada(int idConexao, String sistema) throws Exception {
@@ -40,5 +48,9 @@ public class ProdutoService {
     
     public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
         return produtoAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
+    }
+    
+    public boolean isLojaMatrizMigracao(int idConexao, String idLojaOrigem) throws Exception {
+        return cfgDAO.verificaLojaMatrizMigracao(idConexao, idLojaOrigem);
     }
 }

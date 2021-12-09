@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,9 @@ import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorCodigoExternoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * @author Leandro
@@ -33,6 +38,8 @@ public class ProdutoFornecedorDAO {
     private int idLojaVR = -1;
     private String importLoja = "";
     private String importSistema = "";
+    
+    private final LogController logController = new LogController();
 
     public void setIdLojaVR(int idLojaVR) {
         this.idLojaVR = idLojaVR;
@@ -556,6 +563,14 @@ public class ProdutoFornecedorDAO {
                 }
                 ProgressBar.next();
             }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_PRODUTO_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    getIdLojaVR());
+            
             Conexao.commit();
         } catch (Exception e) {
             Conexao.rollback();

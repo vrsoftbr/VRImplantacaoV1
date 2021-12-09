@@ -139,6 +139,27 @@ public class ConfiguracaoBaseDadosDAO {
 
         return retorno;
     }
+    
+    public boolean verificaLojaMatrizMigracao(int idConexao, String idLojaOrigem) throws Exception {
+        boolean retorno = false;
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select "
+                    + "lojamatriz "
+                    + "from "
+                    + "implantacao2_5.conexaoloja "
+                    + "where id_conexao = " + idConexao
+                    + " and id_lojaorigem = '" + idLojaOrigem + "'")) {
+                if (rs.next()) {
+                    retorno = rs.getBoolean("lojamatriz");
+                }
+            }
+        }
+
+        return retorno;
+    }
+    
     public boolean existeLojaMapeada(String tipoLoja,
             ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         boolean retorno = false;

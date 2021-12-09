@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,6 +24,10 @@ import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2_5.service.migracao.FornecedorService;
+import vrimplantacao2_5.classe.Global;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -34,11 +39,46 @@ public class FornecedorRepository {
 
     private FornecedorRepositoryProvider provider;
     private MultiMap<String, Integer> contatos;
+    private boolean forcarUnificacao = false;
+
+    private final LogController logController;
 
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
+        this.logController = new LogController();
     }
+    
+    public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
+        FornecedorService fornecedorService = new FornecedorService();
+        this.forcarUnificacao = provider.getOpcoes().contains(OpcaoFornecedor.FORCAR_UNIFICACAO);
+        
+        int idConexao = fornecedorService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
+                registro = fornecedorService.verificaRegistro();
 
+        if (this.forcarUnificacao) {
+            unificar(fornecedores);
+        } else {
+
+            if (registro > 0 && idConexao == 0) {
+                unificar(fornecedores);
+            } else {
+                boolean existeConexao = fornecedorService.
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                boolean lojaMigrada = fornecedorService.
+                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+
+                if (registro > 0 && existeConexao && !lojaMigrada) {
+                    String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+
+                    fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+                }
+
+                salvar(fornecedores);
+            }
+        }
+    }
+    
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;
@@ -90,6 +130,7 @@ public class FornecedorRepository {
 
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo);
+                    anterior.setIdConexao(provider.getIdConexao());
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
                             anterior,
@@ -120,6 +161,13 @@ public class FornecedorRepository {
 
                 provider.next();
             }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
 
             provider.commit();
         } catch (Exception e) {
@@ -290,6 +338,7 @@ public class FornecedorRepository {
 
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo);
+                    anterior.setIdConexao(provider.getIdConexao());
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
                             anterior,
@@ -323,6 +372,13 @@ public class FornecedorRepository {
                 provider.next();
             }
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.UNIFICAR_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
+                    
             provider.commit();
         } catch (Exception e) {
             provider.rollback();

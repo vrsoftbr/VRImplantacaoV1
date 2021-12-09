@@ -699,7 +699,7 @@ public class ProdutoAnteriorDAO {
             }
             sql.put("contadorimportacao", contador);
             sql.put("situacaocadastro", anterior.getSituacaoCadastro().getId());
-            sql.put("dataimportacao", anterior.getDataHora());
+            sql.put("dataimportacao", "'" + anterior.getDataHora() + "'");
             sql.put("obsimportacao", anterior.getObsImportacao());
             
             sql.put("icmscstsaida", anterior.getIcmsCstSaida());
