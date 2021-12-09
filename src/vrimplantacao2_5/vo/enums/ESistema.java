@@ -200,6 +200,7 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
+import vrimplantacao2_5.dao.sistema.SygmaDAO;
 
 /**
  *
@@ -405,7 +406,8 @@ public enum ESistema {
     LINEAR(196, "LINEAR", new LinearDAO()),
     ARIUS(197, "ARIUS", new AriusDAO()),
     GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()),
-    SG(199, "SG", new SGDAO());
+    SG(199, "SG", new SGDAO()),
+    SYGMA(200, "SYGMA", new SygmaDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
 
     private int id;

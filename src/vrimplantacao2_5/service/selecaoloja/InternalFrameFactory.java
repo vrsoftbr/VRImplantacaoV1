@@ -6,6 +6,7 @@ import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
@@ -45,6 +46,9 @@ public abstract class InternalFrameFactory {
                 break;
             case SG:
                 internalFrame = new SG2_5GUI(frame);
+                break;
+            case SYGMA:
+                internalFrame = new Sygma2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;                
