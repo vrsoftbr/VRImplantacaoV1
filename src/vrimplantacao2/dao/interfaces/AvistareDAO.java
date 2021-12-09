@@ -620,7 +620,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.VndEstacaoID as ecf,\n"
                     + "	t.CliSaldoMovValor as valor,\n"
                     + "	t.CliSaldoMovObservacao as observacao,\n"
-                    + "	tc.CliCodigoPessoal as id_cliente\n"
+                    + "	coalesce(tc.CliCodigoPessoal, tc.cliId) as id_cliente\n"
                   //+ "	t.CliSaldoMovCliID as id_cliente\n"             // ROTATIVO POR ID_CLIENTE
                     + "from\n"
                     + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
