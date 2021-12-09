@@ -26,8 +26,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
     private GatewaySistemasDAO dao = null;
     private GatewaySistemasVO vo = new GatewaySistemasVO();
     private GatewaySistemasController controller = null;
-    private MapaLojaController mapaLojaController = null;
-    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
+    private MapaLojaController mapaLojaController = null;    
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -55,15 +54,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private void alterarSituacaoMigracao() throws Exception {
-        String lojaOrigem = pnlConn.getLojaOrigem();
-        int lojaVR = pnlConn.getLojaVR();
-        
-        mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
-        
-        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
-    }
-
     private GatewaySistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
@@ -72,13 +62,11 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         return vo;        
     }
     
-    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-        
-        configuracaoBaseDadosGUI = baseDadosGui;
         
         carregarParametros();
 
@@ -134,7 +122,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new GatewaySistemas2_5GUI(i_mdiFrame, null);
+                instance = new GatewaySistemas2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -203,8 +191,6 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     ProgressBar.dispose();
                     
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    alterarSituacaoMigracao();
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();

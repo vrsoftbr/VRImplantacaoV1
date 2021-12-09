@@ -42,13 +42,13 @@ public abstract class InternalFrameFactory {
                 internalFrame = new Hipcom2_5GUI(frame);
                 break;
             case GATEWAYSISTEMAS:
-                internalFrame = new GatewaySistemas2_5GUI(frame, null);
+                internalFrame = new GatewaySistemas2_5GUI(frame);
                 break;
             case SG:
                 internalFrame = new SG2_5GUI(frame);
                 break;
             case AVISTARE:
-                internalFrame = new Avistare2_5GUI(frame, null);
+                internalFrame = new Avistare2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;                
@@ -83,13 +83,13 @@ public abstract class InternalFrameFactory {
                 internalFrame = new Hipcom2_5GUI(frame);
                 break;
             case GATEWAYSISTEMAS:
-                internalFrame = new GatewaySistemas2_5GUI(frame, baseDadosGui);
+                internalFrame = new GatewaySistemas2_5GUI(frame);
                 break;
             case SG:
                 internalFrame = new SG2_5GUI(frame);
                 break;
             case AVISTARE:
-                internalFrame = new Avistare2_5GUI(frame, null);
+                internalFrame = new Avistare2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;                

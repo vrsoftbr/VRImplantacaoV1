@@ -27,7 +27,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private AvistareVO vo = new AvistareVO();
     private AvistareController controller = null;
     private MapaLojaController mapaLojaController = null;
-    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -53,15 +52,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private void alterarSituacaoMigracao() throws Exception {
-        String lojaOrigem = pnlConn.getLojaOrigem();
-        int lojaVR = pnlConn.getLojaVR();
-        
-        mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
-        
-        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
-    }
-
     private AvistareVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
@@ -69,13 +59,11 @@ public class Avistare2_5GUI extends VRInternalFrame {
         return vo;        
     }
     
-    public Avistare2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+    public Avistare2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-        
-        configuracaoBaseDadosGUI = baseDadosGui;
         
         carregarParametros();
 
@@ -131,7 +119,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Avistare2_5GUI(i_mdiFrame, null);
+                instance = new Avistare2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -198,8 +186,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.dispose();
                     
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    //alterarSituacaoMigracao();
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
