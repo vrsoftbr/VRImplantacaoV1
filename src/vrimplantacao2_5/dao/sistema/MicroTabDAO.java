@@ -55,8 +55,6 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
@@ -86,7 +84,6 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.EXCECAO,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO
         ));
@@ -174,13 +171,15 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportLoja(getSistema());
+                    imp.setImportSistema(getSistema());
+
                     imp.setMerc1ID(rst.getString("mercid1"));
                     imp.setMerc1Descricao(rst.getString("desc1"));
                     imp.setMerc2ID(rst.getString("mercid2"));
-                    imp.setMerc2Descricao("desc2");
+                    imp.setMerc2Descricao(rst.getString("desc2"));
                     imp.setMerc3ID(rst.getString("mercid3"));
                     imp.setMerc3Descricao(rst.getString("desc3"));
+                    result.add(imp);
                 }
             }
         }

@@ -50,6 +50,7 @@ public abstract class InternalFrameFactory {
                 break;
             case MICROTAB:
                 internalFrame = new MicroTab2_5GUI(frame, null);
+                break;
             default:
                 internalFrame = null;
         }
@@ -90,6 +91,7 @@ public abstract class InternalFrameFactory {
                 break;
             case MICROTAB:
                 internalFrame = new MicroTab2_5GUI(frame, baseDadosGui);
+                break;
             default:
                 internalFrame = null;
         }

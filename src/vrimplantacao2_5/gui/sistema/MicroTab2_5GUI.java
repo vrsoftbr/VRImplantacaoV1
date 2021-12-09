@@ -9,29 +9,21 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
-import vrimplantacao2_5.vo.checks.migracao.OpcoesMigracaoVO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class MicroTab2_5GUI extends VRInternalFrame {
-
+    
     private static final String SISTEMA = ESistema.MICROTAB.getNome();
     private static MicroTab2_5GUI instance;
-    private String vLojaCliente = "-1";
-    private int vLojaVR = -1;
-    private MicroTabDAO dao = null;
-    private MapaLojaController mapaLojaController = null;
-    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
-    
+
+    private final MicroTabDAO dao = new MicroTabDAO();
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
         tabProdutos.carregarParametros(params, SISTEMA);
-        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
-        vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
 
     private void gravarParametros() throws Exception {
@@ -48,45 +40,41 @@ public class MicroTab2_5GUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private void alterarSituacaoMigracao() throws Exception {
-        String lojaOrigem = pnlConn.getLojaOrigem();
-        int lojaVR = pnlConn.getLojaVR();
-        
-        mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
-        
-        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
-    }
-
-    
-    public OpcoesMigracaoVO carregarOpcoesMigracao() {        
-        
-        Parametros params = Parametros.get();
-        
-        OpcoesMigracaoVO opcoesMigracaoVO = new OpcoesMigracaoVO();
-        
-        opcoesMigracaoVO.setHabilitarMigracaoFamiliaProduto(params.getBool("OPCAO MIGRACAO", "MIGRAR FAMILIAS PRODUTO"));
-        opcoesMigracaoVO.setHabilitarMigracaoMercadologicos(params.getBool("OPCAO MIGRACAO", "MIGRAR MERCADOLOGICOS"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutos(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS"));
-        opcoesMigracaoVO.setHabilitarMigracaoFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoProdutosFornecedores(params.getBool("OPCAO MIGRACAO", "MIGRAR PRODUTOS FORNECEDORES"));
-        opcoesMigracaoVO.setHabilitarMigracaoContasPagar(params.getBool("OPCAO MIGRACAO", "MIGRAR CONTAS PAGAR"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesEventuais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES EVENTUAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoClientesPreferenciais(params.getBool("OPCAO MIGRACAO", "MIGRAR CLIENTES PREFERENCIAIS"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCreditoRotativo(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CREDITO ROTATIVO"));
-        opcoesMigracaoVO.setHabilitarMigracaoReceberCheque(params.getBool("OPCAO MIGRACAO", "MIGRAR RECEBER CHEQUE"));        
-        
-        return opcoesMigracaoVO;        
-    }
-    
     public MicroTab2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-        
-        configuracaoBaseDadosGUI = baseDadosGui;
-        
+
         carregarParametros();
+
+        tabProdutos.setOpcoesDisponiveis(dao);                
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);        
+        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
       
         pnlConn.setOnConectar(new ConexaoEvent() {
             @Override
@@ -120,6 +108,10 @@ public class MicroTab2_5GUI extends VRInternalFrame {
 
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
+            
+            int idLojaVR, balanca;
+            String idLojaCliente;
+            String lojaMesmoID;
 
             @Override
             public void run() {
@@ -127,57 +119,42 @@ public class MicroTab2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
+                    idLojaVR = pnlConn.getLojaVR();
+                    idLojaCliente = pnlConn.getLojaOrigem();
+
                     Importador importador = new Importador(dao);
+
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
 
-                    switch (tabs.getSelectedIndex()) {
-                        case 0:
-                            break;
-                        case 1:
-                            switch (tabImportacao.getSelectedIndex()) {
-                                case 0:
-                                    tabProdutos.executarImportacao();
-                                    break;
-                                case 1:
-                                    tabFornecedores.executarImportacao();
-                                    break;
-                                case 2:
-                                    tabClientes.executarImportacao();
-                                    break;
-                                default:
-                                    break;
-                            }   break;
-                        case 2:
-                            if (chkUnifProdutos.isSelected()) {
-                                importador.unificarProdutos();
-                            }   if (chkUnifFornecedor.isSelected()) {
-                                importador.unificarFornecedor();
-                            }   if (chkUnifProdutoFornecedor.isSelected()) {
-                                importador.unificarProdutoFornecedor();
-                            }   if (chkUnifClientePreferencial.isSelected()) {
-                                importador.unificarClientePreferencial();
-                            }   if (chkUnifClienteEventual.isSelected()) {
-                                importador.unificarClienteEventual();
-                            }   break;
-                        default:
-                            break;
+                    if (tabs.getSelectedIndex() == 0) {
+                        switch (tabImportacao.getSelectedIndex()) {
+                            case 0:
+                                tabProdutos.executarImportacao();
+                                break;
+                            case 1:
+                                tabFornecedores.executarImportacao();
+                                break;
+                            case 2:
+                                tabClientes.executarImportacao();
+                                break;
+                            default: break;
+                        }
                     }
-                    
-                    gravarParametros();                    
-                    
+
+                    pnlConn.atualizarParametros();
+
                     ProgressBar.dispose();
-                    
+
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    alterarSituacaoMigracao();
-                    
+
+                    pnlConn.fecharConexao();
+
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
                     ex.printStackTrace();
@@ -426,9 +403,8 @@ public class MicroTab2_5GUI extends VRInternalFrame {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
-            
-            importarTabelas();
-            
+            gravarParametros();
+            importarTabelas();            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 

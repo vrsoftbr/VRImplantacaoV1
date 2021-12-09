@@ -20,9 +20,9 @@ public enum EScriptLojaOrigemSistema {
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
-    MICROTAB(200, 5, "SELECT \n"
-            + "  1 id,\n"
-            + "  'Loja 01' descricao\n"
+    MICROTAB(201, 5, "SELECT "
+            + " 1 as id,"
+            + " ''Loja_01'' descricao"
             + " FROM CONFIG");
 
     private int idSistema;
