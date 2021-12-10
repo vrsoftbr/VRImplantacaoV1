@@ -20,24 +20,30 @@ public enum EScriptLojaOrigemSistema {
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
-    SYGMA(200,5, "select "
+    SYGMA(200, 5,
+            "select "
             + "1 as id, "
             + "val_parametro descricao "
             + "from tparametro t "
             + "where ordem_parametro = 1002"),
-    UNIPLUS(179, 11, 
-            "select \n" +
-            "	id,\n" +
-            "	nome || '' - '' || cnpj as descricao\n" +
-            "from \n" +
-            "	filial"),
+    UNIPLUS(179, 11,
+            "select \n"
+            + "	id,\n"
+            + "	nome || '' - '' || cnpj as descricao\n"
+            + "from \n"
+            + "	filial"),
     AVISTARE(16, 13, "select distinct\n"
             + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
             + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
             + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
-            + "from dbo.TB_CONFIG");
+            + "from dbo.TB_CONFIG"),
+    BOMSOFT(203, 5,
+            "SELECT "
+            + " ID_CFG id, "
+            + " FANTASIA_CFG descricao "
+            + "FROM CONFIG "
+            + "ORDER BY 1");
 
-    
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;
@@ -50,7 +56,7 @@ public enum EScriptLojaOrigemSistema {
 
     public int getIdSistema() {
         return this.idSistema;
-    }    
+    }
 
     public int getIdBancoDados() {
         return this.idBancoDados;
