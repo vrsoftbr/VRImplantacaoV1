@@ -106,7 +106,6 @@ import vrimplantacao2.gui.interfaces.AutoAdmGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
-import vrimplantacao2.gui.interfaces.AvistareGUI;
 import vrimplantacao2.gui.interfaces.BaseGUI;
 import vrimplantacao2.gui.interfaces.BrainSoftGUI;
 import vrimplantacao2.gui.interfaces.BrajanGestoresGUI;
@@ -886,7 +885,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuArtSystem = new javax.swing.JMenuItem();
         mnuAtenasSQLServer = new javax.swing.JMenuItem();
         mnuAtma = new javax.swing.JMenuItem();
-        mnuAvistate = new javax.swing.JMenuItem();
         mnuControlX = new javax.swing.JMenuItem();
         mnuDataSync = new javax.swing.JMenuItem();
         mnuDirector = new javax.swing.JMenuItem();
@@ -3116,14 +3114,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSQLServer2.add(mnuAtma);
 
-        mnuAvistate.setText("Avistare");
-        mnuAvistate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAvistateActionPerformed(evt);
-            }
-        });
-        mnuSQLServer2.add(mnuAvistate);
-
         mnuControlX.setText("ControlX");
         mnuControlX.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -5252,11 +5242,6 @@ public final class MenuGUI extends VRMdiFrame {
         TpaRootacGUI.exibir(this); //WIN-GE2SQLJG01G\ROOTAC_DB
     }//GEN-LAST:event_mnuTpaRootacActionPerformed
 
-    private void mnuAvistateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAvistateActionPerformed
-        // TODO add your handling code here:
-        AvistareGUI.exibir(this);
-    }//GEN-LAST:event_mnuAvistateActionPerformed
-
     private void mnuCronos20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCronos20ActionPerformed
         Cronos20GUI.exibir(this);
     }//GEN-LAST:event_mnuCronos20ActionPerformed
@@ -5671,7 +5656,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAutomaq;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
-    private javax.swing.JMenuItem mnuAvistate;
     private javax.swing.JMenuItem mnuBase;
     private javax.swing.JMenuItem mnuBrainSoft;
     private javax.swing.JMenuItem mnuBrajanGestores;

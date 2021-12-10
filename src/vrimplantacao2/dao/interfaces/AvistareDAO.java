@@ -653,6 +653,16 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.avistareVO.getDataInicioVenda(), this.avistareVO.getDataTerminoVenda());
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.avistareVO.getDataInicioVenda(), this.avistareVO.getDataTerminoVenda());
+    }    
+    
     public static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");

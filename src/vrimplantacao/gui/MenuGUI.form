@@ -2080,14 +2080,6 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAtmaActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuAvistate">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Avistare"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAvistateActionPerformed"/>
-                          </Events>
-                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuControlX">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="ControlX"/>

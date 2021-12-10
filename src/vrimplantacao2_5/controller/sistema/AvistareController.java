@@ -28,8 +28,6 @@ public class AvistareController extends InterfaceController {
     private AvistareDAO dao = null;
     private final String SISTEMA = "Avistare";
     private String complementoSistema = "";
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
     
     public AvistareController() {}
     
@@ -53,22 +51,6 @@ public class AvistareController extends InterfaceController {
     public void setAvistare(AvistareVO avistareVO) {
         dao.avistareVO = avistareVO;
     }
-    
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }    
     
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
