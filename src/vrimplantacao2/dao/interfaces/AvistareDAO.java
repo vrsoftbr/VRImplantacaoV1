@@ -653,28 +653,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
+    public static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -783,7 +762,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     }
 
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+    public static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;

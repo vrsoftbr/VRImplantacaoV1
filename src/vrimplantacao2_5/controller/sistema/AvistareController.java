@@ -6,12 +6,16 @@
 package vrimplantacao2_5.controller.sistema;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
 import vrimplantacao2_5.vo.sistema.AvistareVO;
 
@@ -24,6 +28,8 @@ public class AvistareController extends InterfaceController {
     private AvistareDAO dao = null;
     private final String SISTEMA = "Avistare";
     private String complementoSistema = "";
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
     
     public AvistareController() {}
     
@@ -47,6 +53,22 @@ public class AvistareController extends InterfaceController {
     public void setAvistare(AvistareVO avistareVO) {
         dao.avistareVO = avistareVO;
     }
+    
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }    
     
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
