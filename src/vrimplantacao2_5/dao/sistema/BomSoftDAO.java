@@ -41,8 +41,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
@@ -55,8 +53,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
-                OpcaoProduto.QTD_EMBALAGEM_EAN,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
@@ -69,10 +65,8 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.NCM,
-                OpcaoProduto.EXCECAO,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO
         ));
@@ -151,9 +145,9 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-
+                    imp.setImportSistema(getSistema());
+                    
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("desc_merc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -196,7 +190,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -315,7 +308,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
     
@@ -370,7 +362,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -449,7 +440,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -488,7 +478,187 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
+    
+    /*
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new BomSoftDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new BomSoftDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    }
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "SELECT\n"
+                    + "	ID_VEN id_venda,\n"
+                    + "	DATA_VEN data,\n"
+                    + "	CLIENTE_VEN id_cliente,\n"
+                    + "	SUBSTRING(OBS_VEN FROM 11 FOR 20) numerocupom, \n"
+                    + "	CAIXA_VEN ecf,\n"
+                    + " ACRESCIMOS_VEN acrescimo,\n"
+                    + "	DESCONTOS_VEN desconto,"
+                    + "	SUBTOTAL_VEN subtotalimpressora\n"
+                    + "FROM\n"
+                    + "	VENDAS v\n"
+                    + "WHERE\n"
+                    + " VALORPAGO_VEN > 0"
+                    + "	AND DATA_VEN BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
+                    + "ORDER BY 1";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+                        String id = rst.getString("id_item");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(id);
+                        next.setProduto(rst.getString("produto"));
+                        next.setCodigoBarras(rst.getString("codigobarra"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n"
+                    + "	NUMERO_VIT id_venda,\n"
+                    + "	ID_VIT id_item,\n"
+                    + "	PRODUTO_VIT produto,\n"
+                    + "	p.REFERENCIA_PROD codigobarra,\n"
+                    + "	p.DESCRICAO_PROD descricao,\n"
+                    + "	UND_VIT unidade,\n"
+                    + "	QTDE_VIT quantidade,\n"
+                    + "	PRUNIT_VIT precovenda,\n"
+                    + "	SUBTOTAL_VIT total\n"
+                    + "FROM\n"
+                    + "	VENITENS vi\n"
+                    + "	JOIN VENDAS v ON v.ID_VEN = vi.NUMERO_VIT\n"
+                    + "	JOIN PRODUTOS p ON p.CODIGO_PROD = vi.PRODUTO_VIT \n"
+                    + "WHERE\n"
+                    + " v.VALORPAGO_VEN > 0"
+                    + "	AND v.DATA_VEN BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "ORDER BY 1,2";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }*/
 }
