@@ -22,7 +22,7 @@ import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 
 import vrimplantacao2.parametro.Parametros;
 
-public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
+ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
 
     private static final String SISTEMA = "Cerebro";
     private static final String SERVIDOR_SQL = "Firebird";
@@ -279,6 +279,10 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
+                        if (chkConvEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -371,6 +375,8 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
         vRLabel6 = new vrframework.bean.label.VRLabel();
         vRLabel7 = new vrframework.bean.label.VRLabel();
         vRLabel9 = new vrframework.bean.label.VRLabel();
+        tabConveniado = new javax.swing.JPanel();
+        chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -785,6 +791,33 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
 
+        chkConvEmpresa.setText("Empresa");
+        chkConvEmpresa.setEnabled(true);
+        chkConvEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvEmpresaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabConveniadoLayout = new javax.swing.GroupLayout(tabConveniado);
+        tabConveniado.setLayout(tabConveniadoLayout);
+        tabConveniadoLayout.setHorizontalGroup(
+            tabConveniadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConveniadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(556, Short.MAX_VALUE))
+        );
+        tabConveniadoLayout.setVerticalGroup(
+            tabConveniadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConveniadoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(214, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Conveniado", tabConveniado);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -877,7 +910,7 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(txtComplSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 28, Short.MAX_VALUE))
+                .addGap(0, 14, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -888,12 +921,9 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE)
-                            .addComponent(tabs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -901,9 +931,9 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -971,10 +1001,15 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
         dao.complSistema = txtComplSistema.getText();
     }//GEN-LAST:event_txtComplSistemaKeyReleased
 
+    private void chkConvEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvEmpresaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
@@ -1018,6 +1053,7 @@ public class CerebroGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel tabConveniado;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTextField txtCodTiposDocumentos;
     private vrframework.bean.textField.VRTextField txtComplSistema;

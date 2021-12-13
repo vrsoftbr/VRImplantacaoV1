@@ -16,6 +16,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -886,7 +887,7 @@ public class CerebroDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
@@ -957,6 +958,72 @@ public class CerebroDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     result.add(rst.getString("documento"));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    " with convenio as ( select  distinct cls.codigo_convenio from clientes cls where cls.codigo_convenio is not null)\n"
+                    + " select\n"
+                    + "    c.codigo_cliente id_empresaconvenio,\n"
+                    + "    c.descricao razao,\n"
+                    + "    c.cpf_cnpj cnpj,\n"
+                    + "    coalesce(c.inscricao_estadual,'') inscricaoestadual,\n"
+                    + "    c.endereco endereco,\n"
+                    + "    c.numero numero,\n"
+                    + "    c.complemento complemento,\n"
+                    + "    c.bairro bairro,\n"
+                    + "    c.cidade municipio,\n"
+                    + "    c.estado uf,\n"
+                    + "    c.cep cep,\n"
+                    + "    coalesce(coalesce(c.telefone1,c.celular), c.telefone2) telefone,\n"
+                    + "    c.data_cadastro datainicio,\n"
+                    + "    '2022-12-31' datatermino,\n"
+                    + "    'S' ativo,\n"
+                    + "    0 desconto,\n"
+                    + "    'S' renovacaoautomatica,\n"
+                    + "    '' diapagamento,\n"
+                    + "    'N' bloqueado,\n"
+                    + "    '01/12/2021' diainiciorenovacao,\n"
+                    + "    '31/12/2022' diafimrenovacao,\n"
+                    + "    coalesce(c.observacao, '') observacoes\n"
+                    + " from clientes c\n"
+                    + " right join convenio co on c.codigo_cliente = co.codigo_convenio"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id_empresaconvenio"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setSituacaoCadastro("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setDesconto(rst.getDouble("desconto"));
+                    imp.setRenovacaoAutomatica("S".equals(rst.getString("renovacaoautomatica")));
+                    imp.setDiaPagamento(20);
+                    imp.setBloqueado(!"N".equals(rst.getString("bloqueado")));
+                    imp.setDiaInicioRenovacao(1);
+                    imp.setDiaFimRenovacao(31);
+                    imp.setObservacoes(rst.getString("observacoes"));
+                    result.add(imp);
+                    
                 }
             }
         }
