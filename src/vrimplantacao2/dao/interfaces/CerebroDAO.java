@@ -16,6 +16,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -1023,10 +1024,42 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setDiaFimRenovacao(31);
                     imp.setObservacoes(rst.getString("observacoes"));
                     result.add(imp);
-                    
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    c.codigo_cliente id,\n"
+                    + "    c.descricao nome,\n"
+                    + "    c.codigo_convenio id_empresaconvenio,\n"
+                    + "    'N' bloquado,\n"
+                    + "    'S' ativo,\n"
+                    + "    0 senha,\n"
+                    + "    c.cpf_cnpj cnpj,\n"
+                    + "    '' observacao,\n"
+                    + "    '31/12/2100' validadecartao,\n"
+                    + "    '' to_char,\n"
+                    + "    'S' visualizasaldo,\n"
+                    + "    '' databloqueio,\n"
+                    + "    c.limite_convenio,\n"
+                    + "    0 conveniodesconto,\n"
+                    + "    1 lojacadastro\n"
+                    + "from clientes c  where c.codigo_convenio is not null"
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                }
+            }
+        }
+
         return result;
     }
 }
