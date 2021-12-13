@@ -300,6 +300,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
             tabImportacao.add(pnlImpOutrosDados);
         }
+        
+        if (!opt.contains(OpcaoProduto.PDV_VENDA)) {
+            this.remove(tabImportacaoVendas);
+        }
+        
         tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
         
