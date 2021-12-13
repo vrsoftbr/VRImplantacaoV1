@@ -148,6 +148,8 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     public void fecharConexao() throws Exception {
         if(conexao != null) {
+            lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/parado_12.png")));
+            
             conexao.close();
         }
     }

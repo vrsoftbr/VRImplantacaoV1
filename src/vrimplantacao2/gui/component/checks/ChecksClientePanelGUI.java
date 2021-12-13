@@ -156,6 +156,16 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCheque.setVisible(false);
             this.remove(tabCheque);
         }
+        
+        if (opt.contains(OpcaoCliente.CONVENIO_CONVENIADO)) {
+            chkConveniado.setVisible(true);
+            chkConveniadoEmpresa.setVisible(true);
+            chkConveniadoTransacao.setVisible(true);
+            tabConvenio.add(pnlConvenio);
+        } else {
+            pnlConvenio.setVisible(false);
+            this.remove(tabConvenio);
+        }
 
         tabImportacao.revalidate();
         tabCreditoRotativo.revalidate();
@@ -449,6 +459,18 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkCheque.isSelected()) {
             importador.importarCheque();
         }
+        
+        if (chkConveniado.isSelected()) {
+            importador.importarConvenioConveniado();
+        }
+        
+        if (chkConveniadoEmpresa.isSelected()) {
+            importador.importarConvenioEmpresa();
+        }
+        
+        if (chkConveniadoTransacao.isSelected()) {
+            importador.importarConvenioTransacao();
+        }
     }
 
     public void executarImportacao() throws Exception {
@@ -529,6 +551,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         pnlCheque = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabConvenio = new javax.swing.JPanel();
+        pnlConvenio = new javax.swing.JPanel();
+        chkConveniado = new javax.swing.JCheckBox();
+        chkConveniadoEmpresa = new javax.swing.JCheckBox();
+        chkConveniadoTransacao = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -1089,7 +1117,60 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addGap(0, 327, Short.MAX_VALUE))
         );
 
-        addTab("Receber Cheque", tabCheque);
+        addTab("Importação Cheque", tabCheque);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniado, "Conveniado");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniadoEmpresa, "Empresa");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniadoTransacao, "Transação");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Dados");
+
+        javax.swing.GroupLayout pnlConvenioLayout = new javax.swing.GroupLayout(pnlConvenio);
+        pnlConvenio.setLayout(pnlConvenioLayout);
+        pnlConvenioLayout.setHorizontalGroup(
+            pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlConvenioLayout.createSequentialGroup()
+                        .addComponent(chkConveniado)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkConveniadoEmpresa)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkConveniadoTransacao))
+                    .addComponent(jLabel1))
+                .addContainerGap(425, Short.MAX_VALUE))
+        );
+        pnlConvenioLayout.setVerticalGroup(
+            pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConvenioLayout.createSequentialGroup()
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkConveniado)
+                    .addComponent(chkConveniadoEmpresa)
+                    .addComponent(chkConveniadoTransacao))
+                .addGap(14, 14, 14))
+        );
+
+        javax.swing.GroupLayout tabConvenioLayout = new javax.swing.GroupLayout(tabConvenio);
+        tabConvenio.setLayout(tabConvenioLayout);
+        tabConvenioLayout.setHorizontalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlConvenio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabConvenioLayout.setVerticalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(289, Short.MAX_VALUE))
+        );
+
+        addTab("Importação Convênio", tabConvenio);
 
         getAccessibleContext().setAccessibleName("Importação de Clientes");
     }// </editor-fold>//GEN-END:initComponents
@@ -1112,6 +1193,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCnpj;
     public vrframework.bean.checkBox.VRCheckBox chkComplemento;
     public vrframework.bean.checkBox.VRCheckBox chkContatoAdicional;
+    public javax.swing.JCheckBox chkConveniado;
+    public javax.swing.JCheckBox chkConveniadoEmpresa;
+    public javax.swing.JCheckBox chkConveniadoTransacao;
     public vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkDataAdmissao;
     public vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
@@ -1141,6 +1225,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public vrframework.bean.checkBox.VRCheckBox chkValorLimite;
+    public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
@@ -1151,6 +1236,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel9;
     public vrframework.bean.panel.VRPanel pnlCheque;
     public vrframework.bean.panel.VRPanel pnlContato;
+    public javax.swing.JPanel pnlConvenio;
     public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDados1;
@@ -1161,6 +1247,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JPanel tabCheque;
     public javax.swing.JPanel tabClienteEventual;
+    public javax.swing.JPanel tabConvenio;
     public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
     public javax.swing.JPanel tabParametros;

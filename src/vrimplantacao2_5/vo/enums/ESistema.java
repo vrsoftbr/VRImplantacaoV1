@@ -199,6 +199,7 @@ import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
+import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
@@ -411,11 +412,12 @@ public enum ESistema {
     GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()),
     SG(199, "SG", new SGDAO()),
     SYGMA(200, "SYGMA", new SygmaDAO()),
-    BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
-    //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     MICROTAB(201, "MICROTAB", new MicroTabDAO()),
-    MRC6(202,"MRC6", new MRC6DAO());
-
+    MRC6(202,"MRC6", new MRC6DAO()),
+    BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
+    ASSIST(204, "ASSIST", new AssistDAO());
+    //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
+    
     private int id;
     private String nome;
     private InterfaceDAO dao;

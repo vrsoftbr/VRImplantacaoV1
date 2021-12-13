@@ -1,6 +1,8 @@
 package vrimplantacao2.dao.cadastro.mercadologico;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -8,6 +10,8 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -16,6 +20,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 public class MercadologicoRepository {
     
     private final MercadologicoRepositoryProvider provider;
+    private final LogController logController = new LogController();
 
     public MercadologicoRepository(String sistema, String lojaOrigem, int lojaVR) throws Exception {
         this(new MercadologicoRepositoryProvider(
@@ -49,6 +54,14 @@ public class MercadologicoRepository {
                 salvar(null, merc, 1, nivelMaximo, opt);
             }
             provider.gerarAAcertar(nivelMaximo);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_MERCADOLOGICO.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
+            
             provider.commit();
         } catch (Exception e) {
             provider.rollback();

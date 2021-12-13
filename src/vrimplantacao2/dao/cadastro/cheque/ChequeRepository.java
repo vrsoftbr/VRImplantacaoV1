@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.cheque;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,8 @@ import vrimplantacao2.vo.cadastro.cliente.cheque.ChequeVO;
 import vrimplantacao2.vo.enums.TipoAlinea;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -18,9 +22,11 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
  */
 public class ChequeRepository {
     private final ChequeRepositoryProvider provider;
+    private final LogController logController;
 
     public ChequeRepository(ChequeRepositoryProvider provider) {
-        this.provider = provider;        
+        this.provider = provider;  
+        this.logController = new LogController();
     }
 
     public void salvar(List<ChequeIMP> cheques) throws Exception {        
@@ -62,6 +68,13 @@ public class ChequeRepository {
                 
                 provider.next();
             }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_CHEQUE.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
             
             provider.commit();
         } catch (Exception e) {
