@@ -1889,7 +1889,7 @@
         </Container>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="tabImportacaoVendas">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
           <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o de Vendas">
@@ -1908,7 +1908,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="pnlImpPdvVenda" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="568" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -1922,33 +1922,19 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                                      <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="edtDtVendaIni" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="edtDtVendaFim" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                              <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkImportarCodigoAnterior" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkImportarEanAnterior" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkImportarEanAtual" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkAtualizarCustos" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="171" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="edtDtVendaIni" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="edtDtVendaFim" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="422" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1964,13 +1950,6 @@
                               <Component id="edtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkImportarCodigoAnterior" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkImportarEanAnterior" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkImportarEanAtual" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkAtualizarCustos" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -2003,38 +1982,6 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edtDtVendaFimActionPerformed"/>
               </Events>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarCodigoAnterior">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Importar por C&#xf3;digo Anterior"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarEanAnterior">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Importar por EAN Anterior"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarEanAtual">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Importar por EAN Atual"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtualizarCustos">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Atualizar Custos"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
             </Component>
           </SubComponents>
         </Container>
