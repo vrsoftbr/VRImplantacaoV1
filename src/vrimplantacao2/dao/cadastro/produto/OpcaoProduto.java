@@ -457,7 +457,8 @@ public enum OpcaoProduto {
     /***
      * Forçar unficação de produtos, sem passar pela migração normal.
      */
-    FORCAR_UNIFICACAO;
+    FORCAR_UNIFICACAO,
+    PDV_VENDA;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
