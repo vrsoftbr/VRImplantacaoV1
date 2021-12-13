@@ -698,6 +698,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkDivisao = new vrframework.bean.checkBox.VRCheckBox();
         chkDivisaoProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkNumeroParcela = new vrframework.bean.checkBox.VRCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        pnlImpPdvVenda = new vrframework.bean.panel.VRPanel();
+        jLabel15 = new javax.swing.JLabel();
+        chkMercadologico1 = new vrframework.bean.checkBox.VRCheckBox();
+        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -733,7 +739,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkManterCodigoMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addContainerGap(160, Short.MAX_VALUE))
         );
         pnlOptMercadologicoLayout.setVerticalGroup(
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -810,7 +816,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 249, Short.MAX_VALUE))))
+                        .addGap(0, 283, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -862,7 +868,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
                 .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(479, Short.MAX_VALUE))
+                .addContainerGap(513, Short.MAX_VALUE))
         );
         pnlOptAssociadoLayout.setVerticalGroup(
             pnlOptAssociadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -926,7 +932,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(rdbPautaEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkPautaUsarEansMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addContainerGap(159, Short.MAX_VALUE))
         );
         pnlOptPautaFiscalLayout.setVerticalGroup(
             pnlOptPautaFiscalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -961,7 +967,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(376, Short.MAX_VALUE))
+                .addContainerGap(410, Short.MAX_VALUE))
         );
         pnlOptIcmsLayout.setVerticalGroup(
             pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -993,7 +999,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkNutricionalResetarIDs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(340, Short.MAX_VALUE))
+                .addContainerGap(408, Short.MAX_VALUE))
         );
         pnlOptOptNutricionalLayout.setVerticalGroup(
             pnlOptOptNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1027,7 +1033,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkResetarIdsNormais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(242, Short.MAX_VALUE))
+                .addContainerGap(321, Short.MAX_VALUE))
         );
         pnlResetarIdsLayout.setVerticalGroup(
             pnlResetarIdsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1246,7 +1252,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkPrateleira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkTeclaAssociada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
         pnlImpComplLayout.setVerticalGroup(
             pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1686,11 +1692,90 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         scrollImportação.setViewportView(tabImportacao);
 
         addTab("Importação de Produtos", scrollImportação);
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, "PDV VENDA");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologico1, "Pdv Venda");
+        chkMercadologico1.setEnabled(true);
+
+        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaIniActionPerformed(evt);
+            }
+        });
+
+        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaFimActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlImpPdvVendaLayout = new javax.swing.GroupLayout(pnlImpPdvVenda);
+        pnlImpPdvVenda.setLayout(pnlImpPdvVendaLayout);
+        pnlImpPdvVendaLayout.setHorizontalGroup(
+            pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel15))
+                    .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkMercadologico1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(413, Short.MAX_VALUE))
+        );
+        pnlImpPdvVendaLayout.setVerticalGroup(
+            pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkMercadologico1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlImpPdvVendaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlImpPdvVenda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(pnlImpPdvVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 528, Short.MAX_VALUE))
+        );
+
+        addTab("Importação de Vendas", jPanel1);
     }// </editor-fold>//GEN-END:initComponents
 
     private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
         chkPautaUsarEansMenores.setEnabled(rdbPautaEan.isSelected());
     }//GEN-LAST:event_rdbPautaEanActionPerformed
+
+    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
+        if (edtDtVendaIni.getDate() == null) {
+            edtDtVendaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaIniActionPerformed
+
+    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
+        if (edtDtVendaFim.getDate() == null) {
+            edtDtVendaFim.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1745,6 +1830,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkMargemMaxima;
     public vrframework.bean.checkBox.VRCheckBox chkMargemMinima;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    public vrframework.bean.checkBox.VRCheckBox chkMercadologico1;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoNaoExcluir;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivelReplicar;
     public vrframework.bean.checkBox.VRCheckBox chkNaoTransformarEANemUN;
@@ -1796,12 +1882,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkVolumeEmbalagem;
     public vrframework.bean.checkBox.VRCheckBox chkVolumeQtd;
     public vrframework.bean.checkBox.VRCheckBox chkVrAtacado;
+    public org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
+    public org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel14;
+    public javax.swing.JLabel jLabel15;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1810,11 +1899,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
+    public javax.swing.JPanel jPanel1;
     public vrframework.bean.panel.VRPanel pnlImpCompl;
     public vrframework.bean.panel.VRPanel pnlImpInfoAdic;
     public vrframework.bean.panel.VRPanel pnlImpMercadologico;
     public vrframework.bean.panel.VRPanel pnlImpOutrosDados;
     public vrframework.bean.panel.VRPanel pnlImpPautaFiscal;
+    public vrframework.bean.panel.VRPanel pnlImpPdvVenda;
     public vrframework.bean.panel.VRPanel pnlImpProduto;
     public vrframework.bean.panel.VRPanel pnlImpTributacao;
     public vrframework.bean.panel.VRPanel pnlOptAssociado;
