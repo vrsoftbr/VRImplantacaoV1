@@ -713,6 +713,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkUsarEANAnterior = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -1720,6 +1721,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkUsarEANAnterior, "Usar código EAN anterior para importar as vendas");
+        chkUsarEANAnterior.setEnabled(true);
+
         javax.swing.GroupLayout pnlImpPdvVendaLayout = new javax.swing.GroupLayout(pnlImpPdvVenda);
         pnlImpPdvVenda.setLayout(pnlImpPdvVendaLayout);
         pnlImpPdvVendaLayout.setHorizontalGroup(
@@ -1727,15 +1731,20 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
                 .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel15))
+                        .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel15))
+                            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(422, Short.MAX_VALUE))
         );
         pnlImpPdvVendaLayout.setVerticalGroup(
@@ -1749,6 +1758,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1762,7 +1773,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             tabImportacaoVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabImportacaoVendasLayout.createSequentialGroup()
                 .addComponent(pnlImpPdvVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 568, Short.MAX_VALUE))
+                .addGap(0, 547, Short.MAX_VALUE))
         );
 
         addTab("Importação de Vendas", tabImportacaoVendas);
@@ -1883,6 +1894,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProd;
     public vrframework.bean.checkBox.VRCheckBox chkTipoProduto;
+    public vrframework.bean.checkBox.VRCheckBox chkUsarEANAnterior;
     public vrframework.bean.checkBox.VRCheckBox chkValidade;
     public vrframework.bean.checkBox.VRCheckBox chkVendaControlada;
     public vrframework.bean.checkBox.VRCheckBox chkVendaPdv;
@@ -2355,7 +2367,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     && edtDtVendaIni.getDate() != null
                     && edtDtVendaFim.getDate() != null) {
 
-                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                if (chkUsarEANAnterior.isSelected()) {
+                    importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
+                } else {
+                    importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                }
             }
         }
     }
