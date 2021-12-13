@@ -111,6 +111,7 @@ public class ConvenioConveniadoRepository {
             
             provider.commit();
         } catch (Exception e) {
+            e.printStackTrace();
             provider.rollback();
             throw e;
         }

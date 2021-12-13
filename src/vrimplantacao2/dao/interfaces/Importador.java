@@ -218,8 +218,10 @@ public class Importador {
      */
     public void importarMercadologico(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();        
+        
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();
         Set<OpcaoProduto> opt = new HashSet<>(Arrays.asList(opcoes));
+        
         if (Parametros.OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva()) {
             MercadologicoRepository repository = new MercadologicoRepository(
                     getSistema(),
@@ -229,6 +231,8 @@ public class Importador {
             repository.salvarNormal(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
         } else {
             MercadologicoDAO dao = new MercadologicoDAO();
+            
+            dao.setIdLojaVR(getLojaVR());
             dao.salvar(mercadologicos, opt);
         }
     }

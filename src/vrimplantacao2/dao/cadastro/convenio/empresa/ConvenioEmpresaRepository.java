@@ -95,6 +95,8 @@ public class ConvenioEmpresaRepository {
 
     public ConvenioEmpresaVO converterEmpresa(ConvenioEmpresaIMP imp) throws Exception {
         ConvenioEmpresaVO vo = new ConvenioEmpresaVO();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        
         vo.setRazaoSocial(imp.getRazao());
         vo.setEndereco(imp.getEndereco());
         vo.setBairro(imp.getBairro());
@@ -116,8 +118,8 @@ public class ConvenioEmpresaRepository {
         vo.setCep(Utils.stringToInt(imp.getCep()));
         vo.setInscricaoEstadual(imp.getInscricaoEstadual());
         vo.setCnpj(Utils.stringToLong(imp.getCnpj()));
-        vo.setDataInicio(imp.getDataInicio());
-        vo.setDataTermino(imp.getDataTermino());
+        vo.setDataInicio(imp.getDataInicio() == null ? sdf.parse(sdf.format(new Date())) : imp.getDataInicio());
+        vo.setDataTermino(imp.getDataTermino() == null ? sdf.parse(sdf.format(new Date())) : imp.getDataTermino());
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
         if (imp.getDiaInicioRenovacao() > 0 && imp.getDiaFimRenovacao() == 0) {
             vo.setRenovacaoAutomatica(true);

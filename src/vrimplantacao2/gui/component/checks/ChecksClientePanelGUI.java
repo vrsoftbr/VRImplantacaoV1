@@ -459,6 +459,18 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkCheque.isSelected()) {
             importador.importarCheque();
         }
+        
+        if (chkConveniado.isSelected()) {
+            importador.importarConvenioConveniado();
+        }
+        
+        if (chkConveniadoEmpresa.isSelected()) {
+            importador.importarConvenioEmpresa();
+        }
+        
+        if (chkConveniadoTransacao.isSelected()) {
+            importador.importarConvenioTransacao();
+        }
     }
 
     public void executarImportacao() throws Exception {

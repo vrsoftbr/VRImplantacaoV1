@@ -2,7 +2,9 @@ package vrimplantacao2.dao.cadastro;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +18,8 @@ import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * DAO responsável por gravar os dados do mercadológico no banco de dados.
@@ -31,6 +35,8 @@ public class MercadologicoDAO {
      */
     private MultiMap<String, MercadologicoVO> anteriores;
     private MercadologicoVO aAcertar;
+    private final LogController logController = new LogController();
+    private int idLojaVR;
 
     /**
      * Cria a tabela no banco de dados caso ela não exista.
@@ -269,6 +275,13 @@ public class MercadologicoDAO {
             }
 
             gerarAAcertar(nivelMax);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_MERCADOLOGICO.getId(),
+                    sdf.format(new Date()),
+                    getIdLojaVR());
 
             Conexao.commit();
         } catch (Exception ex) {
@@ -912,4 +925,11 @@ public class MercadologicoDAO {
         }
     }
 
+    public int getIdLojaVR() {
+        return idLojaVR;
+    }
+
+    public void setIdLojaVR(int idLojaVR) {
+        this.idLojaVR = idLojaVR;
+    }
 }
