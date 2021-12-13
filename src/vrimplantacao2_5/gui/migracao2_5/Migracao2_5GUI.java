@@ -24,6 +24,7 @@ public class Migracao2_5GUI extends VRInternalFrame {
     private static Migracao2_5GUI instance;
     private Migracao2_5Controller controller = new Migracao2_5Controller();
     private ESistema eSistema;
+    
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
