@@ -143,12 +143,15 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         if (onConectar != null) {
             onConectar.executar();
+            lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/parado_12.png")));
         }
     }
 
     public void fecharConexao() throws Exception {
         if(conexao != null) {
             conexao.close();
+            
+            
         }
     }
     
