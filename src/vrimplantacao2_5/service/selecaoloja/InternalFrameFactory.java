@@ -95,6 +95,9 @@ public abstract class InternalFrameFactory {
             case AVISTARE:
                 internalFrame = new Avistare2_5GUI(frame);
                 break;
+            case ASSIST:
+                internalFrame = new Assist2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;                
         }

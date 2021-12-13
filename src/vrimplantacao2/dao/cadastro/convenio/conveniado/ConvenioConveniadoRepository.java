@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.convenio.conveniado;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,8 @@ import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoVO;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.TipoServicoConvenio;
 import vrimplantacao2.vo.cadastro.convenio.empresa.ConvenioEmpresaAnteriorVO;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
@@ -24,9 +28,11 @@ public class ConvenioConveniadoRepository {
     private static final Logger LOG = Logger.getLogger(ConvenioConveniadoRepository.class.getName());
     
     private final ConvenioConveniadoRepositoryProvider provider;
+    private final LogController logController;
 
     public ConvenioConveniadoRepository(ConvenioConveniadoRepositoryProvider provider) throws Exception {        
         this.provider = provider;
+        this.logController = new LogController();
     }
 
     public void salvar(List<ConveniadoIMP> conveniados, Set<OpcaoConvenio> opcoes) throws Exception {
@@ -95,6 +101,13 @@ public class ConvenioConveniadoRepository {
                 
                 provider.next();
             }
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_CONVENIO_CONVENIADO.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
             
             provider.commit();
         } catch (Exception e) {

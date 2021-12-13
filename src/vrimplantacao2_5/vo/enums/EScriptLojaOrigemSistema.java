@@ -30,7 +30,8 @@ public enum EScriptLojaOrigemSistema {
             + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
             + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
             + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
-            + "from dbo.TB_CONFIG");
+            + "from dbo.TB_CONFIG"),
+    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao");
     
     private int idSistema;
     private int idBancoDados;

@@ -2,6 +2,7 @@ package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -58,10 +59,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.ATIVO,
-                OpcaoProduto.PESO_BRUTO,
-                OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
-                OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
@@ -75,7 +73,6 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
-                OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         ));
     }
@@ -98,7 +95,8 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CONVENIO_CONVENIADO));
     }
 
     @Override
@@ -534,8 +532,33 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "")) {
-                
+                    "select \n" +
+                    "	distinct\n" +
+                    "	tmvdata lancamento,\n" +
+                    "	tmvorcgcpf idconveniado,\n" +
+                    "	tmvorclien razao,\n" +
+                    "	tmvnumseq documento,\n" +
+                    "	tmvhorario hora,\n" +
+                    "	substring(tmvtermina, 5, 2) ecf,\n" +
+                    "	tmvlrtotal total \n" +
+                    "from \n" +
+                    "	public.back025 \n" +
+                    "where \n" +
+                    "	tmvorclien != '' and \n" +
+                    "	tmvdata between '2021-12-01' and '2021-12-31'")) {
+                while (rs.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    
+                    imp.setId(rs.getString("documento"));
+                    imp.setNumeroCupom(imp.getId());
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setIdConveniado(rs.getString("idconveniado"));
+                    imp.setDataMovimento(rs.getDate("lancamento"));
+                    imp.setValor(rs.getDouble("total"));
+                    imp.setDataHora(new Timestamp(rs.getLong("hora")));
+                    
+                    result.add(imp);
+                }
             }
         }
         
