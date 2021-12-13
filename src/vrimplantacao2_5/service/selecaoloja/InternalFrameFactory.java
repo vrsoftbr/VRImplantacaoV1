@@ -6,6 +6,8 @@ import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
+import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -22,10 +24,11 @@ public abstract class InternalFrameFactory {
 
     /**
      * Build da interface GUI do sistema selecionado
+     *
      * @param sistema Sistema informado na conexão
      * @param frame MenuGUI
      * @return VRInternalFrame desejado
-     * @throws Exception 
+     * @throws Exception
      */
     public static VRInternalFrame getInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
         VRInternalFrame internalFrame;
@@ -57,22 +60,28 @@ public abstract class InternalFrameFactory {
             case BOMSOFT:
                 internalFrame = new BomSoft2_5GUI(frame);
                 break;
+            case MICROTAB:
+                internalFrame = new MicroTab2_5GUI(frame, null);
+                break;
+            case MRC6:
+                internalFrame = new MRC62_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
 
         return internalFrame;
     }
-    
+
     /**
      * Build da interface GUI do sistema selecionado
+     *
      * @param sistema Sistema informado na conexão
      * @param frame MenuGUI
      * @param baseDadosGui ConfiguracaoBaseDadoGUI
      * @return VRInternalFrame desejado
-     * @throws Exception 
+     * @throws Exception
      */
-    
     public static VRInternalFrame getInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
         VRInternalFrame internalFrame;
 
@@ -102,6 +111,11 @@ public abstract class InternalFrameFactory {
                 break;
             case BOMSOFT:
                 internalFrame = new BomSoft2_5GUI(frame);
+            case MICROTAB:
+                internalFrame = new MicroTab2_5GUI(frame, baseDadosGui);
+                break;
+            case MRC6:
+                internalFrame = new MRC62_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
@@ -110,3 +124,4 @@ public abstract class InternalFrameFactory {
         return internalFrame;
     }
 }
+

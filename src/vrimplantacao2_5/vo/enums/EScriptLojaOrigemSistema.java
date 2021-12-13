@@ -42,7 +42,17 @@ public enum EScriptLojaOrigemSistema {
             + " ID_CFG id, "
             + " FANTASIA_CFG descricao "
             + "FROM CONFIG "
-            + "ORDER BY 1");
+            + "ORDER BY 1"),
+    MICROTAB(201, 5, "SELECT "
+            + " 1 as id,"
+            + " ''Loja_01'' descricao"
+            + " FROM CONFIG"),
+    MRC6(202, 13, "select"
+            + " codigo as id, "
+            + " nome as descricao,"
+            + " cnpj "
+            + " from "
+            + " entidades");
 
     private int idSistema;
     private int idBancoDados;
