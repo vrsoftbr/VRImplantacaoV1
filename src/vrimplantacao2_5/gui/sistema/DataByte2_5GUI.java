@@ -9,48 +9,48 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.SGDAO;
+import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class SG2_5GUI extends VRInternalFrame {
+public class DataByte2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.SG.getNome();
-    private static SG2_5GUI instance;
+    private static final String SISTEMA = ESistema.DATABYTE.getNome();
+    private static DataByte2_5GUI instance;
 
-    private final SGDAO sgDAO = new SGDAO();
+    private final DataByteDAO dao = new DataByteDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public SG2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public DataByte2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
-        tabProdutos.setOpcoesDisponiveis(sgDAO);
-        tabFornecedores.setOpcoesDisponiveis(sgDAO);
-        tabClientes.setOpcoesDisponiveis(sgDAO);
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return sgDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                return sgDAO.getSistema();
+                return dao.getSistema();
             }
 
             @Override
             public String getLoja() {
-                sgDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return sgDAO.getLojaOrigem();
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -59,7 +59,7 @@ public class SG2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.SG);
+        pnlConn.setSistema(ESistema.DATABYTE);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -95,7 +95,7 @@ public class SG2_5GUI extends VRInternalFrame {
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
-                    Importador importador = new Importador(sgDAO);
+                    Importador importador = new Importador(dao);
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
@@ -141,7 +141,7 @@ public class SG2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new SG2_5GUI(i_mdiFrame);
+                instance = new DataByte2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -172,22 +172,22 @@ public class SG2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("SG");
+        setTitle("DataByte");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 

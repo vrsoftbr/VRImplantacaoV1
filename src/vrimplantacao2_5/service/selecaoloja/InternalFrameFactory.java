@@ -12,6 +12,7 @@ import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
+import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
@@ -70,6 +71,9 @@ public abstract class InternalFrameFactory {
             case ASSIST:
                 internalFrame = new Assist2_5GUI(frame);
                 break;
+            case DATABYTE:
+                internalFrame = new DataByte2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -125,6 +129,9 @@ public abstract class InternalFrameFactory {
             case ASSIST:
                 internalFrame = new Assist2_5GUI(frame);
                 break;
+            case DATABYTE:
+                internalFrame = new DataByte2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -132,4 +139,3 @@ public abstract class InternalFrameFactory {
         return internalFrame;
     }
 }
-

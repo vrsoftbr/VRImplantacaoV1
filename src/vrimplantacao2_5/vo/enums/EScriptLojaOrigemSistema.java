@@ -53,8 +53,12 @@ public enum EScriptLojaOrigemSistema {
             + " cnpj "
             + " from "
             + " entidades"),
-    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao");
-    
+    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
+    DATABYTE(205, 5, "SELECT \n"
+            + " CODIGO AS id,\n"
+            + " RAZAOSOCIAL AS descricao\n"
+            + "FROM FILIAL");
+
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;
