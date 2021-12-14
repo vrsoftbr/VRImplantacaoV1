@@ -71,9 +71,9 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
         controller = new AvistareController();
         
-        tabProdutos.setOpcoesDisponiveis(controller);                
+        tabProdutos.setOpcoesDisponiveis(controller);
         tabFornecedores.setOpcoesDisponiveis(controller);
-        tabClientes.setOpcoesDisponiveis(controller);        
+        tabClientes.setOpcoesDisponiveis(controller);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
