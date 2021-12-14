@@ -9,7 +9,6 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.controller.sistema.AvistareController;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
@@ -23,7 +22,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private AvistareVO vo = new AvistareVO();
     private AvistareController controller = null;
-    private MapaLojaController mapaLojaController = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
