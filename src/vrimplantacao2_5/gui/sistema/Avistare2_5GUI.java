@@ -1,13 +1,10 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import java.util.Date;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
