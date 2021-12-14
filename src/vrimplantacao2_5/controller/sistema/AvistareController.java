@@ -21,11 +21,13 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
  */
 public class AvistareController extends InterfaceController {
 
-    private AvistareDAO dao = null;
+    public AvistareDAO dao = null;
     private final String SISTEMA = "Avistare";
     private String complementoSistema = "";
     
-    public AvistareController() {}
+    public AvistareController() {
+        this.dao = new AvistareDAO();
+    }
     
     public AvistareController(AvistareDAO dao) {
         this.dao = dao;

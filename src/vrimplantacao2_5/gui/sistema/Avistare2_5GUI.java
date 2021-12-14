@@ -24,7 +24,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private static Avistare2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private AvistareDAO dao = null;
     private AvistareVO vo = new AvistareVO();
     private AvistareController controller = null;
     private MapaLojaController mapaLojaController = null;
@@ -75,9 +74,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
         
         carregarParametros();
 
-        dao = new AvistareDAO();
-        
-        controller = new AvistareController(dao);
+        controller = new AvistareController();
         
         tabProdutos.setOpcoesDisponiveis(controller);                
         tabFornecedores.setOpcoesDisponiveis(controller);
@@ -87,19 +84,19 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
             @Override
             public MapaTributoProvider getProvider() {
-                return dao;
+                return controller.dao;
             }
 
             @Override
             public String getSistema() {
                 controller.setComplementoSistema(pnlConn.getComplemento());
-                return dao.getSistema();
+                return controller.dao.getSistema();
             }
 
             @Override
             public String getLoja() {
                 controller.setLojaOrigem(pnlConn.getLojaOrigem());
-                return controller.getLojaOrigem();
+                return controller.dao.getLojaOrigem();
             }
 
             @Override
@@ -147,7 +144,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    Importador importador = new Importador(dao);
+                    Importador importador = new Importador(controller.dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
