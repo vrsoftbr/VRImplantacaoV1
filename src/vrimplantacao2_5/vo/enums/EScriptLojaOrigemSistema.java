@@ -42,6 +42,13 @@ public enum EScriptLojaOrigemSistema {
             + " ID_CFG id, "
             + " FANTASIA_CFG descricao "
             + "FROM CONFIG "
+            + "ORDER BY 1"),
+    TENTACULO(205, 5,
+            "SELECT "
+            + "	EMP_CODIGO id, "
+            + "	EMP_FANTASIA descricao "
+            + "FROM "
+            + "	EMPRESAS "
             + "ORDER BY 1");
 
     private int idSistema;
