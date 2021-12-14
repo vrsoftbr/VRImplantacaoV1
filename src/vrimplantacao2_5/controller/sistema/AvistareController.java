@@ -22,8 +22,6 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
 public class AvistareController extends InterfaceController {
 
     public AvistareDAO dao = null;
-    private final String SISTEMA = "Avistare";
-    private String complementoSistema = "";
     
     public AvistareController() {
         this.dao = new AvistareDAO();
@@ -31,19 +29,6 @@ public class AvistareController extends InterfaceController {
     
     public AvistareController(AvistareDAO dao) {
         this.dao = dao;
-    }
-    
-    @Override
-    public String getSistema() {
-        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
-    }
-    
-    public String getComplementoSistema() {
-        return this.complementoSistema;
-    }
-    
-    public void setComplementoSistema(String complementoSistema) {
-        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
     public void setAvistare(AvistareVO avistareVO) {

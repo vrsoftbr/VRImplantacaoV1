@@ -186,7 +186,7 @@ public class AtualizadorDAO {
                     + "        ON DELETE NO ACTION\n"
                     + ");\n"
                     + "CREATE TABLE IF NOT EXISTS implantacao2_5.lojaorigem (\n"
-                    + "     id VARCHAR(10) NOT NULL,\n"
+                    + "     id VARCHAR(20) NOT NULL,\n"
                     + "     descricao VARCHAR(100) NOT NULL,\n"
                     + "     mixprincipal boolean default false,\n"
                     + "     id_conexaoloja INTEGER,\n"

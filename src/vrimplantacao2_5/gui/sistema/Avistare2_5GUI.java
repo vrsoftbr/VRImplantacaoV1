@@ -84,14 +84,14 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                controller.setComplementoSistema(pnlConn.getComplemento());
+                controller.dao.setComplementoSistema(pnlConn.getComplemento());
                 return controller.dao.getSistema();
             }
 
             @Override
             public String getLoja() {
                 controller.setLojaOrigem(pnlConn.getLojaOrigem());
-                return controller.dao.getLojaOrigem();
+                return controller.getLojaOrigem();
             }
 
             @Override
@@ -139,13 +139,14 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
+                    controller.dao.setComplementoSistema(pnlConn.getComplemento());
+                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
+                    
                     Importador importador = new Importador(controller.dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
-                    
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
