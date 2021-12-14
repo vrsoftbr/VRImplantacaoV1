@@ -7,8 +7,14 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -18,6 +24,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -42,6 +49,44 @@ public class CerebroDAO extends InterfaceDAO {
         }
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.QTD_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.ICMS_SAIDA,
+            OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+            OpcaoProduto.ICMS_SAIDA_NF,
+            OpcaoProduto.ICMS_ENTRADA,
+            OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+            OpcaoProduto.ICMS_CONSUMIDOR
+        }));
+    }
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -1045,7 +1090,7 @@ public class CerebroDAO extends InterfaceDAO {
                     + "    0 senha,\n"
                     + "    c.cpf_cnpj cnpj,\n"
                     + "    '' observacao,\n"
-                    + "    '31/12/2100' validadecartao,\n"
+                    + "    '2100-12-31' validadecartao,\n"
                     + "    '' to_char,\n"
                     + "    'S' visualizasaldo,\n"
                     + "    '' databloqueio,\n"
@@ -1056,6 +1101,59 @@ public class CerebroDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdEmpresa(rst.getString("id_empresaconvenio"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setBloqueado(!"N".equals(rst.getString("bloquado")));
+                    imp.setSituacaoCadastro("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setValidadeCartao(rst.getDate("validadecartao"));
+                    imp.setVisualizaSaldo("S".equals(rst.getString("visualizasaldo")));
+                    imp.setConvenioLimite(rst.getDouble("limite_convenio"));
+                    imp.setConvenioDesconto(rst.getDouble("conveniodesconto"));
+                    imp.setLojaCadastro(rst.getInt("lojacadastro"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    " select\n"
+                    + "    sequencial_cpr id,\n"
+                    + "    codigo_cliente id_conveniado,\n"
+                    + "    1 ecf,\n"
+                    + "    sequencial_cpr numerocupom,\n"
+                    + "    cast(data_emissao as timestamp) datahora,\n"
+                    + "    valor,\n"
+                    + "    'OK' situacaotransacao,\n"
+                    + "    data_emissao datamovimento,\n"
+                    + "    'N' finalizado,\n"
+                    + "    documento observacao\n"
+                    + "from MOVIMENTOS_CPR\n"
+                    + "where codigo_empresa = 1\n"
+                    + "and codigo_tipodocumento = 4\n"
+                    + "and status in ('N', 'P')"
+            )) {
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("id_conveniado"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setDataHora(new Timestamp(rst.getDate("datahora").getTime()));
+                    imp.setDataMovimento(rst.getDate("datamovimento"));
+                    imp.setFinalizado(!"N".equals(rst.getString("finalizado")));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
                 }
             }
         }
