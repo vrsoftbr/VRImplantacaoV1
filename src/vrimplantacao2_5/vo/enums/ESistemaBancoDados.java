@@ -33,7 +33,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_CFSOFTSIAECF(20, "CFSOFTSIAECF", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_CGA(27, "CGA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_CPLUS(22, "CPLUS", 5, "FIREBIRD", "", "", "", 3050),
-    FIREBIRD_DATABYTE(205, "DATABYTE", 5, "FIREBIRD", "", "", "", 3050),
+    FIREBIRD_DATABYTE(205, "DATABYTE", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_DELFI(39, "DELFI", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_DESTRO(40, "DESTRO", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_DSOFT(37, "DSOFT", 5, "FIREBIRD", "", "", "", 3050),
