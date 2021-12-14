@@ -491,35 +491,27 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    crpnrolancamento as id,\n"
-                    + "    crpdatalancamento as emissao,\n"
-                    + "    crpnumdocumento as cupom,\n"
-                    + "    crpnrocaixa as ecf,\n"
-                    + "    crpvalorlancamento as valor,\n"
-                    + "    crpcodcliente as idcliente,\n"
-                    + "    c.clicpf_cgc as cnpjcpf,\n"
-                    + "    crpvencimentoconta as vencimento,\n"
-                    + "    crpdeslancamento as obs \n"
-                    + "FROM    \n"
-                    + "    tbcontasreceberpagar cr\n"
-                    + "    left join tbclientes c on cr.crpcodcliente = c.cliId\n"
-                    + "where\n"
-                    + "    crpdatapagamento is null\n"
-                    + "    and crpflaglancado = false\n"
+                    "select\n"
+                    + "	codcup id,\n"
+                    + "	data::date emissao,\n"
+                    + "	codcup numerocupom,\n"
+                    + "	substring(terminal,7,2) ecf,\n"
+                    + "	vrtotal valor,\n"
+                    + "	codcli idcliente,\n"
+                    + "	data::date vencimento\n"
+                    + "from\n"
+                    + "	fiado\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
                     imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setIdCliente(rst.getString("idcliente"));
-                    imp.setCnpjCliente(rst.getString("cnpjcpf"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setObservacao(rst.getString("obs"));
 
                     result.add(imp);
                 }
