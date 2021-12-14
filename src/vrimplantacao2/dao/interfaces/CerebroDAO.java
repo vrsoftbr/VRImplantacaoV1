@@ -1153,6 +1153,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setDataMovimento(rst.getDate("datamovimento"));
                     imp.setFinalizado(!"N".equals(rst.getString("finalizado")));
                     imp.setObservacao(rst.getString("observacao"));
+                    imp.setValor(rst.getDouble("valor"));
                     result.add(imp);
                 }
             }
