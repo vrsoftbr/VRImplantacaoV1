@@ -284,6 +284,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         this.configuracaoBancoVO = configuracaoBancoVO;
 
         txtNomeConexao.setText(configuracaoBancoVO.getDescricao());
+        txtComplemento.setText(configuracaoBancoVO.getComplemento());
         cboSistema.setDescricao(configuracaoBancoVO.getSistema().getNome());
         cboBD.setDescricao(configuracaoBancoVO.getBancoDados().getNome());
 
