@@ -31,7 +31,6 @@ public class GatewaySistemasController extends InterfaceController {
         this.dao = dao;
     }
 
-    @Override
     public String getSistema() {
         return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
     }
