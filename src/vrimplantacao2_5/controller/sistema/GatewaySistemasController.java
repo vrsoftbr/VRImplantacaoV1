@@ -30,18 +30,6 @@ public class GatewaySistemasController extends InterfaceController {
     public GatewaySistemasController(GatewaySistemasDAO dao) {                
         this.dao = dao;
     }
-
-    public String getSistema() {
-        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
-    }
-    
-    public String getComplementoSistema() {
-        return this.complementoSistema;
-    }
-    
-    public void setComplementoSistema(String complementoSistema) {
-        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
-    }
     
     public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO) {
         dao.gatewaySistemasVO = gatewaySistemasVO;
