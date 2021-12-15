@@ -25,7 +25,9 @@ public class GatewaySistemasController extends InterfaceController {
     private String complementoSistema = "";
     private final String SISTEMA = "Gateway Sistemas";
     
-    public GatewaySistemasController() {}
+    public GatewaySistemasController() {
+        this.dao = new GatewaySistemasDAO();
+    }
     
     public GatewaySistemasController(GatewaySistemasDAO dao) {                
         this.dao = dao;

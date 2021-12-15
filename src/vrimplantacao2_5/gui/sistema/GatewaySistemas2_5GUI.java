@@ -70,9 +70,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         
         carregarParametros();
 
-        dao = new GatewaySistemasDAO();
-        
-        controller = new GatewaySistemasController(dao);
+        controller = new GatewaySistemasController();
         
         tabProdutos.setOpcoesDisponiveis(controller);                
         tabFornecedores.setOpcoesDisponiveis(controller);
@@ -87,8 +85,8 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                controller.setComplementoSistema(pnlConn.getComplemento());
-                return controller.getSistema();
+                controller.dao.setComplementoSistema(pnlConn.getComplemento());
+                return controller.dao.getSistema();
             }
 
             @Override
@@ -142,13 +140,14 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
+                    controller.dao.setComplementoSistema(pnlConn.getComplemento());
+                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema());
+                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    controller.setGatewaySistemas(carregarOpcaoesMigracaoSistema());
-                    
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
