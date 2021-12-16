@@ -20,6 +20,7 @@ public class ConexaoFirebird implements DriverConexao {
     private boolean usandoString = false; 
     public static String encoding = "";
 
+    @Override
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         Class.forName("org.firebirdsql.jdbc.FBDriver");
 
@@ -34,6 +35,7 @@ public class ConexaoFirebird implements DriverConexao {
             if (encoding != null && !encoding.equals("")) {
                 extra = "encoding=" + encoding;
             }
+            
             con = DriverManager.getConnection("jdbc:firebirdsql:" + i_ip + "/" + i_porta + ":" + i_database + ("".equals(extra) ? "" : "?" + extra), i_usuario, i_senha);
 
         } catch (Exception ex) {
@@ -117,6 +119,7 @@ public class ConexaoFirebird implements DriverConexao {
         }
     }
 
+    @Override
     public void close() throws Exception {
         try {
             con.close();

@@ -54,10 +54,7 @@ public enum EScriptLojaOrigemSistema {
             + " from "
             + " entidades"),
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
-    DATABYTE(205, 5, "SELECT \n"
-            + " CODIGO AS id,\n"
-            + " RAZAOSOCIAL AS descricao\n"
-            + "FROM FILIAL");
+    DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL");
 
     private int idSistema;
     private int idBancoDados;

@@ -107,9 +107,9 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
-                    + " COD_ICMS id,\n"
+                    + " COD_ICMS descricao,\n"
                     + " ALIQ_ICMS aliquota,\n"
-                    + " SITTRIBUTARIA descricao\n"
+                    + " SITTRIBUTARIA id\n"
                     + "FROM ICMS"
             )) {
                 while (rst.next()) {
