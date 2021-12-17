@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.EcoCentauroDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -44,6 +45,8 @@ public class EcoCentauroGUI extends VRInternalFrame {
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
+        edtDtVendaIni.setDate(params.getDate(NOME_SISTEMA, "VENDAS_INI"));
+        edtDtVendaFim.setDate(params.getDate(NOME_SISTEMA, "VENDAS_FIM"));
     }
 
     private void gravarParametros() throws Exception {
@@ -54,6 +57,8 @@ public class EcoCentauroGUI extends VRInternalFrame {
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
+        edtDtVendaIni.setDate(params.getDate(NOME_SISTEMA, "VENDAS_INI"));
+        edtDtVendaFim.setDate(params.getDate(NOME_SISTEMA, "VENDAS_FIM"));
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
@@ -204,6 +209,13 @@ public class EcoCentauroGUI extends VRInternalFrame {
                             if (chkAjustarDigitoVerificador.isSelected()){
                                 dao.importarDigitoVerificador();
                             }   break;
+                        case 5:
+                            if (chkPdvVendas.isSelected()) {
+                                dao.setVendaDataIni(edtDtVendaIni.getDate());
+                                dao.setVendaDataFim(edtDtVendaFim.getDate());
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            }
+                            break;
                         default:
                             break;
                     }
