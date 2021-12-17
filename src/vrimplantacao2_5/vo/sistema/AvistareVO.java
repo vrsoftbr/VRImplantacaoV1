@@ -15,7 +15,7 @@ public class AvistareVO {
 
     private boolean temArquivoBalanca = false;
     private Date dataInicioVenda;
-    private Date dataTerminoVenda;
+    private Date dataTerminoVenda; 
 
     public boolean isTemArquivoBalanca() {
         return this.temArquivoBalanca;
