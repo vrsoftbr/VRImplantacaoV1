@@ -271,6 +271,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setValidade(0);
+                        imp.seteBalanca(false);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
