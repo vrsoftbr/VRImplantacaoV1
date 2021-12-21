@@ -512,25 +512,23 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    fornecedor AS idfornecedor,\n"
-                    + "    produto AS idproduto,\n"
-                    + "    ultcompraqtde AS qtdembalagem,\n"
-                    + "    ultcompradata AS dataalteracao,\n"
-                    + "    codnofornecedor AS codigoexterno\n"
-                    + "FROM testfornecproduto\n"
-                    + "ORDER BY 1, 2"
+                    "SELECT \n"
+                    + "	CODIFAB idfornecedor,\n"
+                    + "	CODIPRO idproduto,\n"
+                    + "	1 qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "	WHERE CODIFAB IS NOT NULL \n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setIdProduto(rst.getString("idproduto"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
 
                     result.add(imp);
                 }
@@ -712,7 +710,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
     /*
         DEV DE VENDAS INTERROMPIDO, NÃO TESTADAS AINDA
-    */
+     */
     private Date vendaDataIni;
     private Date vendaDataFim;
 
