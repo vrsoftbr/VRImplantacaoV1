@@ -200,6 +200,7 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
@@ -415,7 +416,8 @@ public enum ESistema {
     MICROTAB(201, "MICROTAB", new MicroTabDAO()),
     MRC6(202,"MRC6", new MRC6DAO()),
     BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
-    ASSIST(204, "ASSIST", new AssistDAO());
+    ASSIST(204, "ASSIST", new AssistDAO()),
+    DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;

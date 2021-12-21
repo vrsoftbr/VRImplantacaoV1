@@ -53,7 +53,13 @@ public enum EScriptLojaOrigemSistema {
             + " cnpj "
             + " from "
             + " entidades"),
-    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao");
+    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
+    DOBESCGA(206,5,"select\n"
+                    + " ret000.\"Codigo\" as id,\n"
+                    + " ret000.\"Fantasia\" as descricao,\n"
+                    + " ret000.\"CNPJ\"\n"
+                    + " from ret000\n"
+                    + " order by ret000.\"Codigo\"");
     
     private int idSistema;
     private int idBancoDados;

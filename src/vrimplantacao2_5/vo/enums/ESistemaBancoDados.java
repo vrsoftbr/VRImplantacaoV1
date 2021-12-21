@@ -35,6 +35,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_CPLUS(22, "CPLUS", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_DELFI(39, "DELFI", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_DESTRO(40, "DESTRO", 5, "FIREBIRD", "", "", "", 3050),
+    FIREBIRD_DOBESCGA(206, "DOBESCGA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_DSOFT(37, "DSOFT", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_ETICA(48, "ETICA", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_FACILITE(52, "FACILITE", 5, "FIREBIRD", "", "", "", 3050),
