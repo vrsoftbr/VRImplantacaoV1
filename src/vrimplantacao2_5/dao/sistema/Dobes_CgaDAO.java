@@ -26,6 +26,8 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao.vo.vrimplantacao.OfertaVO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -42,9 +44,10 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
  *
  * @author Desenvolvimento
  */
-public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
-    
+public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
+
     private String lojaCliente;
+    public String complemento;
 
     public String getLojaCliente() {
         return this.lojaCliente;
@@ -52,24 +55,26 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
 
     @Override
     public String getSistema() {
-        return "Dobes CGA";
+        return "Dobes CGA" + complemento;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "ret016.\"ALIQCod\",\n"
-                    + "ret016.\"ALIQDesc\",\n"
-                    + "ret016.\"ALIQNFPerc\",\n"
-                    + "ret016.\"ALIQRedNF\",\n"
-                    + "ret016.\"ALIQPerc\",\n"
-                    + "CASE WHEN ret016.\"ALIQRedNF\" > 0 THEN 20\n"
-                    + "ELSE 0 END cst\n"
-                    + "from ret016\n"
-                    + "order by ret016.\"ALIQCod\" ASC"
+                    "SELECT\n"
+                    + "	ret016.\"ALIQCod\",\n"
+                    + "	ret016.\"ALIQDesc\",\n"
+                    + "	ret016.\"ALIQNFPerc\",\n"
+                    + "	ret016.\"ALIQRedNF\",\n"
+                    + "	ret016.\"ALIQPerc\",\n"
+                    + "	CASE\n"
+                    + "		WHEN ret016.\"ALIQRedNF\" > 0 THEN 20\n"
+                    + "		ELSE 0\n"
+                    + "	END cst\n"
+                    + "FROM ret016\n"
+                    + "ORDER BY ret016.\"ALIQCod\" ASC"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -85,7 +90,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return result;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -99,6 +104,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
@@ -125,14 +131,47 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
                     OpcaoProduto.FORCAR_ATUALIZACAO,}
         ));
     }
-    
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
+        ));
+    }
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret011.\"SUBCod\", ret011.\"SUBDesc\" "
-                    + "from ret011"
+                    "SELECT\n"
+                    + "	ret011.\"SUBCod\",\n"
+                    + "	ret011.\"SUBDesc\"\n"
+                    + "FROM\n"
+                    + "	ret011"
             )) {
                 while (rst.next()) {
                     if ((rst.getString("SUBDesc") != null)
@@ -149,18 +188,26 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret018.\"SECCod\", ret018.\"SECDesc\", ret019.\"GRUCod\",\n"
-                    + "ret019.\"GRUDesc\", ret020.\"SUBGCod\",ret020.\"SUBGDesc\"\n"
-                    + "from ret018\n"
-                    + "INNER JOIN RET019 ON RET018.\"SECCod\"  = RET019.\"SECCod\"\n"
-                    + "INNER JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
-                    + "order by RET018.\"SECCod\", RET020.\"GRUCod\""
+                    "SELECT\n"
+                    + "	ret018.\"SECCod\",\n"
+                    + "	ret018.\"SECDesc\",\n"
+                    + "	ret019.\"GRUCod\",\n"
+                    + "	ret019.\"GRUDesc\",\n"
+                    + "	ret020.\"SUBGCod\",\n"
+                    + "	ret020.\"SUBGDesc\"\n"
+                    + "FROM\n"
+                    + "	ret018\n"
+                    + "JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
+                    + "JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
+                    + "ORDER BY\n"
+                    + "	RET018.\"SECCod\",\n"
+                    + "	RET020.\"GRUCod\""
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -178,29 +225,54 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
-                    + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
-                    + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
-                    + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
-                    + "ret051.\"PRODBARCod\" ean, ret051.clasfisccod, ret051.natreccod,\n"
-                    + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
-                    + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
-                    + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
-                    + "ret051.tabbcred cstEntrada, al2.\"ALIQNFPerc\" aliqCredito, al2.\"ALIQRedNF\" redCredito,\n"
-                    + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\", \n"
-                    + "ret051.prodcustofinal, ret051.prodcustofinalvenda\n "
-                    + "from RET051\n"
-                    + "left join ret041 on ret041.clasfisccod = ret051.clasfisccod\n"
-                    + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
-                    + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
-                    + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
-                    + "order by ret051.\"PRODCod\""
+                    "SELECT\n"
+                    + "	ret051.\"PRODCod\",\n"
+                    + "	ret051.\"PRODNome\",\n"
+                    + "	ret051.\"PRODNomeRed\",\n"
+                    + "	ret051.\"PRODEtq\",\n"
+                    + "	ret051.\"PRODCadast\",\n"
+                    + "	ret051.\"PRODCusto\",\n"
+                    + "	ret051.\"PRODMargem\",\n"
+                    + "	ret051.\"PRODVenda\",\n"
+                    + "	ret051.\"GRUCod\",\n"
+                    + "	ret051.\"SUBGCod\",\n"
+                    + "	ret051.prodai,\n"
+                    + "	ret051.\"SECCod\",\n"
+                    + "	ret051.\"PRODBARCod\" ean,\n"
+                    + "	ret051.clasfisccod,\n"
+                    + "	ret051.natreccod,\n"
+                    + "	ret051.prodstcofinsent,\n"
+                    + "	ret051.prodstcofins,\n"
+                    + "	ret051.\"SUBCod\",\n"
+                    + "	ret051.prodsdo,\n"
+                    + "	prodqtemb,\n"
+                    + "	ret051.\"ALIQCod\",\n"
+                    + "	ret051.\"TABBCod\" cstSaida,\n"
+                    + "	al1.\"ALIQNFPerc\" aliqDebito,\n"
+                    + "	al1.\"ALIQRedNF\" redDebito,\n"
+                    + "	ret051.aliqcred,\n"
+                    + "	ret051.tabbcred cstEntrada,\n"
+                    + "	al2.\"ALIQNFPerc\" aliqCredito,\n"
+                    + "	al2.\"ALIQRedNF\" redCredito,\n"
+                    + "	ret041.clasfisccod ncm,\n"
+                    + "	ret041.clasfisccest CODCEST,\n"
+                    + "	ret051.\"PRODUnid\",\n"
+                    + "	ret051.prodcustofinal,\n"
+                    + "	ret051.prodcustofinalvenda\n"
+                    + "FROM\n"
+                    + "	RET051\n"
+                    + "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n"
+                    + "LEFT JOIN RET053 ON	RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
+                    + "LEFT JOIN ret016 al1 ON	al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
+                    + "LEFT JOIN ret016 al2 ON	al2.\"ALIQCod\" = ret051.aliqcred\n"
+                    + "ORDER BY\n"
+                    + "	ret051.\"PRODCod\""
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -208,6 +280,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
                     ProdutoIMP imp = new ProdutoIMP();
                     ProdutoBalancaVO produtoBalanca;
                     imp.setImportId(rst.getString("PRODCod"));
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setEan(rst.getString("ean"));
 
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getImportId());
@@ -220,14 +295,12 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
                     if (produtoBalanca != null) {
                         imp.seteBalanca(true);
                         imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        imp.setEan(imp.getImportId());
                     } else {
                         imp.setValidade(0);
                         imp.seteBalanca(false);
                     }
 
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("PRODNome"));
                     imp.setDescricaoReduzida(rst.getString("PRODNomeRed"));
                     imp.setDescricaoGondola(rst.getString("PRODEtq"));
@@ -267,19 +340,20 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "ret052.\"BARCod\",\n"
-                    + "ret052.\"PRODCod\",\n"
-                    + "ret052.barunbxa,\n"
-                    + "ret051.\"PRODUnid\"\n"
-                    + "from RET052\n"
-                    + "inner join ret051 on ret051.\"PRODCod\" = ret052.\"PRODCod\""
+                    "SELECT\n"
+                    + "	ret052.\"BARCod\",\n"
+                    + "	ret052.\"PRODCod\",\n"
+                    + "	ret052.barunbxa,\n"
+                    + "	ret051.\"PRODUnid\"\n"
+                    + "FROM\n"
+                    + "	RET052\n"
+                    + "JOIN ret051 ON ret051.\"PRODCod\" = ret052.\"PRODCod\""
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -295,15 +369,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret154.forcod, ret154.prodcod,\n"
-                    + "ret154.prodbarcod, ret154.codfabricante\n"
-                    + "from RET154"
+                    "SELECT\n"
+                    + "	ret154.forcod,\n"
+                    + "	ret154.prodcod,\n"
+                    + "	ret154.prodbarcod,\n"
+                    + "	ret154.codfabricante\n"
+                    + "FROM\n"
+                    + "	RET154"
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -321,7 +399,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -422,23 +500,59 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret028.\"CLICod\", ret028.\"CLINome\", ret028.\"CLIFantasia\", ret028.\"CLIContato\",\n"
-                    + "ret028.\"CLIEnd\", ret028.\"CLIBairro\", ret028.\"CLICep\", ret501.cidibge, ret501.\"CIDNome\",\n"
-                    + "ret501.ciduf, ret028.\"CLIFone1\", ret028.\"CLIFone2\", ret028.\"CLIFax\", ret028.clicpf,\n"
-                    + "ret028.clirg, ret028.clicnpj, ret028.cliie, ret028.\"CLIInclusao\", ret028.\"CLICadastro\",\n"
-                    + "ret028.\"CLIEmail\", ret028.\"CLINasc\", ret028.clinumero, ret028.clicomplemento, ret028.\"CLICred\", \n"
-                    + "ret028.\"CLIEstCIV\", ret028.clisexo, ret028.\"CLIPai\", ret028.\"CLIMae\", ret028.clicj,\n"
-                    + "ret028.clicjcpf, ret028.clicjrg, ret028.\"CLICJNasc\", ret028.\"CLIObs\", ret028.\"CLIBco1\",\n"
-                    + "ret028.\"CLIAg1\", ret028.\"CLICta1\", ret028.\"CLILIMCred\", ret028.\"CLICPTrab\", ret028.\"CLITrab\",\n"
-                    + "ret028.\"CLICPRenda\", ret028.\"CLITrabFone\", ret028.cliativo, ret028.clilimcc\n"
-                    + "from ret028\n"
-                    + "left join RET501 on RET501.\"CIDCod\"  = ret028.\"CIDCod\" "
+                    "SELECT\n"
+                    + "	ret028.\"CLICod\",\n"
+                    + "	ret028.\"CLINome\",\n"
+                    + "	ret028.\"CLIFantasia\",\n"
+                    + "	ret028.\"CLIContato\",\n"
+                    + "	ret028.\"CLIEnd\",\n"
+                    + "	ret028.\"CLIBairro\",\n"
+                    + "	ret028.\"CLICep\",\n"
+                    + "	ret501.cidibge,\n"
+                    + "	ret501.\"CIDNome\",\n"
+                    + "	ret501.ciduf,\n"
+                    + "	ret028.\"CLIFone1\",\n"
+                    + "	ret028.\"CLIFone2\",\n"
+                    + "	ret028.\"CLIFax\",\n"
+                    + "	ret028.clicpf,\n"
+                    + "	ret028.clirg,\n"
+                    + "	ret028.clicnpj,\n"
+                    + "	ret028.cliie,\n"
+                    + "	ret028.\"CLIInclusao\",\n"
+                    + "	ret028.\"CLICadastro\",\n"
+                    + "	ret028.\"CLIEmail\",\n"
+                    + "	ret028.\"CLINasc\",\n"
+                    + "	ret028.clinumero,\n"
+                    + "	ret028.clicomplemento,\n"
+                    + "	ret028.\"CLICred\",\n"
+                    + "	ret028.\"CLIEstCIV\",\n"
+                    + "	ret028.clisexo,\n"
+                    + "	ret028.\"CLIPai\",\n"
+                    + "	ret028.\"CLIMae\",\n"
+                    + "	ret028.clicj,\n"
+                    + "	ret028.clicjcpf,\n"
+                    + "	ret028.clicjrg,\n"
+                    + "	ret028.\"CLICJNasc\",\n"
+                    + "	ret028.\"CLIObs\",\n"
+                    + "	ret028.\"CLIBco1\",\n"
+                    + "	ret028.\"CLIAg1\",\n"
+                    + "	ret028.\"CLICta1\",\n"
+                    + "	ret028.\"CLILIMCred\",\n"
+                    + "	ret028.\"CLICPTrab\",\n"
+                    + "	ret028.\"CLITrab\",\n"
+                    + "	ret028.\"CLICPRenda\",\n"
+                    + "	ret028.\"CLITrabFone\",\n"
+                    + "	ret028.cliativo,\n"
+                    + "	ret028.clilimcc\n"
+                    + "FROM\n"
+                    + "	ret028\n"
+                    + "LEFT JOIN RET501 ON	RET501.\"CIDCod\" = ret028.\"CIDCod\""
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -564,16 +678,26 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
             }
         }
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ret010.\"CLICod\", ret010.\"CCTCupom\", ret010.cctecf, ret010.\"CCTData\",\n"
-                    + "ret010.cctvcto, ret010.\"CCTDebito\", ret010.cctobs, ret010.\"CCTPgto\", ret010.\"CCTCod\"\n"
-                    + "from ret010\n"
-                    + "where ret010.\"CCTPG\" = 'N'"
+                    "SELECT\n"
+                    + "	ret010.\"CLICod\",\n"
+                    + "	ret010.\"CCTCupom\",\n"
+                    + "	ret010.cctecf,\n"
+                    + "	ret010.\"CCTData\",\n"
+                    + "	ret010.cctvcto,\n"
+                    + "	ret010.\"CCTDebito\",\n"
+                    + "	ret010.cctobs,\n"
+                    + "	ret010.\"CCTPgto\",\n"
+                    + "	ret010.\"CCTCod\"\n"
+                    + "FROM\n"
+                    + "	ret010\n"
+                    + "WHERE\n"
+                    + "	ret010.\"CCTPG\" = 'N'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -591,7 +715,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> vResult = new ArrayList<>();
@@ -600,12 +724,22 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "    p.\"FORCod\"||' - '||p.\"PAGDoc\"||' - '||p.\"PAGParc\" id,\n"
-                    + "    p.\"FORCod\", f.\"FORRazao\", f.forcnpj, p.\"PAGDoc\", p.\"PAGParc\", p.\"PAGPgto\",\n"
-                    + "    p.\"PAGDup\", p.pagcmp, p.\"PAGVcto\", p.pagvlr, p.\"PAGJuros\", p.\"PAGDesc\", p.pagobs\n"
+                    + "    p.\"FORCod\",\n"
+                    + "    f.\"FORRazao\", \n"
+                    + "    f.forcnpj, \n"
+                    + "    p.\"PAGDoc\", \n"
+                    + "    p.\"PAGParc\", \n"
+                    + "    p.\"PAGPgto\",\n"
+                    + "    p.\"PAGDup\", \n"
+                    + "    p.pagcmp, \n"
+                    + "    p.\"PAGVcto\", \n"
+                    + "    p.pagvlr, \n"
+                    + "    p.\"PAGJuros\", \n"
+                    + "    p.\"PAGDesc\", \n"
+                    + "    p.pagobs\n"
                     + "FROM\n"
                     + "    RET091 p\n"
-                    + "inner join\n"
-                    + "    ret007 f on f.\"FORCod\" = p.\"FORCod\"\n"
+                    + "JOIN ret007 f on f.\"FORCod\" = p.\"FORCod\"\n"
                     + "where\n"
                     + "    p.\"PAGPgto\" is null\n"
                     + "order by\n"
@@ -647,18 +781,32 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select ch.\"CHQCod\", ch.\"CHQBco\", ch.\"CHQConta\", ch.\"CHQAge\", ch.\"CHQNum\",\n"
-                    + "ch.\"CHQVcto\", ch.\"CHQLcto\", ch.\"CHQValor\", ch.\"CLICod\", ch.\"CHQTitular\",\n"
-                    + "ch.\"CHQDoc\", ch.\"CHQObs\", cl.clirg, cl.\"CLIFone1\"\n"
-                    + "from ret033 ch\n"
-                    + "left join ret028 cl on cl.\"CLICod\" = ch.\"CLICod\"\n"
-                    + "where ch.\"CHQBaixa\" is null"
+                    "SELECT\n"
+                    + "	ch.\"CHQCod\",\n"
+                    + "	ch.\"CHQBco\",\n"
+                    + "	ch.\"CHQConta\",\n"
+                    + "	ch.\"CHQAge\",\n"
+                    + "	ch.\"CHQNum\",\n"
+                    + "	ch.\"CHQVcto\",\n"
+                    + "	ch.\"CHQLcto\",\n"
+                    + "	ch.\"CHQValor\",\n"
+                    + "	ch.\"CLICod\",\n"
+                    + "	ch.\"CHQTitular\",\n"
+                    + "	ch.\"CHQDoc\",\n"
+                    + "	ch.\"CHQObs\",\n"
+                    + "	cl.clirg,\n"
+                    + "	cl.\"CLIFone1\"\n"
+                    + "FROM\n"
+                    + "	ret033 ch\n"
+                    + "LEFT JOIN ret028 cl ON	cl.\"CLICod\" = ch.\"CLICod\"\n"
+                    + "WHERE\n"
+                    + "	ch.\"CHQBaixa\" IS NULL"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -681,7 +829,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
         }
         return vResult;
     }
-    
+
     public void importarOfertas(int idLojaVR, int idLojaCliente, String impLoja) throws Exception {
         ProgressBar.setStatus("Carregando dados das ofertas");
         List<OfertaVO> ofertas = carregarOfertas(idLojaVR, idLojaCliente);
@@ -693,12 +841,15 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider{
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    ret051.\"PRODCod\", ret051.\"PRODVendaPR\",\n"
-                    + "    ret051.\"PRODPromoIN\", ret051.\"PRODPromoFM\"\n"
-                    + "from\n"
-                    + "    ret051\n"
-                    + "where ret051.\"PRODPromoFM\" >= current_date"
+                    "SELECT\n"
+                    + "	ret051.\"PRODCod\",\n"
+                    + "	ret051.\"PRODVendaPR\",\n"
+                    + "	ret051.\"PRODPromoIN\",\n"
+                    + "	ret051.\"PRODPromoFM\"\n"
+                    + "FROM\n"
+                    + "	ret051\n"
+                    + "WHERE\n"
+                    + "	ret051.\"PRODPromoFM\" >= current_date"
             )) {
                 while (rst.next()) {
                     OfertaVO vo = new OfertaVO();

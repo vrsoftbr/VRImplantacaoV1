@@ -56,6 +56,7 @@ public abstract class InternalFrameFactory {
                 break;
             case SYGMA:
                 internalFrame = new Sygma2_5GUI(frame);
+                break;
             case AVISTARE:
                 internalFrame = new Avistare2_5GUI(frame);
                 break;
@@ -114,6 +115,7 @@ public abstract class InternalFrameFactory {
                 break;
             case SYGMA:
                 internalFrame = new Sygma2_5GUI(frame);
+                break;
             case AVISTARE:
                 internalFrame = new Avistare2_5GUI(frame);
                 break;

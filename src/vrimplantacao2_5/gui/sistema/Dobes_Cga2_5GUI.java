@@ -9,19 +9,17 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.controller.sistema.AvistareController;
+import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
-import vrimplantacao2_5.vo.sistema.AvistareVO;
 
 public class Dobes_Cga2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.AVISTARE.getNome();
+    private static final String SISTEMA = ESistema.DOBESCGA.getNome();
     private static Dobes_Cga2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private AvistareVO vo = new AvistareVO();
-    private AvistareController controller = null;
+    private final Dobes_CgaDAO dao = new Dobes_CgaDAO();
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -46,20 +44,6 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
         
         params.salvar();
     }
-
-    private AvistareVO carregarOpcaoesMigracaoSistema() throws Exception {
-        
-        vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
-        
-        if (tabProdutos.edtDtVendaIni.getDate() != null) {
-            vo.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
-        }
-        if (tabProdutos.edtDtVendaFim.getDate() != null) {
-            vo.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-        }
-        
-        return vo;        
-    }
     
     public Dobes_Cga2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -68,30 +52,29 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
         
         carregarParametros();
-
-        controller = new AvistareController();
         
-        tabProdutos.setOpcoesDisponiveis(controller);
-        tabFornecedores.setOpcoesDisponiveis(controller);
-        tabClientes.setOpcoesDisponiveis(controller);
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
-                return controller.dao;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                controller.dao.setComplementoSistema(pnlConn.getComplemento());
-                return controller.dao.getSistema();
+                //dao.setComplementoSistema(pnlConn.getComplemento());
+                //return controller.dao.getSistema();
+                return dao.getSistema();
             }
 
             @Override
             public String getLoja() {
-                controller.setLojaOrigem(pnlConn.getLojaOrigem());
-                return controller.getLojaOrigem();
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -108,7 +91,7 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
             }
         });
         
-        pnlConn.setSistema(ESistema.AVISTARE);
+        pnlConn.setSistema(ESistema.DOBESCGA);
         pnlConn.getNomeConexao();
         
         centralizarForm();
@@ -138,11 +121,8 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-
-                    controller.dao.setComplementoSistema(pnlConn.getComplemento());
-                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
                     
-                    Importador importador = new Importador(controller.dao);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
@@ -150,6 +130,10 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    
+                    if(pnlConn.getComplemento() != null && !pnlConn.getComplemento().isEmpty()) {
+                        dao.complemento = " - " + pnlConn.getComplemento();
+                    }
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:
