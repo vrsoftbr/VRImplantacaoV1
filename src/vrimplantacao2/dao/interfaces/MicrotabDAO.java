@@ -7,12 +7,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoInformix;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -71,37 +76,13 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " SUP003 AS id,\n"
-                    + " DESCRICAO AS descricao\n"
-                    + "FROM SUP003"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    vResult.add(imp);
-                }
-            }
-        }
-        return vResult;
-    }
-
-    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
+                OpcaoProduto.PRODUTOS_BALANCA,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN,
@@ -209,6 +190,100 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	p.ID,\n"
+                    + "	CASE WHEN char_length(p.CODIGO) > 3 THEN substring(p.codigo from 2 for char_length(p.CODIGO))\n"
+                    + "	     ELSE p.CODIGO END ean,\n"
+                    + "	p.DESCRICAO descricaocompleta,\n"
+                    + "	p.DESCRI_REDUZ descricaoreduzida,\n"
+                    + "	p.ID_SETOR idmerc1,\n"
+                    + "	p.ID_SUB_SETOR idmerc2,\n"
+                    + "	p.ID_SUB_SETOR idmerc3,\n"
+                    + "	p.CUSTO_MEDIO custo,\n"
+                    + "	p.VALOR_VAREJO precovenda,\n"
+                    + "	CASE\n"
+                    + "		WHEN p.STATUS = 'A' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END situacaocadastro,\n"
+                    + "	p.UNIDADE,\n"
+                    + "	p.CST,\n"
+                    + "	p.CSOSN,\n"
+                    + "	p.CEST,\n"
+                    + "	p.NCM,\n"
+                    + "	p.ID_ALIQUOTA,\n"
+                    + "	sp.SALDO estoque,\n"
+                    + "	p.DT_ALTERA dtcadastro\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "JOIN ALIQUOTA a ON a.ID = p.ID_ALIQUOTA\n"
+                    + "LEFT JOIN SALDO_PROD sp ON sp.ID_PROD = p.ID\n"
+                    + "WHERE \n"
+                    + " p.codigo LIKE '2%'\n"
+                    + " AND\n"
+                    + " char_length(p.CODIGO) < 7\n"
+                    + " AND \n"
+                    + " char_length(p.CODIGO) > 2"
+            )) {
+
+                while (rst.next()) {
+                    Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+
+                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(0);
+                    }
+
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setDataCadastro(rst.getDate("dtcadastro"));
+                    imp.setCodMercadologico1(rst.getString("idmerc1"));
+                    imp.setCodMercadologico2(rst.getString("idmerc2"));
+                    imp.setCodMercadologico3(rst.getString("idmerc3"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+
+                    imp.setIcmsDebitoId(rst.getString("ID_ALIQUOTA"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("ID_ALIQUOTA"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("ID_ALIQUOTA"));
+                    imp.setIcmsCreditoId(rst.getString("ID_ALIQUOTA"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("ID_ALIQUOTA"));
+                    imp.setIcmsConsumidorId(rst.getString("ID_ALIQUOTA"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -216,7 +291,8 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.ID,\n"
-                    + "	p.CODIGO ean,\n"
+                    + "	CASE WHEN char_length(p.CODIGO) > 3 THEN substring(p.codigo from 2 for char_length(p.CODIGO))\n"
+                    + "	     ELSE p.CODIGO END ean,\n"
                     + "	p.DESCRICAO descricaocompleta,\n"
                     + "	p.DESCRI_REDUZ descricaoreduzida,\n"
                     + "	p.ID_SETOR idmerc1,\n"
@@ -245,7 +321,6 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
