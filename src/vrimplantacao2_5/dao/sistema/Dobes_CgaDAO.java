@@ -47,7 +47,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String lojaCliente;
-    public String complemento;
+    public String complemento = "";
 
     public String getLojaCliente() {
         return this.lojaCliente;
