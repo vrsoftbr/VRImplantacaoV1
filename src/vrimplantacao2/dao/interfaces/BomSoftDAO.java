@@ -28,6 +28,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -293,7 +294,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     String idIcmsDebito;
                     idIcmsDebito = rst.getString("icms_cst") + "-" + rst.getString("icms_aliq") + "-" + rst.getString("icms_red");
-                    
+
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
@@ -381,6 +382,35 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rst.getDate("data_cad"));
                     imp.setAtivo(rst.getBoolean("situacaocadastro"));
                     imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	FORNECEDOR_PXF id_fornecedor,\n"
+                    + "	PRODUTO_PXF id_produto,\n"
+                    + "	1 qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PROXFOR\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setQtdEmbalagem(1);
 
                     result.add(imp);
                 }
@@ -666,7 +696,6 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             rst = stm.executeQuery(sql);
         }
 
-        
         @Override
         public boolean hasNext() {
             obterNext();
