@@ -131,7 +131,10 @@ public class ProdutoRepository {
 
             setNotify("Gravando os produtos...", organizados.size());
             for (ProdutoIMP imp : organizados) {
+                
                 StringBuilder rep = new StringBuilder();
+                imp.setImportSistema(this.provider.getSistema());
+                
                 try {
 
                     rep
@@ -181,6 +184,7 @@ public class ProdutoRepository {
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
                                     anterior.setDataHora(dataImportacao);
+                                  
 
                                     provider.anterior().salvar(anterior);
                                     notificar();
@@ -637,6 +641,7 @@ public class ProdutoRepository {
 
             setNotify("Gravando os produtos (unificação)...", organizados.size());
             for (ProdutoIMP imp : organizados) {
+                imp.setImportSistema(this.provider.getSistema());
                 processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
 

@@ -11,6 +11,7 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Dobes_Cga2_5GUI extends VRInternalFrame {
@@ -68,7 +69,7 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
             public String getSistema() {
                 //dao.setComplementoSistema(pnlConn.getComplemento());
                 //return controller.dao.getSistema();
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -123,6 +124,7 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);
                     
                     Importador importador = new Importador(dao);
+                    
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
@@ -130,10 +132,6 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
-                    if(pnlConn.getComplemento() != null && !pnlConn.getComplemento().isEmpty()) {
-                        dao.complemento = " - " + pnlConn.getComplemento();
-                    }
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:

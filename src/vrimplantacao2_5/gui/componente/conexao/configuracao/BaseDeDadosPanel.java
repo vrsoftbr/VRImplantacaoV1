@@ -12,6 +12,7 @@ import vrimplantacao2_5.controller.componente.ComponenteConexaoController;
 import vrimplantacao2_5.controller.selecaoloja.SelecaoLojaController;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
+import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
@@ -44,18 +45,12 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         initComponents();
         desabilitarBotaoConectar();
         setDadosConexao("");
-        
-        if (conexao != null) {
-            System.out.println("conexão");
-        } else {
-            System.out.println("sem conexão");
-        }
     }
 
     private void setConfiguracao() throws Exception {
         getNomeConexao();
     }
-    
+
     public void setSistema(ESistema sistema) {
         this.sistema = sistema;
     }
@@ -69,28 +64,46 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         return onConectar;
     }
 
-    public void getNomeConexao() throws Exception {
+    /*public void getNomeConexao() throws Exception {
         cboConexao.setModel(new DefaultComboBoxModel());
 
         conexoes = controller.consultar(sistema.getId());
-        
+
         if (conexoes.size() == 0) {
             throw new VRException("Nenhuma conexão cadastrada para o sistema informado!");
         }
-        
+
         for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
-            String complemento = (configuracaoVO.getComplemento() != null && 
-                            !configuracaoVO.getComplemento().isEmpty()) ?
-                            " - COMPLEMENTO: " + configuracaoVO.getComplemento() : "";
-            
-            cboConexao.addItem(new ItemComboVO(configuracaoVO.getId(), 
-                                configuracaoVO.getDescricao() + complemento));
+            String complemento = (configuracaoVO.getComplemento() != null
+                    && !configuracaoVO.getComplemento().isEmpty())
+                    ? " - COMPLEMENTO: " + configuracaoVO.getComplemento() : "";
+
+            cboConexao.addItem(new ItemComboVO(configuracaoVO.getId(),
+                    configuracaoVO.getDescricao() + complemento));
         }
 
         if (conexoes.size() > 0) {
             habilitarBotaoConectar();
         }
-        
+
+        preencheCampoLojaVR();
+    }*/
+
+    public void getNomeConexao() throws Exception {
+        cboConexao.setModel(new DefaultComboBoxModel());
+        cfgVO = controller.getConexao(SelecaoLojaGUI.idConexao);
+
+        if (cfgVO == null) {
+            throw new VRException("Nenhuma conexão cadastrada para o sistema informado!");
+        }
+
+        cboConexao.addItem(new ItemComboVO(cfgVO.getId(),
+                cfgVO.getDescricao()));
+
+        if (cfgVO != null) {
+            habilitarBotaoConectar();
+        }
+
         preencheCampoLojaVR();
     }
 
@@ -123,21 +136,20 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     private void construirConexao() throws VRException, Exception {
         ComponenteConexaoController conexaoController = new ComponenteConexaoController();
-        cfgVO = conexoes.get(cboConexao.getSelectedIndex());
         EBancoDados eBD = EBancoDados.getById(cfgVO.getBancoDados().getId());
 
         conexao = conexaoController.getConexao(eBD);
 
         validaInformacao(eBD);
-        
-        conexao.abrirConexao(cfgVO.getHost(), cfgVO.getPorta(), cfgVO.getSchema(), 
-                                                cfgVO.getUsuario(), cfgVO.getSenha());
+
+        conexao.abrirConexao(cfgVO.getHost(), cfgVO.getPorta(), cfgVO.getSchema(),
+                cfgVO.getUsuario(), cfgVO.getSenha());
 
         btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
         lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/disponivel_12.png")));
 
-        setDadosConexao("SISTEMA " + cfgVO.getSistema().getNome() + 
-                " - BANCO " + cfgVO.getBancoDados().getNome());
+        setDadosConexao("SISTEMA " + cfgVO.getSistema().getNome()
+                + " - BANCO " + cfgVO.getBancoDados().getNome());
 
         atualizarParametros();
 
@@ -147,13 +159,13 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     }
 
     public void fecharConexao() throws Exception {
-        if(conexao != null) {
+        if (conexao != null) {
             lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/parado_12.png")));
-            
+
             conexao.close();
         }
     }
-    
+
     private void validaInformacao(EBancoDados eBD) throws VRException {
         if (cfgVO.getHost().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + eBD + "!");
@@ -171,17 +183,17 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         final String SISTEMA = cfgVO.getSistema().getNome();
         final String ENGINE = cfgVO.getBancoDados().getNome();
-        
+
         params.put(cfgVO.getHost(), SISTEMA, ENGINE, "HOST");
         params.put(cfgVO.getSchema(), SISTEMA, ENGINE, "DATABASE");
         params.put(cfgVO.getPorta(), SISTEMA, ENGINE, "PORTA");
         params.put(cfgVO.getUsuario(), SISTEMA, ENGINE, "USUARIO");
         params.put(cfgVO.getSenha(), SISTEMA, ENGINE, "SENHA");
         params.put(cfgVO.getSistema().getNome(), SISTEMA, ENGINE, "SISTEMA");
-        
+
         params.salvar();
     }
 
@@ -217,19 +229,19 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     public String getSenha() {
         return cfgVO.getSenha();
     }
-    
+
     public String getComplemento() {
         return cfgVO.getComplemento();
     }
-    
+
     public String getLojaOrigem() {
         return configuracaoLojaVO.getIdLojaOrigem();
     }
-    
+
     public int getLojaVR() {
         return configuracaoLojaVO.getIdLojaVR();
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
