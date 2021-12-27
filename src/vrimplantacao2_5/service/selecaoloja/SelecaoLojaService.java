@@ -42,6 +42,18 @@ public class SelecaoLojaService {
         return result;
     }
     
+    public ConfiguracaoBaseDadosVO getConexao(int idConexao) {
+        ConfiguracaoBaseDadosVO result = null;
+        
+        try {
+            result = configuracaoDAO.getConexao(idConexao);
+        } catch (Exception e) {
+            Util.exibirMensagemErro(e, "Seleção de Loja");
+        }
+        
+        return result;
+    }
+    
     public List<ConfiguracaoBancoLojaVO> getLojaMapeada(int idConexao) {
         List<ConfiguracaoBancoLojaVO> lojas = null;
 

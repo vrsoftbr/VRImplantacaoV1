@@ -26,6 +26,7 @@ public class SelecaoLojaGUI extends VRDialog {
     private List<ConfiguracaoBancoLojaVO> lojas = null;
     private List<ConfiguracaoBaseDadosVO> conexoes = null;
     public ConfiguracaoBaseDadosGUI baseDadosGUI = null;
+    public static int idConexao = 0;
     
     /**
      * Creates new form MigracaoGUI
@@ -92,21 +93,10 @@ public class SelecaoLojaGUI extends VRDialog {
         ConfiguracaoBaseDadosVO configuracaoVO = conexoes.get(cboConexao.getSelectedIndex());
         ESistema eSistema = ESistema.getById(configuracaoVO.getSistema().getId());
         
-        VRInternalFrame internalFrame = controller.construirInternalFrame(eSistema, parentFrame);
-        
-        if (internalFrame == null) {
-            throw new VRException("Nenhuma tela encontrada para o sistema informado!");
-        }
-        
-        this.setVisible(false);
-        internalFrame.setVisible(true);
-    }
-
-    private void construirInternalFrame(ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
-        ConfiguracaoBaseDadosVO configuracaoVO = conexoes.get(cboConexao.getSelectedIndex());
-        ESistema eSistema = ESistema.getById(configuracaoVO.getSistema().getId());
-        
-        VRInternalFrame internalFrame = controller.construirInternalFrame(eSistema, parentFrame, baseDadosGui);
+        idConexao = configuracaoVO.getId();
+        VRInternalFrame internalFrame = controller.construirInternalFrame(
+                                                        eSistema, 
+                                                        parentFrame);
         
         if (internalFrame == null) {
             throw new VRException("Nenhuma tela encontrada para o sistema informado!");
@@ -205,7 +195,7 @@ public class SelecaoLojaGUI extends VRDialog {
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
         try {
-            construirInternalFrame(this.baseDadosGUI);
+            construirInternalFrame();
         } catch (Exception ex) {
             ex.printStackTrace();
             Util.exibirMensagemErro(ex, "Seleção de Loja");

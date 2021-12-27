@@ -189,7 +189,7 @@ public class Importador {
      * @return
      */
     public String getSistema() {
-        return interfaceDAO.getSistema();
+        return interfaceDAO.getSistema() + " - " + getIdConexao();
     }
 
     /**
