@@ -205,6 +205,7 @@ import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
+import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
 
@@ -418,9 +419,9 @@ public enum ESistema {
     MRC6(202,"MRC6", new MRC6DAO()),
     BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
     ASSIST(204, "ASSIST", new AssistDAO()),
+    DATABYTE(205, "DATABYTE", new DataByteDAO()),
     DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()),
-    DATABYTE(205, "DATABYTE", new DataByteDAO());
-
+    TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;

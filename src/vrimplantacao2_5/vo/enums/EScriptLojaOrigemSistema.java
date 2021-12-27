@@ -60,7 +60,14 @@ public enum EScriptLojaOrigemSistema {
                     + " ret000.\"CNPJ\"\n"
                     + " from ret000\n"
                     + " order by ret000.\"Codigo\""),
-    DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL");
+    DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
+    TENTACULO(207, 5,
+            "SELECT "
+            + "	EMP_CODIGO id, "
+            + "	EMP_FANTASIA descricao "
+            + "FROM "
+            + "	EMPRESAS "
+            + "ORDER BY 1");
 
     private int idSistema;
     private int idBancoDados;
