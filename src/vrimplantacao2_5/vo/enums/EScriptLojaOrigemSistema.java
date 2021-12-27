@@ -59,8 +59,9 @@ public enum EScriptLojaOrigemSistema {
                     + " ret000.\"Fantasia\" as descricao,\n"
                     + " ret000.\"CNPJ\"\n"
                     + " from ret000\n"
-                    + " order by ret000.\"Codigo\"");
-    
+                    + " order by ret000.\"Codigo\""),
+    DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL");
+
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;

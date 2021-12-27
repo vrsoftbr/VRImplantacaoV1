@@ -36,7 +36,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel implements Configur
     }
 
     /**
-     * Creates new form ConexaoMySQLPanel
+     * Creates new form ConexaoFirebirdPanel
      */
     public ConexaoFirebirdPanel() {
         initComponents();
