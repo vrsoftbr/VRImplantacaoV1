@@ -64,31 +64,6 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         return onConectar;
     }
 
-    /*public void getNomeConexao() throws Exception {
-        cboConexao.setModel(new DefaultComboBoxModel());
-
-        conexoes = controller.consultar(sistema.getId());
-
-        if (conexoes.size() == 0) {
-            throw new VRException("Nenhuma conexão cadastrada para o sistema informado!");
-        }
-
-        for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
-            String complemento = (configuracaoVO.getComplemento() != null
-                    && !configuracaoVO.getComplemento().isEmpty())
-                    ? " - COMPLEMENTO: " + configuracaoVO.getComplemento() : "";
-
-            cboConexao.addItem(new ItemComboVO(configuracaoVO.getId(),
-                    configuracaoVO.getDescricao() + complemento));
-        }
-
-        if (conexoes.size() > 0) {
-            habilitarBotaoConectar();
-        }
-
-        preencheCampoLojaVR();
-    }*/
-
     public void getNomeConexao() throws Exception {
         cboConexao.setModel(new DefaultComboBoxModel());
         cfgVO = controller.getConexao(SelecaoLojaGUI.idConexao);
