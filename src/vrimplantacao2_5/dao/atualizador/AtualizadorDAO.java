@@ -149,7 +149,6 @@ public class AtualizadorDAO {
                     + "     id_sistema integer NOT NULL,\n"
                     + "     id_bancodados integer NOT NULL,\n"
                     + "     complemento varchar(10) NULL,\n"
-                    + "     CONSTRAINT un_conexao_sistema UNIQUE (id_sistema, complemento),\n"
                     + "     CONSTRAINT fk_id_bancodados FOREIGN KEY (id_bancodados)\n"
                     + "         REFERENCES implantacao2_5.bancodados (id) MATCH SIMPLE\n"
                     + "      ON UPDATE NO ACTION ON DELETE NO ACTION,\n"

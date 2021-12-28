@@ -3834,19 +3834,6 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItem24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem24ActionPerformed
         ContechGUI.exibir(this);
-        /*try {
-            this.setWaitCursor();
-            if (formImportarContech == null || formImportarContech.isClosed()) {
-                formImportarContech = new ContechGUI(this);
-            }
-
-            formImportarContech.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }*/
     }//GEN-LAST:event_jMenuItem24ActionPerformed
 
     private void jMenuItemFMSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemFMSistemasActionPerformed

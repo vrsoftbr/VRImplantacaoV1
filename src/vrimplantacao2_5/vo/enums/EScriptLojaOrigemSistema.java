@@ -67,7 +67,15 @@ public enum EScriptLojaOrigemSistema {
             + "	EMP_FANTASIA descricao "
             + "FROM "
             + "	EMPRESAS "
-            + "ORDER BY 1");
+            + "ORDER BY 1"),
+    CONSINCO(209, 9, "SELECT \n" +
+                    "	nroempresa id,\n" +
+                    "	nomereduzido  || ' - ' || nrocgc || '' || digcgc razao,\n" +
+                    "	fantasia \n" +
+                    "FROM \n" +
+                    "	ge_empresa\n" +
+                    "WHERE \n" +
+                    "	status = ''A''");
 
     private int idSistema;
     private int idBancoDados;
