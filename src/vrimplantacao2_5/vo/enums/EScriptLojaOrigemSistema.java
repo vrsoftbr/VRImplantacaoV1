@@ -53,8 +53,13 @@ public enum EScriptLojaOrigemSistema {
             + " cnpj "
             + " from "
             + " entidades"),
-    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao");
-    
+    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
+    FXSISTEMAS(208, 5, "SELECT "
+            + "	e.ID, "
+            + "	e.RAZAO_SOCIAL descricao "
+            + "FROM "
+            + "	EMPRESA e");
+
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;
