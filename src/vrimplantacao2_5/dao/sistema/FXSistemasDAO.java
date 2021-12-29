@@ -216,80 +216,93 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	p.CODPRO id,\n"
-                    + "	p.DESCRICAO descricao,\n"
-                    + "	pd.DESCRICAOCOMPLETA descricao_completa,\n"
-                    + "	pd.REFERENCIA ean,\n"
-                    + "	pd.UNIDMED unidade,\n"
-                    + "	CASE\n"
-                    + "	  WHEN CODSUBGRUPO = 2 THEN 1\n"
-                    + "	  ELSE 0\n"
-                    + "	END e_balanca,\n"
-                    + "	qd_est estoque,\n"
-                    + "	qd_max estmax,\n"
-                    + "	pesobruto,\n"
-                    + "	pd.PESOLIQ pesoliquido,\n"
-                    + "	pd.CUSTOCOMPRA custo,\n"
-                    + "	pd.MARGEM,\n"
-                    + "	pd.PRECO_VIST precovenda,\n"
-                    + "	CASE\n"
-                    + "	  WHEN pd.FLAGINATIVO = 'N' THEN 1\n"
-                    + "	  ELSE 0\n"
-                    + "	END situacaocadastro,\n"
-                    + "	pd.CODNCM ncm,\n"
-                    + " p.CODTABTRIBUT id_icms,\n"
-                    + "	SUBSTRING(t2.CSTCONSU FROM 2 FOR 3) cst_debito,\n"
-                    + "	t2.ALQCONSU aliq_debito,\n"
-                    + "	CASE WHEN t2.BASECONSU <> 0 THEN ((t2.BASECONSU-100)*-1) ELSE t2.BASECONSU END red_debito,\n"
-                    + "	SUBSTRING(t2.CSTENTRADA FROM 2 FOR 3) cst_credito,\n"
-                    + "	t2.ALQENTRADA aliq_credito,\n"
-                    + "	t2.BASEENTRADA red_credito,\n"
-                    + "	pc.CSTPISSAI piscofins_debito,\n"
-                    + "	pc.CSTPISENT piscofins_credito\n"
-                    + "FROM\n"
-                    + "	TPRODUTO p\n"
-                    + "	JOIN TDERIVACAO pd ON pd.CODPRO = p.CODPRO\n"
-                    + "	JOIN TABPISCOF pc ON pc.CODTABPISCOF = p.CODTABPISCOF\n"
-                    + "	JOIN TABTRIBUT t1 ON t1.CODTABTRIBUT = p.CODTABTRIBUT \n"
-                    + "	JOIN TABTRIBUTUF t2 ON t2.CODTABTRIBUT = t1.CODTABTRIBUT \n"
-                    + "WHERE\n"
-                    + "	t2.TABUF = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                    + "	p.ID Id,\n"
+                    + "	p.DATA_CADASTRO dataCadastro,\n"
+                    + "	p.DATA_ALTERACAO dataAlteracao,\n"
+                    + "	p.COD_BARRAS ean,\n"
+                    + "	'1' as qtdEmbalagem,\n"
+                    + "	e.DESCRICAO tipoEmbalagem,\n"
+                    + "	p.BALANCA e_balanca,\n"
+                    + "	p.DESCRICAO descricaoCompleta,\n"
+                    + "	p.DESCRICAO_FISCAL descricaoReduzida,\n"
+                    + "	p.DESCRICAO descricaoGondola,    \n"
+                    + "    SUBSTRING (gp.ID FROM 1 FOR 2 ) codMercadologico1,\n"
+                    + "    SUBSTRING (gp.ID FROM 4 FOR 5 ) codMercadologico2,\n"
+                    + "    SUBSTRING (gp.ID FROM 4 FOR 5 ) codMercadologico3,\n"
+                    + "    p.PESO_BRUTO pesoBruto,\n"
+                    + "    p.PESO_LIQUIDO pesoLiquido,\n"
+                    + "    pe.ESTOQUE_MAXIMO estoqueMaximo,\n"
+                    + "    pe.ESTOQUE_MINIMO estoqueMinimo,\n"
+                    + "    pe.ESTOQUE_ATUAL estoque,\n"
+                    + "    p.MARGEM_LUCRO_BRUTO margem,\n"
+                    + "    p.PRECO_CUSTO_LIQUIDO custoSemImposto, \n"
+                    + "    p.PRECO_CUSTO custoComImposto,\n"
+                    + "    p.PRECO_VENDA precovenda,  \n"
+                    + "    CASE \n"
+                    + "		WHEN STATUS = '0'\n"
+                    + "		THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "    END situacaoCadastro,\n"
+                    + "    p.NCM ncm,\n"
+                    + "    p.ID_CEST cest, \n"
+                    + "    p.PIS_COFINS_CST piscofinsCstDebito,\n"
+                    + "    p.PIS_COFINS_CST_ENTRADA piscofinsCstCredito,\n"
+                    + "    P.PIS_COFINS_NATUREZA_RECEITA piscofinsNaturezaReceita,\n"
+                    + "    p.ALIQ_ICMS icmsAliqEntrada,\n"
+                    + "    p.BASEREDPERC_ICMS icmsReducaoEntrada, \n"
+                    + "    p.CST_SAIDA icmsCstSaida,\n"
+                    + "    p.BASEREDPERC_ICMS icmsReducaoSaida,\n"
+                    + "    p.CST_SAIDA_EXT icmsCstSaidaForaEstado\n"
+                    + "FROM PRODUTO p \n"
+                    + "LEFT JOIN FNC_EMBALAGENS e ON p.ID_EMBALAGENS = e.ID \n"
+                    + "LEFT JOIN GRUPO_PRODUTOS gp ON p.GRUPO_PRODUTOS = gp.ID \n"
+                    + "LEFT JOIN PRODUTO_ESTOQUE pe ON p.ID = pe.ID_PRODUTO \n"
+                    + "WHERE pe.ID_EMPRESA = " + getLojaOrigem() + "\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
 
-                    imp.setImportId(rs.getString("id"));
+                    imp.setImportId(rs.getString("Id"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricao_completa"));
-                    imp.setDescricaoReduzida(rs.getString("descricao"));
+                    imp.setDescricaoCompleta(rs.getString("descricaoCompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
                     imp.seteBalanca(rs.getBoolean("e_balanca"));
+                    imp.setDataCadastro(rs.getDate("dataCadastro"));
+                    imp.setDataAlteracao(rs.getDate("dataAlteracao"));
 
+                    imp.setCodMercadologico1("codMercadologico1");
+                    imp.setCodMercadologico2("codMercadologico2");
+                    imp.setCodMercadologico3("codMercadologico3");
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMaximo(rs.getDouble("estmax"));
-                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoqueMaximo"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoqueMinimo"));
+                    imp.setPesoBruto(rs.getDouble("pesoBruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoLiquido"));
 
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoSemImposto(rs.getDouble("custo"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoSemImposto(rs.getDouble("custoSemImposto"));
+                    imp.setCustoComImposto(rs.getDouble("custoComImposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
 
-                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
+                    imp.setSituacaoCadastro(rs.getInt("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
 
-                    imp.setIcmsDebitoId(rs.getString("id_icms"));
-                    imp.setIcmsCreditoId(rs.getString("id_icms"));
-                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
-                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms"));
-                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_icms"));
-                    imp.setIcmsConsumidorId(rs.getString("id_icms"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqEntrada"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsReducaoEntrada"));
+                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
+                    imp.setIcmsCstSaidaForaEstado(rs.getInt("icmsCstSaidaForaEstado"));
 
-                    imp.setPiscofinsCstDebito(rs.getInt("piscofins_debito"));
-                    imp.setPiscofinsCstCredito(rs.getInt("piscofins_credito"));
+                    imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
+                    imp.setPiscofinsCstCredito(rs.getInt("piscofinsCstCredito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsNaturezaReceita"));
+                    
 
                     result.add(imp);
                 }
@@ -551,7 +564,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN PRODUTO p ON\n"
                     + "	g.ID_PRODUTO = p.ID\n"
                     + "WHERE\n"
-                    + "	ID_EMPRESA = 2\n"
+                    + "	ID_EMPRESA = " + getLojaOrigem() + "\n"
                     + "	AND DATA_INICIAL <= 'now' AND NOVO_VALOR < p.PRECO_VENDA\n"
                     + "ORDER BY 1, 2"
             )) {
@@ -679,7 +692,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	fcp.id id,\n"
                     + "	ID_FORNECEDOR idFornecedor,\n"
@@ -691,19 +704,19 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM \n"
                     + "	FNC_CONTAS_PAGAR fcp \n"
                     + "JOIN FOR_CLI fc ON fcp.ID_FORNECEDOR = fc.ID \n"
-                    + "WHERE ID_EMPRESA = 2\n"
+                    + "WHERE ID_EMPRESA = " + getLojaOrigem() + "\n"
                     + "AND fcp.SITUACAO = 0\n"
                     + "ORDER BY 1"
             )) {
-                while (rst.next()) {
+                while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    imp.setId(rst.getString("id"));
-                    imp.setIdFornecedor(rst.getString("idFornecedor"));
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idFornecedor"));
                     imp.setCnpj("CNPJ");
                     imp.setNumeroDocumento("numeroDocumento");
-                    imp.setDataEmissao(rst.getDate("dataEmissao"));
-                    imp.setDataEntrada(rst.getTimestamp("dataEntrada"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataEmissao(rs.getDate("dataEmissao"));
+                    imp.setDataEntrada(rs.getTimestamp("dataEntrada"));
+                    imp.setValor(rs.getDouble("valor"));
 
                     result.add(imp);
                 }
