@@ -613,6 +613,9 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clilimite limite\n"
                     + "from \n"
                     + "	cliente c")) {
+                
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -634,8 +637,15 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rs.getString("cep"));
                     imp.setUf(rs.getString("uf"));
                     imp.setTelefone(rs.getString("telefone"));
-                    imp.setDataCadastro(rs.getDate("cadastro"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    
+                    if(rs.getString("cadastro") != null && !rs.getString("cadastro").isEmpty()) {
+                        imp.setDataCadastro(sdf.parse(rs.getString("cadastro")));
+                    }
+                    
+                    if(rs.getString("nascimento") != null && !rs.getString("nascimento").isEmpty()) {
+                        imp.setDataNascimento(sdf.parse(rs.getString("nascimento")));
+                    }
+                    
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setValorLimite(rs.getDouble("limite"));
                     
