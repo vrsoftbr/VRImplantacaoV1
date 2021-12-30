@@ -446,7 +446,7 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANs();
         ProdutoDAO dao = new ProdutoDAO();
-        dao.setImportSistema(getInterfaceDAO().getSistema());
+        dao.setImportSistema(getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
