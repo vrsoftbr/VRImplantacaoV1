@@ -35,11 +35,10 @@ public class UniplusDAO extends InterfaceDAO {
 
     private String complemento = "";
     private TabelaPreco tabelaPreco = TabelaPreco.TABELA_FORMACAO_PRECO_PRODUTO;
-            
+
     public boolean DUN14Atacado = false;
     public boolean NewEan = false;
     public boolean ProdutoFornecedorNotas = false;
-    
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -122,7 +121,7 @@ public class UniplusDAO extends InterfaceDAO {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with merc as (\n" +
+                    /*"with merc as (\n" +
                     "select\n" +
                     "	codigo,\n" +
                     "	trim(substring(rpad(codigo,30,' '),1,6)) merc1,\n" +
@@ -168,11 +167,21 @@ public class UniplusDAO extends InterfaceDAO {
                     "		m4.merc1 = m5.merc1 and\n" +
                     "		m4.merc2 = m5.merc2 and\n" +
                     "		m4.merc3 = m5.merc3 and\n" +
-                    "		m4.merc4 = m5.merc4"
+                    "		m4.merc4 = m5.merc4"*/
+                    "select\n"
+                    + "	codigo merc1,\n"
+                    + "	nome merc1_desc,\n"
+                    + "	codigo merc2,\n"
+                    + "	nome merc2_desc,\n"
+                    + "	codigo merc3,\n"
+                    + "	nome merc3_desc	\n"
+                    + "from\n"
+                    + "	hierarquia h\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setMerc1ID(rs.getString("merc1"));
@@ -180,11 +189,11 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("merc2_desc"));
                     imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("merc3_desc"));
+                    imp.setMerc3Descricao(rs.getString("merc3_desc"));/*
                     imp.setMerc4ID(rs.getString("merc4"));
                     imp.setMerc4Descricao(rs.getString("merc4_desc"));
                     imp.setMerc5ID(rs.getString("merc5"));
-                    imp.setMerc5Descricao(rs.getString("merc5_desc"));
+                    imp.setMerc5Descricao(rs.getString("merc5_desc"));*/
 
                     result.add(imp);
                 }
@@ -223,116 +232,120 @@ public class UniplusDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with \n" +
-                    "saldoestoque as (\n" +
-                    "	select\n" +
-                    "	distinct on (idfilial, idproduto,codigoproduto)\n" +
-                    "		idfilial,\n" +
-                    "		idproduto,\n" +
-                    "		codigoproduto,\n" +
-                    "		TO_CHAR(TO_TIMESTAMP(currenttimemillis / 1000), 'DD/MM/YYYY HH24:MI:SS') ultimaalteracao,\n" +
-                    "		quantidade\n" +
-                    "	from\n" +
-                    "		saldoestoque\n" +
-                    "	order by \n" +
-                    "		idfilial,\n" +
-                    "		idproduto,\n" +
-                    "		codigoproduto,\n" +
-                    "		currenttimemillis desc\n" +
-                    ")\n" +
-                    "select \n" +
-                    "	p.id,\n" +
-                    "	p.codigo, \n" +
-                    "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n" +
-                    "	p.inativo, \n" +
-                    "	p.diasvencimento as validade,\n" +
-                    "	p.nome as descricaocompleta, \n" +
-                    "	p.nomeecf as descricaoreduzida, \n" +
-                    "	p.nome as descricaogondola, \n" +
-                    "	p.datacadastro, \n" +
-                    "	p.unidademedida as unidade, \n" +
-                    "	1 qtdembalagem, \n" +
-                    "	p.custoindireto custooperacional,\n" +
-                    "	p.percentuallucroajustado margemlucro,\n" +
-                    "	fp.codigo codigofamilia,\n" +
-                    "	p.percentualmarkupajustado margem,\n" +
-                    "	pr1.precoultimacompra csimp,\n" +
-                    "	pr1.precocusto ccimp,\n" +
-                    "	p.precocusto cbkp,\n" +
-                    "	coalesce(pr1.precoultimacompra, p.precocusto) custosemimposto,\n" +
-                    "	coalesce(pr1.precocusto, p.precocusto) custocomimposto,	\n" +
-                    "	pr1.preco p1,\n" +
-                    "	pr2.preco p2,\n" +
-                    "	p.preco pbkp,\n" +
-                    "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda1,\n" +
-                    "	coalesce(pr2.preco, pr1.preco, p.preco) as precovenda2,\n" +
-                    "	p.quantidademinima, \n" +
-                    "	p.quantidademaxima, \n" +
-                    "	e.quantidade, \n" +
-                    "	p.tributacao, \n" +
-                    "	p.situacaotributaria as cst, \n" +
-                    "	p.cstpis, \n" +
-                    "	p.cstcofins, \n" +
-                    "	p.cstpisentrada, \n" +
-                    "	p.icmsentrada as icmscredito, \n" +
-                    "	p.icmssaida as icmsdebito, \n" +
-                    "	p.aliquotaicmsinterna, \n" +
-                    "	p.pesavel, \n" +
-                    "	p.ncm, \n" +
-                    "	p.idcest, \n" +
-                    "	cest.codigo as cest, \n" +
-                    "	p.cstpisentrada, \n" +
-                    "	p.cstpis, \n" +
-                    "	p.idfamilia, \n" +
-                    "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n" +
-                    "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n" +
-                    "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n" +
-                    "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n" +
-                    "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n" +
-                    "	r.codigo naturezareceita\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "	join filial f on\n" +
-                    "		f.id = " + getLojaOrigem() + "\n" +
-                    "	left join formacaoprecoproduto pr1 on\n" +
-                    "		pr1.idproduto = p.id and\n" +
-                    "		pr1.idfilial = f.id\n" +
-                    "	left join preco pr2 on\n" +
-                    "		pr2.produto = p.codigo and\n" +
-                    "		pr2.filial = f.codigo \n" +
-                    "	left join saldoestoque e on\n" +
-                    "		e.idproduto = p.id and\n" +
-                    "		e.codigoproduto = p.codigo and\n" +
-                    "		e.idfilial = f.id\n" +
-                    "	left join cest on\n" +
-                    "		cest.id = p.idcest\n" +
-                    "	left join receitasemcontribuicao r on\n" +
-                    "		p.idreceitasemcontribuicao = r.id\n" +
-                    "	left join familiaproduto fp on\n" +
-                    "	        p.idfamilia::bigint = fp.codigo::bigint\n" +
-                    "    left join hierarquia merc on\n" +
-                    "    	p.idhierarquia = merc.id\n" +
-                    "order by \n" +
-                    "	p.id"
+                    "with \n"
+                    + "saldoestoque as (\n"
+                    + "	select\n"
+                    + "	distinct on (idfilial, idproduto,codigoproduto)\n"
+                    + "		idfilial,\n"
+                    + "		idproduto,\n"
+                    + "		codigoproduto,\n"
+                    + "		TO_CHAR(TO_TIMESTAMP(currenttimemillis / 1000), 'DD/MM/YYYY HH24:MI:SS') ultimaalteracao,\n"
+                    + "		quantidade\n"
+                    + "	from\n"
+                    + "		saldoestoque\n"
+                    + "	order by \n"
+                    + "		idfilial,\n"
+                    + "		idproduto,\n"
+                    + "		codigoproduto,\n"
+                    + "		currenttimemillis desc\n"
+                    + ")\n"
+                    + "select \n"
+                    + "	p.id,\n"
+                    + "	p.codigo, \n"
+                    + "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n"
+                    + "	p.inativo, \n"
+                    + "	p.diasvencimento as validade,\n"
+                    + "	p.nome as descricaocompleta, \n"
+                    + "	p.nomeecf as descricaoreduzida, \n"
+                    + "	p.nome as descricaogondola, \n"
+                    + "	p.datacadastro, \n"
+                    + "	p.unidademedida as unidade, \n"
+                    + "	1 qtdembalagem, \n"
+                    + "	p.custoindireto custooperacional,\n"
+                    + "	p.lucrobruto margemlucro,\n"
+                    + "	fp.codigo codigofamilia,\n"
+                    + "	p.percentualmarkupajustado margem,\n"
+                    + "	pr1.precoultimacompra csimp,\n"
+                    + "	pr1.precocusto ccimp,\n"
+                    + "	p.precocusto cbkp,\n"
+                    + "	coalesce(pr1.precoultimacompra, p.precocusto) custosemimposto,\n"
+                    + "	coalesce(pr1.precocusto, p.precocusto) custocomimposto,	\n"
+                    + "	pr1.preco p1,\n"
+                    + "	pr2.preco p2,\n"
+                    + "	p.preco pbkp,\n"
+                    + "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda1,\n"
+                    + "	coalesce(pr2.preco, pr1.preco, p.preco) as precovenda2,\n"
+                    + "	p.quantidademinima, \n"
+                    + "	p.quantidademaxima, \n"
+                    + "	e.quantidade, \n"
+                    + "	p.tributacao, \n"
+                    + "	p.situacaotributaria as cst, \n"
+                    + " p.tributacaoespecialnfcesat cst_consumidor,\n"
+                    + "	p.cstpis, \n"
+                    + "	p.cstcofins, \n"
+                    + "	p.cstpisentrada, \n"
+                    + "	p.icmsentrada as icmscredito, \n"
+                    + "	p.icmssaida as icmsdebito, \n"
+                    + "	p.aliquotaicmsinterna, \n"
+                    + "	p.pesavel, \n"
+                    + "	p.ncm, \n"
+                    + "	p.idcest, \n"
+                    + "	cest.codigo as cest, \n"
+                    + "	p.cstpisentrada, \n"
+                    + "	p.cstpis, \n"
+                    + "	p.idfamilia, \n"
+                    + " p.idhierarquia merc1,\n"
+                    + " p.idhierarquia merc2,\n"
+                    + " p.idhierarquia merc3,\n"/*
+                    + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
+                    + "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n"
+                    + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
+                    + "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
+                    + "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n"*/
+                    + "	r.codigo naturezareceita\n"
+                    + "from \n"
+                    + "	produto p\n"
+                    + "	join filial f on\n"
+                    + "		f.id = " + getLojaOrigem() + "\n"
+                    + "	left join formacaoprecoproduto pr1 on\n"
+                    + "		pr1.idproduto = p.id and\n"
+                    + "		pr1.idfilial = f.id\n"
+                    + "	left join preco pr2 on\n"
+                    + "		pr2.produto = p.codigo and\n"
+                    + "		pr2.filial = f.codigo \n"
+                    + "	left join saldoestoque e on\n"
+                    + "		e.idproduto = p.id and\n"
+                    + "		e.codigoproduto = p.codigo and\n"
+                    + "		e.idfilial = f.id\n"
+                    + "	left join cest on\n"
+                    + "		cest.id = p.idcest\n"
+                    + "	left join receitasemcontribuicao r on\n"
+                    + "		p.idreceitasemcontribuicao = r.id\n"
+                    + "	left join familiaproduto fp on\n"
+                    + "	        p.idfamilia::bigint = fp.codigo::bigint\n"
+                    + "    left join hierarquia merc on\n"
+                    + "    	p.idhierarquia = merc.id\n"
+                    + "order by \n"
+                    + "	p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
                     imp.setIdFamiliaProduto(rs.getString("codigofamilia"));
 
-                    imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? 
-                            SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
-                    
+                    imp.setSituacaoCadastro(rs.getInt("inativo") == 1
+                            ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
 
                     ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rs.getString("ean")));
-                    
+
                     if (bal == null) {
                         imp.setEan(rs.getString("ean"));
                         imp.seteBalanca(rs.getBoolean("pesavel"));
@@ -355,8 +368,7 @@ public class UniplusDAO extends InterfaceDAO {
                     } else {
                         imp.setPrecovenda(rs.getDouble("precovenda2"));
                     }
-                    imp.setMargem(rs.getDouble("margem"));
-
+                    
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
@@ -368,7 +380,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("aliquotaicmsinterna"));
 
                     imp.setIcmsAliqConsumidor(rs.getDouble("aliquotaicmsinterna"));
-                    imp.setIcmsCstConsumidor(rs.getInt("cst"));
+                    imp.setIcmsCstConsumidor(rs.getInt("cst_consumidor"));
                     imp.setIcmsReducaoConsumidor(0);
 
                     imp.setPiscofinsCstCredito(rs.getString("cstpisentrada"));
@@ -378,8 +390,8 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setCodMercadologico4(rs.getString("merc4"));
-                    imp.setCodMercadologico5(rs.getString("merc5"));
+                    //imp.setCodMercadologico4(rs.getString("merc4"));
+                    //imp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     result.add(imp);
@@ -451,8 +463,8 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	nfi.referenciafornecedor referenciafornecedor\n"
                         + "from \n"
                         + "	notafiscalitem nfi\n"
-                        + "	join notafiscal nf 		on 		nf.id = nfi.idnotafiscal\n"
-                        + "	join entidade f			on 		f.id = nf.identidade\n"
+                        + "	join notafiscal nf on nf.id = nfi.idnotafiscal\n"
+                        + "	join entidade f	on f.id = nf.identidade\n"
                         + "where\n"
                         + "	nfi.referenciafornecedor != ''\n"
                         + "order by\n"
@@ -655,7 +667,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "left join\n"
                     + "	estado est on est.id = e.idestado\n"
                     + "where\n"
-                    + "	e.fornecedor = 1\n"
+                    + "	e.fornecedor = " + getLojaOrigem() + "\n"
                     + "	or e.id in (select distinct identidade from financeiro where tipo = 'P')\n"
                     + "order by\n"
                     + "	e.codigo::integer")) {
@@ -721,7 +733,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + " es.codigo estado,\n"
                     + "	e.cep,\n"
                     + "	e.telefone,\n"
-                    + "	e.celular,\n"
+                    + "	replace (e.celular,'0xx','') celular,\n"
                     + "	e.fax,\n"
                     + "	e.email,\n"
                     + "	e.nascimento,\n"
@@ -735,7 +747,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "left join\n"
                     + "	estado es on c.idestado = es.id\n"
                     + "where\n"
-                    + "	e.cliente = 1\n"
+                    + "	e.cliente = " + getLojaOrigem() + "\n"
                     + "order by\n"
                     + "	e.codigo::integer")) {
                 while (rs.next()) {
@@ -967,10 +979,10 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataEntrada(rst.getDate("entrada"));
                     imp.setObservacao(
                             new StringBuilder(rst.getString("tipodocumento"))
-                            .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor") : "")
-                            .append(" - ")
-                            .append(rst.getString("observacao"))
-                            .toString()
+                                    .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor") : "")
+                                    .append(" - ")
+                                    .append(rst.getString("observacao"))
+                                    .toString()
                     );
                     imp.addVencimento(
                             rst.getDate("vencimento"),
@@ -984,13 +996,13 @@ public class UniplusDAO extends InterfaceDAO {
 
         return result;
     }
-    
+
     public static enum TabelaPreco {
         TABELA_FORMACAO_PRECO_PRODUTO,
         TABELA_PRECO;
 
         public static TabelaPreco getByOrdinal(int ordinal) {
-            for (TabelaPreco preco: values()) {
+            for (TabelaPreco preco : values()) {
                 if (preco.ordinal() == ordinal) {
                     return preco;
                 }
