@@ -432,8 +432,9 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkDUN14Atacado" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNewEan" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTemArquivoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="404" max="32767" attributes="0"/>
+                          <EmptySpace pref="426" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -444,7 +445,9 @@
                           <Component id="chkDUN14Atacado" min="-2" pref="31" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkNewEan" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="155" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="131" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -458,6 +461,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNewEan">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Prefixo + C&#xf3;d."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
                   </Properties>
                 </Component>
               </SubComponents>

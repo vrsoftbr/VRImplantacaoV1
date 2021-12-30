@@ -99,6 +99,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     uniplusDAO.DUN14Atacado = chkDUN14Atacado.isSelected();
                     uniplusDAO.NewEan = chkNewEan.isSelected();
                     uniplusDAO.ProdutoFornecedorNotas = chkProdutoNota.isSelected();
+                    uniplusDAO.usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
 
                     Importador importador = new Importador(uniplusDAO);
 
@@ -111,6 +112,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     if (tab.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:
+                                uniplusDAO.usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
                                 tabProdutos.executarImportacao();
                                 break;
                             case 1:
@@ -224,6 +226,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         pnlParam = new vrframework.bean.panel.VRPanel();
         chkDUN14Atacado = new vrframework.bean.checkBox.VRCheckBox();
         chkNewEan = new vrframework.bean.checkBox.VRCheckBox();
+        chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -285,20 +288,20 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -472,6 +475,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         chkNewEan.setText("Prefixo + Cód.");
 
+        chkTemArquivoBalanca.setText("Tem Arquivo Balança");
+
         javax.swing.GroupLayout pnlParamLayout = new javax.swing.GroupLayout(pnlParam);
         pnlParam.setLayout(pnlParamLayout);
         pnlParamLayout.setHorizontalGroup(
@@ -480,8 +485,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(404, Short.MAX_VALUE))
+                    .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(426, Short.MAX_VALUE))
         );
         pnlParamLayout.setVerticalGroup(
             pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -490,7 +496,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(131, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parâmetros Extra", pnlParam);
@@ -634,6 +642,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoNota;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
     private javax.swing.ButtonGroup grbPriorizarPreco;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
