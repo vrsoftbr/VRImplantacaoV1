@@ -39,6 +39,7 @@ public class UniplusDAO extends InterfaceDAO {
     public boolean DUN14Atacado = false;
     public boolean NewEan = false;
     public boolean ProdutoFornecedorNotas = false;
+    public boolean usar_arquivoBalanca;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -252,7 +253,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "select \n"
                     + "	p.id,\n"
                     + "	p.codigo, \n"
-                    + "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n"
+                    + " p.ean,"
+                    //+ "	case when p.pesavel = 1 then p.ean else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n"
                     + "	p.inativo, \n"
                     + "	p.diasvencimento as validade,\n"
                     + "	p.nome as descricaocompleta, \n"
@@ -325,16 +327,19 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	        p.idfamilia::bigint = fp.codigo::bigint\n"
                     + "    left join hierarquia merc on\n"
                     + "    	p.idhierarquia = merc.id\n"
+                    + "where length(p.ean) <= 14\n"
                     + "order by \n"
                     + "	p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
+                    imp.setEan(rs.getString("ean"));
                     imp.setIdFamiliaProduto(rs.getString("codigofamilia"));
 
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1
@@ -344,9 +349,27 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
 
-                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rs.getString("ean")));
+                    //ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rs.getString("ean")));
+                    if (usar_arquivoBalanca) {
+                        ProdutoBalancaVO bal = null;
+                        if (imp.getEan() != null && !imp.getEan().isEmpty()){
+                           bal = balanca.get(Utils.stringToInt(imp.getEan(), -2));
+                        } else {
+                            bal = balanca.get(Utils.stringToInt(rs.getString("codigo"), -2));
+                        }
+                      
+                        if (bal != null) {
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                            imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.setTipoEmbalagem(rs.getString("unidade"));
+                            imp.seteBalanca(false);
+                        }
+                    } 
 
-                    if (bal == null) {
+                    /*if (bal == null) {
                         imp.setEan(rs.getString("ean"));
                         imp.seteBalanca(rs.getBoolean("pesavel"));
                         imp.setTipoEmbalagem(rs.getString("unidade"));
@@ -358,8 +381,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                         imp.setQtdEmbalagem(1);
                         //imp.setValidade(rs.getInt(bal.getValidade()));
-                    }
-
+                    }*/
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
@@ -368,7 +390,7 @@ public class UniplusDAO extends InterfaceDAO {
                     } else {
                         imp.setPrecovenda(rs.getDouble("precovenda2"));
                     }
-                    
+
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
