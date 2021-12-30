@@ -197,7 +197,7 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.ID,\n"
-                    + "	CASE WHEN char_length(p.CODIGO) > 3 THEN substring(p.codigo from 2 for char_length(p.CODIGO))\n"
+                    + "	CASE WHEN char_length(p.CODIGO) > 3 THEN substring(p.codigo from 3 for char_length(p.CODIGO))\n"
                     + "	     ELSE p.CODIGO END ean,\n"
                     + "	p.DESCRICAO descricaocompleta,\n"
                     + "	p.DESCRI_REDUZ descricaoreduzida,\n"
@@ -291,8 +291,7 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.ID,\n"
-                    + "	CASE WHEN char_length(p.CODIGO) > 3 THEN substring(p.codigo from 2 for char_length(p.CODIGO))\n"
-                    + "	     ELSE p.CODIGO END ean,\n"
+                    + " p.CODIGO as ean,\n"
                     + "	p.DESCRICAO descricaocompleta,\n"
                     + "	p.DESCRI_REDUZ descricaoreduzida,\n"
                     + "	p.ID_SETOR idmerc1,\n"
@@ -331,11 +330,11 @@ public class MicrotabDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("idmerc2"));
                     imp.setCodMercadologico3(rst.getString("idmerc3"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setEstoque(rst.getDouble("estoque"));
 
                     imp.setIcmsDebitoId(rst.getString("ID_ALIQUOTA"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("ID_ALIQUOTA"));
