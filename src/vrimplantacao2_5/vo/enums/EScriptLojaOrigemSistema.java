@@ -70,10 +70,9 @@ public enum EScriptLojaOrigemSistema {
             + "ORDER BY 1"),
     CONSINCO(209, 9, "SELECT \n" +
                     "	nroempresa id,\n" +
-                    "	nomereduzido  || ' - ' || nrocgc || '' || digcgc razao,\n" +
-                    "	fantasia \n" +
+                    "	nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao\n" +
                     "FROM \n" +
-                    "	ge_empresa\n" +
+                    "	consinco.ge_empresa\n" +
                     "WHERE \n" +
                     "	status = ''A''");
 

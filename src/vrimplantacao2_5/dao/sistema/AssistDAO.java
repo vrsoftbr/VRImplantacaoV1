@@ -19,9 +19,11 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -200,8 +202,8 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.procst cst,\n"
                     + "	p.proassoccf idaliquota,\n"
                     + "	p.prodatacad cadastro,\n"
-                    + "	p.proclfisc cest,\n"
-                    + "	p.proncmsh ncm,\n"
+                    + "	p.proclfisc ncm,\n"
+                    + "	p.proncmsh cest,\n"
                     + "	p.prosittrib situacaotributaria\n"
                     + "from \n"
                     + "	public.file005 p")) {
@@ -574,6 +576,113 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	substring(coalesce(clicpf, clicgc), 0, 4) ||\n"
+                    + "	substring(coalesce(clicpf, clicgc), 9, 4) id,\n"
+                    + "	c.clicpf cnpj,\n"
+                    + " c.clicgc cpf, \n"
+                    + "	c.clistatus status,\n"
+                    + "	c.clirg rgie,\n"
+                    + "	c.clifantasi fantasia,\n"
+                    + "	c.clirazao razao,\n"
+                    + "	c.clienderec endereco,\n"
+                    + "	c.clibairro bairro,\n"
+                    + "	c.clicidcod ibgecidade,\n"
+                    + "	c.clicidade cidade,\n"
+                    + "	c.cliendnum numero,\n"
+                    + "	c.cliendcomp complemento,\n"
+                    + "	c.clicep cep,\n"
+                    + "	c.cliuf uf,\n"
+                    + "	c.clifone1 telefone,\n"
+                    + "	c.clifone2 telefone2,\n"
+                    + "	c.clifax fax,\n"
+                    + "	c.clicadata cadastro,\n"
+                    + "	c.cliconvcgc idempresa,\n"
+                    + "	c.clidatnasc nascimento,\n"
+                    + "	c.clidiavenc vencimento,\n"
+                    + "	c.clihistor1 observacao,\n"
+                    + "	c.clilimite limite\n"
+                    + "from \n"
+                    + "	cliente c")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    
+                    if(imp.getCnpj() == null) {
+                        imp.setCnpj(rs.getString("cpf"));
+                    }
+                    
+                    imp.setInscricaoestadual(rs.getString("rgie"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	distinct\n"
+                    + "	tmvdata lancamento,\n"
+                    + "	substring(tmvorcgcpf, 0, 4) ||\n"
+                    + "	substring(tmvorcgcpf, 9, 4) idcliente,\n"
+                    + "	tmvorclien razao,\n"
+                    + "	tmvnumseq documento,\n"
+                    + "	tmvhorario hora,\n"
+                    + "	substring(tmvtermina, 5, 2) ecf,\n"
+                    + "	tmvlrtotal total \n"
+                    + "from \n"
+                    + "	public.back025 \n"
+                    + "where \n"
+                    + "	tmvorclien != '' and \n"
+                    + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rs.getString("documento"));
+                    imp.setNumeroCupom(imp.getId());
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("lancamento"));
+                    imp.setValor(rs.getDouble("total"));
+
+                    result.add(imp);
+                }    
+            }
+        }
+        
         return result;
     }
 }

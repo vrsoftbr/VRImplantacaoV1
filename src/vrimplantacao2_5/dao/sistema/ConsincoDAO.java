@@ -17,6 +17,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -53,7 +54,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
@@ -79,7 +80,8 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.VENDA_PDV
         ));
     }
     
@@ -118,13 +120,13 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pertributado reducao,\n" +
                     "	situacaonf cst\n" +
                     "from \n" +
-                    "	map_tributacaouf mt\n" +
+                    "	consinco.map_tributacaouf mt\n" +
                     "where \n" +
                     "	ufempresa = 'SP' and \n" +
                     "	ufclientefornec = 'SP' and \n" +
                     "	tiptributacao = 'SN' and \n" +
                     "	nroregtributacao = 2 /*lucro real*/ and \n" +
-                    "	nrotributacao in (select distinct nrotributacao from map_famdivisao)")) {
+                    "	nrotributacao in (select distinct nrotributacao from consinco.map_famdivisao)")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"), 
@@ -154,7 +156,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	seqcategorian2 codmercadologico2,\n" +
                     "	categorian2 descmercadologico2\n" +
                     "from \n" +
-                    "	etlv_categoria")) {
+                    "	consinco.etlv_categoria")) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -185,7 +187,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	seqfamilia id,\n" +
                     "	familia\n" +
                     "from \n" +
-                    "	map_familia")) {
+                    "	consinco.map_familia")) {
                 while(rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                     
@@ -219,12 +221,12 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		mc.cmdiacusliquidoemp custocomimposto,\n" +
                     "		mc.vlrcusbrutovda custobruto\n" +
                     "	   from \n" +
-                    "		mrl_custodia mc \n" +
+                    "		consinco.mrl_custodia mc \n" +
                     "	   where \n" +
                     "		dtaentradasaida = (select \n" +
                     "				     max(dtaentradasaida)\n" +
                     "				from \n" +
-                    "                                mrl_custodia \n" +
+                    "                                consinco.mrl_custodia \n" +
                     "				where\n" +
                     "                               seqproduto = mc.seqproduto and \n" +
                     "                               nroempresa = mc.nroempresa))\n" +
@@ -262,25 +264,25 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		cu.custosemimposto = 0 then\n" +
                     "	round(\n" +
                     "	 nvl(\n" +
-                    "		fmrl_custoultcomprapiscofins(\n" +
+                    "		consinco.fmrl_custoultcomprapiscofins(\n" +
                     "			pre.seqproduto, \n" +
                     "			pre.nroempresa, \n" +
-                    "			nvl(fmad_tipcalcultcompra(pre.nroempresa, 's'), 'l'), \n" +
+                    "			nvl(consinco.fmad_tipcalcultcompra(pre.nroempresa, 's'), 'l'), \n" +
                     "			trunc(sysdate), \n" +
-                    "			nvl(fmad_tipcalcultcompra(pre.nroempresa, 'c'), 's')), 0\n" +
+                    "			nvl(consinco.fmad_tipcalcultcompra(pre.nroempresa, 'c'), 's')), 0\n" +
                     "			) * pre.qtdembalagem, 4) else \n" +
                     "	cu.custosemimposto end custosemimpostotemp,\n" +
                     "	cu.custocomimposto custocomimpostotemp,\n" +
                     "	round(\n" +
                     "	 nvl(\n" +
-                    "		fmrl_custoprodempdata(\n" +
+                    "		consinco.fmrl_custoprodempdata(\n" +
                     "			pre.seqproduto, \n" +
                     "			pre.nroempresa, \n" +
-                    "			nvl(fmad_tipcalcultcompra(pre.nroempresa, 's'), 'l'),\n" +
+                    "			nvl(consinco.fmad_tipcalcultcompra(pre.nroempresa, 's'), 'l'),\n" +
                     "			trunc(sysdate)\n" +
                     "			) * pre.qtdembalagem, 4)) as custocomimposto,\n" +
                     "	round(\n" +
-                    "		fc5margempreco(\n" +
+                    "		consinco.fc5margempreco(\n" +
                     "			pre.seqproduto,\n" +
                     "			pre.nroempresa, \n" +
                     "			pre.nrosegmento, \n" +
@@ -301,44 +303,44 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	fa.situacaonfpissai pisaida,\n" +
                     "	fad.nrotributacao idaliquota,\n" +
                     "	fad.seqcomprador comprador\n" +
-                    "from  \n" +
-                    "	map_produto p\n" +
-                    "join \n" +
-                    "	mad_segmento ms on\n" +
+                    "from \n" +
+                    "	consinco.map_produto p\n" +
+                    "join\n" +
+                    "	consinco.mad_segmento ms on\n" +
                     "	ms.nrosegmento = 1\n" +
-                    "left join \n" +
-                    "	mrl_produtoempresa pe on\n" +
+                    "left join\n" +
+                    "	consinco.mrl_produtoempresa pe on\n" +
                     "	p.seqproduto = pe.seqproduto\n" +
-                    "left join \n" +
-                    "	map_prodcodigo ean on\n" +
+                    "left join\n" +
+                    "	consinco.map_prodcodigo ean on\n" +
                     "	p.seqproduto = ean.seqproduto\n" +
-                    "left join \n" +
-                    "	map_famembalagem mfv on\n" +
+                    "left join\n" +
+                    "	consinco.map_famembalagem mfv on\n" +
                     "	ean.qtdembalagem = mfv.qtdembalagem and \n" +
                     "	ean.seqfamilia = mfv.seqfamilia\n" +
-                    "left join \n" +
-                    "	mrl_prodempseg pre on\n" +
-                    "	p.seqproduto = pre.seqproduto and \n" +
-                    "	pre.nroempresa = pe.nroempresa and \n" +
+                    "left join\n" +
+                    "	consinco.mrl_prodempseg pre on\n" +
+                    "	p.seqproduto = pre.seqproduto and\n" +
+                    "	pre.nroempresa = pe.nroempresa and\n" +
                     "	pre.nrosegmento = ms.nrosegmento\n" +
-                    "left join \n" +
-                    "	map_familia fa on\n" +
+                    "left join\n" +
+                    "	consinco.map_familia fa on\n" +
                     "	p.seqfamilia = fa.seqfamilia\n" +
                     "left join \n" +
-                    "	map_famdivisao fad on\n" +
-                    "	fa.seqfamilia = fad.seqfamilia and \n" +
+                    "	consinco.map_famdivisao fad on\n" +
+                    "	fa.seqfamilia = fad.seqfamilia and\n" +
                     "	fad.nrodivisao = ms.nrodivisao\n" +
-                    "left join \n" +
-                    "	map_famembalagem mf on\n" +
-                    "	fad.seqfamilia = mf.seqfamilia and \n" +
+                    "left join\n" +
+                    "	consinco.map_famembalagem mf on\n" +
+                    "	fad.seqfamilia = mf.seqfamilia and\n" +
                     "	fad.padraoembcompra = mf.qtdembalagem\n" +
-                    "left join \n" +
-                    "	etlv_categoria cat on\n" +
+                    "left join\n" +
+                    "	consinco.etlv_categoria cat on\n" +
                     "	fa.seqfamilia = cat.seqfamilia\n" +
-                    "left join \n" +
-                    "	custos cu on pe.nroempresa = cu.nroempresa and \n" +
+                    "left join\n" +
+                    "	custos cu on pe.nroempresa = cu.nroempresa and\n" +
                     "	pe.seqproduto = cu.seqproduto\n" +
-                    "where \n" +
+                    "where\n" +
                     "	pe.nroempresa = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -401,7 +403,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	seqcomprador id,\n" +
                     "	comprador\n" +
                     "from \n" +
-                    "	max_comprador"
+                    "	consinco.max_comprador"
             )) {
                 while (rst.next()) {
                     result.add(new CompradorIMP(rst.getString("id"), rst.getString("comprador")));
@@ -446,9 +448,9 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   pes.homepage,\n" +
                     "   pes.emailnfe\n" +
                     "from\n" +
-                    "   maf_fornecedor forn\n" +
+                    "   consinco.maf_fornecedor forn\n" +
                     "inner join \n" +
-                    "	ge_pessoa pes ON forn.seqfornecedor = pes.seqpessoa")) {
+                    "	consinco.ge_pessoa pes ON forn.seqfornecedor = pes.seqpessoa")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
@@ -493,7 +495,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setObservacao(rs.getString("observacao"));
                     
-                    String contato = rs.getString("contato");
+                    String contato = rs.getString("nomecontato");
                     
                     if(contato != null && !contato.isEmpty()) {
                         imp.addContato(contato, rs.getString("fonecontato"), null, TipoContato.COMERCIAL, rs.getString("emailcontato"));
@@ -519,10 +521,10 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	fone,\n" +
                     "	celular,\n" +
                     "	fax,\n" +
-                    "	email \n" +
-                    "from \n" +
-                    "	maf_forneccontato"
-                  + "where seqfornecedor = " + imp.getImportId())) {
+                    "	email\n" +
+                    "from\n" +
+                    "	consinco.maf_forneccontato\n" +
+                    "where seqfornecedor = " + imp.getImportId())) {
                 while(rs.next()) {
                     imp.addContato(rs.getString("nomerazao"), 
                             rs.getString("fone"), 
@@ -546,20 +548,20 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	a.nroempresa,\n" +
                     "	f.nomerazao\n" +
                     "from\n" +
-                    "	mrl_prodempresawm a\n" +
-                    "join map_produto b on\n" +
+                    "	consinco.mrl_prodempresawm a\n" +
+                    "join consinco.map_produto b on\n" +
                     "	a.seqproduto = b.seqproduto\n" +
-                    "join map_familia c on\n" +
+                    "join consinco.map_familia c on\n" +
                     "	c.seqfamilia = b.seqfamilia\n" +
-                    "join map_famfornec d on\n" +
+                    "join consinco.map_famfornec d on\n" +
                     "	d.seqfamilia = b.seqfamilia\n" +
-                    "join ge_pessoa f on\n" +
+                    "join consinco.ge_pessoa f on\n" +
                     "	f.seqpessoa = d.seqfornecedor\n" +
                     "	and not exists (\n" +
                     "	select\n" +
                     "		1\n" +
                     "	from\n" +
-                    "		map_produto z\n" +
+                    "		consinco.map_produto z\n" +
                     "	where\n" +
                     "		z.seqprodutosecundario = b.seqproduto)\n" +
                     "where\n" +
@@ -640,14 +642,15 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	gpc.NOMEPAI,\n" +
                     "	gpc.NOMEMAE\n" +
                     "FROM\n" +
-                    "	mrl_cliente c,\n" +
-                    "	ge_pessoa p,\n" +
-                    "	ge_pessoacadastro gpc,\n" +
-                    "	fi_cliente fc\n" +
+                    "	consinco.mrl_cliente c,\n" +
+                    "	consinco.ge_pessoa p,\n" +
+                    "	consinco.ge_pessoacadastro gpc,\n" +
+                    "	consinco.fi_cliente fc\n" +
                     "WHERE\n" +
                     "	p.seqpessoa = c.seqpessoa(+) AND \n" +
                     "	gpc.seqpessoa(+) = c.seqpessoa AND \n" +
-                    "	fc.seqpessoa(+) = c.seqpessoa\n" +
+                    "	fc.seqpessoa(+) = c.seqpessoa and\n" +
+                    "   c.nroempresa = " + getLojaOrigem() + "\n" +        
                     "ORDER BY\n" +
                     "	p.seqpessoa")) {
                 while(rs.next()) {
@@ -659,6 +662,11 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rs.getString("inscricaorg"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setValorLimite(rs.getDouble("limite"));
+                    
+                    if(imp.getValorLimite() > 99999999) {
+                        imp.setValorLimite(0);
+                    }
+                    
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
@@ -667,10 +675,22 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumero(rs.getString("numero"));
                     imp.setDataNascimento(rs.getDate("dtaaniversario"));
                     imp.setDataCadastro(rs.getDate("dtacadastramento"));
-                    imp.setAtivo(rs.getString("statuspessoa").equals("LIBERADO"));
-                    imp.setBloqueado(rs.getString("statusfinanceiro").equals("LIBERADO"));
-                    imp.setSexo(rs.getString("sexo").equals("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                    imp.setTelefone(rs.getString("foneddd1").concat(rs.getString("fonenro1")));
+                    
+                    if(rs.getString("statuspessoa") != null && !rs.getString("statuspessoa").isEmpty()) {
+                        imp.setAtivo(rs.getString("statuspessoa").equals("LIBERADO"));
+                    }
+                    
+                    if(rs.getString("statusfinanceiro") != null && 
+                            !rs.getString("statusfinanceiro").isEmpty() ) {
+                        imp.setBloqueado(rs.getString("statusfinanceiro").equals("LIBERADO"));
+                    }
+                    
+                    if(rs.getString("sexo") != null && !rs.getString("sexo").isEmpty()) {
+                        imp.setSexo(rs.getString("sexo").equals("F") ? 
+                                TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    }
+                    
+                    imp.setTelefone(rs.getString("foneddd1") + "" + rs.getString("fonenro1"));
                     imp.setEmail(rs.getString("email"));
                     
                     result.add(imp);
@@ -714,7 +734,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		SELECT\n" +
                     "			n.situacaocredito\n" +
                     "		FROM\n" +
-                    "			gev_pessoacadastro n\n" +
+                    "			consinco.gev_pessoacadastro n\n" +
                     "		WHERE\n" +
                     "			n.seqpessoa = a.seqpessoa)\n" +
                     "		ELSE NULL\n" +
@@ -743,38 +763,38 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	a.situacao,\n" +
                     "	nvl(a.susplib, 'l') susplib,\n" +
                     "	c.nomerazao nomerazaopessoa,\n" +
-                    "	fif_valor_taxa_admcupom(a.seqtitulo,\n" +
+                    "	consinco.fif_valor_taxa_admcupom(a.seqtitulo,\n" +
                     "	a.vlradministracao,\n" +
                     "	a.taxacupom) vlrtaxas,\n" +
                     "	nvl(b.pctdescfinanc, 0) pctdescfinanc,\n" +
                     "	nvl((SELECT max(fd.percdescfinacordo)\n" +
-                    "            FROM maf_fornecdivisao fd,\n" +
-                    "                   max_empresa me\n" +
+                    "            FROM consinco.maf_fornecdivisao fd,\n" +
+                    "                   consinco.max_empresa me\n" +
                     "            WHERE fd.nrodivisao = me.nrodivisao\n" +
                     "            AND fd.seqfornecedor = a.seqpessoa\n" +
                     "            AND me.nroempresa = a.nroempresa), 0) pctdescacordo,\n" +
                     "	a.seqdepositario,\n" +
                     "	n.descricao depositario\n" +
                     "FROM\n" +
-                    "	fi_titulo a,\n" +
-                    "	fi_compltitulo b,\n" +
-                    "	ge_pessoa c,\n" +
-                    "	fi_titulobco d,\n" +
-                    "	ge_banco j,\n" +
-                    "	fi_especie k,\n" +
-                    "	ge_empresa l,\n" +
-                    "	ge_agencia m,\n" +
-                    "	fi_depositario n\n" +
+                    "	consinco.fi_titulo a,\n" +
+                    "	consinco.fi_compltitulo b,\n" +
+                    "	consinco.ge_pessoa c,\n" +
+                    "	consinco.fi_titulobco d,\n" +
+                    "	consinco.ge_banco j,\n" +
+                    "	consinco.fi_especie k,\n" +
+                    "	consinco.ge_empresa l,\n" +
+                    "	consinco.ge_agencia m,\n" +
+                    "	consinco.fi_depositario n\n" +
                     "WHERE\n" +
-                    "	a.seqtitulo = b.seqtitulo (+)\n" +
+                    "	a.seqtitulo = b.seqtitulo(+)\n" +
                     "	AND a.nrobanco = j.nrobanco\n" +
                     "	AND a.codespecie = k.codespecie\n" +
                     "	AND a.nroempresamae = k.nroempresamae\n" +
                     "	AND a.nroempresa = l.nroempresa\n" +
                     "	AND a.seqtitulo = d.seqtitulo (+)\n" +
                     "	AND a.seqpessoa = c.seqpessoa\n" +
-                    "	AND a.nrobanco = m.nrobanco (+)\n" +
-                    "	AND a.seqagencia = m.seqagencia (+)\n" +
+                    "	AND a.nrobanco = m.nrobanco(+)\n" +
+                    "	AND a.seqagencia = m.seqagencia(+)\n" +
                     "	AND a.seqdepositario = n.seqdepositario\n" +
                     "	AND a.abertoquitado = 'A'\n" +
                     "	AND a.nroempresa = " + getLojaOrigem() + "\n" +
@@ -789,6 +809,126 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("dtavencimento"));
                     imp.setParcela(rs.getInt("nroparcela"));
                     imp.setValor(rs.getDouble("vlremaberto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	(CASE\n" +
+                    "		WHEN b.seqtitulo IS NULL THEN 'CHEQUE'\n" +
+                    "		ELSE 'TITULO'\n" +
+                    "	END) AS tipo,\n" +
+                    "	a.nroempresa,\n" +
+                    "	l.razaosocial AS nomeempresa,\n" +
+                    "	a.nrobanco,\n" +
+                    "	j.razaosocial AS nomebanco,\n" +
+                    "	a.seqagencia,\n" +
+                    "	m.nomeagencia,\n" +
+                    "	a.nrotitulo,\n" +
+                    "	a.vlroriginal,\n" +
+                    "	a.vlrnominal,\n" +
+                    "	a.vlrpago,\n" +
+                    "	a.vlrnominal - a.vlrpago AS vlremaberto,\n" +
+                    "	a.seqpessoa,\n" +
+                    "	a.codespecie,\n" +
+                    "	k.descricao AS descespecie,\n" +
+                    "	a.serietitulo,\n" +
+                    "	a.nroparcela,\n" +
+                    "	a.sitjuridica,\n" +
+                    "	(CASE\n" +
+                    "		WHEN a.obrigdireito = 'd' THEN (\n" +
+                    "		SELECT\n" +
+                    "			n.situacaocredito\n" +
+                    "		FROM\n" +
+                    "			consinco.gev_pessoacadastro n\n" +
+                    "		WHERE\n" +
+                    "			n.seqpessoa = a.seqpessoa)\n" +
+                    "		ELSE NULL\n" +
+                    "	END) AS sitcredito,\n" +
+                    "	a.dtaprogramada,\n" +
+                    "	a.dtaemissao,\n" +
+                    "	a.dtavencimento,\n" +
+                    "	a.dtamovimento,\n" +
+                    "	a.dtamovimento - a.dtaemissao AS dtaviagem,\n" +
+                    "	a.dtaprogramada - a.dtaemissao AS prazoefetivo,\n" +
+                    "	a.seqtitulo,\n" +
+                    "	a.nroempresamae,\n" +
+                    "	a.obrigdireito,\n" +
+                    "	a.nroaltdepositario,\n" +
+                    "	a.nrocarga,\n" +
+                    "	a.acertadacarga,\n" +
+                    "	a.dtacarga,\n" +
+                    "	b.codbarra,\n" +
+                    "	nvl(b.vlrdesccontrato, 0) AS vlrdesccontrato,\n" +
+                    "	b.codigofator,\n" +
+                    "	c.seqpessoa || ' - ' || c.nomerazao AS nomerazao,\n" +
+                    "	c.fisicajuridica,\n" +
+                    "	c.seqcidade,\n" +
+                    "	d.seqctacorrente,\n" +
+                    "	d.codcarteira,\n" +
+                    "	a.situacao,\n" +
+                    "	nvl(a.susplib, 'l') susplib,\n" +
+                    "	c.nomerazao nomerazaopessoa,\n" +
+                    "	consinco.fif_valor_taxa_admcupom(a.seqtitulo,\n" +
+                    "	a.vlradministracao,\n" +
+                    "	a.taxacupom) vlrtaxas,\n" +
+                    "	nvl(b.pctdescfinanc, 0) pctdescfinanc,\n" +
+                    "	nvl((SELECT max(fd.percdescfinacordo)\n" +
+                    "            FROM consinco.maf_fornecdivisao fd,\n" +
+                    "                   consinco.max_empresa me\n" +
+                    "            WHERE fd.nrodivisao = me.nrodivisao\n" +
+                    "            AND fd.seqfornecedor = a.seqpessoa\n" +
+                    "            AND me.nroempresa = a.nroempresa), 0) pctdescacordo,\n" +
+                    "	a.seqdepositario,\n" +
+                    "	n.descricao depositario\n" +
+                    "FROM\n" +
+                    "	consinco.fi_titulo a,\n" +
+                    "	consinco.fi_compltitulo b,\n" +
+                    "	consinco.ge_pessoa c,\n" +
+                    "	consinco.fi_titulobco d,\n" +
+                    "	consinco.ge_banco j,\n" +
+                    "	consinco.fi_especie k,\n" +
+                    "	consinco.ge_empresa l,\n" +
+                    "	consinco.ge_agencia m,\n" +
+                    "	consinco.fi_depositario n\n" +
+                    "WHERE\n" +
+                    "	a.seqtitulo = b.seqtitulo (+)\n" +
+                    "	AND a.nrobanco = j.nrobanco\n" +
+                    "	AND a.codespecie = k.codespecie\n" +
+                    "	AND a.nroempresamae = k.nroempresamae\n" +
+                    "	AND a.nroempresa = l.nroempresa\n" +
+                    "	AND a.seqtitulo = d.seqtitulo (+)\n" +
+                    "	AND a.seqpessoa = c.seqpessoa\n" +
+                    "	AND a.nrobanco = m.nrobanco (+)\n" +
+                    "	AND a.seqagencia = m.seqagencia (+)\n" +
+                    "	AND a.seqdepositario = n.seqdepositario\n" +
+                    "	AND a.abertoquitado = 'A'\n" +
+                    "	AND a.nroempresa = " + getLojaOrigem() + "\n" +
+                    "	AND a.seqdepositario = 2")) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("seqtitulo"));
+                    imp.setNumeroDocumento(rs.getString("nrotitulo"));
+                    imp.setIdFornecedor(rs.getString("seqpessoa"));
+                    imp.setDataEmissao(rs.getDate("dtaemissao"));
+                    imp.setDataEntrada(rs.getDate("dtamovimento"));
+                    
+                    imp.addVencimento(
+                            rs.getDate("dtavencimento"), 
+                            rs.getDouble("vlremaberto"), 
+                            rs.getInt("nroparcela"));
                     
                     result.add(imp);
                 }

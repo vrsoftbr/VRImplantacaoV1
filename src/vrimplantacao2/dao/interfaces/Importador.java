@@ -540,7 +540,7 @@ public class Importador {
         
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         
-        provider.setSistema(getInterfaceDAO().getSistema());
+        provider.setSistema(getSistema());
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setIdConexao(getIdConexao());
@@ -604,7 +604,7 @@ public class Importador {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
-                getInterfaceDAO().getSistema(),
+                getSistema(),
                 getInterfaceDAO().getLojaOrigem(),
                 getLojaVR()
         );

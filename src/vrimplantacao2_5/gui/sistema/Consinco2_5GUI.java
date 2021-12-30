@@ -129,6 +129,7 @@ public class Consinco2_5GUI extends VRInternalFrame {
                     pnlConn.fecharConexao();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
+                    ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
             }
