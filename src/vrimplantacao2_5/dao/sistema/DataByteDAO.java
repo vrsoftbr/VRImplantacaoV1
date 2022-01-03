@@ -106,19 +106,16 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                    "SELECT distinct\n"
                     + " COD_ICMS id,\n"
                     + " ALIQ_ICMS aliquota,\n"
-                    + " SITTRIBUTARIA id\n"
+                    + " SITTRIBUTARIA descricao\n"
                     + "FROM ICMS"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
-                            rst.getString("descricao"),
-                            0,
-                            rst.getFloat("id"),
-                            0
+                            rst.getString("descricao")
                     ));
                 }
             }
@@ -198,7 +195,7 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.SUBSTITUICAO,\n"
                     + " p.CEST cest\n"
                     + " FROM PRODUTOS p\n"
-                    + " JOIN ESTOQUEFILIAL estq ON estq.COD_PROD = p.COD_PROD"
+                    + " JOIN ESTOQUEFILIAL estq ON estq.COD_PROD = p.COD_PROD"//AND ESTQ.COD_FILIAL = "+ getLojaOrigem() +" "
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -207,7 +204,6 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
