@@ -7,13 +7,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -29,9 +33,10 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
-/**
+/*
  *
  * @author Michael
+ *
  */
 public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -198,7 +203,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id_produto"));
+                    imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
@@ -220,6 +225,15 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DATA_CADASTRO dataCadastro,\n"
                     + "	p.DATA_ALTERACAO dataAlteracao,\n"
                     + "	p.COD_BARRAS ean,\n"
+                    + "	CASE \n"
+                    + "	WHEN p.COD_BARRAS LIKE '200%'\n"
+                    + "	THEN SUBSTRING (p.COD_BARRAS FROM 2 FOR 11) \n"
+                    + "	WHEN p.COD_BARRAS LIKE '789%' \n"
+                    + "	THEN SUBSTRING (p.COD_BARRAS FROM 4 FOR 9)\n"
+                    + "	WHEN p.COD_BARRAS = '' \n"
+                    + "	THEN p.id\n"
+                    + "	ELSE p.id \n"
+                    + "	END cod_balanca,\n"
                     + "	'1' as qtdEmbalagem,\n"
                     + "	e.DESCRICAO tipoEmbalagem,\n"
                     + "	p.BALANCA e_balanca,\n"
@@ -252,14 +266,15 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.BASEREDPERC_ICMS icmsReducaoEntrada, \n"
                     + "    p.CST_SAIDA icmsCstSaida,\n"
                     + "    p.BASEREDPERC_ICMS icmsReducaoSaida,\n"
-                    + "    p.CST_SAIDA_EXT icmsCstSaidaForaEstado\n"
+                    + "    COALESCE (p.CST_SAIDA_EXT = NULL, '040') icmsCstSaidaForaEstado\n"
                     + "FROM PRODUTO p \n"
                     + "LEFT JOIN FNC_EMBALAGENS e ON p.ID_EMBALAGENS = e.ID \n"
                     + "LEFT JOIN GRUPO_PRODUTOS gp ON p.GRUPO_PRODUTOS = gp.ID \n"
                     + "LEFT JOIN PRODUTO_ESTOQUE pe ON p.ID = pe.ID_PRODUTO \n"
-                    + "WHERE pe.ID_EMPRESA = " + getLojaOrigem() + "\n"
+                    + "WHERE pe.ID_EMPRESA = " + getLojaOrigem() + " \n"
                     + "ORDER BY 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -302,7 +317,23 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinsCstCredito"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsNaturezaReceita"));
-                    
+
+                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(0);
+                    }
 
                     result.add(imp);
                 }
@@ -346,7 +377,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    OBSERVACOES observacao\n"
                     + "FROM\n"
                     + "	FOR_CLI\n"
-                    + "ORDER BY 1;"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -744,7 +775,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	THEN VALOR \n"
                     + "	ELSE VALOR - VALOR_PAGO \n"
                     + "	END VALOR,\n"
-                    + "	fcr.OBSERVACOES \n"
+                    + "	fcr.OBSERVACOES observacao\n"
                     + "FROM \n"
                     + "	FNC_CONTAS_RECEBER fcr \n"
                     + "JOIN CADCLI c ON fcr.ID_CLIENTE = c.CODIGO \n"

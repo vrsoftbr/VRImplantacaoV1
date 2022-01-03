@@ -116,7 +116,8 @@ public class FXSistemas2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
-                            default: break;
+                            default:
+                                break;
                         }
                     }
 
