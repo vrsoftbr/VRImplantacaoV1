@@ -56,7 +56,7 @@ public enum EScriptLojaOrigemSistema {
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
     FXSISTEMAS(208, 5, "SELECT "
             + "	e.ID, "
-            + "	e.RAZAO_SOCIAL descricao "
+            + "	e.RAZAO_SOCIAL empresa "
             + "FROM "
             + "	EMPRESA e");
 

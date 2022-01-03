@@ -55,12 +55,19 @@ public class FXSistemas2_5GUIPadrao extends VRInternalFrame {
         
         params.salvar();
     }
-
+    
     private FXSistemasVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
         vo.setProdutosBalancaIniciaCom20(chkProdProdutoBalancaIniciaCom20.isSelected());
         vo.setProdutosBalancaIniciaCom789(chkProdProdutoBalancaIniciaCom789.isSelected());
+        
+        if (tabProdutos.edtDtVendaIni.getDate() != null) {
+            vo.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+        }
+        if (tabProdutos.edtDtVendaFim.getDate() != null) {
+            vo.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+        }
         
         return vo;        
     }

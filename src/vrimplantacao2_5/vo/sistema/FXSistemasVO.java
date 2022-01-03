@@ -5,6 +5,8 @@
  */
 package vrimplantacao2_5.vo.sistema;
 
+import java.util.Date;
+
 /**
  *
  * @author Michael
@@ -14,6 +16,8 @@ public class FXSistemasVO {
     private boolean temArquivoBalanca = false;
     private boolean produtosBalancaIniciaCom20 = false;
     private boolean produtosBalancaIniciaCom789 = false;
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
 
     public boolean isTemArquivoBalanca() {
         return this.temArquivoBalanca;
@@ -37,5 +41,21 @@ public class FXSistemasVO {
     
     public void setProdutosBalancaIniciaCom789(boolean produtosBalancaIniciaCom789) {
         this.produtosBalancaIniciaCom789 = produtosBalancaIniciaCom789;
+    }
+    
+     public Date getDataInicioVenda() {
+        return this.dataInicioVenda;
+    }
+    
+    public Date getDataTerminoVenda() {
+        return this.dataTerminoVenda;
+    }
+    
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
     }
 }

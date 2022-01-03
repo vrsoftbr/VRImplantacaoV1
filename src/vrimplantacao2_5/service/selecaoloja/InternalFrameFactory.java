@@ -13,6 +13,7 @@ import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUIPadrao;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;

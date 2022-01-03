@@ -72,7 +72,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -859,10 +859,16 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setNumeroSerie("serie");
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setIdClientePreferencial("id_cliente");
+                        next.setCpf("cpf");
+                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
                 }
@@ -882,7 +888,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.numero,\n"
                     + "	CASE WHEN vd.NUMERO_CFE IS NULL THEN v.ID||'-'||v.NUMERO ELSE vd.NUMERO_CFE END numerocupom,\n"
                     + "	COALESCE (id_pdv,1) ecf,\n"
-                    + "	DATA_EMISSAO emissao,\n"
+                    + "	DATA_EMISSAO data,\n"
                     + "	HORA_EMISSAO hora,\n"
                     + "	v.serie,\n"
                     + "	v.VALOR_CONTABIL valor,\n"
@@ -896,7 +902,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	LEFT JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
                     + "WHERE\n"
                     + "	ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+                    + "	AND DATA_EMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -936,14 +942,15 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nroitem"));
-                        next.setProduto(rst.getString("produto"));
+                        next.setSequencia(rst.getInt("nritem"));
+                        next.setProduto(rst.getString("id_produto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setPrecoVenda(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
 
                     }
                 }
@@ -956,25 +963,25 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	id id_venda,\n"
-                    + "	v.numero,\n"
-                    + "	CASE WHEN vd.NUMERO_CFE IS NULL THEN v.ID||'-'||v.NUMERO ELSE vd.NUMERO_CFE END numerocupom,\n"
-                    + "	COALESCE (id_pdv,1) ecf,\n"
-                    + "	DATA_EMISSAO emissao,\n"
-                    + "	HORA_EMISSAO hora,\n"
-                    + "	v.serie,\n"
-                    + "	v.VALOR_CONTABIL valor,\n"
-                    + "	v.ID_CLIENTE,\n"
-                    + "	c.CGC cpf,\n"
-                    + "	c.NOME nomecliente,\n"
-                    + "	CASE WHEN SITUACAO = 1 THEN 1 ELSE 0 END cancelado\n"
+                    + "	vi.id nritem,\n"
+                    + "	ID_NF id_venda,\n"
+                    + "	vi.ID||vi.ID_NF||vi.ID_PRODUTO id_item,\n"
+                    + "	vi.ID_PRODUTO,\n"
+                    + "	p.DESCRICAO,\n"
+                    + "	vi.QTD quantidade,\n"
+                    + "	vi.VLR_TOTAL_PRODUTO total,\n"
+                    + "	VLR_DESCONTO desconto,\n"
+                    + "	VLR_ACRESCIMO acrescimo,\n"
+                    + "	p.COD_BARRAS codigobarras,\n"
+                    + "	un.DESCRICAO unidade\n"
                     + "FROM\n"
-                    + "	NF_SAIDA v\n"
-                    + "	LEFT JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
-                    + "	LEFT JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
+                    + "	NF_SAIDA_ITENS vi\n"
+                    + "	LEFT JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
+                    + "	LEFT JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
+                    + " JOIN NF_SAIDA v ON v.ID = vi.ID_NF \n"
                     + "WHERE\n"
-                    + "	ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+                    + "	vi.ID_EMPRESA = " + idLojaCliente + "\n"
+                    + "	AND v.DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

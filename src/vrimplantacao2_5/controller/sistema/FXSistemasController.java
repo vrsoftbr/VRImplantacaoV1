@@ -56,7 +56,6 @@ public class FXSistemasController extends InterfaceController {
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -89,7 +88,9 @@ public class FXSistemasController extends InterfaceController {
                 OpcaoProduto.ICMS_CONSUMIDOR,
                 OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.MAPA_TRIBUTACAO
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.VENDA_CONTROLADA
         ));
     }
 
