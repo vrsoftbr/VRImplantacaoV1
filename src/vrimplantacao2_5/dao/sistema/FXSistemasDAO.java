@@ -72,6 +72,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
@@ -109,6 +110,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.UF,
                 OpcaoFornecedor.CEP,
                 OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.OBSERVACAO));
     }
 
@@ -604,7 +606,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	g.ID_PRODUTO = p.ID\n"
                     + "WHERE\n"
                     + "	ID_EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND DATA_INICIAL <= 'now' AND NOVO_VALOR < p.PRECO_VENDA\n"
+                    + "	AND DATA_INICIAL >= 'now' AND NOVO_VALOR < p.PRECO_VENDA\n"
                     + "ORDER BY 1, 2"
             )) {
                 while (rs.next()) {
@@ -634,7 +636,11 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    CGC AS cnpj,\n"
                     + "    IE AS inscricaoestadual,\n"
                     + "    ORGAOEXPEDIDOR AS orgaoemissor,\n"
-                    + "    RAZAOSOCIAL AS razao,\n"
+                    + "    CASE \n"
+                    + "	    WHEN RAZAOSOCIAL is NULL \n"
+                    + "	    THEN NOME \n"
+                    + "	    ELSE RAZAOSOCIAL \n"
+                    + "    END razao,\n"
                     + "    NOME AS fantasia,\n"
                     + "    CASE \n"
                     + "    	WHEN OBS = 'ATV' \n"
