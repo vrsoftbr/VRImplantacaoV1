@@ -430,7 +430,7 @@ public class Importador {
         
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
         
-        dao.setImportSistema(getInterfaceDAO().getSistema());
+        dao.setImportSistema(getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
