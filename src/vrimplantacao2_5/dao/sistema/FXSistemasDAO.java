@@ -74,6 +74,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
+                //OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -833,15 +834,18 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new FXSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
-
+    
     @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception{
         return new FXSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        
+        SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
         private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
@@ -851,8 +855,6 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -875,7 +877,6 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCpf("cpf");
                         next.setNomeCliente(rst.getString("nomecliente"));
                         next.setCancelado(rst.getBoolean("cancelado"));
-
                     }
                 }
             } catch (SQLException | ParseException ex) {
