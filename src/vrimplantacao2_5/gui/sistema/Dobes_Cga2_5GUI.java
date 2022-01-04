@@ -67,8 +67,6 @@ public class Dobes_Cga2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                //dao.setComplementoSistema(pnlConn.getComplemento());
-                //return controller.dao.getSistema();
                 return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
