@@ -447,7 +447,7 @@ public class Importador {
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANs();
         ProdutoDAO dao = new ProdutoDAO();
         dao.setImportSistema(getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
@@ -541,7 +541,7 @@ public class Importador {
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         
         provider.setSistema(getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setIdConexao(getIdConexao());
         ClienteRepository rep = new ClienteRepository(provider);
@@ -605,7 +605,7 @@ public class Importador {
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
                 getSistema(),
-                getInterfaceDAO().getLojaOrigem(),
+                getLojaOrigem(),
                 getLojaVR()
         );
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
