@@ -22,6 +22,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private AvistareVO vo = new AvistareVO();
     private AvistareController controller = null;
+    Importador importador = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -75,8 +76,10 @@ public class Avistare2_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(controller);
         tabClientes.setOpcoesDisponiveis(controller);
         
+        importador = new Importador(controller.dao);
+        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
-
+            
             @Override
             public MapaTributoProvider getProvider() {
                 return controller.dao;
@@ -84,8 +87,8 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                controller.dao.setComplementoSistema(pnlConn.getComplemento());
-                return controller.dao.getSistema();
+                importador.setIdConexao(pnlConn.idConexao);                
+                return importador.getSistema();
             }
 
             @Override
@@ -139,14 +142,12 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    controller.dao.setComplementoSistema(pnlConn.getComplemento());
                     controller.setAvistare(carregarOpcaoesMigracaoSistema());
                     
-                    Importador importador = new Importador(controller.dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
-
+                    
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
