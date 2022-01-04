@@ -834,18 +834,15 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new FXSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
-    
+
     @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception{
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new FXSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        
-        SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
         private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
@@ -855,6 +852,9 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -871,10 +871,10 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setNumeroSerie("serie");
+                        next.setNumeroSerie(rst.getString("serie"));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
-                        next.setIdClientePreferencial("id_cliente");
-                        next.setCpf("cpf");
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nomecliente"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
@@ -905,8 +905,8 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CASE WHEN SITUACAO = 1 THEN 1 ELSE 0 END cancelado\n"
                     + "FROM\n"
                     + "	NF_SAIDA v\n"
-                    + "	LEFT JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
-                    + "	LEFT JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
+                    + "	JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
+                    + "	JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
                     + "WHERE\n"
                     + "	ID_EMPRESA = " + idLojaCliente + "\n"
                     + "	AND DATA_EMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n";
@@ -955,8 +955,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
 
                     }
@@ -971,20 +970,19 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n"
                     + "	vi.id nritem,\n"
-                    + "	ID_NF id_venda,\n"
+                    + "	vi.ID_NF id_venda,\n"
                     + "	vi.ID||vi.ID_NF||vi.ID_PRODUTO id_item,\n"
                     + "	vi.ID_PRODUTO,\n"
                     + "	p.DESCRICAO,\n"
                     + "	vi.QTD quantidade,\n"
-                    + "	vi.VLR_TOTAL_PRODUTO total,\n"
-                    + "	VLR_DESCONTO desconto,\n"
-                    + "	VLR_ACRESCIMO acrescimo,\n"
+                    + "	vi.VLR_UNITARIO valor,\n"
+                    + "	vi.VLR_ACRESCIMO acrescimo,\n"
                     + "	p.COD_BARRAS codigobarras,\n"
                     + "	un.DESCRICAO unidade\n"
                     + "FROM\n"
                     + "	NF_SAIDA_ITENS vi\n"
-                    + "	LEFT JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
-                    + "	LEFT JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
+                    + " JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
+                    + " JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
                     + " JOIN NF_SAIDA v ON v.ID = vi.ID_NF \n"
                     + "WHERE\n"
                     + "	vi.ID_EMPRESA = " + idLojaCliente + "\n"
