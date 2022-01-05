@@ -84,8 +84,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                controller.dao.setComplementoSistema(pnlConn.getComplemento());
-                return controller.dao.getSistema();
+                return controller.dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -139,7 +138,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    controller.dao.setComplementoSistema(pnlConn.getComplemento());
                     controller.setAvistare(carregarOpcaoesMigracaoSistema());
                     
                     Importador importador = new Importador(controller.dao);

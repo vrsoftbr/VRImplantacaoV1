@@ -47,19 +47,10 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public AvistareVO avistareVO = null;
     private final String SISTEMA = "Avistare";
-    private String complementoSistema = "";
     
     @Override
     public String getSistema() {
-        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
-    }
-    
-    public String getComplementoSistema() {
-        return this.complementoSistema;
-    }
-    
-    public void setComplementoSistema(String complementoSistema) {
-        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
+        return SISTEMA;
     }
     
     public List<Estabelecimento> getLojasCliente() throws Exception {
