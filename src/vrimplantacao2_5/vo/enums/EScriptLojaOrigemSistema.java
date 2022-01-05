@@ -74,7 +74,12 @@ public enum EScriptLojaOrigemSistema {
                     "FROM \n" +
                     "	consinco.ge_empresa\n" +
                     "WHERE \n" +
-                    "	status = ''A''");
+                    "	status = ''A''"),
+    FXSISTEMAS(208, 5, "SELECT "
+            + "	e.ID, "
+            + "	e.RAZAO_SOCIAL descricao "
+            + "FROM "
+            + "	EMPRESA e");
 
     private int idSistema;
     private int idBancoDados;
