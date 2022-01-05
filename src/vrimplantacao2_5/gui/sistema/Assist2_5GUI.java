@@ -44,7 +44,7 @@ public class Assist2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return assistDAO.getSistema();
+                return assistDAO.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
