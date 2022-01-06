@@ -132,7 +132,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    /*"select \n"
                     + "	distinct \n"
                     + "	gr.grumcodigo merc1,\n"
                     + "	gr.grumdescri descmerc1,\n"
@@ -143,7 +143,18 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join public.file004 gr on pr.procategor = gr.grumcodigo\n"
                     + "join public.file002 sg on pr.prosbgrcod = sg.sbgrucodig\n"
                     + "order by \n"
-                    + "	merc1, merc2")) {
+                    + "	merc1, merc2"*/
+                    "select\n"
+                    + "	distinct\n"
+                    + "	procategor merc1,\n"
+                    + "	procatdesc descmerc1,\n"
+                    + "	prosbgrcod merc2,\n"
+                    + "	prosbgrdes descmerc2,\n"
+                    + "	prosbgrcod merc3,\n"
+                    + "	prosbgrdes descmerc3\n"
+                    + "from file005\n"
+                    + "where prosbgrdes != ''\n"
+                    + "order by 1,3")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
 
@@ -153,8 +164,8 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    imp.setMerc3ID(rs.getString("merc3"));
+                    imp.setMerc3Descricao(rs.getString("descmerc3"));
 
                     result.add(imp);
                 }
@@ -206,7 +217,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.proncmsh cest,\n"
                     + "	p.prosittrib situacaotributaria\n"
                     + "from \n"
-                    + "	public.file005 p")) {
+                    + "	public.file005 p WHERE proultvend >= '2019-04-01'")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -220,7 +231,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");
+                    imp.setCodMercadologico3(imp.getCodMercadologico2());
 
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
@@ -552,10 +563,10 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where \n"
                     + "	tmvorclien != '' and \n"
                     + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
-                
+
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                
+
                 while (rs.next()) {
                     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
 
@@ -565,10 +576,10 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdConveniado(rs.getString("idconveniado"));
                     imp.setDataMovimento(rs.getDate("lancamento"));
                     imp.setValor(rs.getDouble("total"));
-                    
-                    String hora = timestampDate.format(rs.getDate("lancamento")) + " " + 
-                            rs.getString("hora");
-                    
+
+                    String hora = timestampDate.format(rs.getDate("lancamento")) + " "
+                            + rs.getString("hora");
+
                     imp.setDataHora(new Timestamp(format.parse(hora).getTime()));
 
                     result.add(imp);
@@ -582,9 +593,9 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + "	substring(coalesce(clicpf, clicgc), 0, 4) ||\n"
                     + "	substring(coalesce(clicpf, clicgc), 9, 4) id,\n"
@@ -605,7 +616,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clifone1 telefone,\n"
                     + "	c.clifone2 telefone2,\n"
                     + "	c.clifax fax,\n"
-                    + "	c.clicadata cadastro,\n"
+                    + "	c.clicadata::varchar cadastro,\n"
                     + "	c.cliconvcgc idempresa,\n"
                     + "	c.clidatnasc nascimento,\n"
                     + "	c.clidiavenc vencimento,\n"
@@ -613,20 +624,19 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clilimite limite\n"
                     + "from \n"
                     + "	cliente c")) {
-                
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                
-                while(rs.next()) {
+
+                //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setCnpj(rs.getString("cnpj"));
-                    
-                    if(imp.getCnpj() == null) {
+
+                    if (imp.getCnpj() == null) {
                         imp.setCnpj(rs.getString("cpf"));
                     }
-                    
-                    imp.setInscricaoestadual(rs.getString("rgie"));
+
+                    imp.setInscricaoestadual(Utils.formataNumero(rs.getString("rgie")));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setEndereco(rs.getString("endereco"));
@@ -637,32 +647,33 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rs.getString("cep"));
                     imp.setUf(rs.getString("uf"));
                     imp.setTelefone(rs.getString("telefone"));
-                    
-                    if(rs.getString("cadastro") != null && !rs.getString("cadastro").isEmpty()) {
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
+
+                    /*if(rs.getString("cadastro") != null && !rs.getString("cadastro").isEmpty()) {
                         imp.setDataCadastro(sdf.parse(rs.getString("cadastro")));
                     }
                     
                     if(rs.getString("nascimento") != null && !rs.getString("nascimento").isEmpty()) {
                         imp.setDataNascimento(sdf.parse(rs.getString("nascimento")));
-                    }
-                    
+                    }*/
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setValorLimite(rs.getDouble("limite"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + "	distinct\n"
                     + "	tmvdata lancamento,\n"
@@ -678,7 +689,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where \n"
                     + "	tmvorclien != '' and \n"
                     + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
-                while(rs.next()) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rs.getString("documento"));
@@ -689,10 +700,10 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rs.getDouble("total"));
 
                     result.add(imp);
-                }    
+                }
             }
         }
-        
+
         return result;
     }
 }
