@@ -16,6 +16,7 @@ import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
+import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
@@ -87,6 +88,9 @@ public abstract class InternalFrameFactory {
             case CONSINCO:
                 internalFrame = new Consinco2_5GUI(frame);
                 break;
+            case FXSISTEMAS:
+                internalFrame = new FXSistemas2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -151,6 +155,9 @@ public abstract class InternalFrameFactory {
                 break;
             case TENTACULO:
                 internalFrame = new Provenco_Tentaculo2_5GUI(frame);
+                break;
+            case FXSISTEMAS:
+                internalFrame = new FXSistemas2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

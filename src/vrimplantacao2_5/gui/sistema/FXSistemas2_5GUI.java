@@ -9,48 +9,48 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class Assist2_5GUI extends VRInternalFrame {
+public class FXSistemas2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ASSIST.getNome();
-    private static Assist2_5GUI instance;
+    private static final String SISTEMA = ESistema.FXSISTEMAS.getNome();
+    private static FXSistemas2_5GUI instance;
 
-    private final AssistDAO assistDAO = new AssistDAO();
+    private final FXSistemasDAO dao = new FXSistemasDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public Assist2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public FXSistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
-        tabProdutos.setOpcoesDisponiveis(assistDAO);
-        tabFornecedores.setOpcoesDisponiveis(assistDAO);
-        tabClientes.setOpcoesDisponiveis(assistDAO);
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return assistDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                return assistDAO.getSistema() + " - " + pnlConn.idConexao;
+                return dao.getSistema();
             }
 
             @Override
             public String getLoja() {
-                assistDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return assistDAO.getLojaOrigem();
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -59,7 +59,7 @@ public class Assist2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ASSIST);
+        pnlConn.setSistema(ESistema.FXSISTEMAS);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -95,7 +95,7 @@ public class Assist2_5GUI extends VRInternalFrame {
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
-                    Importador importador = new Importador(assistDAO);
+                    Importador importador = new Importador(dao);
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
@@ -104,6 +104,13 @@ public class Assist2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    
+                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
+                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+                    }
+                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
+                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+                    }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -116,7 +123,8 @@ public class Assist2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
-                            default: break;
+                            default:
+                                break;
                         }
                     }
 
@@ -141,7 +149,7 @@ public class Assist2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Assist2_5GUI(i_mdiFrame);
+                instance = new FXSistemas2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -172,22 +180,22 @@ public class Assist2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("SG");
+        setTitle("Sygma");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 

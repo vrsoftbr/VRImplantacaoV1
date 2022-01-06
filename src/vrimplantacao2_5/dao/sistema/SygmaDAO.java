@@ -29,7 +29,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
- * @author Alan
+ * @author Alan @
  */
 public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
