@@ -46,7 +46,7 @@ public class Consinco2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return consincoDAO.getSistema();
+                return consincoDAO.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override

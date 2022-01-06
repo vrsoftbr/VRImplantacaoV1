@@ -232,6 +232,7 @@ public class Importador {
         } else {
             MercadologicoDAO dao = new MercadologicoDAO();
             
+            dao.setSistema(getSistema());
             dao.setIdLojaVR(getLojaVR());
             dao.salvar(mercadologicos, opt);
         }
