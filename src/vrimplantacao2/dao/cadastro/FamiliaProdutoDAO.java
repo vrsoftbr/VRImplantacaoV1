@@ -15,9 +15,18 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 public class FamiliaProdutoDAO {
     
     private boolean gerarCodigo = false;
+    private String sistema;
 
     public boolean isGerarCodigo() {
         return gerarCodigo;
+    }
+    
+    public String getSistema() {
+        return this.sistema;
+    }
+    
+    public void setSistema(String sistema) {
+        this.sistema = sistema;
     }
 
     /**
@@ -131,7 +140,7 @@ public class FamiliaProdutoDAO {
             try (Statement stm = Conexao.createStatement()) {
                 for (FamiliaProdutoIMP oFamilia: aux.values()) {
                     if (!getAnteriores().containsKey(
-                            oFamilia.getImportSistema(),
+                            getSistema(),
                             oFamilia.getImportLoja(),
                             oFamilia.getImportId()
                     )) {                        
@@ -184,7 +193,7 @@ public class FamiliaProdutoDAO {
                             + "imploja, "
                             + "impid, "
                             + "codigoatual ) values (" 
-                            + Utils.quoteSQL(oFamilia.getImportSistema()) + ", "
+                            + Utils.quoteSQL(getSistema()) + ", "
                             + Utils.quoteSQL(oFamilia.getImportLoja()) + ", "
                             + Utils.quoteSQL(oFamilia.getImportId()) + ", "
                             + vo.getId() + ""
@@ -192,7 +201,7 @@ public class FamiliaProdutoDAO {
                         
                         getAnteriores().put(
                             vo,
-                            oFamilia.getImportSistema(),
+                            getSistema(),
                             oFamilia.getImportLoja(),
                             oFamilia.getImportId()
                         );

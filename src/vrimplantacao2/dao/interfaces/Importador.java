@@ -265,6 +265,7 @@ public class Importador {
         ProgressBar.setStatus("Carregando dados da família do produto...");
         List<FamiliaProdutoIMP> familias = getInterfaceDAO().getFamiliaProduto();
         FamiliaProdutoDAO dao = new FamiliaProdutoDAO();
+        dao.setSistema(getSistema());
         dao.salvar(familias);
     }
 
