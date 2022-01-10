@@ -260,9 +260,9 @@ public class VersatilDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
 
-                    imp.setCodMercadologico1("m1id");
-                    imp.setCodMercadologico2("m2id");
-                    imp.setCodMercadologico3("m3id");
+                    imp.setCodMercadologico1(rs.getString("m1id"));
+                    imp.setCodMercadologico2(rs.getString("m2id"));
+                    imp.setCodMercadologico3(rs.getString("m3id"));
 
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoque_maximo"));
