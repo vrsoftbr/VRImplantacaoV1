@@ -55,12 +55,12 @@ public enum EScriptLojaOrigemSistema {
             + " entidades"),
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
     DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
-    DOBESCGA(206,5,"select\n"
-                    + " ret000.\"Codigo\" as id,\n"
-                    + " ret000.\"Fantasia\" as descricao,\n"
-                    + " ret000.\"CNPJ\"\n"
-                    + " from ret000\n"
-                    + " order by ret000.\"Codigo\""),
+    DOBESCGA(206, 5, "select\n"
+            + " ret000.\"Codigo\" as id,\n"
+            + " ret000.\"Fantasia\" as descricao,\n"
+            + " ret000.\"CNPJ\"\n"
+            + " from ret000\n"
+            + " order by ret000.\"Codigo\""),
     TENTACULO(207, 5,
             "SELECT "
             + "	EMP_CODIGO id, "
@@ -68,18 +68,23 @@ public enum EScriptLojaOrigemSistema {
             + "FROM "
             + "	EMPRESAS "
             + "ORDER BY 1"),
-    CONSINCO(209, 9, "SELECT \n" +
-                    "	nroempresa id,\n" +
-                    "	nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao\n" +
-                    "FROM \n" +
-                    "	consinco.ge_empresa\n" +
-                    "WHERE \n" +
-                    "	status = ''A''"),
+    CONSINCO(209, 9, "SELECT \n"
+            + "	nroempresa id,\n"
+            + "	nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao\n"
+            + "FROM \n"
+            + "	consinco.ge_empresa\n"
+            + "WHERE \n"
+            + "	status = ''A''"),
     FXSISTEMAS(208, 5, "SELECT "
             + "	e.ID, "
             + "	e.RAZAO_SOCIAL descricao "
             + "FROM "
-            + "	EMPRESA e");
+            + "	EMPRESA e"),
+    VERSATIL(210, 5, "SELECT\n"
+            + "	COD_EMPRESA id,\n"
+            + "	FANTASIA descricao\n"
+            + "FROM\n"
+            + "	EMPRESA");
 
     private int idSistema;
     private int idBancoDados;

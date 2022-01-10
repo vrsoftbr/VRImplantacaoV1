@@ -9,15 +9,15 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
+import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Versatil2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.FXSISTEMAS.getNome();
+    private static final String SISTEMA = ESistema.VERSATIL.getNome();
     private static Versatil2_5GUI instance;
 
-    private final FXSistemasDAO dao = new FXSistemasDAO();
+    private final VersatilDAO dao = new VersatilDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -59,7 +59,7 @@ public class Versatil2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.FXSISTEMAS);
+        pnlConn.setSistema(ESistema.VERSATIL);
         pnlConn.getNomeConexao();
 
         centralizarForm();

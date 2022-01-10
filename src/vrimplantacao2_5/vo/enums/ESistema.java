@@ -210,6 +210,7 @@ import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
+import vrimplantacao2_5.dao.sistema.VersatilDAO;
 
 /**
  *
@@ -425,7 +426,8 @@ public enum ESistema {
     DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()),
     TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
-    FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO());
+    FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
+    VERSATIL(210, "VERSATIL", new VersatilDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
