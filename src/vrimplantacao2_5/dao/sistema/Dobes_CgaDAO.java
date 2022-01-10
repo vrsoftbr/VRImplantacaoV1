@@ -330,6 +330,10 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
                     imp.setIcmsDebitoId(rst.getString("ALIQCod"));
                     imp.setIcmsCreditoId(rst.getString("ALIQCRED"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("ALIQCod"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("ALIQCod"));
+                    imp.setIcmsConsumidorId(rst.getString("ALIQCod"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("ALIQCRED"));
 
                     vResult.add(imp);
                     contador++;
