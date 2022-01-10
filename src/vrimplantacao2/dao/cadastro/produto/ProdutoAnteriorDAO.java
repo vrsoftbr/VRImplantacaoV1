@@ -1342,19 +1342,25 @@ public class ProdutoAnteriorDAO {
     public int verificaRegistro() throws Exception {
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    /*"select \n" +
                     "	count(*) qtd \n" +
                     "from \n" +
                     "	implantacao.codant_produto \n" +
                     "where \n" +
-                    "	codigoatual in (select codigoatual from implantacao.codant_produto limit 100)")) {
+                    "	codigoatual in (select codigoatual from implantacao.codant_produto limit 100)"*/
+                    "select\n" +
+                    "	count(*) qtd\n" +
+                    "	from\n" +
+                    "implantacao.codant_produto\n" +
+                    "where codigoatual is not null"
+            )) {
                 if (rs.next()) {
                     return rs.getInt("qtd");
+                } else {
+                    return 0;
                 }
             }
         }
-        
-        return 0;
     }
     
     public int getConexaoMigrada(int idConexao, String sistema) throws Exception {
