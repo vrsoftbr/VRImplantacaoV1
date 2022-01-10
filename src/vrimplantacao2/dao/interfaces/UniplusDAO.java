@@ -340,7 +340,13 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
-                    imp.setEan(rs.getString("ean").substring(1, 14));
+                    //imp.setEan(rs.getString("ean").substring(0, 14));
+                    if (rs.getString("ean").length() > 1 && rs.getString("ean").length() < 14) {
+                            imp.setEan(rs.getString("ean").substring(1, rs.getString("ean").length()));
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                    
                     imp.setIdFamiliaProduto(rs.getString("codigofamilia"));
                     
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1
