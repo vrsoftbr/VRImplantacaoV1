@@ -528,7 +528,7 @@ public class VersatilDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTelefone("telefone");
+                    imp.setTelefone(rs.getString("telefone1"));
                     imp.setCelular(rs.getString("celular"));
 
                     imp.setAtivo(rs.getBoolean("ativo"));
@@ -572,12 +572,12 @@ public class VersatilDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("idFornecedor"));
-                    imp.setCnpj("CNPJ");
-                    imp.setNumeroDocumento("numeroDocumento");
+                    imp.setCnpj(rs.getString("CNPJ"));
+                    imp.setNumeroDocumento(rs.getString("numeroDocumento"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setDataEntrada(rs.getTimestamp("dataEntrada"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao("observacao");
+                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -610,7 +610,7 @@ public class VersatilDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("id_cliente"));
-                    imp.setNumeroCupom("numerodocumento");
+                    imp.setNumeroCupom(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setJuros(rs.getDouble("taxa_juros"));
