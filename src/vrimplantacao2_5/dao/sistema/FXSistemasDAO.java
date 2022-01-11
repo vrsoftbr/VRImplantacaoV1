@@ -301,9 +301,9 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dataCadastro"));
                     imp.setDataAlteracao(rs.getDate("dataAlteracao"));
 
-                    imp.setCodMercadologico1("codMercadologico1");
-                    imp.setCodMercadologico2("codMercadologico2");
-                    imp.setCodMercadologico3("codMercadologico3");
+                    imp.setCodMercadologico1(rs.getString("codMercadologico1"));
+                    imp.setCodMercadologico2(rs.getString("codMercadologico2"));
+                    imp.setCodMercadologico3(rs.getString("codMercadologico3"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoqueMaximo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoqueMinimo"));
@@ -400,8 +400,8 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
                     imp.setIe_rg(rs.getString("ie_rg"));
-                    imp.setInsc_municipal("insc_municipal");
-                    imp.setSuframa("suframa");
+                    imp.setInsc_municipal(rs.getString("insc_municipal"));
+                    imp.setSuframa(rs.getString("suframa"));
                     imp.setAtivo(rs.getInt("ativo") == 1);
 
                     imp.setEndereco(rs.getString("endereco"));
@@ -659,7 +659,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    NASC AS dataNascimento,\n"
                     + "    DT_INC AS dataCadastro,\n"
                     + "    EMPRESA AS empresa,\n"
-                    + "    EMP_ENDERECO AS empempresaEndereco,\n"
+                    + "    EMP_ENDERECO AS empresaEndereco,\n"
                     + "    END_COMPLEMENTO AS empresaComplemento,\n"
                     + "    EMP_BAIRRO AS empresaBairro,\n"
                     + "    EMP_CIDADE AS empresaMunicipio,\n"
@@ -700,24 +700,24 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTelefone("telefone");
-                    imp.setOrgaoemissor("orgaoemissor");
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
 
-                    imp.setEstadoCivil("estadoCivil");
+                    imp.setEstadoCivil(rs.getString("estadoCivil"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setNomeConjuge(rs.getString("nomeConjuge"));
                     imp.setNomeMae(rs.getString("nomeMae"));
                     imp.setNomePai(rs.getString("nomePai"));
-                    imp.setEmpresa("empresa");
-                    imp.setEmpresaEndereco("empresaEndereco");
-                    imp.setEmpresaComplemento("empresaComplemento");
-                    imp.setEmpresaBairro("empresaBairro");
-                    imp.setEmpresaMunicipio("empresaMunicipio");
-                    imp.setEmpresaUf("empresaUf");
-                    imp.setEmpresaCep("empresaCep");
-                    imp.setEmpresaTelefone("empresaTelefone");
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaEndereco(rs.getString("empresaEndereco"));
+                    imp.setEmpresaComplemento(rs.getString("empresaComplemento"));
+                    imp.setEmpresaBairro(rs.getString("empresaBairro"));
+                    imp.setEmpresaMunicipio(rs.getString("empresaMunicipio"));
+                    imp.setEmpresaUf(rs.getString("empresaUf"));
+                    imp.setEmpresaCep(rs.getString("empresaCep"));
+                    imp.setEmpresaTelefone(rs.getString("empresaTelefone"));
                     imp.setDataAdmissao(rs.getDate("dataAdmissao"));
-                    imp.setCargo("cargo");
+                    imp.setCargo(rs.getString("cargo"));
                     imp.setEmpresaTelefone(rs.getString("empresaTelefone"));
                     imp.setSalario(rs.getDouble("salario"));
                     imp.setDiaVencimento(rs.getInt("diaVencimento"));
@@ -758,8 +758,8 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("idFornecedor"));
-                    imp.setCnpj("CNPJ");
-                    imp.setNumeroDocumento("numeroDocumento");
+                    imp.setCnpj(rs.getString("CNPJ"));
+                    imp.setNumeroDocumento(rs.getString("numeroDocumento"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setDataEntrada(rs.getTimestamp("dataEntrada"));
                     imp.setValor(rs.getDouble("valor"));
@@ -804,7 +804,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setCnpjCliente(rs.getString("CPFCnpj"));
-                    imp.setNumeroCupom("numeroDocumento");
+                    imp.setNumeroCupom(rs.getString("numeroDocumento"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setValor(rs.getDouble("valor"));
 
