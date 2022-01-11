@@ -556,6 +556,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "	b.seqproduto,\n" +
+                    "   b.REFFABRICANTE AS codigoexterno,\n" +
                     "	d.seqfornecedor,\n" +
                     "	a.nroempresa,\n" +
                     "	f.nomerazao\n" +
@@ -585,6 +586,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("seqfornecedor"));
                     imp.setIdProduto(rs.getString("seqproduto"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
                 }

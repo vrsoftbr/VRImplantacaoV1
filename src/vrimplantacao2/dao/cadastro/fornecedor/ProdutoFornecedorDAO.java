@@ -269,22 +269,22 @@ public class ProdutoFornecedorDAO {
                 //}
                 FornecedorVO fornecedor = null;
                 if (fornAntDAO.getAnteriores().containsKey(
-                        imp.getImportSistema(),
+                        importSistema,
                         imp.getImportLoja(),
                         imp.getIdFornecedor())) {
                     fornecedor = fornAntDAO.getAnteriores().get(
-                            imp.getImportSistema(),
+                            importSistema,
                             imp.getImportLoja(),
                             imp.getIdFornecedor()
                     ).getCodigoAtual();
                 }
                 ProdutoVO produto = null;
                 if (prodAntDAO.getCodigoAnterior().containsKey(
-                        imp.getImportSistema(),
+                        importSistema,
                         imp.getImportLoja(),
                         imp.getIdProduto())) {
                     produto = prodAntDAO.getCodigoAnterior().get(
-                            imp.getImportSistema(),
+                            importSistema,
                             imp.getImportLoja(),
                             imp.getIdProduto()
                     ).getCodigoAtual();
