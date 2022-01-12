@@ -45,6 +45,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
+                OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
