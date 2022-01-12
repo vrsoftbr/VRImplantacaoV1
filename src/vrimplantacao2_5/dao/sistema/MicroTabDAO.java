@@ -173,6 +173,7 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.ID_SUB_SETOR idmerc3,\n"
                     + "	p.CUSTO_MEDIO custo,\n"
                     + "	p.VALOR_VAREJO precovenda,\n"
+                    + " p.VALIDADE,\n"
                     + "	CASE\n"
                     + "		WHEN p.STATUS = 'A' THEN 1\n"
                     + "		ELSE 0\n"
@@ -200,6 +201,7 @@ public class MicroTabDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setValidade(rst.getInt("validade"));
                     imp.setDataCadastro(rst.getDate("dtcadastro"));
                     imp.setCodMercadologico1(rst.getString("idmerc1"));
                     imp.setCodMercadologico2(rst.getString("idmerc2"));
