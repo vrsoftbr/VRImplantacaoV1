@@ -262,13 +262,31 @@ public class CissDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getInt("piscofinsentrada"));
                     imp.setPiscofinsCstDebito(rst.getInt("piscofinssaida"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("tipoNaturezaReceita"));
+                    
                     imp.setIcmsCstSaida(rst.getInt("icmsCstDebito"));
-                    imp.setIcmsCstEntrada(rst.getInt("icmsCstCredito"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icmsAliqCredito"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqDebito"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icmsPercReducaoSaida"));
+                    
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("icmsCstDebito"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icmsAliqDebito"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icmsPercReducaoSaida"));
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icmsCstDebito"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icmsAliqDebito"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icmsPercReducaoSaida"));
+                    
+                    imp.setIcmsCstConsumidor(rst.getInt("icmsCstDebito"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("icmsAliqDebito"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("icmsPercReducaoSaida"));
+                    
+                    imp.setIcmsCstEntrada(rst.getInt("icmsCstCredito"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icmsAliqCredito"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("icmsPercReducaoEntrada"));
-
+                    
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("icmsCstCredito"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icmsAliqCredito"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icmsPercReducaoEntrada"));
+                    
                     result.add(imp);
                 }
             }
