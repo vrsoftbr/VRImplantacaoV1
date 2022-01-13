@@ -120,10 +120,10 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	CODITR id,\n"
-                    + "    NOMETR descricao,\n"
-                    + "    CODICST cst_saida,\n"
-                    + "    PERC_ICM aliquota_saida,\n"
-                    + "    PERC_RED reducao_saida\n"
+                    + " NOMETR descricao,\n"
+                    + " CODICST cst_saida,\n"
+                    + " PERC_ICM aliquota_saida,\n"
+                    + " PERC_RED reducao_saida\n"
                     + "FROM\n"
                     + "	TRIBUTA TR\n"
                     + "ORDER BY 1"
@@ -281,24 +281,24 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	pr.PREVE precovenda,\n"
                     + "	COALESCE (p.ESTOMIN,0) estmin,\n"
                     + "	p.ESTOMAX estmax,\n"
-                    + "	t.CODICST cst_saida,\n"
-                    + "	t.PERC_ICM aliq_saida,\n"
-                    + "	t.PERC_RED red_saida,\n"
+                    + " tc.CODITR id_credito,\n"
+                    + "	td.CODITR id_debito,\n"
                     + "	DATA_ALTERA data_alteracao,\n"
                     + " pcc.CST_PIS piscofinscredito,\n"
                     + " pcd.CST_PIS piscofinsdebito,\n"
                     + " CASE WHEN p.atides = 'A' THEN 1 ELSE 0 END situacaocadastro\n"
                     + "FROM\n"
                     + "	PRODUTOS p\n"
-                    + "	LEFT JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "	LEFT JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
-                    + "	LEFT JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
-                    + "	LEFT JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO  AND pr.AGP_CODIGO = p.CODILF\n"
-                    + "	LEFT JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF \n"
-                    + "	LEFT JOIN TRIBUTA_LOJAS i ON i.CODIPRO = p.CODIPRO\n"
-                    + "	LEFT JOIN TRIBUTA t ON t.CODITR = i.CODITRC\n"
-                    + " LEFT JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
-                    + "	LEFT JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
+                    + "	JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "	JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
+                    + "	JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
+                    + "	JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO  AND pr.AGP_CODIGO = p.CODILF \n"
+                    + "	JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF \n"
+                    + "	JOIN TRIBUTA_LOJAS ti ON ti.CODIPRO = p.CODIPRO\n"
+                    + " JOIN TRIBUTA tc ON tc.CODITR = ti.CODITRE\n"
+                    + "	JOIN TRIBUTA td ON td.CODITR = ti.CODITRC\n"
+                    + " JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
+                    + "	JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
                     + "WHERE\n"
                     + "	CODILF = " + getLojaOrigem() + ""
             )) {
@@ -342,15 +342,15 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
                     String idIcmsDebito, IdIcmsCredito;
 
-                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliq_saida") + "-" + rst.getString("red_saida");
-                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliq_entrada") + "-" + rst.getString("red_entrada");
-
+                    idIcmsDebito = rst.getString("id_debito");
+                    IdIcmsCredito = rst.getString("id_credito");
+                    
                     imp.setIcmsDebitoId(idIcmsDebito);
-                    imp.setIcmsConsumidorId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
-                    //imp.setIcmsCreditoId(IdIcmsCredito);
-                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsConsumidorId(idIcmsDebito);
+                    imp.setIcmsCreditoId(IdIcmsCredito);
+                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
