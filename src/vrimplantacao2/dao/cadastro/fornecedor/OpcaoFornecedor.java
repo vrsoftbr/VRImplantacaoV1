@@ -108,7 +108,8 @@ public enum OpcaoFornecedor {
                 PRAZO_FORNECEDOR,
                 CONDICAO_PAGAMENTO,
                 TIPO_INDICADOR_IE,
-                OBSERVACAO
+                OBSERVACAO,
+                TIPO_EMPRESA
         ));
     }
     

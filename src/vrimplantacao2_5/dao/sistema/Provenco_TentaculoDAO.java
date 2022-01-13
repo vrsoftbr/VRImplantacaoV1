@@ -18,6 +18,7 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -59,7 +60,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
@@ -85,7 +86,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.FABRICANTE
         ));
     }
 
@@ -96,7 +98,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR));
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
 
     @Override
@@ -159,8 +162,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
 
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("desc_merc1"));
@@ -259,12 +262,14 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS digito,\n"
                     + "	DESCRICAO descricaocompleta,\n"
                     + "	DESCRI_AB descricaoreduzida,\n"
-                    + "	un.ABRE_EMB tipoembalagem,\n"
+                    + "	un_v.ABRE_EMB tipoembalagem,\n"
+                    + "	un_c.ABRE_EMB emb_compra,\n"
                     + "	ean.QTD_UNI qtdembalagem,\n"
                     + "	PESO_BRU pesobruto,\n"
                     + "	PESO_LIQ pesoliquido,	\n"
                     + "	CASE WHEN balanca = 'S' THEN 1 ELSE 0 END e_balanca,\n"
                     + "	CODIFAM familia,\n"
+                    + " p.codifab fabricante,\n"
                     + "	CODIGRU merc1,\n"
                     + "	CODISGR merc2,\n"
                     + "	CODISGR merc3,\n"
@@ -286,7 +291,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "FROM\n"
                     + "	PRODUTOS p\n"
                     + "	LEFT JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "	LEFT JOIN EMBALAG un ON un.CODIEMB = p.CODIEMB_V\n"
+                    + "	LEFT JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
+                    + "	LEFT JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
                     + "	LEFT JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO  AND pr.AGP_CODIGO = p.CODILF\n"
                     + "	LEFT JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF \n"
                     + "	LEFT JOIN TRIBUTA_LOJAS i ON i.CODIPRO = p.CODIPRO\n"
@@ -303,19 +309,22 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setCodMercadologico3(imp.getCodMercadologico2());
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -331,10 +340,10 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
 
-                    String idIcmsDebito;//, IdIcmsCredito;
+                    String idIcmsDebito, IdIcmsCredito;
 
                     idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliq_saida") + "-" + rst.getString("red_saida");
-                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliq_entrada") + "-" + rst.getString("red_entrada");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
@@ -439,6 +448,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	FOR_FANTASIA fantasia,\n"
                     + "	FOR_CGC cnpj,\n"
                     + "	FOR_INSC ie,\n"
+                    + " COALESCE(FOR_PRODUTOR,'N') produtor,\n"
+                    + " COALESCE(FOR_OPT_SIMPLES,'N') simples_nacional,\n"
                     + "	FOR_ENDERECO endereco,\n"
                     + "	FOR_NUMEND numero,\n"
                     + "	FOR_BAIRRO bairro,\n"
@@ -479,6 +490,16 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                                 (email.length() > 50 ? email.substring(0, 50) : email));
                     }
 
+                    if ("S".equals(rs.getString("produtor"))) {
+                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        }
+                    } else if ("S".equals(rs.getString("simples_nacional"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    }
+
                     result.add(imp);
                 }
             }
@@ -487,20 +508,22 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "    fornecedor AS idfornecedor,\n"
-                    + "    produto AS idproduto,\n"
-                    + "    ultcompraqtde AS qtdembalagem,\n"
-                    + "    ultcompradata AS dataalteracao,\n"
-                    + "    codnofornecedor AS codigoexterno\n"
-                    + "FROM testfornecproduto\n"
-                    + "ORDER BY 1, 2"
+                    "SELECT DISTINCT\n"
+                    + "	p.CODIPRO idproduto,\n"
+                    + "	CODIFAB idfornecedor,\n"
+                    + "	ean.QTD_UNI qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "	jOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "WHERE\n"
+                    + "	CODIFAB IS NOT NULL \n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -509,9 +532,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
 
                     result.add(imp);
                 }
@@ -519,8 +540,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         }
 
         return result;
-    }
-
+    }*/
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
@@ -693,10 +713,10 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     /*
         DEV DE VENDAS INTERROMPIDO, NÃO TESTADAS AINDA
     
