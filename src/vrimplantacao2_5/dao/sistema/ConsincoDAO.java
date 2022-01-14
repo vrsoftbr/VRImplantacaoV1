@@ -578,7 +578,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoOracle.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    "select distinct \n" +
                     "	b.seqproduto,\n" +
                     "   b.REFFABRICANTE AS codigoexterno,\n" +
                     "	d.seqfornecedor,\n" +
