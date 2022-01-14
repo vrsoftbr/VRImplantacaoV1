@@ -394,6 +394,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rs.getString("cest"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pisaida"));
                     imp.setIcmsDebitoId(rs.getString("idaliquota"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
