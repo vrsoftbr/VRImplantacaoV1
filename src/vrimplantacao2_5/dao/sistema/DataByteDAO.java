@@ -108,10 +108,11 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
-                OpcaoFornecedor.PAGAR_FORNECEDOR
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.TELEFONE
         ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -120,6 +121,13 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.EMPRESA,
+                OpcaoCliente.SALARIO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.OBSERVACOES2,
+                OpcaoCliente.OBSERVACOES,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -300,7 +308,8 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	DTCADASTRO dtcadastro,\n"
                     + "	STATUS\n"
                     + "FROM\n"
-                    + "	FORNEC"
+                    + "	FORNEC\n"
+                    + "	ORDER BY NOME"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -422,9 +431,16 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " CPF_CO,\n"
                     + " PAI nomepai,\n"
                     + " MAE nomemae,\n"
+                    + " EMPRESA empresa,\n"
+                    + " EMP_RENDA renda,\n"
                     + " LIMITE limite,\n"
+                    + " CASE \n"
+                    + " WHEN FLAG_BLOQUEIO LIKE 'S'\n"
+                    + " THEN 1\n"
+                    + " ELSE 0\n"
+                    + " END bloqueio,\n"
                     + " DTATUALIZACAO\n"
-                    + "FROM CADCLI "
+                    + "FROM CADCLI"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -432,19 +448,34 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
+                    imp.setDataNascimento(rst.getDate("dtnasc"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setCnpj(rst.getString("cpfcnpj"));
                     imp.setInscricaoestadual(rst.getString("inscestrg"));
-                    imp.setTelefone(rst.getString("telefone"));
+
+                    if (rst.getString("telefone") == null) {
+                        imp.setTelefone(rst.getString("telefone"));
+                    } else if (rst.getString("telefone").startsWith("0")) {
+                        imp.setTelefone(rst.getString("telefone").substring(1));
+                    } else {
+                        imp.setTelefone(rst.getString("telefone"));
+                    }
+
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setSalario(rst.getDouble("renda"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setDataCadastro(rst.getDate("dtcadastro"));
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setNomePai(rst.getString("nomepai"));
                     imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setEstadoCivil(rst.getString("civil"));
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setBloqueado(rst.getBoolean("bloqueio"));
 
                     result.add(imp);
 
@@ -467,7 +498,11 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " NUM_OPER numerodocumento,\n"
                     + " DT_VENDA dataemissao,\n"
                     + " DTATUALIZACAO,\n"
-                    + " VALOR valor,\n"
+                    + " CASE \n"
+                    + " WHEN BAIXADO LIKE 'S'\n"
+                    + " THEN VALOR\n"
+                    + " ELSE VR_ATUAL \n"
+                    + " END valor,\n"
                     + " N_FISCAL,\n"
                     + " PARCELA,\n"
                     + " VENCIMENTO datavencimento,\n"
