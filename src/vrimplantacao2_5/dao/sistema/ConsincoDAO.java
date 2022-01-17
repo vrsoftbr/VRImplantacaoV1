@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -117,7 +118,10 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
-                OpcaoFornecedor.PAGAR_FORNECEDOR));
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.CONDICAO_PAGAMENTO,
+                OpcaoFornecedor.PRAZO_FORNECEDOR,
+                OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR));
     }
 
     @Override
@@ -134,8 +138,8 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from \n" +
                     "	consinco.map_tributacaouf mt\n" +
                     "where \n" +
-                    "	ufempresa = 'SP' and \n" +
-                    "	ufclientefornec = 'SP' and \n" +
+                    "	ufempresa = '" + Parametros.get().getUfPadraoV2().getSigla() + "' and \n" +
+                    "	ufclientefornec = '" + Parametros.get().getUfPadraoV2().getSigla() + "' and \n" +
                     "	tiptributacao = 'SN' and \n" +
                     "	nroregtributacao = 2 /*lucro real*/ and \n" +
                     "	nrotributacao in (select distinct nrotributacao from consinco.map_famdivisao)")) {
@@ -229,8 +233,10 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		mc.seqproduto,\n" +
                     "		mc.cmdiavlrnf custonf,\n" +
                     "		mc.vlrtotalvda precovendatotal,\n" +
-                    "		mc.vlrcusliquidovda custosemimposto,\n" +
-                    "		mc.cmdiacusliquidoemp custocomimposto,\n" +
+                    //"		mc.vlrcusliquidovda custosemimposto,\n" +
+                    //"		mc.cmdiacusliquidoemp custocomimposto,\n" +
+                    "           mc.CMDIAVLRNF custosemimposto,\n" +
+                    "           coalesce(mc.CMDIAVLRNF, 0) + coalesce(mc.CMDIAIPI, 0) + coalesce(mc.CMDIAICMSST, 0) as custocomimposto\n," +
                     "		mc.vlrcusbrutovda custobruto\n" +
                     "	   from \n" +
                     "		consinco.mrl_custodia mc \n" +
@@ -325,7 +331,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.seqproduto = pe.seqproduto\n" +
                     "left join\n" +
                     "	consinco.map_prodcodigo ean on\n" +
-                    "	p.seqproduto = ean.seqproduto\n" +
+                    "	p.seqproduto = ean.seqproduto and ean.TIPCODIGO not in ('F')\n" +
                     "left join\n" +
                     "	consinco.map_famembalagem mfv on\n" +
                     "	ean.qtdembalagem = mfv.qtdembalagem and \n" +
@@ -388,6 +394,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rs.getString("cest"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pisaida"));
                     imp.setIcmsDebitoId(rs.getString("idaliquota"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
@@ -458,11 +465,18 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   forn.faxcontato,\n" +
                     "   forn.observacao,\n" +
                     "   pes.homepage,\n" +
-                    "   pes.emailnfe\n" +
+                    "   pes.emailnfe,\n" +
+                    "   pzo.pzomedvisitarep,\n" +
+                    "   pzo.pzomedentrega,\n" +
+                    "   pzo.pzomedatraso,\n" +
+                    "   pzo.pzopagamento\n" +
                     "from\n" +
                     "   consinco.maf_fornecedor forn\n" +
                     "inner join \n" +
-                    "	consinco.ge_pessoa pes ON forn.seqfornecedor = pes.seqpessoa")) {
+                    "	consinco.ge_pessoa pes ON forn.seqfornecedor = pes.seqpessoa\n" +
+                    "left join CONSINCO.MAF_FORNECDIVISAO pzo " +
+                    " on pzo.SEQFORNECEDOR = forn.seqfornecedor"        
+            )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
@@ -482,6 +496,17 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo(rs.getString("statusgeral").equals("A"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setTel_principal(rs.getString("fone1"));
+                    
+                    imp.setPrazoEntrega(rs.getInt("pzomedentrega"));
+                    imp.setPrazoVisita(rs.getInt("pzomedvisitarep"));
+                    
+                    if (rs.getString("pzopagamento") != null && !rs.getString("pzopagamento").trim().isEmpty()) {
+                        String[] pzos = rs.getString("pzopagamento").split("\\/");
+
+                        for (String pzo : pzos) {
+                            imp.addCondicaoPagamento(Integer.parseInt(pzo.trim()));
+                        }
+                    }
                     
                     String fone2 = rs.getString("fone2");
                     String fone3 = rs.getString("fone3");
@@ -554,7 +579,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoOracle.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    "select distinct \n" +
                     "	b.seqproduto,\n" +
                     "   b.REFFABRICANTE AS codigoexterno,\n" +
                     "	d.seqfornecedor,\n" +
@@ -564,6 +589,9 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	consinco.mrl_prodempresawm a\n" +
                     "join consinco.map_produto b on\n" +
                     "	a.seqproduto = b.seqproduto\n" +
+                    "JOIN CONSINCO.map_prodcodigo pc ON\n" +
+                    "   pc.SEQPRODUTO = b.SEQPRODUTO and \n" + 
+                    "   pc.TIPCODIGO = 'F' \n" +        
                     "join consinco.map_familia c on\n" +
                     "	c.seqfamilia = b.seqfamilia\n" +
                     "join consinco.map_famfornec d on\n" +
@@ -587,6 +615,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("seqfornecedor"));
                     imp.setIdProduto(rs.getString("seqproduto"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setTipoIpi(1);
                     
                     result.add(imp);
                 }
