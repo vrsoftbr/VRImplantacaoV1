@@ -606,7 +606,9 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	where\n" +
                     "		z.seqprodutosecundario = b.seqproduto)\n" +
                     "where\n" +
-                    "	nroempresa = " + getLojaOrigem())) {
+                    "	nroempresa = " + getLojaOrigem() + "\n" +
+                    "and f.nrocgccpf LIKE '%'||pf.CGCFORNEC||'%'"
+            )) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
