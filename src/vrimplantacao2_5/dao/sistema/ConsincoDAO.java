@@ -576,54 +576,61 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select distinct \n" +
-                    "	b.seqproduto,\n" +
-                    "   b.REFFABRICANTE AS codigoexterno,\n" +
-                    "	d.seqfornecedor,\n" +
-                    "	a.nroempresa,\n" +
-                    "	f.nomerazao\n" +
-                    "from\n" +
-                    "	consinco.mrl_prodempresawm a\n" +
-                    "join consinco.map_produto b on\n" +
-                    "	a.seqproduto = b.seqproduto\n" +
-                    "JOIN CONSINCO.map_prodcodigo pc ON\n" +
-                    "   pc.SEQPRODUTO = b.SEQPRODUTO and \n" + 
-                    "   pc.TIPCODIGO = 'F' \n" +        
-                    "join consinco.map_familia c on\n" +
-                    "	c.seqfamilia = b.seqfamilia\n" +
-                    "join consinco.map_famfornec d on\n" +
-                    "	d.seqfamilia = b.seqfamilia\n" +
-                    "join consinco.ge_pessoa f on\n" +
-                    "	f.seqpessoa = d.seqfornecedor\n" +
-                    "	and not exists (\n" +
-                    "	select\n" +
-                    "		1\n" +
-                    "	from\n" +
-                    "		consinco.map_produto z\n" +
-                    "	where\n" +
-                    "		z.seqprodutosecundario = b.seqproduto)\n" +
-                    "where\n" +
-                    "	nroempresa = " + getLojaOrigem() + "\n" +
-                    "and f.nrocgccpf LIKE '%'||pf.CGCFORNEC||'%'"
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT distinct\n"
+                    + "	pc.TIPCODIGO,\n"
+                    + "	b.seqproduto,\n"
+                    + "	b.REFFABRICANTE AS codigoexterno,\n"
+                    + "	d.seqfornecedor,\n"
+                    + "	c.SEQFAMILIA,\n"
+                    + "	f.nomerazao \n"
+                    + "from\n"
+                    + "	consinco.mrl_prodempresawm a	\n"
+                    + "join consinco.map_produto b on\n"
+                    + "	a.seqproduto = b.seqproduto\n"
+                    + "\n"
+                    + "join consinco.map_familia c on\n"
+                    + "	c.seqfamilia = b.seqfamilia\n"
+                    + "JOIN CONSINCO.map_prodcodigo pc ON\n"
+                    + "	pc.SEQPRODUTO = b.SEQPRODUTO \n"
+                    + "	AND pc.TIPCODIGO = 'F'\n"
+                    + "JOIN CONSINCO.MRFV_PRODCODIGOFORNEC pf ON\n"
+                    + "	pf.CGCFORNEC = pc.CGCFORNEC AND \n"
+                    + "	pf.SEQPRODUTO = b.SEQPRODUTO\n"
+                    + "join consinco.map_famfornec d on\n"
+                    + "	d.seqfamilia = b.seqfamilia\n"
+                    + "JOIN CONSINCO.maf_fornecedor fo ON\n"
+                    + "	fo.SEQFORNECEDOR = d.SEQFORNECEDOR \n"
+                    + "join consinco.ge_pessoa f on\n"
+                    + "	f.seqpessoa = d.seqfornecedor\n"
+                    + "	and not exists (\n"
+                    + "	select\n"
+                    + "		1\n"
+                    + "	from\n"
+                    + "		consinco.map_produto z\n"
+                    + "	where\n"
+                    + "		z.seqprodutosecundario = b.seqproduto)\n"
+                    + "where\n"
+                    + " a.nroempresa = " + getLojaOrigem() + "\n"
+                    + "AND f.nrocgccpf LIKE '%'||pf.CGCFORNEC||'%'"
             )) {
-                while(rs.next()) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("seqfornecedor"));
                     imp.setIdProduto(rs.getString("seqproduto"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setTipoIpi(1);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
