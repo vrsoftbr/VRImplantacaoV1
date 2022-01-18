@@ -26,6 +26,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
@@ -96,7 +97,9 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
-                OpcaoFornecedor.PAGAR_FORNECEDOR));
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
     }
 
     @Override
@@ -107,6 +110,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -579,7 +584,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
@@ -611,7 +616,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         }
 
         return result;
-    }*/
+    }
+    
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
@@ -681,6 +687,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "     ELSE 0\n"
                     + "	END bloqueado,\n"
                     + "	TRUNC(CLI_LIMITE,11) limite,\n"
+                    + " vc.vcnv_dia_rece vencimento,\n"
                     + "	CLI_NASCIMENTO data_nascimento,\n"
                     + "	CLI_DTULCO data_cadastro,\n"
                     + "	CLI_EST_CIVIL estadocivil,\n"
@@ -697,6 +704,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "FROM\n"
                     + "	CLIENTES c\n"
                     + "	JOIN CIDADES m ON c.CID_CODIGO = m.CID_CODIGO \n"
+                    + "	LEFT JOIN VENCIMENTO_CONVENIO vc ON C.VCNV_CODIGO = vc.VCNV_CODIGO AND vc.CNV_CODIGO = c.CNV_CODIGO\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -723,6 +731,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setValorLimite(rs.getDouble("limite"));
                     }
 
+                    imp.setDiaVencimento(rs.getInt("vencimento"));
                     imp.setDataNascimento(rs.getDate("data_nascimento"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setEstadoCivil(rs.getString("estadocivil"));
