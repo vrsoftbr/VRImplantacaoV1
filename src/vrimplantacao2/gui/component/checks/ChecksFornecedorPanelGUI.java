@@ -13,22 +13,22 @@ import vrimplantacao2_5.controller.interfaces.InterfaceController;
 public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
     public Importador importador;
-    private Set<OpcaoFornecedor> opt = OpcaoFornecedor.getPadrao();    
+    private Set<OpcaoFornecedor> opt = OpcaoFornecedor.getPadrao();
 
     public void setImportador(Importador importador) {
         this.importador = importador;
     }
-    
+
     public void setOpcoesDisponiveis(InterfaceDAO dao) {
         this.opt = dao.getOpcoesDisponiveisFornecedor();
         tabImportacao.removeAll();
-        
+
         if (opt.contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS)) {
             chkImportarSomenteAtivos.setVisible(true);
         } else {
             chkImportarSomenteAtivos.setVisible(false);
         }
-                
+
         if (opt.contains(OpcaoFornecedor.DADOS)
                 || opt.contains(OpcaoFornecedor.RAZAO_SOCIAL)
                 || opt.contains(OpcaoFornecedor.NOME_FANTASIA)
@@ -45,7 +45,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
             tabImportacao.add(pnlDados);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.ENDERECO)
                 || opt.contains(OpcaoFornecedor.NUMERO)
                 || opt.contains(OpcaoFornecedor.COMPLEMENTO)
@@ -68,7 +68,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlEndereco.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.TELEFONE)
                 || opt.contains(OpcaoFornecedor.CONTATOS)) {
 
@@ -98,22 +98,21 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosComplementares.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR)) {
             chkProdutoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR));
         } else {
             pnlProdutoFornecedor.setVisible(false);
             this.remove(pnlProdForn);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR)) {
             chkPagarFornecedor.setVisible(opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR));
         } else {
             this.remove(pnlContaPagar);
             pnlContasPagar.setVisible(false);
         }
-        
-        
+
         tabImportacao.revalidate();
         tabImportacao.repaint();
     }
@@ -121,19 +120,19 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public void setOpcoesDisponiveis(InterfaceController controller) {
         this.opt = controller.getOpcoesDisponiveisFornecedor();
         tabImportacao.removeAll();
-        
+
         if (opt.contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS)) {
             chkImportarSomenteAtivos.setVisible(true);
         } else {
             chkImportarSomenteAtivos.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.FORCAR_UNIFICACAO)) {
             chkForcarUnificacao.setVisible(true);
         } else {
             chkForcarUnificacao.setVisible(false);
         }
-                
+
         if (opt.contains(OpcaoFornecedor.DADOS)
                 || opt.contains(OpcaoFornecedor.RAZAO_SOCIAL)
                 || opt.contains(OpcaoFornecedor.NOME_FANTASIA)
@@ -150,7 +149,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
             tabImportacao.add(pnlDados);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.ENDERECO)
                 || opt.contains(OpcaoFornecedor.NUMERO)
                 || opt.contains(OpcaoFornecedor.COMPLEMENTO)
@@ -173,7 +172,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlEndereco.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.TELEFONE)
                 || opt.contains(OpcaoFornecedor.CONTATOS)) {
 
@@ -203,34 +202,33 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosComplementares.setVisible(false);
         }
-        
+
         if (!opt.contains(OpcaoFornecedor.DADOS)) {
             this.remove(scrollImportação);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR)) {
             chkProdutoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR));
         } else {
             pnlProdutoFornecedor.setVisible(false);
             this.remove(pnlProdForn);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR)) {
             chkPagarFornecedor.setVisible(opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR));
         } else {
             this.remove(pnlContaPagar);
             pnlContasPagar.setVisible(false);
         }
-        
-        
+
         tabImportacao.revalidate();
         tabImportacao.repaint();
     }
-    
+
     public Set<OpcaoFornecedor> getOpcoesDisponiveis() {
         return opt;
     }
-    
+
     /**
      * Creates new form ChecksFornecedorPanelGUI
      */
@@ -238,9 +236,9 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         super();
         initComponents();
     }
-    
+
     public void importar() throws Exception {
-        
+
         Set<OpcaoFornecedor> opcao = new HashSet<>();
         if (chkImportarSomenteAtivos.isSelected()) {
             opcao.add(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS);
@@ -250,7 +248,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         }
         if (chkFornecedor.isSelected()) {
             importador.importarFornecedor(opcao);
-        }  
+        }
         if (chkRazao.isSelected()) {
             opcao.add(OpcaoFornecedor.RAZAO_SOCIAL);
         }
@@ -311,25 +309,56 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         if (!opcao.isEmpty()) {
             importador.atualizarFornecedor(opcao.toArray(new OpcaoFornecedor[]{}));
-        }        
-        
+        }
+
         if (chkProdutoFornecedor.isSelected()) {
             importador.importarProdutoFornecedor();
         }
-        
+
         if (chkPagarFornecedor.isSelected()) {
             if (chkImportarSomenteAtivos.isSelected()) {
                 importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);
             } else {
                 importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-            }            
+            }
         }
     }
-    
+
     public void executarImportacao() throws Exception {
         importar();
     }
-        
+
+    public void limparFornecedor() {
+        ImportarSemFornecedor.setSelected(false);
+        chkBairro.setSelected(false);
+        chkCep.setSelected(false);
+        chkCnpj.setSelected(false);
+        chkComplemento.setSelected(false);
+        chkCondicaoPagamento.setSelected(false);
+        chkContatoAdicional.setSelected(false);
+        chkDataCadastro.setSelected(false);
+        chkEndereco.setSelected(false);
+        chkFantasia.setSelected(false);
+        chkForcarUnificacao.setSelected(false);
+        chkFornecedor.setSelected(false);
+        chkIE.setSelected(false);
+        chkIM.setSelected(false);
+        chkImportarSomenteAtivos.setSelected(false);
+        chkIndicadorIE.setSelected(false);
+        chkMunicipio.setSelected(false);
+        chkMunicipioIbge.setSelected(false);
+        chkNumero.setSelected(false);
+        chkObservacao.setSelected(false);
+        chkPagarFornecedor.setSelected(false);
+        chkPrazoFornecedor.setSelected(false);
+        chkProdutoFornecedor.setSelected(false);
+        chkRazao.setSelected(false);
+        chkSituacaoCadastro.setSelected(false);
+        chkTelefone.setSelected(false);
+        chkUf.setSelected(false);
+        chkUfIbge.setSelected(false);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -825,7 +854,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     }//GEN-LAST:event_chkMunicipioActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-        
+
     }//GEN-LAST:event_formComponentShown
 
 
@@ -877,18 +906,18 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel tabImportacao;
     public javax.swing.JPanel tabParametros;
     // End of variables declaration//GEN-END:variables
-    
+
     private String[] concat(String[] params, String novo) {
         params = Arrays.copyOf(params, params.length + 1);
         params[params.length - 1] = novo;
         return params;
     }
-    
-    public void gravarParametros(Parametros parametros, String... params) {        
+
+    public void gravarParametros(Parametros parametros, String... params) {
         parametros.put(chkImportarSomenteAtivos.isSelected(), concat(params, "SOMENTES_FORNECEDORES_ATIVOS"));
     }
 
     public void carregarParametros(Parametros parametros, String... params) {
         chkImportarSomenteAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_FORNECEDORES_ATIVOS")));
-    }    
+    }
 }

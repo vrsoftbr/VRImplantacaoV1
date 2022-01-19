@@ -30,7 +30,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             chkImportarClienteAtivo.setVisible(false);
         }
-                
+
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -134,21 +134,21 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosEmpresa.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
             chkClienteEventual.setVisible(true);
         } else {
             this.remove(tabClienteEventual);
         }
-        
-        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
+
+        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
             tabCreditoRotativo.add(pnlCreditoRotativo);
         } else {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
             tabCheque.add(pnlCheque);
@@ -156,7 +156,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCheque.setVisible(false);
             this.remove(tabCheque);
         }
-        
+
         if (opt.contains(OpcaoCliente.CONVENIO_CONVENIADO)) {
             chkConveniado.setVisible(true);
             chkConveniadoEmpresa.setVisible(true);
@@ -183,7 +183,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             chkImportarClienteAtivo.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -287,17 +287,17 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosEmpresa.setVisible(false);
         }
-        
+
         if (!opt.contains(OpcaoCliente.DADOS)) {
             this.remove(scrollImportação);
         }
-        
+
         if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
             chkClienteEventual.setVisible(true);
         } else {
             this.remove(tabClienteEventual);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
             tabCreditoRotativo.add(pnlCreditoRotativo);
@@ -305,7 +305,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
             tabCheque.add(pnlCheque);
@@ -318,7 +318,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.revalidate();
         tabCheque.revalidate();
     }
-    
+
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
         return opt;
     }
@@ -327,7 +327,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
      * Creates new form ChecksClientePanelGUI
      */
     public ChecksClientePanelGUI() {
-        super();        
+        super();
         initComponents();
     }
 
@@ -338,11 +338,11 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkForcarUnificacao.isSelected()) {
             opcao.add(OpcaoCliente.FORCAR_UNIFICACAO);
         }
-        
+
         if (chkImportarClienteAtivo.isSelected()) {
             opcao.add(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO);
         }
-        
+
         if (chkClientePreferencial.isSelected()) {
             importador.importarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
@@ -350,7 +350,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkClienteEventual.isSelected()) {
             importador.importarClienteEventual(opcao.toArray(new OpcaoCliente[]{}));
         }
-        
+
         if (chkNome.isSelected()) {
             opcao.add(OpcaoCliente.RAZAO);
         }
@@ -451,23 +451,23 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (!opcao.isEmpty()) {
             importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
-        
+
         if (chkCreditoRotativo.isSelected()) {
             importador.importarCreditoRotativo();
         }
-        
+
         if (chkCheque.isSelected()) {
             importador.importarCheque();
         }
-        
+
         if (chkConveniado.isSelected()) {
             importador.importarConvenioConveniado();
         }
-        
+
         if (chkConveniadoEmpresa.isSelected()) {
             importador.importarConvenioEmpresa();
         }
-        
+
         if (chkConveniadoTransacao.isSelected()) {
             importador.importarConvenioTransacao();
         }
@@ -475,6 +475,52 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
     public void executarImportacao() throws Exception {
         importar();
+    }
+
+    public void limparCliente() {
+        chkBairro.setSelected(false);
+        chkBloqueado.setSelected(false);
+        chkCargo.setSelected(false);
+        chkCelular.setSelected(false);
+        chkCep.setSelected(false);
+        chkCheque.setSelected(false);
+        chkClienteEventual.setSelected(false);
+        chkClientePreferencial.setSelected(false);
+        chkCnpj.setSelected(false);
+        chkComplemento.setSelected(false);
+        chkContatoAdicional.setSelected(false);
+        chkConveniado.setSelected(false);
+        chkConveniadoEmpresa.setSelected(false);
+        chkConveniadoTransacao.setSelected(false);
+        chkCreditoRotativo.setSelected(false);
+        chkDataAdmissao.setSelected(false);
+        chkDataCadastro.setSelected(false);
+        chkDataNascimento.setSelected(false);
+        chkEmail.setSelected(false);
+        chkEmpresa.setSelected(false);
+        chkEndereco.setSelected(false);
+        chkEstadoCivil.setSelected(false);
+        chkForcarUnificacao.setSelected(false);
+        chkIE.setSelected(false);
+        chkImportarClienteAtivo.setSelected(false);
+        chkMunicipio.setSelected(false);
+        chkMunicipioIbge.setSelected(false);
+        chkNome.setSelected(false);
+        chkNomeConjuge.setSelected(false);
+        chkNomeMae.setSelected(false);
+        chkNomePai.setSelected(false);
+        chkNumero.setSelected(false);
+        chkObservacao.setSelected(false);
+        chkObservacao2.setSelected(false);
+        chkPermiteCheque.setSelected(false);
+        chkPermiteCreditoRotativo.setSelected(false);
+        chkSalario.setSelected(false);
+        chkSexo.setSelected(false);
+        chkSituacaoCadastro.setSelected(false);
+        chkTelefone.setSelected(false);
+        chkUf.setSelected(false);
+        chkUfIbge.setSelected(false);
+        chkValorLimite.setSelected(false);
     }
 
     /**
