@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +24,9 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -46,6 +49,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(GZSistemasDAO.class.getName());
     public boolean utilizaPrecoTerminal = false;
+    private boolean temArquivoBalanca = false;
 
     @Override
     public String getSistema() {
@@ -94,6 +98,14 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
             OpcaoProduto.MARGEM
         }));
+    }
+
+    public boolean isTemArquivoBalanca() {
+        return temArquivoBalanca;
+    }
+
+    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
+        this.temArquivoBalanca = temArquivoBalanca;
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
@@ -251,6 +263,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join mercodb.saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
                     + "order by e.cdprod"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO()
+                                                                            .getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -270,9 +284,21 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.seteBalanca(true);
                     }
-
-                 // imp.seteBalanca(rst.getInt("setor") > 0);
+                    
                     imp.setValidade(rst.getInt("validade"));
+                    
+                    if(isTemArquivoBalanca()) {
+                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+                        
+                        if (bal != null) {
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                            imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : rst.getInt("VALIDADE"));
+                        } else {
+                            imp.seteBalanca(false);
+                        }
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricao").trim());
                     imp.setDescricaoReduzida(rst.getString("descpdv").trim());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
