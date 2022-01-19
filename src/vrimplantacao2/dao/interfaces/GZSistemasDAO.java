@@ -66,6 +66,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
             OpcaoProduto.DATA_CADASTRO,
             OpcaoProduto.DATA_ALTERACAO,
             OpcaoProduto.EAN,
@@ -258,9 +259,9 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "s.estmaximo,\n"
                     + "s.quant as estoque,\n"
                     + "s.situacao\n"
-                    + "from mercodb.estoque e\n"
-                    + "left join mercodb.tributa t on t.codigo = e.tributa\n"
-                    + "left join mercodb.saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
+                    + "from estoque e\n"
+                    + "left join tributa t on t.codigo = e.tributa\n"
+                    + "left join saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
                     + "order by e.cdprod"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO()
@@ -334,6 +335,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
                     imp.setIcmsDebitoId(rst.getString("codtrib"));
                     imp.setIcmsCreditoId(rst.getString("codtrib"));
+                    imp.setIcmsConsumidorId(imp.getIcmsCreditoId());
+                    
                     result.add(imp);
                 }
             }
