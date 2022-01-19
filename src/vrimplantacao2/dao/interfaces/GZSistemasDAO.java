@@ -246,9 +246,9 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "s.estmaximo,\n"
                     + "s.quant as estoque,\n"
                     + "s.situacao\n"
-                    + "from mercodb.estoque e\n"
-                    + "left join mercodb.tributa t on t.codigo = e.tributa\n"
-                    + "left join mercodb.saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
+                    + "from estoque e\n"
+                    + "left join tributa t on t.codigo = e.tributa\n"
+                    + "left join saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
                     + "order by e.cdprod"
             )) {
                 while (rst.next()) {
@@ -649,8 +649,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.sexo,\n"
                     + "cc.limite,\n"
                     + "cc.situacao bloqueado\n"
-                    + "from mercodb.clientes c\n"
-                    + "left join mercodb.clicartao cc on cc.cdcliente = c.codigo\n"
+                    + "from clientes c\n"
+                    + "left join clicartao cc on cc.cdcliente = c.codigo\n"
                     + "order by codigo"
             )) {
                 while (rst.next()) {
@@ -729,7 +729,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "emissao, "
                     + "vencto, "
                     + "obs\n"
-                    + "from mercodb.contrec\n"
+                    + "from contrec\n"
                     + "where receb is null\n"
                     + "and loja = " + getLojaOrigem()
             )) {
