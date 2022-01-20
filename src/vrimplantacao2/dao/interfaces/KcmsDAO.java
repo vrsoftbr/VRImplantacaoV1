@@ -63,7 +63,25 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT \n"
+                    "SELECT \n"
+                    + " CONCAT(CODALIQ,'.0.0000.000') id_aliquota,\n"
+                    + " 0 cst,\n"
+                    + " DESCRCAD DESCRICAO,\n"
+                    + " '',\n"
+                    + " PERCENTUAL percentual,\n"
+                    + " 0 reducao\n"
+                    + "FROM CDALIQUOTA\n"
+                    + "WHERE \n"
+                    + "CONCAT(CODALIQ,'.0.0000.000') NOT IN (\n"
+                    + "    SELECT DISTINCT \n"
+                    + "     CONCAT(p.CODALIQ ,'.', p.PERCREDUC,'.',trib.SITTRIB) id_aliquota\n"
+                    + "    FROM CDPRODUTOS p\n"
+                    + "     JOIN CDALIQUOTA aliq ON aliq.CODALIQ = p.CODALIQ\n"
+                    + "     JOIN CDTRIBUTACAO trib ON trib.CODTRIB = p.CODTRIB\n"
+                    + ")\n"
+                    + "AND CODALIQ IN (SELECT DISTINCT CODALIQECF FROM CDPRODUTOS)  \n"
+                    + "UNION\n"
+                    + "SELECT DISTINCT \n"
                     + " concat(p.CODALIQ ,'.', p.PERCREDUC,'.',trib.SITTRIB) id_aliquota,\n"
                     + " trib.SITTRIB cst,\n"
                     + " aliq.DESCRCAD DESCRICAO,\n"
@@ -229,7 +247,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    P.CODGRUPOFISCAL, \n"
                     + "    P.PERCALIQSUBTRIB, \n"
                     + "    P.TIPOSUBTRIB, \n"
-                    + "    P.CODALIQECF, \n"
+                    + "    concat(P.CODALIQECF,'.0.0000.000') id_aliquota_consumidor, \n"
                     + "    P.IDNCM, \n"
                     + "    P.CODTRIBSN, \n"
                     + "    P.CODCSTPIS, \n"
@@ -304,7 +322,9 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rs.getString("id_aliquota"));
                     imp.setIcmsDebitoForaEstadoId(rs.getString("id_aliquota"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_aliquota"));
-                    imp.setIcmsConsumidorId(rs.getString("id_aliquota"));
+                    imp.setIcmsConsumidorId(rs.getString("id_aliquota_consumidor"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquota"));
+                    imp.setIcmsCreditoId(rs.getString("id_aliquota"));
 
                     if ((rs.getString("codbarra") != null)
                             && ("S".equals(rs.getString("pesavel")))
