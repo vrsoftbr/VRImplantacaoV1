@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -536,6 +537,25 @@ public class CissDAO extends InterfaceDAO {
         List<ClienteIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
+            
+            Map<String, Double> pontos = new HashMap<>();
+            
+            try(ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	clp.idindicador idcliente,\n" +
+                    "	sum(p.qtdpontos - p.qtdpontosresgatados) pontos\n" +
+                    "from\n" +
+                    "	dba.clube_pontuacao_analitica p\n" +
+                    "join dba.clube_pontuacao clp on	p.idpontuacao = clp.idpontuacao\n" +
+                    "join dba.clube_fidelizacao cf on clp.idclube = cf.idclube\n" +
+                    "WHERE \n" +
+                    "	clp.IDEMPRESA = " + getLojaOrigem() + "\n" +
+                    "group by clp.idindicador")) {
+                while(rst.next()) {
+                    pontos.put(rst.getString("idcliente"), rst.getDouble("pontos"));
+                }
+            }
+            
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "        c.idclifor id,\n"
@@ -596,6 +616,10 @@ public class CissDAO extends InterfaceDAO {
                     imp.setCelular(rst.getString("FONE2"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("EMAIL"));
+                    
+                    if(pontos.containsKey(imp.getId())) {
+                        imp.setPonto(pontos.get(imp.getId()));
+                    }
 
                     result.add(imp);
                 }

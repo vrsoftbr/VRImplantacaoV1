@@ -12,6 +12,7 @@ import vrimplantacao2.dao.cadastro.LocalDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodAnteriorDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodTelefoneDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -35,6 +36,7 @@ public class ClienteRepositoryProvider {
     private String lojaOrigem;
     private int lojaVR;
     private ClientePreferencialDAO clientePreferencialDAO;
+    private ProdutoDAO produtoDAO;
     private Map<Integer, MunicipioVO> municipioByID;
     private MultiMap<String, MunicipioVO> municipioByDesc;
     private boolean desativarNotificacao = false;
@@ -146,6 +148,14 @@ public class ClienteRepositoryProvider {
         return evt;
     }
 
+    int getProduto() throws Exception {
+       return produtoDAO.getProduto();
+    }
+
+    long getEan() throws Exception {
+        return produtoDAO.getEan(getProduto());
+    }
+    
     public static class OrgPreferencial {
         
         ClienteRepositoryProvider provider;

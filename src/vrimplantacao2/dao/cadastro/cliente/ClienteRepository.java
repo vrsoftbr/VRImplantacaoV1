@@ -1232,7 +1232,9 @@ public class ClienteRepository {
 
             java.sql.Date dataPontuacao = Utils.getDataAtual();
             int numeroCupom = 1;
-
+            int idProduto = provider.getProduto();
+            long ean = provider.getEan();
+            
             for (ClienteIMP imp : clientes) {
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -1299,7 +1301,7 @@ public class ClienteRepository {
                         vendaDAO.gerarVendaPontuacao(vendaVO);
 
                         itemVO.setVenda(vendaVO);
-                        itemVO.setId_produto(53687);
+                        itemVO.setId_produto(idProduto);
                         itemVO.setQuantidade(1);
                         itemVO.setPrecoVenda(0);
                         itemVO.setId_aliquota(6);
@@ -1311,7 +1313,7 @@ public class ClienteRepository {
                         itemVO.setValorAcrescimo(0);
                         itemVO.setValorAcrescimoCupom(0);
                         itemVO.setRegraCalculo("");
-                        itemVO.setCodigoBarras(7896950800059L);
+                        itemVO.setCodigoBarras(ean);
                         itemVO.setUnidadeMedida("");
                         itemVO.setTotalizadorParcial("");
                         itemVO.setSequencia(1);
@@ -1320,7 +1322,7 @@ public class ClienteRepository {
                         vendaItemDAO.gravarItemPontuacao(itemVO);
 
                         pontuacaoVO.setIdVenda(vendaVO.getId());
-                        pontuacaoVO.setIdPromocao(1);
+                        pontuacaoVO.setIdPromocao(2);
                         pontuacaoVO.setPonto(imp.getPonto());
                         pontuacaoVO.setCnpj(Utils.stringToLong(imp.getCnpj()));
                         pontuacaoVO.setIdSituacaoPromocaoPontuacao(1);
