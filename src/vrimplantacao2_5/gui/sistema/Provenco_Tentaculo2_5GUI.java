@@ -105,6 +105,13 @@ public class Provenco_Tentaculo2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
 
+                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
+                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+                    }
+                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
+                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+                    }
+
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:
@@ -116,7 +123,9 @@ public class Provenco_Tentaculo2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
-                            default: break;
+                            default:
+                                break;
+
                         }
                     }
 
