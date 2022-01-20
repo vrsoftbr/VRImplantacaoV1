@@ -93,6 +93,36 @@ public class ProdutoDAO {
         }
         return cadastrados;
     }
+    
+    	public int getProduto() throws Exception {
+        int idProduto = 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from produto \n"
+                    + "limit 1"
+            )) {
+                if (rst.next()) {
+                    idProduto = rst.getInt("id");
+                }
+            }
+        }
+        return idProduto;
+    }
+
+    public long getEan(int id) throws Exception {
+        long eanProduto = 0L;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigobarras from produtoautomacao p \n"
+                    + "where id_produto = " + id + ""
+            )) {
+                if (rst.next()) {
+                    eanProduto = rst.getLong("codigobarras");
+                }
+            }
+        }
+        return eanProduto;
+    }
 
     /**
      * Insere um {@link ProdutoVO} no banco de dados.

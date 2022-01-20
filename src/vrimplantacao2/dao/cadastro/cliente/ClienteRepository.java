@@ -1299,7 +1299,7 @@ public class ClienteRepository {
                         vendaDAO.gerarVendaPontuacao(vendaVO);
 
                         itemVO.setVenda(vendaVO);
-                        itemVO.setId_produto(53687);
+                        itemVO.setId_produto(provider.getProduto());
                         itemVO.setQuantidade(1);
                         itemVO.setPrecoVenda(0);
                         itemVO.setId_aliquota(6);
@@ -1311,7 +1311,7 @@ public class ClienteRepository {
                         itemVO.setValorAcrescimo(0);
                         itemVO.setValorAcrescimoCupom(0);
                         itemVO.setRegraCalculo("");
-                        itemVO.setCodigoBarras(7896950800059L);
+                        itemVO.setCodigoBarras(provider.getEan());
                         itemVO.setUnidadeMedida("");
                         itemVO.setTotalizadorParcial("");
                         itemVO.setSequencia(1);
