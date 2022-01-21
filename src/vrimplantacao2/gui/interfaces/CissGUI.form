@@ -172,6 +172,7 @@
                                   <Component id="chkSoAtivos" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkForcarPreco" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -259,23 +260,29 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                                              <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                              <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                                              <Component id="chkT1Custo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkSoAtivos" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
                                               <Component id="chkT1NatReceita" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="chkT1ICMS" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" attributes="0">
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                                                      <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
+                                                      <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                                      <Component id="chkT1Custo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="chkSoAtivos" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                              </Group>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkForcarPreco" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                   </Group>
@@ -303,7 +310,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="38" max="32767" attributes="0"/>
+                          <EmptySpace pref="22" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -458,6 +465,11 @@
                 <Component class="vrframework.bean.textField.VRTextField" name="txtDtOferta">
                   <Properties>
                     <Property name="mascara" type="java.lang.String" value="Data"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarPreco">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="For&#xe7;ar Pre&#xe7;o e Custo"/>
                   </Properties>
                 </Component>
               </SubComponents>
