@@ -39,7 +39,9 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         tabProdutos.carregarParametros(params, NOME_SISTEMA);
         txtHostFirebird.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
         txtBancoDadosFirebird.setArquivo(params.getWithNull("dados", NOME_SISTEMA, "DATABASE"));
+        txtBancoDadosFirebirdVendas.setArquivo(params.getWithNull("dados", NOME_SISTEMA, "DATABASE_VENDAS"));
         txtPortaFirebird.setText(params.getWithNull("3050", NOME_SISTEMA, "PORTA"));
+        txtComplemento.setText(params.getWithNull("", NOME_SISTEMA, "COMPLEMENTO"));
         txtUsuarioFirebird.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
         txtSenhaFirebird.setText(params.getWithNull("masterkey", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
@@ -54,7 +56,9 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         tabProdutos.gravarParametros(params, NOME_SISTEMA);
         params.put(txtHostFirebird.getText(), NOME_SISTEMA, "HOST");
         params.put(txtBancoDadosFirebird.getArquivo(), NOME_SISTEMA, "DATABASE");
+        params.put(txtBancoDadosFirebirdVendas.getArquivo(), NOME_SISTEMA, "DATABASE_PDV");
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
+        txtComplemento.setText(params.getWithNull("", NOME_SISTEMA, "COMPLEMENTO"));
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
         params.put(edtDtVendaIni.getDate(), NOME_SISTEMA, "VENDAS_INI");
@@ -105,9 +109,9 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -126,6 +130,27 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
         if (txtUsuarioFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
+        }
+
+        if (!txtBancoDadosFirebird.getArquivo().isEmpty()) {
+            dao.setBancoretaguarda(ConexaoFirebird.getNewConnection(
+                    txtHostFirebird.getText(),
+                    txtPortaFirebird.getInt(),
+                    txtBancoDadosFirebird.getArquivo(),
+                    txtUsuarioFirebird.getText(),
+                    txtSenhaFirebird.getText(),
+                    null
+            ));
+        }
+        if (!txtBancoDadosFirebirdVendas.getArquivo().isEmpty()) {
+            dao.setBancovendas(ConexaoFirebird.getNewConnection(
+                    txtHostFirebird.getText(),
+                    txtPortaFirebird.getInt(),
+                    txtBancoDadosFirebirdVendas.getArquivo(),
+                    txtUsuarioFirebird.getText(),
+                    txtSenhaFirebird.getText(),
+                    null
+            ));
         }
 
         connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(),
@@ -177,11 +202,11 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    
+
                     switch (tab.getSelectedIndex()) {
                         case 0:
                             tabProdutos.setImportador(importador);
@@ -197,19 +222,24 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                         case 3:
                             if (cbxUnifProdutos.isSelected()) {
                                 importador.unificarProdutos();
-                            }   if (cbxUnifFornecedores.isSelected()) {
+                            }
+                            if (cbxUnifFornecedores.isSelected()) {
                                 importador.unificarFornecedor();
-                            }   if (cbxUnifProdFornecedor.isSelected()) {
+                            }
+                            if (cbxUnifProdFornecedor.isSelected()) {
                                 importador.unificarProdutoFornecedor();
-                            }   if (cbxUnifCliPreferencial.isSelected()) {
+                            }
+                            if (cbxUnifCliPreferencial.isSelected()) {
                                 importador.unificarClientePreferencial();
-                            }   break;
+                            }
+                            break;
                         case 4:
                             if (chkPdvVendas.isSelected()) {
-                                dao.setVendaDataIni(edtDtVendaIni.getDate());
-                                dao.setVendaDataFim(edtDtVendaFim.getDate());
-                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
-                            }   break;
+                                dao.setVendaDataInicio(edtDtVendaIni.getDate());
+                                dao.setVendaDataTermino(edtDtVendaFim.getDate());
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL);
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -293,6 +323,8 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
         txtComplemento = new vrframework.bean.textField.VRTextField();
         vRLabel8 = new vrframework.bean.label.VRLabel();
         txtBancoDadosFirebird = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel9 = new vrframework.bean.label.VRLabel();
+        txtBancoDadosFirebirdVendas = new vrframework.bean.fileChooser.VRFileChooser();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setResizable(true);
@@ -408,7 +440,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                     .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxUnifProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(304, Short.MAX_VALUE))
+                .addContainerGap(443, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -472,7 +504,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                 .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addContainerGap(429, Short.MAX_VALUE))
         );
         pnlVendasLayout.setVerticalGroup(
             pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -525,7 +557,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
         vRLabel5.setText("Senha:");
 
-        txtPortaFirebird.setText("1521");
+        txtPortaFirebird.setText("3050");
         txtPortaFirebird.setCaixaAlta(false);
         txtPortaFirebird.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -535,7 +567,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
         vRLabel7.setText("Porta");
 
-        vRLabel3.setText("Banco de Dados");
+        vRLabel3.setText("Banco de Dados (Retaguarda)");
 
         txtHostFirebird.setCaixaAlta(false);
 
@@ -559,6 +591,8 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
 
         vRLabel8.setText("Complemento");
 
+        vRLabel9.setText("Banco de Dados (Vendas)");
+
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
         pnlConexao.setLayout(pnlConexaoLayout);
         pnlConexaoLayout.setHorizontalGroup(
@@ -572,11 +606,18 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                             .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                             .addGroup(pnlConexaoLayout.createSequentialGroup()
                                 .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 51, Short.MAX_VALUE))
+                            .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
+                                .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(109, 109, 109))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
+                                .addComponent(txtBancoDadosFirebirdVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtUsuarioFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -612,13 +653,15 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                     .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtUsuarioFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtBancoDadosFirebirdVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -644,7 +687,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tab, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+                    .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -758,6 +801,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.panel.VRPanel tabVendas;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
+    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebirdVendas;
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
     private vrframework.bean.textField.VRTextField txtPortaFirebird;
@@ -772,6 +816,7 @@ public class Provenco_TentaculoGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo2;

@@ -43,7 +43,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="tab" alignment="0" pref="0" max="32767" attributes="0"/>
-                  <Component id="vRTabbedPane1" alignment="0" pref="616" max="32767" attributes="0"/>
+                  <Component id="vRTabbedPane1" alignment="0" pref="755" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -230,7 +230,7 @@
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="304" max="32767" attributes="0"/>
+                      <EmptySpace pref="443" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -320,7 +320,7 @@
                           <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlPdvVendaDatas" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="290" max="32767" attributes="0"/>
+                          <EmptySpace pref="429" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -424,13 +424,23 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtBancoDadosFirebird" pref="289" max="32767" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
                                       <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="51" max="32767" attributes="0"/>
                                   </Group>
+                                  <Component id="txtBancoDadosFirebird" pref="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="109" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="txtBancoDadosFirebirdVendas" min="-2" pref="224" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="txtUsuarioFirebird" min="-2" pref="88" max="-2" attributes="0"/>
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
@@ -480,6 +490,7 @@
                           <Component id="vRLabel4" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel3" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel9" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
@@ -487,6 +498,7 @@
                           <Component id="txtUsuarioFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="txtHostFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="txtBancoDadosFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtBancoDadosFirebirdVendas" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -535,7 +547,7 @@
             </Component>
             <Component class="vrframework.bean.textField.VRTextField" name="txtPortaFirebird">
               <Properties>
-                <Property name="text" type="java.lang.String" value="1521"/>
+                <Property name="text" type="java.lang.String" value="3050"/>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -549,7 +561,7 @@
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Banco de Dados"/>
+                <Property name="text" type="java.lang.String" value="Banco de Dados (Retaguarda)"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.textField.VRTextField" name="txtHostFirebird">
@@ -596,6 +608,13 @@
               </Properties>
             </Component>
             <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtBancoDadosFirebird">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel9">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Banco de Dados (Vendas)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtBancoDadosFirebirdVendas">
             </Component>
           </SubComponents>
         </Container>
