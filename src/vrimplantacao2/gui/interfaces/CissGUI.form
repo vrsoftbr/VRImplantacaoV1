@@ -484,14 +484,22 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkCliDtNascimento" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkCliCelular" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliRG" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
                                           <Component id="chkTemFicha" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
@@ -500,8 +508,6 @@
                                       <Component id="chkPontuacao" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkPagamentoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="360" max="32767" attributes="0"/>
                       </Group>
@@ -522,11 +528,20 @@
                               <Component id="chkPontuacao" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliRG" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliCelular" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkPagamentoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliDtNascimento" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="68" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -595,6 +610,21 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPontuacao">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Pontos"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliRG">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="RG"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCelular">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Celular"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliDtNascimento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Nascimento"/>
                   </Properties>
                 </Component>
               </SubComponents>
