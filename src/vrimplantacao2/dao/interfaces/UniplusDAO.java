@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Util;
+import vrimplantacao.dao.cadastro.ClientePreferencialDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
@@ -119,6 +122,21 @@ public class UniplusDAO extends InterfaceDAO {
     }
     
     @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR));
+    }
+    
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -171,11 +189,11 @@ public class UniplusDAO extends InterfaceDAO {
                     "		m4.merc3 = m5.merc3 and\n" +
                     "		m4.merc4 = m5.merc4"*/
                     "select\n"
-                    + "	codigo merc1,\n"
+                    + "	id merc1,\n"
                     + "	nome merc1_desc,\n"
-                    + "	codigo merc2,\n"
+                    + "	id merc2,\n"
                     + "	nome merc2_desc,\n"
-                    + "	codigo merc3,\n"
+                    + "	id merc3,\n"
                     + "	nome merc3_desc	\n"
                     + "from\n"
                     + "	hierarquia h\n"
@@ -328,7 +346,6 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	        p.idfamilia::bigint = fp.codigo::bigint\n"
                     + "    left join hierarquia merc on\n"
                     + "    	p.idhierarquia = merc.id\n"
-                    //+ "where length(p.ean) <= 14\n"
                     + "order by \n"
                     + "	p.id"
             )) {
@@ -342,7 +359,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setImportId(rs.getString("codigo"));
                     //imp.setEan(rs.getString("ean").substring(0, 14));
                     if (rs.getString("ean").length() > 1 && rs.getString("ean").length() < 14) {
-                            imp.setEan(rs.getString("ean").substring(1, rs.getString("ean").length()));
+                            imp.setEan(rs.getString("ean").substring(0, rs.getString("ean").length()));
                         } else {
                             imp.setEan(rs.getString("ean"));
                         }
@@ -715,10 +732,8 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	e.inativo\n"
                         + "from\n"
                         + "	entidade e\n"
-                        + "left join\n"
-                        + "	cidade c on c.id = e.idcidade\n"
-                        + "left join\n"
-                        + "	estado est on est.id = e.idestado\n"
+                        + "left join cidade c on c.id = e.idcidade\n"
+                        + "left join estado est on est.id = e.idestado\n"
                         + "where\n"
                         + "	e.fornecedor = " + getLojaOrigem() + "\n"
                         + "	or e.id in (select distinct identidade from financeiro where tipo = 'P')\n"
@@ -782,10 +797,10 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	e.bairro,\n"
                         + "	c.codigo municipioibge,\n"
                         + "	c.nome municipio,\n"
-                        + " es.codigoibge estadoibge,\n"
-                        + " es.codigo estado,\n"
+                        + "     es.codigoibge estadoibge,\n"
+                        + "     es.codigo estado,\n"
                         + "	e.cep,\n"
-                        + "	e.telefone,\n"
+                        + "	replace (e.telefone,'0xx','') telefone,\n"
                         + "	replace (e.celular,'0xx','') celular,\n"
                         + "	e.fax,\n"
                         + "	e.email,\n"
@@ -795,12 +810,10 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	e.inativo\n"
                         + "from \n"
                         + "	entidade e\n"
-                        + "left join\n"
-                        + "	cidade c on c.id = e.idcidade\n"
-                        + "left join\n"
-                        + "	estado es on c.idestado = es.id\n"
+                        + "left join cidade c on c.id = e.idcidade\n"
+                        + "left join estado es on c.idestado = es.id\n"
                         + "where\n"
-                        + "	e.cliente = " + getLojaOrigem() + "\n"
+                        + "	e.idfilialcadastro = " + getLojaOrigem() + "\n"
                         + "order by\n"
                         + "	e.codigo::integer")) {
                     while (rs.next()) {
