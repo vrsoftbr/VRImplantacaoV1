@@ -255,6 +255,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "s.termvenda vendaterminal,\n"        
                     + "s.perclucro,\n"
                     + "s.precocusto,\n"
+                    + "s.precocomp,\n"
                     + "s.estminimo,\n"
                     + "s.estmaximo,\n"
                     + "s.quant as estoque,\n"
@@ -310,13 +311,14 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("depto"));
                     imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("perclucro"));
-                    if(utilizaPrecoTerminal) {
+                    imp.setPrecovenda(rst.getDouble("vendaterminal"));
+                    /*if(utilizaPrecoTerminal) {
                         imp.setPrecovenda(rst.getDouble("vendaterminal"));
                     } else {
                         imp.setPrecovenda(rst.getDouble("precovenda"));
-                    }
+                    }*/
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoSemImposto(rst.getDouble("precocomp"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));

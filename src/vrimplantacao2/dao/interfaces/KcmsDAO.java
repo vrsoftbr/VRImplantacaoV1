@@ -211,6 +211,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    P.PESAVEL, \n"
                     + "    P.UNIDADE, \n"
                     + "    P.UNDCOMPRA, \n"
+                    + "    1 as qtde, \n"
                     + "    P.QTDEMBAL, \n"
                     + "    P.QTDEMBALCPR, \n"
                     + "    P.CODGENERO, \n"
@@ -295,7 +296,8 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rs.getInt("valbalanca"));
                     imp.seteBalanca("S".equals(rs.getString("pesavel")) ? true : false);
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembal"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembal"));
+                    imp.setQtdEmbalagem(rs.getInt("qtde"));
                     imp.setCodMercadologico1(rs.getString("codgenero"));
                     imp.setCodMercadologico2(rs.getString("codgrupo"));
                     imp.setCodMercadologico3(rs.getString("codsubgrupo"));
