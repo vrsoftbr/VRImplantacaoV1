@@ -350,9 +350,9 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "	COD_PROD produtoid,\n"
                     + "	COD_FORNEC fornecedorid,\n"
-                    + "	REFERENCIA\n"
-                    + "FROM\n"
-                    + "	PRODUTOS_FORNECEDOR;"
+                    + "	REFERENCIA referencia \n"
+                    + " FROM \n"
+                    + "	PRODUTOS_FORNECEDOR"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
