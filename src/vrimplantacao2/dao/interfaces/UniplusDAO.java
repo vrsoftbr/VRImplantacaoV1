@@ -124,16 +124,30 @@ public class UniplusDAO extends InterfaceDAO {
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                OpcaoCliente.DADOS,
-                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.DADOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.VENCIMENTO_ROTATIVO,
-                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.ENDERECO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.TELEFONE,
-                OpcaoCliente.CELULAR));
+                OpcaoCliente.VENCIMENTO_ROTATIVO));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.TIPO_EMPRESA
+        ));
     }
     
     @Override
@@ -715,8 +729,8 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	c.nome as municipio,\n"
                         + "	c.codigoibge as ibgemunicipio,\n"
                         + "	e.cep,\n"
-                        + "	e.telefone,\n"
-                        + "	e.celular,\n"
+                        + "	replace (e.telefone,'0xx','') telefone,\n"
+                        + "	replace (e.celular,'0xx','') celular,\n"
                         + "	e.fax,\n"
                         + "	e.email,\n"
                         + "	e.nascimento,\n"
