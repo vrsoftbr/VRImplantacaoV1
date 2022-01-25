@@ -928,7 +928,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     = "SELECT\n"
                     + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
                     + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO || pdv.PRO_ID || pdv.MOV_SEQ_COO), '-', '') AS id_item,\n"
-                    + "	SUBSTRING(pdv.PRO_COD_BARRA FROM 1 FOR CHAR_LENGTH(pdv.PRO_COD_BARRA)-1) ean,\n"
+                    + "	pdv.PRO_COD_BARRA ean,\n"
                     + "	p.PRO_DESCRICAO produto,\n"
                     + "	pdv.MOV_LOJA AS loja,\n"
                     + "	pdv.MOV_PDV AS pdv,\n"
