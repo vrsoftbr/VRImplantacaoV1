@@ -149,10 +149,14 @@ public class ClienteRepositoryProvider {
     }
 
     int getProduto() throws Exception {
+        produtoDAO = new ProdutoDAO();
+        
        return produtoDAO.getProduto();
     }
 
     long getEan() throws Exception {
+        produtoDAO = new ProdutoDAO();
+        
         return produtoDAO.getEan(getProduto());
     }
     

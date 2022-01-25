@@ -88,6 +88,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean utilizaMetodoAjustaAliquota = false;
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean removerCodigoCliente = false;
+    public boolean utilizaEstoqueMultiLoja = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -367,8 +368,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     
-                    imp.setEstoque(rst.getDouble("estoque") == 0 ? 
-                            rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque_produto"));
+                    
+                    if(utilizaEstoqueMultiLoja) {
+                        imp.setEstoque(rst.getDouble("estoque"));
+                    }
                     
                     imp.setTroca(rst.getDouble("estoquetroca"));
                     

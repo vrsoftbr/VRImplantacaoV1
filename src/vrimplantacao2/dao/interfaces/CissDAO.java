@@ -563,6 +563,8 @@ public class CissDAO extends InterfaceDAO {
                     + "        c.NOMEFANTASIA fantasia,\n"
                     + "        c.CNPJCPF cnpj,\n"
                     + "        c.INSCRESTADUAL inscricaoestadual,\n"
+                    + "        pf.DTNASCIMENTO,\n"
+                    + "        pf.RG,\n"        
                     + "        c.FONE1,\n"
                     + "        c.ENDERECO,\n"
                     + "        c.BAIRRO,\n"
@@ -586,6 +588,7 @@ public class CissDAO extends InterfaceDAO {
                     + "from\n"
                     + "        dba.cliente_fornecedor c\n"
                     + "        left join dba.cidades_ibge cid on cid.idcidade = c.idcidade\n"
+                    + "        LEFT JOIN dba.PESSOA_FISICA pf ON c.IDCLIFOR = pf.IDCLIFOR\n"        
                     + "        left join dba.cliente_convenio conv on c.idconvenio = conv.idconvenio"//\n" +
             //"where\n" +
             //"        c.TIPOCADASTRO in ('A','C')"
@@ -598,6 +601,12 @@ public class CissDAO extends InterfaceDAO {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    
+                    if(imp.getInscricaoestadual() != null && !imp.getInscricaoestadual().trim().isEmpty()
+                            && imp.getInscricaoestadual().equals("ISENTO")) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    }
+                    
                     imp.setTelefone(rst.getString("FONE1"));
                     imp.setEndereco(rst.getString("ENDERECO"));
                     imp.setBairro(rst.getString("BAIRRO"));
@@ -613,9 +622,10 @@ public class CissDAO extends InterfaceDAO {
                     imp.setValorLimite(rst.getDouble("vallimitecredito") + rst.getDouble("vallimiteconvenio"));
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
                     imp.setAtivo(rst.getBoolean("id_situacaoCadastro"));
-                    imp.setCelular(rst.getString("FONE2"));
+                    imp.setCelular(rst.getString("FONECELULAR"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("EMAIL"));
+                    imp.setDataNascimento(rst.getDate("dtnascimento"));
                     
                     if(pontos.containsKey(imp.getId())) {
                         imp.setPonto(pontos.get(imp.getId()));
