@@ -68,6 +68,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                     ArrayList<DivergenciaVO> vDivergenciaGeral = new ArrayList();
                     dao.incluirEcfInexistente = chkIncluirEcfsInexistentes.isSelected();
                     dao.incluirModeloEcfPadrao();
+                    dao.utilizarCodigoXML = chkUtilizaCodigoXML.isSelected();
 
                     Set<Integer> lojas = new LinkedHashSet<>();
                     for (String arq : arquivos) {
@@ -159,6 +160,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         chkExibirDivergencias = new vrframework.bean.checkBox.VRCheckBox();
         chkEliminarVendaExistente = new vrframework.bean.checkBox.VRCheckBox();
         chkIncluirEcfsInexistentes = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtilizaCodigoXML = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnImportar = new vrframework.bean.button.VRButton();
@@ -223,6 +225,8 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
 
         chkIncluirEcfsInexistentes.setText("Incluir ECFs inexistentes");
 
+        chkUtilizaCodigoXML.setText("Utilizar Código do XML");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -235,7 +239,10 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkIncluirEcfsInexistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                                .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkUtilizaCodigoXML, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -258,7 +265,9 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUtilizaCodigoXML, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -394,6 +403,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkEliminarVendaExistente;
     private vrframework.bean.checkBox.VRCheckBox chkExibirDivergencias;
     private vrframework.bean.checkBox.VRCheckBox chkIncluirEcfsInexistentes;
+    private vrframework.bean.checkBox.VRCheckBox chkUtilizaCodigoXML;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;

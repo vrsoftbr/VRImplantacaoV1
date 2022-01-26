@@ -59,6 +59,7 @@ public class NotaSaidaNfceDAO {
     private ArrayList<DivergenciaVO> vDivergencia = null;
     
     public boolean incluirEcfInexistente = false;
+    public boolean utilizarCodigoXML = false;
     private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void eliminarVenda(long idVenda) throws Exception{
@@ -296,6 +297,11 @@ public class NotaSaidaNfceDAO {
                     String codigo = String.format("%.0f", Utils.stringToDouble(cProd.getTextContent()));
                     String codigoAcom, idProduto;
                     //codigoAcom = codigo.substring(0, codigo.length() - 2);
+                    
+                    if(utilizarCodigoXML) {
+                        codigo = String.valueOf(cProd.getTextContent());
+                    }
+                    
                     idProduto = codigo;
                     ProdutoMapa mp = mapa.get(tipo.toString(), idProduto);
                     if (importacaoV2) {
@@ -419,6 +425,7 @@ public class NotaSaidaNfceDAO {
                 oVendaItem.unidadeMedida = unidadeMedida;
                 oVendaItem.idTipoCancelamento = -1;
                 oVendaItem.matriculaCancelamento = -1;
+                oVendaItem.data = simpleDateFormat.format(dataEmissao);
 
                 oVenda.vItem.add(oVendaItem);
             }
@@ -547,7 +554,14 @@ public class NotaSaidaNfceDAO {
                 sql.append("INSERT INTO pdv.vendaitem (id_venda, id_produto, quantidade, precovenda, valortotal, id_aliquota,");
                 sql.append(" cancelado, valorcancelado, id_tipocancelamento, matriculacancelamento, contadordoc, valordesconto,");
                 sql.append(" valoracrescimo, valordescontocupom, valoracrescimocupom, regracalculo, codigobarras, unidademedida,");
-                sql.append(" totalizadorparcial, sequencia, valoracrescimofixo, valordescontopromocao, valorbasesubstituicaoefetivo, valoricmssubstituicaoefetivo) VALUES (");
+                sql.append(" totalizadorparcial, sequencia, valoracrescimofixo, valordescontopromocao, valorbasesubstituicaoefetivo, valoricmssubstituicaoefetivo");
+                
+                if(versao.igualOuMaiorQue(4, 0, 0)) {
+                    sql.append(", data) values (");
+                } else {
+                    sql.append(") values (");
+                }
+                
                 sql.append(idVenda + ", ");
                 sql.append(oItem.idProduto + ", ");
                 sql.append(oItem.quantidade + ", ");
@@ -571,7 +585,13 @@ public class NotaSaidaNfceDAO {
                 sql.append(oItem.valorAcrescimoFixo + ",");
                 sql.append(oItem.valorDescontoPromocao + ",");
                 sql.append(oItem.valorBaseSubstituicaoEfetivo + ",");
-                sql.append(oItem.valorIcmsSubstituicaoEfetivo + ")");
+                sql.append(oItem.valorIcmsSubstituicaoEfetivo);
+                
+                if(versao.igualOuMaiorQue(4, 0, 0)) {
+                    sql.append(",'" + Util.formatDataBanco(oItem.data) + "')");
+                } else {
+                    sql.append(")");
+                }
 
                 stm.execute(sql.toString());
 

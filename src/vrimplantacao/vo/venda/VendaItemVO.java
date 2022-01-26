@@ -1,5 +1,7 @@
 package vrimplantacao.vo.venda;
 
+import java.util.Date;
+
 
 
 public class VendaItemVO {
@@ -31,6 +33,7 @@ public class VendaItemVO {
     public double valorDescontoScanntech = 0;
     public double quantidadeScanntech = 0;
     public long idVenda = 0;
+    public String data;
     
     public double valorBaseSubstituicaoEfetivo = 0;    
     public double valorIcmsSubstituicaoEfetivo = 0;    
