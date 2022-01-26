@@ -248,7 +248,7 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	THEN SUBSTRING(p.COD_BARRAS FROM 5 FOR 11)\n"
                     + "	ELSE p.COD_BARRAS\n"
                     + "	END ean,\n"
-                    + "	p.COD_BARRAS codbar,\n"
+                    + "	p.COD_BARRAS ean2,\n"
                     + "	'1' as qtdEmbalagem,\n"
                     + "	e.DESCRICAO tipoEmbalagem,\n"
                     + "	p.BALANCA e_balanca,\n"
