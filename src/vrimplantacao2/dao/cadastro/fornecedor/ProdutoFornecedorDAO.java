@@ -266,7 +266,7 @@ public class ProdutoFornecedorDAO {
                 //if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {
                 //    ProgressBar.next();
                 //    continue;
-                //}
+                //}                                
                 FornecedorVO fornecedor = null;
                 if (fornAntDAO.getAnteriores().containsKey(
                         importSistema,

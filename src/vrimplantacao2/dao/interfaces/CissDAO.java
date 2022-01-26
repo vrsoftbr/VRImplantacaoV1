@@ -567,6 +567,7 @@ public class CissDAO extends InterfaceDAO {
                     imp.setComplemento(rst.getString("COMPLEMENTO"));
                     imp.setCep(rst.getString("cep"));
                     imp.setObservacao2(rst.getString("observacao"));
+                    imp.setPonto(0);
                     imp.setMunicipioIBGE(rst.getInt("id_municipio"));
                     imp.setMunicipio(rst.getString("descrcidade"));
                     imp.setUf(rst.getString("id_estado"));

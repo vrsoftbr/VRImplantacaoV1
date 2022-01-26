@@ -25,6 +25,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
@@ -128,6 +129,9 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.BLOQUEADO,
                 OpcaoCliente.OBSERVACOES2,
                 OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -346,9 +350,9 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "	COD_PROD produtoid,\n"
                     + "	COD_FORNEC fornecedorid,\n"
-                    + "	REFERENCIA\n"
-                    + "FROM\n"
-                    + "	PRODUTOS_FORNECEDOR;"
+                    + "	REFERENCIA referencia \n"
+                    + " FROM \n"
+                    + "	PRODUTOS_FORNECEDOR"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -426,6 +430,7 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " DT_INC dtcadastro,\n"
                     + " NASC dtnasc,\n"
                     + " CIVIL,\n"
+                    + " END_COMPLEMENTO complemento,\n"
                     + " CONJUGE nomeconjuge,\n"
                     + " NAS_CO,\n"
                     + " CPF_CO,\n"
@@ -435,10 +440,15 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " EMP_RENDA renda,\n"
                     + " LIMITE limite,\n"
                     + " CASE \n"
-                    + " WHEN FLAG_BLOQUEIO LIKE 'S'\n"
+                    + " WHEN OBS LIKE 'BLQ'\n"
+                    + " THEN 0\n"
+                    + " ELSE 1\n"
+                    + " END ativo,\n"
+                    + "  CASE \n"
+                    + " WHEN OBS LIKE 'BLQ'\n"
                     + " THEN 1\n"
                     + " ELSE 0\n"
-                    + " END bloqueio,\n"
+                    + " END bloqueado,\n"
                     + " DTATUALIZACAO\n"
                     + "FROM CADCLI"
             )) {
@@ -448,14 +458,15 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setDataNascimento(rst.getDate("dtnasc"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
+                    imp.setNumero(rst.getString("numero"));
                     imp.setCnpj(rst.getString("cpfcnpj"));
                     imp.setInscricaoestadual(rst.getString("inscestrg"));
+                    imp.setComplemento(rst.getString("complemento"));
 
                     if (rst.getString("telefone") == null) {
                         imp.setTelefone(rst.getString("telefone"));
@@ -475,7 +486,8 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstadoCivil(rst.getString("civil"));
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
                     imp.setObservacao(rst.getString("obs"));
-                    imp.setBloqueado(rst.getBoolean("bloqueio"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
 
@@ -620,7 +632,6 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setNumeroSerie(rst.getString("serie"));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         next.setCpf(rst.getString("cpf"));
@@ -640,23 +651,23 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
-                    + "	s.id id_venda,\n"
-                    + "	CASE WHEN s.NUM_CUPOM IS NULL THEN s.id||'-'||s.NUM_OPER ELSE s.NUM_CUPOM END numerocupom,\n"
-                    + "	s.NUM_CAIXA ecf,\n"
-                    + "	s.DTEMISSAO data,\n"
-                    + "	s.HORAEMISSAO hora,\n"
-                    + "	s.SERIE serie,\n"
-                    + "	s.VRTOTALPRODUTOS valor,\n"
-                    + "	s.COD_CLI id_cliente,\n"
-                    + "	c.CGC cpf,\n"
-                    + "	s.NOME nomecliente,\n"
-                    + "	CASE WHEN STATUS = 'C' THEN 1 ELSE 0 END cancelado\n"
+                    + "	c.seq id_venda,\n"
+                    + "	CASE WHEN c.SEQ IS NULL THEN c.SEQ||'-'||c.NUM_OPER ELSE c.SEQ END numerocupom,\n"
+                    + "	c.COD_CAIXA ecf,\n"
+                    + "	c.DATA data,\n"
+                    + "	c.HORA hora,\n"
+                    + "	c.VALORTOTAL valor,\n"
+                    + "	c.DESCONTO desconto,\n"
+                    + "	c.COD_CLI id_cliente,\n"
+                    + "	cc.CGC cpf,\n"
+                    + "	cc.NOME nomecliente,\n"
+                    + "	CASE WHEN c.SITUACAO = 'A' THEN 0 ELSE 1 END cancelado\n"
                     + "FROM\n"
-                    + "	SAT_MOVIMENTO s\n"
-                    + "	LEFT JOIN CADCLI c ON s.COD_CLI = c.CODIGO \n"
+                    + "	CAIXA c\n"
+                    + "	LEFT JOIN CADCLI cc ON c.COD_CLI = cc.CODIGO \n"
                     + "WHERE\n"
-                    + "	s.COD_FILIAL = " + idLojaCliente + "\n"
-                    + "	AND s.DTEMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n";
+                    + "	c.DATA BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
+                    + "	AND c.NATUREZA = 500";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -702,7 +713,8 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
-
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        
                     }
                 }
             } catch (Exception ex) {
@@ -713,22 +725,24 @@ public class DataByteDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n"
-                    + "	si.NUMEROITEM nritem,\n"
-                    + "	si.ID_SAT_MVTO id_venda,\n"
-                    + "	si.id id_item,\n"
-                    + "	si.COD_PROD id_produto,\n"
-                    + "	si.NOME_PROD descricao,\n"
-                    + "	si.QUANTIDADE quantidade,\n"
-                    + "	si.PRECO_VEND valor,\n"
-                    + "	si.VRDESCONTO desconto,\n"
-                    + "	p.UNIDADE unidade\n"
+                    = "WITH teste AS (SELECT NUM_OPER, max(NUMEROITEM) n FROM venda GROUP BY 1)\n"
+                    + "SELECT  \n"
+                    + " v.NUMEROITEM nritem,\n"
+                    + "	c.SEQ id_venda,\n"
+                    + "	v.SEQ id_item,\n"
+                    + "	v.COD_PROD id_produto,\n"
+                    + "	v.NOME_PROD descricao,\n"
+                    + "	v.QUANTIDADE quantidade,\n"
+                    + "	v.PRECO_VEND valor,\n"
+                    + "	v.UNIDADE unidade,\n"
+                    + "	(c.DESCONTO/t.n) desconto\n"
                     + "FROM\n"
-                    + "	SAT_ITENS si\n"
-                    + "	LEFT JOIN SAT_MOVIMENTO sm ON si.ID_SAT_MVTO = sm.ID \n"
-                    + "	JOIN PRODUTOS p ON si.COD_PROD = p.COD_PROD "
-                    + "WHERE\n"
-                    + "	sm.DTEMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+                    + " VENDA v \n"
+                    + " JOIN CAIXA c ON v.NUM_OPER = c.NUM_OPER \n"
+                    + " JOIN teste t ON t.num_oper = v.NUM_OPER \n"
+                    + "WHERE v.DATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	AND NATUREZA = 500\n"
+                    + "GROUP BY 1, 2, 3, 4, 5, 6, 7 ,8 , 9";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
