@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -46,7 +49,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
     private Connection bancovendas;
     private Connection bancoretaguarda;
     private String complemento = "";
-    
+
     public Connection getBancovendas() {
         return bancovendas;
     }
@@ -62,11 +65,11 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
     public void setBancoretaguarda(Connection bancoretaguarda) {
         this.bancoretaguarda = bancoretaguarda;
     }
-    
+
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
-    
+
     @Override
     public String getSistema() {
         return "Tentaculo" + (!"".equals(complemento) ? " - " + complemento : "");
@@ -777,9 +780,143 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         return result;
     }
 
+    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	distinct p.id id,\n"
+                    + "	cp.codigoatual,\n"
+                    + "	pa.codigobarras,\n"
+                    + "	p.descricaocompleta,\n"
+                    + "	p.id_tipoembalagem\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	join produtoautomacao pa on p.id = pa.id_produto\n"
+                    + "	join implantacao.codant_produto cp on p.id = cp.codigoatual\n"
+                    + "	join implantacao.codant_ean ce on ce.importid = cp.impid and ce.importsistema = cp.impsistema and ce.importloja = cp.imploja \n"
+                    + "where\n"
+                    + "	p.pesavel = false\n"
+                    + "	and p.id = pa.codigobarras\n"
+                    + "	and length(ce.ean) < 7\n"
+                    + "	and p.id_tipoembalagem <> 4\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
+                    vo.setIdproduto(rst.getInt("id"));
+                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
+                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void importarDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        ProgressBar.setStatus("Carregar Produtos...");
+        try {
+            result = getDigitoVerificador();
+
+            if (!result.isEmpty()) {
+                gravarCodigoBarrasDigitoVerificador(result);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
+
+        Conexao.begin();
+        Statement stm, stm2 = null;
+        ResultSet rst = null;
+
+        stm = Conexao.createStatement();
+        stm2 = Conexao.createStatement();
+
+        String sql = "";
+        ProgressBar.setStatus("Gravando Código de Barras...");
+        ProgressBar.setMaximum(vo.size());
+
+        try {
+
+            for (ProdutoAutomacaoVO i_vo : vo) {
+
+                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
+                rst = stm.executeQuery(sql);
+
+                if (!rst.next()) {
+                    sql = "insert into produtoautomacao ("
+                            + "id_produto, "
+                            + "codigobarras, "
+                            + "id_tipoembalagem, "
+                            + "qtdembalagem) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ", "
+                            + i_vo.getIdTipoEmbalagem() + ", 1);";
+                    stm2.execute(sql);
+                } else {
+                    sql = "insert into implantacao.produtonaogerado ("
+                            + "id_produto, "
+                            + "codigobarras) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ");";
+                    stm2.execute(sql);
+                }
+                ProgressBar.next();
+            }
+
+            stm.close();
+            stm2.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
+    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
+        String codigo = String.format("%012d", i_codigo);
+
+        int somaPar = 0;
+        int somaImpar = 0;
+
+        for (int i = 0; i < 12; i += 2) {
+            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
+            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
+        }
+
+        int soma = somaImpar + (3 * somaPar);
+        int digito = 0;
+        boolean verifica = false;
+        int calculo = 0;
+
+        do {
+            calculo = soma % 10;
+
+            if (calculo != 0) {
+                digito += 1;
+                soma += 1;
+            }
+        } while (calculo != 0);
+
+        if (i_digito) {
+            return Long.parseLong(codigo + digito);
+        } else {
+            return Long.parseLong(codigo);
+        }
+    }
+
     private Date vendaDataInicio;
     private Date vendaDataTermino;
-    
+
     public void setVendaDataInicio(Date vendaDataInicio) {
         this.vendaDataInicio = vendaDataInicio;
     }
@@ -798,7 +935,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino, bancovendas);
     }
 
-        private static class VendaIterator implements Iterator<VendaIMP> {
+    private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
