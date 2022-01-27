@@ -289,7 +289,8 @@ public class FornecedorAnteriorDAO {
                 "				cnpj,\n" +
                 "				ie,\n" +
                 "				nome,\n" +
-                "				false\n" +
+                "				false,\n" +
+                "                               id_conexao\n" + 
                 "			from\n" +
                 "				implantacao.codant_clientepreferencial\n" +
                 "			where\n" +
@@ -343,11 +344,10 @@ public class FornecedorAnteriorDAO {
                 "					select\n" +
                 "						id\n" +
                 "					from\n" +
-                "						implantacao.codant_clienteeventual	\n" +
+                "						implantacao.codant_clienteeventual\n" +
                 "					where\n" +
                 "						sistema = r.sistema and \n" +
-                "						loja = r.loja_nova\n" +
-                "				);\n" +
+                "						loja = r.loja_nova);\n" +
                 "		end if;\n" +
                 "\n" +
                 "		--Produtos\n" +
@@ -446,7 +446,8 @@ public class FornecedorAnteriorDAO {
                 "				codigoatual,\n" +
                 "				cnpj,\n" +
                 "				razao,\n" +
-                "				fantasia\n" +
+                "				fantasia,\n" +
+                "                               id_conexao\n" +
                 "			from \n" +
                 "				implantacao.codant_fornecedor\n" +
                 "			where\n" +

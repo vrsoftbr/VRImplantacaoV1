@@ -84,7 +84,16 @@ public enum EScriptLojaOrigemSistema {
             + "	COD_EMPRESA id,\n"
             + "	FANTASIA descricao\n"
             + "FROM\n"
-            + "	EMPRESA");
+            + "	EMPRESA"),
+    VRMASTER(182, 11, "select\n" +
+                    "	l.id,\n" +
+                    "	l.descricao\n" +
+                    "from \n" +
+                    "	loja l \n" +
+                    "inner join fornecedor f on l.id_fornecedor = f.id \n" +
+                    "where l.id_situacaocadastro = 1\n" +
+                    "order by\n" +
+                    "	l.id");
 
     private int idSistema;
     private int idBancoDados;

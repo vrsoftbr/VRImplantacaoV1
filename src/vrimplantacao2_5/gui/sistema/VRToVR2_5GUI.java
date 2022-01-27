@@ -74,8 +74,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                dao.setComplemento(pnlConn.getComplemento());
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
