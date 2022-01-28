@@ -22,11 +22,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -119,6 +121,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.OUTRAS_RECEITAS,
                 OpcaoFornecedor.CONDICAO_PAGAMENTO,
                 OpcaoFornecedor.PRAZO_FORNECEDOR,
                 OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR));
@@ -474,8 +477,54 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   consinco.maf_fornecedor forn\n" +
                     "inner join \n" +
                     "	consinco.ge_pessoa pes ON forn.seqfornecedor = pes.seqpessoa\n" +
-                    "left join CONSINCO.MAF_FORNECDIVISAO pzo " +
-                    " on pzo.SEQFORNECEDOR = forn.seqfornecedor"        
+                    "left join CONSINCO.MAF_FORNECDIVISAO pzo\n" +
+                    " on pzo.SEQFORNECEDOR = forn.seqfornecedor\n" +
+                    "UNION ALL \n" +
+                    "select\n" +
+                    "   pes.SEQPESSOA,\n" +
+                    "   pes.nomerazao,\n" +
+                    "   pes.fantasia,\n" +
+                    "   pes.bairro,\n" +
+                    "   pes.cep,\n" +
+                    "   pes.logradouro endereco,\n" +
+                    "   pes.nrologradouro numero,\n" +
+                    "   pes.cidade,\n" +
+                    "   pes.uf, \n" +
+                    "   'A' statusgeral,\n" +
+                    "   pes.cmpltologradouro complemento,\n" +
+                    "   pes.foneddd1 || pes.fonenro1 fone1,\n" +
+                    "   pes.foneddd2 || pes.fonenro2 fone2,\n" +
+                    "   pes.foneddd3 || pes.fonenro3 fone3,\n" +
+                    "   pes.faxddd || pes.faxnro fax,\n" +
+                    "   pes.nrocgccpf || pes.digcgccpf cnpj,\n" +
+                    "   pes.inscricaorg ie,\n" +
+                    "   pes.email,\n" +
+                    "   pes.dtainclusao cadastro,\n" +
+                    "   '' nomecontato,\n" +
+                    "   '' fonecontato,\n" +
+                    "   '' emailcontato,\n" +
+                    "   '' faxcontato,\n" +
+                    "   '' observacao,\n" +
+                    "   pes.homepage,\n" +
+                    "   pes.emailnfe,\n" +
+                    "   0 pzomedvisitarep,\n" +
+                    "   0 pzomedentrega,\n" +
+                    "   0 pzomedatraso,\n" +
+                    "   '' pzopagamento\n" +
+                    "from\n" +
+                    "	consinco.ge_pessoa pes\n" +
+                    "WHERE \n" +
+                    "	pes.SEQPESSOA IN \n" +
+                    "	(SELECT\n" +
+                    "       distinct\n" +
+                    "       a.seqpessoa\n" +
+                    "	FROM\n" +
+                    "       consinco.fi_titulo a\n" +
+                    "	WHERE a.abertoquitado = 'A'\n" +
+                    "	AND a.nroempresa = " + getLojaOrigem() + "\n" +
+                    "	AND a.seqdepositario = 2\n" +
+                    "	AND a.CODESPECIE NOT IN ('DUPP', 'BONIAC', 'DEVREC', 'ACCODUP', 'BONIDEV')\n" +
+                    "   AND a.SEQPESSOA NOT IN (SELECT seqfornecedor FROM consinco.maf_fornecedor))"        
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -967,7 +1016,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	AND a.seqdepositario = n.seqdepositario\n" +
                     "	AND a.abertoquitado = 'A'\n" +
                     "	AND a.nroempresa = " + getLojaOrigem() + "\n" +
-                    "	AND a.seqdepositario = 2")) {
+                    "	AND a.seqdepositario = 2 AND a.CODESPECIE = 'DUPP'")) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
@@ -981,6 +1030,123 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                             rs.getDate("dtavencimento"), 
                             rs.getDouble("vlremaberto"), 
                             rs.getInt("nroparcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	(CASE\n" +
+                    "		WHEN b.seqtitulo IS NULL THEN 'CHEQUE'\n" +
+                    "		ELSE 'TITULO'\n" +
+                    "	END) AS tipo,\n" +
+                    "	a.nroempresa,\n" +
+                    "	l.razaosocial AS nomeempresa,\n" +
+                    "	a.nrobanco,\n" +
+                    "	j.razaosocial AS nomebanco,\n" +
+                    "	a.seqagencia,\n" +
+                    "	m.nomeagencia,\n" +
+                    "	a.nrotitulo,\n" +
+                    "	a.vlroriginal,\n" +
+                    "	a.vlrnominal,\n" +
+                    "	a.vlrpago,\n" +
+                    "	a.vlrnominal - a.vlrpago AS vlremaberto,\n" +
+                    "	a.seqpessoa,\n" +
+                    "	a.codespecie,\n" +
+                    "	k.descricao AS descespecie,\n" +
+                    "	a.serietitulo,\n" +
+                    "	a.nroparcela,\n" +
+                    "	a.sitjuridica,\n" +
+                    "	(CASE\n" +
+                    "		WHEN a.obrigdireito = 'd' THEN (\n" +
+                    "		SELECT\n" +
+                    "			n.situacaocredito\n" +
+                    "		FROM\n" +
+                    "			consinco.gev_pessoacadastro n\n" +
+                    "		WHERE\n" +
+                    "			n.seqpessoa = a.seqpessoa)\n" +
+                    "		ELSE NULL\n" +
+                    "	END) AS sitcredito,\n" +
+                    "	a.dtaprogramada,\n" +
+                    "	a.dtaemissao,\n" +
+                    "	a.dtavencimento,\n" +
+                    "	a.dtamovimento,\n" +
+                    "	a.dtamovimento - a.dtaemissao AS dtaviagem,\n" +
+                    "	a.dtaprogramada - a.dtaemissao AS prazoefetivo,\n" +
+                    "	a.seqtitulo,\n" +
+                    "	a.nroempresamae,\n" +
+                    "	a.obrigdireito,\n" +
+                    "	a.nroaltdepositario,\n" +
+                    "	a.nrocarga,\n" +
+                    "	a.acertadacarga,\n" +
+                    "	a.dtacarga,\n" +
+                    "	b.codbarra,\n" +
+                    "	nvl(b.vlrdesccontrato, 0) AS vlrdesccontrato,\n" +
+                    "	b.codigofator,\n" +
+                    "	c.seqpessoa || ' - ' || c.nomerazao AS nomerazao,\n" +
+                    "	c.fisicajuridica,\n" +
+                    "	c.seqcidade,\n" +
+                    "	d.seqctacorrente,\n" +
+                    "	d.codcarteira,\n" +
+                    "	a.situacao,\n" +
+                    "	nvl(a.susplib, 'l') susplib,\n" +
+                    "	c.nomerazao nomerazaopessoa,\n" +
+                    "	consinco.fif_valor_taxa_admcupom(a.seqtitulo,\n" +
+                    "	a.vlradministracao,\n" +
+                    "	a.taxacupom) vlrtaxas,\n" +
+                    "	nvl(b.pctdescfinanc, 0) pctdescfinanc,\n" +
+                    "	nvl((SELECT max(fd.percdescfinacordo)\n" +
+                    "            FROM consinco.maf_fornecdivisao fd,\n" +
+                    "                   consinco.max_empresa me\n" +
+                    "            WHERE fd.nrodivisao = me.nrodivisao\n" +
+                    "            AND fd.seqfornecedor = a.seqpessoa\n" +
+                    "            AND me.nroempresa = a.nroempresa), 0) pctdescacordo,\n" +
+                    "	a.seqdepositario,\n" +
+                    "	n.descricao depositario\n" +
+                    "FROM\n" +
+                    "	consinco.fi_titulo a,\n" +
+                    "	consinco.fi_compltitulo b,\n" +
+                    "	consinco.ge_pessoa c,\n" +
+                    "	consinco.fi_titulobco d,\n" +
+                    "	consinco.ge_banco j,\n" +
+                    "	consinco.fi_especie k,\n" +
+                    "	consinco.ge_empresa l,\n" +
+                    "	consinco.ge_agencia m,\n" +
+                    "	consinco.fi_depositario n\n" +
+                    "WHERE\n" +
+                    "	a.seqtitulo = b.seqtitulo (+)\n" +
+                    "	AND a.nrobanco = j.nrobanco\n" +
+                    "	AND a.codespecie = k.codespecie\n" +
+                    "	AND a.nroempresamae = k.nroempresamae\n" +
+                    "	AND a.nroempresa = l.nroempresa\n" +
+                    "	AND a.seqtitulo = d.seqtitulo (+)\n" +
+                    "	AND a.seqpessoa = c.seqpessoa\n" +
+                    "	AND a.nrobanco = m.nrobanco (+)\n" +
+                    "	AND a.seqagencia = m.seqagencia (+)\n" +
+                    "	AND a.seqdepositario = n.seqdepositario\n" +
+                    "	AND a.abertoquitado = 'A'\n" +
+                    "	AND a.nroempresa = " + getLojaOrigem() + "\n" +
+                    "	AND a.seqdepositario = 2\n" +
+                    "	AND a.CODESPECIE NOT IN ('DUPP', 'BONIAC', 'DEVREC', 'ACCODUP', 'BONIDEV')")) {
+                while(rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(rs.getString("seqtitulo"));
+                    imp.setIdFornecedor(rs.getString("seqpessoa"));
+                    imp.setDataEmissao(rs.getDate("dtaemissao"));
+                    imp.setDataVencimento(rs.getDate("dtavencimento"));
+                    imp.setValor(rs.getDouble("vlremaberto"));
+                    imp.setObservacao(rs.getString("codespecie") + " - " + rs.getString("descespecie"));
                     
                     result.add(imp);
                 }
