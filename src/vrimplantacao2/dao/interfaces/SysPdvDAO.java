@@ -422,7 +422,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    else 'UN' end as tipoembalagem,\n"
                     + "    p.prounid, \n"
                     + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
-                    + "    coalesce(p.provld, 0) validade,\n"
+                    + "    coalesce(replace(p.provld,' ',''),0) validade,\n"
                     + "    p.trbid,\n"
                     + "    p.procest cest,\n"
                     + "    p.natcodigo piscofins_natrec\n"
