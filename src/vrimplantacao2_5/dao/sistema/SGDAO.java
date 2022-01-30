@@ -17,6 +17,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -125,14 +126,42 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " codpro produtoid,\n"
+                    + " codbarra codigobarras,\n"
+                    + " qtdeembal embalagem,\n"
+                    + " case when qtdeembal > 1 then 'CX'\n"
+                    + " else 'UN' end as unidade\n"
+                    + "from arqbar;"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("produtoid"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setQtdEmbalagem(rst.getInt("embalagem"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = 
-                new ProdutoBalancaDAO().getProdutosBalanca();
+        Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca
+                = new ProdutoBalancaDAO().getProdutosBalanca();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    "select distinct on (p.codpro01) \n"
                     + "	p.codpro01 id,\n"
                     + "	p.balanca01,\n"
                     + "	ean.codbarra codigobarras,\n"
@@ -229,34 +258,34 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	f.codforn02 id,\n" +
-                    "	f.razforn02 razao,\n" +
-                    "	f.nomeabr02 fantasia,\n" +
-                    "	f.endforn02 endereco,\n" +
-                    "	f.bairro02 bairro,\n" +
-                    "	f.cgcforn02 cnpj,\n" +
-                    "	f.insforn02 ie,\n" +
-                    "	f.insmunic02 im,\n" +
-                    "	f.cepforn02 cep,\n" +
-                    "	f.fonefor02 telefone,\n" +
-                    "	f.nomecon02 nomecontato,\n" +
-                    "	m.codibge ibge_municipio,\n" +
-                    "	m.nome municipio,\n" +
-                    "	m.uf,\n" +
-                    "	f.numender02 numero,\n" +
-                    "	f.compleme02 complemento,\n" +
-                    "	f.datacad02 cadastro,\n" +
-                    "	f.datanasc02 nascimento\n" +
-                    "from \n" +
-                    "	cadforn f \n" +
-                    "left join tabmun m on f.codmunic02 = m.codigo")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	f.codforn02 id,\n"
+                    + "	f.razforn02 razao,\n"
+                    + "	f.nomeabr02 fantasia,\n"
+                    + "	f.endforn02 endereco,\n"
+                    + "	f.bairro02 bairro,\n"
+                    + "	f.cgcforn02 cnpj,\n"
+                    + "	f.insforn02 ie,\n"
+                    + "	f.insmunic02 im,\n"
+                    + "	f.cepforn02 cep,\n"
+                    + "	f.fonefor02 telefone,\n"
+                    + "	f.nomecon02 nomecontato,\n"
+                    + "	m.codibge ibge_municipio,\n"
+                    + "	m.nome municipio,\n"
+                    + "	m.uf,\n"
+                    + "	f.numender02 numero,\n"
+                    + "	f.compleme02 complemento,\n"
+                    + "	f.datacad02 cadastro,\n"
+                    + "	f.datanasc02 nascimento\n"
+                    + "from \n"
+                    + "	cadforn f \n"
+                    + "left join tabmun m on f.codmunic02 = m.codigo")) {
+                while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
@@ -273,77 +302,77 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setDatacadastro(rs.getDate("cadastro"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	codforn13 id_fornecedor,\n" +
-                    "	codpro13 id_produto,\n" +
-                    "	cadpro.unidpro01 unidade\n" +
-                    "from \n" +
-                    "	profor\n" +
-                    "left join cadpro on profor.codpro13 = cadpro.codpro01\n" +
-                    "left join cadforn on profor.codforn13 = cadforn.codforn02")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	codforn13 id_fornecedor,\n"
+                    + "	codpro13 id_produto,\n"
+                    + "	cadpro.unidpro01 unidade\n"
+                    + "from \n"
+                    + "	profor\n"
+                    + " join cadpro on profor.codpro13 = cadpro.codpro01\n"
+                    + " join cadforn on profor.codforn13 = cadforn.codforn02")) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	c.codcli10 id,\n" +
-                    "	c.razsoc10 razao,\n" +
-                    "	c.nomefan10,\n" +
-                    "	c.cgccpf10 cnpj,\n" +
-                    "	c.insccli10 ie,\n" +
-                    "	c.endcli10 endereco,\n" +
-                    "	c.numendcl10 numero,\n" +
-                    "	c.bairro10 bairro,\n" +
-                    "	c.cepcli10 cep,\n" +
-                    "	m.codibge ibge_municipio,\n" +
-                    "	m.nome municipio,\n" +
-                    "	m.uf,\n" +
-                    "	c.fonecli10 telefone,\n" +
-                    "	c.celcli10 celular,\n" +
-                    "	c.datacad10 cadastro,\n" +
-                    "	c.datanasc10 nascimento,\n" +
-                    "	c.limcompr10 valorlimite,\n" +
-                    "	c.situacao10 situacao,\n" +
-                    "	c.emailcli10 email\n" +
-                    "from \n" +
-                    "	cadcli c\n" +
-                    "left join tabmun m on c.codmunic10 = m.codigo")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	c.codcli10 id,\n"
+                    + "	c.razsoc10 razao,\n"
+                    + "	c.nomefan10,\n"
+                    + "	c.cgccpf10 cnpj,\n"
+                    + "	c.insccli10 ie,\n"
+                    + "	c.endcli10 endereco,\n"
+                    + "	c.numendcl10 numero,\n"
+                    + "	c.bairro10 bairro,\n"
+                    + "	c.cepcli10 cep,\n"
+                    + "	m.codibge ibge_municipio,\n"
+                    + "	m.nome municipio,\n"
+                    + "	m.uf,\n"
+                    + "	c.fonecli10 telefone,\n"
+                    + "	c.celcli10 celular,\n"
+                    + "	c.datacad10 cadastro,\n"
+                    + "	c.datanasc10 nascimento,\n"
+                    + "	c.limcompr10 valorlimite,\n"
+                    + "	c.situacao10 situacao,\n"
+                    + "	c.emailcli10 email\n"
+                    + "from \n"
+                    + "	cadcli c\n"
+                    + "left join tabmun m on c.codmunic10 = m.codigo")) {
+                while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("nomefan10"));
@@ -361,44 +390,87 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
                     imp.setEmail(rs.getString("email"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " c.lanent15 id,\n"
+                    + " f.codforn02 idfornecedor,\n"
+                    + " c.codfil15 loja,\n"
+                    + " c.datemis15 dtemissao,\n"
+                    + " c.datvenc15 dtvencimento,\n"
+                    + " c.numdoc15 numerodocumento,\n"
+                    + " c.valpag15 valor,\n"
+                    + " c.desconto15 desconto,\n"
+                    + " c.ttparcel15 parcela,\n"
+                    + " c.observ15 obs\n"
+                    + "from contpag c\n"
+                    + "join cadforn f on f.codforn02 = c.codforn15\n"
+                    + "where \n"
+                    + " c.datpag15 is null \n"
+                    + " and\n"
+                    + " c.codfil15 = " + getLojaOrigem() + ";"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setVencimento(rst.getDate("dtvencimento"));
+                    imp.setNumeroDocumento(rst.getString("numeroDocumento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("obs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	c.lansai60 id,\n" +
-                    "	cp.codcli10 id_cliente,\n" +
-                    "	cp.cgccpf10 cnpj,\n" +
-                    "	cp.razsoc10 razao,\n" +
-                    "	c.numdoc60 documento,\n" +
-                    "	c.datemis60 emissao,\n" +
-                    "	c.datvenc60 vencimento,\n" +
-                    "	c.valor60 valor,\n" +
-                    "	c.valrec60 valorecebido,\n" +
-                    "	c.datrec60 recebimento,\n" +
-                    "	c.jurosrec60 juros,\n" +
-                    "	c.observ60 observacao,\n" +
-                    "	c.clifor60 tipo\n" +
-                    "from \n" +
-                    "	conrec c\n" +
-                    "inner join cadcli cp on c.codcli60 = cp.codcli10\n" +
-                    "where \n" +
-                    "	c.codfil60 = " + getLojaOrigem() + " and\n" +
-                    "   c.datrec60 is null")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	c.lansai60 id,\n"
+                    + "	cp.codcli10 id_cliente,\n"
+                    + "	cp.cgccpf10 cnpj,\n"
+                    + "	cp.razsoc10 razao,\n"
+                    + "	c.numdoc60 documento,\n"
+                    + "	c.datemis60 emissao,\n"
+                    + "	c.datvenc60 vencimento,\n"
+                    + "	c.valor60 valor,\n"
+                    + "	c.valrec60 valorecebido,\n"
+                    + "	c.datrec60 recebimento,\n"
+                    + "	c.jurosrec60 juros,\n"
+                    + "	c.observ60 observacao,\n"
+                    + "	c.clifor60 tipo\n"
+                    + "from \n"
+                    + "	conrec c\n"
+                    + "inner join cadcli cp on c.codcli60 = cp.codcli10\n"
+                    + "where \n"
+                    + "	c.codfil60 = " + getLojaOrigem() + " and\n"
+                    + "   c.datrec60 is null")) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("id_cliente"));
                     imp.setValor(rs.getDouble("valor"));
@@ -406,12 +478,12 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setNumeroCupom(rs.getString("documento"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 }
