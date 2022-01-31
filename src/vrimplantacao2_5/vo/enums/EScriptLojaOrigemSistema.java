@@ -1,5 +1,7 @@
 package vrimplantacao2_5.vo.enums;
 
+import vrimplantacao2_5.dao.sistema.DSICDAO;
+
 /**
  *
  * @author Desenvolvimento
@@ -85,15 +87,16 @@ public enum EScriptLojaOrigemSistema {
             + "	FANTASIA descricao\n"
             + "FROM\n"
             + "	EMPRESA"),
-    VRMASTER(182, 11, "select\n" +
-                    "	l.id,\n" +
-                    "	l.descricao\n" +
-                    "from \n" +
-                    "	loja l \n" +
-                    "inner join fornecedor f on l.id_fornecedor = f.id \n" +
-                    "where l.id_situacaocadastro = 1\n" +
-                    "order by\n" +
-                    "	l.id");
+    VRMASTER(182, 11, "select\n"
+            + "	l.id,\n"
+            + "	l.descricao\n"
+            + "from \n"
+            + "	loja l \n"
+            + "inner join fornecedor f on l.id_fornecedor = f.id \n"
+            + "where l.id_situacaocadastro = 1\n"
+            + "order by\n"
+            + "	l.id"),
+    DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa");
 
     private int idSistema;
     private int idBancoDados;

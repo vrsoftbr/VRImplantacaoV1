@@ -201,6 +201,7 @@ import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
+import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
@@ -427,7 +428,8 @@ public enum ESistema {
     TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
-    VERSATIL(210, "VERSATIL", new VersatilDAO());
+    VERSATIL(210, "VERSATIL", new VersatilDAO()),
+    DSIC(211, "DSIC", new DSICDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
