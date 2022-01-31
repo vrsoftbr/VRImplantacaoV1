@@ -93,7 +93,8 @@ public enum EScriptLojaOrigemSistema {
                     "inner join fornecedor f on l.id_fornecedor = f.id \n" +
                     "where l.id_situacaocadastro = 1\n" +
                     "order by\n" +
-                    "	l.id");
+                    "	l.id"),
+    SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO");
 
     private int idSistema;
     private int idBancoDados;

@@ -1312,7 +1312,7 @@ public class ConsincoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("cupom") + "-" + rst.getString("sequencia");
+                        String id = rst.getString("seqnf") + "-" + rst.getString("sequencia");
 
                         next.setId(id);
                         next.setVenda(rst.getString("seqnf"));
