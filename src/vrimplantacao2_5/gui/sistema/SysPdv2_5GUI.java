@@ -62,8 +62,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                dao.setComplementoSistema(pnlConn.getComplemento());
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -247,7 +246,6 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     importador.setIdConexao(pnlConn.idConexao);
                     
-                    dao.setComplementoSistema(pnlConn.getComplemento());
                     dao.setFinalizadorasRotativo(rotativoSelecionado);
                     dao.setFinalizadorasCheque(chequeSelecionado);
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
