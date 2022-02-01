@@ -304,6 +304,7 @@ import vrimplantacao2.gui.interfaces.Provenco_TentaculoGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
+import vrimplantacao2.gui.interfaces.SatFacilGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
@@ -725,6 +726,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMSuper = new javax.swing.JMenuItem();
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
+        chkSatFacil = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
         mnuSygma = new javax.swing.JMenuItem();
         mnuTentaculo = new javax.swing.JMenuItem();
@@ -1925,6 +1927,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuPlenus);
+
+        chkSatFacil.setText("SatFacil");
+        chkSatFacil.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSatFacilActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkSatFacil);
 
         chkSGMaster.setText("SG Master");
         chkSGMaster.addActionListener(new java.awt.event.ActionListener() {
@@ -5567,11 +5577,17 @@ public final class MenuGUI extends VRMdiFrame {
         SygmaGUI.exibir(this);
     }//GEN-LAST:event_mnuSygmaActionPerformed
 
+    private void chkSatFacilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSatFacilActionPerformed
+        // TODO add your handling code here:
+        SatFacilGUI.exibir(this);
+    }//GEN-LAST:event_chkSatFacilActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
+    private javax.swing.JMenuItem chkSatFacil;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
