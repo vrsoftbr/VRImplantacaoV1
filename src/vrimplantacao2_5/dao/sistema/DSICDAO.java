@@ -1,15 +1,20 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -18,17 +23,14 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ConveniadoIMP;
-import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
-import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
@@ -45,56 +47,59 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.PRODUTOS,
-                OpcaoProduto.EAN,
-                OpcaoProduto.EAN_EM_BRANCO,
-                OpcaoProduto.PESAVEL,
-                OpcaoProduto.VALIDADE,
-                OpcaoProduto.DESC_COMPLETA,
-                OpcaoProduto.DESC_REDUZIDA,
-                OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.ATIVO,
-                OpcaoProduto.ESTOQUE,
-                OpcaoProduto.MARGEM,
-                OpcaoProduto.PRECO,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.CEST,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
-                OpcaoProduto.NCM,
-                OpcaoProduto.CEST,
-                OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.ESTOQUE,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.VENDA_PDV
         ));
     }
 
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
-                OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
-                OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR));
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO));
     }
 
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                OpcaoCliente.DADOS,
-                OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.DADOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO,
-                OpcaoCliente.CONVENIO_CONVENIADO));
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
+        ));
     }
 
     @Override
@@ -103,15 +108,15 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	cficodigo id,\n"
-                    + "	cficodigo || ' - ' || (case when cfiecfaliq::varchar = '0.00' then cfiecfpos else cfiecfaliq::varchar end) descricao,\n"
-                    + "	cfiecfaliq icms,\n"
-                    + "	case when cfiecfpos = 'FF' then 60\n"
-                    + "	         when cfiecfpos = 'II' then 40 else 0 end as cst,\n"
-                    + "	0 reducao\n"
-                    + "from \n"
-                    + "	public.file059")) {
+                    "select distinct\n"
+                    + "	 csosn_codigo id,\n"
+                    + "	 csosn_descricao descricao,\n"
+                    + "	 csosn_clasfiscaltabb cst,\n"
+                    + "	 0 icms,\n"
+                    + "	 0 reducao\n"
+                    + "from\n"
+                    + "	 csosn\n"
+                    + "order by 1")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
@@ -172,40 +177,30 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	p.procodigo id,\n"
-                    + "	p.procodbar1 ean,\n"
-                    + "	p.prodesampl descricaocompleta,\n"
-                    + "	p.prodesatac descricaoatacado,\n"
-                    + "	p.procategor merc1,\n"
-                    + "	p.prosbgrcod merc2,\n"
-                    + "	p.prouniabre unidade,\n"
-                    + "	p.provendeci balanca,\n"
-                    + "	p.proestsupe estoque,\n"
-                    + "	p.prominsupe estoquemin,\n"
-                    + "	p.promaxsupe estoquemax,\n"
-                    + "	p.procustsm custo,\n"
-                    + "	p.prouprcomp custocompra,\n"
-                    + "	p.promargsm margem,\n"
-                    + "	p.promargsm2 margem2,\n"
-                    + "	p.promargsm3 margem3,\n"
-                    + "	p.promargat margematacado,\n"
-                    + "	p.proprcvare precovenda,\n"
-                    + "	p.propreco2 preco2,\n"
-                    + "	p.propreco3 preco3,\n"
-                    + "	p.propreco4 preco4,\n"
-                    + "	p.propreco5 preco5,\n"
-                    + "	p.propreco6 preco6,\n"
-                    + "	p.probalanca isbalanca,\n"
-                    + "	p.provalidad validade,\n"
-                    + "	p.proposiecf icms_ecf,\n"
-                    + "	p.procst cst,\n"
-                    + "	p.proassoccf idaliquota,\n"
-                    + "	p.prodatacad cadastro,\n"
-                    + "	p.proclfisc ncm,\n"
-                    + "	p.proncmsh cest,\n"
-                    + "	p.prosittrib situacaotributaria\n"
-                    + "from \n"
-                    + "	public.file005 p WHERE proultvend >= '2019-04-01'")) {
+                    + "	pro_codigo id,\n"
+                    + "	pro_codigobarra ean,\n"
+                    + "	pro_descricao descricao,\n"
+                    + "	un.unp_siglautilizada tipo_emb,\n"
+                    + " grp_id merc1,\n"
+                    + "	sgr_id merc2,\n"
+                    + "	pro_estoqueminimo est_minimo,\n"
+                    + "	pro_qtdestoque estoque,\n"
+                    + "	pro_precoreposicao custo,\n"
+                    + "	pro_mrglucro margem,\n"
+                    + "	pro_precovenda precovenda,\n"
+                    + "	t.tip_codigo ncm,\n"
+                    + "	pro_cest cest,\n"
+                    + "	case when pro_pesavel = true then 1 else 0 end e_balanca,\n"
+                    + "	case when pro_regdel is null then 1 else 0 end ativo,\n"
+                    + "	p.csosn_codigo_estadual id_icms,\n"
+                    + "pro_qtddias_validade validade\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	  left join unidade_produto un on un.unp_id = p.unp_id \n"
+                    + "	  left join tipi t on p.tip_id = t.tip_id \n"
+                    + "where\n"
+                    + "	emp_id = " + getLojaOrigem() + "\n"
+                    + "order by 1")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -213,7 +208,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
 
@@ -221,26 +216,23 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
 
-                    imp.setDataCadastro(rs.getDate("cadastro"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagem(rs.getString("tipo_emb"));
                     imp.setCustoComImposto(rs.getDouble("custo"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
-
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    
+                    imp.setEstoqueMinimo(rs.getDouble("est_minimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
-
-                    imp.setIcmsConsumidorId(rs.getString("idaliquota"));
+                    imp.setSituacaoCadastro(rs.getInt("ativo"));
+                    
+                    imp.setIcmsConsumidorId(rs.getString("id_icms"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
 
-                    //imp.setPiscofinsCstDebito(rs.getString("cstpis"));
-                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
@@ -254,7 +246,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                                 ? balanca.getValidade() : 0);
                     } else {
                         imp.setValidade(Utils.stringToInt(rs.getString("validade")));
-                        imp.seteBalanca(rs.getString("isbalanca").trim().equals("S"));
+                        imp.seteBalanca(rs.getString("e_balanca").trim().equals("S"));
                     }
 
                     result.add(imp);
@@ -271,37 +263,12 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	procodigo id,\n"
-                    + "	procodbar1 ean\n"
-                    + "from \n"
-                    + "	public.file005\n"
-                    + "where \n"
-                    + "	procodbar1 != ''\n"
-                    + "union \n"
-                    + "select \n"
-                    + "	procodigo id,\n"
-                    + "	procodbar2 ean\n"
-                    + "from \n"
-                    + "	public.file005\n"
-                    + "where \n"
-                    + "	procodbar2 != ''\n"
-                    + "union\n"
-                    + "select \n"
-                    + "	procodigo id,\n"
-                    + "	procodbar3 ean\n"
-                    + "from \n"
-                    + "	public.file005\n"
-                    + "where \n"
-                    + "	procodbar3 != ''\n"
-                    + "union \n"
-                    + "select \n"
-                    + "	procodigo id,\n"
-                    + "	procodbar4 ean\n"
-                    + "from \n"
-                    + "	public.file005\n"
-                    + "where \n"
-                    + "	procodbar4 != ''")) {
+                    "select\n"
+                    + "	pro_codigo id,\n"
+                    + "	pro_codigobarra ean\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "order by 1")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -337,7 +304,8 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 o.out_bairro bairro,\n"
                     + "	 cd.cid_nome cidade,\n"
                     + "	 cd.cid_uf uf,\n"
-                    + "	 o.out_cep cep\n"
+                    + "	 o.out_cep cep,\n"
+                    + "	 c.clf_telefone1 telefone\n"
                     + "from\n"
                     + "	 clifor_pf cf,\n"
                     + "	 cliente_fornecedor c\n"
@@ -350,19 +318,20 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 and c.clf_cliforambos = 'F'\n"
                     + "union\n"
                     + "select\n"
-                    + "	 c.clf_id,\n"
-                    + "	 cj.cfj_razaosocial as clf_nome,\n"
-                    + "	 c.clf_nome as apelido,\n"
-                    + "	 c.clf_statusfj,\n"
+                    + "	 c.clf_id id,\n"
+                    + "	 cj.cfj_razaosocial as razao,\n"
+                    + "	 c.clf_nome as fantasia,\n"
+                    + "	 c.clf_statusfj tipo_pessoa,\n"
                     + "	 cj.cfj_cnpj as cpf_cnpj,\n"
-                    + "	 cj.cfj_inscestadual as rg_iscricao_estadual,\n"
+                    + "	 cj.cfj_inscestadual as rg_ie,\n"
                     + "	 o.out_endereco endereco,\n"
                     + "	 o.out_complemento complemento,\n"
                     + "	 o.out_numero numero,\n"
                     + "	 o.out_bairro bairro,\n"
                     + "	 cd.cid_nome cidade,\n"
                     + "	 cd.cid_uf uf,\n"
-                    + "	 o.out_cep cep\n"
+                    + "	 o.out_cep cep,\n"
+                    + "	 c.clf_telefone1 telefone\n"
                     + "from\n"
                     + "	 clifor_pj cj,\n"
                     + "	 cliente_fornecedor c\n"
@@ -382,44 +351,16 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("id"));
-                    imp.setIe_rg(rs.getString("ie"));
-
+                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
+                    imp.setIe_rg(rs.getString("rg_ie"));
                     imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
                     imp.setCep(rs.getString("cep"));
-
                     imp.setTel_principal(rs.getString("telefone"));
-
-                    String tel2 = rs.getString("telefone2"),
-                            fax = rs.getString("fax"),
-                            contato = rs.getString("contato"),
-                            observacao = rs.getString("observacao"),
-                            observacao2 = rs.getString("obs2");
-
-                    if (tel2 != null && !tel2.isEmpty()) {
-                        imp.addContato("1", "FONE2", tel2, null, TipoContato.NFE, null);
-                    }
-
-                    if (fax != null && !fax.isEmpty()) {
-                        imp.addContato("2", "FAX", fax, null, TipoContato.NFE, null);
-                    }
-
-                    if (contato != null && !contato.isEmpty()) {
-                        imp.addContato("3", contato, null, null, TipoContato.NFE, null);
-                    }
-
-                    if (observacao != null && !observacao.isEmpty()) {
-                        imp.setObservacao(observacao);
-                    }
-
-                    if (observacao2 != null && !observacao2.isEmpty()) {
-                        imp.addContato("4", observacao2, null, null, TipoContato.NFE, null);
-                    }
 
                     result.add(imp);
                 }
@@ -435,14 +376,12 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	pr.procodigo idproduto,\n"
-                    + "	pf.forcgcpf idfornecedor,\n"
-                    + "	pf.forcodigox referencia\n"
-                    + "from \n"
-                    + "	public.file035 pf \n"
-                    + "join \n"
-                    + "	public.file005 pr on pf.procodigo = pr.procodigo")) {
+                    "select\n"
+                    + "	clf_id idfornecedor,\n"
+                    + "	pro_id idproduto\n"
+                    + "from\n"
+                    + "	fornecedores_e_seus_produtos\n"
+                    + "order by 1,2")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
@@ -450,154 +389,6 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setCodigoExterno(rs.getString("referencia"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
-        List<ConvenioEmpresaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	c.convcgc id,\n"
-                    + "	c.convcgc cnpj,\n"
-                    + "	c.convie ie,\n"
-                    + "	c.convrazao razao,\n"
-                    + "	c.convfantas fantasia,\n"
-                    + "	c.convend endereco,\n"
-                    + "	c.convbairro bairro,\n"
-                    + "	c.convcidade cidade,\n"
-                    + "	c.convuf uf,\n"
-                    + "	c.convcep cep,\n"
-                    + "	c.convfone1 telefone,\n"
-                    + "	c.convemail email\n"
-                    + "from \n"
-                    + "	public.file006 c")) {
-                while (rs.next()) {
-                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setCnpj(rs.getString("cnpj"));
-                    imp.setInscricaoEstadual(rs.getString("ie"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("uf"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setTelefone(rs.getString("telefone"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ConveniadoIMP> getConveniado() throws Exception {
-        List<ConveniadoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	substring(coalesce(clicpf, clicgc), 0, 4) ||\n"
-                    + "	substring(coalesce(clicpf, clicgc), 9, 4) id,\n"
-                    + "	c.clicpf cnpj,\n"
-                    + " c.clicgc cpf, \n"
-                    + "	c.clistatus status,\n"
-                    + "	c.clirg rgie,\n"
-                    + "	c.clifantasi fantasia,\n"
-                    + "	c.clirazao razao,\n"
-                    + "	c.clienderec endereco,\n"
-                    + "	c.clibairro bairro,\n"
-                    + "	c.clicidcod ibgecidade,\n"
-                    + "	c.clicidade cidade,\n"
-                    + "	c.cliendnum numero,\n"
-                    + "	c.cliendcomp complemento,\n"
-                    + "	c.clicep cep,\n"
-                    + "	c.cliuf uf,\n"
-                    + "	c.clifone1 telefone,\n"
-                    + "	c.clifone2 telefone2,\n"
-                    + "	c.clifax fax,\n"
-                    + "	c.clicadata cadastro,\n"
-                    + "	c.cliconvcgc idempresa,\n"
-                    + "	c.clidatnasc nascimento,\n"
-                    + "	c.clidiavenc vencimento,\n"
-                    + "	c.clihistor1 observacao,\n"
-                    + "	c.clilimite limite\n"
-                    + "from \n"
-                    + "	cliente c")) {
-                while (rs.next()) {
-                    ConveniadoIMP imp = new ConveniadoIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setCnpj(rs.getString("cnpj"));
-
-                    if (imp.getCnpj() == null) {
-                        imp.setCnpj(rs.getString("cpf"));
-                    }
-
-                    imp.setIdEmpresa(rs.getString("idempresa"));
-                    imp.setNome(rs.getString("razao"));
-                    imp.setConvenioLimite(rs.getDouble("limite"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
-        List<ConvenioTransacaoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	distinct\n"
-                    + "	tmvdata lancamento,\n"
-                    + "	substring(tmvorcgcpf, 0, 4) ||\n"
-                    + "	substring(tmvorcgcpf, 9, 4) idconveniado,\n"
-                    + "	tmvorclien razao,\n"
-                    + "	tmvnumseq documento,\n"
-                    + "	tmvhorario hora,\n"
-                    + "	substring(tmvtermina, 5, 2) ecf,\n"
-                    + "	tmvlrtotal total \n"
-                    + "from \n"
-                    + "	public.back025 \n"
-                    + "where \n"
-                    + "	tmvorclien != '' and \n"
-                    + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
-
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-
-                while (rs.next()) {
-                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-
-                    imp.setId(rs.getString("documento"));
-                    imp.setNumeroCupom(imp.getId());
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setIdConveniado(rs.getString("idconveniado"));
-                    imp.setDataMovimento(rs.getDate("lancamento"));
-                    imp.setValor(rs.getDouble("total"));
-
-                    String hora = timestampDate.format(rs.getDate("lancamento")) + " "
-                            + rs.getString("hora");
-
-                    imp.setDataHora(new Timestamp(format.parse(hora).getTime()));
 
                     result.add(imp);
                 }
@@ -626,7 +417,8 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 o.out_bairro bairro,\n"
                     + "	 cd.cid_nome cidade,\n"
                     + "	 cd.cid_uf uf,\n"
-                    + "	 o.out_cep cep\n"
+                    + "	 o.out_cep cep,\n"
+                    + "  c.clf_telefone1 telefone\n"
                     + "from\n"
                     + "	 clifor_pf cf,\n"
                     + "	 cliente_fornecedor c\n"
@@ -639,19 +431,20 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 and c.clf_cliforambos = 'C'\n"
                     + "union\n"
                     + "select\n"
-                    + "	 c.clf_id,\n"
-                    + "	 cj.cfj_razaosocial as clf_nome,\n"
-                    + "	 c.clf_nome as apelido,\n"
-                    + "	 c.clf_statusfj,\n"
+                    + "	 c.clf_id id,\n"
+                    + "	 cj.cfj_razaosocial as razao,\n"
+                    + "	 c.clf_nome as fantasia,\n"
+                    + "	 c.clf_statusfj tipo_pessoa,\n"
                     + "	 cj.cfj_cnpj as cpf_cnpj,\n"
-                    + "	 cj.cfj_inscestadual as rg_iscricao_estadual,\n"
+                    + "	 cj.cfj_inscestadual as rg_ie,\n"
                     + "	 o.out_endereco endereco,\n"
                     + "	 o.out_complemento complemento,\n"
                     + "	 o.out_numero numero,\n"
                     + "	 o.out_bairro bairro,\n"
                     + "	 cd.cid_nome cidade,\n"
                     + "	 cd.cid_uf uf,\n"
-                    + "	 o.out_cep cep\n"
+                    + "	 o.out_cep cep,\n"
+                    + "  c.clf_telefone1 telefone\n"
                     + "from\n"
                     + "	 clifor_pj cj,\n"
                     + "	 cliente_fornecedor c\n"
@@ -663,41 +456,22 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 and c.clf_regdel is null\n"
                     + "	 and c.clf_cliforambos = 'C'\n"
                     + "order by 1")) {
-
-                //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setCnpj(rs.getString("cnpj"));
-
-                    if (imp.getCnpj() == null) {
-                        imp.setCnpj(rs.getString("cpf"));
-                    }
-
-                    imp.setInscricaoestadual(Utils.formataNumero(rs.getString("rgie")));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(Utils.formataNumero(rs.getString("rg_ie")));
                     imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
                     imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
-                    imp.setCep(rs.getString("cep"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("telefone"));
-                    imp.setDataCadastro(rs.getDate("cadastro"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
-
-                    /*if(rs.getString("cadastro") != null && !rs.getString("cadastro").isEmpty()) {
-                        imp.setDataCadastro(sdf.parse(rs.getString("cadastro")));
-                    }
-                    
-                    if(rs.getString("nascimento") != null && !rs.getString("nascimento").isEmpty()) {
-                        imp.setDataNascimento(sdf.parse(rs.getString("nascimento")));
-                    }*/
-                    imp.setObservacao(rs.getString("observacao"));
-                    imp.setValorLimite(rs.getDouble("limite"));
 
                     result.add(imp);
                 }
@@ -707,42 +481,195 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
     @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new DSICDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	distinct\n"
-                    + "	tmvdata lancamento,\n"
-                    + "	substring(tmvorcgcpf, 0, 4) ||\n"
-                    + "	substring(tmvorcgcpf, 9, 4) idcliente,\n"
-                    + "	tmvorclien razao,\n"
-                    + "	tmvnumseq documento,\n"
-                    + "	tmvhorario hora,\n"
-                    + "	substring(tmvtermina, 5, 2) ecf,\n"
-                    + "	tmvlrtotal total \n"
-                    + "from \n"
-                    + "	public.back025 \n"
-                    + "where \n"
-                    + "	tmvorclien != '' and \n"
-                    + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new DSICDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
 
-                    imp.setId(rs.getString("documento"));
-                    imp.setNumeroCupom(imp.getId());
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setDataEmissao(rs.getDate("lancamento"));
-                    imp.setValor(rs.getDouble("total"));
+    private static class VendaIterator implements Iterator<VendaIMP> {
 
-                    result.add(imp);
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setNumeroSerie(rst.getString("serie"));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setCpf(rst.getString("cpf"));
+                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
                 }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
             }
         }
 
-        return result;
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "SELECT\n"
+                    + "	id id_venda,\n"
+                    + "	v.numero,\n"
+                    + "	CASE WHEN vd.NUMERO_CFE IS NULL THEN v.ID||'-'||v.NUMERO ELSE vd.NUMERO_CFE END numerocupom,\n"
+                    + "	COALESCE (id_pdv,1) ecf,\n"
+                    + "	DATA_EMISSAO data,\n"
+                    + "	HORA_EMISSAO hora,\n"
+                    + "	v.serie,\n"
+                    + "	v.VALOR_CONTABIL valor,\n"
+                    + "	v.ID_CLIENTE,\n"
+                    + "	c.CGC cpf,\n"
+                    + "	c.NOME nomecliente,\n"
+                    + "	CASE WHEN SITUACAO = 1 THEN 1 ELSE 0 END cancelado\n"
+                    + "FROM\n"
+                    + "	NF_SAIDA v\n"
+                    + "	JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
+                    + "	JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
+                    + "WHERE\n"
+                    + "	ID_EMPRESA = " + idLojaCliente + "\n"
+                    + "	AND DATA_EMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
+                        next.setSequencia(rst.getInt("nritem"));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n"
+                    + "	vi.id nritem,\n"
+                    + "	vi.ID_NF id_venda,\n"
+                    + "	vi.ID||vi.ID_NF||vi.ID_PRODUTO id_item,\n"
+                    + "	vi.ID_PRODUTO,\n"
+                    + "	p.DESCRICAO,\n"
+                    + "	vi.QTD quantidade,\n"
+                    + "	vi.VLR_UNITARIO valor,\n"
+                    + "	vi.VLR_ACRESCIMO acrescimo,\n"
+                    + "	p.COD_BARRAS codigobarras,\n"
+                    + "	un.DESCRICAO unidade\n"
+                    + "FROM\n"
+                    + "	NF_SAIDA_ITENS vi\n"
+                    + " JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
+                    + " JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
+                    + " JOIN NF_SAIDA v ON v.ID = vi.ID_NF \n"
+                    + "WHERE\n"
+                    + "	vi.ID_EMPRESA = " + idLojaCliente + "\n"
+                    + "	AND v.DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }

@@ -830,12 +830,12 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new Provenco_TentaculoDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataInicioVenda);
+        return new Provenco_TentaculoDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new Provenco_TentaculoDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataInicioVenda);
+        return new Provenco_TentaculoDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     public void setDataInicioVenda(Date date) {
