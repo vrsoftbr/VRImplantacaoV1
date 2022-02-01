@@ -13,6 +13,7 @@ import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
+import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
@@ -95,6 +96,9 @@ public abstract class InternalFrameFactory {
             case VERSATIL:
                 internalFrame = new Versatil2_5GUI(frame);
                 break;
+            case DSIC:
+                internalFrame = new DSIC2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -165,6 +169,9 @@ public abstract class InternalFrameFactory {
                 break;
             case VERSATIL:
                 internalFrame = new Versatil2_5GUI(frame);
+                break;
+            case DSIC:
+                internalFrame = new DSIC2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

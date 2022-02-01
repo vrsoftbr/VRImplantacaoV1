@@ -1,5 +1,7 @@
 package vrimplantacao2_5.vo.enums;
 
+import vrimplantacao2_5.dao.sistema.DSICDAO;
+
 /**
  *
  * @author Desenvolvimento
@@ -94,7 +96,8 @@ public enum EScriptLojaOrigemSistema {
                     "where l.id_situacaocadastro = 1\n" +
                     "order by\n" +
                     "	l.id"),
-    SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO");
+    SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
+    DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa");
 
     private int idSistema;
     private int idBancoDados;
