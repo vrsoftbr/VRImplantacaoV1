@@ -1,7 +1,5 @@
 package vrimplantacao2_5.vo.enums;
 
-import vrimplantacao2_5.dao.sistema.DSICDAO;
-
 /**
  *
  * @author Desenvolvimento
