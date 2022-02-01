@@ -97,8 +97,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.ENDERECO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.ENDERECO
         ));
     }
 
@@ -193,7 +192,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when pro_pesavel = true then 1 else 0 end e_balanca,\n"
                     + "	case when pro_regdel is null then 1 else 0 end ativo,\n"
                     + "	p.csosn_codigo_estadual id_icms,\n"
-                    + "pro_qtddias_validade validade\n"
+                    + " pro_qtddias_validade validade\n"
                     + "from\n"
                     + "	produto p\n"
                     + "	  left join unidade_produto un on un.unp_id = p.unp_id \n"
@@ -221,11 +220,11 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    
+
                     imp.setEstoqueMinimo(rs.getDouble("est_minimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
-                    
+
                     imp.setIcmsConsumidorId(rs.getString("id_icms"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
@@ -525,7 +524,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numcupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
 
@@ -535,9 +534,9 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setNumeroSerie(rst.getString("serie"));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setCpf(rst.getString("cpf_cnpj"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
@@ -552,26 +551,27 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "SELECT\n"
-                    + "	id id_venda,\n"
-                    + "	v.numero,\n"
-                    + "	CASE WHEN vd.NUMERO_CFE IS NULL THEN v.ID||'-'||v.NUMERO ELSE vd.NUMERO_CFE END numerocupom,\n"
-                    + "	COALESCE (id_pdv,1) ecf,\n"
-                    + "	DATA_EMISSAO data,\n"
-                    + "	HORA_EMISSAO hora,\n"
-                    + "	v.serie,\n"
-                    + "	v.VALOR_CONTABIL valor,\n"
-                    + "	v.ID_CLIENTE,\n"
-                    + "	c.CGC cpf,\n"
-                    + "	c.NOME nomecliente,\n"
-                    + "	CASE WHEN SITUACAO = 1 THEN 1 ELSE 0 END cancelado\n"
-                    + "FROM\n"
-                    + "	NF_SAIDA v\n"
-                    + "	JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
-                    + "	JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
-                    + "WHERE\n"
-                    + "	ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND DATA_EMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n";
+                    = "select\n"
+                    + "	cfe_id id_venda,\n"
+                    + "	case when cfe_numerocfe is null\n"
+                    + "     then cfe_id else cfe_numerocfe end numcupom,\n"
+                    + "	1 ecf,\n"
+                    + "	substring(cfe_dtautorizacao::varchar,1,11) as data,\n"
+                    + "	substring(cfe_dtautorizacao::varchar,12,8) hora,\n"
+                    + "	cfe_serie serie,\n"
+                    + "	cfe_valtotalprodutos valor,\n"
+                    + "	cfe_valdesconto desconto,\n"
+                    + "	v.clf_id id_cliente,\n"
+                    + "	c.cfj_razaosocial nomecliente,\n"
+                    + "	c.cfj_cnpj cpf_cnpj,\n"
+                    + "	case when cfe_motivocancelamento is null\n"
+                    + "     then 0 else 1 end cancelado\n"
+                    + "from\n"
+                    + "	cfe_emitida v\n"
+                    + "	left join clifor_pj c on c.clf_id = v.clf_id\n"
+                    + "where\n"
+                    + "	v.emp_id = " + idLojaCliente + "\n"
+                    + "	and cfe_dtautorizacao between '" + strDataInicio + "' and '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -617,8 +617,9 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
 
                     }
                 }
@@ -630,25 +631,26 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n"
-                    + "	vi.id nritem,\n"
-                    + "	vi.ID_NF id_venda,\n"
-                    + "	vi.ID||vi.ID_NF||vi.ID_PRODUTO id_item,\n"
-                    + "	vi.ID_PRODUTO,\n"
-                    + "	p.DESCRICAO,\n"
-                    + "	vi.QTD quantidade,\n"
-                    + "	vi.VLR_UNITARIO valor,\n"
-                    + "	vi.VLR_ACRESCIMO acrescimo,\n"
-                    + "	p.COD_BARRAS codigobarras,\n"
-                    + "	un.DESCRICAO unidade\n"
-                    + "FROM\n"
-                    + "	NF_SAIDA_ITENS vi\n"
-                    + " JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
-                    + " JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
-                    + " JOIN NF_SAIDA v ON v.ID = vi.ID_NF \n"
-                    + "WHERE\n"
-                    + "	vi.ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND v.DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+                    = "Select\n"
+                    + "	vi.cfe_id id_venda,\n"
+                    + "	cfi_id id_item,\n"
+                    + "	cfi_sequenciaitem nritem,\n"
+                    + "	vi.pro_id id_produto,\n"
+                    + "	vi.cfi_unidade unidade,\n"
+                    + "	cfi_descricao descricao,\n"
+                    + "	p.pro_codigobarra codigobarras,\n"
+                    + "	cfi_quantidade quantidade,\n"
+                    + "	cfi_precounitario precovenda,\n"
+                    + "	cfi_valacrescimo acrescimo,\n"
+                    + "	cfi_valdesconto desconto\n"
+                    + "from\n"
+                    + "	cfe_emitida_itens vi\n"
+                    + "	join cfe_emitida v on v.cfe_id = vi.cfe_id\n"
+                    + "	left join produto p on p.pro_id = vi.pro_id\n"
+                    + "where\n"
+                    + "	v.emp_id = " + idLojaCliente + "\n"
+                    + "	and v.cfe_dtautorizacao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "order by 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
