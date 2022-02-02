@@ -15,9 +15,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.VRToVRDAO;
+import vrimplantacao2.dao.interfaces.WebSaqDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -27,18 +26,18 @@ import vrimplantacao2_5.vo.enums.ESistema;
  *
  * @author Guilherme
  */
-public class VRToVR2_5GUI extends VRInternalFrame {
+public class WebSac2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.VRMASTER.getNome();
+    private static final String SISTEMA = ESistema.WEBSAQ.getNome();
 
-    private static VRToVR2_5GUI instance;
-    private final VRToVRDAO dao;
+    private static WebSac2_5GUI instance;
+    private final WebSaqDAO dao;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new VRToVR2_5GUI(i_mdiFrame);
+                instance = new WebSac2_5GUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -54,9 +53,9 @@ public class VRToVR2_5GUI extends VRInternalFrame {
      * @param frame
      * @throws java.lang.Exception
      */
-    public VRToVR2_5GUI(VRMdiFrame frame) throws Exception {
+    public WebSac2_5GUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new VRToVRDAO();
+        this.dao = new WebSaqDAO();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {
@@ -93,7 +92,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         
-        pnlConn.setSistema(ESistema.VRMASTER);
+        pnlConn.setSistema(ESistema.WEBSAQ);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -139,10 +138,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     importador.setIdConexao(pnlConn.idConexao);
-                    
-                    dao.eanAtacado = chkEANAtacado.isSelected();
-                    dao.apenasAtivo = chkSomenteAtivo.isSelected();
-                    dao.setComplemento(pnlConn.getComplemento());
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -195,22 +190,11 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        dao.importarRotativoBaixados = chkCreditoRotativoBaixados.isSelected();
-                        if (chkCreditoRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        if (chkPdvVendas.isSelected()) {
-                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            OpcaoVenda[] opt = new OpcaoVenda[10];
-                            opt[0] = OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR;
-                            if (chkPdvVendasCustos.isSelected()) {
-                                opt[1] = OpcaoVenda.ATUALIZAR_CUSTOS;
-                            }
-                            importador.importarVendas(opt);
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
                         }
                         if (chkLimiteCredito.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
@@ -226,10 +210,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                         }
                         if (chkCvConveniado.isSelected()) {
                             importador.importarConvenioConveniado();
-                        }
-                        dao.importarConveniosBaixados = chkCvTransacaoBaixados.isSelected();
-                        if (chkCvTransacao.isSelected()) {
-                            importador.importarConvenioTransacao();
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -335,6 +315,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         try {
@@ -749,9 +730,13 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(399, Short.MAX_VALUE))
+                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -760,7 +745,9 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                 .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabs.addTab("Especifico", jPanel1);
@@ -963,6 +950,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;

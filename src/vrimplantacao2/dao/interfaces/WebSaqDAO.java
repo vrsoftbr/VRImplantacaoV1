@@ -10,19 +10,24 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -74,6 +79,33 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codsimilar,\n" +
+                    "	descricao\n" +
+                    "from \n" +
+                    "	simprod")) {
+                while(rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codsimilar"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -82,6 +114,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.codproduto,\n"
                     + "p.descricao,\n"
                     + "p.descricaofiscal,\n"
+                    + "pe.codean ean,\n"        
                     + "p.coddepto,\n"
                     + "p.codgrupo,\n"
                     + "p.codsubgrupo,\n"
@@ -122,20 +155,38 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cf.aliqicms as icmsaliq,\n"
                     + "cf.aliqredicms as icmsred\n"
                     + "from produto p \n"
+                    + "left join produtoean pe on p.codproduto = pe.codproduto\n"        
                     + "left join embalagem e on e.codembal = p.codembalvda\n"
-                    + "inner join unidade u on u.codunidade = e.codunidade\n"
+                    + "left join unidade u on u.codunidade = e.codunidade\n"
                     + "left join piscofins pcs on pcs.codpiscofins = p.codpiscofinssai\n"
                     + "left join piscofins pce on pce.codpiscofins = p.codpiscofinsent\n"
                     + "left join ncm on ncm.idncm = p.idncm\n"
                     + "left join classfiscal cf on cf.codcf = p.codcfpdv\n"
                     + "order by p.codproduto"
             )) {
+                
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codproduto"));
                     imp.seteBalanca("S".equals(rst.getString("pesado")));
+                    
+                    imp.setEan(rst.getString("ean"));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
+                    
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        imp.setValidade(bal.getValidade() > 1 ? 
+                                bal.getValidade() : rst.getInt("diasvalidade"));
+                        imp.setEan(imp.getImportId());
+                    }
+                    
                     imp.setValidade(rst.getInt("diasvalidade"));
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
@@ -145,7 +196,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("coddepto"));
                     imp.setCodMercadologico2(rst.getString("codgrupo"));
                     imp.setCodMercadologico3(rst.getString("codsubgrupo"));
-                    imp.setIdFamiliaProduto(rst.getString("codfamilia"));
+                    imp.setIdFamiliaProduto(rst.getString("codsimilar"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
                     imp.setPesoLiquido(rst.getDouble("pesoliq"));
@@ -162,6 +213,11 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
                     imp.setIcmsDebitoId(rst.getString("codcfpdv"));
                     imp.setIcmsCreditoId(rst.getString("codcfpdv"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
                     result.add(imp);
                 }
             }
@@ -639,6 +695,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
                     imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("codcliente"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
@@ -646,6 +703,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rst.getDouble("valor"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setJuros(rst.getDouble("valorjuros"));
+                    
                     result.add(imp);
                 }
             }
