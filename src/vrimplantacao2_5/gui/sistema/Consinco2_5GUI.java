@@ -107,6 +107,8 @@ public class Consinco2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
 
+                    consincoDAO.outrasDespesas = chkImportarOutrasDespesas.isSelected();
+                    
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:
@@ -182,6 +184,8 @@ public class Consinco2_5GUI extends VRInternalFrame {
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        tabExtras = new vrframework.bean.panel.VRPanel();
+        chkImportarOutrasDespesas = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -318,6 +322,27 @@ public class Consinco2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Vendas", tabVendas);
 
+        chkImportarOutrasDespesas.setText("Pagar Fornecedor (Outras Despesas)");
+
+        javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
+        tabExtras.setLayout(tabExtrasLayout);
+        tabExtrasLayout.setHorizontalGroup(
+            tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabExtrasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkImportarOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(350, Short.MAX_VALUE))
+        );
+        tabExtrasLayout.setVerticalGroup(
+            tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabExtrasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkImportarOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(198, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Parametros Extras", tabExtras);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -378,6 +403,7 @@ public class Consinco2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkImportarOutrasDespesas;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
@@ -389,6 +415,7 @@ public class Consinco2_5GUI extends VRInternalFrame {
     private javax.swing.JScrollPane scpClientes;
     private javax.swing.JPanel tabCli;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
+    private vrframework.bean.panel.VRPanel tabExtras;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;

@@ -109,7 +109,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         if (opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR)) {
             chkPagarFornecedor.setVisible(opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR));
-            chkOutrasReceitas.setVisible(opt.contains(OpcaoFornecedor.OUTRAS_RECEITAS));
+            chkOutrasDespesas.setVisible(opt.contains(OpcaoFornecedor.OUTRAS_RECEITAS));
         } else {
             this.remove(pnlContaPagar);
             pnlContasPagar.setVisible(false);
@@ -332,8 +332,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             }
         }
         
-        if (chkOutrasReceitas.isSelected()) {
-            importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
+        if (chkOutrasDespesas.isSelected()) {
+            importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
         }
     }
 
@@ -428,7 +428,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         jLabel12 = new javax.swing.JLabel();
         chkPagarFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         ImportarSemFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkOutrasReceitas = new vrframework.bean.checkBox.VRCheckBox();
+        chkOutrasDespesas = new vrframework.bean.checkBox.VRCheckBox();
 
         setName(""); // NOI18N
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -826,8 +826,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(ImportarSemFornecedor, "Importar Sem Fornecedor");
         ImportarSemFornecedor.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkOutrasReceitas, "Outras Receitas");
-        chkOutrasReceitas.setEnabled(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chkOutrasDespesas, "Outras Despesas");
+        chkOutrasDespesas.setEnabled(true);
 
         javax.swing.GroupLayout pnlContasPagarLayout = new javax.swing.GroupLayout(pnlContasPagar);
         pnlContasPagar.setLayout(pnlContasPagarLayout);
@@ -844,8 +844,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ImportarSemFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(285, Short.MAX_VALUE))
+                        .addComponent(chkOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(276, Short.MAX_VALUE))
         );
         pnlContasPagarLayout.setVerticalGroup(
             pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -856,7 +856,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkPagarFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ImportarSemFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -909,7 +909,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
     public vrframework.bean.checkBox.VRCheckBox chkNumero;
     public vrframework.bean.checkBox.VRCheckBox chkObservacao;
-    public vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
+    public vrframework.bean.checkBox.VRCheckBox chkOutrasDespesas;
     public vrframework.bean.checkBox.VRCheckBox chkPagarFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkPrazoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
