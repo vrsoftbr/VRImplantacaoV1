@@ -212,6 +212,7 @@ import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.dao.sistema.SatFacilDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
+import vrimplantacao2_5.dao.sistema.TslDAO;
 import vrimplantacao2_5.dao.sistema.VersatilDAO;
 
 /**
@@ -431,7 +432,7 @@ public enum ESistema {
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
     DSIC(211, "DSIC", new DSICDAO()),
-    TSL(212, "TSL", new VersatilDAO()),
+    TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
