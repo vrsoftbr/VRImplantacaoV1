@@ -210,6 +210,7 @@ import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
+import vrimplantacao2_5.dao.sistema.TslDAO;
 import vrimplantacao2_5.dao.sistema.VersatilDAO;
 
 /**
@@ -428,7 +429,7 @@ public enum ESistema {
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
-    TSL(213, "TSL", new VersatilDAO());
+    TSL(213, "TSL", new TslDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;

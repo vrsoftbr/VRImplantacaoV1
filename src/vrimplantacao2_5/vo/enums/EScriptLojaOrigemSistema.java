@@ -94,7 +94,7 @@ public enum EScriptLojaOrigemSistema {
             + "where l.id_situacaocadastro = 1\n"
             + "order by\n"
             + "	l.id"),
-    TSl(213, 8, "SELECT\n"
+    TSl(212, 8, "SELECT\n"
             + "	EMPCOD id,\n"
             + "	EMPNOM descricao\n"
             + "FROM\n"
