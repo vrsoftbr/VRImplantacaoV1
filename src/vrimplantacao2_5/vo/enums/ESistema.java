@@ -429,7 +429,8 @@ public enum ESistema {
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
-    DSIC(211, "DSIC", new DSICDAO());
+    DSIC(211, "DSIC", new DSICDAO()),
+    TSL(212, "TSL", new VersatilDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;

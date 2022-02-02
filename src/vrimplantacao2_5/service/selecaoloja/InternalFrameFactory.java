@@ -19,6 +19,7 @@ import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
+import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
@@ -98,6 +99,8 @@ public abstract class InternalFrameFactory {
                 break;
             case DSIC:
                 internalFrame = new DSIC2_5GUI(frame);
+            case TSL:
+                internalFrame = new Tsl2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
@@ -172,6 +175,8 @@ public abstract class InternalFrameFactory {
                 break;
             case DSIC:
                 internalFrame = new DSIC2_5GUI(frame);
+            case TSL:
+                internalFrame = new Tsl2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

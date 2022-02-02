@@ -1135,6 +1135,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
