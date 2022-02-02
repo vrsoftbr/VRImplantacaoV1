@@ -366,34 +366,6 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
-        List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
-
-        try (
-                Statement stm = ConexaoMySQL.getConexao().createStatement();
-                ResultSet rst = stm.executeQuery(
-                        " select\n"
-                        + "     RECCLI as id_cliente,\n"
-                        + "	sum(RECTOTAL) as valor\n"
-                        + "from\n"
-                        + "	tsm003\n"
-                        + "	WHERE \n"
-                        + " RECBAIXA <> 'S'\n"
-                        + "group by\n"
-                        + "RECCLI"
-                )) {
-            while (rst.next()) {
-                result.add(new CreditoRotativoPagamentoAgrupadoIMP(
-                        rst.getString("id_cliente"),
-                        rst.getDouble("valor")
-                ));
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new TslDAO.VendaIterator(getLojaOrigem(), this.tslVO.getDataInicioVenda(), this.tslVO.getDataTerminoVenda());
     }
