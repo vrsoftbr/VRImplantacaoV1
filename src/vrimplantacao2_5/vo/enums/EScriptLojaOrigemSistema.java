@@ -100,7 +100,16 @@ public enum EScriptLojaOrigemSistema {
                     + "codestabelec id, \n"
                     + "razaosocial descricao \n"
                     + "from estabelecimento\n"
-                    + "order by codestabelec");
+                    + "order by codestabelec"),
+    TSl(212, 8, "SELECT\n"
+            + "	EMPCOD id,\n"
+            + "	EMPNOM descricao\n"
+            + "FROM\n"
+            + "	tsc008a"),
+    SATFACIL(213, 5, "SELECT \n"
+            + "  ID_REGISTRO id,\n"
+            + "  NOME_LOJA descricao\n"
+            + "  FROM PARAMETROS");
 
     private int idSistema;
     private int idBancoDados;

@@ -132,7 +132,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"select \n"
+                    "select \n"
                     + "	distinct \n"
                     + "	gr.grumcodigo merc1,\n"
                     + "	gr.grumdescri descmerc1,\n"
@@ -143,18 +143,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join public.file004 gr on pr.procategor = gr.grumcodigo\n"
                     + "join public.file002 sg on pr.prosbgrcod = sg.sbgrucodig\n"
                     + "order by \n"
-                    + "	merc1, merc2"*/
-                    "select\n"
-                    + "	distinct\n"
-                    + "	procategor merc1,\n"
-                    + "	procatdesc descmerc1,\n"
-                    + "	prosbgrcod merc2,\n"
-                    + "	prosbgrdes descmerc2,\n"
-                    + "	prosbgrcod merc3,\n"
-                    + "	prosbgrdes descmerc3\n"
-                    + "from file005\n"
-                    + "where prosbgrdes != ''\n"
-                    + "order by 1,3")) {
+                    + "	merc1, merc2")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
 
@@ -164,8 +153,8 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("descmerc3"));
+                    imp.setMerc3ID(imp.getMerc2ID());
+                    imp.setMerc3Descricao(imp.getMerc2Descricao());
 
                     result.add(imp);
                 }
@@ -251,8 +240,6 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
 
-                    //imp.setPiscofinsCstDebito(rs.getString("cstpis"));
-                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
@@ -561,8 +548,7 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from \n"
                     + "	public.back025 \n"
                     + "where \n"
-                    + "	tmvorclien != '' and \n"
-                    + "	tmvdata between '2021-12-01' and '2021-12-31'")) {
+                    + "	tmvorclien != ''")) {
 
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
@@ -625,7 +611,6 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from \n"
                     + "	cliente c")) {
 
-                //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
@@ -650,13 +635,6 @@ public class AssistDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
 
-                    /*if(rs.getString("cadastro") != null && !rs.getString("cadastro").isEmpty()) {
-                        imp.setDataCadastro(sdf.parse(rs.getString("cadastro")));
-                    }
-                    
-                    if(rs.getString("nascimento") != null && !rs.getString("nascimento").isEmpty()) {
-                        imp.setDataNascimento(sdf.parse(rs.getString("nascimento")));
-                    }*/
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
