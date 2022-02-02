@@ -427,7 +427,8 @@ public enum ESistema {
     TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
-    VERSATIL(210, "VERSATIL", new VersatilDAO());
+    VERSATIL(210, "VERSATIL", new VersatilDAO()),
+    TSL(213, "TSL", new VersatilDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
