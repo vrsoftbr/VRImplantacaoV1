@@ -100,7 +100,12 @@ public enum EScriptLojaOrigemSistema {
             + "	EMPCOD id,\n"
             + "	EMPNOM descricao\n"
             + "FROM\n"
-            + "	tsc008a");
+            + "	tsc008a"),
+    SATFACIL(213, 5, "SELECT \n"
+            + "  ID_REGISTRO id,\n"
+            + "  NOME_LOJA descricao\n"
+            + "  FROM PARAMETROS");
+
 
     private int idSistema;
     private int idBancoDados;
