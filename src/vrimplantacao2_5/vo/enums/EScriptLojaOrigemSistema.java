@@ -94,7 +94,7 @@ public enum EScriptLojaOrigemSistema {
             + "where l.id_situacaocadastro = 1\n"
             + "order by\n"
             + "	l.id"),
-    SATFACIL(211, 5, "SELECT \n"
+    SATFACIL(213, 5, "SELECT \n"
             + "  ID_REGISTRO id,\n"
             + "  NOME_LOJA descricao\n"
             + "  FROM PARAMETROS");
