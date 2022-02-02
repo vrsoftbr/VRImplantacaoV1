@@ -49,6 +49,8 @@ public class ContasPagarRepository {
         provider.notificar("Contas à Pagar - Preparando a importação...");
         MultiMap<Long, FornecedorVO> cnpjFornecedor = provider.getCnpjFornecedor();
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
+        
+        
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
         MultiMap<String, PagarFornecedorVO> pagarFornecedor;
         MultiMap<String, PagarFornecedorParcelaVO> pagarFornecedorParcela;

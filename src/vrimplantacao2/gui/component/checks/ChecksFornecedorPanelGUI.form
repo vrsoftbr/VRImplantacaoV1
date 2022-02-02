@@ -719,10 +719,10 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="ImportarSemFornecedor" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkOutrasReceitas" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOutrasDespesas" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="285" max="32767" attributes="0"/>
+                      <EmptySpace pref="276" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -735,7 +735,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chkPagarFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="ImportarSemFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkOutrasReceitas" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOutrasDespesas" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="17" max="32767" attributes="0"/>
                   </Group>
@@ -767,9 +767,9 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOutrasReceitas">
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOutrasDespesas">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Outras Receitas"/>
+                <Property name="text" type="java.lang.String" value="Outras Despesas"/>
                 <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="true" type="code"/>
                 </Property>
