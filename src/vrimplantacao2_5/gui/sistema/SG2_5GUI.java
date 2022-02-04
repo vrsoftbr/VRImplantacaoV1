@@ -22,6 +22,7 @@ public class SG2_5GUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        chekDigitoBalanca.setSelected(params.getBool(SISTEMA));
     }
 
     public SG2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -44,7 +45,7 @@ public class SG2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return sgDAO.getSistema();
+                return sgDAO.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -104,6 +105,7 @@ public class SG2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    sgDAO.digitobalanca = chekDigitoBalanca.isSelected();
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -165,6 +167,9 @@ public class SG2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        pnlEspecial = new javax.swing.JTabbedPane();
+        tbProdutosEspecial = new javax.swing.JPanel();
+        chekDigitoBalanca = new javax.swing.JCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -236,6 +241,29 @@ public class SG2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        chekDigitoBalanca.setText("Remove Digito Balança");
+
+        javax.swing.GroupLayout tbProdutosEspecialLayout = new javax.swing.GroupLayout(tbProdutosEspecial);
+        tbProdutosEspecial.setLayout(tbProdutosEspecialLayout);
+        tbProdutosEspecialLayout.setHorizontalGroup(
+            tbProdutosEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tbProdutosEspecialLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chekDigitoBalanca)
+                .addContainerGap(402, Short.MAX_VALUE))
+        );
+        tbProdutosEspecialLayout.setVerticalGroup(
+            tbProdutosEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tbProdutosEspecialLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(chekDigitoBalanca)
+                .addContainerGap(166, Short.MAX_VALUE))
+        );
+
+        pnlEspecial.addTab("Produtos", tbProdutosEspecial);
+
+        tabImportacao.addTab("Especial", pnlEspecial);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -284,8 +312,10 @@ public class SG2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JCheckBox chekDigitoBalanca;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
+    private javax.swing.JTabbedPane pnlEspecial;
     private vrframework.bean.panel.VRPanel pnlMigrar;
     private javax.swing.JScrollPane scpClientes;
     private javax.swing.JPanel tabCli;
@@ -294,5 +324,6 @@ public class SG2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private javax.swing.JPanel tbProdutosEspecial;
     // End of variables declaration//GEN-END:variables
 }

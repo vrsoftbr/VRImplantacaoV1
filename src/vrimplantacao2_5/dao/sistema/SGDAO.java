@@ -30,6 +30,12 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
  * @author guilhermegomes
  */
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    public boolean digitobalanca = false;
+    
+    public void setDigitoBalanca(boolean digitoBalanca) {
+        this.digitobalanca = digitobalanca;
+    }
 
     @Override
     public String getSistema() {
@@ -164,7 +170,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct on (p.codpro01) \n"
                     + "	p.codpro01 id,\n"
                     + "	p.balanca01,\n"
-                    + "	ean.codbarra codigobarras,\n"
+                    //+ "	ean.codbarra codigobarras,\n"
+                    + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
+                            + "else ean.codbarra::varchar end codigobarras,\n":"ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
                     + "	p.descpro01 descricaocompleta,\n"
                     + "	p.descabr01 descricaoreduzida,\n"
