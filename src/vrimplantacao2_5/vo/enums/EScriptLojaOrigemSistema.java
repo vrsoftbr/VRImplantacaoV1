@@ -96,6 +96,11 @@ public enum EScriptLojaOrigemSistema {
                     "	l.id"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa"),
+    WEBSAQ(188, 11, "select \n"
+                    + "codestabelec id, \n"
+                    + "razaosocial descricao \n"
+                    + "from estabelecimento\n"
+                    + "order by codestabelec"),
     TSl(212, 8, "SELECT\n"
             + "	EMPCOD id,\n"
             + "	EMPNOM descricao\n"
@@ -105,7 +110,6 @@ public enum EScriptLojaOrigemSistema {
             + "  ID_REGISTRO id,\n"
             + "  NOME_LOJA descricao\n"
             + "  FROM PARAMETROS");
-
 
     private int idSistema;
     private int idBancoDados;

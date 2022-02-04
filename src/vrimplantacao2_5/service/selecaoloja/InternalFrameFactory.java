@@ -24,6 +24,7 @@ import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
@@ -100,6 +101,9 @@ public abstract class InternalFrameFactory {
                 break;
             case DSIC:
                 internalFrame = new DSIC2_5GUI(frame);
+                break;
+            case WEBSAQ:
+                internalFrame = new WebSac2_5GUI(frame);
                 break;
             case TSL:
                 internalFrame = new Tsl2_5GUI(frame);
