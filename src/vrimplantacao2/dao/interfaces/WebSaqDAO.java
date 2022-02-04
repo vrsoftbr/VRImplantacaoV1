@@ -286,53 +286,57 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "f.codfornec,\n"
-                    + "f.endereco,\n"
-                    + "f.bairro,\n"
-                    + "f.cep,\n"
-                    + "f.codcidade,\n"
-                    + "c.nome as nomecidade,\n"
-                    + "c.codoficial cidadeibge,\n"
-                    + "f.uf,\n"
-                    + "f.contato1,\n"
-                    + "f.fone1,\n"
-                    + "f.fone2,\n"
-                    + "f.fone3,\n"
-                    + "f.site,\n"
-                    + "f.email,\n"
-                    + "f.tppessoa,\n"
-                    + "f.cpfcnpj,\n"
-                    + "f.rgie,\n"
-                    + "f.codatividade,\n"
-                    + "f.codbanco,\n"
-                    + "f.agencia,\n"
-                    + "f.contacorrente,\n"
-                    + "f.observacao,\n"
-                    + "f.contato2,\n"
-                    + "f.contato3,\n"
-                    + "f.email1,\n"
-                    + "f.email2,\n"
-                    + "f.email3,\n"
-                    + "f.fone,\n"
-                    + "f.fax,\n"
-                    + "f.numero,\n"
-                    + "f.complemento,\n"
-                    + "f.suframa,\n"
-                    + "f.datainclusao,\n"
-                    + "f.tipocompra,\n"
-                    + "f.inscmunicipal,\n"
-                    + "f.status\n"
-                    + "from fornecedor f\n"
-                    + "left join cidade c on c.codcidade = f.codcidade\n"
-                    + "order by codfornec"
+                    "select \n" +
+                    "    f.codfornec,\n" +
+                    "    regexp_replace(f.nome,'[^A-z 0-9]','','g') as razao,\n" +
+                    "    regexp_replace(f.endereco,'[^A-z 0-9]','','g') endereco,\n" +
+                    "    regexp_replace(f.bairro,'[^A-z 0-9]','','g') bairro,\n" +
+                    "    f.cep,\n" +
+                    "    f.codcidade,\n" +
+                    "    regexp_replace(c.nome,'[^A-z 0-9]','','g') as nomecidade,\n" +
+                    "    c.codoficial cidadeibge,\n" +
+                    "    f.uf,\n" +
+                    "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato1,\n" +
+                    "    f.fone1,\n" +
+                    "    f.fone2,\n" +
+                    "    f.fone3,\n" +
+                    "    f.site,\n" +
+                    "    f.email,\n" +
+                    "    f.tppessoa,\n" +
+                    "    f.cpfcnpj,\n" +
+                    "    f.rgie,\n" +
+                    "    f.codatividade,\n" +
+                    "    f.codbanco,\n" +
+                    "    f.agencia,\n" +
+                    "    f.contacorrente,\n" +
+                    "    regexp_replace(f.observacao,'[^A-z 0-9]','','g') as observacao,\n" +
+                    "    f.contato2,\n" +
+                    "    f.contato3,\n" +
+                    "    f.email1,\n" +
+                    "    f.email2,\n" +
+                    "    f.email3,\n" +
+                    "    f.fone,\n" +
+                    "    f.fax,\n" +
+                    "    f.numero,\n" +
+                    "    f.complemento,\n" +
+                    "    f.suframa,\n" +
+                    "    f.datainclusao,\n" +
+                    "    f.tipocompra,\n" +
+                    "    f.inscmunicipal,\n" +
+                    "    f.status\n" +
+                    "from fornecedor f\n" +
+                    "left join cidade c on c.codcidade = f.codcidade\n" +
+                    "order by \n" +
+                    "	codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codfornec"));
                     imp.setCnpj_cpf(rst.getString("cpfcnpj"));
+                    imp.setRazao(rst.getString("razao"));
                     imp.setIe_rg(rst.getString("rgie"));
                     imp.setInsc_municipal(rst.getString("inscmunicipal"));
                     imp.setEndereco(rst.getString("endereco"));

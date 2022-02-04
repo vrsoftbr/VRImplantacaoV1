@@ -104,6 +104,7 @@ public abstract class InternalFrameFactory {
                 break;
             case WEBSAQ:
                 internalFrame = new WebSac2_5GUI(frame);
+                break;
             case TSL:
                 internalFrame = new Tsl2_5GUI(frame);
                 break;

@@ -327,7 +327,7 @@ public class WebSac2_5GUI extends VRInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Importação VR para VR");
+        setTitle("Importação Websac");
 
         tabParametros.addTab("Produtos", tabProdutos);
 
