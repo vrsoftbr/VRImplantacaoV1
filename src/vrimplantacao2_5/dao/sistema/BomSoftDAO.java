@@ -126,9 +126,9 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
-    
-    public List<MercadologicoIMP> getMercadologico() throws Exception {
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -147,7 +147,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("desc_merc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -200,7 +200,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	CODIGO_PROD id,\n"
-                    + "	REFERENCIA_PROD ean,\n"
+                    + "	REPLACE(REPLACE(SUBSTRING(REFERENCIA_PROD FROM 1 FOR 14),'.',''),'/','')ean,\n"
                     + "	DESCRICAO_PROD descricao,\n"
                     + "	GRUPO_PROD merc1,\n"
                     + "	GRUPO_PROD merc2,\n"
@@ -273,13 +273,13 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("est_maximo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                    //imp.seteBalanca(rst.getBoolean("e_balanca"));
-                    //imp.setValidade(rst.getInt("validade"));
+                    imp.seteBalanca(rs.getBoolean("e_balanca"));
+                    imp.setValidade(rs.getInt("validade"));
 
                     imp.setPiscofinsCstCredito(rs.getString("piscofins"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins"));
 
-                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
+                    int codigoProduto = Utils.stringToInt(rs.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
                     if (produtoBalanca != null) {
@@ -310,7 +310,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -480,7 +480,7 @@ public class BomSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     /*
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
