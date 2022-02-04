@@ -12,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,14 +27,12 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
-import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2_5.vo.sistema.TslVO;
 
 /**
@@ -183,8 +180,8 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.PRECO1 precovenda,  \n"
                     + "    CASE \n"
                     + "		WHEN p.INATIVO = '0'\n"
-                    + "		THEN 0\n"
-                    + "		ELSE 1\n"
+                    + "		THEN 1\n"
+                    + "		ELSE 0\n"
                     + "    END situacaoCadastro,\n"
                     + "    p.NCM ncm,\n"
                     + "    p.PIS_MIX piscofinsCstDebito,\n"
@@ -312,19 +309,68 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	CLICOD id,\n"
-                    + "	CLINOM nome\n"
-                    + "	from tslc001"
+                    " SELECT \n"
+                    + " CLICOD id,\n"
+                    + " CLINOM nome,\n"
+                    + " CLIEND endereco,\n"
+                    + " NUMERO numero,\n"
+                    + " CLIBAI bairro,\n"
+                    + " CLICEP cep,\n"
+                    + " CLICID municipio,\n"
+                    + " CLIEST uf,\n"
+                    + " CLICGC cpfcnpj,\n"
+                    + " CLIEST inscest,\n"
+                    + " CLITEL telefone,\n"
+                    + " CELULAR celular,\n"
+                    + " OBS obs,\n"
+                    + " CADASTRO dtcadastro,\n"
+                    + " nullif(DTNASC, '0000-00-00') dtnasc,\n"
+                    + " ESTCIVIL CIVIL,\n"
+                    + " CLICOMPLE complemento,\n"
+                    + " CONJUJE nomeconjuge,\n"
+                    + " nullif (NASCONJ, '0000-00-00'),\n"
+                    + " CPFCONJ,\n"
+                    + " PAI nomepai,\n"
+                    + " MAE nomemae,\n"
+                    + " EMRPESA empresa,\n"
+                    + " RENDA renda,\n"
+                    + " LIMITE limite,\n"
+                    + " case \n"
+                    + " when BLOQUEIO like 'N'\n"
+                    + " then 0\n"
+                    + " else 1\n"
+                    + " end ativo\n"
+                    + " from tslc001"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("nome"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setDataNascimento(rst.getDate("dtnasc"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCnpj(rst.getString("cpfcnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscest"));
+                    imp.setComplemento(rst.getString("complemento"));
+
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setSalario(rst.getDouble("renda"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setDataCadastro(rst.getDate("dtcadastro"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setEstadoCivil(rst.getString("civil"));
+                    imp.setNomeConjuge(rst.getString("nomeconjuge"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
-
                 }
             }
         }
