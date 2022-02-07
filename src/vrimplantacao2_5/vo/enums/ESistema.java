@@ -434,6 +434,7 @@ public enum ESistema {
     DSIC(211, "DSIC", new DSICDAO()),
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO());
+    //WBA(214,"WBA",new WBADAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
