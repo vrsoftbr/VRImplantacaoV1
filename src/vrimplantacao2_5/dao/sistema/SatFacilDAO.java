@@ -566,7 +566,7 @@ public class SatFacilDAO extends InterfaceDAO implements MapaTributoProvider {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numcupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
 
@@ -575,10 +575,11 @@ public class SatFacilDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCpf(rst.getString("cpf_cnpj"));
+
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -593,23 +594,21 @@ public class SatFacilDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
-                    + "	c.seq id_venda,\n"
-                    + "	CASE WHEN c.SEQ IS NULL THEN c.SEQ||'-'||c.NUM_OPER ELSE c.SEQ END numerocupom,\n"
-                    + "	c.COD_CAIXA ecf,\n"
-                    + "	c.DATA data,\n"
-                    + "	c.HORA hora,\n"
-                    + "	c.VALORTOTAL valor,\n"
-                    + "	c.DESCONTO desconto,\n"
-                    + "	c.COD_CLI id_cliente,\n"
-                    + "	cc.CGC cpf,\n"
-                    + "	cc.NOME nomecliente,\n"
-                    + "	CASE WHEN c.SITUACAO = 'A' THEN 0 ELSE 1 END cancelado\n"
+                    + "	CHAVE_VENDA id_venda,\n"
+                    + "	NUMERO_CUPOM numcupom,\n"
+                    + "	NUMERO_ECF ecf,\n"
+                    + "	DATA_CUPOM data,\n"
+                    + "	HORA_CUPOM hora,\n"
+                    + "	TOTAL_VENDA valor,\n"
+                    + "	TOTAL_DESCONTOS desconto,\n"
+                    + "	TOTAL_ACRESCIMOS acrescimo,\n"
+                    + "	CODIGO_CLIENTE id_cliente,\n"
+                    + "	CPF_CNPJ \n"
                     + "FROM\n"
-                    + "	CAIXA c\n"
-                    + "	LEFT JOIN CADCLI cc ON c.COD_CLI = cc.CODIGO \n"
-                    + "WHERE\n"
-                    + "	c.DATA BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "	AND c.NATUREZA = 500";
+                    + "	VENDAS_CABECALHO v\n"
+                    + "WHERE \n"
+                    + "	DATA_CUPOM BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
+                    + "ORDER BY 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -652,9 +651,11 @@ public class SatFacilDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setSequencia(rst.getInt("nritem"));
                         next.setProduto(rst.getString("id_produto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setValorDesconto(rst.getDouble("desconto"));
 
                     }
@@ -667,24 +668,23 @@ public class SatFacilDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "WITH teste AS (SELECT NUM_OPER, max(NUMEROITEM) n FROM venda GROUP BY 1)\n"
-                    + "SELECT  \n"
-                    + " v.NUMEROITEM nritem,\n"
-                    + "	c.SEQ id_venda,\n"
-                    + "	v.SEQ id_item,\n"
-                    + "	v.COD_PROD id_produto,\n"
-                    + "	v.NOME_PROD descricao,\n"
-                    + "	v.QUANTIDADE quantidade,\n"
-                    + "	v.PRECO_VEND valor,\n"
-                    + "	v.UNIDADE unidade,\n"
-                    + "	(c.DESCONTO/t.n) desconto\n"
+                    = "SELECT\n"
+                    + "	CHAVE_VENDA id_venda,\n"
+                    + "	ID_REGISTRO id_item,\n"
+                    + "	NUMERO_ITEM nritem,\n"
+                    + "	vi.CODIGO id_produto,\n"
+                    + "	p.CODIGO_UNIDADE unidade,\n"
+                    + "	vi.CODIGO_BARRAS codigobarras,\n"
+                    + "	p.DESCRICAO descricao,\n"
+                    + "	QUANTIDADE,\n"
+                    + "	VALOR_VENDA precovenda,\n"
+                    + "	ACRESCIMO_ITEM acrescimo,\n"
+                    + "	DESCONTO_ITEM desconto\n"
                     + "FROM\n"
-                    + " VENDA v \n"
-                    + " JOIN CAIXA c ON v.NUM_OPER = c.NUM_OPER \n"
-                    + " JOIN teste t ON t.num_oper = v.NUM_OPER \n"
-                    + "WHERE v.DATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "	AND NATUREZA = 500\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6, 7 ,8 , 9";
+                    + "	VENDAS_CORPO vi\n"
+                    + "	LEFT JOIN PRODUTOS p ON p.CODIGO = vi.CODIGO\n"
+                    + "WHERE\n"
+                    + "	vi.DATA_VENDA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '"+ VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
