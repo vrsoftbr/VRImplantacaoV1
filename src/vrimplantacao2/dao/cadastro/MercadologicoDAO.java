@@ -779,8 +779,12 @@ public class MercadologicoDAO {
         MercadologicoVO mercadologico = getCodigoAnterior().get(chaves);
         if (mercadologico == null) {
             LOG.finest(Arrays.toString(chaves) + " mercadológico não encontrado");
-            if (aAcertar == null) {
+            if (aAcertar == null) {                
                 aAcertar = getAAcertar();
+                if (aAcertar == null){
+                   gerarAAcertar(getNivelMaximoMercadologico());
+                   aAcertar = getAAcertar();
+                }
                 LOG.finer("A Acertar localizado " + aAcertar.toString());
             }
             mercadologico = aAcertar;
@@ -798,6 +802,10 @@ public class MercadologicoDAO {
             }
         }
     }
+
+    /*private void inserirMecadologicoAcertar() throws Exception {
+       int merc = getNivelMaximoMercadologico();
+    }*/
 
     /**
      * Classe utilizada auxiliar na importação.
