@@ -781,6 +781,10 @@ public class MercadologicoDAO {
             LOG.finest(Arrays.toString(chaves) + " mercadológico não encontrado");
             if (aAcertar == null) {
                 aAcertar = getAAcertar();
+                if (aAcertar == null){
+                   gerarAAcertar(getNivelMaximoMercadologico());
+                   aAcertar = getAAcertar();
+                }
                 LOG.finer("A Acertar localizado " + aAcertar.toString());
             }
             mercadologico = aAcertar;
