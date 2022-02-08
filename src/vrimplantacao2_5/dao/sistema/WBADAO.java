@@ -55,7 +55,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
-                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -92,7 +91,6 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.UF,
                 OpcaoFornecedor.CEP,
                 OpcaoFornecedor.DATA_CADASTRO,
-                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.OBSERVACAO));
     }
 
@@ -154,9 +152,9 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS > 0 THEN '20'\n"
                     + "	 WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS = 0 THEN '00' \n"
                     + "	 ELSE 40\n"
-                    + "	END AS integer) AS CST,\n"
-                    + "	p.ICMS AS ALIQ,\n"
-                    + "	p.REDUZICMS RED\n"
+                    + "	END AS integer) AS cst,\n"
+                    + "	p.ICMS AS aliq,\n"
+                    + "	p.REDUZICMS red\n"
                     + "FROM\n"
                     + "	CTPROD p\n"
                     + "LEFT JOIN\n"
@@ -164,9 +162,13 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.CODIGO = i.CODIGO"
             )) {
                 while (rs.next()) {
+                    String id = rs.getString("cst") + "-" + rs.getString("aliq") + "-" + rs.getString("red");
                     result.add(new MapaTributoIMP(
-                            rs.getString("id"),
-                            rs.getString("descricao")));
+                            id,
+                            id,
+                            rs.getInt("cst"),
+                            rs.getDouble("aliq"),
+                            rs.getDouble("red")));
                 }
             }
         }
@@ -230,9 +232,7 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	  WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS > 0 THEN '20'\n"
                     + "	  WHEN i.NF_CODICMS LIKE '%T%' AND p.REDUZICMS = 0 THEN '00' \n"
                     + "	  ELSE 40\n"
-                    + "	END AS integer) AS CST,\n"
-                    + "	p.ICMS icmsaliq,\n"
-                    + "	p.REDUZICMS icmsred,\n"
+                    + "	END AS integer)||'-'||p.ICMS||'-'||p.REDUZICMS id_icms,\n"
                     + "	p.MARGEMFIXA margem,\n"
                     + "	p.NF_CFISCAL ncm,\n"
                     + "	CASE \n"
@@ -274,10 +274,13 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setNcm(rst.getString("ncm"));
 
-                    imp.setIcmsCstSaida(rst.getInt("cst"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icmsaliq"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("icmsred"));
-                    
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
 
