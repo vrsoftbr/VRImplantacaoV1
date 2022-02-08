@@ -214,6 +214,7 @@ import vrimplantacao2_5.dao.sistema.SatFacilDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
 import vrimplantacao2_5.dao.sistema.TslDAO;
 import vrimplantacao2_5.dao.sistema.VersatilDAO;
+import vrimplantacao2_5.dao.sistema.WBADAO;
 
 /**
  *
@@ -433,7 +434,8 @@ public enum ESistema {
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
     DSIC(211, "DSIC", new DSICDAO()),
     TSL(212, "TSL", new TslDAO()),
-    SATFACIL(213,"SATFACIL",new SatFacilDAO());
+    SATFACIL(213,"SATFACIL",new SatFacilDAO()),
+    WBA(214,"WBA",new WBADAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;

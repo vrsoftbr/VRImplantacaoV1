@@ -24,6 +24,7 @@ import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 import vrimplantacao2_5.vo.enums.ESistema;
 
@@ -111,6 +112,9 @@ public abstract class InternalFrameFactory {
             case SATFACIL:
                 internalFrame = new SatFacil2_5GUI(frame);
                 break;
+            case WBA:
+                internalFrame = new WBA2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -190,6 +194,9 @@ public abstract class InternalFrameFactory {
                 break;
             case SATFACIL:
                 internalFrame = new SatFacil2_5GUI(frame);
+                break;
+            case WBA:
+                internalFrame = new WBA2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
