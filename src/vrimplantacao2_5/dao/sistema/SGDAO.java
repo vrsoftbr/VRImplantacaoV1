@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +17,13 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
@@ -30,9 +33,9 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
  * @author guilhermegomes
  */
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     public boolean digitobalanca = false;
-    
+
     public void setDigitoBalanca(boolean digitoBalanca) {
         this.digitobalanca = digitobalanca;
     }
@@ -172,7 +175,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.balanca01,\n"
                     //+ "	ean.codbarra codigobarras,\n"
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
-                            + "else ean.codbarra::varchar end codigobarras,\n":"ean.codbarra codigobarras,\n")
+                            + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
                     + "	p.descpro01 descricaocompleta,\n"
                     + "	p.descabr01 descricaoreduzida,\n"
@@ -260,6 +263,42 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date datatermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " o.codpro produtoid,\n"
+                    + " o.dataini,\n"
+                    + " o.datafim,\n"
+                    + " o.precofer oferta,\n"
+                    + " p.prevend01 precovenda,\n"
+                    + " o.codfil loja\n"
+                    + "from profer o\n"
+                    + "join cadpro p on p.codpro01 = o.codpro \n"
+                    + "where\n"
+                    + " o.datafim >= now()\n"
+                    + " and\n"
+                    + " o.codfil = "
+            )) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("produtoid"));
+                    imp.setDataInicio(rs.getDate("dataini"));
+                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setPrecoNormal(rs.getDouble("precovenda"));
+                    imp.setPrecoOferta(rs.getDouble("oferta"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+
+                    result.add(imp);
+
+                }
+            }
+        }
         return result;
     }
 
