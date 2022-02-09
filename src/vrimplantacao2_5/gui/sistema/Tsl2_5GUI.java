@@ -299,7 +299,7 @@ public class Tsl2_5GUI extends VRInternalFrame {
                 .addGap(301, 301, 301))
         );
 
-        tabs.addTab("Parâmetros Avistare", tabParametros);
+        tabs.addTab("Parâmetros TSL", tabParametros);
 
         vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         vRPanel7.setMaximumSize(new java.awt.Dimension(400, 32767));

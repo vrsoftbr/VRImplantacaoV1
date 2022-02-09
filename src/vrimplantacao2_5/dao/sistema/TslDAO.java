@@ -145,7 +145,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -158,10 +158,15 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	when p.DTATU = '0000-00-00'\n"
                     + "	then now()\n"
                     + "	else p.DTATU\n"
-                    + "	end dataCadastro,"
+                    + "	end dataCadastro,\n"
                     + "	p.DTATU dataAlteracao,\n"
                     + "	substring(CODBAR from 4) ean,\n"
-                    + "	p.PESADO cod_balanca,\n"
+                    + "	CASE \n"
+                    + "	WHEN p.CODBAR LIKE '00000%'\n"
+                    + "	THEN SUBSTRING(p.CODBAR FROM 8) \n"
+                    + "	else substring(CODBAR from 4) \n"
+                    + "	END cod_balanca,\n"
+                    + "	p.PESADO e_balanca,\n"
                     + "	p.QTDITEMD qtdEmbalagem,\n"
                     + "	p.UNI tipoEmbalagem,\n"
                     + "	p.DESCPRO descricaoCompleta,\n"
@@ -203,7 +208,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	substring(p.CST_MIX from 2) cst,\n"
                     + "	p.ALICOFINS,\n"
                     + "    p.REDUCAO_MIX icmsReducaoSaida,\n"
-                    + "    COALESCE (p.CST_MIX = NULL, '040') icmsCstSaidaForaEstado\n"
+                    + "    COALESCE(p.CST_MIX = NULL, '040') icmsCstSaidaForaEstado\n"
                     + "    from tslc003 p\n"
                     + "    left join tslc033 m on p.GRUPO = m.CODIGO"
             )) {
@@ -214,17 +219,13 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
 
                     if (tslVO.isTemArquivoBalanca()) {
-                        imp.setEan(rst.getString("ean"));
-                        imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
-                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.setValidade(0);
-                        imp.seteBalanca(false);
-                    } else {
-                        int codigoProduto = Utils.stringToInt(rst.getString("Id"), -2);
+                        int codigoProduto = Utils.stringToInt(rst.getString("cod_balanca"), -2);
                         ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
+                        
                         if (produtoBalanca != null) {
                             imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                             imp.seteBalanca(true);
@@ -238,6 +239,12 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setValidade(0);
                             imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         }
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaoCompleta"));
@@ -328,7 +335,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " ESTCIVIL CIVIL,\n"
                     + " CLICOMPLE complemento,\n"
                     + " CONJUJE nomeconjuge,\n"
-                    + " nullif (NASCONJ, '0000-00-00'),\n"
+                    + " nullif(NASCONJ, '0000-00-00'),\n"
                     + " CPFCONJ,\n"
                     + " PAI nomepai,\n"
                     + " MAE nomemae,\n"
