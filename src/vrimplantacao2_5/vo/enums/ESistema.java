@@ -429,17 +429,13 @@ public enum ESistema {
     DATABYTE(205, "DATABYTE", new DataByteDAO()),
     DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()),
     TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
-    CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
+    CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
-<<<<<<< HEAD
     DSIC(211, "DSIC", new DSICDAO()),
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO()),
     WBA(214,"WBA",new WBADAO());
-=======
-    TSL(212, "TSL", new TslDAO());
->>>>>>> origin/impl_2.5-sacolacheia
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
