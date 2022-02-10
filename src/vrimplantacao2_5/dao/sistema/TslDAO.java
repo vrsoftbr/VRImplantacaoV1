@@ -145,7 +145,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -221,24 +221,15 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
 
-                    if (tslVO.isTemArquivoBalanca()) {
-                        int codigoProduto = Utils.stringToInt(rst.getString("cod_balanca"), -2);
-                        ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+                    int codigoProduto = Utils.stringToInt(rst.getString("cod_balanca"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
-                        
-                        if (produtoBalanca != null) {
-                            imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                            imp.seteBalanca(true);
-                            imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
-                            imp.setValidade(produtoBalanca.getValidade());
-                            imp.setQtdEmbalagem(1);
-                        } else {
-                            imp.setEan(rst.getString("ean"));
-                            imp.seteBalanca(false);
-                            imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
-                            imp.setValidade(0);
-                            imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        }
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(false);
@@ -453,7 +444,6 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setId(id);
 
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-
 
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         next.setCpf(rst.getString("cpf"));
