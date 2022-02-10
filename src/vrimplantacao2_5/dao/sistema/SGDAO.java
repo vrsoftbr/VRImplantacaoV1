@@ -21,6 +21,7 @@ import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -173,6 +174,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct on (p.codpro01) \n"
                     + "	p.codpro01 id,\n"
                     + "	p.balanca01,\n"
+                    + " p.codgrupo01 familia_id,\n"
                     //+ "	ean.codbarra codigobarras,\n"
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
@@ -235,6 +237,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setIdFamiliaProduto(rs.getString("familia_id"));
 
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotadebito"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
@@ -267,6 +270,29 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " codagru03 id,\n"
+                    + " desagru03 descricao\n"
+                    + "from tabagr;"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<OfertaIMP> getOfertas(Date datatermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -283,7 +309,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + " o.datafim >= now()\n"
                     + " and\n"
-                    + " o.codfil = "
+                    + " o.codfil = " + getLojaOrigem() + " "
             )) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();

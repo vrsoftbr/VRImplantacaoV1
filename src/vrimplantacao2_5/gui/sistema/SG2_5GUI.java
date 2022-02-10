@@ -36,6 +36,8 @@ public class SG2_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(sgDAO);
         tabClientes.setOpcoesDisponiveis(sgDAO);
         tabProdutos.btnMapaTribut.setEnabled(false);
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(sgDAO.getLojaOrigem());
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
