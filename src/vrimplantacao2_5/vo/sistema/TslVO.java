@@ -13,17 +13,8 @@ import java.util.Date;
  */
 public class TslVO {
 
-    private boolean temArquivoBalanca = false;
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
-
-    public boolean isTemArquivoBalanca() {
-        return this.temArquivoBalanca;
-    }
-
-    public void setTemArquivoBalanca(boolean temArquivoBalanca) {
-        this.temArquivoBalanca = temArquivoBalanca;
-    }    
 
     public Date getDataInicioVenda() {
         return this.dataInicioVenda;

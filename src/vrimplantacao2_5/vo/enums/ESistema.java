@@ -432,10 +432,14 @@ public enum ESistema {
     CONSINCO(209, "CONSINCO", new ConsincoDAO()),
     FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
     VERSATIL(210, "VERSATIL", new VersatilDAO()),
+<<<<<<< HEAD
     DSIC(211, "DSIC", new DSICDAO()),
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO()),
     WBA(214,"WBA",new WBADAO());
+=======
+    TSL(212, "TSL", new TslDAO());
+>>>>>>> origin/impl_2.5-sacolacheia
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
