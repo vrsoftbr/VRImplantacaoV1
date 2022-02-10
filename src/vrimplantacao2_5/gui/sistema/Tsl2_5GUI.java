@@ -29,7 +29,7 @@ public class Tsl2_5GUI extends VRInternalFrame {
         tabProdutos.carregarParametros(params, SISTEMA);
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
-        chkProdTemArquivoBalanca.setSelected(params.getBool(SISTEMA, "TEM ARQUIVO DE BALANCA"));
+       // chkProdTemArquivoBalanca.setSelected(params.getBool(SISTEMA, "TEM ARQUIVO DE BALANCA"));
     }
 
     private void gravarParametros() throws Exception {
@@ -40,7 +40,7 @@ public class Tsl2_5GUI extends VRInternalFrame {
         params.put(pnlConn.getPorta(), SISTEMA, "PORTA");
         params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
         params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
-        params.put(chkProdTemArquivoBalanca.isSelected(), SISTEMA, "TEM ARQUIVO DE BALANCA");
+      //  params.put(chkProdTemArquivoBalanca.isSelected(), SISTEMA, "TEM ARQUIVO DE BALANCA");
 
         pnlConn.atualizarParametros();
         
@@ -49,7 +49,7 @@ public class Tsl2_5GUI extends VRInternalFrame {
 
     private TslVO carregarOpcaoesMigracaoSistema() throws Exception {
         
-        vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
+       // vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
         
         if (tabProdutos.edtDtVendaIni.getDate() != null) {
             vo.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
@@ -149,25 +149,20 @@ public class Tsl2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
 
-                    switch (tabs.getSelectedIndex()) {
-                        case 0:
-                            break;
-                        case 1:
-                            switch (tabImportacao.getSelectedIndex()) {
-                                case 0:
-                                    tabProdutos.executarImportacao();
-                                    break;
-                                case 1:
-                                    tabFornecedores.executarImportacao();
-                                    break;
-                                case 2:
-                                    tabClientes.executarImportacao();
-                                    break;
-                                default:
-                                    break;
-                            }   break;
-                        default:
-                            break;
+                    if (tabs.getSelectedIndex() == 0) {
+                        switch (tabImportacao.getSelectedIndex()) {
+                            case 0:
+                                tabProdutos.executarImportacao();
+                                break;
+                            case 1:
+                                tabFornecedores.executarImportacao();
+                                break;
+                            case 2:
+                                tabClientes.executarImportacao();
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     
                     gravarParametros();                    
@@ -193,12 +188,9 @@ public class Tsl2_5GUI extends VRInternalFrame {
 
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabParametros = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        chkProdTemArquivoBalanca = new vr.view.components.checkbox.VRCheckBox();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -250,56 +242,31 @@ public class Tsl2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar)
         );
-
-        chkProdTemArquivoBalanca.setText("Tem Arquivo da Balança");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkProdTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(604, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkProdTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(162, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("Produtos", jPanel2);
-
-        javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
-        tabParametros.setLayout(tabParametrosLayout);
-        tabParametrosLayout.setHorizontalGroup(
-            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabParametrosLayout.createSequentialGroup()
-                .addComponent(jTabbedPane1)
-                .addGap(221, 221, 221))
-        );
-        tabParametrosLayout.setVerticalGroup(
-            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabParametrosLayout.createSequentialGroup()
-                .addComponent(jTabbedPane1)
-                .addGap(301, 301, 301))
-        );
-
-        tabs.addTab("Parâmetros Avistare", tabParametros);
 
         vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         vRPanel7.setMaximumSize(new java.awt.Dimension(400, 32767));
@@ -430,18 +397,21 @@ public class Tsl2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formInternalFrameClosing
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private vr.view.components.checkbox.VRCheckBox chkProdTemArquivoBalanca;
+    private javax.swing.JButton jBLimpar;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
-    private javax.swing.JPanel tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
