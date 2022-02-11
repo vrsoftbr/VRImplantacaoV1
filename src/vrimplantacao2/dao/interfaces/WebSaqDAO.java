@@ -143,7 +143,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.enviarecommerce,\n"
                     + "p.comprimento,\n"
                     + "p.cest,\n"
-                    + "u.sigla as embalagem,\n"
+                    + "case when p.pesado = 'S' then 'KG' else u.sigla end as embalagem,\n"
                     + "e.quantidade as qtdembalagem,\n"
                     + "pcs.codcst cstpiscofinssaida,\n"
                     + "pce.codcst cstpiscofinsentrada,\n"
