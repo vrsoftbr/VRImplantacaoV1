@@ -99,6 +99,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR));
     }
 
@@ -174,7 +175,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct on (p.codpro01) \n"
                     + "	p.codpro01 id,\n"
                     + "	p.balanca01,\n"
-                    + " p.codgrupo01 familia_id,\n"
+                    + " p.agrupa01 familia_id,\n"
                     //+ "	ean.codbarra codigobarras,\n"
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
@@ -501,7 +502,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEmissao(rst.getDate("dtemissao"));
                     imp.setVencimento(rst.getDate("dtvencimento"));
                     imp.setNumeroDocumento(rst.getString("numeroDocumento"));
                     imp.setValor(rst.getDouble("valor"));

@@ -66,11 +66,16 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         this.vendaDataFim = vendaDataFim;
     }
     
-    @Override
+    /*@Override
     public String getSistema() {
         if (!"".equals(this.complemento)) {
             return "Linear - " + this.complemento;
         }
+        return "Linear";
+    }*/
+    
+     @Override
+    public String getSistema() {
         return "Linear";
     }
     
