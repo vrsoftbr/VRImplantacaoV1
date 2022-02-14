@@ -14,11 +14,13 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -518,7 +520,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.cg2_frequencia frequencia,\n" +
                     "	f.cg2_prazoentrega prazoentrega,\n" +
                     "	f.cg2_ativo situacao,\n" +
-                    "	f.cg2_tipofornecedor tipo\n" +
+                    "	f.cg2_tipofornecedor tipo,\n"+
+                    "   f.cg2_produtor produtor \n" +
                     "FROM \n" +
                     "	cg2 f")) {
                 while(rs.next()) {
@@ -536,6 +539,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     rg = rs.getString("rg");
                     ie = rs.getString("ie");
                     
+
                     if(cpf != null && !"".equals(cpf)) {
                         imp.setCnpj_cpf(cpf);
                     } else {
@@ -547,6 +551,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setIe_rg(rg);
                     }
+                    
+                    if ("1".equals(rs.getString("produtor"))) {
+                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        }
+                    }
+
                     
                     imp.setInsc_municipal(rs.getString("im"));
                     imp.setEndereco(Utils.acertarTexto(rs.getString("endereco")));
@@ -581,6 +594,19 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
     }
 
     @Override

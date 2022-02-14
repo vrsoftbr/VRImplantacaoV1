@@ -17,7 +17,7 @@ public class Linear2_5GUI extends VRInternalFrame {
     private static final String SISTEMA = ESistema.LINEAR.getNome();
     private static Linear2_5GUI instance;
 
-    private final LinearDAO linearDAO = new LinearDAO();
+    private final LinearDAO dao = new LinearDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -34,28 +34,28 @@ public class Linear2_5GUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
 
         carregarParametros();
-        tabProdutos.setOpcoesDisponiveis(linearDAO);
-        tabFornecedores.setOpcoesDisponiveis(linearDAO);
-        tabClientes.setOpcoesDisponiveis(linearDAO);
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabFornecedores.setOpcoesDisponiveis(dao);
+        tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
         pnlBalanca.setSistema(SISTEMA);
-        pnlBalanca.setLoja(linearDAO.getLojaOrigem());
+        pnlBalanca.setLoja(dao.getLojaOrigem());
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return linearDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                return linearDAO.getSistema() + " - " + pnlConn.idConexao;
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
             public String getLoja() {
-                linearDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return linearDAO.getLojaOrigem();
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -100,7 +100,7 @@ public class Linear2_5GUI extends VRInternalFrame {
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
-                    Importador importador = new Importador(linearDAO);
+                    Importador importador = new Importador(dao);
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
@@ -109,8 +109,8 @@ public class Linear2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    linearDAO.setMultiplicarQtdEmbalagemPeloVolume(chkUtilizarEs1ParaCotacao.isSelected());
-                    linearDAO.setFiltrarProdutos(chkFiltrarProdutos.isSelected());
+                    dao.setMultiplicarQtdEmbalagemPeloVolume(chkUtilizarEs1ParaCotacao.isSelected());
+                    dao.setFiltrarProdutos(chkFiltrarProdutos.isSelected());
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -166,11 +166,6 @@ public class Linear2_5GUI extends VRInternalFrame {
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
-        pnlEspecial = new javax.swing.JTabbedPane();
-        tbProdutosEspecial = new javax.swing.JPanel();
-        chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
-        chkUtilizarEs1ParaCotacao = new vrframework.bean.checkBox.VRCheckBox();
-        chkFiltrarProdutos = new vrframework.bean.checkBox.VRCheckBox();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
@@ -178,6 +173,11 @@ public class Linear2_5GUI extends VRInternalFrame {
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        pnlEspecial = new javax.swing.JTabbedPane();
+        tbProdutosEspecial = new javax.swing.JPanel();
+        chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtilizarEs1ParaCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkFiltrarProdutos = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -186,10 +186,6 @@ public class Linear2_5GUI extends VRInternalFrame {
 
         setTitle("Linear");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-            }
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
@@ -200,6 +196,10 @@ public class Linear2_5GUI extends VRInternalFrame {
             public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -226,6 +226,30 @@ public class Linear2_5GUI extends VRInternalFrame {
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
+
+        tabImportacao.addTab("Produtos", tabProdutos);
+        tabImportacao.addTab("Fornecedores", tabFornecedores);
+
+        scpClientes.setViewportView(tabClientes);
+
+        javax.swing.GroupLayout tabCliLayout = new javax.swing.GroupLayout(tabCli);
+        tabCli.setLayout(tabCliLayout);
+        tabCliLayout.setHorizontalGroup(
+            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabCliLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabCliLayout.setVerticalGroup(
+            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+        );
+
+        tabImportacao.addTab("Clientes", tabCli);
+
+        tabMenu.addTab("Importação", tabImportacao);
+        tabMenu.addTab("Balança", pnlBalanca);
 
         chkSomenteEansUnitarios.setText("Somente EANs unitários");
 
@@ -260,30 +284,6 @@ public class Linear2_5GUI extends VRInternalFrame {
 
         tabMenu.addTab("Parâmetros", pnlEspecial);
 
-        tabImportacao.addTab("Produtos", tabProdutos);
-        tabImportacao.addTab("Fornecedores", tabFornecedores);
-
-        scpClientes.setViewportView(tabClientes);
-
-        javax.swing.GroupLayout tabCliLayout = new javax.swing.GroupLayout(tabCli);
-        tabCli.setLayout(tabCliLayout);
-        tabCliLayout.setHorizontalGroup(
-            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabCliLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        tabCliLayout.setVerticalGroup(
-            tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-        );
-
-        tabImportacao.addTab("Clientes", tabCli);
-
-        tabMenu.addTab("Importação", tabImportacao);
-        tabMenu.addTab("Balança", pnlBalanca);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -306,8 +306,6 @@ public class Linear2_5GUI extends VRInternalFrame {
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("Linear");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
