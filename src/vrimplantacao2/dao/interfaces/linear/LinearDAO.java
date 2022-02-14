@@ -123,6 +123,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
+                    OpcaoProduto.MARGEM_MAXIMA,
+                    OpcaoProduto.MARGEM_MINIMA,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO

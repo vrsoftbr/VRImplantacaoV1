@@ -207,7 +207,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pis.cstcofins,\n"
                     + "	p.codncm01 ncm,\n"
                     + "	p.codcest01 cest,\n"
-                    + "	natpisco01 naturezareceita\n"
+                    + "	p.natpisco01 naturezareceita\n"
                     + "from \n"
                     + "	cadpro p \n"
                     + "left join arqbar ean on p.codpro01 = ean.codpro\n"
@@ -247,6 +247,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("naturezareceita"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));

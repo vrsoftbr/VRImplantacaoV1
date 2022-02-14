@@ -64,7 +64,7 @@ public class Linear2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.SG);
+        pnlConn.setSistema(ESistema.LINEAR);
         pnlConn.getNomeConexao();
 
         centralizarForm();
