@@ -816,7 +816,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.cg1_nomeconjuge conjuge\n"
                     + "FROM\n"
                     + "	cg1 c"
-                    + " where cg1_convenio = 0;"
+                    //+ " where cg1_convenio = 0;"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
@@ -913,9 +913,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.FN1_VALOR valor\n"
                     + "FROM \n"
                     + "	fn1 f\n"
-                    + " JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
+                    //+ " JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
                     + "WHERE \n"
-                    + " c.cg1_convenio = 0 AND\n"
+                    //+ " c.cg1_convenio = 0 AND\n"
                     + "	f.fn1_dtbaixa IS null AND\n"
                     + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
                     + "	f.fn1_tipo NOT IN (37, 62, 64)")) {
