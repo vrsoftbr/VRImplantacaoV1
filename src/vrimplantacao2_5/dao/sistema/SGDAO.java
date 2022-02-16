@@ -203,7 +203,14 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.alikicm01 || '-' || coalesce(p.cdsitrib01, 0) id_aliquotadebito, \n"
                     + "	p.cdobsicm01 idicms,\n"
                     + "	p.aicmstef01 icmstef,\n"
-                    + "	pis.cstpis,\n"
+                    + "case when upper(p.piscofin01) = 'M' then '04'\n"
+                    + "	     when upper(p.piscofin01) = 'C' then '08'\n"
+                    + "	     when upper(p.piscofin01) = 'I' then '07'\n"
+                    + "	     when upper(p.piscofin01) = 'P' then '09'\n"
+                    + "	     when upper(p.piscofin01) = 'S' then '05'\n"
+                    + "	     when upper(p.piscofin01) = 'Z' then '06'\n"
+                    + "	     when upper(p.piscofin01) = 'E' then '01'\n"
+                    + " else null end cstpis,\n"
                     + "	pis.cstcofins,\n"
                     + "	p.codncm01 ncm,\n"
                     + "	p.codcest01 cest,\n"
@@ -246,7 +253,6 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("naturezareceita"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
