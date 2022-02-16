@@ -1091,7 +1091,7 @@ public class ProdutoRepository {
 
                         if (forcarNovo) {
                             obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
-                            gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
+                            gravarCodigoAtual(provider.getSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
@@ -1108,7 +1108,7 @@ public class ProdutoRepository {
                     automacao.setProduto(codigoAtual);
                     provider.automacao().salvar(automacao);
 
-                    gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
+                    gravarCodigoAtual(provider.getSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                 }
             } else {
                 id = idProdutoExistente;
@@ -1117,7 +1117,7 @@ public class ProdutoRepository {
                 obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
 
                 // gravar codigo atual se for null
-                gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
+                gravarCodigoAtual(provider.getSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
             }
         }
         /**
