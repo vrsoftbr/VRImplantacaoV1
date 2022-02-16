@@ -180,8 +180,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
-                    + "	p.descpro01 descricaocompleta,\n"
-                    + "	p.descabr01 descricaoreduzida,\n"
+                    + "(p.lin1etiq01||' '||p.lin2etiq01) descricaocompleta,\n"
+                    + "	p.descpro01 descricaoreduzida,\n"
+                    + "	p.descabr01 descricaogondola,\n"
                     + "	p.datacad01 datacadastro,\n"
                     + "	p.unidpro01 unidade,\n"
                     + "	p.cusreal01 custocomimposto,\n"
@@ -231,7 +232,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("codigobarras"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
