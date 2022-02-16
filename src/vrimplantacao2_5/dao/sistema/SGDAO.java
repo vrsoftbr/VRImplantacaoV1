@@ -180,8 +180,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
-                    + "	p.descpro01 descricaocompleta,\n"
-                    + "	p.descabr01 descricaoreduzida,\n"
+                    + "(p.lin1etiq01||' '||p.lin2etiq01) descricaocompleta,\n"
+                    + "	p.descpro01 descricaoreduzida,\n"
+                    + "	p.descabr01 descricaogondola,\n"
                     + "	p.datacad01 datacadastro,\n"
                     + "	p.unidpro01 unidade,\n"
                     + "	p.cusreal01 custocomimposto,\n"
@@ -203,7 +204,14 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.alikicm01 || '-' || coalesce(p.cdsitrib01, 0) id_aliquotadebito, \n"
                     + "	p.cdobsicm01 idicms,\n"
                     + "	p.aicmstef01 icmstef,\n"
-                    + "	pis.cstpis,\n"
+                    + "case when upper(p.piscofin01) = 'M' then '04'\n"
+                    + "	     when upper(p.piscofin01) = 'C' then '08'\n"
+                    + "	     when upper(p.piscofin01) = 'I' then '07'\n"
+                    + "	     when upper(p.piscofin01) = 'P' then '09'\n"
+                    + "	     when upper(p.piscofin01) = 'S' then '05'\n"
+                    + "	     when upper(p.piscofin01) = 'Z' then '06'\n"
+                    + "	     when upper(p.piscofin01) = 'E' then '01'\n"
+                    + " else null end cstpis,\n"
                     + "	pis.cstcofins,\n"
                     + "	p.codncm01 ncm,\n"
                     + "	p.codcest01 cest,\n"
@@ -224,7 +232,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("codigobarras"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
@@ -246,7 +254,6 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("naturezareceita"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
