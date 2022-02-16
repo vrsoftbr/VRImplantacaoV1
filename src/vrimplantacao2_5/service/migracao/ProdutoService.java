@@ -53,4 +53,12 @@ public class ProdutoService {
     public boolean isLojaMatrizMigracao(int idConexao, String idLojaOrigem) throws Exception {
         return cfgDAO.verificaLojaMatrizMigracao(idConexao, idLojaOrigem);
     }
+    
+    /**
+     * @return Retorna o impsistema da primeira loja migrada
+     * @throws java.lang.Exception
+     */
+    public String getImpSistemaInicial() throws Exception {
+        return produtoAnteriorDAO.getImpSistema();
+    }
 }

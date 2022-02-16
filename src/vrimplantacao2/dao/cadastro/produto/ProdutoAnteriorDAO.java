@@ -1791,4 +1791,24 @@ public class ProdutoAnteriorDAO {
             stm.execute(sql);
         }
     }
+    
+    public String getImpSistema() throws Exception {
+        String loja = "";
+        
+        try(Statement stm = Conexao.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	distinct impsistema \n" +
+                    "from \n" +
+                    "	implantacao.codant_produto\n" +
+                    "where \n" +
+                    "	dataimportacao = (select min(dataimportacao) from implantacao.codant_produto) ")) {
+                if(rs.next()) {
+                    loja = rs.getString("impsistema");
+                }
+            }
+        }
+        
+        return loja;
+    }
 }

@@ -209,7 +209,8 @@ public class ConfiguracaoBaseDadosDAO {
                     + "from\n"
                     + "	implantacao2_5.conexaoloja c\n"
                     + "join public.loja l on c.id_lojadestino = l.id\n"
-                    + "join implantacao2_5.lojaorigem ljo on ljo.id = c.id_lojaorigem\n"        
+                    + "join implantacao2_5.lojaorigem ljo on ljo.id = c.id_lojaorigem and\n"        
+                    + "ljo.id_conexaoloja = c.id\n"        
                     + "where\n"
                     + "	id_conexao = " + idConexao)) {
                 while (rs.next()) {

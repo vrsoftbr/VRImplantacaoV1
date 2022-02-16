@@ -300,6 +300,8 @@ public class ProdutoRepository {
         
         int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                 registros = produtoService.verificaRegistro();
+        
+        String impSistema = produtoService.getImpSistemaInicial();
                 
         if(!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
                 && registros == 0) {
@@ -310,8 +312,12 @@ public class ProdutoRepository {
         if (this.forcarUnificacao) {
             unificar(produtos);
         } else {
-            
-            if (registros > 0 && idConexao == 0) {
+            /**
+             * Se já existe registro na codant e a nova conexão não existe na codant ou
+             * o nome do sistema (sistema ' - ' complemento) da primeira importação é diferente 
+             * do sistema da nova importação, então a rotina define que é uma unificação.
+             */
+            if (registros > 0 && idConexao == 0 || (!impSistema.equals(getSistema()))) {
                 unificar(produtos);
             } else {
                 boolean existeConexao = produtoService.
