@@ -180,7 +180,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
-                    + "(p.lin1etiq01||' '||p.lin2etiq01) descricaocompleta,\n"
+                    + "(descpro01||''||desccomp01||' '||descabr01) descricaocompleta,\n"
                     + "	p.descpro01 descricaoreduzida,\n"
                     + "	p.descabr01 descricaogondola,\n"
                     + "	p.datacad01 datacadastro,\n"
