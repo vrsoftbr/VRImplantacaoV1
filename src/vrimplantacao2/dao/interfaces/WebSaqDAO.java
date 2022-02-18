@@ -143,7 +143,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.enviarecommerce,\n"
                     + "p.comprimento,\n"
                     + "p.cest,\n"
-                    + "case when p.pesado = 'S' then 'KG' else u.sigla end as embalagem,\n"
+                    + "case when p.pesado = 'S' and p.pesounid = 'P' then 'KG' else u.sigla end as embalagem,\n"
                     + "e.quantidade as qtdembalagem,\n"
                     + "pcs.codcst cstpiscofinssaida,\n"
                     + "pce.codcst cstpiscofinsentrada,\n"
@@ -176,6 +176,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.seteBalanca("S".equals(rst.getString("pesado")));
                     
                     imp.setEan(rst.getString("ean"));
+                    imp.setValidade(rst.getInt("diasvalidade"));
                     
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
                     
@@ -187,7 +188,6 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(imp.getImportId());
                     }
                     
-                    imp.setValidade(rst.getInt("diasvalidade"));
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaofiscal"));
