@@ -180,7 +180,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
-                    + "(descpro01||''||desccomp01||' '||descabr01) descricaocompleta,\n"
+                    + "(p.descpro01||''||p.desccomp01) descricaocompleta,\n"
                     + "	p.descpro01 descricaoreduzida,\n"
                     + "	p.descabr01 descricaogondola,\n"
                     + "	p.datacad01 datacadastro,\n"
@@ -215,7 +215,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pis.cstcofins,\n"
                     + "	p.codncm01 ncm,\n"
                     + "	p.codcest01 cest,\n"
-                    + "	p.natpisco01 naturezareceita\n"
+                    + "	p.natpisco01 naturezareceita,\n"
+                    + " case when sitpro01 = 'I' then 0\n"
+                    + "    else 1 end situacao\n"
                     + "from \n"
                     + "	cadpro p \n"
                     + "left join arqbar ean on p.codpro01 = ean.codpro\n"
@@ -247,6 +249,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setIdFamiliaProduto(rs.getString("familia_id"));
+                    imp.setSituacaoCadastro(rs.getInt("situacao"));
 
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotadebito"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
