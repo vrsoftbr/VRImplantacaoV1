@@ -14,7 +14,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class WBA2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.FXSISTEMAS.getNome();
+    private static final String SISTEMA = ESistema.WBA.getNome();
     private static WBA2_5GUI instance;
 
     private final WBADAO dao = new WBADAO();
@@ -174,7 +174,8 @@ public class WBA2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Sygma");
+        setTitle("WBA");
+        setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

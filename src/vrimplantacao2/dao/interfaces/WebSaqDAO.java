@@ -81,27 +81,27 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	codsimilar,\n" +
-                    "	descricao\n" +
-                    "from \n" +
-                    "	simprod")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	codsimilar,\n"
+                    + "	descricao\n"
+                    + "from \n"
+                    + "	simprod")) {
+                while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codsimilar"));
                     imp.setDescricao(rs.getString("descricao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -114,7 +114,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.codproduto,\n"
                     + "p.descricao,\n"
                     + "p.descricaofiscal,\n"
-                    + "pe.codean ean,\n"        
+                    + "pe.codean ean,\n"
                     + "p.coddepto,\n"
                     + "p.codgrupo,\n"
                     + "p.codsubgrupo,\n"
@@ -155,7 +155,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cf.aliqicms as icmsaliq,\n"
                     + "cf.aliqredicms as icmsred\n"
                     + "from produto p \n"
-                    + "left join produtoean pe on p.codproduto = pe.codproduto\n"        
+                    + "left join produtoean pe on p.codproduto = pe.codproduto\n"
                     + "left join embalagem e on e.codembal = p.codembalvda\n"
                     + "left join unidade u on u.codunidade = e.codunidade\n"
                     + "left join piscofins pcs on pcs.codpiscofins = p.codpiscofinssai\n"
@@ -164,30 +164,30 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join classfiscal cf on cf.codcf = p.codcfpdv\n"
                     + "order by p.codproduto"
             )) {
-                
+
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
-                
+
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codproduto"));
                     imp.seteBalanca("S".equals(rst.getString("pesado")));
-                    
+
                     imp.setEan(rst.getString("ean"));
                     imp.setValidade(rst.getInt("diasvalidade"));
-                    
+
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
-                    
+
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(bal.getValidade() > 1 ? 
-                                bal.getValidade() : rst.getInt("diasvalidade"));
+                        imp.setValidade(bal.getValidade() > 1
+                                ? bal.getValidade() : rst.getInt("diasvalidade"));
                         imp.setEan(imp.getImportId());
                     }
-                    
+
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaofiscal"));
@@ -217,7 +217,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
-                    
+
                     result.add(imp);
                 }
             }
@@ -286,52 +286,52 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "    f.codfornec,\n" +
-                    "    regexp_replace(f.nome,'[^A-z 0-9]','','g') as razao,\n" +
-                    "    regexp_replace(f.endereco,'[^A-z 0-9]','','g') endereco,\n" +
-                    "    regexp_replace(f.bairro,'[^A-z 0-9]','','g') bairro,\n" +
-                    "    f.cep,\n" +
-                    "    f.codcidade,\n" +
-                    "    regexp_replace(c.nome,'[^A-z 0-9]','','g') as nomecidade,\n" +
-                    "    c.codoficial cidadeibge,\n" +
-                    "    f.uf,\n" +
-                    "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato1,\n" +
-                    "    f.fone1,\n" +
-                    "    f.fone2,\n" +
-                    "    f.fone3,\n" +
-                    "    f.site,\n" +
-                    "    f.email,\n" +
-                    "    f.tppessoa,\n" +
-                    "    f.cpfcnpj,\n" +
-                    "    f.rgie,\n" +
-                    "    f.codatividade,\n" +
-                    "    f.codbanco,\n" +
-                    "    f.agencia,\n" +
-                    "    f.contacorrente,\n" +
-                    "    regexp_replace(f.observacao,'[^A-z 0-9]','','g') as observacao,\n" +
-                    "    f.contato2,\n" +
-                    "    f.contato3,\n" +
-                    "    f.email1,\n" +
-                    "    f.email2,\n" +
-                    "    f.email3,\n" +
-                    "    f.fone,\n" +
-                    "    f.fax,\n" +
-                    "    f.numero,\n" +
-                    "    f.complemento,\n" +
-                    "    f.suframa,\n" +
-                    "    f.datainclusao,\n" +
-                    "    f.tipocompra,\n" +
-                    "    f.inscmunicipal,\n" +
-                    "    f.status\n" +
-                    "from fornecedor f\n" +
-                    "left join cidade c on c.codcidade = f.codcidade\n" +
-                    "order by \n" +
-                    "	codfornec"
+                    "select \n"
+                    + "    f.codfornec,\n"
+                    + "    regexp_replace(f.nome,'[^A-z 0-9]','','g') as razao,\n"
+                    + "    regexp_replace(f.endereco,'[^A-z 0-9]','','g') endereco,\n"
+                    + "    regexp_replace(f.bairro,'[^A-z 0-9]','','g') bairro,\n"
+                    + "    f.cep,\n"
+                    + "    f.codcidade,\n"
+                    + "    regexp_replace(c.nome,'[^A-z 0-9]','','g') as nomecidade,\n"
+                    + "    c.codoficial cidadeibge,\n"
+                    + "    f.uf,\n"
+                    + "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato1,\n"
+                    + "    f.fone1,\n"
+                    + "    f.fone2,\n"
+                    + "    f.fone3,\n"
+                    + "    f.site,\n"
+                    + "    f.email,\n"
+                    + "    f.tppessoa,\n"
+                    + "    f.cpfcnpj,\n"
+                    + "    f.rgie,\n"
+                    + "    f.codatividade,\n"
+                    + "    f.codbanco,\n"
+                    + "    f.agencia,\n"
+                    + "    f.contacorrente,\n"
+                    + "    regexp_replace(f.observacao,'[^A-z 0-9]','','g') as observacao,\n"
+                    + "    f.contato2,\n"
+                    + "    f.contato3,\n"
+                    + "    f.email1,\n"
+                    + "    f.email2,\n"
+                    + "    f.email3,\n"
+                    + "    f.fone,\n"
+                    + "    f.fax,\n"
+                    + "    f.numero,\n"
+                    + "    f.complemento,\n"
+                    + "    f.suframa,\n"
+                    + "    f.datainclusao,\n"
+                    + "    f.tipocompra,\n"
+                    + "    f.inscmunicipal,\n"
+                    + "    f.status\n"
+                    + "from fornecedor f\n"
+                    + "left join cidade c on c.codcidade = f.codcidade\n"
+                    + "order by \n"
+                    + "	codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codfornec"));
@@ -532,7 +532,72 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    "select\n"
+                    + "	c.codcliente,\n"
+                    + "	regexp_replace(c.nome,'[^A-z 0-9]','','g') nome,\n"
+                    + "	regexp_replace(c.razaosocial,'[^A-z 0-9]','','g') razaosocial,\n"
+                    + "	regexp_replace(c.enderfat,'[^A-z 0-9]','','g') enderfat,\n"
+                    + "	regexp_replace(c.bairrofat,'[^A-z 0-9]','','g') bairrofat,\n"
+                    + "	c.cepfat,\n"
+                    + "	c.codcidadefat,\n"
+                    + "	c.uffat,\n"
+                    + "	regexp_replace(c.enderent,'[^A-z 0-9]','','g') enderent,\n"
+                    + "	regexp_replace(c.bairroent,'[^A-z 0-9]','','g') bairroent,\n"
+                    + "	c.cepent,\n"
+                    + "	c.codcidadeent,\n"
+                    + "	c.ufent,\n"
+                    + "	regexp_replace(c.contato,'[^A-z 0-9]','','g') contato,\n"
+                    + "	c.site,\n"
+                    + "	c.email,\n"
+                    + "	c.tppessoa,\n"
+                    + "	c.cpfcnpj,\n"
+                    + "	c.rgie,\n"
+                    + "	regexp_replace(c.observacao,'[^A-z 0-9]','','g') observacao,\n"
+                    + "	c.dtnascto,\n"
+                    + "	c.sexo,\n"
+                    + "	c.estcivil,\n"
+                    + "	c.tipomoradia,\n"
+                    + "	c.dtmoradia,\n"
+                    + "	regexp_replace(c.enderres,'[^A-z 0-9]','','g') enderres,\n"
+                    + "	regexp_replace(c.bairrores,'[^A-z 0-9]','','g') bairrores,\n"
+                    + "	c.cepres,\n"
+                    + "	c.codcidaderes,\n"
+                    + "	regexp_replace(cid.nome,'[^A-z 0-9]','','g') nomecidade,\n"
+                    + "	cid.codoficial as cidadeibge,\n"
+                    + "	c.ufres,\n"
+                    + "	regexp_replace(c.nomeconj,'[^A-z 0-9]','','g') nomeconj,\n"
+                    + "	c.cpfconj,\n"
+                    + "	c.rgconj,\n"
+                    + "	c.salarioconj,\n"
+                    + "	c.foneres,\n"
+                    + "	c.celular,\n"
+                    + "	c.fonefat,\n"
+                    + "	c.faxfat,\n"
+                    + "	c.foneent,\n"
+                    + "	c.faxent,\n"
+                    + "	c.dtinclusao,\n"
+                    + "	c.salario,\n"
+                    + "	c.senha,\n"
+                    + "	c.numerofat,\n"
+                    + "	c.complementofat,\n"
+                    + "	c.numeroent,\n"
+                    + "	c.complementoent,\n"
+                    + "	c.numerores,\n"
+                    + "	c.complementores,\n"
+                    + "	(coalesce(c.limite1, 0) + coalesce(c.limite2) - coalesce(c.debito1, 0) - coalesce(debito2, 0)) as valorlimite,\n"
+                    + "	c.limite1,\n"
+                    + "	c.emailnfe,\n"
+                    + "	c.rgemissor,\n"
+                    + "	c.codstatus,\n"
+                    + "	regexp_replace(s.descricao,'[^A-z 0-9]','','g') descricao,\n"
+                    + "	s.bloqueado\n"
+                    + "from\n"
+                    + "	cliente c\n"
+                    + "inner join statuscliente s on s.codstatus = c.codstatus\n"
+                    + "left join cidade cid on cid.codcidade = c.codcidaderes\n"
+                    + "order by\n"
+                    + "	c.codcliente"
+                    /*"select \n"
                     + "c.codcliente,\n"
                     + "c.nome,\n"
                     + "c.razaosocial,\n"
@@ -594,7 +659,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from cliente c\n"
                     + "inner join statuscliente s on s.codstatus = c.codstatus\n"
                     + "left join cidade cid on cid.codcidade = c.codcidaderes\n"
-                    + "order by c.codcliente"
+                    + "order by c.codcliente"*/
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -699,7 +764,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("codcliente"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
@@ -707,7 +772,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rst.getDouble("valor"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setJuros(rst.getDouble("valorjuros"));
-                    
+
                     result.add(imp);
                 }
             }

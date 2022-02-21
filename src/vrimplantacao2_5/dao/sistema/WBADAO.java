@@ -91,7 +91,8 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.UF,
                 OpcaoFornecedor.CEP,
                 OpcaoFornecedor.DATA_CADASTRO,
-                OpcaoFornecedor.OBSERVACAO));
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR));
     }
 
     @Override
