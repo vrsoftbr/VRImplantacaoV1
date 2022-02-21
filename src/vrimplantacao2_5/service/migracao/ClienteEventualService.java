@@ -46,4 +46,8 @@ public class ClienteEventualService {
     public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
         return this.clienteAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
     }
+    
+     public String getImpSistemaInicial() throws Exception {
+        return this.clienteAnteriorDAO.getImpSistema();
+    }
 }

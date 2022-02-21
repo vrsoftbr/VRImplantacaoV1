@@ -625,4 +625,24 @@ public class FornecedorAnteriorDAO {
         return lojaJaMigrada;
     }
     
+    public String getImpSistema() throws Exception {
+        String loja = "";
+        
+        try(Statement stm = Conexao.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	importsistema\n" +
+                    "from 	\n" +
+                    "	implantacao.codant_fornecedor cf\n" +
+                    "where \n" +
+                    "	id_conexao = (select min(id_conexao) from implantacao.codant_fornecedor)\n" +
+                    "limit 1")) {
+                if(rs.next()) {
+                    loja = rs.getString("importsistema");
+                }
+            }
+        }
+        
+        return loja;
+    }
 }

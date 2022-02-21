@@ -64,11 +64,13 @@ public class ClienteRepository {
 
         int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = clienteService.verificaRegistro();
+        
+        String impSistema = clienteService.getImpSistemaInicial();
 
         if (this.forcarUnificacao) {
             unificarClientePreferencial(clientes, opt);
         } else {
-            if (registro > 0 && idConexao == 0) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
                 unificarClientePreferencial(clientes, opt);
             } else {
                 boolean existeConexao = clienteService.
@@ -95,11 +97,13 @@ public class ClienteRepository {
         int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = clienteService.verificaRegistro();
         
+        String impSistema = clienteService.getImpSistemaInicial();
+        
         if (this.forcarUnificacao) {
             unificarClienteEventual(clientes, opt);
         } else {
 
-            if (registro > 0 && idConexao == 0) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
                 unificarClienteEventual(clientes, opt);
             } else {
                 boolean existeConexao = clienteService.

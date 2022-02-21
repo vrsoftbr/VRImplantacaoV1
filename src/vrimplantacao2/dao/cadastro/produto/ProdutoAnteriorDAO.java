@@ -1798,11 +1798,12 @@ public class ProdutoAnteriorDAO {
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "	distinct impsistema \n" +
+                    "	impsistema \n" +
                     "from \n" +
                     "	implantacao.codant_produto\n" +
                     "where \n" +
-                    "	dataimportacao = (select min(dataimportacao) from implantacao.codant_produto) ")) {
+                    "	id_conexao = (select min(id_conexao) from implantacao.codant_produto)\n" +
+                    "limit 1")) {
                 if(rs.next()) {
                     loja = rs.getString("impsistema");
                 }

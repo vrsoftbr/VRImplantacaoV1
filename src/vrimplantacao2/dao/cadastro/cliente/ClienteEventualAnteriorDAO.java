@@ -644,4 +644,25 @@ public class ClienteEventualAnteriorDAO {
         
         return lojaJaMigrada;
     }
+    
+    public String getImpSistema() throws Exception {
+        String loja = "";
+        
+        try(Statement stm = Conexao.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	sistema\n" +
+                    "from \n" +
+                    "	implantacao.codant_clienteeventual\n" +
+                    "where \n" +
+                    "	id_conexao = (select min(id_conexao) from implantacao.codant_clienteeventual)\n" +
+                    "limit 1")) {
+                if(rs.next()) {
+                    loja = rs.getString("sistema");
+                }
+            }
+        }
+        
+        return loja;
+    }
 }

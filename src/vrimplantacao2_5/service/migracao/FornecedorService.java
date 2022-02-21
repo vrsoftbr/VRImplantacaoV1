@@ -41,4 +41,8 @@ public class FornecedorService {
     public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
         return this.fornecedorAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
     }
+    
+    public String getImpSistemaInicial() throws Exception {
+        return this.fornecedorAnteriorDAO.getImpSistema();
+    }
 }

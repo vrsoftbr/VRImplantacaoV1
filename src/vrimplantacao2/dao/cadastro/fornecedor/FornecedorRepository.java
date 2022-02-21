@@ -54,12 +54,14 @@ public class FornecedorRepository {
         
         int idConexao = fornecedorService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = fornecedorService.verificaRegistro();
+        
+        String impSistema = fornecedorService.getImpSistemaInicial();
 
         if (this.forcarUnificacao) {
             unificar(fornecedores);
         } else {
 
-            if (registro > 0 && idConexao == 0) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
                 unificar(fornecedores);
             } else {
                 boolean existeConexao = fornecedorService.
