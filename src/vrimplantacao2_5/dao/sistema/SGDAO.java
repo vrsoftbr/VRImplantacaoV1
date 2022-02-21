@@ -211,7 +211,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	     when upper(p.piscofin01) = 'S' then '05'\n"
                     + "	     when upper(p.piscofin01) = 'Z' then '06'\n"
                     + "	     when upper(p.piscofin01) = 'E' then '01'\n"
-                    + " else null end cstpis,\n"
+                    + " else 01 end cstpis,\n"
                     + "	pis.cstcofins,\n"
                     + "	p.codncm01 ncm,\n"
                     + "	p.codcest01 cest,\n"
