@@ -23,6 +23,7 @@ import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -96,7 +97,22 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                 }
         ));
     }
-
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO
+        ));
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -296,6 +312,22 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idaliquota"));
                     imp.setIcmsConsumidorId(rst.getString("idaliquota"));
 
+                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(0);
+                    }
+
                     result.add(imp);
                 }
             }
@@ -352,7 +384,8 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.complemento,\n"
                     + "	f.bairro,\n"
                     + "	c.cidade,\n"
-                    + "	f.desativado as status,\n"
+                    + "	case when f.desativado = 0 then 1\n"
+                    + "	else 0 end as status,\n"
                     + "	c.codigoibge,\n"
                     + "	f.cep,\n"
                     + "	c.estado,\n"
