@@ -61,7 +61,7 @@ public class FornecedorRepository {
             unificar(fornecedores);
         } else {
 
-            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(this.provider.getSistema()))) {
                 unificar(fornecedores);
             } else {
                 boolean existeConexao = fornecedorService.

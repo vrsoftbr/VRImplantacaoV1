@@ -70,7 +70,7 @@ public class ClienteRepository {
         if (this.forcarUnificacao) {
             unificarClientePreferencial(clientes, opt);
         } else {
-            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(this.provider.getSistema()))) {
                 unificarClientePreferencial(clientes, opt);
             } else {
                 boolean existeConexao = clienteService.
@@ -103,7 +103,7 @@ public class ClienteRepository {
             unificarClienteEventual(clientes, opt);
         } else {
 
-            if (registro > 0 && idConexao == 0 || (!impSistema.equals(this.provider.getSistema()))) {
+            if (registro > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(this.provider.getSistema()))) {
                 unificarClienteEventual(clientes, opt);
             } else {
                 boolean existeConexao = clienteService.

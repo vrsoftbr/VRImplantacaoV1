@@ -1804,7 +1804,7 @@ public class ProdutoAnteriorDAO {
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "	impsistema \n" +
+                    "	impsistema\n" +
                     "from \n" +
                     "	implantacao.codant_produto\n" +
                     "where \n" +

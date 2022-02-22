@@ -301,7 +301,7 @@ public class ProdutoRepository {
         int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                 registros = produtoService.verificaRegistro();
         
-        String impSistema = produtoService.getImpSistemaInicial();
+        String impSistema = produtoService.getImpSistemaInicial().trim();
                 
         if(!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
                 && registros == 0) {
@@ -317,7 +317,7 @@ public class ProdutoRepository {
              * o nome do sistema (sistema ' - ' complemento) da primeira importação é diferente 
              * do sistema da nova importação, então a rotina define que é uma unificação.
              */
-            if (registros > 0 && idConexao == 0 || (!impSistema.equals(getSistema()))) {
+            if (registros > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(getSistema()))) {
                 unificar(produtos);
             } else {
                 boolean existeConexao = produtoService.
