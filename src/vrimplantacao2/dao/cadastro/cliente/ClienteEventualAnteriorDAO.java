@@ -310,7 +310,8 @@ public class ClienteEventualAnteriorDAO {
                 "				cnpj,\n" +
                 "				ie,\n" +
                 "				nome,\n" +
-                "				false\n" +
+                "				false,\n" +
+                "                               id_conexao\n" +
                 "			from\n" +
                 "				implantacao.codant_clientepreferencial\n" +
                 "			where\n" +
@@ -346,7 +347,8 @@ public class ClienteEventualAnteriorDAO {
                 "				cnpj,\n" +
                 "				ie,\n" +
                 "				nome,\n" +
-                "				false\n" +
+                "				false,\n" +
+                "                               id_conexao\n" +
                 "			from\n" +
                 "				implantacao.codant_clienteeventual\n" +
                 "			where\n" +
@@ -395,7 +397,37 @@ public class ClienteEventualAnteriorDAO {
                 "			ncm, \n" +
                 "			cest, \n" +
                 "			contadorimportacao, \n" +
-                "			novo\n" +
+                "			novo,\n" +
+                "                       codigosped,\n" +
+                "                       situacaocadastro,\n" +
+                "                       dataimportacao,\n" +
+                "                       obsimportacao,\n" +
+                "                       icmscstsaida,\n" +
+                "                       icmsaliqsaida,\n" +
+                "                       icmsreducaosaida,\n" +
+                "                       icmscstsaidaforaestado,\n" +
+                "                       icmsaliqsaidaforaestado,\n" +
+                "                       icmsreducaosaidaforaestado,\n" +
+                "                       icmscstsaidaforaestadonf,\n" +
+                "                       icmsaliqsaidaforaestadonf,\n" +
+                "                       icmsreducaosaidaforaestadonf,\n" +
+                "                       icmscstentrada,\n" +
+                "                       icmsaliqentrada,\n" +
+                "                       icmsreducaoentrada,\n" +
+                "                       icmscstentradaforaestado,\n" +
+                "                       icmsaliqentradaforaestado,\n" +
+                "                       icmsreducaoentradaforaestado,\n" +
+                "                       icmscstconsumidor,\n" +
+                "                       icmsaliqconsumidor,\n" +
+                "                       icmsreducaoconsumidor,\n" +
+                "                       icmsdebitoid,\n" +
+                "                       icmsdebitoforaestadoid,\n" +
+                "                       icmsdebitoforaestadonfid,\n" +
+                "                       icmscreditoid,\n" +
+                "                       icmscreditoforaestadoid,\n" +
+                "                       icmsconsumidorid,\n" +
+                "                       datacadastro,\n" +
+                "                       id_conexao\n" +
                 "		FROM \n" +
                 "			implantacao.codant_produto\n" +
                 "		where\n" +
@@ -467,7 +499,8 @@ public class ClienteEventualAnteriorDAO {
                 "				codigoatual,\n" +
                 "				cnpj,\n" +
                 "				razao,\n" +
-                "				fantasia\n" +
+                "				fantasia,\n" +
+                "                               id_conexao\n" +
                 "			from \n" +
                 "				implantacao.codant_fornecedor\n" +
                 "			where\n" +
@@ -568,7 +601,10 @@ public class ClienteEventualAnteriorDAO {
                 "				id_aliquota,\n" +
                 "				orig_cst,\n" +
                 "				orig_aliquota,\n" +
-                "				orig_reduzido\n" +
+                "				orig_reduzido,\n" +
+                "                               orig_fcp,\n" +
+                "                               orig_desonerado,\n" +
+                "                               orig_porcentagemdesonerado\n" +
                 "			from \n" +
                 "				implantacao.mapatributacao a\n" +
                 "			where\n" +

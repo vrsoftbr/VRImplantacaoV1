@@ -1471,7 +1471,8 @@ public class ProdutoAnteriorDAO {
                 "				cnpj,\n" +
                 "				ie,\n" +
                 "				nome,\n" +
-                "				false\n" +
+                "				false,\n" +
+                "                               id_conexao\n" +
                 "			from\n" +
                 "				implantacao.codant_clientepreferencial\n" +
                 "			where\n" +
@@ -1507,7 +1508,8 @@ public class ProdutoAnteriorDAO {
                 "				cnpj,\n" +
                 "				ie,\n" +
                 "				nome,\n" +
-                "				false\n" +
+                "				false,\n" +
+                "                               id_conexao\n" +
                 "			from\n" +
                 "				implantacao.codant_clienteeventual\n" +
                 "			where\n" +
@@ -1658,7 +1660,8 @@ public class ProdutoAnteriorDAO {
                 "				codigoatual,\n" +
                 "				cnpj,\n" +
                 "				razao,\n" +
-                "				fantasia\n" +
+                "				fantasia,\n" +
+                "                               id_conexao\n" +
                 "			from \n" +
                 "				implantacao.codant_fornecedor\n" +
                 "			where\n" +
@@ -1759,7 +1762,10 @@ public class ProdutoAnteriorDAO {
                 "				id_aliquota,\n" +
                 "				orig_cst,\n" +
                 "				orig_aliquota,\n" +
-                "				orig_reduzido\n" +
+                "				orig_reduzido,\n" +
+                "                               orig_fcp,\n" +
+                "                               orig_desonerado,\n" +
+                "                               orig_porcentagemdesonerado\n" +
                 "			from \n" +
                 "				implantacao.mapatributacao a\n" +
                 "			where\n" +
