@@ -217,9 +217,9 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	p.CODIGO id,\n"
-                    + "	p.CODIGO ean,\n"
-                    + "	p.NOME descricaocompleta,\n"
+                    + "	TRIM(p.CODIGO) id,\n"
+                    + "	SUBSTRING(TRIM(p.CODIGO) FROM 1 FOR 14) ean,\n"
+                    + "	TRIM(p.NOME) descricaocompleta,\n"
                     + "	COALESCE (p.UNIDADE,'UN') UNIDADE,\n"
                     + "	p.DATA_CT data_cadastro,\n"
                     + "	p.DTATUALIZ data_alteracao,\n"
