@@ -190,7 +190,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    END situacaoCadastro,\n"
                     + "    p.NCM ncm,\n"
                     + "    p.PIS_MIX piscofinsCstDebito,\n"
-                    + "    p.ALIICMS_MIX icmsAliqEntrada,\n"
+                    + "    p.ALICOFINS icmsAliqEntrada,\n"
                     + "    p.REDUCAO_MIX icmsReducaoEntrada, \n"
                     + "    case \n"
                     + "    when p.CST_MIX = ''\n"
