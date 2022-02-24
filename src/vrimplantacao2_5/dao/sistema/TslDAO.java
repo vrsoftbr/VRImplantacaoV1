@@ -180,6 +180,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.ESTOQUE estoqueMaximo,\n"
                     + "    p.MIN estoqueMinimo,\n"
                     + "    p.ESTOQUE estoque,\n"
+                    + "    p.LUCRO margem,\n"
                     + "    p.CUSTOCOM custoSemImposto, \n"
                     + "    p.CUSTO custoComImposto,\n"
                     + "    p.PRECO1 precovenda,  \n"
@@ -189,7 +190,8 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		ELSE 0\n"
                     + "    END situacaoCadastro,\n"
                     + "    p.NCM ncm,\n"
-                    + "    p.PIS_MIX piscofinsCstDebito,\n"
+                    + "    p.TPPIS piscofinsCstDebito,\n"
+                    + "    p.TPCOFINSS piscofinsCstcredito,\n"
                     + "    p.ALICOFINS icmsAliqEntrada,\n"
                     + "    p.REDUCAO_MIX icmsReducaoEntrada, \n"
                     + "    case \n"
@@ -238,6 +240,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     }
 
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setDescricaoCompleta(rst.getString("descricaoCompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaoGondola"));
