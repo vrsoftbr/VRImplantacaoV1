@@ -186,13 +186,14 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIGO idproduto,\n"
-                    + "	CODIGO ean,\n"
+                    + "	TRIM(CODIGO) idproduto,\n"
+                    + "	SUBSTRING(TRIM(CODIGO) FROM 1 FOR 14) ean,\n"
                     + "	1 AS qtdembalagem,\n"
                     + "	NOME\n"
                     + "FROM\n"
                     + "	CTPROD\n"
-                    + "WHERE codigo <> ''\n"
+                    + "WHERE\n"
+                    + "	codigo <> ''\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -265,15 +266,15 @@ public class WBADAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    
+
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
-                    
+
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setEan(imp.getImportId());
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
