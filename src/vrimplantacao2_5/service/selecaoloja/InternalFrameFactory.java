@@ -12,6 +12,7 @@ import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
+import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
@@ -118,6 +119,9 @@ public abstract class InternalFrameFactory {
                 break;
             case LINEAR:
                 internalFrame = new Linear2_5GUI(frame);
+                break;
+            case CPGESTOR:
+                internalFrame = new CPGestorByView2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
