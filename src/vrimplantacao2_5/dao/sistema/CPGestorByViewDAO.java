@@ -36,12 +36,12 @@ import vrimplantacao2_5.vo.enums.ESistema;
  * @author guilhermegomes
  */
 public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     @Override
     public String getSistema() {
         return ESistema.CPGESTOR.getNome();
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -88,7 +88,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoProduto.VENDA_PDV
         ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -100,7 +100,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.RECEBER_CHEQUE));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -119,36 +119,36 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "")) {
-                while(rs.next()) {
+                while (rs.next()) {
                     result.add(new MapaTributoIMP(
-                            rs.getString(""), 
-                            rs.getString("") + " - " + 
-                                rs.getString("") + " - " + 
-                                    rs.getString(""), 
+                            rs.getString(""),
+                            rs.getString("") + " - "
+                            + rs.getString("") + " - "
+                            + rs.getString(""),
                             rs.getInt(""),
-                            rs.getDouble(""), 
+                            rs.getDouble(""),
                             rs.getDouble("")));
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "")) {
-                while(rs.next()) {
+                while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString(""));
@@ -157,96 +157,96 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMerc2Descricao(rs.getString(""));
                     imp.setMerc3ID("1");
                     imp.setMerc3Descricao(imp.getMerc2Descricao());
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	PR_CODINT id,\n" +
-                    "	PR_NOME descricao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_sta \n" +
-                    "WHERE \n" +
-                    "	PR_MASTER = 'M' AND \n" +
-                    "	PR_ATIVO = 'S' AND \n" +
-                    "	LJ_ASSOCIACAO = " + getLojaOrigem())) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	PR_CODINT id,\n"
+                    + "	PR_NOME descricao\n"
+                    + "FROM \n"
+                    + "	vw_exp_produtos_sta \n"
+                    + "WHERE \n"
+                    + "	PR_MASTER = 'M' AND \n"
+                    + "	PR_ATIVO = 'S' AND \n"
+                    + "	LJ_ASSOCIACAO = " + getLojaOrigem())) {
+                while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setDescricao(rs.getString("descricao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmm");
-        
+
         List<ProdutoIMP> result = new ArrayList<>();
         Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca
                 = new ProdutoBalancaDAO().getProdutosBalanca();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	p.pr_codint id,\n" +
-                    "	p.pr_nome descricaocompleta,\n" +
-                    "	p.PR_NOMEGONDOLA descricaogondola,\n" +
-                    "	p.PR_NOMEABREVIADO descricaoreduzida,\n" +
-                    "	ean.PR_CBARRA codigobarras,\n" +
-                    "	ean.PR_QTDE qtdembalagemvenda,\n" +
-                    "	p.SE_CODIG mercadologico,\n" +
-                    "   p.PR_codigo_MASTER familia,\n" +        
-                    "	p.cod_depto_ecom,\n" +
-                    "	p.UNI_VENDA embalagemvenda,\n" +
-                    "	p.PR_VOLUME volume,\n" +
-                    "	p.TC_CODIG embalagemcompra,\n" +
-                    "	p.PR_ATIVO situacaocadastro,\n" +
-                    "	p.PR_PRECOVENDA_ATUAL precovenda,\n" +
-                    "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n" +
-                    "	p.PR_CUSTO_SEM_ICMS custosemimposto,\n" +
-                    "   p.PR_DIAS_VALIDADE validade,\n" +        
-                    "	p.PR_PESO_VARIAVEL balanca,\n" +
-                    "	p.PR_PESO_LIQUIDO pesoliquido,\n" +
-                    "	p.PR_PESO_BRUTO pesobruto,\n" +
-                    "	p.PR_DIAS_VALIDADE validade,\n" +
-                    "	p.PR_VENDA_PESO_UNIDADE pesavel,\n" +
-                    "	p.PR_QTDE_CAIXA qtdembalagemcompra,\n" +
-                    "	p.DATA_HORA_INC datacadastro,\n" +
-                    "	p.LJ_ASSOCIACAO loja,\n" +
-                    "	p.CODIGO_COMPRADOR comprador,\n" +
-                    "	p.ESTOQUE_MINIMO estoquemin,\n" +
-                    "	p.ncm,\n" +
-                    "	ean.PR_CEST cest,\n" +
-                    "   p.pr_codigocstent cstcredito,\n" +
-                    "	p.pr_codigocstsai cstdebito\n" +        
-                    "FROM \n" +
-                    "	vw_exp_produtos_sta p\n" +
-                    "LEFT JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT \n" +
-                    "WHERE \n" +
-                    "	p.lj_associacao = " + getLojaOrigem())) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	p.pr_codint id,\n"
+                    + "	p.pr_nome descricaocompleta,\n"
+                    + "	p.PR_NOMEGONDOLA descricaogondola,\n"
+                    + "	p.PR_NOMEABREVIADO descricaoreduzida,\n"
+                    + "	ean.PR_CBARRA codigobarras,\n"
+                    + "	ean.PR_QTDE qtdembalagemvenda,\n"
+                    + "	p.SE_CODIG mercadologico,\n"
+                    + "   p.PR_codigo_MASTER familia,\n"
+                    + "	p.cod_depto_ecom,\n"
+                    + "	p.UNI_VENDA embalagemvenda,\n"
+                    + "	p.PR_VOLUME volume,\n"
+                    + "	p.TC_CODIG embalagemcompra,\n"
+                    + "	p.PR_ATIVO situacaocadastro,\n"
+                    + "	p.PR_PRECOVENDA_ATUAL precovenda,\n"
+                    + "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n"
+                    + "	p.PR_CUSTO_SEM_ICMS custosemimposto,\n"
+                    + "   p.PR_DIAS_VALIDADE validade,\n"
+                    + "	p.PR_PESO_VARIAVEL balanca,\n"
+                    + "	p.PR_PESO_LIQUIDO pesoliquido,\n"
+                    + "	p.PR_PESO_BRUTO pesobruto,\n"
+                    + "	p.PR_DIAS_VALIDADE validade,\n"
+                    + "	p.PR_VENDA_PESO_UNIDADE pesavel,\n"
+                    + "	p.PR_QTDE_CAIXA qtdembalagemcompra,\n"
+                    + "	p.DATA_HORA_INC datacadastro,\n"
+                    + "	p.LJ_ASSOCIACAO loja,\n"
+                    + "	p.CODIGO_COMPRADOR comprador,\n"
+                    + "	p.ESTOQUE_MINIMO estoquemin,\n"
+                    + "	p.ncm,\n"
+                    + "	ean.PR_CEST cest,\n"
+                    + "   p.pr_codigocstent cstcredito,\n"
+                    + "	p.pr_codigocstsai cstdebito\n"
+                    + "FROM \n"
+                    + "	vw_exp_produtos_sta p\n"
+                    + "LEFT JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT \n"
+                    + "WHERE \n"
+                    + "	p.lj_associacao = " + getLojaOrigem())) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -260,30 +260,29 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    
+
                     /*imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3("1");*/
-                    
                     ProdutoBalancaVO balanca = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
-                    
-                    if(balanca != null) {
+
+                    if (balanca != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
                         imp.setValidade(balanca.getValidade() > 1 ? balanca.getValidade() : 0);
                     }
-                    
+
                     if ((rs.getString("familia") != null)
                             && (!rs.getString("familia").trim().isEmpty())) {
                         imp.setIdFamiliaProduto(rs.getString("familia"));
                     }
-                    
+
                     String dataCadastro = rs.getString("datacadastro");
-                    
+
                     if (dataCadastro != null && !dataCadastro.equals("")) {
                         imp.setDataCadastro(SDF.parse(rs.getString("datacadastro")));
                     }
-                    
+
                     imp.setValidade(rs.getInt("validade"));
                     imp.setSituacaoCadastro(rs.getString("situacaocadastro").equals("S") ? 1 : 0);
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
@@ -293,7 +292,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCest(rs.getString("cest"));
                     imp.setNcm(rs.getString("ncm"));
-                    
+
                     /*imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pisaida"));
@@ -303,15 +302,14 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());*/
-                    
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<CompradorIMP> getCompradores() throws Exception {
         List<CompradorIMP> result = new ArrayList<>();
@@ -332,45 +330,45 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	cf_tipo tipo,\n" +
-                    "	cf_codig id,\n" +
-                    "	cf_razao razao,\n" +
-                    "	cf_cgc cnpj,\n" +
-                    "	cf_inscr ie,\n" +
-                    "	cf_fanta fantasia,\n" +
-                    "	cf_ender endereco,\n" +
-                    "	cf_bairr bairro,\n" +
-                    "	mnc_codig ibgemunicipio,\n" +
-                    "	cf_cidad cidade,\n" +
-                    "	cf_numero_endereco numero,\n" +
-                    "   cf_complemento complemento,\n" +        
-                    "	cf_uf uf,\n" +
-                    "	cf_cep cep,\n" +
-                    "	cf_telef1 telefone,\n" +
-                    "	cf_telef2 telefone2,\n" +
-                    "	cf_fax fax,\n" +
-                    "	cf_contato contato,\n" +
-                    "	cf_inativo inativo,\n" +
-                    "	data_inc datacadastro,\n" +
-                    "	cf_prazo_pgto prazopagamento,\n" +
-                    "	cf_fornecedor_fabricante fabrincate,\n" +
-                    "	cnae,\n" +
-                    "	cf_atividade,\n" +
-                    "	cf_simples_nacional simples,\n" +
-                    "	flg_consumidor_final consumidor,\n" +
-                    "	flg_indiedest indicadorie\n" +
-                    "FROM \n" +
-                    "	vw_exp_forn_sta\n" +
-                    "WHERE \n" +
-                    "	cf_tipo = 'F'"        
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	cf_tipo tipo,\n"
+                    + "	cf_codig id,\n"
+                    + "	cf_razao razao,\n"
+                    + "	cf_cgc cnpj,\n"
+                    + "	cf_inscr ie,\n"
+                    + "	cf_fanta fantasia,\n"
+                    + "	cf_ender endereco,\n"
+                    + "	cf_bairr bairro,\n"
+                    + "	mnc_codig ibgemunicipio,\n"
+                    + "	cf_cidad cidade,\n"
+                    + "	cf_numero_endereco numero,\n"
+                    + "   cf_complemento complemento,\n"
+                    + "	cf_uf uf,\n"
+                    + "	cf_cep cep,\n"
+                    + "	cf_telef1 telefone,\n"
+                    + "	cf_telef2 telefone2,\n"
+                    + "	cf_fax fax,\n"
+                    + "	cf_contato contato,\n"
+                    + "	cf_inativo inativo,\n"
+                    + "	data_inc datacadastro,\n"
+                    + "	cf_prazo_pgto prazopagamento,\n"
+                    + "	cf_fornecedor_fabricante fabrincate,\n"
+                    + "	cnae,\n"
+                    + "	cf_atividade,\n"
+                    + "	cf_simples_nacional simples,\n"
+                    + "	flg_consumidor_final consumidor,\n"
+                    + "	flg_indiedest indicadorie\n"
+                    + "FROM \n"
+                    + "	vw_exp_forn_sta\n"
+                    + "WHERE \n"
+                    + "	cf_tipo = 'F'"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -387,39 +385,39 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setAtivo(rs.getString("inativo").equals("F"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setTel_principal(rs.getString("telefone"));
-                    
+
                     String tel2 = rs.getString("telefone2");
-                    
-                    if(tel2 != null && !tel2.equals("")) {
+
+                    if (tel2 != null && !tel2.equals("")) {
                         imp.addContato("1", "TELEFONE2", tel2, null, TipoContato.COMERCIAL, null);
                     }
-                    
+
                     String fax = rs.getString("fax");
-                    
-                    if(fax != null && !fax.equals("")) {
+
+                    if (fax != null && !fax.equals("")) {
                         imp.addContato("2", "FAX", fax, null, TipoContato.COMERCIAL, null);
                     }
-                    
+
                     String contato = rs.getString("contato");
-                    
-                    if(contato != null && !contato.equals("")) {
+
+                    if (contato != null && !contato.equals("")) {
                         imp.addContato("3", contato, null, null, TipoContato.COMERCIAL, null);
                     }
-                    
+
                     imp.setPrazoPedido(rs.getInt("prazopagamento"));
-                    
+
                     int indicadorIE = rs.getInt("indicadorie");
-                    
+
                     imp.setTipoIndicadorIe(
-                        indicadorIE == 1 ? TipoIndicadorIE.CONTRIBUINTE_ICMS :
-                                indicadorIE == 2 ? TipoIndicadorIE.CONTRIBUINTE_ISENTO :
-                                        TipoIndicadorIE.NAO_CONTRIBUINTE);
-                    
+                            indicadorIE == 1 ? TipoIndicadorIE.CONTRIBUINTE_ICMS
+                                    : indicadorIE == 2 ? TipoIndicadorIE.CONTRIBUINTE_ISENTO
+                                            : TipoIndicadorIE.NAO_CONTRIBUINTE);
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -452,38 +450,98 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	cf_tipo tipo,\n"
+                    + "	cf_codig id,\n"
+                    + "	cf_razao razao,\n"
+                    + "	cf_cgc cnpj,\n"
+                    + "	cf_inscr ie,\n"
+                    + "	cf_fanta fantasia,\n"
+                    + "	cf_ender endereco,\n"
+                    + "	cf_bairr bairro,\n"
+                    + "	mnc_codig ibgemunicipio,\n"
+                    + "	cf_cidad cidade,\n"
+                    + "	cf_numero_endereco numero,\n"
+                    + "   cf_complemento complemento,\n"
+                    + "	cf_uf uf,\n"
+                    + "	cf_cep cep,\n"
+                    + "	cf_telef1 telefone,\n"
+                    + "	cf_telef2 telefone2,\n"
+                    + "	cf_fax fax,\n"
+                    + "	cf_contato contato,\n"
+                    + "	cf_inativo inativo,\n"
+                    + "	data_inc datacadastro,\n"
+                    + "	cf_prazo_pgto prazopagamento,\n"
+                    + "	cf_fornecedor_fabricante fabrincate,\n"
+                    + "	cnae,\n"
+                    + "	cf_atividade,\n"
+                    + "	cf_simples_nacional simples,\n"
+                    + "	flg_consumidor_final consumidor,\n"
+                    + "	flg_indiedest indicadorie\n"
+                    + "FROM \n"
+                    + "	vw_exp_forn_sta\n"
+                    + "WHERE \n"
+                    + "	cf_tipo = 'C'")) {
+                while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setCnpj(rs.getString("nrocpfcnpj"));
-                    imp.setInscricaoestadual(rs.getString("inscricaorg"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setValorLimite(rs.getDouble("limite"));
-                    
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setAtivo(rs.getString("inativo").equals("F"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+
+                    int indicadorIE = rs.getInt("indicadorie");
+
+                    imp.setTipoIndicadorIe(indicadorIE == 1 ? TipoIndicadorIE.CONTRIBUINTE_ICMS
+                            : indicadorIE == 2 ? TipoIndicadorIE.CONTRIBUINTE_ISENTO
+                                    : TipoIndicadorIE.NAO_CONTRIBUINTE);
+
+                    imp.setFax(rs.getString("fax"));
+
+                    String tel2 = rs.getString("telefone2");
+
+                    if (tel2 != null && !tel2.equals("")) {
+                        imp.addContato("1", "TELEFONE2", tel2, null, null);
+                    }
+
+                    String contato = rs.getString("contato");
+
+                    if (contato != null && !contato.equals("")) {
+                        imp.addContato("2", contato, null, null, null);
+                    }
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "")) {
-                while(rs.next()) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rs.getString(""));
                     imp.setNumeroCupom(rs.getString(""));
                     imp.setIdCliente(rs.getString(""));
@@ -491,12 +549,12 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setDataVencimento(rs.getDate(""));
                     imp.setParcela(rs.getInt(""));
                     imp.setValor(rs.getDouble(""));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 }
