@@ -6,6 +6,7 @@ package vrimplantacao2_5.vo.enums;
  */
 public enum EScriptLojaOrigemSistema {
 
+    ARIUS(197, 9, "SELECT id, id || ' - ' || descritivo || '-' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5,
             "SELECT l.COD_EMPRESA AS id, "
             + "(l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao "
@@ -85,22 +86,22 @@ public enum EScriptLojaOrigemSistema {
             + "	FANTASIA descricao\n"
             + "FROM\n"
             + "	EMPRESA"),
-    VRMASTER(182, 11, "select\n" +
-                    "	l.id,\n" +
-                    "	l.descricao\n" +
-                    "from \n" +
-                    "	loja l \n" +
-                    "inner join fornecedor f on l.id_fornecedor = f.id \n" +
-                    "where l.id_situacaocadastro = 1\n" +
-                    "order by\n" +
-                    "	l.id"),
+    VRMASTER(182, 11, "select\n"
+            + "	l.id,\n"
+            + "	l.descricao\n"
+            + "from \n"
+            + "	loja l \n"
+            + "inner join fornecedor f on l.id_fornecedor = f.id \n"
+            + "where l.id_situacaocadastro = 1\n"
+            + "order by\n"
+            + "	l.id"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa"),
     WEBSAQ(188, 11, "select \n"
-                    + "codestabelec id, \n"
-                    + "razaosocial descricao \n"
-                    + "from estabelecimento\n"
-                    + "order by codestabelec"),
+            + "codestabelec id, \n"
+            + "razaosocial descricao \n"
+            + "from estabelecimento\n"
+            + "order by codestabelec"),
     TSl(212, 8, "SELECT\n"
             + "	EMPCOD id,\n"
             + "	EMPNOM descricao\n"
@@ -109,21 +110,21 @@ public enum EScriptLojaOrigemSistema {
     SATFACIL(213, 5, "SELECT ID_REGISTRO id, NOME_LOJA descricao FROM PARAMETROS"),
     WBA(214, 5, "SELECT CAST(CODIGO AS integer) AS id, NOME descricao FROM FILIAL ORDER BY 1"),
     LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS razao FROM empresa ORDER BY 1"),
-    CPGESTOR(21, 9, "SELECT \n" +
-                    "	LJ_ASSOCIACAO id,\n" +
-                    "	''SANTA FE'' razao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_sta\n" +
-                    "WHERE \n" +
-                    "	rownum <= 1\n" +
-                    "UNION ALL \n" +
-                    "SELECT \n" +
-                    "	lj_associacao id,\n" +
-                    "	''ZUZU'' razao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_zuzu\n" +
-                    "WHERE \n" +
-                    "	rownum <= 1");
+    CPGESTOR(21, 9, "SELECT \n"
+            + "	LJ_ASSOCIACAO id,\n"
+            + "	''SANTA FE'' razao\n"
+            + "FROM \n"
+            + "	vw_exp_produtos_sta\n"
+            + "WHERE \n"
+            + "	rownum <= 1\n"
+            + "UNION ALL \n"
+            + "SELECT \n"
+            + "	lj_associacao id,\n"
+            + "	''ZUZU'' razao\n"
+            + "FROM \n"
+            + "	vw_exp_produtos_zuzu\n"
+            + "WHERE \n"
+            + "	rownum <= 1");
 
     private int idSistema;
     private int idBancoDados;
