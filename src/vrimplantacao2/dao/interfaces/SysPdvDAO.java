@@ -53,9 +53,9 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
  * @author Leandro
  */
 public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private static final Logger LOG = Logger.getLogger(SysPdvDAO.class.getName());
-    
+
     private TipoConexao tipoConexao;
     private String complementoSistema = "";
     public String FZDCOD = "";
@@ -73,7 +73,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setRemoverDigitoDaBalanca(boolean removerDigitoDaBalanca) {
         this.removerDigitoDaBalanca = removerDigitoDaBalanca;
     }
-    
+
     public void setFinalizadorasRotativo(Set<String> finalizadorasRotativo) {
         this.finalizadorasRotativo = finalizadorasRotativo;
     }
@@ -131,7 +131,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FORCAR_ATUALIZACAO
         ));
     }
-    
+
     public void setGerarEanAtacado(boolean gerarEanAtacado) {
         this.gerarEanAtacado = gerarEanAtacado;
     }
@@ -225,22 +225,22 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	t.trbid,\n" +
-                    "	t.trbdes,\n" +
-                    "	t.trbtabb cst,\n" +
-                    "	t.trbalq aliquota,\n" +
-                    "	t.trbred reducao,\n" +
-                    "	coalesce(t.TRBALQFCP, 0) fcp\n" +
-                    "from\n" +
-                    "	TRIBUTACAO t\n" +
-                    "where\n" +
-                    "	t.trbid in (select trbid from produto)\n" +
-                    "order by\n" +
-                    "	1"
+                    "select\n"
+                    + "	t.trbid,\n"
+                    + "	t.trbdes,\n"
+                    + "	t.trbtabb cst,\n"
+                    + "	t.trbalq aliquota,\n"
+                    + "	t.trbred reducao,\n"
+                    + "	coalesce(t.TRBALQFCP, 0) fcp\n"
+                    + "from\n"
+                    + "	TRIBUTACAO t\n"
+                    + "where\n"
+                    + "	t.trbid in (select trbid from produto)\n"
+                    + "order by\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -253,7 +253,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -440,10 +440,11 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 System.out.println(eans.size());
                 while (rst.next()) {
-                    
+
                     String id = rst.getString("id");
-                    if (id != null && id.trim().isEmpty())
+                    if (id != null && id.trim().isEmpty()) {
                         id = null;
+                    }
                     Set<Ean> e = eans.get(id);
 
                     if (e != null) {
@@ -460,7 +461,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCodMercadologico1(rst.getString("merc1"));
                             imp.setCodMercadologico2(rst.getString("merc2"));
                             imp.setCodMercadologico3(rst.getString("merc3"));
-                                                        
+
                             int plu;
                             if (removerDigitoDaBalanca) {
                                 plu = ProdutoBalancaDAO.TipoConversao.REMOVER_DIGITO.convert(ean.ean);
@@ -468,8 +469,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                                 plu = ProdutoBalancaDAO.TipoConversao.SIMPLES.convert(ean.ean);
                             }
                             final boolean isBalancaNoSysPdv = rst.getBoolean("e_balanca");
-                                                        
-                            if (utilizarPropesvarNaBalanca) {                                
+
+                            if (utilizarPropesvarNaBalanca) {
                                 if ("KG".equals(rst.getString("tipoembalagem"))) {
                                     imp.seteBalanca(true);
                                     imp.setQtdEmbalagem(1);
@@ -520,23 +521,23 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                             imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                             imp.setDataCadastro(rst.getDate("datacadastro"));
-                            
+
                             String qtdEmb = rst.getString("qtdembalagem");
-                            
-                            if(qtdEmb != null && !"".equals(qtdEmb)) {
-                                if(qtdEmb.length() > 6) {
+
+                            if (qtdEmb != null && !"".equals(qtdEmb)) {
+                                if (qtdEmb.length() > 6) {
                                     imp.setQtdEmbalagemCotacao(0);
                                 } else {
                                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
                                 }
                             }
-                            
+
                             if (rst.getDouble("margem2") > 99999999) {
                                 imp.setMargem(0);
                             } else {
                                 imp.setMargem(rst.getDouble("margem2"));
                             }
-                            
+
                             imp.setPrecovenda(rst.getDouble("precovenda"));
                             imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                             imp.setPesoBruto(rst.getDouble("pesobruto"));
@@ -586,7 +587,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     while (rst.next()) {
 
                         int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
-                        
+
                         if (codigoAtual > 0) {
                             ProdutoIMP imp = new ProdutoIMP();
                             imp.setImportLoja(getLojaOrigem());
@@ -599,7 +600,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             try (Statement stm = tipoConexao.getConnection().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
@@ -664,7 +665,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             try (Statement stm = tipoConexao.getConnection().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
@@ -907,7 +908,6 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }*/
-
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -1040,9 +1040,9 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     public static class FinalizadoraRecord {
-        
+
         public String id;
         public String descricao;
         public boolean selected = false;
@@ -1069,7 +1069,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1079,13 +1079,14 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             StringBuilder builder = new StringBuilder();
-            for(Iterator<String> iterator = this.finalizadorasRotativo.iterator(); iterator.hasNext();) {
+            for (Iterator<String> iterator = this.finalizadorasRotativo.iterator(); iterator.hasNext();) {
                 builder
                         .append("'")
                         .append(iterator.next())
                         .append("'");
-                if (iterator.hasNext())
+                if (iterator.hasNext()) {
                     builder.append(",");
+                }
             }
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
@@ -1135,61 +1136,60 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
 
-        try (Statement st = tipoConexao.getConnection().createStatement()) {            
+        try (Statement st = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "SELECT \n" +
-                    "	transacao.trnseq sequencia,\n" +
-                    "	transacao.cxanum numerocaixa,\n" +
-                    "	transacao.trndat data,\n" +
-                    "	transacao.trnseqeqp,\n" +
-                    "	transacao.cxanumeqp,\n" +
-                    "	transacao.funcod,\n" +
-                    "	transacao.trnfunaut,\n" +
-                    "	transacao.clicod,\n" +
-                    "	cliente.clides,\n" +
-                    "	finalizacao.fzdtext1 banco,\n" +
-                    "	finalizacao.fzdtext2 agencia,\n" +
-                    "	finalizacao.fzdtext3 conta,\n" +
-                    "	finalizacao.fzdtext4 numerocheque,\n" +
-                    "	finalizacao.fzddatven datavencimento,\n" +
-                    "	finalizacao.fzdvlr valor,\n" +
-                    "	finalizacao.fzdesp,\n" +
-                    "	finalizacao.fzdcod,\n" +
-                    "	finalizadora.fzddes observacao,\n" +
-                    "	finalizadora.fzdlercmc7,\n" +
-                    "	iteplapag.ipptxt1,\n" +
-                    "	iteplapag.ipptxt2,\n" +
-                    "	iteplapag.ipptxt3,\n" +
-                    "	iteplapag.ipptxt4,\n" +
-                    "	iteplapag.ippvlrlan,\n" +
-                    "	iteplapag.ippdatven\n" +
-                    "FROM transacao\n" +
-                    "	LEFT OUTER JOIN finalizacao ON (\n" +
-                    "		transacao.trnseq=finalizacao.trnseq\n" +
-                    "		AND transacao.trndat=finalizacao.trndat\n" +
-                    "		AND transacao.cxanum=finalizacao.cxanum\n" +
-                    "	)\n" +
-                    "	LEFT OUTER JOIN iteplapag ON (\n" +
-                    "		finalizacao.trnseq=iteplapag.trnseq\n" +
-                    "		AND finalizacao.trndat=iteplapag.trndat\n" +
-                    "		AND finalizacao.cxanum=iteplapag.cxanum\n" +
-                    "		AND finalizacao.fzdseq=iteplapag.seqfzd)\n" +
-                    "	LEFT OUTER JOIN cliente ON (\n" +
-                    "		cliente.clicod=transacao.clicod\n" +
-                    "	)\n" +
-                    "	LEFT OUTER JOIN finalizadora ON (\n" +
-                    "		finalizadora.fzdcod=finalizacao.fzdcod\n" +
-                    "	)\n" +
-                    "WHERE \n" +
-                    "	transacao.trntip <> '7'\n" +
-                    "	AND finalizacao.fzdesp = '1'\n" +
-                    "ORDER BY\n" +
-                    "	transacao.TRNDAT, transacao.trnseq"
+                    "SELECT \n"
+                    + "	transacao.trnseq sequencia,\n"
+                    + "	transacao.cxanum numerocaixa,\n"
+                    + "	transacao.trndat data,\n"
+                    + "	transacao.trnseqeqp,\n"
+                    + "	transacao.cxanumeqp,\n"
+                    + "	transacao.funcod,\n"
+                    + "	transacao.trnfunaut,\n"
+                    + "	transacao.clicod,\n"
+                    + "	cliente.clides,\n"
+                    + "	finalizacao.fzdtext1 banco,\n"
+                    + "	finalizacao.fzdtext2 agencia,\n"
+                    + "	finalizacao.fzdtext3 conta,\n"
+                    + "	finalizacao.fzdtext4 numerocheque,\n"
+                    + "	finalizacao.fzddatven datavencimento,\n"
+                    + "	finalizacao.fzdvlr valor,\n"
+                    + "	finalizacao.fzdesp,\n"
+                    + "	finalizacao.fzdcod,\n"
+                    + "	finalizadora.fzddes observacao,\n"
+                    + "	finalizadora.fzdlercmc7,\n"
+                    + "	iteplapag.ipptxt1,\n"
+                    + "	iteplapag.ipptxt2,\n"
+                    + "	iteplapag.ipptxt3,\n"
+                    + "	iteplapag.ipptxt4,\n"
+                    + "	iteplapag.ippvlrlan,\n"
+                    + "	iteplapag.ippdatven\n"
+                    + "FROM transacao\n"
+                    + "	LEFT OUTER JOIN finalizacao ON (\n"
+                    + "		transacao.trnseq=finalizacao.trnseq\n"
+                    + "		AND transacao.trndat=finalizacao.trndat\n"
+                    + "		AND transacao.cxanum=finalizacao.cxanum\n"
+                    + "	)\n"
+                    + "	LEFT OUTER JOIN iteplapag ON (\n"
+                    + "		finalizacao.trnseq=iteplapag.trnseq\n"
+                    + "		AND finalizacao.trndat=iteplapag.trndat\n"
+                    + "		AND finalizacao.cxanum=iteplapag.cxanum\n"
+                    + "		AND finalizacao.fzdseq=iteplapag.seqfzd)\n"
+                    + "	LEFT OUTER JOIN cliente ON (\n"
+                    + "		cliente.clicod=transacao.clicod\n"
+                    + "	)\n"
+                    + "	LEFT OUTER JOIN finalizadora ON (\n"
+                    + "		finalizadora.fzdcod=finalizacao.fzdcod\n"
+                    + "	)\n"
+                    + "WHERE \n"
+                    + "	transacao.trntip <> '7'\n"
+                    + "	AND finalizacao.fzdesp = '1'\n"
+                    + "ORDER BY\n"
+                    + "	transacao.TRNDAT, transacao.trnseq"
             )) {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
@@ -1227,9 +1227,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             String dataOferta = new SimpleDateFormat("yyyy-MM-dd").format(dtOfertas);
             try (ResultSet rst = stm.executeQuery(
-                    (
-                            usarOfertasDoEncarte ?
-                            "select\n"
+                    (usarOfertasDoEncarte
+                            ? "select\n"
                             + "     ep.PROCOD id_produto,\n"
                             + "     cast('" + dataOferta + "' as date) as datainicial,\n"
                             + "     cast(e.ENCDATFIM as date) datafinal,\n"
@@ -1241,9 +1240,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             + "where\n"
                             + "     e.ENCDATFIM >= '" + dataOferta + "'\n"
                             + "order by\n"
-                            + "     id_produto" :
-                                    
-                            "select distinct\n"
+                            + "     id_produto"
+                            : "select distinct\n"
                             + "    oft.procod id_produto,\n"
                             + "    oft.pprdatini datainicial,\n"
                             + "    oft.pprdatfim datafinal,\n"
@@ -1253,8 +1251,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             + "where\n"
                             + "    oft.pprdatfim >= '" + dataOferta + "'\n"
                             + "order by\n"
-                            + "    id_produto"
-                    )
+                            + "    id_produto")
             )) {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
@@ -1422,27 +1419,27 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     public static enum TipoConexao {
 
         FIREBIRD {
-                    @Override
-                    public Connection getConnection() {
-                        return ConexaoFirebird.getConexao();
-                    }
+            @Override
+            public Connection getConnection() {
+                return ConexaoFirebird.getConexao();
+            }
 
-                    @Override
-                    public String getSistema() {
-                        return "SysPdv(FIREBIRD)";
-                    }
-                },
+            @Override
+            public String getSistema() {
+                return "SysPdv(FIREBIRD)";
+            }
+        },
         SQL_SERVER {
-                    @Override
-                    public Connection getConnection() {
-                        return ConexaoSqlServer.getConexao();
-                    }
+            @Override
+            public Connection getConnection() {
+                return ConexaoSqlServer.getConexao();
+            }
 
-                    @Override
-                    public String getSistema() {
-                        return "SysPdv(SQLSERVER)";
-                    }
-                };
+            @Override
+            public String getSistema() {
+                return "SysPdv(SQLSERVER)";
+            }
+        };
 
         public abstract Connection getConnection();
 
@@ -1507,7 +1504,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                         //String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         //next.setHoraInicio(TIMESTAMP.parse(horaInicio));
                         //next.setHoraTermino(TIMESTAMP.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        //next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                     }
                 }
@@ -1535,6 +1533,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	LOJCOD = " + idLojaCliente + "\n"
                     + "	AND TRNSEQEQP != 0\n"
+                    + " AND TRNTIP = '1'\n"
+                    + " AND v.TRNSTAPAF = '?'\n"
                     + "	AND cast(TRNDATVEN as date) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
                     + "ORDER BY 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -1565,7 +1565,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
         public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-        
+
         private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
@@ -1582,7 +1582,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setProduto(rst.getString("id_produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setPrecoVenda(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCodigoBarras(rst.getString("ean"));
@@ -1605,7 +1605,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	iv.PROCOD id_produto,\n"
                     + "	p.PRODESRDZ descricao,\n"
                     + "	ITVQTDVDA quantidade,\n"
-                    + "	ITVVLRTOT total,\n"
+                    + "	ITVVLRUNI total,\n"
                     + "	ITVVLRDCN desconto,\n"
                     + "	ITVVLRACR acrescimo,\n"
                     + "	ITVCODAUX ean,\n"
@@ -1615,9 +1615,12 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	LEFT JOIN PRODUTO p ON p.PROCOD = iv.PROCOD \n"
                     + "WHERE \n"
                     + "	iv.LOJCOD = '" + idLojaCliente + "'\n"
-                    + "	AND v.TRNSEQEQP != 0\n"
-                    + "	AND v.TRNDAT BETWEEN '" + FORMAT.format(dataInicio) +
-                                    "' and '" + FORMAT.format(dataTermino) + "'\n"
+                    + " AND v.TRNSEQEQP != 0\n"
+                    + " AND v.TRNTIP = '1'\n"
+                    + " AND iv.ITVTIP = 1\n"
+                    + "	AND iv.ITVPRESENTE IS NOT NULL "
+                    + "	AND v.TRNDAT BETWEEN '" + FORMAT.format(dataInicio)
+                    + "' and '" + FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
