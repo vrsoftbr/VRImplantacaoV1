@@ -94,6 +94,7 @@ public enum EScriptLojaOrigemSistema {
             + "where l.id_situacaocadastro = 1\n"
             + "order by\n"
             + "	l.id"),
+    SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     TSl(212, 8, "SELECT\n"
             + "	EMPCOD id,\n"
             + "	EMPNOM descricao\n"
