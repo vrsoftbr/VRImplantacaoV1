@@ -6,6 +6,7 @@
 package vrimplantacao2_5.vo.enums;
 
 import vrimplantacao.dao.interfaces.AriusDAO;
+import vrimplantacao2.dao.cadastro.Stock_PostgresDAO;
 import vrimplantacao2.dao.interfaces.ASoftDAO;
 import vrimplantacao2.dao.interfaces.AccesysDAO;
 import vrimplantacao2.dao.interfaces.AcomDAO;
@@ -435,7 +436,8 @@ public enum ESistema {
     DSIC(211, "DSIC", new DSICDAO()),
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO()),
-    WBA(214,"WBA",new WBADAO());
+    WBA(214,"WBA",new WBADAO()),
+    STOCK(215, "STOCK", new Stock_PostgresDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
