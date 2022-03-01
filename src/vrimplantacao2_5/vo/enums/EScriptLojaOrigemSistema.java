@@ -6,7 +6,7 @@ package vrimplantacao2_5.vo.enums;
  */
 public enum EScriptLojaOrigemSistema {
 
-    ARIUS(197, 9, "SELECT id, id || ' - ' || descritivo || '-' || cnpj_cpf descricao FROM empresas ORDER BY id"),
+    ARIUS(197, 9, "SELECT id ,id || '' - '' || descritivo || '' - '' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5,
             "SELECT l.COD_EMPRESA AS id, "
             + "(l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao "
