@@ -204,20 +204,28 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
     }
 
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
-                OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.CONDICAO_PAGAMENTO,
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.PRAZO_FORNECEDOR
         ));
     }
 
@@ -226,11 +234,13 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
+                OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
-                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
