@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
@@ -138,7 +133,7 @@ public class LiteciDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "p.coditem,\n"
-                    + "p.codbarra,\n"
+                    + "CASE WHEN p.debalanca ='S' THEN p.codbalanca ELSE p.codbarra END codbarra,\n"
                     + "p.codbalanca,\n"
                     + "p.debalanca,\n"
                     + "p.pesound,\n"
