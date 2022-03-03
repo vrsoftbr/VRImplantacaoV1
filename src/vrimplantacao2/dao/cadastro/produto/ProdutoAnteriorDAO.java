@@ -1438,7 +1438,8 @@ public class ProdutoAnteriorDAO {
                     "	implantacao.codant_produto \n" +
                     "where \n" +
                     "	impsistema = '" + sistema + "' and \n" +
-                    "	id_conexao = " + idConexao + "\n" +
+                    "	id_conexao = " + idConexao + " and \n" +
+                    "   dataimportacao = (select min(dataimportacao) from implantacao.codant_produto) \n" +        
                     "limit 1")) {
                 if(rs.next()) {
                     loja = rs.getString("imploja");

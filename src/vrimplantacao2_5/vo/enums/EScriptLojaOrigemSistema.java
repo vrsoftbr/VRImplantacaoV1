@@ -123,7 +123,8 @@ public enum EScriptLojaOrigemSistema {
                     "FROM \n" +
                     "	vw_exp_produtos_zuzu\n" +
                     "WHERE \n" +
-                    "	rownum <= 1");
+                    "	rownum <= 1"),
+    STOCK(215,11,"select empid as id, empnome as descricao from tbempresas;");
 
     private int idSistema;
     private int idBancoDados;
