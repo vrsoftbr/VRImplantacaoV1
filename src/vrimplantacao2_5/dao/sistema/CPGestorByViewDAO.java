@@ -16,17 +16,13 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.vo.enums.ESistema;
@@ -35,7 +31,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
  *
  * @author guilhermegomes
  */
-public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvider {
+public class CPGestorByViewDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
@@ -117,56 +113,6 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
     }
 
     @Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
-        List<MapaTributoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "")) {
-                while (rs.next()) {
-                    result.add(new MapaTributoIMP(
-                            rs.getString(""),
-                            rs.getString("") + " - "
-                            + rs.getString("") + " - "
-                            + rs.getString(""),
-                            rs.getInt(""),
-                            rs.getDouble(""),
-                            rs.getDouble("")));
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "")) {
-                while (rs.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rs.getString(""));
-                    imp.setMerc1Descricao(rs.getString(""));
-                    imp.setMerc2ID(rs.getString(""));
-                    imp.setMerc2Descricao(rs.getString(""));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
@@ -215,7 +161,10 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	ean.PR_CBARRA codigobarras,\n"
                     + "	ean.PR_QTDE qtdembalagemvenda,\n"
                     + "	p.SE_CODIG mercadologico,\n"
-                    + "   p.PR_codigo_MASTER familia,\n"
+                    + " SUBSTR(p.se_codig, 0, 2) mercadologico1,\n"
+                    + "	SUBSTR(p.se_codig, 3, 3) mercadologico2,\n" 
+                    + "	SUBSTR(p.se_codig, 6, 3) mercadologico3,"        
+                    + " p.PR_codigo_MASTER familia,\n"
                     + "	p.cod_depto_ecom,\n"
                     + "	p.UNI_VENDA embalagemvenda,\n"
                     + "	p.PR_VOLUME volume,\n"
@@ -224,7 +173,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.PR_PRECOVENDA_ATUAL precovenda,\n"
                     + "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n"
                     + "	p.PR_CUSTO_SEM_ICMS custosemimposto,\n"
-                    + "   p.PR_DIAS_VALIDADE validade,\n"
+                    + " p.PR_DIAS_VALIDADE validade,\n"
                     + "	p.PR_PESO_VARIAVEL balanca,\n"
                     + "	p.PR_PESO_LIQUIDO pesoliquido,\n"
                     + "	p.PR_PESO_BRUTO pesobruto,\n"
@@ -237,7 +186,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.ESTOQUE_MINIMO estoquemin,\n"
                     + "	p.ncm,\n"
                     + "	ean.PR_CEST cest,\n"
-                    + "   p.pr_codigocstent cstcredito,\n"
+                    + " p.pr_codigocstent cstcredito,\n"
                     + "	p.pr_codigocstsai cstdebito\n"
                     + "FROM \n"
                     + "	vw_exp_produtos_sta p\n"
@@ -251,7 +200,6 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("codigobarras"));
-                    imp.seteBalanca(rs.getString("balanca").equals("S"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagemvenda"));
                     imp.setTipoEmbalagem(rs.getString("embalagemvenda"));
                     imp.setIdFamiliaProduto(rs.getString("familia"));
@@ -261,15 +209,19 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
 
-                    /*imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");*/
+                    imp.setCodMercadologico1(rs.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rs.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rs.getString("mercadologico3"));
+                    
                     ProdutoBalancaVO balanca = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
 
                     if (balanca != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
                         imp.setValidade(balanca.getValidade() > 1 ? balanca.getValidade() : 0);
+                    } else {
+                        imp.seteBalanca(rs.getString("balanca").equals("S"));
+                        imp.setValidade(rs.getInt("validade"));
                     }
 
                     if ((rs.getString("familia") != null)
@@ -282,8 +234,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     if (dataCadastro != null && !dataCadastro.equals("")) {
                         imp.setDataCadastro(SDF.parse(rs.getString("datacadastro")));
                     }
-
-                    imp.setValidade(rs.getInt("validade"));
+                    
                     imp.setSituacaoCadastro(rs.getString("situacaocadastro").equals("S") ? 1 : 0);
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -465,7 +416,7 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	mnc_codig ibgemunicipio,\n"
                     + "	cf_cidad cidade,\n"
                     + "	cf_numero_endereco numero,\n"
-                    + "   cf_complemento complemento,\n"
+                    + " cf_complemento complemento,\n"
                     + "	cf_uf uf,\n"
                     + "	cf_cep cep,\n"
                     + "	cf_telef1 telefone,\n"
@@ -523,32 +474,6 @@ public class CPGestorByViewDAO extends InterfaceDAO implements MapaTributoProvid
                     if (contato != null && !contato.equals("")) {
                         imp.addContato("2", contato, null, null, null);
                     }
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "")) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
-                    imp.setId(rs.getString(""));
-                    imp.setNumeroCupom(rs.getString(""));
-                    imp.setIdCliente(rs.getString(""));
-                    imp.setDataEmissao(rs.getDate(""));
-                    imp.setDataVencimento(rs.getDate(""));
-                    imp.setParcela(rs.getInt(""));
-                    imp.setValor(rs.getDouble(""));
 
                     result.add(imp);
                 }
