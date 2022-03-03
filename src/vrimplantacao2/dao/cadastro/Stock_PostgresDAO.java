@@ -21,6 +21,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -170,28 +171,57 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	depid as cod_mercadologico1,\n"
-                    + "	depdesdepartamento as mercadologico1,\n"
-                    + "	depid as cod_mercadologico2,\n"
-                    + "	depdesdepartamento as mercadologico2,\n"
-                    + "	depid as cod_mercadologico3,\n"
-                    + "	depdesdepartamento as mercadologico3\n"
-                    + "FROM\n"
-                    + "	tbGrupos\n"
-                    + "ORDER by 1,3,5"
+                    "select \n"
+                    + " g.depid merc1,\n"
+                    + " g.depdesdepartamento desc1,\n"
+                    + " case when sg.subgrcodigointerno is null then g.depid \n"
+                    + "      else sg.subgrcodigointerno end merc2,\n"
+                    + " case when sg.subgrdescricao is null then g.depdesdepartamento\n"
+                    + "      else sg.subgrdescricao end desc2,\n"
+                    + " case when sg.subgrcodigointerno is null then g.depid \n"
+                    + "      else sg.subgrcodigointerno end merc3,\n"
+                    + " case when sg.subgrdescricao is null then g.depdesdepartamento\n"
+                    + "      else sg.subgrdescricao end desc3  \n"
+                    + "from tbgrupos g\n"
+                    + "left join tbsubgrupo sg on sg.subgrcodigo = g.depid\n"
+                    + "order by 1,3,5"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("cod_mercadologico1"));
-                    imp.setMerc1Descricao(rst.getString("mercadologico1"));
-                    imp.setMerc2ID(rst.getString("cod_mercadologico2"));
-                    imp.setMerc2Descricao(rst.getString("mercadologico2"));
-                    imp.setMerc3ID(rst.getString("cod_mercadologico3"));
-                    imp.setMerc3Descricao(rst.getString("mercadologico3"));
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc1"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("desc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("desc3"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " p.proid idproduto,\n"
+                    + " f.forid idfornecedor\n"
+                    + "from tbprodutos p\n"
+                    + "join tbfornecedores f on f.fordesfornecedor = p.profornecedorrec"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
                     result.add(imp);
                 }
             }
@@ -217,9 +247,9 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	prolucro AS margem,\n"
                     + "	proqntminima AS estoqueminimo,\n"
                     + "	proqntestoque AS estoque,\n"
-                    + "	proCodDepartamento AS cod_mercadologico1,\n"
-                    + "	proCodDepartamento AS cod_mercadologico2,\n"
-                    + " proCodDepartamento AS cod_mercadologico3,\n"
+                    + "	procoddepartamento AS cod_mercadologico1,\n"
+                    + "	procodsubgrupo AS cod_mercadologico2,\n"
+                    + " procodsubgrupo AS cod_mercadologico3,\n"
                     + "	propeso AS pesobruto,\n"
                     + "	prodataalterado AS dataalteracao,\n"
                     + "	proncm AS ncm,\n"
@@ -272,6 +302,7 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+
                     imp.seteBalanca(rst.getBoolean("balanca"));
 
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_credito"));
