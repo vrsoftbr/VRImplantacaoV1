@@ -738,6 +738,8 @@ public class ClienteRepository {
         vo.setCnpj(imp.getCnpj());
         vo.setIe(imp.getInscricaoestadual());
         vo.setNome(imp.getRazao());
+        vo.setIdConexao(provider.getIdConexao());
+        
         return vo;
     }
 

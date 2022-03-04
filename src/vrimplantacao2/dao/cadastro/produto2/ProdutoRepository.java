@@ -328,7 +328,7 @@ public class ProdutoRepository {
 
                 if (registros > 0 && existeConexao && !lojaJaMigrada) {
                     String lojaModelo = produtoService.
-                                        getLojaModelo(this.provider.getIdConexao(), getSistema());
+                                                getLojaModelo(this.provider.getIdConexao(), getSistema());
 
                     produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
                 }
@@ -1694,6 +1694,7 @@ public class ProdutoRepository {
         destino.setImportSistema(imp.getImportSistema());
         destino.setImportLoja(imp.getImportLoja());
         destino.setImportId(imp.getImportId());
+        destino.setIdConexao(provider.getIdConexao());
         destino.setDescricao(imp.getDescricaoCompleta());
         destino.setPisCofinsCredito(imp.getPiscofinsCstCredito());
         destino.setPisCofinsDebito(imp.getPiscofinsCstDebito());
