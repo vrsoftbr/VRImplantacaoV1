@@ -989,6 +989,7 @@ public class ClienteRepository {
      * @param opt
      * @throws Exception
      */
+    
     public void unificarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
 
         int iniciarEm = 1;
