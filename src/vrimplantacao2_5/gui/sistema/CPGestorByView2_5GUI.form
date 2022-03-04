@@ -28,7 +28,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tabMenu" alignment="1" pref="603" max="32767" attributes="0"/>
+                  <Component id="tabMenu" alignment="1" pref="696" max="32767" attributes="0"/>
                   <Component id="pnlMigrar" alignment="0" max="32767" attributes="0"/>
                   <Component id="pnlConn" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -131,7 +131,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="scpClientes" pref="587" max="32767" attributes="0"/>
+                          <Component id="scpClientes" pref="684" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -167,18 +167,37 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="lblViewProduto" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblViewEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtViewEAN" alignment="0" pref="169" max="32767" attributes="0"/>
-                              <Component id="txtViewProduto" alignment="0" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="lblViewProduto" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblViewEAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtViewEAN" alignment="0" pref="169" max="32767" attributes="0"/>
+                                      <Component id="txtViewProduto" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="lblViewFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtViewFornecedor" alignment="0" min="-2" pref="169" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="vRLabel8" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="txtDelimitadorProd" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="455" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="txtProdutoFile" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="lblViewFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtViewFornecedor" alignment="0" min="-2" pref="169" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="233" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -201,7 +220,22 @@
                           <Component id="lblViewEAN" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtViewEAN" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="100" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDelimitadorProd" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                  <Component id="txtProdutoFile" min="-2" pref="27" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace min="0" pref="41" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -227,6 +261,23 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtViewFornecedor">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Del"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="txtDelimitadorProd">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="^"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtProdutoFile">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Informe o arquivo dos produtos"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

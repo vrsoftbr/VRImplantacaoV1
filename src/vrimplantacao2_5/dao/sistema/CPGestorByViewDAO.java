@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,8 +15,12 @@ import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.utils.arquivo.Arquivo;
+import vrimplantacao2.utils.arquivo.ArquivoFactory;
+import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
@@ -33,11 +38,35 @@ import vrimplantacao2_5.vo.enums.ESistema;
  */
 public class CPGestorByViewDAO extends InterfaceDAO {
 
+    private String arquivo;
+    private final Map<String, String> opcoes = new LinkedHashMap<>();
+    private int complemento;
+    
     @Override
     public String getSistema() {
         return ESistema.CPGESTOR.getNome();
     }
+    
+    public String getArquivo() {
+        return arquivo;
+    }
 
+    public void setArquivo(String arquivo) {
+        this.arquivo = arquivo;
+    }
+    
+    public Map<String, String> getOpcoes() {
+        return opcoes;
+    }
+
+    public int getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(int complemento) {
+        this.complemento = complemento;
+    }
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -259,6 +288,93 @@ public class CPGestorByViewDAO extends InterfaceDAO {
         }
 
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        List<ProdutoIMP> result = new ArrayList<>();
+        Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        ProdutoAnteriorDAO anteriorDAO = new ProdutoAnteriorDAO();
+        
+        if (opt == OpcaoProduto.ICMS) {
+            
+            for (LinhaArquivo linha : arq) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                
+                imp.setImportId(anteriorDAO.
+                                    getCodigoAnteriorEAN(getSistema() + " - " + getComplemento(), 
+                                    getLojaOrigem(), 
+                                    linha.getString("EAN")));
+                
+                //ICMS CREDITO
+                imp.setIcmsCstEntrada(linha.getInt("EI_CST"));
+                imp.setIcmsAliqEntrada(linha.getDouble("EI_ALQ"));
+                imp.setIcmsReducaoEntrada(linha.getDouble("EI_RBC"));
+                
+                if(imp.getIcmsCstEntrada() == 70) {
+                    imp.setIcmsCstEntrada(60);
+                }
+                
+                if(imp.getIcmsCstEntrada() == 10) {
+                    imp.setIcmsCstEntrada(60);
+                }
+                
+                //ICMS CREDITO FORA ESTADO
+                imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
+                
+                //ICMS DEBITO e CONSUMIDOR
+                imp.setIcmsCstSaida(linha.getInt("SNC_CST"));
+                imp.setIcmsAliqSaida(linha.getDouble("SNC_ALQ"));
+                imp.setIcmsReducaoSaida(linha.getDouble("SNC_RBC"));
+                
+                imp.setIcmsCstConsumidor(linha.getInt("SNC_CST"));
+                imp.setIcmsAliqConsumidor(linha.getDouble("SNC_ALQ"));
+                imp.setIcmsReducaoConsumidor(linha.getDouble("SNC_RBC"));
+                
+                //ICMS DEBITO FORA ESTADO
+                imp.setIcmsCstSaidaForaEstado(linha.getInt("SNC_CST"));
+                imp.setIcmsAliqSaidaForaEstado(linha.getDouble("SNC_ALQ"));
+                imp.setIcmsReducaoSaidaForaEstado(linha.getDouble("SNC_RBC"));
+                
+                imp.setIcmsCstSaidaForaEstadoNF(linha.getInt("SNC_CST"));
+                imp.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("SNC_ALQ"));
+                imp.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("SNC_RBC"));
+                
+                result.add(imp);
+            }
+            
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.PIS_COFINS) {
+            
+            for (LinhaArquivo linha : arq) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                
+                imp.setImportId(anteriorDAO.
+                        getCodigoAnteriorEAN(getSistema() + " - " + getComplemento(), 
+                                            getLojaOrigem(), 
+                                            linha.getString("EAN")));
+                
+                imp.setPiscofinsCstCredito(linha.getString("PIS_CST_E"));
+                imp.setPiscofinsCstDebito(linha.getString("PIS_CST_S"));
+                
+                result.add(imp);
+            }
+            
+            return result;
+        }
+
+        return null;
     }
 
     @Override
