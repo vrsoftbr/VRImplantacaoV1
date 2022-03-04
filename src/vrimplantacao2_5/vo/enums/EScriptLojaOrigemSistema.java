@@ -108,7 +108,7 @@ public enum EScriptLojaOrigemSistema {
             + "	tsc008a"),
     SATFACIL(213, 5, "SELECT ID_REGISTRO id, NOME_LOJA descricao FROM PARAMETROS"),
     WBA(214, 5, "SELECT CAST(CODIGO AS integer) AS id, NOME descricao FROM FILIAL ORDER BY 1"),
-    LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS razao FROM empresa ORDER BY 1"),
+    LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS descricao FROM empresa ORDER BY 1"),
     CPGESTOR(21, 9, "SELECT \n" +
                     "	LJ_ASSOCIACAO id,\n" +
                     "	''SANTA FE'' razao\n" +

@@ -36,29 +36,6 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         tabClientes.setOpcoesDisponiveis(cpgestorDAO);
         tabProdutos.btnMapaTribut.setEnabled(false);
 
-        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
-            @Override
-            public MapaTributoProvider getProvider() {
-                return cpgestorDAO;
-            }
-
-            @Override
-            public String getSistema() {
-                return cpgestorDAO.getSistema() + " - " + pnlConn.idConexao;
-            }
-
-            @Override
-            public String getLoja() {
-                cpgestorDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return cpgestorDAO.getLojaOrigem();
-            }
-
-            @Override
-            public Frame getFrame() {
-                return mdiFrame;
-            }
-        });
-
         pnlConn.setSistema(ESistema.CPGESTOR);
         pnlConn.getNomeConexao();
 
