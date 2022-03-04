@@ -48,6 +48,10 @@ public class FornecedorRepository {
         this.logController = new LogController();
     }
     
+    public String getLoja() {
+        return provider.getLojaOrigem();
+    }
+    
     public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
         FornecedorService fornecedorService = new FornecedorService();
         this.forcarUnificacao = provider.getOpcoes().contains(OpcaoFornecedor.FORCAR_UNIFICACAO);
@@ -67,12 +71,12 @@ public class FornecedorRepository {
                 boolean existeConexao = fornecedorService.
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
 
-                boolean lojaMigrada = fornecedorService.
-                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
-
-                if (registro > 0 && existeConexao && !lojaMigrada) {
-                    String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-
+                String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+                                
+                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+                    
+                    this.provider.setStatus("Fornecedor - Copiando código anterior Fornecedor...");
+                    
                     fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
 

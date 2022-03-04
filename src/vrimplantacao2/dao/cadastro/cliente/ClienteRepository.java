@@ -57,6 +57,10 @@ public class ClienteRepository {
         this.provider = provider;
         this.logController = new LogController();
     }
+    
+    public String getLoja() {
+        return provider.getLojaOrigem();
+    }
 
     public void salvarClientePreferencial2_5(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
         ClientePreferencialService clienteService = new ClientePreferencialService();
@@ -76,12 +80,11 @@ public class ClienteRepository {
                 boolean existeConexao = clienteService.
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
 
-                boolean lojaMigrada = clienteService.
-                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
-
-                if (registro > 0 && existeConexao && !lojaMigrada) {
-                    String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-
+                String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+                
+                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+                    
+                    this.provider.setNotificacao("Cliente Preferencial - Copiando código anterior Cliente...", clientes.size());                    
                     clienteService.copiarCodantClientePreferencial(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
 
@@ -109,12 +112,11 @@ public class ClienteRepository {
                 boolean existeConexao = clienteService.
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
 
-                boolean lojaMigrada = clienteService.
-                        verificaMultilojaMigrada(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
-
-                if (registro > 0 && existeConexao && !lojaMigrada) {
-                    String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-
+                String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+                
+                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+                    
+                    this.provider.setNotificacao("Cliente Eventual - Copiando código anterior Cliente...", clientes.size());
                     clienteService.copiarCodantClienteEventual(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
 

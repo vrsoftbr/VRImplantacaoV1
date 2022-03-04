@@ -90,11 +90,11 @@ public class ProdutoRepository {
     public Set<OpcaoProduto> getOpcoes() {
         return provider.getOpcoes();
     }
-    
+
     public boolean isForcarUnificacao() {
         return this.forcarUnificacao;
     }
-    
+
     public void setForcarUnificacao(boolean forcarUnificacao) {
         this.forcarUnificacao = forcarUnificacao;
     }
@@ -126,15 +126,15 @@ public class ProdutoRepository {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             String dataImportacao = sdf.format(new Date());
 
             setNotify("Gravando os produtos...", organizados.size());
             for (ProdutoIMP imp : organizados) {
-                
+
                 StringBuilder rep = new StringBuilder();
                 imp.setImportSistema(this.provider.getSistema());
-                
+
                 try {
 
                     rep
@@ -184,7 +184,6 @@ public class ProdutoRepository {
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
                                     anterior.setDataHora(dataImportacao);
-                                  
 
                                     provider.anterior().salvar(anterior);
                                     notificar();
@@ -279,7 +278,7 @@ public class ProdutoRepository {
                     provider.complemento().copiarProdutoComplemento(getLojaVR(), loja.getId());
                 }
             }
-            
+
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_PRODUTO.getId(),
                     sdf.format(new Date()),
@@ -297,39 +296,39 @@ public class ProdutoRepository {
         ProdutoService produtoService = new ProdutoService();
 
         forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
-        
+
         int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                 registros = produtoService.verificaRegistro();
-        
+
         String impSistema = produtoService.getImpSistemaInicial().trim();
-                
-        if(!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
+
+        if (!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
                 && registros == 0) {
             throw new VRException("Favor, selecionar loja matriz para primeira importação!\n"
                     + "Os códigos devem ser mantidos da loja principal!");
         }
-        
+
         if (this.forcarUnificacao) {
             unificar(produtos);
         } else {
             /**
-             * Se já existe registro na codant e a nova conexão não existe na codant ou
-             * o nome do sistema (sistema ' - ' complemento) da primeira importação é diferente 
-             * do sistema da nova importação, então a rotina define que é uma unificação.
+             * Se já existe registro na codant e a nova conexão não existe na
+             * codant ou o nome do sistema (sistema ' - ' complemento) da
+             * primeira importação é diferente do sistema da nova importação,
+             * então a rotina define que é uma unificação.
              */
             if (registros > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(getSistema()))) {
                 unificar(produtos);
             } else {
                 boolean existeConexao = produtoService.
                         verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
+                
+                String lojaModelo = produtoService.
+                            getLojaModelo(this.provider.getIdConexao(), getSistema());
 
-                boolean lojaJaMigrada = produtoService.
-                        verificaMultilojaMigrada(getLoja(), getSistema(), this.provider.getIdConexao());
-
-                if (registros > 0 && existeConexao && !lojaJaMigrada) {
-                    String lojaModelo = produtoService.
-                                                getLojaModelo(this.provider.getIdConexao(), getSistema());
-
+                if (registros > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+                    
+                    provider.setStatus("Produtos - Copiando código anterior produto...");
                     produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
                 }
 
@@ -560,7 +559,7 @@ public class ProdutoRepository {
                     }
                     provider.next();
                 }
-                
+
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
@@ -571,7 +570,7 @@ public class ProdutoRepository {
                             sdf.format(new Date()),
                             provider.getLojaVR());
                 }
-                
+
                 if (optSimples.contains(OpcaoProduto.TROCA)) {
                     provider.complemento().gerarLogDeTroca();
                 }
@@ -652,7 +651,7 @@ public class ProdutoRepository {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             //Executa log de operação
             logController.executar(EOperacao.UNIFICAR_PRODUTO.getId(),
                     sdf.format(new Date()),
