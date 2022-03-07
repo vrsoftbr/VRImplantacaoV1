@@ -73,8 +73,8 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 
 /**
- *
- * @author Alan
+ * @author Leandro
+ * @author2_5 Alan
  */
 public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     
