@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -22,6 +23,7 @@ public class ProdutoAnteriorDAO {
     private String importSistema = "";
     private String importLoja = "";
     private boolean carregarTodosOsAnteriores = false;
+    private ProdutoRepositoryProvider provider;
 
     public ProdutoAnteriorDAO() {
     }
@@ -63,14 +65,14 @@ public class ProdutoAnteriorDAO {
         }
         return codigoAnterior;
     }
-    
+
     public MultiMap<String, ProdutoAnteriorVO> getForcarNovo() throws Exception {
         if (forcarNovo == null) {
             atualizarForcarNovo();
         }
         return forcarNovo;
     }
-    
+
     private void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
@@ -129,8 +131,8 @@ public class ProdutoAnteriorDAO {
                     + "                      icmscreditoid character varying,\n"
                     + "                      icmscreditoforaestadoid character varying,\n"
                     + "                      icmsconsumidorid character varying,\n"
-                    + "                      dataalteracao timestamp, \n"        
-                    + "                      datacadastro timestamp, \n"        
+                    + "                      dataalteracao timestamp, \n"
+                    + "                      datacadastro timestamp, \n"
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
@@ -211,7 +213,7 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public int getCodigoAnterior2ByEAN(String sistema, String loja, String id) throws Exception {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
@@ -309,19 +311,19 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	cp.codigoatual\n" +
-                    "from\n" +
-                    "	implantacao.codant_ean ce\n" +
-                    "	join implantacao.codant_produto cp on\n" +
-                    "		ce.importsistema = cp.impsistema and\n" +
-                    "		ce.importloja = cp.imploja and\n" +
-                    "		ce.importid = cp.impid\n" +
-                    "where\n" +
-                    "	ce.ean::bigint = " + ean + " and\n" +
-                    "	ce.importsistema = '" + sistema + "' and\n" +
-                    "	ce.importloja = '" + loja + "'\n" +
-                    "limit 1\n"
+                    "select\n"
+                    + "	cp.codigoatual\n"
+                    + "from\n"
+                    + "	implantacao.codant_ean ce\n"
+                    + "	join implantacao.codant_produto cp on\n"
+                    + "		ce.importsistema = cp.impsistema and\n"
+                    + "		ce.importloja = cp.imploja and\n"
+                    + "		ce.importid = cp.impid\n"
+                    + "where\n"
+                    + "	ce.ean::bigint = " + ean + " and\n"
+                    + "	ce.importsistema = '" + sistema + "' and\n"
+                    + "	ce.importloja = '" + loja + "'\n"
+                    + "limit 1\n"
             )) {
 
                 if (rst.next()) {
@@ -338,19 +340,19 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	cp.codigoatual\n" +
-                    "from\n" +
-                    "	implantacao.codant_ean ce\n" +
-                    "	join implantacao.codant_produto cp on\n" +
-                    "		ce.importsistema = cp.impsistema and\n" +
-                    "		ce.importloja = cp.imploja and\n" +
-                    "		ce.importid = cp.impid\n" +
-                    "where\n" +
-                    "	ce.ean::bigint = " + ean + " and\n" +
-                    "	ce.importsistema = '" + sistema + "' and\n" +
-                    "	ce.importloja = '" + loja + "'\n" +
-                    "limit 1\n"
+                    "select\n"
+                    + "	cp.codigoatual\n"
+                    + "from\n"
+                    + "	implantacao.codant_ean ce\n"
+                    + "	join implantacao.codant_produto cp on\n"
+                    + "		ce.importsistema = cp.impsistema and\n"
+                    + "		ce.importloja = cp.imploja and\n"
+                    + "		ce.importid = cp.impid\n"
+                    + "where\n"
+                    + "	ce.ean::bigint = " + ean + " and\n"
+                    + "	ce.importsistema = '" + sistema + "' and\n"
+                    + "	ce.importloja = '" + loja + "'\n"
+                    + "limit 1\n"
             )) {
 
                 if (rst.next()) {
@@ -362,7 +364,7 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public String getCodigoAnteriorCpGestor(String ean) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
@@ -411,7 +413,7 @@ public class ProdutoAnteriorDAO {
                     + "	ant.cest,\n"
                     + "	ant.contadorimportacao,\n"
                     + "	ant.novo,\n"
-                    + " ant.id_conexao\n"        
+                    + " ant.id_conexao\n"
                     + "FROM \n"
                     + "	implantacao.codant_produto ant\n"
                     + "	left join produto p on ant.codigoatual = p.id\n"
@@ -471,46 +473,46 @@ public class ProdutoAnteriorDAO {
         createTable();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
-                    "	ant.impsistema, \n" +
-                    "	ant.imploja, \n" +
-                    "	ant.impid, \n" +
-                    "	ant.descricao, \n" +
-                    "	p.descricaocompleta, \n" +
-                    "	p.descricaoreduzida, \n" +
-                    "	p.descricaogondola, \n" +
-                    "	ant.codigoatual, \n" +
-                    "	ant.piscofinscredito, \n" +
-                    "	ant.piscofinsdebito, \n" +
-                    "	ant.piscofinsnaturezareceita, \n" +
-                    "	ant.icmscst, \n" +
-                    "	ant.icmsaliq, \n" +
-                    "	ant.icmsreducao, \n" +
-                    "	ant.estoque, \n" +
-                    "	ant.e_balanca, \n" +
-                    "	ant.custosemimposto, \n" +
-                    "	ant.custocomimposto, \n" +
-                    "	ant.margem, \n" +
-                    "	ant.precovenda, \n" +
-                    "	ant.ncm, \n" +
-                    "	ant.cest,\n" +
-                    "	ant.contadorimportacao,\n" +
-                    "	ant.novo\n" +
-                    "FROM \n" +
-                    "	implantacao.codant_produto ant\n" +
-                    "	left join produto p on\n" +
-                    "		ant.codigoatual = p.id\n" +
-                    "where\n" +
-                    "    ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n" +
-                    "    ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + " and    \n" +
-                    "	ant.obsimportacao in (\n" +
-                    "		'PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)',\n" +
-                    "		'PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE vrimplantacao2.dao.cadastro.produto2.ProdutoRepository'\n" +
-                    "	)\n" +
-                    "order by\n" +
-                    "	ant.impsistema, \n" +
-                    "	ant.imploja, \n" +
-                    "	ant.impid"
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on\n"
+                    + "		ant.codigoatual = p.id\n"
+                    + "where\n"
+                    + "    ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n"
+                    + "    ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + " and    \n"
+                    + "	ant.obsimportacao in (\n"
+                    + "		'PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)',\n"
+                    + "		'PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE vrimplantacao2.dao.cadastro.produto2.ProdutoRepository'\n"
+                    + "	)\n"
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid"
             )) {
                 int cont = 1;
                 while (rst.next()) {
@@ -551,7 +553,7 @@ public class ProdutoAnteriorDAO {
             }
         }
     }
-    
+
     private int contador = -1;
 
     private void obtemContador() throws Exception {
@@ -602,10 +604,10 @@ public class ProdutoAnteriorDAO {
                         obtemContador();
                     }
                     sql.put("contadorimportacao", contador);
-                    
+
                     sql.put("situacaocadastro", vo.getSituacaoCadastro().getId());
                     sql.put("dataimportacao", vo.getDataHora());
-                    sql.put("obsimportacao", vo.getObsImportacao());                    
+                    sql.put("obsimportacao", vo.getObsImportacao());
 
                     sql.put("icmscstsaida", vo.getIcmsCstSaida());
                     sql.put("icmsaliqsaida", vo.getIcmsAliqSaida());
@@ -639,7 +641,7 @@ public class ProdutoAnteriorDAO {
                     sql.put("icmscreditoforaestadoid", vo.getIcmsCreditoForaEstadoId());
 
                     sql.put("icmsconsumidorid", vo.getIcmsConsumidorId());
-                    
+
                     try {
                         stm.execute(sql.getInsert());
                     } catch (Exception e) {
@@ -663,14 +665,13 @@ public class ProdutoAnteriorDAO {
     public void salvar(ProdutoAnteriorVO anterior) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             //<editor-fold defaultstate="collapsed" desc="Conflito de Insert - Melhoria">
             /*INSERT INTO cliente VALUES (2, 'MARIAA')
             ON CONFLICT (id)
             DO
               UPDATE SET nome = 'MARIAA';*/
             //</editor-fold>
-
             sql.setTableName("codant_produto");
             sql.setSchema("implantacao");
             sql.put("impsistema", anterior.getImportSistema());
@@ -701,43 +702,43 @@ public class ProdutoAnteriorDAO {
             sql.put("situacaocadastro", anterior.getSituacaoCadastro().getId());
             sql.put("dataimportacao", "'" + anterior.getDataHora() + "'");
             sql.put("obsimportacao", anterior.getObsImportacao());
-            
+
             sql.put("icmscstsaida", anterior.getIcmsCstSaida());
             sql.put("icmsaliqsaida", anterior.getIcmsAliqSaida());
             sql.put("icmsreducaosaida", anterior.getIcmsReducaoSaida());
-            
+
             sql.put("icmscstsaidaforaestado", anterior.getIcmsCstSaidaForaEstado());
             sql.put("icmsaliqsaidaforaestado", anterior.getIcmsAliqSaidaForaEstado());
             sql.put("icmsreducaosaidaforaestado", anterior.getIcmsReducaoSaidaForaEstado());
-            
+
             sql.put("icmscstsaidaforaestadonf", anterior.getIcmsCstSaidaForaEstadoNf());
             sql.put("icmsaliqsaidaforaestadonf", anterior.getIcmsAliqSaidaForaEstadoNf());
             sql.put("icmsreducaosaidaforaestadonf", anterior.getIcmsReducaoSaidaForaEstadoNf());
-            
+
             sql.put("icmscstentrada", anterior.getIcmsCstEntrada());
             sql.put("icmsaliqentrada", anterior.getIcmsAliqEntrada());
             sql.put("icmsreducaoentrada", anterior.getIcmsReducaoEntrada());
-            
+
             sql.put("icmscstentradaforaestado", anterior.getIcmsCstEntradaForaEstado());
             sql.put("icmsaliqentradaforaestado", anterior.getIcmsAliqEntradaForaEstado());
             sql.put("icmsreducaoentradaforaestado", anterior.getIcmsReducaoEntradaForaEstado());
-            
+
             sql.put("icmscstconsumidor", anterior.getIcmsCstConsumidor());
             sql.put("icmsaliqconsumidor", anterior.getIcmsAliqConsumidor());
             sql.put("icmsreducaoconsumidor", anterior.getIcmsReducaoConsumidor());
-            
+
             sql.put("icmsdebitoid", anterior.getIcmsDebitoId());
             sql.put("icmsdebitoforaestadoid", anterior.getIcmsDebitoForaEstadoId());
             sql.put("icmsdebitoforaestadonfid", anterior.getIcmsDebitoForaEstadoIdNf());
-            
+
             sql.put("icmscreditoid", anterior.getIcmsCreditoId());
             sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
-            
+
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
             sql.put("datacadastro", anterior.getDataCadastro());
 
             sql.put("id_conexao", anterior.getIdConexao());
-            
+
             try {
                 stm.execute(sql.getInsert());
                 getCodigoAnterior().put(
@@ -760,12 +761,12 @@ public class ProdutoAnteriorDAO {
             sql.setSchema("implantacao");
             sql.setTableName("codant_produto");
             sql.put("codigoatual", (anterior.getCodigoAtual() != null ? anterior.getCodigoAtual().getId() : null));
-            
+
             sql.setWhere(
                     "impsistema = '" + anterior.getImportSistema() + "'"
                     + " and imploja = '" + anterior.getImportLoja() + "'"
                     + " and impid = '" + anterior.getImportId() + "'");
-            
+
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }
@@ -781,47 +782,47 @@ public class ProdutoAnteriorDAO {
             sql.put("icmscst", anterior.getIcmsCst());
             sql.put("icmsaliq", anterior.getIcmsAliq());
             sql.put("icmsreducao", anterior.getIcmsReducao());
-            
+
             sql.put("icmscstsaida", anterior.getIcmsCstSaida());
             sql.put("icmsaliqsaida", anterior.getIcmsAliqSaida());
             sql.put("icmsreducaosaida", anterior.getIcmsReducaoSaida());
-            
+
             sql.put("icmscstsaidaforaestado", anterior.getIcmsCstSaidaForaEstado());
             sql.put("icmsaliqsaidaforaestado", anterior.getIcmsAliqSaidaForaEstado());
             sql.put("icmsreducaosaidaforaestado", anterior.getIcmsReducaoSaidaForaEstado());
-            
+
             sql.put("icmscstsaidaforaestadonf", anterior.getIcmsCstSaidaForaEstadoNf());
             sql.put("icmsaliqsaidaforaestadonf", anterior.getIcmsAliqSaidaForaEstadoNf());
             sql.put("icmsreducaosaidaforaestadonf", anterior.getIcmsReducaoSaidaForaEstadoNf());
-            
+
             sql.put("icmscstentrada", anterior.getIcmsCstEntrada());
             sql.put("icmsaliqentrada", anterior.getIcmsAliqEntrada());
             sql.put("icmsreducaoentrada", anterior.getIcmsReducaoEntrada());
-            
+
             sql.put("icmscstentradaforaestado", anterior.getIcmsCstEntradaForaEstado());
             sql.put("icmsaliqentradaforaestado", anterior.getIcmsAliqEntradaForaEstado());
             sql.put("icmsreducaoentradaforaestado", anterior.getIcmsReducaoEntradaForaEstado());
-            
+
             sql.put("icmscstconsumidor", anterior.getIcmsCstConsumidor());
             sql.put("icmsaliqconsumidor", anterior.getIcmsAliqConsumidor());
             sql.put("icmsreducaoconsumidor", anterior.getIcmsReducaoConsumidor());
-            
+
             sql.put("icmsdebitoid", anterior.getIcmsDebitoId());
             sql.put("icmsdebitoforaestadoid", anterior.getIcmsDebitoForaEstadoId());
             sql.put("icmsdebitoforaestadonfid", anterior.getIcmsDebitoForaEstadoIdNf());
-            
+
             sql.put("icmscreditoid", anterior.getIcmsCreditoId());
             sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
-            
+
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
-            
+
             sql.put("dataalteracao", anterior.getDataHoraAlteracao());
-            
+
             sql.setWhere(
                     "impsistema = '" + anterior.getImportSistema() + "'"
                     + " and imploja = '" + anterior.getImportLoja() + "'"
                     + " and impid = '" + anterior.getImportId() + "'");
-            
+
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }
@@ -837,54 +838,54 @@ public class ProdutoAnteriorDAO {
             sql.put("icmscst", anterior.getIcmsCst());
             sql.put("icmsaliq", anterior.getIcmsAliq());
             sql.put("icmsreducao", anterior.getIcmsReducao());
-            
+
             sql.put("icmscstsaida", anterior.getIcmsCstSaida());
             sql.put("icmsaliqsaida", anterior.getIcmsAliqSaida());
             sql.put("icmsreducaosaida", anterior.getIcmsReducaoSaida());
-            
+
             sql.put("icmscstsaidaforaestado", anterior.getIcmsCstSaidaForaEstado());
             sql.put("icmsaliqsaidaforaestado", anterior.getIcmsAliqSaidaForaEstado());
             sql.put("icmsreducaosaidaforaestado", anterior.getIcmsReducaoSaidaForaEstado());
-            
+
             sql.put("icmscstsaidaforaestadonf", anterior.getIcmsCstSaidaForaEstadoNf());
             sql.put("icmsaliqsaidaforaestadonf", anterior.getIcmsAliqSaidaForaEstadoNf());
             sql.put("icmsreducaosaidaforaestadonf", anterior.getIcmsReducaoSaidaForaEstadoNf());
-            
+
             sql.put("icmscstentrada", anterior.getIcmsCstEntrada());
             sql.put("icmsaliqentrada", anterior.getIcmsAliqEntrada());
             sql.put("icmsreducaoentrada", anterior.getIcmsReducaoEntrada());
-            
+
             sql.put("icmscstentradaforaestado", anterior.getIcmsCstEntradaForaEstado());
             sql.put("icmsaliqentradaforaestado", anterior.getIcmsAliqEntradaForaEstado());
             sql.put("icmsreducaoentradaforaestado", anterior.getIcmsReducaoEntradaForaEstado());
-            
+
             sql.put("icmscstconsumidor", anterior.getIcmsCstConsumidor());
             sql.put("icmsaliqconsumidor", anterior.getIcmsAliqConsumidor());
             sql.put("icmsreducaoconsumidor", anterior.getIcmsReducaoConsumidor());
-            
+
             sql.put("icmsdebitoid", anterior.getIcmsDebitoId());
             sql.put("icmsdebitoforaestadoid", anterior.getIcmsDebitoForaEstadoId());
             sql.put("icmsdebitoforaestadonfid", anterior.getIcmsDebitoForaEstadoIdNf());
-            
+
             sql.put("icmscreditoid", anterior.getIcmsCreditoId());
             sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
-            
+
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
-            
+
             sql.put("dataalteracao", anterior.getDataHoraAlteracao());
-            
+
             sql.setWhere(
                     "impsistema = '" + anterior.getImportSistema() + "'"
                     + " and imploja = '" + anterior.getImportLoja() + "'"
                     + " and impid = '" + anterior.getImportId() + "'");
-                
+
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }
-            
+
         }
     }
-    
+
     public Map<String, ProdutoAnteriorVO> getCodigoAnterior(String sistema, String loja) throws Exception {
         Map<String, ProdutoAnteriorVO> result = new LinkedHashMap<>();
         createTable();
@@ -1000,7 +1001,7 @@ public class ProdutoAnteriorDAO {
 
         return result;
     }
-    
+
     /**
      * Retorna o código atual dos produtos através do código de importação.
      *
@@ -1058,7 +1059,7 @@ public class ProdutoAnteriorDAO {
         }
         return result;
     }
-    
+
     public ProdutoAnteriorVO getProdutoAnterior(String sistema, String loja, String id) throws Exception {
         createTable();
         try (Statement stm = Conexao.createStatement()) {
@@ -1234,7 +1235,7 @@ public class ProdutoAnteriorDAO {
                     + "where \n"
                     + "       ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
                     + "       ant.impid = " + SQLUtils.stringSQL(id) + "\n and\n"
-                    + "       ant.codigoatual is not null\n"        
+                    + "       ant.codigoatual is not null\n"
                     + "order by\n"
                     + "	ant.impsistema, \n"
                     + "	ant.impid"
@@ -1257,53 +1258,53 @@ public class ProdutoAnteriorDAO {
 
         return null;
     }
-    
+
     public void atualizarForcarNovo() throws Exception {
         forcarNovo = new MultiMap<>(3);
         criarColunaCodAnt();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	impsistema,\n" +
-                    "	imploja,\n" +
-                    "	impid\n" +
-                    "from \n" +
-                    "	implantacao.codant_produto\n" +
-                    "where \n" +
-                    "	impsistema = '" + getImportSistema() + "' and \n" +
-                    "	imploja = '" + getImportLoja() + "' and \n" +
-                    "	forcarnovo is true"
+                    "select \n"
+                    + "	impsistema,\n"
+                    + "	imploja,\n"
+                    + "	impid\n"
+                    + "from \n"
+                    + "	implantacao.codant_produto\n"
+                    + "where \n"
+                    + "	impsistema = '" + getImportSistema() + "' and \n"
+                    + "	imploja = '" + getImportLoja() + "' and \n"
+                    + "	forcarnovo is true"
             )) {
                 while (rst.next()) {
                     ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
-                    
+
                     vo.setImportSistema(rst.getString("impsistema"));
                     vo.setImportLoja(rst.getString("imploja"));
                     vo.setImportId(rst.getString("impid"));
-                    
+
                     forcarNovo.put(vo, vo.getChave());
                 }
             }
         }
     }
-    
+
     private void criarColunaCodAnt() throws Exception {
-        try(Statement stm = Conexao.createStatement()) {
+        try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "do $$\n" +
-                    "begin\n" +
-                    "	if not exists (\n" +
-                    "       select \n" +
-                    "		* \n" +
-                    "	    from \n" +
-                    "		information_schema.columns\n" +
-                    "       where \n" +
-                    "		table_schema = 'implantacao' and \n" +
-                    "		column_name = 'forcarnovo') then \n" +
-                    "	execute 'alter table implantacao.codant_produto add column forcarnovo boolean default false'; \n" +
-                    "end if;\n" +
-                    "end\n" +
-                    "$$");
+                    "do $$\n"
+                    + "begin\n"
+                    + "	if not exists (\n"
+                    + "       select \n"
+                    + "		* \n"
+                    + "	    from \n"
+                    + "		information_schema.columns\n"
+                    + "       where \n"
+                    + "		table_schema = 'implantacao' and \n"
+                    + "		column_name = 'forcarnovo') then \n"
+                    + "	execute 'alter table implantacao.codant_produto add column forcarnovo boolean default false'; \n"
+                    + "end if;\n"
+                    + "end\n"
+                    + "$$");
         }
     }
 
@@ -1311,21 +1312,21 @@ public class ProdutoAnteriorDAO {
         MultiMap<String, Integer> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	antean.importid,\n" +
-                    "	antean.ean,\n" +
-                    "	ant.codigoatual\n" +
-                    "from\n" +
-                    "	implantacao.codant_produto ant\n" +
-                    "	join implantacao.codant_ean antean on\n" +
-                    "		ant.impsistema = antean.importsistema and\n" +
-                    "		ant.imploja = antean.importloja and\n" +
-                    "		ant.impid = antean.importid \n" +
-                    "where\n" +
-                    "	ant.impsistema = '" + sistema + "' and\n" +
-                    "	ant.imploja = '" + loja + "'\n" +
-                    "order by\n" +
-                    "	1, 2"
+                    "select\n"
+                    + "	antean.importid,\n"
+                    + "	antean.ean,\n"
+                    + "	ant.codigoatual\n"
+                    + "from\n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	join implantacao.codant_ean antean on\n"
+                    + "		ant.impsistema = antean.importsistema and\n"
+                    + "		ant.imploja = antean.importloja and\n"
+                    + "		ant.impid = antean.importid \n"
+                    + "where\n"
+                    + "	ant.impsistema = '" + sistema + "' and\n"
+                    + "	ant.imploja = '" + loja + "'\n"
+                    + "order by\n"
+                    + "	1, 2"
             )) {
                 while (rst.next()) {
                     result.put(
@@ -1338,21 +1339,15 @@ public class ProdutoAnteriorDAO {
         }
         return result;
     }
-    
+
     public int verificaRegistro() throws Exception {
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    /*"select \n" +
-                    "	count(*) qtd \n" +
-                    "from \n" +
-                    "	implantacao.codant_produto \n" +
-                    "where \n" +
-                    "	codigoatual in (select codigoatual from implantacao.codant_produto limit 100)"*/
-                    "select\n" +
-                    "	count(*) qtd\n" +
-                    "	from\n" +
-                    "implantacao.codant_produto\n" +
-                    "where codigoatual is not null"
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	count(*) qtd\n"
+                    + "	from\n"
+                    + "implantacao.codant_produto\n"
+                    + "where codigoatual is not null"
             )) {
                 if (rs.next()) {
                     return rs.getInt("qtd");
@@ -1362,460 +1357,461 @@ public class ProdutoAnteriorDAO {
             }
         }
     }
-    
+
     public int getConexaoMigrada(int idConexao, String sistema) throws Exception {
         int conexao = 0;
-        
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id_conexao \n" +
-                    "from \n" +
-                    "	implantacao.codant_produto\n" +
-                    "where \n" +
-                    "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "   id_conexao = " + idConexao + " limit 1")) {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	id_conexao \n"
+                    + "from \n"
+                    + "	implantacao.codant_produto\n"
+                    + "where \n"
+                    + "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     conexao = rs.getInt("id_conexao");
                 }
             }
         }
-        
+
         return conexao;
     }
-    
+
     public boolean verificaMigracaoMultiloja(String lojaOrigem, String sistema, int idConexao) throws Exception {
         boolean conexao = false;
-        
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id_conexao \n" +
-                    "from \n" +
-                    "	implantacao.codant_produto\n" +
-                    "where \n" +
-                    "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "   id_conexao = " + idConexao + " limit 1")) {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	id_conexao \n"
+                    + "from \n"
+                    + "	implantacao.codant_produto\n"
+                    + "where \n"
+                    + "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     conexao = true;
                 }
             }
         }
-        
+
         return conexao;
     }
-    
+
     public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
         boolean lojaJaMigrada = false;
-        
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id_conexao \n" +
-                    "from \n" +
-                    "	implantacao.codant_produto\n" +
-                    "where \n" +
-                    "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "   imploja = " + SQLUtils.stringSQL(lojaOrigem) + "and\n" +        
-                    "   id_conexao = " + idConexao + " limit 1")) {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	id_conexao \n"
+                    + "from \n"
+                    + "	implantacao.codant_produto\n"
+                    + "where \n"
+                    + "	impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "   imploja = " + SQLUtils.stringSQL(lojaOrigem) + "and\n"
+                    + "   id_conexao = " + idConexao + " limit 1")) {
                 if (rs.next()) {
                     lojaJaMigrada = true;
                 }
             }
         }
-        
+
         return lojaJaMigrada;
     }
-    
+
     public String getLojaModelo(int idConexao, String sistema) throws Exception {
         String loja = "";
-        
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	imploja\n" +
-                    "from \n" +
-                    "	implantacao.codant_produto \n" +
-                    "where \n" +
-                    "	impsistema = '" + sistema + "' and \n" +
-                    "	id_conexao = " + idConexao + "\n" +
-                    "limit 1")) {
-                if(rs.next()) {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	imploja\n"
+                    + "from \n"
+                    + "	implantacao.codant_produto \n"
+                    + "where \n"
+                    + "	impsistema = '" + sistema + "' and \n"
+                    + "	id_conexao = " + idConexao + " and \n"
+                    + "   dataimportacao = (select min(dataimportacao) from implantacao.codant_produto) \n"
+                    + "limit 1")) {
+                if (rs.next()) {
                     loja = rs.getString("imploja");
                 }
             }
         }
-        
+
         return loja;
     }
-    
+
     public void copiarCodantProduto(String sistema, String lojaModelo, String lojaNova) throws Exception {
-        
-        String sql = 
-                "create temp table implantacao_lojas (sistema varchar, loja_modelo varchar, loja_nova varchar) on commit drop;\n" +
-                "insert into implantacao_lojas values ('" + sistema + "', '" + lojaModelo + "', '" + lojaNova + "');\n" +
-                "\n" +
-                "do $$\n" +
-                "declare\n" +
-                "	r record;\n" +
-                "begin\n" +
-                "	for r in select * from implantacao_lojas\n" +
-                "	loop\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clientepreferencial' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.codant_clientepreferencial\n" +
-                "			select\n" +
-                "				r.sistema,\n" +
-                "				r.loja_nova,\n" +
-                "				id,\n" +
-                "				codigoatual,\n" +
-                "				cnpj,\n" +
-                "				ie,\n" +
-                "				nome,\n" +
-                "				false,\n" +
-                "                               id_conexao\n" +
-                "			from\n" +
-                "				implantacao.codant_clientepreferencial\n" +
-                "			where\n" +
-                "				sistema = r.sistema and\n" +
-                "				loja = r.loja_modelo and\n" +
-                "				id in (\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_clientepreferencial\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_clientepreferencial	\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "\n" +
-                "		--Clientes eventuais\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clienteeventual' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.codant_clienteeventual\n" +
-                "			select\n" +
-                "				r.sistema,\n" +
-                "				r.loja_nova,\n" +
-                "				id,\n" +
-                "				codigoatual,\n" +
-                "				cnpj,\n" +
-                "				ie,\n" +
-                "				nome,\n" +
-                "				false,\n" +
-                "                               id_conexao\n" +
-                "			from\n" +
-                "				implantacao.codant_clienteeventual\n" +
-                "			where\n" +
-                "				sistema = r.sistema and\n" +
-                "				loja = r.loja_modelo and\n" +
-                "				id in (\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_clienteeventual\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_clienteeventual	\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "\n" +
-                "		--Produtos\n" +
-                "\n" +
-                "		insert into implantacao.codant_produto\n" +
-                "		SELECT \n" +
-                "			impsistema, \n" +
-                "			r.loja_nova imploja,\n" +
-                "			impid, \n" +
-                "			descricao, \n" +
-                "			codigoatual, \n" +
-                "			piscofinscredito, \n" +
-                "			piscofinsdebito, \n" +
-                "			piscofinsnaturezareceita, \n" +
-                "			icmscst, \n" +
-                "			icmsaliq, \n" +
-                "			icmsreducao, \n" +
-                "			estoque, \n" +
-                "			e_balanca, \n" +
-                "			custosemimposto, \n" +
-                "			custocomimposto, \n" +
-                "			margem, \n" +
-                "			precovenda, \n" +
-                "			ncm, \n" +
-                "			cest, \n" +
-                "			contadorimportacao, \n" +
-                "			novo,\n" +
-                "                       codigosped,\n" +
-                "                       situacaocadastro,\n" +
-                "                       dataimportacao,\n" +
-                "                       obsimportacao,\n" +
-                "                       icmscstsaida,\n" +
-                "                       icmsaliqsaida,\n" +
-                "                       icmsreducaosaida,\n" +
-                "                       icmscstsaidaforaestado,\n" +
-                "                       icmsaliqsaidaforaestado,\n" +
-                "                       icmsreducaosaidaforaestado,\n" +
-                "                       icmscstsaidaforaestadonf,\n" +
-                "                       icmsaliqsaidaforaestadonf,\n" +
-                "                       icmsreducaosaidaforaestadonf,\n" +
-                "                       icmscstentrada,\n" +
-                "                       icmsaliqentrada,\n" +
-                "                       icmsreducaoentrada,\n" +
-                "                       icmscstentradaforaestado,\n" +
-                "                       icmsaliqentradaforaestado,\n" +
-                "                       icmsreducaoentradaforaestado,\n" +
-                "                       icmscstconsumidor,\n" +
-                "                       icmsaliqconsumidor,\n" +
-                "                       icmsreducaoconsumidor,\n" +
-                "                       icmsdebitoid,\n" +
-                "                       icmsdebitoforaestadoid,\n" +
-                "                       icmsdebitoforaestadonfid,\n" +
-                "                       icmscreditoid,\n" +
-                "                       icmscreditoforaestadoid,\n" +
-                "                       icmsconsumidorid,\n" +
-                "                       datacadastro,\n" +
-                "                       id_conexao\n" +
-                "		FROM \n" +
-                "			implantacao.codant_produto\n" +
-                "		where\n" +
-                "			impsistema = r.sistema and \n" +
-                "			imploja = r.loja_modelo and\n" +
-                "			impid in (\n" +
-                "				select\n" +
-                "					impid\n" +
-                "				from\n" +
-                "					implantacao.codant_produto\n" +
-                "				where\n" +
-                "					impsistema = r.sistema and \n" +
-                "					imploja = r.loja_modelo\n" +
-                "				except\n" +
-                "				select\n" +
-                "					impid\n" +
-                "				from\n" +
-                "					implantacao.codant_produto	\n" +
-                "				where\n" +
-                "					impsistema = r.sistema and \n" +
-                "					imploja = r.loja_nova\n" +
-                "			)\n" +
-                "		order by impid;\n" +
-                "\n" +
-                "\n" +
-                "		insert into implantacao.codant_ean \n" +
-                "		SELECT \n" +
-                "			ant.importsistema,\n" +
-                "			r.loja_nova imploja,\n" +
-                "			ant.importid, \n" +
-                "			ant.ean,\n" +
-                "			ant.qtdembalagem,\n" +
-                "			ant.valor,\n" +
-                "			ant.tipoembalagem\n" +
-                "		FROM \n" +
-                "			implantacao.codant_ean ant\n" +
-                "			join (\n" +
-                "			select\n" +
-                "				importid,\n" +
-                "				ean\n" +
-                "			from\n" +
-                "				implantacao.codant_ean\n" +
-                "			where\n" +
-                "				importsistema = r.sistema and \n" +
-                "				importloja = r.loja_modelo\n" +
-                "			except\n" +
-                "			select\n" +
-                "				importid,\n" +
-                "				ean\n" +
-                "			from\n" +
-                "				implantacao.codant_ean	\n" +
-                "			where\n" +
-                "				importsistema = r.sistema and \n" +
-                "				importloja = r.loja_nova\n" +
-                "			) a on\n" +
-                "			ant.importid = a.importid and\n" +
-                "			ant.ean = a.ean\n" +
-                "		where   \n" +
-                "			ant.importsistema = r.sistema and \n" +
-                "			ant.importloja = r.loja_modelo\n" +
-                "			order by ant.importid;\n" +
-                "\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_fornecedor' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.codant_fornecedor\n" +
-                "			select\n" +
-                "				importsistema,\n" +
-                "				r.loja_nova,\n" +
-                "				importid,\n" +
-                "				codigoatual,\n" +
-                "				cnpj,\n" +
-                "				razao,\n" +
-                "				fantasia,\n" +
-                "                               id_conexao\n" +
-                "			from \n" +
-                "				implantacao.codant_fornecedor\n" +
-                "			where\n" +
-                "				importsistema = r.sistema and \n" +
-                "				importloja = r.loja_modelo and\n" +
-                "				importid in (\n" +
-                "					select\n" +
-                "						importid\n" +
-                "					from\n" +
-                "						implantacao.codant_fornecedor\n" +
-                "					where\n" +
-                "						importsistema = r.sistema and \n" +
-                "						importloja = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						importid\n" +
-                "					from\n" +
-                "						implantacao.codant_fornecedor	\n" +
-                "					where\n" +
-                "						importsistema = r.sistema and \n" +
-                "						importloja = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_convenioempresa' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.codant_convenioempresa\n" +
-                "			select\n" +
-                "				sistema,\n" +
-                "				r.loja_nova loja,\n" +
-                "				id,\n" +
-                "				codigoatual,\n" +
-                "				cnpj,\n" +
-                "				razao\n" +
-                "			from \n" +
-                "				implantacao.codant_convenioempresa a\n" +
-                "			where\n" +
-                "				a.sistema = r.sistema and\n" +
-                "				a.loja = r.loja_modelo and\n" +
-                "				a.id in (\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_convenioempresa\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_convenioempresa	\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_conveniado' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.codant_conveniado\n" +
-                "			select\n" +
-                "				sistema,\n" +
-                "				r.loja_nova loja,\n" +
-                "				id,\n" +
-                "				codigoatual,\n" +
-                "				cnpj,\n" +
-                "				razao\n" +
-                "			from \n" +
-                "				implantacao.codant_conveniado a\n" +
-                "			where\n" +
-                "				a.sistema = r.sistema and\n" +
-                "				a.loja = r.loja_modelo and\n" +
-                "				a.id in (\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_conveniado\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						id\n" +
-                "					from\n" +
-                "						implantacao.codant_conveniado	\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						loja = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "\n" +
-                "		if (exists(select table_name from information_schema.tables t where t.table_name = 'mapatributacao' and t.table_schema = 'implantacao')) then\n" +
-                "			insert into implantacao.mapatributacao\n" +
-                "			select\n" +
-                "				sistema,\n" +
-                "				r.loja_nova loja,\n" +
-                "				orig_id,\n" +
-                "				orig_descricao,\n" +
-                "				id_aliquota,\n" +
-                "				orig_cst,\n" +
-                "				orig_aliquota,\n" +
-                "				orig_reduzido,\n" +
-                "                               orig_fcp,\n" +
-                "                               orig_desonerado,\n" +
-                "                               orig_porcentagemdesonerado\n" +
-                "			from \n" +
-                "				implantacao.mapatributacao a\n" +
-                "			where\n" +
-                "				a.sistema = r.sistema and\n" +
-                "				a.agrupador = r.loja_modelo and\n" +
-                "				a.orig_id in (\n" +
-                "					select\n" +
-                "						orig_id\n" +
-                "					from\n" +
-                "						implantacao.mapatributacao\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						agrupador = r.loja_modelo\n" +
-                "					except\n" +
-                "					select\n" +
-                "						orig_id\n" +
-                "					from\n" +
-                "						implantacao.mapatributacao	\n" +
-                "					where\n" +
-                "						sistema = r.sistema and \n" +
-                "						agrupador = r.loja_nova\n" +
-                "				);\n" +
-                "		end if;\n" +
-                "	end loop;     \n" +
-                "end;\n" +
-                "$$;\n";
-        
-        try(Statement stm = Conexao.createStatement()) {
+
+        String sql
+                = "create temp table implantacao_lojas (sistema varchar, loja_modelo varchar, loja_nova varchar) on commit drop;\n"
+                + "insert into implantacao_lojas values ('" + sistema + "', '" + lojaModelo + "', '" + lojaNova + "');\n"
+                + "\n"
+                + "do $$\n"
+                + "declare\n"
+                + "	r record;\n"
+                + "begin\n"
+                + "	for r in select * from implantacao_lojas\n"
+                + "	loop\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clientepreferencial' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.codant_clientepreferencial\n"
+                + "			select\n"
+                + "				r.sistema,\n"
+                + "				r.loja_nova,\n"
+                + "				id,\n"
+                + "				codigoatual,\n"
+                + "				cnpj,\n"
+                + "				ie,\n"
+                + "				nome,\n"
+                + "				false,\n"
+                + "                               id_conexao\n"
+                + "			from\n"
+                + "				implantacao.codant_clientepreferencial\n"
+                + "			where\n"
+                + "				sistema = r.sistema and\n"
+                + "				loja = r.loja_modelo and\n"
+                + "				id in (\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_clientepreferencial\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_clientepreferencial	\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "\n"
+                + "		--Clientes eventuais\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clienteeventual' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.codant_clienteeventual\n"
+                + "			select\n"
+                + "				r.sistema,\n"
+                + "				r.loja_nova,\n"
+                + "				id,\n"
+                + "				codigoatual,\n"
+                + "				cnpj,\n"
+                + "				ie,\n"
+                + "				nome,\n"
+                + "				false,\n"
+                + "                               id_conexao\n"
+                + "			from\n"
+                + "				implantacao.codant_clienteeventual\n"
+                + "			where\n"
+                + "				sistema = r.sistema and\n"
+                + "				loja = r.loja_modelo and\n"
+                + "				id in (\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_clienteeventual\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_clienteeventual	\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "\n"
+                + "		--Produtos\n"
+                + "\n"
+                + "		insert into implantacao.codant_produto\n"
+                + "		SELECT \n"
+                + "			impsistema, \n"
+                + "			r.loja_nova imploja,\n"
+                + "			impid, \n"
+                + "			descricao, \n"
+                + "			codigoatual, \n"
+                + "			piscofinscredito, \n"
+                + "			piscofinsdebito, \n"
+                + "			piscofinsnaturezareceita, \n"
+                + "			icmscst, \n"
+                + "			icmsaliq, \n"
+                + "			icmsreducao, \n"
+                + "			estoque, \n"
+                + "			e_balanca, \n"
+                + "			custosemimposto, \n"
+                + "			custocomimposto, \n"
+                + "			margem, \n"
+                + "			precovenda, \n"
+                + "			ncm, \n"
+                + "			cest, \n"
+                + "			contadorimportacao, \n"
+                + "			novo,\n"
+                + "                       codigosped,\n"
+                + "                       situacaocadastro,\n"
+                + "                       dataimportacao,\n"
+                + "                       obsimportacao,\n"
+                + "                       icmscstsaida,\n"
+                + "                       icmsaliqsaida,\n"
+                + "                       icmsreducaosaida,\n"
+                + "                       icmscstsaidaforaestado,\n"
+                + "                       icmsaliqsaidaforaestado,\n"
+                + "                       icmsreducaosaidaforaestado,\n"
+                + "                       icmscstsaidaforaestadonf,\n"
+                + "                       icmsaliqsaidaforaestadonf,\n"
+                + "                       icmsreducaosaidaforaestadonf,\n"
+                + "                       icmscstentrada,\n"
+                + "                       icmsaliqentrada,\n"
+                + "                       icmsreducaoentrada,\n"
+                + "                       icmscstentradaforaestado,\n"
+                + "                       icmsaliqentradaforaestado,\n"
+                + "                       icmsreducaoentradaforaestado,\n"
+                + "                       icmscstconsumidor,\n"
+                + "                       icmsaliqconsumidor,\n"
+                + "                       icmsreducaoconsumidor,\n"
+                + "                       icmsdebitoid,\n"
+                + "                       icmsdebitoforaestadoid,\n"
+                + "                       icmsdebitoforaestadonfid,\n"
+                + "                       icmscreditoid,\n"
+                + "                       icmscreditoforaestadoid,\n"
+                + "                       icmsconsumidorid,\n"
+                + "                       datacadastro,\n"
+                + "                       id_conexao\n"
+                + "		FROM \n"
+                + "			implantacao.codant_produto\n"
+                + "		where\n"
+                + "			impsistema = r.sistema and \n"
+                + "			imploja = r.loja_modelo and\n"
+                + "			impid in (\n"
+                + "				select\n"
+                + "					impid\n"
+                + "				from\n"
+                + "					implantacao.codant_produto\n"
+                + "				where\n"
+                + "					impsistema = r.sistema and \n"
+                + "					imploja = r.loja_modelo\n"
+                + "				except\n"
+                + "				select\n"
+                + "					impid\n"
+                + "				from\n"
+                + "					implantacao.codant_produto	\n"
+                + "				where\n"
+                + "					impsistema = r.sistema and \n"
+                + "					imploja = r.loja_nova\n"
+                + "			)\n"
+                + "		order by impid;\n"
+                + "\n"
+                + "\n"
+                + "		insert into implantacao.codant_ean \n"
+                + "		SELECT \n"
+                + "			ant.importsistema,\n"
+                + "			r.loja_nova imploja,\n"
+                + "			ant.importid, \n"
+                + "			ant.ean,\n"
+                + "			ant.qtdembalagem,\n"
+                + "			ant.valor,\n"
+                + "			ant.tipoembalagem\n"
+                + "		FROM \n"
+                + "			implantacao.codant_ean ant\n"
+                + "			join (\n"
+                + "			select\n"
+                + "				importid,\n"
+                + "				ean\n"
+                + "			from\n"
+                + "				implantacao.codant_ean\n"
+                + "			where\n"
+                + "				importsistema = r.sistema and \n"
+                + "				importloja = r.loja_modelo\n"
+                + "			except\n"
+                + "			select\n"
+                + "				importid,\n"
+                + "				ean\n"
+                + "			from\n"
+                + "				implantacao.codant_ean	\n"
+                + "			where\n"
+                + "				importsistema = r.sistema and \n"
+                + "				importloja = r.loja_nova\n"
+                + "			) a on\n"
+                + "			ant.importid = a.importid and\n"
+                + "			ant.ean = a.ean\n"
+                + "		where   \n"
+                + "			ant.importsistema = r.sistema and \n"
+                + "			ant.importloja = r.loja_modelo\n"
+                + "			order by ant.importid;\n"
+                + "\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_fornecedor' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.codant_fornecedor\n"
+                + "			select\n"
+                + "				importsistema,\n"
+                + "				r.loja_nova,\n"
+                + "				importid,\n"
+                + "				codigoatual,\n"
+                + "				cnpj,\n"
+                + "				razao,\n"
+                + "				fantasia,\n"
+                + "                               id_conexao\n"
+                + "			from \n"
+                + "				implantacao.codant_fornecedor\n"
+                + "			where\n"
+                + "				importsistema = r.sistema and \n"
+                + "				importloja = r.loja_modelo and\n"
+                + "				importid in (\n"
+                + "					select\n"
+                + "						importid\n"
+                + "					from\n"
+                + "						implantacao.codant_fornecedor\n"
+                + "					where\n"
+                + "						importsistema = r.sistema and \n"
+                + "						importloja = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						importid\n"
+                + "					from\n"
+                + "						implantacao.codant_fornecedor	\n"
+                + "					where\n"
+                + "						importsistema = r.sistema and \n"
+                + "						importloja = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_convenioempresa' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.codant_convenioempresa\n"
+                + "			select\n"
+                + "				sistema,\n"
+                + "				r.loja_nova loja,\n"
+                + "				id,\n"
+                + "				codigoatual,\n"
+                + "				cnpj,\n"
+                + "				razao\n"
+                + "			from \n"
+                + "				implantacao.codant_convenioempresa a\n"
+                + "			where\n"
+                + "				a.sistema = r.sistema and\n"
+                + "				a.loja = r.loja_modelo and\n"
+                + "				a.id in (\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_convenioempresa\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_convenioempresa	\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_conveniado' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.codant_conveniado\n"
+                + "			select\n"
+                + "				sistema,\n"
+                + "				r.loja_nova loja,\n"
+                + "				id,\n"
+                + "				codigoatual,\n"
+                + "				cnpj,\n"
+                + "				razao\n"
+                + "			from \n"
+                + "				implantacao.codant_conveniado a\n"
+                + "			where\n"
+                + "				a.sistema = r.sistema and\n"
+                + "				a.loja = r.loja_modelo and\n"
+                + "				a.id in (\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_conveniado\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						id\n"
+                + "					from\n"
+                + "						implantacao.codant_conveniado	\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						loja = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "\n"
+                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'mapatributacao' and t.table_schema = 'implantacao')) then\n"
+                + "			insert into implantacao.mapatributacao\n"
+                + "			select\n"
+                + "				sistema,\n"
+                + "				r.loja_nova loja,\n"
+                + "				orig_id,\n"
+                + "				orig_descricao,\n"
+                + "				id_aliquota,\n"
+                + "				orig_cst,\n"
+                + "				orig_aliquota,\n"
+                + "				orig_reduzido,\n"
+                + "                               orig_fcp,\n"
+                + "                               orig_desonerado,\n"
+                + "                               orig_porcentagemdesonerado\n"
+                + "			from \n"
+                + "				implantacao.mapatributacao a\n"
+                + "			where\n"
+                + "				a.sistema = r.sistema and\n"
+                + "				a.agrupador = r.loja_modelo and\n"
+                + "				a.orig_id in (\n"
+                + "					select\n"
+                + "						orig_id\n"
+                + "					from\n"
+                + "						implantacao.mapatributacao\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						agrupador = r.loja_modelo\n"
+                + "					except\n"
+                + "					select\n"
+                + "						orig_id\n"
+                + "					from\n"
+                + "						implantacao.mapatributacao	\n"
+                + "					where\n"
+                + "						sistema = r.sistema and \n"
+                + "						agrupador = r.loja_nova\n"
+                + "				);\n"
+                + "		end if;\n"
+                + "	end loop;     \n"
+                + "end;\n"
+                + "$$;\n";
+
+        try (Statement stm = Conexao.createStatement()) {
             stm.execute(sql);
         }
     }
-    
+
     public String getImpSistema() throws Exception {
         String loja = "";
-        
-        try(Statement stm = Conexao.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	impsistema\n" +
-                    "from \n" +
-                    "	implantacao.codant_produto\n" +
-                    "where \n" +
-                    "	id_conexao = (select min(id_conexao) from implantacao.codant_produto)\n" +
-                    "limit 1")) {
-                if(rs.next()) {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	impsistema\n"
+                    + "from \n"
+                    + "	implantacao.codant_produto\n"
+                    + "where \n"
+                    + "	id_conexao = (select min(id_conexao) from implantacao.codant_produto)\n"
+                    + "limit 1")) {
+                if (rs.next()) {
                     loja = rs.getString("impsistema");
                 }
             }
         }
-        
+
         return loja;
     }
 }

@@ -2,7 +2,7 @@
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JInternalFrameFormInfo">
   <Properties>
-    <Property name="title" type="java.lang.String" value="Consinco"/>
+    <Property name="title" type="java.lang.String" value="Stock"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -28,7 +28,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tabMenu" alignment="1" pref="696" max="32767" attributes="0"/>
+                  <Component id="tabMenu" alignment="1" pref="603" max="32767" attributes="0"/>
                   <Component id="pnlMigrar" alignment="0" max="32767" attributes="0"/>
                   <Component id="pnlConn" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -131,7 +131,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="scpClientes" pref="684" max="32767" attributes="0"/>
+                          <Component id="scpClientes" pref="587" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -151,134 +151,6 @@
                     </Component>
                   </SubComponents>
                 </Container>
-              </SubComponents>
-            </Container>
-            <Container class="vrframework.bean.panel.VRPanel" name="tabExtras">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Parametros Extras">
-                    <Property name="tabTitle" type="java.lang.String" value="Parametros Extras"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="lblViewProduto" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="lblViewEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtViewEAN" alignment="0" pref="169" max="32767" attributes="0"/>
-                                      <Component id="txtViewProduto" alignment="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="lblViewFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtViewFornecedor" alignment="0" min="-2" pref="169" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="vRLabel8" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="txtDelimitadorProd" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="455" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="txtProdutoFile" alignment="0" max="32767" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="lblViewProduto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtViewProduto" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="lblViewFornecedor" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtViewFornecedor" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="lblViewEAN" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtViewEAN" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtDelimitadorProd" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                                  <Component id="txtProdutoFile" min="-2" pref="27" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace min="0" pref="41" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-              </Layout>
-              <SubComponents>
-                <Component class="javax.swing.JLabel" name="lblViewProduto">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="View Produto"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtViewProduto">
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtViewEAN">
-                </Component>
-                <Component class="javax.swing.JLabel" name="lblViewEAN">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="View Ean"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JLabel" name="lblViewFornecedor">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="View Fornecedor"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtViewFornecedor">
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Del"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtDelimitadorProd">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="^"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtProdutoFile">
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Informe o arquivo dos produtos"/>
-                  </Properties>
-                </Component>
               </SubComponents>
             </Container>
           </SubComponents>

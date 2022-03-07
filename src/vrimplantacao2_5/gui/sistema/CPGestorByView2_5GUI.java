@@ -36,29 +36,6 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         tabClientes.setOpcoesDisponiveis(cpgestorDAO);
         tabProdutos.btnMapaTribut.setEnabled(false);
 
-        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
-            @Override
-            public MapaTributoProvider getProvider() {
-                return cpgestorDAO;
-            }
-
-            @Override
-            public String getSistema() {
-                return cpgestorDAO.getSistema() + " - " + pnlConn.idConexao;
-            }
-
-            @Override
-            public String getLoja() {
-                cpgestorDAO.setLojaOrigem(pnlConn.getLojaOrigem());
-                return cpgestorDAO.getLojaOrigem();
-            }
-
-            @Override
-            public Frame getFrame() {
-                return mdiFrame;
-            }
-        });
-
         pnlConn.setSistema(ESistema.CPGESTOR);
         pnlConn.getNomeConexao();
 
@@ -108,6 +85,10 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:
+                                cpgestorDAO.getOpcoes().put("delimiter", txtDelimitadorProd.getText());
+                                cpgestorDAO.setArquivo(txtProdutoFile.getArquivo());
+                                cpgestorDAO.setComplemento(pnlConn.idConexao);
+                                
                                 tabProdutos.executarImportacao();
                                 break;
                             case 1:
@@ -173,6 +154,10 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         lblViewEAN = new javax.swing.JLabel();
         lblViewFornecedor = new javax.swing.JLabel();
         txtViewFornecedor = new javax.swing.JTextField();
+        vRLabel8 = new vrframework.bean.label.VRLabel();
+        txtDelimitadorProd = new javax.swing.JTextField();
+        txtProdutoFile = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -234,7 +219,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabCliLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
                 .addContainerGap())
         );
         tabCliLayout.setVerticalGroup(
@@ -250,22 +235,41 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
 
         lblViewFornecedor.setText("View Fornecedor");
 
+        vRLabel8.setText("Del");
+
+        txtDelimitadorProd.setText("^");
+
+        vRLabel1.setText("Informe o arquivo dos produtos");
+
         javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
         tabExtras.setLayout(tabExtrasLayout);
         tabExtrasLayout.setHorizontalGroup(
             tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabExtrasLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblViewProduto)
-                    .addComponent(lblViewEAN)
-                    .addComponent(txtViewEAN, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-                    .addComponent(txtViewProduto))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblViewFornecedor)
-                    .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(233, Short.MAX_VALUE))
+                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblViewProduto)
+                            .addComponent(lblViewEAN)
+                            .addComponent(txtViewEAN, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                            .addComponent(txtViewProduto))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblViewFornecedor)
+                            .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(vRLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(455, 455, 455))
+                            .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
         );
         tabExtrasLayout.setVerticalGroup(
             tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -283,7 +287,18 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                 .addComponent(lblViewEAN)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtViewEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 100, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabExtrasLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(txtProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 41, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parametros Extras", tabExtras);
@@ -298,7 +313,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
+                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
                     .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -350,8 +365,12 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private javax.swing.JTextField txtDelimitadorProd;
+    private vrframework.bean.fileChooser.VRFileChooser txtProdutoFile;
     private javax.swing.JTextField txtViewEAN;
     private javax.swing.JTextField txtViewFornecedor;
     private javax.swing.JTextField txtViewProduto;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel8;
     // End of variables declaration//GEN-END:variables
 }
