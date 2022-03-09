@@ -3,6 +3,7 @@ package vrimplantacao2_5.service.selecaoloja;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
+import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
@@ -127,6 +128,9 @@ public abstract class InternalFrameFactory {
             case STOCK:
                 internalFrame = new Stock_Postgres2_5GUI(frame);
                 break;
+            case ARIUS:
+                internalFrame = new Arius2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -218,6 +222,9 @@ public abstract class InternalFrameFactory {
                 break;
             case STOCK:
                 internalFrame = new Stock_Postgres2_5GUI(frame);
+                break;
+            case ARIUS:
+                internalFrame = new Arius2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

@@ -45,6 +45,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -209,7 +210,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.RECEITA,
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.PAUTA_FISCAL,
-                OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.TIPO_PRODUTO
         ));
     }
 
@@ -414,6 +416,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    nullif(a.subgrupo,0) cod_mercadologico4,\n"
                 + "    a.familia id_familiaproduto,\n"
                 + "    fam.descritivo familiaproduto,\n"
+                + "    case when a.composto = 12 then 'S' else 'N' end tipo_ativo,\n"
+                + "    case when a.composto = 6 then 'S' else 'N' end tipo_usoconsumo,\n"
                 + "    a.pesob pesobruto,\n"
                 + "    a.pesol pesoliquido,\n"
                 + "    a.datahora_cadastro datacadastro,\n"
@@ -551,6 +555,15 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
                     imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
+                    
+                    if ("S".equals(rst.getString("tipo_ativo"))) {
+                        imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO);
+                    } else {
+                        if ("S".equals(rst.getString("tipo_usoconsumo"))) {
+                            imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO);
+                        }
+                    }
+                    
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
