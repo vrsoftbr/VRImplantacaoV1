@@ -1,13 +1,10 @@
 package vrimplantacao2_5.gui.sistema;
 
-import java.awt.Frame;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.dao.sistema.CPGestorByViewDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
@@ -38,6 +35,9 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
 
         pnlConn.setSistema(ESistema.CPGESTOR);
         pnlConn.getNomeConexao();
+        
+        pnlBalanca.setLoja(pnlConn.getLojaOrigem());
+        pnlBalanca.setSistema(SISTEMA);
 
         centralizarForm();
         this.setMaximum(false);

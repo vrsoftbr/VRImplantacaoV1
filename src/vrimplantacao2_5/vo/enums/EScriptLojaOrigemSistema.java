@@ -111,7 +111,7 @@ public enum EScriptLojaOrigemSistema {
     LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS descricao FROM empresa ORDER BY 1"),
     CPGESTOR(21, 9, "SELECT \n" +
                     "	LJ_ASSOCIACAO id,\n" +
-                    "	''SANTA FE'' razao\n" +
+                    "	''SANTA FE'' descricao\n" +
                     "FROM \n" +
                     "	vw_exp_produtos_sta\n" +
                     "WHERE \n" +
@@ -119,7 +119,7 @@ public enum EScriptLojaOrigemSistema {
                     "UNION ALL \n" +
                     "SELECT \n" +
                     "	lj_associacao id,\n" +
-                    "	''ZUZU'' razao\n" +
+                    "	''ZUZU'' descricao\n" +
                     "FROM \n" +
                     "	vw_exp_produtos_zuzu\n" +
                     "WHERE \n" +
