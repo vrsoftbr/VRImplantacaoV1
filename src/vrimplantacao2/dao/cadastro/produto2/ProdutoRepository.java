@@ -1578,7 +1578,7 @@ public class ProdutoRepository {
             if (unidadeCotacao != null) {
                 vo.setTipoEmbalagem(unidadeCotacao);
             } else {
-                vo.setTipoEmbalagem(unidade);
+                vo.setTipoEmbalagem(TipoEmbalagem.KG);
             }
             vo.setPesavel(false);
         }

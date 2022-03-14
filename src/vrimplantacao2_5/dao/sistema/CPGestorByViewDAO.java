@@ -343,7 +343,12 @@ public class CPGestorByViewDAO extends InterfaceDAO {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
 
         List<ProdutoIMP> result = new ArrayList<>();
-        Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        Arquivo arq = null;
+        
+        if (this.arquivo != null && !this.arquivo.isEmpty()) {
+            arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        }
+        
         ProdutoAnteriorDAO anteriorDAO = new ProdutoAnteriorDAO();
         
         if (opt == OpcaoProduto.ICMS) {
