@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
@@ -110,7 +112,8 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.VENDA_PDV
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.FABRICANTE
         ));
     }
 
@@ -181,6 +184,35 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                 = new ProdutoBalancaDAO().getProdutosBalanca();
 
         try (Statement stm = ConexaoOracle.createStatement()) {
+            
+            Map<String, ProdutoIMP> associados = new HashMap<>();
+            
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	*\n" +
+                    "FROM \n" +
+                    "	vw_exp_barras_sta \n" +
+                    "WHERE \n" +
+                    "	pr_nome_bal IS NOT NULL AND \n" +
+                    "	pr_preco_final > 0 and\n" +
+                    "   lj_associacao = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ProdutoIMP associado = new ProdutoIMP();
+                    
+                    associado.setImportLoja(getLojaOrigem());
+                    associado.setImportSistema(getSistema());
+                    associado.setImportId(rs.getString("pr_codint"));
+                    associado.setEan(rs.getString("pr_cbarra"));
+                    associado.setQtdEmbalagem(rs.getInt("pr_qtde"));
+                    associado.setPrecovenda(rs.getDouble("pr_preco_final"));
+                    associado.setDescricaoCompleta(rs.getString("pr_nome_bal"));
+                    associado.setValidade(rs.getInt("pr_dias_validade"));
+                    associado.setTipoEmbalagem(rs.getString("cod_funidade"));
+                    
+                    associados.put(associado.getEan(), associado);
+                }
+            }
+            
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + "	p.pr_codint id,\n"
@@ -216,7 +248,8 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "	p.ncm,\n"
                     + "	ean.PR_CEST cest,\n"
                     + " p.pr_codigocstent cstcredito,\n"
-                    + "	p.pr_codigocstsai cstdebito\n"
+                    + "	p.pr_codigocstsai cstdebito,\n"
+                    + " p.FO_CODIG fabricante\n"        
                     + "FROM \n"
                     + "	vw_exp_produtos_sta p\n"
                     + "LEFT JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT \n"
@@ -272,16 +305,32 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCest(rs.getString("cest"));
                     imp.setNcm(rs.getString("ncm"));
-
-                    /*imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
-                    imp.setPiscofinsCstDebito(rs.getString("pisaida"));
-                    imp.setIcmsDebitoId(rs.getString("idaliquota"));
-                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
-                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());*/
+                    
+                    imp.setFornecedorFabricante(rs.getString("fabricante"));
+                    
+                    if(associados.containsKey(imp.getEan())) {
+                        ProdutoIMP associado = associados.get(imp.getEan());
+                        
+                        balanca = produtosBalanca.get(Utils.stringToInt(associado.getEan(), -2));
+                        
+                        if (balanca != null && 
+                                associado.getDescricaoCompleta() != null && 
+                                    !associado.getDescricaoCompleta().trim().isEmpty()) {
+                            
+                            imp.setImportId(associado.getEan());
+                            imp.setEan(associado.getEan());
+                            imp.setDescricaoCompleta(associado.getDescricaoCompleta());
+                            imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                            imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
+                            imp.setQtdEmbalagem(associado.getQtdEmbalagem());
+                            imp.setValidade(balanca.getValidade() > 1 ? balanca.getValidade() : associado.getValidade());
+                            imp.setPrecovenda(associado.getPrecovenda());  
+                            imp.setEstoque(0d);
+                        }
+                    }
+                    
                     result.add(imp);
                 }
             }
@@ -412,7 +461,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "	mnc_codig ibgemunicipio,\n"
                     + "	cf_cidad cidade,\n"
                     + "	cf_numero_endereco numero,\n"
-                    + "   cf_complemento complemento,\n"
+                    + " cf_complemento complemento,\n"
                     + "	cf_uf uf,\n"
                     + "	cf_cep cep,\n"
                     + "	cf_telef1 telefone,\n"
