@@ -512,7 +512,7 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "    crpdeslancamento as obs \n"
                     + "FROM    \n"
                     + "    tbcontasreceberpagar cr\n"
-                    + "    left join tbclientes c on cr.crpcodcliente = c.cliId\n"
+                    + "    join tbclientes c on cr.crpcodcliente = c.cliId\n"
                     + "where\n"
                     + "    crpdatapagamento is null\n"
                     + "    and crpflaglancado = false\n"
