@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -33,6 +34,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
@@ -51,8 +53,10 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -78,7 +82,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoOracle;
  * @author2_5 Alan
  */
 public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
     private List<PlanoConta> planosSelecionados;
@@ -158,7 +162,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Arius";
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -558,7 +562,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
                     imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
-                    
+
                     if ("S".equals(rst.getString("tipo_ativo"))) {
                         imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO);
                     } else {
@@ -566,7 +570,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO);
                         }
                     }
-                    
+
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -614,7 +618,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opc) throws Exception {
         if (opc == OpcaoProduto.ICMS_FORNECEDOR) {
@@ -899,7 +903,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -1274,13 +1278,13 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "    f.id,\n"
                     + "    f.descritivo razao,\n"
                     + "    f.fantasia,\n"
@@ -1320,7 +1324,86 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    fornecedores f\n"
                     + "left join fornecedores_linhas fl on fl.fornecedor = f.id    \n"
                     + "order by\n"
-                    + "    f.id"
+                    + "    f.id"*/
+                    "SELECT\n"
+                    + "    f.id,\n"
+                    + "    f.descritivo razao,\n"
+                    + "    f.fantasia,\n"
+                    + "    f.cnpj_cpf,\n"
+                    + "    f.inscricao_rg,\n"
+                    + "    f.inscricao_municipal,\n"
+                    + "    f.suframa,\n"
+                    + "    case when f.situacao != 0 then 0 else 1 end ativo,\n"
+                    + "    f.endereco,\n"
+                    + "    f.numero,\n"
+                    + "    f.complemento,\n"
+                    + "    f.bairro,\n"
+                    + "    f.cidade,\n"
+                    + "    f.estado,\n"
+                    + "    f.cod_ibge id_cidade,\n"
+                    + "    f.cep,    \n"
+                    + "    f.telefone1,\n"
+                    + "    f.telefone2,\n"
+                    + "    f.fax,\n"
+                    + "    f.pedminimo,\n"
+                    + "    f.datahora_cadastro,\n"
+                    + "    f.observacao,\n"
+                    + "    f.observacao_pedido,\n"
+                    + "    f.dias_vencto,\n"
+                    + "    f.frequencia prazovisita,\n"
+                    + "    f.entrega prazoentrega,\n"
+                    + "    f.email,\n"
+                    + "    f.condpagto,\n"
+                    + "    f.produtor,\n"
+                    + "    f.simples_nacional,\n"
+                    + "    fl.id as iddivisao,\n"
+                    + "    fl.descritivo as descdivisao,\n"
+                    + "    fl.condpagto as condpgtodivisao,\n"
+                    + "    fl.dias_vencto as diasvencdivisao,\n"
+                    + "    fl.prazo_entrega as prazoentregadivisao\n"
+                    + "from\n"
+                    + "    fornecedores f\n"
+                    + "left join fornecedores_linhas fl on fl.fornecedor = f.id\n"
+                    + "UNION\n"
+                    + "SELECT\n"
+                    + "	id+9000 id,\n"
+                    + "	DESCRITIVO razao,\n"
+                    + "	DESCRITIVO fantasia,\n"
+                    + "	CNPJ cnpj_cpf,\n"
+                    + "	'0' rg,\n"
+                    + "	'0' inscricao_municipal,\n"
+                    + "	0 suframa,\n"
+                    + "	1 ativo,\n"
+                    + "	ENDERECO,\n"
+                    + "	NUMERO,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + "	ESTADO,\n"
+                    + "	COD_IBGE id_cidade,\n"
+                    + "	'00000-00' cep,\n"
+                    + "	'0' telefone1,\n"
+                    + "	'0' telefone2,\n"
+                    + "	'0' fax,\n"
+                    + "	0 pedminimo,\n"
+                    + "	DATAHORA_CADASTRO,\n"
+                    + "	'0' observacao,\n"
+                    + "	'0' observacao_pedido,\n"
+                    + "	DIAS_VENCTO,\n"
+                    + "	0 prazovisita,\n"
+                    + "	0 prazoentrega,\n"
+                    + "	'0' email,\n"
+                    + "	CONDICAO_PAGTO condpagto,\n"
+                    + "	'F' produtor,\n"
+                    + "	'0' simples_nacional,\n"
+                    + "	0 iddivisao,\n"
+                    + "	'0' descdivisao,\n"
+                    + "	'0' condpgtodivisao,\n"
+                    + "	'0' diasvencdivisao,\n"
+                    + "	0 prazoentregadivisao\n"
+                    + "FROM\n"
+                    + "	ADM_CARTOES ac\n"
+                    + "order BY 1"
             )) {
 
                 while (rst.next()) {
@@ -1526,7 +1609,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -1652,7 +1735,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return null;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -1668,71 +1751,71 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.createStatement()) {
             if (importarDeClientes) {
                 try (ResultSet rst = stm.executeQuery(
-                        "WITH LIM AS\n" +
-                        "(SELECT\n" +
-                        "	cliente,\n" +
-                        "	sum(limite) somalimite\n" +
-                        "FROM clientes_limites\n" +
-                        "GROUP BY cliente ORDER BY 1)\n" +
-                        "SELECT\n" +
-                        "	c.id,\n" +
-                        "	c.cnpj_cpf,\n" +
-                        "	c.inscricao_rg,\n" +
-                        "	c.orgao_publico,\n" +
-                        "	c.datahora_cadastro datacadastro,\n" +
-                        "	c.descritivo razao,\n" +
-                        "	c.fantasia,\n" +
-                        "	c.situacao AS bloqueado,\n" +
-                        "	c.endereco,\n" +
-                        "	c.numero,\n" +
-                        "	c.complemento,\n" +
-                        "	c.bairro,\n" +
-                        "	c.cidade,\n" +
-                        "	c.estado,\n" +
-                        "	c.cod_ibge municipio_ibge,\n" +
-                        "	c.cep,\n" +
-                        "	c.estado_civil,\n" +
-                        "	c.data_nascimento,\n" +
-                        "	CASE c.sexo WHEN 1 THEN 0 ELSE 1 END sexo,\n" +
-                        "	c.empresacad,\n" +
-                        "	c.telefoneemp,\n" +
-                        "	c.data_admissao,\n" +
-                        "	c.cargo,\n" +
-                        "	c.salario,\n" +
-                        "	COALESCE (somalimite,0) limite,\n" +
-                        "	c.conjugue,\n" +
-                        "	c.pai,\n" +
-                        "	c.mae,\n" +
-                        "	c.observacao,\n" +
-                        "	c.dias_vencto,\n" +
-                        "	c.telefone1,\n" +
-                        "	c.telefone2,\n" +
-                        "	c.email,\n" +
-                        "	c.fax,\n" +
-                        "	c.telefone_cobranca,\n" +
-                        "	c.endereco_c,\n" +
-                        "	c.numero_c,\n" +
-                        "	c.complemento_c,\n" +
-                        "	c.bairro_c,\n" +
-                        "	c.cidade_c,\n" +
-                        "	c.estado_c,\n" +
-                        "	c.cep_c,\n" +
-                        "	c.inscricao_municipal,\n" +
-                        "	decode(c.empresa_convenio, '', 3, c.empresa_convenio) AS empresa_convenio,\n" +
-                        "CASE\n" +
-                        "		c.estado_civil WHEN 0 THEN 'SOLTEIRO'\n" +
-                        "		WHEN 1 THEN 'CASADO'\n" +
-                        "		WHEN 2 THEN 'DIVORCIADO'\n" +
-                        "		WHEN 3 THEN 'VIUVO'\n" +
-                        "		WHEN 4 THEN 'AMASIADO'\n" +
-                        "	END estadocivil\n" +
-                        "FROM\n" +
-                        "	clientes c\n" +
-                        "	LEFT JOIN LIM ON LIM.CLIENTE = C.ID\n" +
-                        "WHERE\n" +
-                        "	upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n" +
-                        "ORDER BY\n" +
-                        "	ID"
+                        "WITH LIM AS\n"
+                        + "(SELECT\n"
+                        + "	cliente,\n"
+                        + "	sum(limite) somalimite\n"
+                        + "FROM clientes_limites\n"
+                        + "GROUP BY cliente ORDER BY 1)\n"
+                        + "SELECT\n"
+                        + "	c.id,\n"
+                        + "	c.cnpj_cpf,\n"
+                        + "	c.inscricao_rg,\n"
+                        + "	c.orgao_publico,\n"
+                        + "	c.datahora_cadastro datacadastro,\n"
+                        + "	c.descritivo razao,\n"
+                        + "	c.fantasia,\n"
+                        + "	c.situacao AS bloqueado,\n"
+                        + "	c.endereco,\n"
+                        + "	c.numero,\n"
+                        + "	c.complemento,\n"
+                        + "	c.bairro,\n"
+                        + "	c.cidade,\n"
+                        + "	c.estado,\n"
+                        + "	c.cod_ibge municipio_ibge,\n"
+                        + "	c.cep,\n"
+                        + "	c.estado_civil,\n"
+                        + "	c.data_nascimento,\n"
+                        + "	CASE c.sexo WHEN 1 THEN 0 ELSE 1 END sexo,\n"
+                        + "	c.empresacad,\n"
+                        + "	c.telefoneemp,\n"
+                        + "	c.data_admissao,\n"
+                        + "	c.cargo,\n"
+                        + "	c.salario,\n"
+                        + "	COALESCE (somalimite,0) limite,\n"
+                        + "	c.conjugue,\n"
+                        + "	c.pai,\n"
+                        + "	c.mae,\n"
+                        + "	c.observacao,\n"
+                        + "	c.dias_vencto,\n"
+                        + "	c.telefone1,\n"
+                        + "	c.telefone2,\n"
+                        + "	c.email,\n"
+                        + "	c.fax,\n"
+                        + "	c.telefone_cobranca,\n"
+                        + "	c.endereco_c,\n"
+                        + "	c.numero_c,\n"
+                        + "	c.complemento_c,\n"
+                        + "	c.bairro_c,\n"
+                        + "	c.cidade_c,\n"
+                        + "	c.estado_c,\n"
+                        + "	c.cep_c,\n"
+                        + "	c.inscricao_municipal,\n"
+                        + "	decode(c.empresa_convenio, '', 3, c.empresa_convenio) AS empresa_convenio,\n"
+                        + "CASE\n"
+                        + "		c.estado_civil WHEN 0 THEN 'SOLTEIRO'\n"
+                        + "		WHEN 1 THEN 'CASADO'\n"
+                        + "		WHEN 2 THEN 'DIVORCIADO'\n"
+                        + "		WHEN 3 THEN 'VIUVO'\n"
+                        + "		WHEN 4 THEN 'AMASIADO'\n"
+                        + "	END estadocivil\n"
+                        + "FROM\n"
+                        + "	clientes c\n"
+                        + "	LEFT JOIN LIM ON LIM.CLIENTE = C.ID\n"
+                        + "WHERE\n"
+                        + "	upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n"
+                        + "ORDER BY\n"
+                        + "	ID"
                 )) {
                     while (rst.next()) {
 
@@ -2052,11 +2135,54 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = vrimplantacao.classe.ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	cr.id,\n"
+                    + "	ID_CADASTRO id_convenio,\n"
+                    + " cli.ID id_conveniado,\n"
+                    + "	CAIXA ecf,\n"
+                    + "	NF cupom,\n"
+                    + "	cr.DATAHORA_CADASTRO dataemissao,\n"
+                    + "	VALOR,\n"
+                    + "	cr.OBSERVACAO\n"
+                    + "FROM\n"
+                    + "	VW_CONTAS cr\n"
+                    + "	JOIN CONVENIADAS cv ON cv.id = cr.ID_CADASTRO \n"
+                    + " JOIN CLIENTES cli ON cli.CNPJ_CPF = cr.CPF_CNPJ\n"
+                    + "WHERE\n"
+                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND PLANO_CONTA = 71000\n"
+                    + "	AND PAGAMENTO IS NULL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("id_conveniado"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setDataHora(rst.getTimestamp("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
     @Override
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
         List<NotaFiscalIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.createStatement()) {
+        try (Statement stm = vrimplantacao.classe.ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    nfe.id_c100 id,\n"
@@ -2287,7 +2413,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     public void setPlanoContaEntrada(List<PlanoConta> planosSelecionados) {
         this.planosSelecionados = planosSelecionados;
     }
@@ -2513,6 +2639,46 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	cr.ID,\n"
+                    + "	cr.ID_CADASTRO+9000 id_fornecedor,\n"
+                    + "	EMISSAO dataemissao,\n"
+                    + "	VENCIMENTO,\n"
+                    + "	VALOR,\n"
+                    + "	OBSERVACAO\n"
+                    + "FROM\n"
+                    + "	VW_CONTAS cr\n"
+                    + "	JOIN ADM_CARTOES ac ON ac.ID = cr.ID_CADASTRO \n"
+                    + "WHERE\n"
+                    + "	EMPRESA = 1\n"
+                    + "	AND TIPO_CADASTRO = 4\n"
+                    + "	AND PAGAMENTO IS NULL\n"
+                    + "ORDER BY 1 "
+            )) {
+                while (rst.next()) {
+                    //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    ContaReceberIMP imp = new ContaReceberIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -2648,7 +2814,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
@@ -2745,7 +2911,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-    
+
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm;
