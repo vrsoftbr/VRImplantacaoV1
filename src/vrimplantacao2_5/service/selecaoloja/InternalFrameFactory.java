@@ -19,6 +19,7 @@ import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
@@ -127,6 +128,9 @@ public abstract class InternalFrameFactory {
             case STOCK:
                 internalFrame = new Stock_Postgres2_5GUI(frame);
                 break;
+            case GZPRODADOS:
+                internalFrame = new GZProdados2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
@@ -218,6 +222,9 @@ public abstract class InternalFrameFactory {
                 break;
             case STOCK:
                 internalFrame = new Stock_Postgres2_5GUI(frame);
+                break;
+            case GZPRODADOS:
+                internalFrame = new GZProdados2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

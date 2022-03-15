@@ -107,6 +107,7 @@ public enum ESistemaBancoDados {
     MYSQL_GR7(64, "GR7", 8, "MYSQL", "", "", "", 3006),
     MYSQL_GTECH(65, "GTECH", 8, "MYSQL", "", "", "", 3006),
     MYSQL_GZSISTEMAS(66, "GZSISTEMAS", 8, "MYSQL", "", "root", "mestre", 3006),
+    MYSQL_GZPRODADOS(216, "GZPRODADOS", 8, "MYSQL", "", "root", "mestre", 3006),
     MYSQL_HIPCOM(74, "HIPCOM", 8, "MYSQL", "", "root", "hpc00", 3006),
     MYSQL_IQSISTEMAS(77, "IQSISTEMAS", 8, "MYSQL", "", "", "", 3006),
     MYSQL_ISERVER(78, "ISERVER", 8, "MYSQL", "db_iserver", "root", "750051", 3006),

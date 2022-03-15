@@ -124,7 +124,8 @@ public enum EScriptLojaOrigemSistema {
                     "	vw_exp_produtos_zuzu\n" +
                     "WHERE \n" +
                     "	rownum <= 1"),
-    STOCK(215,11,"select empid as id, empnome as descricao from tbempresas;");
+    STOCK(215,11,"select empid as id, empnome as descricao from tbempresas;"),
+    GZPRODADOS(216,8,"select IdEmpresa as id, RazaoSocial as descricao from empresa;");
 
     private int idSistema;
     private int idBancoDados;

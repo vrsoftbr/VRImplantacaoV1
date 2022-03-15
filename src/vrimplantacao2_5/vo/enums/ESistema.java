@@ -206,6 +206,7 @@ import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
+import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
@@ -437,7 +438,8 @@ public enum ESistema {
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO()),
     WBA(214,"WBA",new WBADAO()),
-    STOCK(215, "STOCK", new Stock_PostgresDAO());
+    STOCK(215, "STOCK", new Stock_PostgresDAO()),
+    GZPRODADOS(216,"GZPRODADOS", new GZProdadosDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
     
     private int id;
