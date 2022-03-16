@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -250,7 +249,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.OUTRAS_RECEITAS));
     }
 
     @Override
@@ -2660,7 +2660,6 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ORDER BY 1 "
             )) {
                 while (rst.next()) {
-                    //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     ContaReceberIMP imp = new ContaReceberIMP();
 
                     imp.setId(rst.getString("id"));

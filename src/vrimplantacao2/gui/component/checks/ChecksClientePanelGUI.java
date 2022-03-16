@@ -148,6 +148,14 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
+        
+        if (opt.contains(OpcaoCliente.OUTRAS_RECEITAS)) {
+            chkOutrasReceitas.setVisible(opt.contains(OpcaoCliente.OUTRAS_RECEITAS));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
+        } else {
+            pnlCreditoRotativo.setVisible(false);
+            this.remove(tabCreditoRotativo);
+        }
 
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
@@ -307,6 +315,14 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
+        
+        if (opt.contains(OpcaoCliente.OUTRAS_RECEITAS)) {
+            chkOutrasReceitas.setVisible(opt.contains(OpcaoCliente.OUTRAS_RECEITAS));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
+        } else {
+            pnlCreditoRotativo.setVisible(false);
+            this.remove(tabCreditoRotativo);
+        }
 
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
@@ -460,6 +476,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkCreditoRotativo.isSelected()) {
             importador.importarCreditoRotativo();
         }
+        
+        if (chkOutrasReceitas.isSelected()) {
+            importador.importarOutrasReceitas();
+        }
 
         if (chkCheque.isSelected()) {
             importador.importarCheque();
@@ -599,6 +619,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         pnlCreditoRotativo = new vrframework.bean.panel.VRPanel();
         jLabel7 = new javax.swing.JLabel();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkOutrasReceitas = new vrframework.bean.checkBox.VRCheckBox();
         tabCheque = new javax.swing.JPanel();
         pnlCheque = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
@@ -1094,6 +1115,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Receber Crédito Rotativo");
         chkCreditoRotativo.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkOutrasReceitas, "Outras Receitas");
+        chkOutrasReceitas.setEnabled(true);
+
         javax.swing.GroupLayout pnlCreditoRotativoLayout = new javax.swing.GroupLayout(pnlCreditoRotativo);
         pnlCreditoRotativo.setLayout(pnlCreditoRotativoLayout);
         pnlCreditoRotativoLayout.setHorizontalGroup(
@@ -1105,8 +1129,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(jLabel7))
                     .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(579, Short.MAX_VALUE))
+                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(476, Short.MAX_VALUE))
         );
         pnlCreditoRotativoLayout.setVerticalGroup(
             pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1114,8 +1140,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addGap(6, 6, 6)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabCreditoRotativoLayout = new javax.swing.GroupLayout(tabCreditoRotativo);
@@ -1128,7 +1156,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             tabCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabCreditoRotativoLayout.createSequentialGroup()
                 .addComponent(pnlCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 327, Short.MAX_VALUE))
+                .addGap(0, 301, Short.MAX_VALUE))
         );
 
         addTab("Importação Crédito Rotativo", tabCreditoRotativo);
@@ -1275,6 +1303,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkNumero;
     public vrframework.bean.checkBox.VRCheckBox chkObservacao;
     public vrframework.bean.checkBox.VRCheckBox chkObservacao2;
+    public vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCheque;
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkSalario;
