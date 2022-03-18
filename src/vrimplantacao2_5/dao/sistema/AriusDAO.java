@@ -47,6 +47,7 @@ import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -2672,20 +2673,41 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	cr.ID,\n"
-                    + "	cr.ID_CADASTRO+2000 id_fornecedor,\n"
-                    + "	EMISSAO dataemissao,\n"
-                    + "	VENCIMENTO,\n"
-                    + "	VALOR,\n"
-                    + "	OBSERVACAO\n"
+                    + "	 cr.ID,\n"
+                    + "	 cr.ID_CADASTRO+2000 id_fornecedor,\n"
+                    + "	 tc.REDUZIDO tipo,\n"
+                    + "	 EMISSAO dataemissao,\n"
+                    + "	 VENCIMENTO,\n"
+                    + "	 VALOR,\n"
+                    + "	 OBSERVACAO\n"
                     + "FROM\n"
-                    + "	VW_CONTAS cr\n"
-                    + "	JOIN ADM_CARTOES ac ON ac.ID = cr.ID_CADASTRO \n"
+                    + "	 VW_CONTAS cr\n"
+                    + "	 JOIN VW_TIPO_CADASTRO tc ON tc.id = cr.TIPO_CADASTRO \n"
                     + "WHERE\n"
-                    + "	EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND TIPO_CADASTRO = 4\n"
-                    + "	AND PAGAMENTO IS NULL\n"
-                    + " AND PARCELA <> 0\n"
+                    + "	 EMPRESA =  " + getLojaOrigem() + "\n"
+                    + "	 AND TIPO_CADASTRO = 4\n"
+                    + "	 AND PAGAMENTO IS NULL\n"
+                    + "  AND PARCELA <> 0\n"
+                    + "  AND cr.ID_CADASTRO <> 0\n"
+                    + "  AND DESC_FORMA_PAGTO <> 'TAXA CARTÕES'\n"
+                    + " UNION \n"
+                    + "  SELECT\n"
+                    + "	 cr.ID,\n"
+                    + "	 cr.ID_CADASTRO id_fornecedor,\n"
+                    + "	 tc.REDUZIDO tipo,\n"
+                    + "	 EMISSAO dataemissao,\n"
+                    + "	 VENCIMENTO,\n"
+                    + "	 VALOR,\n"
+                    + "	 OBSERVACAO\n"
+                    + "FROM\n"
+                    + "	 VW_CONTAS cr\n"
+                    + "	 JOIN VW_TIPO_CADASTRO tc ON tc.id = cr.TIPO_CADASTRO\n"
+                    + "WHERE\n"
+                    + "	 EMPRESA =  " + getLojaOrigem() + "\n"
+                    + "	 AND TIPO_CADASTRO = 2\n"
+                    + "	 AND PAGAMENTO IS NULL\n"
+                    + "  AND PARCELA <> 0\n"
+                    + "  AND TIPO_CONTA = 1\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
