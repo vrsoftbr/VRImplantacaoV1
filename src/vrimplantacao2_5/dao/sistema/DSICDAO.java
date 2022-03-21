@@ -24,6 +24,8 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -84,6 +86,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO));
@@ -97,7 +100,8 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.ENDERECO
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
@@ -264,7 +268,8 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	pro_codigo id,\n"
-                    + "	pro_codigobarra ean\n"
+                    + "	pro_codigobarra ean,\n"
+                    + " 1 quantidade\n"
                     + "from\n"
                     + "	produto p\n"
                     + "order by 1")) {
@@ -275,6 +280,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("quantidade"));
 
                     result.add(imp);
                 }
@@ -398,6 +404,47 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	cp.ctp_id id,\n"
+                    + "	cp.clf_id idfornecedor,\n"
+                    + "	cf.cfj_cnpj cnpj,\n"
+                    + "	ctp_dtemissao emissao,\n"
+                    + "	ctp_dtemissao entrada,\n"
+                    + "	ctp_dtvencimento vencimento,\n"
+                    + "	ctp_valdocumento valor,\n"
+                    + "	ctp_historico observacao\n"
+                    + "from\n"
+                    + "	contas_depagamento cp\n"
+                    + "	left join clifor_pj cf on cf.clf_id = cp.clf_id\n"
+                    + "where\n"
+                    + "	emp_id = " + getLojaOrigem() + "\n"
+                    + "	and ctp_dtpagamento is null"
+            )) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataEntrada(rs.getDate("entrada"));
+                    imp.setVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
@@ -471,6 +518,48 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("telefone"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	 ctr_id id,\n"
+                    + "	 ctr_dtemissao emissao,\n"
+                    + "	 clf_id idcliente,\n"
+                    + "	 ctr_numdocto numcupom,\n"
+                    + "	 ctr_valdocumento valor,\n"
+                    + "	 substring(ctr_parcela,5,4)::int parcela,\n"
+                    + "	 ctr_dtvencimento vencimento,\n"
+                    + "	 ctr_historico observacao\n"
+                    + "from\n"
+                    + "	 contas_derecebimento cr\n"
+                    + "where\n"
+                    + "	 emp_id = " + getLojaOrigem() + "\n"
+                    + "	 and ctr_dtrecebimento is null\n"
+                    + "	 and clf_id is not null"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCupom(rs.getString("numcupom"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
