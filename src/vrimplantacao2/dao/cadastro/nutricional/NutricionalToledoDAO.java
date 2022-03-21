@@ -313,6 +313,7 @@ public class NutricionalToledoDAO {
                     "	nutricional")) {
                 while(rs.next()) {
                     NutricionalToledoVO vo = new NutricionalToledoVO();
+                    
                     vo.setDescricao(rs.getString("descricao"));
                     vo.setId(rs.getInt("nutricional"));
                     vo.setIdProduto(rs.getInt("produto"));
@@ -353,8 +354,10 @@ public class NutricionalToledoDAO {
     
     public static void importarNutricionalToledo(String arquivo, int opcaoCodigo, boolean ignorarUltimoDigito) throws Exception {
         ProgressBar.setStatus("Importando dados...Nutricional Toledo...");
+        
         List<NutricionalToledoVO> nutri = new NutricionalToledoDAO().getNutricionalToledo(arquivo);
         NutricionalToledoDAO dao = new NutricionalToledoDAO();
+        
         dao.ignorarUltimoDigito = ignorarUltimoDigito;
         dao.opcaoCodigo = opcaoCodigo;
         dao.salvarNutricionalToledo(nutri);

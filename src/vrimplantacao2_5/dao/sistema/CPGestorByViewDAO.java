@@ -113,7 +113,8 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.VENDA_PDV,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.ATACADO
         ));
     }
 
@@ -275,6 +276,12 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
                     
+                    int merc3 = Utils.stringToInt(imp.getCodMercadologico3());
+                    
+                    if(merc3 == 0) {
+                        imp.setCodMercadologico3(imp.getCodMercadologico2());
+                    }
+                    
                     ProdutoBalancaVO balanca = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
 
                     if (balanca != null) {
@@ -336,6 +343,105 @@ public class CPGestorByViewDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            
+            Map<String, ProdutoIMP> associados = new HashMap<>();
+            
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	*\n" +
+                    "FROM \n" +
+                    "	vw_exp_barras_sta \n" +
+                    "WHERE \n" +
+                    "	pr_nome_bal IS NOT NULL AND \n" +
+                    "	pr_preco_final > 0 and\n" +
+                    "   lj_associacao = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ProdutoIMP associado = new ProdutoIMP();
+                    
+                    associado.setImportLoja(getLojaOrigem());
+                    associado.setImportSistema(getSistema());
+                    associado.setImportId(rs.getString("pr_codint"));
+                    associado.setEan(rs.getString("pr_cbarra"));
+                    associado.setQtdEmbalagem(rs.getInt("pr_qtde"));
+                    associado.setPrecovenda(rs.getDouble("pr_preco_final"));
+                    associado.setDescricaoCompleta(rs.getString("pr_nome_bal"));
+                    associado.setValidade(rs.getInt("pr_dias_validade"));
+                    associado.setTipoEmbalagem(rs.getString("cod_funidade"));
+                    
+                    associados.put(associado.getEan(), associado);
+                }
+            }
+            
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	p.pr_codint id,\n" +
+                    "	p.pr_nome descricaocompleta,\n" +
+                    "	ean.PR_CBARRA codigobarras,\n" +
+                    "	cast(ean.PR_CBARRA AS numeric) AS ean,\n" +
+                    "	ean.PR_PER_DESCONTO percentual,\n" +
+                    "	ean.pr_preco_final precoatacado,\n" +
+                    "	p.PR_PRECOVENDA_ATUAL precovenda,\n" +
+                    "	ean.PR_QTDE qtdembalagemvenda,\n" +
+                    "	ean.COD_FUNIDADE embalagem,\n" +
+                    "	ean.FLG_TIPO_DESC_ATA tipodesconto,\n" +
+                    "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n" +
+                    "	p.PR_CUSTO_SEM_ICMS custosemimposto\n" +
+                    "FROM \n" +
+                    "	vw_exp_produtos_sta p\n" +
+                    "JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT AND \n" +
+                    "	ean.LJ_ASSOCIACAO = p.LJ_ASSOCIACAO\n" +
+                    "WHERE \n" +
+                    "	p.lj_associacao = " + getLojaOrigem() + " AND \n" +
+                    "	ean.pr_preco_final > 0 AND \n" +
+                    "	ean.PR_PRECO_FINAL != p.PR_PRECOVENDA_ATUAL")) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    if (!associados.containsKey(rs.getString("codigobarras"))) {
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("id"));
+                        imp.setEan(rs.getString("codigobarras"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagemvenda"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));
+                        
+                        long eanNumerico = Utils.stringToLong(imp.getEan());
+                        
+                        if (eanNumerico <= 99) {
+                            imp.setEan("999999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 99 && eanNumerico <= 999) {
+                            imp.setEan("9999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 999 && eanNumerico <= 9999) {
+                            imp.setEan("999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 9999 && eanNumerico <= 99999) {
+                            imp.setEan("99" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 99999 && eanNumerico <= 999999) {
+                            imp.setEan("9" + eanNumerico);
+                        }
+                        
+                    }              
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
     
@@ -426,6 +532,74 @@ public class CPGestorByViewDAO extends InterfaceDAO {
             }
             
             return result;
+        }
+        
+         if (opt == OpcaoProduto.ATACADO) {
+             
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            
+            try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n" +
+                        "	p.pr_codint id,\n" +
+                        "	p.pr_nome descricaocompleta,\n" +
+                        "	ean.PR_CBARRA codigobarras,\n" +
+                        "	ean.PR_PER_DESCONTO percentual,\n" +
+                        "	ean.pr_preco_final precoatacado,\n" +
+                        "	p.PR_PRECOVENDA_ATUAL precovenda,\n" +
+                        "	ean.PR_QTDE qtdembalagemvenda,\n" +
+                        "	ean.COD_FUNIDADE embalagem,\n" +
+                        "	ean.FLG_TIPO_DESC_ATA tipodesconto,\n" +
+                        "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n" +
+                        "	p.PR_CUSTO_SEM_ICMS custosemimposto\n" +
+                        "FROM \n" +
+                        "	vw_exp_produtos_sta p\n" +
+                        "JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT AND \n" +
+                        "	ean.LJ_ASSOCIACAO = p.LJ_ASSOCIACAO\n" +
+                        "WHERE \n" +
+                        "	p.lj_associacao = " + getLojaOrigem() + " AND\n" +
+                        "	ean.pr_preco_final > 0 AND \n" +
+                        "	ean.PR_PRECO_FINAL != p.PR_PRECOVENDA_ATUAL"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setEan(rst.getString("codigobarras"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagemvenda"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        
+                        long eanNumerico = Utils.stringToLong(imp.getEan());
+                        
+                        if (eanNumerico <= 99) {
+                            imp.setEan("999999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 99 && eanNumerico <= 999) {
+                            imp.setEan("9999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 999 && eanNumerico <= 9999) {
+                            imp.setEan("999" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 9999 && eanNumerico <= 99999) {
+                            imp.setEan("99" + eanNumerico);
+                        }
+                        
+                        if (eanNumerico > 99999 && eanNumerico <= 999999) {
+                            imp.setEan("9" + eanNumerico);
+                        }
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            
+            return vResult;
         }
 
         return null;

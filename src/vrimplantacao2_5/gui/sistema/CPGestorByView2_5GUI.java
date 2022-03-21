@@ -37,7 +37,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         pnlConn.getNomeConexao();
         
         pnlBalanca.setLoja(pnlConn.getLojaOrigem());
-        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setSistema(SISTEMA + " - " + pnlConn.idConexao);
 
         centralizarForm();
         this.setMaximum(false);
