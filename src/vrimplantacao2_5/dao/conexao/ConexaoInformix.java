@@ -1,4 +1,4 @@
-package vrimplantacao.classe;
+package vrimplantacao2_5.dao.conexao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,8 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
+import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
 
-public class ConexaoInformix {
+public class ConexaoInformix implements DriverConexao {
     
     private int contBegin = 0;
     private static Connection con;
@@ -26,6 +27,7 @@ public class ConexaoInformix {
         abrirConexao(i_ip, "", i_porta, i_database, server, i_usuario, i_senha);
     }
     
+    @Override
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
         Class.forName("com.informix.jdbc.IfxDriver");
 
@@ -145,7 +147,8 @@ public class ConexaoInformix {
         con.createStatement().execute("commit");
     }
 
-    public void abrirConexao(String text, int aInt, String text0, String text1, String text2) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @Override
+    public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

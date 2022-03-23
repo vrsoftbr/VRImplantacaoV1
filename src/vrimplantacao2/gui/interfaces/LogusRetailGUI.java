@@ -827,6 +827,12 @@ public class LogusRetailGUI extends VRInternalFrame {
 
         tabsConn.addTab("Dados da conexão", pnlConn);
 
+        txtServidor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtServidorActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
         vRPanel6.setLayout(vRPanel6Layout);
         vRPanel6Layout.setHorizontalGroup(
@@ -845,9 +851,8 @@ public class LogusRetailGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblServidor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(vRPanel6Layout.createSequentialGroup()
-                                .addComponent(txtServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                            .addComponent(txtServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(vRPanel6Layout.createSequentialGroup()
                                 .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -886,7 +891,7 @@ public class LogusRetailGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE))
+                    .addComponent(vRPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -993,6 +998,10 @@ public class LogusRetailGUI extends VRInternalFrame {
     private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
 
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
+    private void txtServidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtServidorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtServidorActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

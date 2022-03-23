@@ -107,7 +107,6 @@ import vrimplantacao2.dao.interfaces.LinnerDAO;
 import vrimplantacao2.dao.interfaces.LiteciDAO;
 import vrimplantacao2.dao.interfaces.LogTECDAO;
 import vrimplantacao2.dao.interfaces.LogicboxDAO;
-import vrimplantacao2.dao.interfaces.LogusDAO;
 import vrimplantacao2.dao.interfaces.LyncisDAO;
 import vrimplantacao2.dao.interfaces.MSIInforDAO;
 import vrimplantacao2.dao.interfaces.MarketDAO;
@@ -216,6 +215,7 @@ import vrimplantacao2_5.dao.sistema.SygmaDAO;
 import vrimplantacao2_5.dao.sistema.TslDAO;
 import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
+import vrimplantacao2_5.dao.sistema.LogusDAO;
 
 /**
  *

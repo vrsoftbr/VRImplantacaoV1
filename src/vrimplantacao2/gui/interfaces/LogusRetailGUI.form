@@ -30,7 +30,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="tabs" alignment="0" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRPanel6" alignment="1" pref="687" max="32767" attributes="0"/>
+                  <Component id="vRPanel6" alignment="1" pref="872" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -805,6 +805,9 @@
           </SubComponents>
         </Container>
         <Component class="javax.swing.JTextField" name="txtServidor">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtServidorActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
