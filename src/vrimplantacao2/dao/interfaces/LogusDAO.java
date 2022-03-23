@@ -1505,6 +1505,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        
         return result;
     }
 
@@ -1543,6 +1544,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        
         return result;
     }
 }
