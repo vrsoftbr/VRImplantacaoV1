@@ -17,7 +17,7 @@ import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoVO;
  */
 public class PromocaoDAO {
 
-    public MultiMap<Integer, PromocaoVO> getPromocoes() throws Exception {
+    /*public MultiMap<Integer, PromocaoVO> getPromocoes() throws Exception {
         MultiMap<Integer, PromocaoVO> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -28,11 +28,11 @@ public class PromocaoDAO {
             )) {
                 while (rst.next()) {
                     PromocaoVO vo = new PromocaoVO();
-                    vo.setId(rst.getInt("id"));
+                    vo.setId(rst.getString("id"));
                     result.put(vo, vo.getId());
                 }
             }
         }
         return result;
-    }
+    }*/
 }
