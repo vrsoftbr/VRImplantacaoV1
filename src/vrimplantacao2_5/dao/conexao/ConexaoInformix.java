@@ -115,6 +115,7 @@ public class ConexaoInformix implements DriverConexao {
         }
     }
 
+    @Override
     public void close() throws Exception {
         try {
             con.close();
@@ -149,6 +150,6 @@ public class ConexaoInformix implements DriverConexao {
 
     @Override
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        abrirConexao(i_ip, "", i_porta, i_database, server, i_usuario, i_senha);
     }
 }
