@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  *
- * @author Michael
+ * @author Desenvolvimento
  */
 public class PromocaoAnteriorVO {
 
