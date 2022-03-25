@@ -286,7 +286,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         if (!opt.contains(OpcaoProduto.PDV_VENDA)) {
             this.remove(tabImportacaoVendas);
         }
-
+        
+        if (!opt.contains(OpcaoProduto.PROMOCAO)) {
+               chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));;
+            }
+        
         tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
 
@@ -337,6 +341,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkEANemBranco.setVisible(opt.contains(OpcaoProduto.EAN_EM_BRANCO));
             tabImportacao.add(pnlImpProduto);
         }
+        
+        if (opt.contains(OpcaoProduto.PROMOCAO)){
+            pnlImpCompl.add(chkPromocao);
+        }
+
 
         if (opt.contains(OpcaoProduto.PRECO)
                 || opt.contains(OpcaoProduto.CUSTO)
@@ -504,7 +513,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         if (!opt.contains(OpcaoProduto.PDV_VENDA)) {
             this.remove(tabImportacaoVendas);
         }
-
+        
+        if (!opt.contains(OpcaoProduto.PROMOCAO)) {
+            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));;
+        }
+        
         tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
 
@@ -631,6 +644,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVolumeEmbalagem.setSelected(false);
         chkVolumeQtd.setSelected(false);
         chkVrAtacado.setSelected(false);
+        chkPromocao.setSelected(false);
     }
 
     /**
@@ -2024,7 +2038,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
 
-    public void executarImportacao() throws Exception {
+     public void executarImportacao() throws Exception {
         new ProdutoPanelImportador().importar();
     }
 
@@ -2098,6 +2112,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public class ProdutoPanelImportador {
 
         public void importar() throws Exception {
+            
+            if (chkPromocao.isSelected()) {
+                importador.importarPromocao();
+                }
 
             if (chkFamiliaProduto.isSelected()) {
                 importador.importarFamiliaProduto();
@@ -2137,7 +2155,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
             }
-
+            
             if (chkProdutosBalanca.isSelected()) {
                 importador.importarProdutosBalanca(opt.toArray(new OpcaoProduto[]{}));
             }
@@ -2215,6 +2233,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkCustoSemImposto.isSelected()) {
                     opcoes.add(OpcaoProduto.CUSTO_SEM_IMPOSTO);
                 }
+                
                 if (chkPreco.isSelected()) {
                     opcoes.add(OpcaoProduto.PRECO);
                 }
