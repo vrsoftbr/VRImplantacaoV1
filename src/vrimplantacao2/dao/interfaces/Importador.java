@@ -69,6 +69,8 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepository;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepository;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.receita.ReceitaRepository;
@@ -113,6 +115,7 @@ import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
@@ -189,11 +192,7 @@ public class Importador {
      * @return
      */
     public String getSistema() {
-        if (getIdConexao() != 0) {
-            return interfaceDAO.getSistema() + " - " + getIdConexao();
-        } else {
-            return interfaceDAO.getSistema();
-        }
+        return interfaceDAO.getSistema() + " - " + getIdConexao();
     }
 
     /**
@@ -1207,5 +1206,21 @@ public class Importador {
         );
         DivisaoRepository repository = new DivisaoRepository(provider);
         repository.importar(divisoes);
+    }
+
+    public void importarPromocao() throws Exception {
+        //criar get promocoes, por enquanto retorna um array list,
+        //como promocoes nao permite repetição, provavelmte terá de ser
+        //repensado como vendas
+        ProgressBar.setStatus("Carregando Promoções...");
+        List<PromocaoIMP> promocoes = getInterfaceDAO().getPromocoes();
+        PromocaoRepositoryProvider provider = new PromocaoRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR(),
+                getIdConexao()
+        );
+        PromocaoRepository rep = new PromocaoRepository(provider);
+        rep.salvar(promocoes);
     }
 }

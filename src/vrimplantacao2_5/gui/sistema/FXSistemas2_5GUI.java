@@ -42,7 +42,6 @@ public class FXSistemas2_5GUI extends VRInternalFrame {
                 return dao;
             }
             
-
             @Override
             public String getSistema() {
                 return dao.getSistema() + " - " + pnlConn.idConexao;

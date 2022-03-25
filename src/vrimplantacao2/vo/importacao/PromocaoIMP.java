@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class PromocaoIMP {
     
-    private int id;
+    private String id;
     private int idLoja;
     private String descricao;
     private Date dataInicio = new Date();
@@ -22,7 +22,7 @@ public class PromocaoIMP {
     private double quantidade;
     private int qtdcupom;
     private int idSituacaocadastro;
-    private int idTipopromocao;
+    private int idTipopromocao = 1;
     private double valor;
     private int controle;
     private int idTipopercentualvalor;
@@ -39,18 +39,68 @@ public class PromocaoIMP {
     private int qtdLimite;
     private boolean somenteClubeVantagens = false;
     private int diasExpiracao;
+    private String ean;
+    private String id_produto;
+    private String id_promocao;
+    private String descricaoCompleta;
+    private double paga;
+    private int id_finalizadora;
 
+    public int getId_finalizadora() {
+        return id_finalizadora;
+    }
+
+    public void setId_finalizadora(int id_finalizadora) {
+        this.id_finalizadora = id_finalizadora;
+    }
+
+    
+    public String getId_produto() {
+        return id_produto;
+    }
+
+    public void setId_produto(String id_produto) {
+        this.id_produto = id_produto;
+    }
+
+    public String getDescricaoCompleta() {
+        return descricaoCompleta;
+    }
+
+    public void setDescricaoCompleta(String descricaoCompleta) {
+        this.descricaoCompleta = descricaoCompleta;
+    }
+
+    public double getPaga() {
+        return paga;
+    }
+
+    public void setPaga(double paga) {
+        this.paga = paga;
+    }
+
+    
+    public String getEan() {
+        return ean;
+    }
+
+    public void setEan(String ean) {
+        this.ean = ean;
+    }
+
+    
     /**
      * @return the id
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
+    
 
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -403,4 +453,13 @@ public class PromocaoIMP {
     public void setDiasExpiracao(int diasExpiracao) {
         this.diasExpiracao = diasExpiracao;
     }    
+
+    public String getId_promocao() {
+        return id_promocao;
+    }
+
+    public void setId_promocao(String id_promocao) {
+        this.id_promocao = id_promocao;
+    }
+
 }
