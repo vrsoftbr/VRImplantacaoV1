@@ -41,6 +41,7 @@ public class FXSistemas2_5GUI extends VRInternalFrame {
             public MapaTributoProvider getProvider() {
                 return dao;
             }
+            
 
             @Override
             public String getSistema() {
