@@ -40,8 +40,4 @@ public class SelecaoLojaController {
     public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
         return service.construirInternalFrame(sistema, frame);
     }
-    
-    public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
-        return service.construirInternalFrame(sistema, frame, baseDadosGui);
-    }
 }

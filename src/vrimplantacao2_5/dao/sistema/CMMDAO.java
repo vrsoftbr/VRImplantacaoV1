@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
@@ -31,13 +26,13 @@ import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
- * @author Wagner
+ * @author Guilherme
  */
-public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
+public class CMMDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "MRC6";
+        return "CMM";
     }
 
     @Override
@@ -160,28 +155,28 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + " prod.Grupoid as codmerc1,\n"
-                    + " merc1.descricao as descmerc1,\n"
-                    + " prod.Subgrupoid as codmerc2,\n"
-                    + " merc2.descricao as descmerc2,\n"
-                    + " prod.Subgrupoid as codmerc3,\n"
-                    + " merc2.descricao as descmerc3\n"
-                    + "from produtos prod\n"
-                    + "left join produtosgrupos merc1 on merc1.codigo = prod.Grupoid\n"
-                    + "left join produtosgrupos merc2 on merc2.codigo = prod.Subgrupoid\n"
-                    + "order by 1,3,5;"
+                    "select \n" +
+                    "	coalesce(coalesce(d.CodDep, gg.CodGru), g.CodGru) merc1,\n" +
+                    "	coalesce(coalesce(d.Departamento, gg.Grupo), g.Grupo) descmerc1,\n" +
+                    "	coalesce(gg.CodGru, g.CodGru) merc2,\n" +
+                    "	coalesce(gg.Grupo, g.Grupo) descmerc2,\n" +
+                    "	g.CodGru merc3,\n" +
+                    "	g.Grupo descmerc3\n" +
+                    "from \n" +
+                    "	Grupos g\n" +
+                    "LEFT JOIN GrupoGeral gg on g.CodGer = gg.CodGru\n" +
+                    "LEFT JOIN Departamentos d on gg.CodDep = d.CodDep"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setMerc1ID(rst.getString("codmerc1"));
+                    imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("descmerc1"));
-                    imp.setMerc2ID(rst.getString("codmerc2"));
+                    imp.setMerc2ID(rst.getString("merc2"));
                     imp.setMerc2Descricao(rst.getString("descmerc2"));
-                    imp.setMerc3ID(rst.getString("codmerc3"));
+                    imp.setMerc3ID(rst.getString("merc3"));
                     imp.setMerc3Descricao(rst.getString("descmerc3"));
                     result.add(imp);
                 }
@@ -196,35 +191,90 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + " prod.codigo id,\n"
-                    + "	prod.produto descricao,\n"
-                    + "	prod.codigodebarras ean,\n"
-                    + "	prod.familiaID familiaid,\n"
-                    + "	prod.grupoID merc1 ,\n"
-                    + "	prod.subgrupoID merc2,\n"
-                    + "	prod.subgrupoID merc3,\n"
-                    + "	prod.precocusto custo,\n"
-                    + "	prod.precotabela precovenda,\n"
-                    + "	prod.peso pesoliquido,\n"
-                    + "	prod.pesobruto pesobruto,\n"
-                    + "	prod.tipo tipo,\n"
-                    + "	prod.validade validade,\n"
-                    + "	prod.dtcadastro datacadastro,\n"
-                    + "	est.estoquereal estoque,\n"
-                    + "	prod.exibir ativo,\n"
-                    + "	prod.situacaotributariaorigemID,\n"
-                    + "	replace(prod.classificacaoID, '.', '') as ncm,\n"
-                    + "	tax.codigocest as cest,\n"
-                    + "	coalesce(tax.comerciosituacaotributariatributacaoID,\n"
-                    + "	0) as cst,\n"
-                    + "	coalesce(tax.comerciosituacaotributariatributacaoID,\n"
-                    + "	0) as idaliquota\n"
-                    + "from\n"
-                    + "	produtos prod\n"
-                    + "left join estoque est on est.produtoID = prod.codigo\n"
-                    + "left join taxasicms tax on tax.produtoid = prod.codigo\n"
-                    + "order by 1"
+                    "select \n" +
+                    "	pr.CodPro id,\n" +
+                    "	pr.Produto descricaocompleta,\n" +
+                    "	pr.CodBar codigobarras,\n" +
+                    "	coalesce(coalesce(d.CodDep, gg.CodGru), g.CodGru) merc1,\n" +
+                    "	coalesce(gg.CodGru, g.CodGru) merc2,\n" +
+                    "	g.CodGru merc3,\n" +
+                    "	pr.exportarbalanca,\n" +
+                    "	pr.diasval validade,\n" +
+                    "	pr.CodUni embalagemvenda,\n" +
+                    "	pr.qtdecx qtdembalagemcompra,\n" +
+                    "	pr.customedio,\n" +
+                    "	pr.PrecoCompra custocomimposto,\n" +
+                    "	pr.CustoEstoque,\n" +
+                    "	pr.PrecoCusto,\n" +
+                    "	pr.custovendido,\n" +
+                    "	pr.PrecoVenda,\n" +
+                    "	pr.PrecoAtacado,\n" +
+                    "	pr.Margem,\n" +
+                    "	pr.NCM,\n" +
+                    "	pr.cest,\n" +
+                    "	pr.DataCadastro,\n" +
+                    "	pr.Ativo,\n" +
+                    "	ef.estoque,\n" +
+                    "	pr.EstoqueMin,\n" +
+                    "	pr.EstoqueMax,\n" +
+                    "	pr.PesoBruto,\n" +
+                    "	pr.PesoLiquido,\n" +
+                    "	case\n" +
+                    "		when TPro.Cfop is null then TTri.CstIcms\n" +
+                    "		else TPro.CstIcms\n" +
+                    "	end as sac_cst,\n" +
+                    "	case\n" +
+                    "		when TPro.Cfop is null then TTri.PerIcms\n" +
+                    "		else TPro.PerIcms\n" +
+                    "	end as sac_alq,\n" +
+                    "	case\n" +
+                    "		when TPro.Cfop is null then TTri.RedBaseIcms\n" +
+                    "		else TPro.RedBaseIcms\n" +
+                    "	end as sac_rbc,\n" +
+                    "	case\n" +
+                    "		when TProE.Cfop is null then TTriE.CstIcms\n" +
+                    "		else TProE.CstIcms\n" +
+                    "	end as ei_cst,\n" +
+                    "	case\n" +
+                    "		when TProE.Cfop is null then TTriE.PerIcms\n" +
+                    "		else TProE.PerIcms\n" +
+                    "	end as ei_alq,\n" +
+                    "	case\n" +
+                    "		when TProE.Cfop is null then TTriE.RedBaseIcms\n" +
+                    "		else TProE.RedBaseIcms\n" +
+                    "	end as ei_rbc,\n" +
+                    "	pr.CSTPCEnt piscredito,\n" +
+                    "	pr.CSTPCSai pisdebito,\n" +
+                    "	pr.CodTri idicmsdebito,\n" +
+                    "	pr.PerMva as mva, \n" +
+                    " 	pr.PerMva as mva_distribuidor, \n" +
+                    " 	pr.ModIcmsST as tipo_mva\n" +
+                    "from \n" +
+                    "	produtos pr\n" +
+                    "left join EstFil ef on pr.CodPro = ef.CodPro\n" +
+                    "left join TribMov TPro on\n" +
+                    "	pr.CodPro = TPro.CodTri\n" +
+                    "	and TPro.CodMov = 1\n" +
+                    "	and TPro.Cad = 1\n" +
+                    "left join TribMov TTri on\n" +
+                    "	pr.CodTri = TTri.CodTri\n" +
+                    "	and TTri.CodMov = 1\n" +
+                    "	and TTri.Cad = 2\n" +
+                    "left join Tributos on\n" +
+                    "	pr.CodTri = Tributos.CodTri\n" +
+                    "left join TribMov TProE on\n" +
+                    "	pr.CodPro = TProE.CodTri\n" +
+                    "	and TProE.CodMov = 2\n" +
+                    "	and TProE.Cad = 1\n" +
+                    "left join TribMov TTriE on\n" +
+                    "	TTriE.CodTri = Tributos.CodTri\n" +
+                    "	and TTriE.CodMov = 2\n" +
+                    "	and TTriE.Cad = 2\n" +
+                    "left join Grupos g on pr.CodGru = g.CodGru\n" +
+                    "LEFT JOIN GrupoGeral gg on g.CodGer = gg.CodGru\n" +
+                    "LEFT JOIN Departamentos d on gg.CodDep = d.CodDep\n" +
+                    "where \n" +
+                    "	coalesce(ef.CodFil, 1) = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();

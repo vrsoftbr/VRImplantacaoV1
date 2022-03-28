@@ -201,6 +201,7 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
@@ -302,7 +303,6 @@ public enum ESistema {
     IQSISTEMAS(77, "IQSISTEMAS", new IQSistemasDAO()),
     ISERVER(78, "ISERVER", new IServerDAO()),
     INFOBRASIL(79, "INFOBRASIL", new InfoBrasilDAO()),
-    //INFOMAC(80, "INFOMAC", new InfoMacDAO()),
     INOVA(81, "INOVA", new InovaDAO()),
     INTELLICASH(82, "INTELLICASH", new IntelliCashDAO()),
     INTELLICON(83, "INTELLICON", new IntelliconDAO()),
@@ -344,7 +344,6 @@ public enum ESistema {
     PLENUS(119, "PLENUS", new PlenusDAO()),
     POLIGON(120, "POLIGON", new PoligonDAO()),
     POMARES(121, "POMARES", new PomaresDAO()),
-    //PROSUPER(122, "PROSUPER", new ProsuperDAO()),
     PROTON(123, "PROTON", new ProtonDAO()),
     PWGESTOR(124, "PWGESTOR", new PwGestorDAO()),
     PWS(125, "PWS", new PwsDAO()),
@@ -370,7 +369,6 @@ public enum ESistema {
     SAV(145, "SAV", new SavDAO()),
     SCEF(146, "SCEF", new ScefDAO()),
     SHI(147, "SHI", new ShiDAO()),
-    //SIACRIARE(148, "SIACRIARE", new SiaCriareDAO()),
     SIAC(149, "SIAC", new SiacDAO()),
     SIFAT(150, "SIFAT", new SifatDAO()),
     SIGMA(151, "SIGMA", new SigmaDAO()),
@@ -385,7 +383,6 @@ public enum ESistema {
     SOLUTIONSUPERA(160, "SOLUTIONSUPERA", new SolutionSuperaDAO()),
     SOPHYX(161, "SOPHYX", new SophyxDAO()),
     SRI(162, "SRI", new SriDAO()),
-    //SUPERSERVER(163, "SUPERSERVER", new SuperControleDAO()),
     SUPER(164, "SUPER", new SuperDAO()),
     SUPERLOJA10(165, "SUPERLOJA10", new SuperLoja10DAO()),
     SUPERUS(166, "SUPERUS", new SuperusDAO()),
@@ -393,7 +390,6 @@ public enum ESistema {
     SYSAUT(168, "SYSAUT", new SysAutDAO()),
     SYSERP(169, "SYSERP", new SysERPDAO()),
     SYSPDV(170, "SYSPDV", new SysPdvDAO()),
-    //SYSMO(171, "SYSMO", new SysmoDAO()),
     TGA(172, "TGA", new TGADAO()),
     TECNOSOFT(173, "TECNOSOFT", new TecnosoftDAO()),
     TELECON(174, "TELECON", new TeleconDAO()),
@@ -415,7 +411,6 @@ public enum ESistema {
     WINNEXUS(190, "WINNEXUS", new WinNexusDAO()),
     WISASOFT(191, "WISASOFT", new WisaSoftDAO()),
     WMSI(192, "WMSI", new WmsiDAO()),
-    //WSHOP(193, "WSHOP", ""),
     ZOOMBOX(194, "ZOOMBOX", new ZoomboxDAO()),
     ZPF(195, "ZPF", new ZpfDAO()),
     LINEAR(196, "LINEAR", new LinearDAO()),
@@ -437,8 +432,8 @@ public enum ESistema {
     TSL(212, "TSL", new TslDAO()),
     SATFACIL(213,"SATFACIL",new SatFacilDAO()),
     WBA(214,"WBA",new WBADAO()),
-    STOCK(215, "STOCK", new Stock_PostgresDAO());
-    //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
+    STOCK(215, "STOCK", new Stock_PostgresDAO()),
+    CMM(216, "CMM", new CMMDAO());
     
     private int id;
     private String nome;
