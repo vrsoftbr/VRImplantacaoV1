@@ -42,10 +42,8 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.service.migracao.ProdutoService;
-import vrimplantacao2_5.vo.cadastro.LogVO;
 import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
@@ -266,7 +264,7 @@ public class ProdutoRepository {
                     }
 
                     notificar();
-                    LOG.finer("Produto importado: " + rep.toString());
+                    LOG.log(Level.FINER, "Produto importado: {0}", rep.toString());
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, "Erro ao importar o produto\n" + rep.toString(), ex);
                     throw ex;
