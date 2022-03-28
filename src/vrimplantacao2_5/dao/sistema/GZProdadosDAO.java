@@ -5,9 +5,11 @@
  */
 package vrimplantacao2_5.dao.sistema;
 
+import com.sun.imageio.plugins.jpeg.JPEG;
 import vrimplantacao2.dao.interfaces.*;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,12 +24,16 @@ import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -90,6 +96,20 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
             OpcaoProduto.MARGEM
         }));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.CONVENIO_CONVENIADO));
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
@@ -215,6 +235,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.Descricao descricaocompleta,\n"
                     + " p.DescrRed descricaoreduzida,\n"
                     + " p.descricaoetq descricaogondola,\n"
+                    + " p.pesovariavel,\n"
                     + " p.UnidSaida embalagem,\n"
                     + " p.EmbSaida qtde,\n"
                     + " pr.VENDA1 precovenda,\n"
@@ -262,8 +283,8 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("produtoid"));
-                    imp.setTipoEmbalagem(rst.getString("embalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde"));
+                    //imp.setTipoEmbalagem(rst.getString("embalagem"));
+                    //imp.setQtdEmbalagem(rst.getInt("qtde"));
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -276,10 +297,10 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.setEan(rst.getString("ean"));
-                        imp.seteBalanca(false);
+                        imp.seteBalanca(rst.getBoolean("pesovariavel"));
                         imp.setTipoEmbalagem(rst.getString("embalagem"));
-                        imp.setValidade(0);
-                        imp.setQtdEmbalagem(0);
+                        imp.setValidade(rst.getInt("validade"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
                     }
 
                     imp.setValidade(rst.getInt("validade"));
@@ -506,9 +527,9 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setTelefone(rst.getString("fone"));
                     imp.setEmail(rst.getString("email"));
-                    
-                    SimpleDateFormat formatar = new SimpleDateFormat("yyyy-MM-dd"); 
-                    Date data = formatar.parse(rst.getString("dt_nasc"));                    
+
+                    SimpleDateFormat formatar = new SimpleDateFormat("yyyy-MM-dd");
+                    Date data = formatar.parse(rst.getString("dt_nasc"));
 
                     imp.setDataNascimento(data);
                     imp.setCelular(rst.getString("celular"));
@@ -564,6 +585,122 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " IdEmpresaConvenio id,\n"
+                    + " RazaoSocial razao,\n"
+                    + " Fantasia,\n"
+                    + " Endereco,\n"
+                    + " Numero,\n"
+                    + " Bairro,\n"
+                    + " Cidade,\n"
+                    + " Uf,\n"
+                    + " CGC_CPF cnpj,\n"
+                    + " InscRG inscricao\n"
+                    + "from empresa_convenio")) {
+                while (rs.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setUf(rs.getString("uf"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " idCliente,\n"
+                    + " nome,\n"
+                    + " empresa_convenio,\n"
+                    + " cpf,\n"
+                    + " limite,\n"
+                    + " dtAbertura,\n"
+                    + " numerocartao,\n"
+                    + " status_cadastro,\n"
+                    + " status_cliente\n"
+                    + "from cliente \n"
+                    + "where \n"
+                    + " idtipocliente = 1"
+            )) {
+                while (rs.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+
+                    imp.setId(rs.getString("idCliente"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setIdEmpresa(rs.getString("empresa_convenio"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setConvenioLimite(rs.getDouble("limite"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " r.idReceber,\n"
+                    + " r.idCliente,\n"
+                    + " r.Doc,\n"
+                    + " r.Valor,\n"
+                    + " r.emissao,\n"
+                    + " p.venc,\n"
+                    + " r.obs\n"
+                    + "from receber r\n"
+                    + "join parcelareceber p on p.idReceber = r.idReceber\n"
+                    + "join cliente c on c.idCliente = r.idCliente\n"
+                    + "where \n"
+                    + " c.idtipocliente = 1;"
+            )) {
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                while (rs.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+
+                    imp.setId(rs.getString("idReceber"));
+                    imp.setNumeroCupom(rs.getString("Doc"));
+                    imp.setIdConveniado(rs.getString("idCliente"));
+                    imp.setDataMovimento(rs.getDate("emissao"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obs"));
+
+                    imp.setDataHora(new Timestamp(format.parse(imp.getDataMovimento() + " 00:00:00").getTime()));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
