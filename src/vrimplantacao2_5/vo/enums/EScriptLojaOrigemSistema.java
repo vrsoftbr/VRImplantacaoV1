@@ -20,6 +20,7 @@ public enum EScriptLojaOrigemSistema {
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
+    LOGUS(100 , 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
     SYGMA(200, 5,
             "select "
             + "1 as id, "

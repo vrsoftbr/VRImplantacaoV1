@@ -5,6 +5,7 @@ import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
+import vrimplantacao2_5.gui.componente.conexao.informix.ConexaoInformixPanel;
 import vrimplantacao2_5.gui.componente.conexao.mysql.ConexaoMySQLPanel;
 import vrimplantacao2_5.gui.componente.conexao.oracle.ConexaoOraclePanel;
 import vrimplantacao2_5.gui.componente.conexao.postgresql.ConexaoPostgreSQLPanel;
@@ -36,6 +37,11 @@ public abstract class PanelConexaoFactory {
         switch (eBD) {
             case FIREBIRD:
                 panelConexao = new ConexaoFirebirdPanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
+                
+            case INFORMIX:
+                panelConexao = new ConexaoInformixPanel(bdVO.getSchema(), bdVO.getPorta(),
                         bdVO.getUsuario(), bdVO.getSenha());
                 break;
 
