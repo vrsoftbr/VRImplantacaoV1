@@ -130,6 +130,13 @@ public class GZProdados2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    
+                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
+                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+                    }
+                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
+                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+                    }
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:
