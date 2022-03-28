@@ -224,8 +224,6 @@ public class ConexaoInformixPanel extends javax.swing.JPanel implements Configur
                     .addComponent(btnConectar))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        getAccessibleContext().setAccessibleName("Conexão Informix");
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
@@ -266,6 +264,7 @@ public class ConexaoInformixPanel extends javax.swing.JPanel implements Configur
 
         this.port = txtPorta.getText();
         this.database = txtDatabase.getText();
+        this.servidor = txtServidor.getText();
         this.host = txtHost.getText();
         this.user = txtUsuario.getText();
         this.pass = txtSenha.getText();
@@ -288,6 +287,7 @@ public class ConexaoInformixPanel extends javax.swing.JPanel implements Configur
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull(host, sistema, "INFORMIX", "HOST"));
         txtDatabase.setText(params.getWithNull(database, sistema, "INFORMIX", "DATABASE"));
+        txtServidor.setText(params.getWithNull(servidor, sistema, "INFORMIX", "SERVIDOR"));
         txtPorta.setText(params.getWithNull(port, sistema, "INFORMIX", "PORTA"));
         txtUsuario.setText(params.getWithNull(user, sistema, "INFORMIX", "USUARIO"));
         txtSenha.setText(params.getWithNull(pass, sistema, "INFORMIX", "SENHA"));
@@ -296,12 +296,14 @@ public class ConexaoInformixPanel extends javax.swing.JPanel implements Configur
     public String user = "root";
     public String port = "9088";
     public String database = "db_nomecliente_m";
+    public String servidor = "ol_matriz";
     public String host = "localhost";
     
     public void atualizarParametros() {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), sistema, "INFORMIX", "HOST");
         params.put(txtDatabase.getText(), sistema, "INFORMIX", "DATABASE");
+        params.put(txtServidor.getText(), sistema, "INFORMIX", "SERVIDOR");
         params.put(txtPorta.getText(), sistema, "INFORMIX", "PORTA");
         params.put(txtUsuario.getText(), sistema, "INFORMIX", "USUARIO");
         params.put(txtSenha.getText(), sistema, "INFORMIX", "SENHA");
