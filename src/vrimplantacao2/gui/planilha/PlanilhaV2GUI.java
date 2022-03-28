@@ -1451,6 +1451,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 public void run() {
                     try {
                         Importador importador = new Importador(dao);
+                        
+                        importador.importarPorPlanilha = true;
                         dao.setSistema(txtSistema.getText());
                         dao.setLojaOrigem(txtCodLojaOrigem.getText());
                         importador.setLojaVR(((ItemComboVO) cmbLojaDestino.getSelectedItem()).id);

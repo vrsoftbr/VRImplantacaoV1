@@ -71,6 +71,7 @@ public class ProdutoRepositoryProvider {
     private PautaFiscalDAO pautaDao = new PautaFiscalDAO();
     private DivisaoDAO divisaoDAO;
     private FornecedorAnteriorDAO fornecedorAntDAO;
+    private boolean importarPorPlanilha;
 
     public ProdutoRepositoryProvider() {
         try {
@@ -123,6 +124,14 @@ public class ProdutoRepositoryProvider {
 
     public void rollback() throws Exception {
         Conexao.rollback();
+    }
+
+    public boolean isImportarPorPlanilha() {
+        return importarPorPlanilha;
+    }
+
+    public void setImportarPorPlanilha(boolean importarPorPlanilha) {
+        this.importarPorPlanilha = importarPorPlanilha;
     }
 
     public Set<OpcaoProduto> getOpcoes() {

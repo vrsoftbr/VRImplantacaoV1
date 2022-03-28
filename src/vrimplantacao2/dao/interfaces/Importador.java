@@ -129,6 +129,7 @@ public class Importador {
     private boolean importarIndividualLoja = false;
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
+    public boolean importarPorPlanilha = false;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -346,6 +347,7 @@ public class Importador {
         provider.setSistema(getSistema());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
+        provider.setImportarPorPlanilha(this.importarPorPlanilha);
 
         ProdutoRepository repository = new ProdutoRepository(provider);
 

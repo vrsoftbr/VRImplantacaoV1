@@ -293,46 +293,51 @@ public class ProdutoRepository {
     }
 
     public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
-        ProdutoService produtoService = new ProdutoService();
 
-        forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
-
-        int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
-                registros = produtoService.verificaRegistro();
-
-        String impSistema = produtoService.getImpSistemaInicial().trim();
-
-        if (!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
-                && registros == 0) {
-            throw new VRException("Favor, selecionar loja matriz para primeira importação!\n"
-                    + "Os códigos devem ser mantidos da loja principal!");
-        }
-
-        if (this.forcarUnificacao) {
-            unificar(produtos);
+        if (this.provider.isImportarPorPlanilha()) {
+            salvar(produtos);
         } else {
-            /**
-             * Se já existe registro na codant e a nova conexão não existe na
-             * codant ou o nome do sistema (sistema ' - ' complemento) da
-             * primeira importação é diferente do sistema da nova importação,
-             * então a rotina define que é uma unificação.
-             */
-            if (registros > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(getSistema()))) {
+            ProdutoService produtoService = new ProdutoService();
+
+            forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
+
+            int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
+                    registros = produtoService.verificaRegistro();
+
+            String impSistema = produtoService.getImpSistemaInicial().trim();
+
+            if (!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())
+                    && registros == 0) {
+                throw new VRException("Favor, selecionar loja matriz para primeira importação!\n"
+                        + "Os códigos devem ser mantidos da loja principal!");
+            }
+
+            if (this.forcarUnificacao) {
                 unificar(produtos);
             } else {
-                boolean existeConexao = produtoService.
-                        verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
-                
-                String lojaModelo = produtoService.
+                /**
+                 * Se já existe registro na codant e a nova conexão não existe
+                 * na codant ou o nome do sistema (sistema ' - ' complemento) da
+                 * primeira importação é diferente do sistema da nova
+                 * importação, então a rotina define que é uma unificação.
+                 */
+                if (registros > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(getSistema()))) {
+                    unificar(produtos);
+                } else {
+                    boolean existeConexao = produtoService.
+                            verificaMigracaoMultiloja(getLoja(), getSistema(), this.provider.getIdConexao());
+
+                    String lojaModelo = produtoService.
                             getLojaModelo(this.provider.getIdConexao(), getSistema());
 
-                if (registros > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
-                    
-                    provider.setStatus("Produtos - Copiando código anterior produto...");
-                    produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
-                }
+                    if (registros > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
 
-                salvar(produtos);
+                        provider.setStatus("Produtos - Copiando código anterior produto...");
+                        produtoService.copiarCodantProduto(getSistema(), lojaModelo, getLoja());
+                    }
+
+                    salvar(produtos);
+                }
             }
         }
     }
