@@ -59,10 +59,14 @@ public class PromocaoDAO {
 
             try {
                 stm.execute(sql.getInsert());
-            } catch (Exception e) {
-                System.out.println(sql.getInsert());
-                e.printStackTrace();
-                throw e;
+            } catch (Exception a) {
+                try {
+                    stm.execute(sql.getUpdate());
+                } catch (Exception e) {
+                    System.out.println(sql.getInsert());
+                    e.printStackTrace();
+                    throw e;
+                }
             }
         }
     }
@@ -89,10 +93,14 @@ public class PromocaoDAO {
             sql.put("precovenda", itens.getPaga());
             try {
                 stm.execute(sql.getInsert());
-            } catch (Exception e) {
-                System.out.println(sql.getInsert());
-                e.printStackTrace();
-                throw e;
+            } catch (Exception a) {
+                try {
+                    stm.execute(sql.getUpdate());
+                } catch (Exception e) {
+                    System.out.println(sql.getInsert());
+                    e.printStackTrace();
+                    throw e;
+                }
             }
         }
     }
@@ -162,8 +170,10 @@ public class PromocaoDAO {
         }
         return Result;
     }
-    
+
     public void salvarFinalizadora(PromocaoAnteriorVO finaliza) throws Exception {
+        List<PromocaoIMP> teste = getValoresFinalizadora();
+        List<PromocaoIMP> real = getFinalizadora();
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("promocaofinalizadora");
@@ -171,12 +181,31 @@ public class PromocaoDAO {
             sql.put("id_promocao", finaliza.getId_promocao());
             sql.put("id_finalizadora", finaliza.getId_finalizadora());
             try {
+                if (teste.size() < real.size()) {
                 stm.execute(sql.getInsert());
+                } else {stm.execute(sql.getUpdate());}
             } catch (Exception e) {
                 System.out.println(sql.getInsert());
                 e.printStackTrace();
                 throw e;
             }
         }
+    }
+
+    public List<PromocaoIMP> getValoresFinalizadora() throws Exception {
+        List<PromocaoIMP> Result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select * from promocaofinalizadora"
+            )) {
+                while (rst.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+                    imp.setId_promocao(rst.getString("id_promocao"));
+                    imp.setId_finalizadora(rst.getInt("id_finalizadora"));
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
     }
 }

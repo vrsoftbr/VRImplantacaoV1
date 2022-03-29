@@ -78,6 +78,7 @@ public class TslController extends InterfaceController {
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.PDV_VENDA,
+                    OpcaoProduto.PROMOCAO,
                     OpcaoProduto.VENDA_PDV
                 }
         ));
