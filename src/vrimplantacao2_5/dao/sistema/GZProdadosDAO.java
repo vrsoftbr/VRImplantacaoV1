@@ -204,17 +204,16 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + " p.idGrupo mercid1,\n"
-                    + " g.NOME desc1,\n"
-                    + " p.idSubGrupo mercid2,\n"
-                    + " sb.Nome desc2,\n"
-                    + " p.idSubGrupo1 mercid3,\n"
-                    + " sb1.nome desc3\n"
-                    + "from produto p\n"
-                    + "join grupo g on g.IDGRUPO = p.idGrupo\n"
-                    + "join subgrupo sb on sb.idSubGrupo = p.idSubGrupo \n"
-                    + "join subgrupo1 sb1 on sb1.idsubgrupo1 = p.idSubGrupo1\n"
+                    "select\n"
+                    + "	g.IDGRUPO mercid1,\n"
+                    + "	g.NOME desc1,\n"
+                    + "	sb.idSubGrupo mercid2,\n"
+                    + "	sb.Nome desc2,\n"
+                    + "	sb1.idsubgrupo1 mercid3,\n"
+                    + "	sb1.nome desc3\n"
+                    + "from subgrupo1 sb1\n"
+                    + "join grupo g on g.IDGRUPO = sb1.idgrupo\n"
+                    + "join subgrupo sb on sb.idSubGrupo = sb1.idsubgrupo\n"
                     + "order by 1,3,5"
             )) {
                 while (rst.next()) {
@@ -225,7 +224,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rst.getString("desc1"));
                     imp.setMerc2ID(rst.getString("mercid2"));
                     imp.setMerc2Descricao(rst.getString("desc2"));
-                    imp.setMerc3ID("mercid3");
+                    imp.setMerc3ID(rst.getString("mercid3"));
                     imp.setMerc3Descricao(rst.getString("desc3"));
                     result.add(imp);
                 }
@@ -862,7 +861,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " join venda v on v.idvenda = iv.idVenda\n"
                     + " join produto p on p.idProduto = iv.idProduto \n"
                     + "where \n"
-                    + " v.DataMov between '"+ VendaIterator.FORMAT.format(dataInicio) +"' and '"+ VendaIterator.FORMAT.format(dataTermino) +"'";
+                    + " v.DataMov between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
