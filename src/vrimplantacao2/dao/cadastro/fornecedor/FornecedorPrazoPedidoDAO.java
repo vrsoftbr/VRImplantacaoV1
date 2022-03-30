@@ -9,14 +9,14 @@ import vrframework.classe.Conexao;
  */
 public class FornecedorPrazoPedidoDAO {
 
-    public void salvarTodasLojas(int idFornecedor, int diasPrazoPedido) throws Exception{
+    public void salvarTodasLojas(int idFornecedor, int diasPrazoPedido) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "do $$\n" +
                     "declare\n" +
                     "	v_forn integer = " + idFornecedor + ";\n" +
                     "	v_diasentregapedido integer = " + diasPrazoPedido + ";\n" +
-                    "	v_diasatualizapedidoparcial integer = 0;\n" +
+                    "	v_diasatualizapedidoparcial integer = 5;\n" +
                     "	r record;\n" +
                     "begin\n" +
                     "	for r in select id from loja order by id\n" +

@@ -65,11 +65,17 @@ public class FornecedorRepository {
             unificar(fornecedores);
         } else {
 
-            if (registro > 0 && idConexao == 0 || (!impSistema.isEmpty() && !impSistema.equals(this.provider.getSistema()))) {
+            if (registro > 0 && idConexao == 0 || 
+                    (!impSistema.isEmpty() && 
+                        !impSistema.equals(this.provider.getSistema()))) {
+                
                 unificar(fornecedores);
+                
             } else {
                 boolean existeConexao = fornecedorService.
-                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), 
+                                                  this.provider.getSistema(), 
+                                                  this.provider.getIdConexao());
 
                 String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
                                 
@@ -105,6 +111,7 @@ public class FornecedorRepository {
 
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
+            
             for (FornecedorIMP imp : filtrados.values()) {
                 FornecedorAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -460,26 +467,35 @@ public class FornecedorRepository {
     public void processarDivisoes(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> div) throws Exception {
         Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
         
-        for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
+        if (imp.getDivisoes().isEmpty()) {
+            provider.gravarPrazoFornecedor(
+                    vo.getId(),
+                    0, 
+                    7, 
+                    7, 
+                    7);
+        } else {
+            for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
 
-            Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
-            int idDivisao;
-            if (divisao != null) {
-                idDivisao = divisao.getValue();
-            } else {
-                idDivisao = 0;
+                Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
+                int idDivisao;
+                if (divisao != null) {
+                    idDivisao = divisao.getValue();
+                } else {
+                    idDivisao = 0;
+                }
+
+                if (!div.containsKey(
+                        String.valueOf(vo.getId()),
+                        String.valueOf(idDivisao)                    
+                )) {
+                    provider.gravarPrazoFornecedor(vo.getId(), idDivisao, impDiv.getPrazoEntrega(), impDiv.getPrazoVisita(), impDiv.getPrazoSeguranca());
+                    div.put(null, 
+                        String.valueOf(vo.getId()),
+                        String.valueOf(idDivisao)                    
+                    );
+                }            
             }
-
-            if (!div.containsKey(
-                    String.valueOf(vo.getId()),
-                    String.valueOf(idDivisao)                    
-            )) {
-                provider.gravarPrazoFornecedor(vo.getId(), idDivisao, impDiv.getPrazoEntrega(), impDiv.getPrazoVisita(), impDiv.getPrazoSeguranca());
-                div.put(null, 
-                    String.valueOf(vo.getId()),
-                    String.valueOf(idDivisao)                    
-                );
-            }            
         }
     }
 
