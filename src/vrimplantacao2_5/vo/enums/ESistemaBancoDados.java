@@ -216,7 +216,8 @@ public enum ESistemaBancoDados {
     SQLSERVER_TPAROOTAC(177, "TPAROOTAC", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_VISUALCOMERCIO(185, "VISUALCOMERCIO", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_VISUALMIX(186, "VISUALMIX", 13, "SQLSERVER", "", "", "", 1433),
-    SQLSERVER_WINNEXUS(190, "WINNEXUS", 13, "SQLSERVER", "", "", "", 1433);
+    SQLSERVER_WINNEXUS(190, "WINNEXUS", 13, "SQLSERVER", "", "", "", 1433),
+    SQLSERVER_CMM(216, "CMM", 13, "SQLSERVER", "", "", "", 1433);
 
     private int idSistema;
     private String nomeSistema;

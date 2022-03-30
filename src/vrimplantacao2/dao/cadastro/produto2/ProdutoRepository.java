@@ -228,10 +228,14 @@ public class ProdutoRepository {
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
 
-                        if (prod.getDescricaoCompleta() != null
-                                && prod.getDescricaoCompleta().length() >= 3
-                                && ean > 999999) {
-                            provider.salvarLojaVirtual(prod, ean);
+                        if (prod.getDescricaoCompleta() != null 
+                                && !prod.getDescricaoCompleta().trim().isEmpty()
+                                    && prod.getDescricaoCompleta().length() >= 3
+                                        && ean > 999999) {
+                            
+                            if (!(ean > 99999999999999l)) {
+                                provider.salvarLojaVirtual(prod, ean);
+                            }
                         }
 
                         if (aliquota.getBeneficio() != 0) {

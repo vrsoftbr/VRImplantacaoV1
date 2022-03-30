@@ -126,10 +126,10 @@ public enum EScriptLojaOrigemSistema {
                     "	rownum <= 1"),
     STOCK(215,11,"select empid as id, empnome as descricao from tbempresas;"),
     CMM(216, 13, "select \n" +
-            "	f.CodFil id,\n" +
-            "	f.CNPJ + ' - ' + f.Fantasia as descricao," +
-            "from \n" +
-            "	Filiais f");
+                "	f.CodFil id,\n" +
+                "	f.CNPJ + '' - '' + f.Fantasia as descricao\n" +
+                "from \n" +
+                "	Filiais f");
 
     private int idSistema;
     private int idBancoDados;
