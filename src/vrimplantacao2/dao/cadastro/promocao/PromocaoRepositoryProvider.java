@@ -89,10 +89,6 @@ public class PromocaoRepositoryProvider {
         anteriorDAO.salvar(anterior);
     }
     
-    public void gravarPromocaoItensFinalizadora() throws Exception {
-        anteriorDAO.copiarPromocaoItensFinalizadora(sistema, lojaOrigem);
-    }
-
     void getPromocaoItens() throws Exception {
         promocaoDAO.getPromocaoItens();
     }

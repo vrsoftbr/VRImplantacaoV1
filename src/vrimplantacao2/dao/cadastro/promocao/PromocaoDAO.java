@@ -3,14 +3,9 @@ package vrimplantacao2.dao.cadastro.promocao;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoVO;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
@@ -21,8 +16,6 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  * @author Michael
  */
 public class PromocaoDAO {
-
-    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void salvar(PromocaoVO promocao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -146,18 +139,16 @@ public class PromocaoDAO {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	distinct\n"
+                    + "distinct \n"
                     + "	p.id_promocao,\n"
-                    + "	pr.ID id_produto,\n"
+                    + "	imp.codigoatual id_produto,\n"
                     + "	p.paga\n"
                     + "from\n"
                     + "	implantacao.codant_promocao p\n"
                     + "inner join implantacao.codant_produto imp on\n"
                     + "	p.id_produto = imp.impid\n"
-                    + "inner join produto pr on\n"
-                    + "	imp.codigoatual = pr.id\n"
-                    + "order by\n"
-                    + "	2"
+                    + "where p.sistema = imp.impsistema \n"
+                    + "order by 2"
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
@@ -172,7 +163,7 @@ public class PromocaoDAO {
     }
 
     public void salvarFinalizadora(PromocaoAnteriorVO finaliza) throws Exception {
-        List<PromocaoIMP> teste = getValoresFinalizadora();
+        List<PromocaoIMP> teste = getValoresFinalizadora(finaliza.getLoja());
         List<PromocaoIMP> real = getFinalizadora();
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -182,8 +173,10 @@ public class PromocaoDAO {
             sql.put("id_finalizadora", finaliza.getId_finalizadora());
             try {
                 if (teste.size() < real.size()) {
-                stm.execute(sql.getInsert());
-                } else {stm.execute(sql.getUpdate());}
+                    stm.execute(sql.getInsert());
+                } else {
+                    stm.execute(sql.getUpdate());
+                }
             } catch (Exception e) {
                 System.out.println(sql.getInsert());
                 e.printStackTrace();
@@ -192,16 +185,17 @@ public class PromocaoDAO {
         }
     }
 
-    public List<PromocaoIMP> getValoresFinalizadora() throws Exception {
+    public List<PromocaoIMP> getValoresFinalizadora(String loja) throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select * from promocaofinalizadora"
+                    "select distinct pf.* from promocaofinalizadora pf\n"
+                    + "join promocao p on pf.id_promocao = pf.id_promocao \n"
+                    + "join loja l on l.id = " + loja + ""
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
-                    imp.setId_promocao(rst.getString("id_promocao"));
-                    imp.setId_finalizadora(rst.getInt("id_finalizadora"));
+                    imp.setId(rst.getString("id"));
                     Result.add(imp);
                 }
             }

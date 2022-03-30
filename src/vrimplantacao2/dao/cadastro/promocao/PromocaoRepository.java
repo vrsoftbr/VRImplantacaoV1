@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.promocao;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.openide.util.HelpCtx;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoFinalizadoraVO;
@@ -193,10 +194,11 @@ public class PromocaoRepository {
 
     private PromocaoAnteriorVO converterPromocaoFinalizaVO(PromocaoIMP imp) throws Exception {
         PromocaoService promocaoService = new PromocaoService();
-        int idConexao = promocaoService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema());
+        int idConexao = promocaoService.existeConexaoMigrada(this.provider.getLojaVR(), this.provider.getSistema());
         PromocaoAnteriorVO vo = new PromocaoAnteriorVO();
         vo.setId_promocao(imp.getId_promocao());
         vo.setId_finalizadora(imp.getId_finalizadora());
+        vo.setLoja(Integer.toString(idConexao));
 
         return vo;
     }
@@ -207,10 +209,6 @@ public class PromocaoRepository {
 
     public void gravarPromocaoAnterior(PromocaoAnteriorVO anterior) throws Exception {
         provider.gravarPromocaoAnterior(anterior);
-    }
-
-    public void gravarPromocaoItensFinalizadora(String sistema, String lojaOrigem) throws Exception {
-        provider.gravarPromocaoItensFinalizadora();
     }
 
     public void getPromocaoItens() throws Exception {

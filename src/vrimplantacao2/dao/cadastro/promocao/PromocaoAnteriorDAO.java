@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.promocao;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -9,6 +11,7 @@ import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoVO;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 
 /**
  * DAO de promocao anterior.
@@ -67,7 +70,7 @@ public class PromocaoAnteriorDAO {
             sql.put("quantidade", anterior.getQuantidade());
             sql.put("paga", anterior.getPaga());
             sql.put("id_conexao", anterior.getIdConexao());
-
+            
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
@@ -171,109 +174,6 @@ public class PromocaoAnteriorDAO {
         return lojaJaMigrada;
     }
 
-    void copiarPromocaoItensFinalizadora(String sistema, String loja) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(
-                    "do $$\n"
-                    + "	declare\n"
-                    + "		v_id_loja integer;\n"
-                    + "		v_id_promo integer;\n"
-                    + "		rx record;\n"
-                    + "	begin\n"
-                    + "		v_id_loja = " + loja + "; --Código da loja\n"
-                    + "	\n"
-                    + "		--Insere a promoção e retorna o id\n"
-                    + "		for rx in\n"
-                    + "		(select\n"
-                    + "			distinct\n"
-                    + "			id_promocao::integer id,\n"
-                    + "			" + loja + " id_loja,\n"
-                    + "			descricao, \n"
-                    + "			datainicio::date datainicio, \n"
-                    + "			datatermino::date datatermino, \n"
-                    + "			0 pontuacao, \n"
-                    + "			quantidade::numeric(12,3) quantidade, \n"
-                    + "			0::integer qtdcupom, \n"
-                    + "			1::integer id_situacaocadastro, \n"
-                    + "			1::integer id_tipopromocao, \n"
-                    + "			0::numeric(11, 2) valor,\n"
-                    + "			id_promocao::integer controle, \n"
-                    + "			0::integer id_tipopercentualvalor, \n"
-                    + "			1::integer id_tipoquantidade, \n"
-                    + "			false::boolean aplicatodos, \n"
-                    + "			null::varchar(2000) cupom, \n"
-                    + "			0::numeric(11,2) valordesconto, \n"
-                    + "			false::boolean valorreferenteitenslista, \n"
-                    + "			false::boolean verificaprodutosauditados, \n"
-                    + "			null::date datalimiteresgatecupom, \n"
-                    + "			0::integer id_tipopercentualvalordesconto, \n"
-                    + "			paga::numeric(11,2) valorpaga,\n"
-                    + "			false::boolean utilizaquantidadeproporcional\n"
-                    + "		FROM \n"
-                    + "			implantacao.codant_promocao) loop\n"
-                    + "		\n"
-                    + "		INSERT INTO promocao(\n"
-                    + "	            id, id_loja, descricao, datainicio, datatermino, pontuacao, quantidade, \n"
-                    + "	            qtdcupom, id_situacaocadastro, id_tipopromocao, valor, controle, \n"
-                    + "	            id_tipopercentualvalor, id_tipoquantidade, aplicatodos, cupom, \n"
-                    + "	            valordesconto, valorreferenteitenslista, verificaprodutosauditados, \n"
-                    + "	            datalimiteresgatecupom, id_tipopercentualvalordesconto, \n"
-                    + "	            valorpaga, utilizaquantidadeproporcional)\n"
-                    + "		VALUES (\n"
-                    + "			rx.id, \n"
-                    + "			rx.id_loja,\n"
-                    + "			rx.descricao, \n"
-                    + "			rx.datainicio, \n"
-                    + "			rx.datatermino, \n"
-                    + "			rx.pontuacao, \n"
-                    + "			rx.quantidade, \n"
-                    + "			rx.qtdcupom, \n"
-                    + "			rx.id_situacaocadastro, \n"
-                    + "			rx.id_tipopromocao, \n"
-                    + "			rx.valor, \n"
-                    + "			rx.controle, \n"
-                    + "			rx.id_tipopercentualvalor, \n"
-                    + "			rx.id_tipoquantidade, \n"
-                    + "			rx.aplicatodos, \n"
-                    + "			rx.cupom, \n"
-                    + "			rx.valordesconto, \n"
-                    + "			rx.valorreferenteitenslista, \n"
-                    + "			rx.verificaprodutosauditados, \n"
-                    + "			rx.datalimiteresgatecupom, \n"
-                    + "			rx.id_tipopercentualvalordesconto, \n"
-                    + "			rx.valorpaga,\n"
-                    + "			rx.utilizaquantidadeproporcional) returning id into v_id_promo;\n"
-                    + "			\n"
-                    + "		--Insere o item\n"
-                    + "		insert into promocaoitem(id_promocao, id_produto, precovenda)\n"
-                    + "		select\n"
-                    + "			distinct\n"
-                    + "			v_id_promo,\n"
-                    + "			pr.id,\n"
-                    + "			0::numeric precovenda\n"
-                    + "		from \n"
-                    + "			implantacao.codant_promocao p \n"
-                    + "		inner join implantacao.codant_produto imp on p.id_produto = imp.impid \n"
-                    + "		inner join produto pr on imp.codigoatual = pr.id\n"
-                    + "		where\n"
-                    + "			p.id_promocao::integer = rx.id and \n"
-                    + "			imp.impsistema = '" + sistema + "';\n"
-                    + "			\n"
-                    + "		--Insere a finalizadora\n"
-                    + "		insert into promocaofinalizadora(id_promocao, id_finalizadora)\n"
-                    + "		select \n"
-                    + "			v_id_promo,\n"
-                    + "			id \n"
-                    + "		from \n"
-                    + "			pdv.finalizadora;\n"
-                    + "		end loop;\n"
-                    + "	end;\n"
-                    + "$$;");
-        }
-    }
-    
-    // precisa tratar id
-int conta = 0;
     MultiMap<String, PromocaoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
         MultiMap<String, PromocaoAnteriorVO> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -324,5 +224,33 @@ int conta = 0;
             }
         }
         return result;
+    }
+    
+        public List<PromocaoIMP> getPromocaoItens(String sistema) throws Exception {
+        List<PromocaoIMP> Result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "distinct \n"
+                    + "	p.id_promocao,\n"
+                    + "	imp.codigoatual id_produto,\n"
+                    + "	p.paga\n"
+                    + "from\n"
+                    + "	implantacao.codant_promocao p\n"
+                    + "inner join implantacao.codant_produto imp on\n"
+                    + "	p.id_produto = imp.impid\n"
+                    + "where p.sistema = " + SQLUtils.stringSQL(sistema) + " \n"
+                    + "order by 2"
+            )) {
+                while (rst.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+                    imp.setId_promocao(rst.getString("id_promocao"));
+                    imp.setId_produto(rst.getString("id_produto"));
+                    imp.setPaga(rst.getDouble("paga"));
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
     }
 }
