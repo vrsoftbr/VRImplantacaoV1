@@ -22,7 +22,7 @@ public class FornecedorVO {
     private long cnpj = -1;
     private String inscricaoEstadual = "ISENTO";
     private String inscricaoSuframa = "0";
-    private String inscricaoMunicipal;
+    private String inscricaoMunicipal = "";
     private Date dataCadastro;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean bloqueado = false;
@@ -119,7 +119,7 @@ public class FornecedorVO {
     }
 
     public String getInscricaoMunicipal() {
-        return inscricaoMunicipal;
+        return inscricaoMunicipal.equals("null") ? "" : inscricaoMunicipal;
     }
 
     public Date getDataCadastro() {

@@ -24,7 +24,7 @@ public class FornecedorIMP {
     private String fantasia;
     private String cnpj_cpf;
     private String ie_rg;
-    private String insc_municipal;
+    private String insc_municipal = "";
     private String suframa;
     private boolean ativo = true;
     private boolean bloqueado = false;
