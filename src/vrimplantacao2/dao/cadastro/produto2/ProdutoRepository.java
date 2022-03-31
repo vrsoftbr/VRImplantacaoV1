@@ -166,6 +166,7 @@ public class ProdutoRepository {
                             imp.getImportId()
                     );
 
+                    //<editor-fold defaultstate="collapsed" desc="Se código anterior é nulo">
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
 
@@ -241,7 +242,9 @@ public class ProdutoRepository {
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
-                    } else if (anterior.getCodigoAtual() != null) {
+                    } 
+                    //</editor-fold>
+                    else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
                     } else {
