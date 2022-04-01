@@ -43,6 +43,9 @@ public class CPGestorByViewDAO extends InterfaceDAO {
     private String arquivo;
     private final Map<String, String> opcoes = new LinkedHashMap<>();
     private int complemento;
+    private String viewProduto;
+    private String viewEan;
+    private String viewFornecedor;
     
     @Override
     public String getSistema() {
@@ -67,6 +70,30 @@ public class CPGestorByViewDAO extends InterfaceDAO {
 
     public void setComplemento(int complemento) {
         this.complemento = complemento;
+    }
+
+    public String getViewProduto() {
+        return viewProduto;
+    }
+
+    public void setViewProduto(String viewProduto) {
+        this.viewProduto = viewProduto;
+    }
+
+    public String getViewEan() {
+        return viewEan;
+    }
+
+    public void setViewEan(String viewEan) {
+        this.viewEan = viewEan;
+    }
+
+    public String getViewFornecedor() {
+        return viewFornecedor;
+    }
+
+    public void setViewFornecedor(String viewFornecedor) {
+        this.viewFornecedor = viewFornecedor;
     }
     
     @Override
@@ -154,8 +181,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     "SELECT \n"
                     + "	PR_CODINT id,\n"
                     + "	PR_NOME descricao\n"
-                    + "FROM \n"
-                    + "	vw_exp_produtos_sta \n"
+                    + "FROM " + getViewProduto() + " \n"
                     + "WHERE \n"
                     + "	PR_MASTER = 'M' AND \n"
                     + "	PR_ATIVO = 'S' AND \n"
@@ -191,8 +217,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
                     "	*\n" +
-                    "FROM \n" +
-                    "	vw_exp_barras_sta \n" +
+                    "FROM " + getViewEan() + " \n" +
                     "WHERE \n" +
                     "	pr_nome_bal IS NOT NULL AND \n" +
                     "	pr_preco_final > 0 and\n" +
@@ -251,10 +276,9 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + " p.pr_codigocstent cstcredito,\n"
                     + "	p.pr_codigocstsai cstdebito,\n"
                     + " p.FO_CODIG fabricante\n"        
-                    + "FROM \n"
-                    + "	vw_exp_produtos_sta p\n"
-                    + "LEFT JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT \n"
-                    + "WHERE \n"
+                    + "FROM " + getViewProduto() + " p \n"
+                    + "LEFT JOIN " + getViewEan() + " ean ON p.PR_CODINT = ean.PR_CODINT \n"
+                    + "WHERE\n"
                     + "	p.lj_associacao = " + getLojaOrigem())) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -357,8 +381,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
                     "	*\n" +
-                    "FROM \n" +
-                    "	vw_exp_barras_sta \n" +
+                    "FROM " + getViewEan() + "\n" +
                     "WHERE \n" +
                     "	pr_nome_bal IS NOT NULL AND \n" +
                     "	pr_preco_final > 0 and\n" +
@@ -394,9 +417,8 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     "	ean.FLG_TIPO_DESC_ATA tipodesconto,\n" +
                     "	p.PR_MARGEM_BRUTA_SCUSTO margem,\n" +
                     "	p.PR_CUSTO_SEM_ICMS custosemimposto\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_sta p\n" +
-                    "JOIN vw_exp_barras_sta ean ON p.PR_CODINT = ean.PR_CODINT AND \n" +
+                    "FROM " + getViewProduto() + " p \n" +
+                    "JOIN " + getViewEan() + " ean ON p.PR_CODINT = ean.PR_CODINT AND \n" +
                     "	ean.LJ_ASSOCIACAO = p.LJ_ASSOCIACAO\n" +
                     "WHERE \n" +
                     "	p.lj_associacao = " + getLojaOrigem() + " AND \n" +
@@ -656,8 +678,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "	cf_simples_nacional simples,\n"
                     + "	flg_consumidor_final consumidor,\n"
                     + "	flg_indiedest indicadorie\n"
-                    + "FROM \n"
-                    + "	vw_exp_forn_sta\n"
+                    + "FROM " + getViewFornecedor() + "\n"
                     + "WHERE \n"
                     + "	cf_tipo = 'F'"
             )) {
@@ -776,8 +797,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "	cf_simples_nacional simples,\n"
                     + "	flg_consumidor_final consumidor,\n"
                     + "	flg_indiedest indicadorie\n"
-                    + "FROM \n"
-                    + "	vw_exp_forn_sta\n"
+                    + "FROM " + getViewFornecedor() + " \n"
                     + "WHERE \n"
                     + "	cf_tipo = 'C'")) {
                 while (rs.next()) {
