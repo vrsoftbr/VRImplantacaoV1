@@ -489,6 +489,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	left join produtos_ean ean on ean.produto = a.id\n"
                 + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
                 + "	left join familias fam on a.familia = fam.id\n"
+              //+ "WHERE TO_CHAR(a.DATAHORA_CADASTRO, 'yyyy-MM-dd') <= '2022-03-22'\n"
                 + "order by\n"
                 + "    a.id";
 
