@@ -56,7 +56,7 @@ public class FornecedorIMP {
     private Date datacadastro;
     private String observacao;
     
-    private int prazoPedido = 5;
+    private int prazoPedido = 15;
     private String idDivisao;
     
     private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
