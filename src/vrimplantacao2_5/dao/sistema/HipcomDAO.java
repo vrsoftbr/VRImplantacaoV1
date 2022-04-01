@@ -241,7 +241,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.RECEITA,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
-                OpcaoProduto.MAPA_TRIBUTACAO
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA
         ));
     }
 
@@ -396,7 +401,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
                     "	p.procodplu id,\n" +
-                    "	p.prodtcad datacadastro,\n" +
+                    "	case when p.prodtcad = '0000-00-00' then null else p.prodtcad end datacadastro,\n" +
                     "	coalesce(ean.barcodbar, p.procodplu) ean,\n" +
                     "	coalesce(ean.barqtemb, 1) qtdembalagem,\n" +
                     "	coalesce(cot.embqtemb, 1) qtdcotacao,\n" +

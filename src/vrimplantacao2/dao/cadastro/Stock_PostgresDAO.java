@@ -285,14 +285,10 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " case when prodesabilitar = true then 0\n"
                     + "  else 1 end situacao\n"
                     + "FROM\n"
-                    + "	tbprodutos p,\n"
-                    + "	tbGrupos m,\n"
-                    + "	tbtributacoes t,\n"
-                    + "	tbPisCofins pc\n"
-                    + "WHERE\n"
-                    + "	p.procodtributo = t.triid\n"
-                    + "	AND m.depid = p.proCodDepartamento\n"
-                    + "	AND p.proCodPisCofins = pc.pisId\n"
+                    + "	tbprodutos p\n"
+                    + "	left join tbGrupos m on m.depid = p.proCodDepartamento\n"
+                    + " left join tbtributacoes t on p.procodtributo = t.triid\n"
+                    + " left join tbPisCofins pc on p.proCodPisCofins = pc.pisId\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
