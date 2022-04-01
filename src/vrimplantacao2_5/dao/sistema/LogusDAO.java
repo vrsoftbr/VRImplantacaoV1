@@ -18,6 +18,8 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -102,6 +104,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_INDICADOR_IE,
+                OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR));
     }
 
@@ -154,7 +158,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -284,7 +288,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws SQLException {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -322,7 +326,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -336,14 +340,14 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -355,15 +359,15 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("idfamilia"));
                     imp.setDescricao(rst.getString("descricao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -388,12 +392,12 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("id_interno"));
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -401,7 +405,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutosBalanca() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -483,7 +487,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("id_interno"));
                     imp.setEan(rs.getString("ean"));
                     imp.setDescricaoCompleta(rs.getString("descricaogondola") == null ? rs.getString("descricaoreduzida")
@@ -542,10 +546,10 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -559,7 +563,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dcr_reduzida descricaoreduzida,\n"
                     + "	pa.dcr_produto || ' ' || pa.dcr_variedade descricaologus,\n"
                     + "	p.cdg_barra ean,\n"
-                    + "	nullif (pa.flb_tipo_peso, 'F') pesavel,\n"
+                    + "	pa.flb_tipo_peso pesavel,\n"
                     + " pa.flb_balanca unitarioPesavel,\n"
                     + "	pa.flb_habilita_checagem_peso_pdv pesopdv,\n"
                     + "	est.val_custo custosemimposto,\n"
@@ -571,7 +575,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dat_cadastro cadastro,\n"
                     + " pa.cdg_eqv_preco idfamilia,\n"
                     + "	p.dat_desativacao desativacao,\n"
-                    + "	un.sgl_unidade_medida unidade,\n"
+                  //+ " un.sgl_unidade_medida unidade,\n"
+                    + "	p.dcr_embalagem unidade,\n"        
                     + "	p.qtd_por_emb qtdembalagem,\n"
                     + " p.qtd_da_embalagem as volume,\n"
                     + "	ncm.cdg_ncm ncm,\n"
@@ -628,7 +633,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("id_interno"));
                     imp.setEan(rs.getString("ean"));
                     imp.setDescricaoCompleta(rs.getString("descricaogondola") == null ? rs.getString("descricaoreduzida")
@@ -681,14 +686,14 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         if (opt == OpcaoProduto.EXCECAO) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -766,18 +771,18 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_produto"));
                         imp.setPautaFiscalId(imp.getImportId());
-                        
+
                         result.add(imp);
                     }
                 }
-                
+
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.DESC_COMPLETA) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -797,18 +802,18 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setDescricaoCompleta(
                                 (rst.getString("nome") != null ? rst.getString("nome").trim() : "")
                                 + " "
                                 + (rst.getString("variedade") != null ? rst.getString("variedade").trim() : "")
                         );
-                        
+
                         result.add(imp);
                     }
                 }
-                
+
                 return result;
             }
         }
@@ -859,11 +864,11 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
                         imp.setPiscofinsCstCredito(rst.getString("pis_credito"));
-                        
+
                         result.add(imp);
                     }
                 }
@@ -918,17 +923,17 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
                         imp.setPiscofinsCstCredito(rst.getString("pis_credito"));
                         imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                        
+
                         result.add(imp);
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -979,10 +984,10 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setNcm(rst.getString("ncm"));
-                        
+
                         result.add(imp);
                     }
                 }
@@ -1037,15 +1042,15 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setCest(rst.getString("cest"));
-                        
+
                         result.add(imp);
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -1069,7 +1074,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setIcmsDebitoId(rst.getString("idicms"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("idicms"));
@@ -1082,7 +1087,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -1103,15 +1108,15 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setTipoEmbalagemVolume(rst.getString("unidade"));
-                        
+
                         result.add(imp);
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -1135,18 +1140,18 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                             ProdutoIMP imp = new ProdutoIMP();
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
-                            
+
                             imp.setImportId(rst.getString("id"));
                             imp.setQtdEmbalagem(rst.getInt("qtd_por_emb"));
                             imp.setPrecovenda(rst.getDouble("precovenda"));
                             imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-                            
+
                             result.add(imp);
                         }
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -1172,21 +1177,21 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        
+
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setMargem(rst.getDouble("pct_margem"));
-                        
+
                         result.add(imp);
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         return null;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -1198,6 +1203,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.dcr_fantasia fantasia,\n"
                     + "	f.nmr_ie ie,\n"
                     + "	f.nmr_im inscricaomunicipal,\n"
+                    + " f.flb_simples_nac simples_nacional,\n"
+                    + "	f.flb_contrib_icms indicador_ie,\n"
                     + "	f.dat_cadastro cadastro,\n"
                     + "	f.cdg_municipio ibgemunicipio,\n"
                     + "	f.dcr_cidade_old cidadeold,\n"
@@ -1222,7 +1229,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("id"));
                     imp.setCnpj_cpf(imp.getImportId());
                     imp.setRazao(rs.getString("razao"));
@@ -1261,11 +1268,23 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato("4", "PEDIDO", null, null, TipoContato.COMERCIAL, rs.getString("emailpedido"));
                     }
 
+                    if ("1".equals(rs.getString("simples_nacional"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }
+
+                    if ("1".equals(rs.getString("indicador_ie"))) {
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
+                    } else {
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+                    }
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1280,7 +1299,6 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cdg_interno idproduto,\n"
                     + "	pf.cdg_prod_forn codigoexterno,\n"
                     + "	p.qtd_por_emb as qtdembalagem\n"
-                    + "	\n"
                     + "from \n"
                     + "	cadcodfor pf \n"
                     + "inner join cadforn f on pf.cdg_fornecedor = f.cdg_fornecedor \n"
@@ -1290,7 +1308,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
@@ -1300,14 +1318,14 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -1383,7 +1401,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1425,7 +1443,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 }
