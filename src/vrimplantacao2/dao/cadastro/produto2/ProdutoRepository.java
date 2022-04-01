@@ -128,6 +128,7 @@ public class ProdutoRepository {
             String dataImportacao = sdf.format(new Date());
 
             setNotify("Gravando os produtos...", organizados.size());
+            
             for (ProdutoIMP imp : organizados) {
 
                 StringBuilder rep = new StringBuilder();
@@ -165,6 +166,8 @@ public class ProdutoRepository {
                             provider.getLoja(),
                             imp.getImportId()
                     );
+                    
+                    int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
 
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
@@ -223,6 +226,22 @@ public class ProdutoRepository {
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
+                        if (idProdutoExistente > 0) {
+                            anterior.setObsImportacao("PRODUTO JA CADASTRO NO VR MASTER");
+                            
+                            prod.setId(idProdutoExistente);
+                            anterior.setCodigoAtual(prod);
+                            
+                            provider.anterior().salvar(anterior);
+                            
+                            if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
+                                ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                                provider.eanAnterior().salvar(eanAnterior);
+                            }
+                            
+                            continue;
+                        }
+                        
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
@@ -397,7 +416,7 @@ public class ProdutoRepository {
                     strOpt.append(next.toString()).append(iterator.hasNext() ? ", " : "");
                 }
 
-                if (importarSomenteLoja) {
+                if (importarSomenteLoja) { 
                     provider.setStatus("Filtrando produtos que foram inclusos por unificação ou mapeamento");
                     List<ProdutoIMP> a = new ArrayList<>();
                     for (ProdutoIMP imp : organizados) {
