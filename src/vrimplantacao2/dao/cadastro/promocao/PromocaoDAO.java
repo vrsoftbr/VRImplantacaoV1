@@ -16,7 +16,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  * @author Michael
  */
 public class PromocaoDAO {
-
+    
     public void salvar(PromocaoVO promocao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -49,7 +49,7 @@ public class PromocaoDAO {
             sql.put("somenteclubevantagens", promocao.isSomenteClubeVantagens());
             sql.put("diasexpiracao", promocao.getDiasExpiracao());
             sql.put("utilizaquantidadeproporcional", promocao.isUtilizaQuantidadeProporcional());
-
+            
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception a) {
@@ -63,7 +63,7 @@ public class PromocaoDAO {
             }
         }
     }
-
+    
     public void apagarTudo() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from promocaofinalizadora;");
@@ -75,7 +75,7 @@ public class PromocaoDAO {
             stm.execute("alter sequence promocaofinalizadora_id_seq restart with 1;");
         }
     }
-
+    
     public void salvarPromocaoItens(PromocaoAnteriorVO itens) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -97,7 +97,7 @@ public class PromocaoDAO {
             }
         }
     }
-
+    
     public int getId() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -112,7 +112,7 @@ public class PromocaoDAO {
             }
         }
     }
-
+    
     public List<PromocaoIMP> getFinalizadora() throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -133,7 +133,7 @@ public class PromocaoDAO {
         }
         return Result;
     }
-
+    
     public List<PromocaoIMP> getPromocaoItens() throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -161,7 +161,7 @@ public class PromocaoDAO {
         }
         return Result;
     }
-
+    
     public void salvarFinalizadora(PromocaoAnteriorVO finaliza) throws Exception {
         List<PromocaoIMP> teste = getValoresFinalizadora(finaliza.getLoja());
         List<PromocaoIMP> real = getFinalizadora();
@@ -184,7 +184,7 @@ public class PromocaoDAO {
             }
         }
     }
-
+    
     public List<PromocaoIMP> getValoresFinalizadora(String loja) throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {

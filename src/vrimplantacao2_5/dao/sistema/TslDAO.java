@@ -88,7 +88,7 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<PromocaoIMP> getPromocoes() throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
@@ -106,8 +106,8 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.VALORFIXO paga\n"
                     + "from\n"
                     + "	tspromo01 p\n"
-                    + "	join tspromo02 t on t.SEQPROMO01 = p.SEQPROMO01 \n"
-                    + "	join tslc003 pr on pr.CODIGO = t.SEQ003 "
+                    + "join tspromo02 t on t.SEQPROMO01 = p.SEQPROMO01 \n"
+                    + "join tslc003 pr on pr.CODIGO = t.SEQ003 "
             )) {
                 while (rs.next()) {
                     PromocaoIMP imp = new PromocaoIMP();

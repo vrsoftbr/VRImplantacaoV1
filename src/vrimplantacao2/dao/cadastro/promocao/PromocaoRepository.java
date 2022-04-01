@@ -3,10 +3,8 @@ package vrimplantacao2.dao.cadastro.promocao;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.openide.util.HelpCtx;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoAnteriorVO;
-import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoFinalizadoraVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoVO;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2_5.controller.migracao.LogController;
@@ -28,8 +26,10 @@ public class PromocaoRepository {
 
     public void salvar(List<PromocaoIMP> promocoes) throws Exception {
         Map<String, PromocaoIMP> filtrados = filtrar(promocoes);
+        MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+        
         try {
-            MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+            
             provider.setStatus("Gravando promocoes...");
             provider.setMaximo(promocoes.size());
             for (PromocaoIMP imp : promocoes) {
@@ -59,16 +59,17 @@ public class PromocaoRepository {
 
         try {
 
-            MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+            anteriores = provider.getAnteriores();
             provider.setStatus("Gravando cabeçalho promocoes...");
             provider.setMaximo(filtrados.size());
             for (PromocaoIMP imp : filtrados.values()) {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
-                        provider.getLojaOrigem()
+                        provider.getLojaOrigem(),
+                        imp.getId()
                 );
 
-                if (anterior != null) {
+                if (anterior == null) {
                     PromocaoVO promo = converterPromocao(imp);
                     anterior = converterPromocarAnteriorVO(imp);
                     anterior.setCodigoAtual(promo);
@@ -78,7 +79,7 @@ public class PromocaoRepository {
                             anterior,
                             provider.getSistema(),
                             provider.getLojaOrigem(),
-                            imp.getId()
+                            imp.getId_promocao()
                     );
                 }
                 provider.next();
@@ -92,7 +93,8 @@ public class PromocaoRepository {
 
         try {
             List<PromocaoIMP> filtraItens = provider.getItens();
-            MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+            anteriores = provider.getAnteriores();
+            
             provider.setStatus("Gravando itens promocoes...");
             provider.setMaximo(filtraItens.size());
             for (PromocaoIMP imp : filtraItens) {
@@ -120,7 +122,8 @@ public class PromocaoRepository {
 
         try {
             List<PromocaoIMP> filtraFinalizacoes = provider.getFinalizadora();
-            MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+            anteriores = provider.getAnteriores();
+            
             provider.setStatus("Finalizando promocoes...");
             provider.setMaximo(filtraFinalizacoes.size());
             for (PromocaoIMP imp : filtraFinalizacoes) {
@@ -149,7 +152,7 @@ public class PromocaoRepository {
         }
     }
 
-    public Map<String, PromocaoIMP> filtrar(List<PromocaoIMP> promocoes) {
+    public Map<String, PromocaoIMP> filtrar(List<PromocaoIMP> promocoes) throws Exception {
         Map<String, PromocaoIMP> result = new LinkedHashMap<>();
         for (PromocaoIMP imp : promocoes) {
             result.put(imp.getId_promocao(), imp);

@@ -12,7 +12,7 @@ import java.util.Date;
  * @author lucasrafael
  */
 public class PromocaoIMP {
-    
+
     private String id;
     private int idLoja;
     private String descricao;
@@ -54,7 +54,6 @@ public class PromocaoIMP {
         this.id_finalizadora = id_finalizadora;
     }
 
-    
     public String getId_produto() {
         return id_produto;
     }
@@ -79,7 +78,6 @@ public class PromocaoIMP {
         this.paga = paga;
     }
 
-    
     public String getEan() {
         return ean;
     }
@@ -88,14 +86,12 @@ public class PromocaoIMP {
         this.ean = ean;
     }
 
-    
     /**
      * @return the id
      */
     public String getId() {
         return id;
     }
-    
 
     /**
      * @param id the id to set
@@ -378,7 +374,8 @@ public class PromocaoIMP {
     }
 
     /**
-     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to set
+     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to
+     * set
      */
     public void setIdTipoPercentualValorDesconto(int idTipoPercentualValorDesconto) {
         this.idTipoPercentualValorDesconto = idTipoPercentualValorDesconto;
@@ -452,10 +449,14 @@ public class PromocaoIMP {
      */
     public void setDiasExpiracao(int diasExpiracao) {
         this.diasExpiracao = diasExpiracao;
-    }    
+    }
 
     public String getId_promocao() {
-        return id_promocao;
+        if (id_promocao == null) {
+            return id;
+        } else {
+            return id_promocao;
+        }
     }
 
     public void setId_promocao(String id_promocao) {

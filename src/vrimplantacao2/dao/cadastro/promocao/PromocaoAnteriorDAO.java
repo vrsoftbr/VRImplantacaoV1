@@ -70,9 +70,13 @@ public class PromocaoAnteriorDAO {
             sql.put("quantidade", anterior.getQuantidade());
             sql.put("paga", anterior.getPaga());
             sql.put("id_conexao", anterior.getIdConexao());
-            
+
             try {
                 stm.execute(sql.getInsert());
+                if (anterior.getId_promocao() == null) {
+                    stm.execute("update implantacao.codant_promocao set id_promocao = codigoatual");
+                    //sql.getUpdate();
+                }
             } catch (Exception e) {
                 System.out.println(sql.getInsert());
                 e.printStackTrace();
@@ -183,16 +187,18 @@ public class PromocaoAnteriorDAO {
                     + "	ant.loja,\n"
                     + "	ant.id_conexao,\n"
                     + "	ant.id_promocao,\n"
+                    + " ant.codigoatual, \n"
                     + "	ant.descricao,\n"
                     + "	ant.datainicio,\n"
                     + "	ant.datatermino,\n"
                     + "	ant.ean,\n"
-                    + "	ant.id_produto,\n"
+                    + "	p.codigoatual id_produto,\n"
                     + "	ant.descricaocompleta,\n"
                     + "	ant.quantidade,\n"
                     + "	ant.paga\n"
                     + "from \n"
                     + "	implantacao.codant_promocao ant\n"
+                    + "join implantacao.codant_produto p on p.impid = ant.id_produto "
                     + "where\n"
                     + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
                     + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + "\n"
@@ -225,8 +231,8 @@ public class PromocaoAnteriorDAO {
         }
         return result;
     }
-    
-        public List<PromocaoIMP> getPromocaoItens(String sistema) throws Exception {
+
+    public List<PromocaoIMP> getPromocaoItens(String sistema) throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
