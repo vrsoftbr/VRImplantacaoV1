@@ -1557,7 +1557,7 @@ public class ProdutoAnteriorDAO {
                 + "			novo,\n"
                 + "                       codigosped,\n"
                 + "                       situacaocadastro,\n"
-                + "                       dataimportacao,\n"
+                + "                       now(),\n"
                 + "                       obsimportacao,\n"
                 + "                       icmscstsaida,\n"
                 + "                       icmsaliqsaida,\n"
