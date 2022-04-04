@@ -32,7 +32,6 @@ public class PromocaoAnteriorDAO {
                     + "CREATE TABLE implantacao.codant_promocao (\n"
                     + "	sistema varchar NOT NULL,\n"
                     + "	loja varchar NOT NULL,\n"
-                    + "	impid varchar NULL,\n"
                     + "	codigoatual serial not NULL,\n"
                     + "	id_conexao int NOT NULL,\n"
                     + "	id_promocao varchar NULL,\n"
@@ -60,7 +59,6 @@ public class PromocaoAnteriorDAO {
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
             sql.put("id_promocao", anterior.getId_promocao());
-            sql.put("impid", anterior.getId_promocao());
             sql.put("id_produto", anterior.getId_produto());
             sql.put("descricao", anterior.getDescricao());
             sql.put("datainicio", anterior.getDataInicio());
@@ -73,10 +71,6 @@ public class PromocaoAnteriorDAO {
 
             try {
                 stm.execute(sql.getInsert());
-                if (anterior.getId_promocao() == null) {
-                    stm.execute("update implantacao.codant_promocao set id_promocao = codigoatual");
-                    //sql.getUpdate();
-                }
             } catch (Exception e) {
                 System.out.println(sql.getInsert());
                 e.printStackTrace();
@@ -205,7 +199,7 @@ public class PromocaoAnteriorDAO {
                     + "order by\n"
                     + "	ant.sistema,\n"
                     + "	ant.loja,"
-                    + "ant.impid"
+                    + " ant.id_promocao"
             )) {
                 while (rst.next()) {
                     PromocaoAnteriorVO vo = new PromocaoAnteriorVO();
@@ -221,10 +215,16 @@ public class PromocaoAnteriorDAO {
                     vo.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     vo.setQuantidade(rst.getDouble("quantidade"));
                     vo.setPaga(rst.getDouble("paga"));
+                    if (rst.getString("codigoatual") != null) {
+                        PromocaoVO atual = new PromocaoVO();
+                        atual.setId(rst.getString("codigoatual"));
+                        vo.setCodigoatual(atual);
+                    }
                     result.put(
                             vo,
                             vo.getSistema(),
-                            vo.getLoja()
+                            vo.getLoja(),
+                            vo.getId()
                     );
                 }
             }
@@ -258,5 +258,5 @@ public class PromocaoAnteriorDAO {
             }
         }
         return Result;
-    }
+    }   
 }

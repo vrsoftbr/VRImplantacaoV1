@@ -27,15 +27,15 @@ public class PromocaoRepository {
     public void salvar(List<PromocaoIMP> promocoes) throws Exception {
         Map<String, PromocaoIMP> filtrados = filtrar(promocoes);
         MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
-        
         try {
-            
+
             provider.setStatus("Gravando promocoes...");
             provider.setMaximo(promocoes.size());
             for (PromocaoIMP imp : promocoes) {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
-                        provider.getLojaOrigem()
+                        provider.getLojaOrigem(),
+                        imp.getId()
                 );
 
                 if (anterior == null) {
@@ -69,7 +69,7 @@ public class PromocaoRepository {
                         imp.getId()
                 );
 
-                if (anterior == null) {
+                if (anterior != null) {
                     PromocaoVO promo = converterPromocao(imp);
                     anterior = converterPromocarAnteriorVO(imp);
                     anterior.setCodigoAtual(promo);
@@ -94,13 +94,14 @@ public class PromocaoRepository {
         try {
             List<PromocaoIMP> filtraItens = provider.getItens();
             anteriores = provider.getAnteriores();
-            
+
             provider.setStatus("Gravando itens promocoes...");
             provider.setMaximo(filtraItens.size());
             for (PromocaoIMP imp : filtraItens) {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
-                        provider.getLojaOrigem()
+                        provider.getLojaOrigem(),
+                        imp.getId()
                 );
 
                 if (anterior != null) {
@@ -109,7 +110,8 @@ public class PromocaoRepository {
                     anteriores.put(
                             anterior,
                             provider.getSistema(),
-                            provider.getLojaOrigem()
+                            provider.getLojaOrigem(),
+                            imp.getId()
                     );
                 }
                 provider.next();
@@ -123,22 +125,24 @@ public class PromocaoRepository {
         try {
             List<PromocaoIMP> filtraFinalizacoes = provider.getFinalizadora();
             anteriores = provider.getAnteriores();
-            
+
             provider.setStatus("Finalizando promocoes...");
             provider.setMaximo(filtraFinalizacoes.size());
             for (PromocaoIMP imp : filtraFinalizacoes) {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
-                        provider.getLojaOrigem()
+                        provider.getLojaOrigem(),
+                        imp.getId()
                 );
 
-                if (anterior != null) {
+                if (anterior == null) {
                     anterior = converterPromocaoFinalizaVO(imp);
                     gravarPromocaoFinalizadora(anterior);
                     anteriores.put(
                             anterior,
                             provider.getSistema(),
-                            provider.getLojaOrigem()
+                            provider.getLojaOrigem(),
+                            imp.getId()
                     );
                 }
                 provider.next();

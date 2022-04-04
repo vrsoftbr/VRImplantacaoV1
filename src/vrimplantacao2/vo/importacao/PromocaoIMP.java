@@ -452,11 +452,7 @@ public class PromocaoIMP {
     }
 
     public String getId_promocao() {
-        if (id_promocao == null) {
-            return id;
-        } else {
             return id_promocao;
-        }
     }
 
     public void setId_promocao(String id_promocao) {

@@ -110,4 +110,5 @@ public class PromocaoRepositoryProvider {
     void gravarPromocaoFinalizadora(PromocaoAnteriorVO finalizadora) throws Exception {
        promocaoDAO.salvarFinalizadora(finalizadora);
     }
+
 }

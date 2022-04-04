@@ -27,7 +27,16 @@ public class PromocaoAnteriorVO {
     private int idConexao;
     private String id_promocao;
     private int id_finalizadora;
+    private String id;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     public String getId_promocao() {
         return id_promocao;
     }
@@ -138,6 +147,10 @@ public class PromocaoAnteriorVO {
 
     public void setId_finalizadora(int id_finalizadora) {
         this.id_finalizadora = id_finalizadora;
+    }
+
+    public void setCodigoatual(PromocaoVO codigoatual) {
+        this.codigoAtual = codigoatual;
     }
 
     
