@@ -62,6 +62,21 @@ public class AtualizadorDAO {
         }
     }
 
+    public void criarCampoDataImportacao() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                     "alter table implantacao.codant_clientepreferencial \n"
+                    + "add column if not exists dataimportacao timestamp default now();\n"
+                    + "alter table implantacao.codant_clienteeventual \n"
+                    + "add column if not exists dataimportacao timestamp default now();\n"
+                    + "alter table implantacao.codant_ean \n"
+                    + "add column if not exists dataimportacao timestamp default now();\n"
+                    + "alter table implantacao.codant_fornecedor \n"
+                    + "add column if not exists dataimportacao timestamp default now();"
+            );
+        }
+    }
+
     public void criarConstraint() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -313,10 +328,10 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
-            + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
         }
     }
-    
+
     public void salvarMetodo(EMetodo eMetodo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -330,7 +345,7 @@ public class AtualizadorDAO {
             }
         }
     }
-    
+
     public void salvarTipoOperacao(ETipoOperacao eTipoOperacao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(

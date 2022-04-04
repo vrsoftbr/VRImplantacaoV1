@@ -59,6 +59,10 @@ public class AtualizadorService {
     public void criarSchema() throws Exception {
         this.atualizadorDAO.criarSchema();
     }
+    
+    public void criarCampoDataImportacao() throws Exception{
+        this.atualizadorDAO.criarCampoDataImportacao();
+    }
 
     public void criarTabelas() throws Exception {
         this.atualizadorDAO.criarTabelas();
@@ -125,6 +129,7 @@ public class AtualizadorService {
         this.criarSchema();
         this.criarTabelas();
         this.criarConstraint();
+        this.criarCampoDataImportacao();
 
         if (atualizadorDAO.verificarLogUsuario() == 0) {
             atualizadorDAO.inserirUnidade();
