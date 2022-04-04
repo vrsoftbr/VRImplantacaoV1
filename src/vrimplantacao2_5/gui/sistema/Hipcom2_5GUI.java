@@ -13,7 +13,8 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.HipcomDAO;
+//import vrimplantacao2.dao.interfaces.HipcomDAO;
+import vrimplantacao2_5.dao.sistema.HipcomDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -65,7 +66,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override

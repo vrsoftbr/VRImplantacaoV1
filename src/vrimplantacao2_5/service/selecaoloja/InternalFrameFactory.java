@@ -21,6 +21,7 @@ import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
@@ -128,8 +129,8 @@ public abstract class InternalFrameFactory {
             case LOGUS:
                 internalFrame = new Logus2_5GUI(frame);
                 break;
-            case ARIUS:
-                internalFrame = new Arius2_5GUI(frame);
+            case GZPRODADOS:
+                internalFrame = new GZProdados2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

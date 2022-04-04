@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -17,6 +18,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -74,7 +76,8 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.OFERTA
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
                 }
         ));
     }
@@ -172,18 +175,26 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
+                    + " depid merc1,\n"
+                    + " depdesdepartamento desc1,\n"
+                    + " depid merc2,\n"
+                    + " depdesdepartamento desc2,\n"
+                    + " depid merc3,\n"
+                    + " depdesdepartamento desc3\n"
+                    + "from tbgrupos\n"
+                    + "union\n"
+                    + "select \n"
                     + " g.depid merc1,\n"
                     + " g.depdesdepartamento desc1,\n"
-                    + " case when sg.subgrcodigointerno is null then g.depid \n"
-                    + "      else sg.subgrcodigointerno end merc2,\n"
-                    + " case when sg.subgrdescricao is null then g.depdesdepartamento\n"
-                    + "      else sg.subgrdescricao end desc2,\n"
-                    + " case when sg.subgrcodigointerno is null then g.depid \n"
-                    + "      else sg.subgrcodigointerno end merc3,\n"
-                    + " case when sg.subgrdescricao is null then g.depdesdepartamento\n"
-                    + "      else sg.subgrdescricao end desc3  \n"
+                    + " sg.subgrcodigointerno merc2,\n"
+                    + " sg.subgrdescricao desc2,\n"
+                    + " case when sg2.subgrupo3 is null then sg.subgrcodigointerno\n"
+                    + " else sg2.subgrupo3 end merc3,\n"
+                    + " case when sg2.subgrdescricao2 is null then sg.subgrdescricao\n"
+                    + " else sg2.subgrdescricao2 end desc3\n"
                     + "from tbgrupos g\n"
                     + "left join tbsubgrupo sg on sg.subgrcodigo = g.depid\n"
+                    + "left join tbsubgrupo2 sg2 on sg2.subgrupo2 = sg.subgrcodigointerno\n"
                     + "order by 1,3,5"
             )) {
                 while (rst.next()) {
@@ -247,9 +258,13 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	prolucro AS margem,\n"
                     + "	proqntminima AS estoqueminimo,\n"
                     + "	proqntestoque AS estoque,\n"
-                    + "	procoddepartamento AS cod_mercadologico1,\n"
-                    + "	procodsubgrupo AS cod_mercadologico2,\n"
-                    + " procodsubgrupo AS cod_mercadologico3,\n"
+                    + "	procoddepartamento merc1,\n"
+                    + " case when procodsubgrupo is null then procoddepartamento\n"
+                    + "   else procodsubgrupo end merc2,\n"
+                    + " case when procodsubgrupo is null then procoddepartamento\n"
+                    + "      when procodsubgrupo2 is null then procodsubgrupo\n"
+                    + "      when procodsubgrupo2 = 0 then procodsubgrupo\n"
+                    + "   else procodsubgrupo2 end merc3,\n"
                     + "	propeso AS pesobruto,\n"
                     + "	prodataalterado AS dataalteracao,\n"
                     + "	proncm AS ncm,\n"
@@ -266,16 +281,14 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	procodnatreceita AS piscofins_natureza_receita,\n"
                     + " tricstcsosnsaida as csticms,\n"
                     + "	trivalortributacao as aliquotaicms,\n"
-                    + " 0 reducaoicms\n"
+                    + " 0 reducaoicms,\n"
+                    + " case when prodesabilitar = true then 0\n"
+                    + "  else 1 end situacao\n"
                     + "FROM\n"
-                    + "	tbprodutos p,\n"
-                    + "	tbGrupos m,\n"
-                    + "	tbtributacoes t,\n"
-                    + "	tbPisCofins pc\n"
-                    + "WHERE\n"
-                    + "	p.procodtributo = t.triid\n"
-                    + "	AND m.depid = p.proCodDepartamento\n"
-                    + "	AND p.proCodPisCofins = pc.pisId\n"
+                    + "	tbprodutos p\n"
+                    + "	left join tbGrupos m on m.depid = p.proCodDepartamento\n"
+                    + " left join tbtributacoes t on p.procodtributo = t.triid\n"
+                    + " left join tbPisCofins pc on p.proCodPisCofins = pc.pisId\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -294,15 +307,16 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
 
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
+                    imp.setSituacaoCadastro(rst.getInt("situacao"));
                     imp.seteBalanca(rst.getBoolean("balanca"));
 
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_credito"));
@@ -486,6 +500,42 @@ public class Stock_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCpfConjuge(rst.getString("cpf_conju"));
                     imp.setDataNascimentoConjuge(rst.getDate("nasc_conju"));
                     imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " c.crpnrolancamento id,\n"
+                    + " f.forid fornecedorid,\n"
+                    + " c.crpnumdocumento numerodocumento,\n"
+                    + " c.crpdeslancamento obs,\n"
+                    + " c.crpvalorlancamento valor,\n"
+                    + " c.crpdatalancamento emissao,\n"
+                    + " c.crpvencimentoconta vencimento\n"
+                    + "from tbcontasreceberpagar c\n"
+                    + "join tbfornecedores f on f.forid = c.crpcodfornecedor\n"
+                    + "where \n"
+                    + "crpdatapagamento is null\n"
+                    + "and crpflaglancado = false")) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("fornecedorid"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setVencimento(rs.getDate("vencimento"));
 
                     result.add(imp);
                 }

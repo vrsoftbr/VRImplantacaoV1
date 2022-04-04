@@ -131,7 +131,11 @@ public enum EScriptLojaOrigemSistema {
                 "	f.CodFil id,\n" +
                 "	f.CNPJ + '' - '' + f.Fantasia as descricao\n" +
                 "from \n" +
-                "	Filiais f");
+                "	Filiais f"),
+    GZPRODADOS(217,8,"select IdEmpresa as id, RazaoSocial as descricao from empresa;");
+
+    
+
 
     private int idSistema;
     private int idBancoDados;
