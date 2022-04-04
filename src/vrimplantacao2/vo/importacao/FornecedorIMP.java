@@ -24,7 +24,7 @@ public class FornecedorIMP {
     private String fantasia;
     private String cnpj_cpf;
     private String ie_rg;
-    private String insc_municipal;
+    private String insc_municipal = "";
     private String suframa;
     private boolean ativo = true;
     private boolean bloqueado = false;
@@ -56,7 +56,7 @@ public class FornecedorIMP {
     private Date datacadastro;
     private String observacao;
     
-    private int prazoPedido = 0;
+    private int prazoPedido = 15;
     private String idDivisao;
     
     private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
@@ -255,17 +255,17 @@ public class FornecedorIMP {
     }
 
     public int getPrazoEntrega() {
-        if (getDivisoes().isEmpty()) return 0;
+        if (getDivisoes().isEmpty()) return 7;
         return getDivisoes().get(0).getPrazoEntrega();
     }
 
     public int getPrazoSeguranca() {
-        if (getDivisoes().isEmpty()) return 0;
+        if (getDivisoes().isEmpty()) return 7;
         return getDivisoes().get(0).getPrazoSeguranca();
     }
 
     public int getPrazoVisita() {
-        if (getDivisoes().isEmpty()) return 0;
+        if (getDivisoes().isEmpty()) return 7;
         return getDivisoes().get(0).getPrazoVisita();
     }
 
@@ -427,21 +427,21 @@ public class FornecedorIMP {
 
     public void setPrazoEntrega(int prazoEntrega) {
         if (getDivisoes().isEmpty()) {
-            addDivisao("VR", 0, 0, 0);
+            addDivisao("VR", 7, 7, 7);
         }
         getDivisoes().get(0).setPrazoEntrega(prazoEntrega < 0 ? 0 : prazoEntrega);
     }
 
     public void setPrazoSeguranca(int prazoSeguranca) {
         if (getDivisoes().isEmpty()) {
-            addDivisao("VR", 0, 0, 0);
+            addDivisao("VR", 7, 7, 7);
         }
         getDivisoes().get(0).setPrazoSeguranca(prazoSeguranca < 0 ? 0 : prazoSeguranca);
     }
 
     public void setPrazoVisita(int prazoVisita) {
         if (getDivisoes().isEmpty()) {
-            addDivisao("VR", 0, 0, 0);
+            addDivisao("VR", 7, 7, 7);
         }
         getDivisoes().get(0).setPrazoVisita(prazoVisita < 0 ? 0 : prazoVisita);
     }
@@ -509,6 +509,7 @@ public class FornecedorIMP {
     public FornecedorDivisaoIMP addDivisao(String id, int prazoVisita, int prazoEntrega, int prazoSeguranca) {
         
         FornecedorDivisaoIMP div = new FornecedorDivisaoIMP();
+        
         div.setImportSistema(getImportSistema());
         div.setImportLoja(getImportLoja());
         div.setImportFornecedorId(getImportId());
@@ -516,7 +517,9 @@ public class FornecedorIMP {
         div.setPrazoEntrega(prazoEntrega);
         div.setPrazoSeguranca(prazoSeguranca);
         div.setPrazoVisita(prazoVisita);
+        
         this.divisoes.add(div);
+        
         return div;
     }
     

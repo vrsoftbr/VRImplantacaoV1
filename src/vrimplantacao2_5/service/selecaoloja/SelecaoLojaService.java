@@ -70,8 +70,4 @@ public class SelecaoLojaService {
         return InternalFrameFactory.getInternalFrame(sistema, frame);
     }
     
-    public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
-        return InternalFrameFactory.getInternalFrame(sistema, frame, baseDadosGui);
-    }
-    
 }

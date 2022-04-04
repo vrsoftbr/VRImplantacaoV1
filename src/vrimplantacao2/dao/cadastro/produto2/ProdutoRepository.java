@@ -166,6 +166,7 @@ public class ProdutoRepository {
                             imp.getImportId()
                     );
 
+                    //<editor-fold defaultstate="collapsed" desc="Se código anterior é nulo">
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
 
@@ -228,16 +229,22 @@ public class ProdutoRepository {
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
 
-                        if (prod.getDescricaoCompleta() != null
-                                && prod.getDescricaoCompleta().length() >= 3
-                                && ean > 999999) {
-                            provider.salvarLojaVirtual(prod, ean);
+                        if (prod.getDescricaoCompleta() != null 
+                                && !prod.getDescricaoCompleta().trim().isEmpty()
+                                    && prod.getDescricaoCompleta().length() >= 3
+                                        && ean > 999999) {
+                            
+                            if (!(ean > 99999999999999l)) {
+                                provider.salvarLojaVirtual(prod, ean);
+                            }
                         }
 
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
-                    } else if (anterior.getCodigoAtual() != null) {
+                    } 
+                    //</editor-fold>
+                    else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
                     } else {
