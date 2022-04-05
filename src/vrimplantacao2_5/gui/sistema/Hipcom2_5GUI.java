@@ -34,6 +34,8 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(dao.getLojaOrigem());
         chkVendaUtilizaDigito.setSelected(params.getBool(true, SISTEMA, "UTILIZA_DIGITO"));
     }
 
@@ -117,7 +119,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         }        
         
         Thread thread = new Thread() {
-            int idLojaVR;
+            int idLojaVR, balanca;
             String idLojaCliente;
 
             @Override
@@ -125,7 +127,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-
+                
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
@@ -329,6 +331,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         try {
@@ -693,6 +696,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         );
 
         tabOperacoes.addTab("Unificação", jPanel2);
+        tabOperacoes.addTab("Balança", pnlBalanca);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -818,6 +822,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private javax.swing.JPanel pnlOutrasReceitas;
