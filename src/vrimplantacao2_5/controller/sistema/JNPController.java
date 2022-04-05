@@ -11,28 +11,28 @@ import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2_5.dao.sistema.TslDAO;
+import vrimplantacao2_5.dao.sistema.JnpDAO;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
-import vrimplantacao2_5.vo.sistema.TslVO;
+import vrimplantacao2_5.vo.sistema.JnpVO;
 
 /**
  *
  * @author Michael
  */
-public class TslController extends InterfaceController {
+public class JNPController extends InterfaceController {
 
-    public TslDAO dao = null;
+    public JnpDAO dao = null;
     
-    public TslController() {
-        this.dao = new TslDAO();
+    public JNPController() {
+        this.dao = new JnpDAO();
     }
     
-    public TslController(TslDAO dao) {
+    public JNPController(JnpDAO dao) {
         this.dao = dao;
     }
     
-    public void setTsl(TslVO tslVO) {
-        dao.tslVO = tslVO;
+    public void setTsl(JnpVO jnpVO) {
+        dao.jnpVO = jnpVO;
     }
     
     @Override
