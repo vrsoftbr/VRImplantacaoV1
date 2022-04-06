@@ -74,7 +74,6 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
-                //OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,

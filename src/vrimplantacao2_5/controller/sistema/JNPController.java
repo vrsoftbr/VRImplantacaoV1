@@ -31,7 +31,7 @@ public class JNPController extends InterfaceController {
         this.dao = dao;
     }
     
-    public void setTsl(JnpVO jnpVO) {
+    public void setJnp(JnpVO jnpVO) {
         dao.jnpVO = jnpVO;
     }
     
@@ -78,7 +78,11 @@ public class JNPController extends InterfaceController {
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.PDV_VENDA,
-                    OpcaoProduto.VENDA_PDV
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.VENDA_PDV,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.RECEITA,
+                    OpcaoProduto.FAMILIA
                 }
         ));
     }
@@ -108,6 +112,7 @@ public class JNPController extends InterfaceController {
                 OpcaoFornecedor.EMAIL,
                 OpcaoFornecedor.CELULAR,
                 OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
@@ -138,7 +143,9 @@ public class JNPController extends InterfaceController {
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.OUTRAS_RECEITAS,
+                OpcaoCliente.RECEBER_CHEQUE
         ));
     }
 }

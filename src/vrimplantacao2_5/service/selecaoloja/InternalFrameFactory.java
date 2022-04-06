@@ -22,6 +22,7 @@ import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
+import vrimplantacao2_5.gui.sistema.Jnp2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
@@ -131,6 +132,9 @@ public abstract class InternalFrameFactory {
                 break;
             case GZPRODADOS:
                 internalFrame = new GZProdados2_5GUI(frame);
+                break;
+            case JNP:
+                internalFrame = new Jnp2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

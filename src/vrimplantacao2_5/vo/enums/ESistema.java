@@ -218,6 +218,7 @@ import vrimplantacao2_5.dao.sistema.TslDAO;
 import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
+import vrimplantacao2_5.dao.sistema.JnpDAO;
 
 /**
  *
@@ -435,7 +436,8 @@ public enum ESistema {
     WBA(214,"WBA",new WBADAO()),
     STOCK(215, "STOCK", new Stock_PostgresDAO()),
     CMM(216, "CMM", new CMMDAO()),
-    GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO());
+    GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
+    JNP(218,"JNP", new JnpDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
 
     

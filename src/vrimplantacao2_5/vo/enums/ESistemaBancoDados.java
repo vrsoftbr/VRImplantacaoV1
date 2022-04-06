@@ -95,6 +95,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_FXSISTEMAS(208, "FXSISTEMAS", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_VERSATIL(210, "VERSATIL", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_WBA(214, "WBA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
+    FIREBIRD_JNP(218, "JNP", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "", 9088),
     MYSQL_AVANCE(15, "AVANCE", 8, "MYSQL", "", "root", "infor", 3006),
     MYSQL_CLICK(29, "CLICK", 8, "MYSQL", "", "", "", 3006),
