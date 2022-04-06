@@ -143,23 +143,51 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    tab_acesso,\n"
-                    + "    tab_conteudo\n"
-                    + "from\n"
-                    + "    AA2CTABE\n"
-                    + "where\n"
-                    + "    tab_codigo = 3\n"
-                    + "order by\n"
-                    + "    tab_acesso"
+                    "SELECT\n" +
+                    "	CAST(TFI_FIGURA AS varchar(20)) id,\n" +
+                    "	TRIM(FIG.TAB_CONTEUDO) AS descricao,\n" +
+                    "	TFI_CODIGO_CST cst,\n" +
+                    "	TFI_ALIQ_ICM icms,\n" +
+                    "	TFI_BASE_REDUZ_ICMS reducao\n" +
+                    "FROM\n" +
+                    "	AA3TFISC,\n" +
+                    "	AA2CTIPO,\n" +
+                    "	AG1CRFCF,\n" +
+                    "	AA2CTABE FIG\n" +
+                    "WHERE\n" +
+                    "	TIP_CODIGO (+)= TFI_ENTIDADE\n" +
+                    "	AND TCG_CFOP_ALT (+)= TFI_CFOP\n" +
+                    "	AND FIG.TAB_CODIGO (+)= 003\n" +
+                    "	AND FIG.TAB_ACESSO (+)= to_char(TFI_FIGURA, 'FM000') || '       '\n" +
+                    "	AND TFI_CFOP = 5102\n" +
+                    "	AND TFI_AUTOMACAO = 'S'\n" +
+                    "UNION ALL\n" +
+                    "SELECT\n" +
+                    "	'E' || TFI_FIGURA id,\n" +
+                    "	TRIM(FIG.TAB_CONTEUDO) AS descricao,\n" +
+                    "	TFI_CODIGO_CST cst,\n" +
+                    "	TFI_ALIQ_ICM icms,\n" +
+                    "	TFI_BASE_REDUZ_ICMS reducao\n" +
+                    "FROM\n" +
+                    "	AA3TFISC,\n" +
+                    "	AA2CTIPO,\n" +
+                    "	AG1CRFCF,\n" +
+                    "	AA2CTABE FIG\n" +
+                    "WHERE\n" +
+                    "	TIP_CODIGO (+)= TFI_ENTIDADE\n" +
+                    "	AND TCG_CFOP_ALT (+)= TFI_CFOP\n" +
+                    "	AND FIG.TAB_CODIGO (+)= 003\n" +
+                    "	AND FIG.TAB_ACESSO (+)= to_char(TFI_FIGURA, 'FM000') || '       '\n" +
+                    "	AND TFI_CFOP = 1102\n" +
+                    "	AND TFI_AUTOMACAO = 'E'"
             )) {
                 while (rst.next()) {
-                    if (Utils.stringToInt(rst.getString("tab_acesso")) > 0) {
-                        String id = String.valueOf(Utils.stringToInt(rst.getString("tab_acesso")));
-                        result.add(
-                                MapaTributoIMP.make(id, rst.getString("tab_conteudo"))
-                        );
-                    }
+                    result.add(new MapaTributoIMP(
+                            rst.getString("id"), 
+                            rst.getString("descricao"), 
+                            rst.getInt("cst"), 
+                            rst.getDouble("icms"), 
+                            rst.getDouble("reducao")));
                 }
             }
         }
@@ -730,6 +758,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
 
                         imp.setIcmsDebitoId(rst.getString("icms_id"));
+                        imp.setIcmsConsumidorId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
                         imp.setIcmsCreditoId(rst.getString("icms_id"));
