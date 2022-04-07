@@ -235,26 +235,13 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.ID Id,\n"
                     + "	p.DATA_CADASTRO dataCadastro,\n"
                     + "	p.DATA_ALTERACAO dataAlteracao,\n"
-                    + "	CASE \n"
-                    + "	WHEN p.COD_BARRAS LIKE '00%'\n"
-                    + "	THEN SUBSTRING(p.COD_BARRAS FROM 8 FOR 11)\n"
-                    + "	WHEN p.COD_BARRAS LIKE '200%'\n"
-                    + "	THEN SUBSTRING(p.COD_BARRAS FROM 5 FOR 11)\n"
-                    + "	WHEN p.COD_BARRAS LIKE '200%' and p.BALANCA = 1\n"
-                    + "	THEN SUBSTRING(p.COD_BARRAS FROM 5 FOR 11)\n"
-                    + "	WHEN p.COD_BARRAS LIKE '00%' and p.BALANCA = 1\n"
-                    + "	THEN SUBSTRING(p.COD_BARRAS FROM 8 FOR 11)\n"
-                    + "	WHEN p.COD_BARRAS LIKE '789%' and p.BALANCA = 1\n"
-                    + "	THEN SUBSTRING(p.COD_BARRAS FROM 5 FOR 11)\n"
-                    + "	ELSE p.COD_BARRAS\n"
-                    + "	END ean,\n"
-                    + "	p.COD_BARRAS ean2,\n"
+                    + "	p.COD_BARRAS ean,\n"
                     + "	'1' as qtdEmbalagem,\n"
                     + "	e.DESCRICAO tipoEmbalagem,\n"
                     + "	p.BALANCA e_balanca,\n"
                     + "	p.DESCRICAO descricaoCompleta,\n"
                     + "	p.DESCRICAO_FISCAL descricaoReduzida,\n"
-                    + "	p.DESCRICAO descricaoGondola,    \n"
+                    + "	p.DESCRICAO descricaoGondola,   \n"
                     + "    SUBSTRING (gp.ID FROM 1 FOR 2 ) codMercadologico1,\n"
                     + "    SUBSTRING (gp.ID FROM 4 FOR 5 ) codMercadologico2,\n"
                     + "    SUBSTRING (gp.ID FROM 4 FOR 5 ) codMercadologico3,\n"
@@ -273,25 +260,31 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		ELSE 0\n"
                     + "    END situacaoCadastro,\n"
                     + "    p.NCM ncm,\n"
-                    + "    p.ID_CEST cest, \n"
+                    + "    ce.codigo cest,\n"
                     + "    p.PIS_COFINS_CST piscofinsCstDebito,\n"
                     + "    p.PIS_COFINS_CST_ENTRADA piscofinsCstCredito,\n"
                     + "    P.PIS_COFINS_NATUREZA_RECEITA piscofinsNaturezaReceita,\n"
-                    + "    p.ALIQ_ICMS icmsAliqEntrada,\n"
-                    + "    p.BASEREDPERC_ICMS icmsReducaoEntrada, \n"
-                    + "    p.CST_SAIDA icmsCstSaida,\n"
-                    + "    p.BASEREDPERC_ICMS icmsReducaoSaida,\n"
                     + "    CASE \n"
-                    + "    WHEN p.CST_SAIDA_EXT is NULL\n"
-                    + "    THEN '040'\n"
-                    + "    WHEN p.CST_SAIDA_EXT = ''\n"
-                    + "    THEN '040'\n"
-                    + "    ELSE p.CST_SAIDA_EXT\n"
-                    + "    END icmsCstSaidaForaEstado\n"
+                    + "    WHEN p.ID_TRIBUTACAO_SAIDAS IS NULL\n"
+                    + "    THEN COALESCE(p.BASEREDPERC_ICMS, 0.0000)\n"
+                    + "    ELSE COALESCE(x.PERCENTUAL, 0.0000)\n"
+                    + "    END icmsReducaoSaida,\n"
+                    + "    substring(p.CST_SAIDA FROM 2) icmsCstSaida,\n"
+                    + "    CASE \n"
+                    + "    WHEN p.ID_TRIBUTACAO_SAIDAS IS NULL\n"
+                    + "    THEN al.ALIQUOTA||'00'\n"
+                    + "    ELSE x.aliquota\n"
+                    + "    END icmsAliqSaida,\n"
+                    + "    p.BASEREDPERC_ICMS icmsReducaoEntrada,\n"
+                    + "	p.CST_SAIDA_EXT icmsCstSaidaForaEstado\n"
                     + "FROM PRODUTO p \n"
                     + "LEFT JOIN FNC_EMBALAGENS e ON p.ID_EMBALAGENS = e.ID \n"
                     + "LEFT JOIN GRUPO_PRODUTOS gp ON p.GRUPO_PRODUTOS = gp.ID \n"
                     + "LEFT JOIN PRODUTO_ESTOQUE pe ON p.ID = pe.ID_PRODUTO \n"
+                    + "LEFT JOIN ECF_ALIQUOTAS al ON p.ID_ECF_ALIQUOTAS = al.ID\n"
+                    + "LEFT JOIN NF_CALCULO x ON x.ID = p.ID_TRIBUTACAO_SAIDAS \n"
+                    + "LEFT JOIN CEST_NCM cn ON p.ncm = cn.NCM \n"
+                    + "LEFT JOIN cest ce ON cn.ID_CEST = ce.id\n"
                     + "WHERE pe.ID_EMPRESA = " + getLojaOrigem() + "\n"
                     + "ORDER BY 1"
             )) {
@@ -329,15 +322,18 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqEntrada"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsReducaoEntrada"));
-                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
-                    imp.setIcmsCstSaidaForaEstado(rs.getInt("icmsCstSaidaForaEstado"));
-
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinsCstCredito"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsNaturezaReceita"));
+
+                    String icmsId = rs.getString("icmsCstSaida") + "-" + rs.getString("icmsAliqSaida") + "-" + rs.getString("icmsReducaoSaida");
+
+                    imp.setIcmsConsumidorId(icmsId);
+                    imp.setIcmsDebitoId(icmsId);
+                    imp.setIcmsCreditoId(icmsId);
+                    imp.setIcmsCreditoForaEstadoId(icmsId);
+                    imp.setIcmsDebitoForaEstadoId(icmsId);
+                    imp.setIcmsDebitoForaEstadoNfId(icmsId);
 
                     int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -355,7 +351,6 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(0);
                     }
-
                     result.add(imp);
                 }
             }
