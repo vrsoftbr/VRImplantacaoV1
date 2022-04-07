@@ -187,11 +187,12 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkSomenteEansUnitarios" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkUtilizarEs1ParaCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFiltrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkAjustarDigitoVerificador" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="0" pref="202" max="32767" attributes="0"/>
                       </Group>
@@ -206,7 +207,9 @@
                           <Component id="chkUtilizarEs1ParaCotacao" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFiltrarProdutos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="139" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkAjustarDigitoVerificador" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="109" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -225,6 +228,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFiltrarProdutos">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Rede Parana&#xed;ba: Filtrar produtos"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAjustarDigitoVerificador">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Ajustar C&#xf3;digo de Barras (Digito Verificador)"/>
                   </Properties>
                 </Component>
               </SubComponents>

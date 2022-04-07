@@ -111,6 +111,10 @@ public class Linear2_5GUI extends VRInternalFrame {
                     tabClientes.setImportador(importador);
                     dao.setMultiplicarQtdEmbalagemPeloVolume(chkUtilizarEs1ParaCotacao.isSelected());
                     dao.setFiltrarProdutos(chkFiltrarProdutos.isSelected());
+                    
+                    if(chkAjustarDigitoVerificador.isSelected()){
+                        dao.importarDigitoVerificador();
+                    }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -178,6 +182,7 @@ public class Linear2_5GUI extends VRInternalFrame {
         chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
         chkUtilizarEs1ParaCotacao = new vrframework.bean.checkBox.VRCheckBox();
         chkFiltrarProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -257,6 +262,8 @@ public class Linear2_5GUI extends VRInternalFrame {
 
         chkFiltrarProdutos.setText("Rede Paranaíba: Filtrar produtos");
 
+        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
+
         javax.swing.GroupLayout tbProdutosEspecialLayout = new javax.swing.GroupLayout(tbProdutosEspecial);
         tbProdutosEspecial.setLayout(tbProdutosEspecialLayout);
         tbProdutosEspecialLayout.setHorizontalGroup(
@@ -265,7 +272,8 @@ public class Linear2_5GUI extends VRInternalFrame {
                 .addGroup(tbProdutosEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 202, Short.MAX_VALUE))
         );
         tbProdutosEspecialLayout.setVerticalGroup(
@@ -277,7 +285,9 @@ public class Linear2_5GUI extends VRInternalFrame {
                 .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(109, Short.MAX_VALUE))
         );
 
         pnlEspecial.addTab("Especial", tbProdutosEspecial);
@@ -329,6 +339,7 @@ public class Linear2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private vrframework.bean.checkBox.VRCheckBox chkFiltrarProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteEansUnitarios;
     private vrframework.bean.checkBox.VRCheckBox chkUtilizarEs1ParaCotacao;
