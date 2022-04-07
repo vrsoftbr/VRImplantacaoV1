@@ -227,7 +227,7 @@ public class ProdutoRepository {
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
-                        if (idProdutoExistente > 0) {
+                        if (idProdutoExistente > 0 && ean > 999999) {
                             anterior.setObsImportacao("PRODUTO JA CADASTRO NO VR MASTER");
                             
                             prod.setId(idProdutoExistente);
