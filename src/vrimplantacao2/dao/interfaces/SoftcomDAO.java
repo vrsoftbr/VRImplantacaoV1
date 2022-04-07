@@ -59,10 +59,63 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+                    "select\n"
+                    + "	p.[Código da Mercadoria] id,\n"
+                    + "	p.DataCadastro,\n"
+                    + "	case\n"
+                    + "	when p.Balanca = 1 and p.Medida = 'KG' then 'SEM GTIN' else ean.ean end ean,\n"
+                    + "	1 qtdEmbalagem,\n"
+                    + "	p.Medida unidade,\n"
+                    + "	p.Balanca as e_balanca,--p.Balanca,\n"
+                    + "	p.validadedias validade,\n"
+                    + "	p.Mercadoria descricaocompleta,\n"
+                    + "	p.Grupo cod_mercadologico1,\n"
+                    + "	p.SubGrupo cod_mercadologico2,\n"
+                    + "	p.Peso,\n"
+                    + "	p.[Estoque Mínimo] estoqueminimo,\n"
+                    + "	p.[Unidades em Estoque] estoque,\n"
+                    + "	p.[Margem Lucro] margem,\n"
+                    + "	round(p.[Preço C], 2, 1) custocomimposto,\n"
+                    + "	p.[Preço Compra] custosemimposto,\n"
+                    + "	p.[Preço de Venda] precovenda,\n"
+                    + "	case p.Desativado when 1 then 0 else 1 end situacaocadastro,\n"
+                    + "	p.NCM ncm,\n"
+                    + "	nullif(rtrim(ltrim(coalesce(p.cCEST,''))),'') cest,\n"
+                    + "	pisdebito.CSTPIS piscofins_debito,\n"
+                    + "	piscredito.CSTPIS piscofins_credito,\n"
+                    + "	p.NaturezaReceita piscofins_naturezareceita,\n"
+                    + "	p.Situação icms_id,\n"
+                    + "	p.VendaA preco_atacado\n"
+                    + "from\n"
+                    + "	[Cadastro de Mercadorias] p\n"
+                    + "join (\n"
+                    + "		select\n"
+                    + "			[Código da Mercadoria] id,\n"
+                    + "			PAF_Codigo ean\n"
+                    + "		from\n"
+                    + "			[Cadastro de Mercadorias]\n"
+                    + "		where\n"
+                    + "			not PAF_Codigo is null\n"
+                    + "		union\n"
+                    + "		select\n"
+                    + "			[Código da Mercadoria] id,\n"
+                    + "			[Cód Barra] ean\n"
+                    + "		from\n"
+                    + "			[Cadastro de Mercadorias]\n"
+                    + "		where\n"
+                    + "			not [Cód Barra] is null\n"
+                    + "	) ean on p.[Código da Mercadoria] = ean.id\n"
+                    + "	left join NFe_PIS pisdebito on\n"
+                    + "		pisdebito.ID = p.TipoPIS\n"
+                    + "	left join NFe_PIS piscredito on\n"
+                    + "		piscredito.ID = p.TipoPISEntrada\n"
+                    + "where\n"
+                    + "	not p.Mercadoria is null \n"
+                    + "	ORDER BY 1"
+            /*"select\n" +
                     "	p.[Código da Mercadoria] id,\n" +
                     "	p.DataCadastro,\n" +
                     "	ean.ean ean,\n" +
@@ -113,11 +166,11 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join NFe_PIS piscredito on\n" +
                     "		piscredito.ID = p.TipoPISEntrada\n" +
                     "where\n" +
-                    "	not p.Mercadoria is null"
+                    "	not p.Mercadoria is null"*/
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -149,19 +202,19 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
                     imp.setAtacadoPreco(rst.getDouble("preco_atacado"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct Situação id from [Cadastro de Mercadorias] order by 1"
@@ -173,45 +226,45 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	f.[Código do Fornecedor] id,\n" +
-                    "	f.Fornecedor razao,\n" +
-                    "	f.Fantasia,\n" +
-                    "	f.[CGC/CPF] cnpj,\n" +
-                    "	f.[Insc Estadual] ie,\n" +
-                    "	f.InscricaoMunicipal inscmun,\n" +
-                    "	f.[Endereço] endereco,\n" +
-                    //"	f.Num numero,\n" +
-                    "	null numero,\n" +
-                    "	f.Bairro,\n" +
-                    "	f.Cidade,\n" +
-                    "	f.UF,\n" +
-                    "	f.cCidade ibge_mun,\n" +
-                    "	f.CEP,\n" +
-                    "	f.Fone1,\n" +
-                    "	coalesce(f.Fone2,'') fone2,\n" +
-                    "	coalesce(f.Fones,'') fones,\n" +
-                    "	f.DataCadastro,\n" +
-                    "	f.Observações obs,\n" +
-                    "	f.[E-mail] email\n" +
-                    "from\n" +
-                    "	Fornecedores f\n" +
-                    "order by\n" +
-                    "	f.[Código do Fornecedor]"
+                    "select\n"
+                    + "	f.[Código do Fornecedor] id,\n"
+                    + "	f.Fornecedor razao,\n"
+                    + "	f.Fantasia,\n"
+                    + "	f.[CGC/CPF] cnpj,\n"
+                    + "	f.[Insc Estadual] ie,\n"
+                    + "	f.InscricaoMunicipal inscmun,\n"
+                    + "	f.[Endereço] endereco,\n"
+                    + //"	f.Num numero,\n" +
+                    "	null numero,\n"
+                    + "	f.Bairro,\n"
+                    + "	f.Cidade,\n"
+                    + "	f.UF,\n"
+                    + "	f.cCidade ibge_mun,\n"
+                    + "	f.CEP,\n"
+                    + "	f.Fone1,\n"
+                    + "	coalesce(f.Fone2,'') fone2,\n"
+                    + "	coalesce(f.Fones,'') fones,\n"
+                    + "	f.DataCadastro,\n"
+                    + "	f.Observações obs,\n"
+                    + "	f.[E-mail] email\n"
+                    + "from\n"
+                    + "	Fornecedores f\n"
+                    + "order by\n"
+                    + "	f.[Código do Fornecedor]"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -230,7 +283,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rst.getString("Fone1"));
                     imp.setDatacadastro(rst.getDate("DataCadastro"));
                     imp.setObservacao(rst.getString("obs"));
-                    
+
                     String fone2 = Utils.formataNumero(rst.getString("fone2"));
                     if (!"".equals(fone2)) {
                         imp.addContato("F2", "FONE2", fone2, "", TipoContato.COMERCIAL, null);
@@ -243,62 +296,62 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (!"".equals(email)) {
                         imp.addContato("EMAIL", "EMAIL", "", "", TipoContato.COMERCIAL, email);
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	c.[Código do Cliente] id,\n" +
-                    "	c.CGC cnpj,\n" +
-                    "	c.[Inscrição Estadual] inscricaoestadual,\n" +
-                    "	c.[Razão Social] razao,\n" +
-                    "	c.[Nome do Cliente] fantasia,\n" +
-                    "	case when c.Desativado = 0 then 1 else 0 end ativo,\n" +
-                    "	coalesce(c.[Bloquear Cliente], 0) bloquear,\n" +
-                    "	c.Endereço endereco,\n" +
-                    "	c.Num numero,\n" +
-                    "	c.[Ponto de Referência] complemento,\n" +
-                    "	c.Bairro bairro,\n" +
-                    "	c.Cidade municipio,\n" +
-                    "	c.UF uf,\n" +
-                    "	c.cCidade municipio_ibge,\n" +
-                    "	c.CEP cep,\n" +
-                    "	c.Datanasc datanascimento,\n" +
-                    "	c.DataCadastro datacadastro,\n" +
-                    "	c.LocalTrabalho empresa,\n" +
-                    "	c.Renda salario,\n" +
-                    "	c.[Limite Crédito] limite,\n" +
-                    "	c.Conjuge,\n" +
-                    "	c.Pai,\n" +
-                    "	c.Mae,\n" +
-                    "	c.[Observações] obs,\n" +
-                    "	c.RG,\n" +
-                    "	c.[Fone Resid] fone1,\n" +
-                    "	c.fonecob cob_telefone,\n" +
-                    "	c.endcob cob_endereco,\n" +
-                    "	c.bairrocob cob_bairro,\n" +
-                    "	c.cidcob cob_cidade,\n" +
-                    "	c.ufcob cob_uf,\n" +
-                    "	c.cepcob cob_cep\n" +
-                    "from\n" +
-                    "	[Cadastro de Clientes] c\n" +
-                    "order by\n" +
-                    "	id"
+                    "select\n"
+                    + "	c.[Código do Cliente] id,\n"
+                    + "	c.CGC cnpj,\n"
+                    + "	c.[Inscrição Estadual] inscricaoestadual,\n"
+                    + "	c.[Razão Social] razao,\n"
+                    + "	c.[Nome do Cliente] fantasia,\n"
+                    + "	case when c.Desativado = 0 then 1 else 0 end ativo,\n"
+                    + "	coalesce(c.[Bloquear Cliente], 0) bloquear,\n"
+                    + "	c.Endereço endereco,\n"
+                    + "	c.Num numero,\n"
+                    + "	c.[Ponto de Referência] complemento,\n"
+                    + "	c.Bairro bairro,\n"
+                    + "	c.Cidade municipio,\n"
+                    + "	c.UF uf,\n"
+                    + "	c.cCidade municipio_ibge,\n"
+                    + "	c.CEP cep,\n"
+                    + "	c.Datanasc datanascimento,\n"
+                    + "	c.DataCadastro datacadastro,\n"
+                    + "	c.LocalTrabalho empresa,\n"
+                    + "	c.Renda salario,\n"
+                    + "	c.[Limite Crédito] limite,\n"
+                    + "	c.Conjuge,\n"
+                    + "	c.Pai,\n"
+                    + "	c.Mae,\n"
+                    + "	c.[Observações] obs,\n"
+                    + "	c.RG,\n"
+                    + "	c.[Fone Resid] fone1,\n"
+                    + "	c.fonecob cob_telefone,\n"
+                    + "	c.endcob cob_endereco,\n"
+                    + "	c.bairrocob cob_bairro,\n"
+                    + "	c.cidcob cob_cidade,\n"
+                    + "	c.ufcob cob_uf,\n"
+                    + "	c.cepcob cob_cep\n"
+                    + "from\n"
+                    + "	[Cadastro de Clientes] c\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
@@ -331,31 +384,31 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaMunicipio(rst.getString("cob_cidade"));
                     imp.setCobrancaUf(rst.getString("cob_uf"));
                     imp.setCobrancaCep(rst.getString("cob_cep"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     public void importarAtacadoPorEAN(int lojaVR) throws Exception {
         ProgressBar.setStatus("Preparando para gravar atacado...");
         Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-        Map<String, Integer> anteriores = new ProdutoAnteriorDAO().getAnteriores(getSistema(), getLojaOrigem());        
+        Map<String, Integer> anteriores = new ProdutoAnteriorDAO().getAnteriores(getSistema(), getLojaOrigem());
         Map<Long, Integer> eans = new ProdutoAutomacaoDAO().getEansCadastrados();
         Set<Long> atac = new ProdutoAutomacaoDAO().getEansCadastradosAtacado(lojaVR);
-        
+
         Conexao.begin();
-        try {            
+        try {
             List<ProdutoIMP> prods = getProdutos();
             ProgressBar.setStatus("Gravando atacado...");
             ProgressBar.setMaximum(prods.size());
-            for (ProdutoIMP imp: prods) {            
+            for (ProdutoIMP imp : prods) {
                 Integer id = anteriores.get(imp.getImportId());
 
-                if (id != null) {                
+                if (id != null) {
                     if (!atac.contains(id.longValue())) {
                         double precoAtacado = imp.getAtacadoPreco();
                         double precoVenda;
@@ -388,15 +441,15 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                 }
-                
+
                 ProgressBar.next();
             }
-            
+
             Conexao.commit();
         } catch (Exception e) {
             Conexao.rollback();
             throw e;
         }
     }
-    
+
 }
