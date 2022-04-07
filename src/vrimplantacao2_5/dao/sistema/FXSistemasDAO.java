@@ -520,15 +520,12 @@ public class FXSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	pf.COD_FORNECEDOR id_fornecedor,\n"
-                    + "	d.CODPRO id_produto,\n"
-                    + "	pf.REFFORNEC cod_externo\n"
+                    "  SELECT\n"
+                    + "	ID_FORCLI id_fornecedor,\n"
+                    + "	ID_PRODUTO id_produto,\n"
+                    + "	CODIGO cod_externo\n"
                     + "FROM\n"
-                    + "	FORNECPROD pf\n"
-                    + "	JOIN TDERIVACAO d ON d.CODDER = pf.CODDER\n"
-                    + "WHERE\n"
-                    + "	pf.REFFORNEC != '' AND pf.REFFORNEC IS NOT NULL\n"
+                    + "	FOR_CLI_PRODUTOS \n"
                     + "ORDER BY 1,2"
             )) {
                 while (rs.next()) {
