@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -810,9 +811,9 @@ public class CissDAO extends InterfaceDAO {
                     + "	v.idcep";
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
-                LOG.log(Level.FINE, "SQL da venda: " + sql);
+                LOG.log(Level.FINE, "SQL da venda: {0}", sql);
                 rst = stm.executeQuery(sql);
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro ao executar o SQL", ex);
                 throw new RuntimeException(ex);
             }
@@ -856,6 +857,13 @@ public class CissDAO extends InterfaceDAO {
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nomecliente"));
+                        
+                        if(next.getNomeCliente() != null && !next.getNomeCliente().trim().isEmpty()) {
+                            if (next.getNomeCliente().length() > 45) {
+                                next.setNomeCliente(next.getNomeCliente().substring(0, 45));
+                            }
+                        }
+                        
                         next.setEnderecoCliente(String.format(
                                 "%s,%s,%s,%s  %s  %s",
                                 rst.getString("ENDERECO"),
@@ -867,7 +875,7 @@ public class CissDAO extends InterfaceDAO {
                         ));
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro ao obter o proximo registro", ex);
                 throw new RuntimeException(ex);
             }
@@ -906,14 +914,14 @@ public class CissDAO extends InterfaceDAO {
                     + "	e.PERICM icms_aliq,\n"
                     + "	e.PERREDTRIB icms_reducao\n"
                     + "from\n"
-                    + "	notas n\n"
-                    + "	join estoque_analitico e on\n"
+                    + "	dba.notas n\n"
+                    + "	join dba.estoque_analitico e on\n"
                     + "		e.idempresa = n.idempresa and\n"
                     + "		e.idplanilha = n.idplanilha and\n"
                     + "		(e.numsequenciakit is null or e.numsequenciakit <= 0)\n"
-                    + "	join produto_grade ean on\n"
+                    + "	join dba.produto_grade ean on\n"
                     + "		ean.idsubproduto = e.idsubproduto\n"
-                    + "	join produto p on\n"
+                    + "	join dba.produto p on\n"
                     + "		p.idproduto = e.idproduto\n"
                     + "where\n"
                     + "	e.idoperacao = 1300 and\n"
@@ -923,9 +931,9 @@ public class CissDAO extends InterfaceDAO {
 
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
-                LOG.log(Level.FINE, "SQL da venda item: " + sql);
+                LOG.log(Level.FINE, "SQL da venda item: {0}", sql);
                 rst = stm.executeQuery(sql);
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro ao executar o SQL", ex);
                 throw new RuntimeException(ex);
             }
@@ -975,7 +983,7 @@ public class CissDAO extends InterfaceDAO {
                         next.setIcmsReduzido(rst.getDouble("icms_reducao"));
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro ao obter o proximo registro", ex);
                 throw new RuntimeException(ex);
             }

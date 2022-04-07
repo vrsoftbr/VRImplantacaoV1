@@ -89,6 +89,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean removerCodigoCliente = false;
     public boolean utilizaEstoqueMultiLoja = false;
+    public boolean utilizaPrecoMultiloja = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -382,8 +383,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto") == 0 ? 
                             rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
                     
-                    imp.setPrecovenda(rst.getDouble("precovenda") == 0 ? 
-                            rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
+                    imp.setPrecovenda(rst.getDouble("precovenda_produto"));
+                    
+                    if (utilizaPrecoMultiloja) {
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                    }
                     
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));

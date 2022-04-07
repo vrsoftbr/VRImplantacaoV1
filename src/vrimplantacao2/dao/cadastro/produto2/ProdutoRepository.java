@@ -209,10 +209,19 @@ public class ProdutoRepository {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
                         
-                        if(prod.getDescricaoCompleta()!= null && 
-                                prod.getDescricaoCompleta().length() >= 3 && 
-                                    ean > 999999){
-                            provider.salvarLojaVirtual(prod, ean);
+                        if(prod.getDescricaoCompleta() != null &&
+                                !prod.getDescricaoCompleta().trim().isEmpty() &&
+                                    prod.getDescricaoCompleta().length() >= 3 && 
+                                        ean > 999999){
+                            long ean14 = 0;
+                            
+                            if (ean > 99999999999999l) {
+                                String eanStr = String.valueOf(ean).substring(0, 14);
+                                
+                                ean14 = Long.valueOf(eanStr);
+                            }
+                            
+                            provider.salvarLojaVirtual(prod, ean14);
                         }
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
@@ -231,6 +240,7 @@ public class ProdutoRepository {
                         if (!provider.automacao().cadastrado(ean)) {
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(anterior.getCodigoAtual());
+                            
                             provider.automacao().salvar(automacao);
                         }
                     }
@@ -1463,7 +1473,7 @@ public class ProdutoRepository {
             if (unidadeCotacao != null) {
                 vo.setTipoEmbalagem(unidadeCotacao);
             } else {
-                vo.setTipoEmbalagem(unidade);
+                vo.setTipoEmbalagem(TipoEmbalagem.CX);
             }
             vo.setPesavel(false);
         }
