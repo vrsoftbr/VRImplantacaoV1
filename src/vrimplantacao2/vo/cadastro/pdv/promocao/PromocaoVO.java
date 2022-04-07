@@ -21,7 +21,7 @@ public class PromocaoVO {
     private int pontuacao;
     private double quantidade;
     private int qtdcupom;
-    private int idSituacaocadastro;
+    private int idSituacaocadastro = 1;
     private int idTipopromocao;
     private double valor;
     private int controle;
@@ -208,7 +208,7 @@ public class PromocaoVO {
     public void setControle(int controle) {
         this.controle = controle;
     }
-    
+
     /**
      * @param controle the controle to set
      */
@@ -336,7 +336,8 @@ public class PromocaoVO {
     }
 
     /**
-     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to set
+     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to
+     * set
      */
     public void setIdTipoPercentualValorDesconto(int idTipoPercentualValorDesconto) {
         this.idTipoPercentualValorDesconto = idTipoPercentualValorDesconto;

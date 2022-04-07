@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.promocao;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.promocao.PromocaoVO;
@@ -25,114 +26,120 @@ public class PromocaoRepository {
     }
 
     public void salvar(List<PromocaoIMP> promocoes) throws Exception {
-        //Map<String, PromocaoIMP> filtrados = filtrar(promocoes);
-        MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
-        try {
-            limparCodantPromocao(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
-            provider.setStatus("Gravando promocoes...");
-            provider.setMaximo(promocoes.size());
-            for (PromocaoIMP imp : promocoes) {
-                PromocaoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-
-                if (anterior == null) {
-                    anterior = converterPromocaoAnteriorVO(imp);
-                    gravarPromocaoAnterior(anterior);
-                    anteriores.put(
-                            anterior,
+        int i = JOptionPane.showConfirmDialog(null, "Atenção!\n\nSe já houve uma importação, "
+                + "repetir o processo deletará as promoções já importadas.\n\n"
+                + "Deseja prosseguir?\n\n",
+                "Confirmação de Importação", JOptionPane.OK_OPTION);
+        if (i == JOptionPane.YES_OPTION) {
+            MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
+            try {
+                provider.setStatus("Eliminando cadastros anteriores.");
+                limparCodantPromocao(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
+                provider.setStatus("Gravando promocoes...");
+                provider.setMaximo(promocoes.size());
+                for (PromocaoIMP imp : promocoes) {
+                    PromocaoAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
-                            imp.getId_promocao()
+                            imp.getId()
                     );
+
+                    if (anterior == null) {
+                        anterior = converterPromocaoAnteriorVO(imp);
+                        gravarPromocaoAnterior(anterior);
+                        anteriores.put(
+                                anterior,
+                                provider.getSistema(),
+                                provider.getLojaOrigem(),
+                                imp.getId_promocao()
+                        );
+                    }
+                    provider.next();
                 }
-                provider.next();
+
+                provider.commit();
+            } catch (Exception e) {
+                provider.rollback();
+                throw e;
             }
 
-            provider.commit();
-        } catch (Exception e) {
-            provider.rollback();
-            throw e;
-        }
-
-        try {
-            limparFinalizadora(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
-            List<PromocaoIMP> filtrados = provider.getFinalizadora();
-            anteriores = provider.getAnteriores();
-            provider.setStatus("Gravando cabeçalho promocoes e finalizadora");
-            provider.setMaximo(filtrados.size());
-            for (PromocaoIMP imp : filtrados) {
-                PromocaoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId_produto()
-                );
-
-                if (anterior == null) {
-                    PromocaoVO promo = converterPromocao(imp);
-                    anterior = converterPromocaoAnteriorVO(imp);
-                    anterior.setCodigoAtual(promo);
-
-                    gravarPromocao(promo);
-                    anterior = converterPromocaoAnteriorVO(imp);
-                    gravarPromocaoFinalizadora(anterior);
-                    anteriores.put(
-                            anterior,
+            try {
+                provider.setStatus("Eliminando cadastros de promoções anteriores.");
+                limparPromocao(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
+                List<PromocaoIMP> filtrados = provider.getFinalizadora();
+                anteriores = provider.getAnteriores();
+                provider.setStatus("Gravando tipos de pagamentos por promoção");
+                provider.setMaximo(filtrados.size());
+                for (PromocaoIMP imp : filtrados) {
+                    PromocaoAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
-                            imp.getId_promocao()
+                            imp.getId_produto()
                     );
+
+                    if (anterior == null) {
+                        PromocaoVO promo = converterPromocao(imp);
+                        anterior = converterPromocaoAnteriorVO(imp);
+                        anterior.setCodigoAtual(promo);
+
+                        gravarPromocao(promo);
+                        anterior = converterPromocaoAnteriorVO(imp);
+                        gravarPromocaoFinalizadora(anterior);
+                        anteriores.put(
+                                anterior,
+                                provider.getSistema(),
+                                provider.getLojaOrigem(),
+                                imp.getId_promocao()
+                        );
+                    }
+                    provider.next();
                 }
-                provider.next();
+
+                provider.commit();
+            } catch (Exception e) {
+                provider.rollback();
+                throw e;
             }
 
-            provider.commit();
-        } catch (Exception e) {
-            provider.rollback();
-            throw e;
-        }
+            try {
+                List<PromocaoIMP> filtraItens = provider.getItens();
+                anteriores = provider.getAnteriores();
 
-        try {
-            List<PromocaoIMP> filtraItens = provider.getItens();
-            anteriores = provider.getAnteriores();
-
-            provider.setStatus("Gravando itens promocoes...");
-            provider.setMaximo(filtraItens.size());
-            for (PromocaoIMP imp : filtraItens) {
-                PromocaoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId_produto()
-                );
-
-                if (anterior == null) {
-                    anterior = converterPromocaoAnteriorVO(imp);
-                    gravarPromocaoItens(anterior);
-                    anteriores.put(
-                            anterior,
+                provider.setStatus("Gravando itens promocoes...");
+                provider.setMaximo(filtraItens.size());
+                for (PromocaoIMP imp : filtraItens) {
+                    PromocaoAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
-                            imp.getId_promocao()
+                            imp.getId_produto()
                     );
+
+                    if (anterior == null) {
+                        anterior = converterPromocaoAnteriorVO(imp);
+                        gravarPromocaoItens(anterior);
+                        anteriores.put(
+                                anterior,
+                                provider.getSistema(),
+                                provider.getLojaOrigem(),
+                                imp.getId_promocao()
+                        );
+                    }
+                    provider.next();
                 }
-                provider.next();
+                provider.commit();
+            } catch (Exception e) {
+                provider.rollback();
+                throw e;
             }
-            provider.commit();
-        } catch (Exception e) {
+            promocoes.clear();
+            System.gc();
+        } else {
             provider.rollback();
-            throw e;
+            promocoes.clear();
+            System.gc();
         }
     }
 
-    /*public Map<String, PromocaoIMP> filtrar(List<PromocaoIMP> promocoes) throws Exception {
-        Map<String, PromocaoIMP> result = new LinkedHashMap<>();
-        for (PromocaoIMP imp : promocoes) {
-            result.put(imp.getId_promocao(), imp);
-        }
-        return result;
-    }*/
     public PromocaoVO converterPromocao(PromocaoIMP imp) {
         PromocaoVO vo = new PromocaoVO();
         vo.setId(imp.getId_promocao());
@@ -193,7 +200,7 @@ public class PromocaoRepository {
         provider.limparCodantPromocao(lojaOrigem, sistema, idConexao);
     }
 
-    private void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
-        provider.limparFinalizadora(lojaOrigem, sistema, idConexao);
+    private void limparPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        provider.limparPromocao(lojaOrigem, sistema, idConexao);
     }
 }

@@ -70,7 +70,6 @@ public class PromocaoDAO {
             stm.execute("delete from promocaoitem;");
             stm.execute("delete from promoca;");
             stm.execute("drop table if exists implantacao.codant_promocao;");
-            stm.execute("alter sequence promocao_id_seq restart with 1;");
             stm.execute("alter sequence promocaoitem_id_seq restart with 1;");
             stm.execute("alter sequence promocaofinalizadora_id_seq restart with 1;");
         }
@@ -162,6 +161,8 @@ public class PromocaoDAO {
                     + "inner join implantacao.codant_produto imp on\n"
                     + "	p.id_produto = imp.impid\n"
                     + "where p.sistema = imp.impsistema \n"
+                    + "and p.loja = imp.imploja \n"
+                    + "and p.id_conexao = p.id_conexao \n"
                     + "order by 2"
             )) {
                 while (rst.next()) {
@@ -230,7 +231,7 @@ public class PromocaoDAO {
         }
     }
 
-    public void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
+    public void limparPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete\n"
                     + "from\n"
@@ -255,6 +256,42 @@ public class PromocaoDAO {
                     + "    execute 'alter SEQUENCE promocaofinalizadora_id_seq RESTART with '|| maxid;   \n"
                     + "end;\n"
                     + "$$ language plpgsql");
+            stm.execute("delete\n"
+                    + "from\n"
+                    + "	promocaoitem\n"
+                    + "where\n"
+                    + "	id_promocao in (\n"
+                    + "	select\n"
+                    + "		distinct id_promocao::int\n"
+                    + "	from\n"
+                    + "		implantacao.codant_promocao\n"
+                    + "	where\n"
+                    + "		sistema = '" + sistema + "'\n"
+                    + "		and loja = '" + lojaOrigem + "'\n"
+                    + "		and id_conexao = " + idConexao + ")");
+            stm.execute("do $$\n"
+                    + "declare maxid int;\n"
+                    + "begin\n"
+                    + "    select max(id)+1 from promocaoitem into maxid;\n"
+                    + "   	if maxid = 0 then maxid := 1;\n"
+                    + "   	elseif maxid is null then maxid := 1;\n"
+                    + "   	end if;\n"
+                    + "    execute 'alter SEQUENCE promocaoitem_id_seq RESTART with '|| maxid;   \n"
+                    + "end;\n"
+                    + "$$ language plpgsql");
+            stm.execute("delete\n"
+                    + "from\n"
+                    + "	promocao\n"
+                    + "where\n"
+                    + "	id in (\n"
+                    + "	select\n"
+                    + "		distinct id_promocao::int\n"
+                    + "	from\n"
+                    + "		implantacao.codant_promocao\n"
+                    + "	where\n"
+                    + "		sistema = '" + sistema + "'\n"
+                    + "		and loja = '" + lojaOrigem + "'\n"
+                    + "		and id_conexao = " + idConexao + ")");
         }
     }
 }

@@ -116,8 +116,8 @@ public class PromocaoRepositoryProvider {
         promocaoDAO.limparCodantPromocao(lojaOrigem, sistema, idConexao);
     }
 
-    void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
-        promocaoDAO.limparFinalizadora(lojaOrigem, sistema, idConexao);
+    void limparPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        promocaoDAO.limparPromocao(lojaOrigem, sistema, idConexao);
     }
 
 }
