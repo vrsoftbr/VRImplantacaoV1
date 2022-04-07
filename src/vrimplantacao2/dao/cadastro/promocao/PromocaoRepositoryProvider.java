@@ -28,6 +28,7 @@ public class PromocaoRepositoryProvider {
         this.sistema = sistema;        
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
+        this.idConexao = idConexao;
         this.promocaoDAO = new PromocaoDAO();
         this.anteriorDAO = new PromocaoAnteriorDAO();
         this.anteriorDAO.createTable();        
@@ -48,7 +49,7 @@ public class PromocaoRepositoryProvider {
     public String getLojaOrigem() {
         return lojaOrigem;
     }
-
+    
     public int getLojaVR() {
         return lojaVR;
     }
@@ -109,6 +110,14 @@ public class PromocaoRepositoryProvider {
 
     void gravarPromocaoFinalizadora(PromocaoAnteriorVO finalizadora) throws Exception {
        promocaoDAO.salvarFinalizadora(finalizadora);
+    }
+
+    void limparCodantPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        promocaoDAO.limparCodantPromocao(lojaOrigem, sistema, idConexao);
+    }
+
+    void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        promocaoDAO.limparFinalizadora(lojaOrigem, sistema, idConexao);
     }
 
 }

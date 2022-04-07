@@ -25,10 +25,10 @@ public class PromocaoRepository {
     }
 
     public void salvar(List<PromocaoIMP> promocoes) throws Exception {
-        Map<String, PromocaoIMP> filtrados = filtrar(promocoes);
+        //Map<String, PromocaoIMP> filtrados = filtrar(promocoes);
         MultiMap<String, PromocaoAnteriorVO> anteriores = provider.getAnteriores();
         try {
-
+            limparCodantPromocao(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
             provider.setStatus("Gravando promocoes...");
             provider.setMaximo(promocoes.size());
             for (PromocaoIMP imp : promocoes) {
@@ -39,7 +39,7 @@ public class PromocaoRepository {
                 );
 
                 if (anterior == null) {
-                    anterior = converterPromocarAnteriorVO(imp);
+                    anterior = converterPromocaoAnteriorVO(imp);
                     gravarPromocaoAnterior(anterior);
                     anteriores.put(
                             anterior,
@@ -58,23 +58,26 @@ public class PromocaoRepository {
         }
 
         try {
-
+            limparFinalizadora(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
+            List<PromocaoIMP> filtrados = provider.getFinalizadora();
             anteriores = provider.getAnteriores();
-            provider.setStatus("Gravando cabeçalho promocoes...");
+            provider.setStatus("Gravando cabeçalho promocoes e finalizadora");
             provider.setMaximo(filtrados.size());
-            for (PromocaoIMP imp : filtrados.values()) {
+            for (PromocaoIMP imp : filtrados) {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getLojaOrigem(),
-                        imp.getId()
+                        imp.getId_produto()
                 );
 
-                if (anterior != null) {
+                if (anterior == null) {
                     PromocaoVO promo = converterPromocao(imp);
-                    anterior = converterPromocarAnteriorVO(imp);
+                    anterior = converterPromocaoAnteriorVO(imp);
                     anterior.setCodigoAtual(promo);
 
                     gravarPromocao(promo);
+                    anterior = converterPromocaoAnteriorVO(imp);
+                    gravarPromocaoFinalizadora(anterior);
                     anteriores.put(
                             anterior,
                             provider.getSistema(),
@@ -101,69 +104,35 @@ public class PromocaoRepository {
                 PromocaoAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getLojaOrigem(),
-                        imp.getId()
+                        imp.getId_produto()
                 );
 
-                if (anterior != null) {
-                    anterior = converterPromocarAnteriorVO(imp);
+                if (anterior == null) {
+                    anterior = converterPromocaoAnteriorVO(imp);
                     gravarPromocaoItens(anterior);
                     anteriores.put(
                             anterior,
                             provider.getSistema(),
                             provider.getLojaOrigem(),
-                            imp.getId()
+                            imp.getId_promocao()
                     );
                 }
                 provider.next();
             }
             provider.commit();
-        } catch (Exception e) {
-            provider.rollback();
-            throw e;
-        }
-
-        try {
-            List<PromocaoIMP> filtraFinalizacoes = provider.getFinalizadora();
-            anteriores = provider.getAnteriores();
-
-            provider.setStatus("Finalizando promocoes...");
-            provider.setMaximo(filtraFinalizacoes.size());
-            for (PromocaoIMP imp : filtraFinalizacoes) {
-                PromocaoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-
-                if (anterior == null) {
-                    anterior = converterPromocaoFinalizaVO(imp);
-                    gravarPromocaoFinalizadora(anterior);
-                    anteriores.put(
-                            anterior,
-                            provider.getSistema(),
-                            provider.getLojaOrigem(),
-                            imp.getId()
-                    );
-                }
-                provider.next();
-            }
-            provider.commit();
-            promocoes.clear();
-            System.gc();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
     }
 
-    public Map<String, PromocaoIMP> filtrar(List<PromocaoIMP> promocoes) throws Exception {
+    /*public Map<String, PromocaoIMP> filtrar(List<PromocaoIMP> promocoes) throws Exception {
         Map<String, PromocaoIMP> result = new LinkedHashMap<>();
         for (PromocaoIMP imp : promocoes) {
             result.put(imp.getId_promocao(), imp);
         }
         return result;
-    }
-
+    }*/
     public PromocaoVO converterPromocao(PromocaoIMP imp) {
         PromocaoVO vo = new PromocaoVO();
         vo.setId(imp.getId_promocao());
@@ -179,7 +148,7 @@ public class PromocaoRepository {
         return vo;
     }
 
-    public PromocaoAnteriorVO converterPromocarAnteriorVO(PromocaoIMP imp) throws Exception {
+    public PromocaoAnteriorVO converterPromocaoAnteriorVO(PromocaoIMP imp) throws Exception {
         PromocaoService promocaoService = new PromocaoService();
         int idConexao = promocaoService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema());
         PromocaoAnteriorVO vo = new PromocaoAnteriorVO();
@@ -195,17 +164,7 @@ public class PromocaoRepository {
         vo.setDescricaoCompleta(imp.getDescricaoCompleta());
         vo.setQuantidade(imp.getQuantidade());
         vo.setPaga(imp.getPaga());
-
-        return vo;
-    }
-
-    private PromocaoAnteriorVO converterPromocaoFinalizaVO(PromocaoIMP imp) throws Exception {
-        PromocaoService promocaoService = new PromocaoService();
-        int idConexao = promocaoService.existeConexaoMigrada(this.provider.getLojaVR(), this.provider.getSistema());
-        PromocaoAnteriorVO vo = new PromocaoAnteriorVO();
-        vo.setId_promocao(imp.getId_promocao());
         vo.setId_finalizadora(imp.getId_finalizadora());
-        vo.setLoja(Integer.toString(idConexao));
 
         return vo;
     }
@@ -228,5 +187,13 @@ public class PromocaoRepository {
 
     private void gravarPromocaoFinalizadora(PromocaoAnteriorVO finalizadora) throws Exception {
         provider.gravarPromocaoFinalizadora(finalizadora);
+    }
+
+    private void limparCodantPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        provider.limparCodantPromocao(lojaOrigem, sistema, idConexao);
+    }
+
+    private void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        provider.limparFinalizadora(lojaOrigem, sistema, idConexao);
     }
 }

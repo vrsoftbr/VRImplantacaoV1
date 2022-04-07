@@ -16,7 +16,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  * @author Michael
  */
 public class PromocaoDAO {
-    
+
     public void salvar(PromocaoVO promocao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -49,7 +49,7 @@ public class PromocaoDAO {
             sql.put("somenteclubevantagens", promocao.isSomenteClubeVantagens());
             sql.put("diasexpiracao", promocao.getDiasExpiracao());
             sql.put("utilizaquantidadeproporcional", promocao.isUtilizaQuantidadeProporcional());
-            
+
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception a) {
@@ -63,7 +63,7 @@ public class PromocaoDAO {
             }
         }
     }
-    
+
     public void apagarTudo() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from promocaofinalizadora;");
@@ -75,7 +75,7 @@ public class PromocaoDAO {
             stm.execute("alter sequence promocaofinalizadora_id_seq restart with 1;");
         }
     }
-    
+
     public void salvarPromocaoItens(PromocaoAnteriorVO itens) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -97,7 +97,7 @@ public class PromocaoDAO {
             }
         }
     }
-    
+
     public int getId() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -112,20 +112,34 @@ public class PromocaoDAO {
             }
         }
     }
-    
+
     public List<PromocaoIMP> getFinalizadora() throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct \n"
-                    + "	p.id_promocao,\n"
+                    + "	p.id_promocao id,\n"
+                    + "	p.loja id_loja,\n"
+                    + "	p.descricao descricao,\n"
+                    + "	p.datainicio datainicio,\n"
+                    + "	p.datatermino datatermino,\n"
+                    + "	p.quantidade quantidade,\n"
+                    + "	p.id_promocao controle,\n"
+                    + "	p.paga valorpaga,\n"
                     + "	f.id id_finalizadora\n"
                     + "from\n"
-                    + "	promocaoitem p, pdv.finalizadora f "
+                    + "	implantacao.codant_promocao p, pdv.finalizadora f "
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
-                    imp.setId_promocao(rst.getString("id_promocao"));
+                    imp.setId_promocao(rst.getString("id"));
+                    imp.setIdLoja(rst.getInt("id_loja"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setQuantidade(rst.getDouble("quantidade"));
+                    imp.setControle(rst.getInt("controle"));
+                    imp.setPaga(rst.getDouble("valorpaga"));
                     imp.setId_finalizadora(rst.getInt("id_finalizadora"));
                     Result.add(imp);
                 }
@@ -133,7 +147,7 @@ public class PromocaoDAO {
         }
         return Result;
     }
-    
+
     public List<PromocaoIMP> getPromocaoItens() throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -161,10 +175,8 @@ public class PromocaoDAO {
         }
         return Result;
     }
-    
+
     public void salvarFinalizadora(PromocaoAnteriorVO finaliza) throws Exception {
-        List<PromocaoIMP> teste = getValoresFinalizadora(finaliza.getLoja());
-        List<PromocaoIMP> real = getFinalizadora();
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("promocaofinalizadora");
@@ -172,11 +184,7 @@ public class PromocaoDAO {
             sql.put("id_promocao", finaliza.getId_promocao());
             sql.put("id_finalizadora", finaliza.getId_finalizadora());
             try {
-                if (teste.size() < real.size()) {
-                    stm.execute(sql.getInsert());
-                } else {
-                    stm.execute(sql.getUpdate());
-                }
+                stm.execute(sql.getInsert());
             } catch (Exception e) {
                 System.out.println(sql.getInsert());
                 e.printStackTrace();
@@ -184,7 +192,7 @@ public class PromocaoDAO {
             }
         }
     }
-    
+
     public List<PromocaoIMP> getValoresFinalizadora(String loja) throws Exception {
         List<PromocaoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -201,5 +209,52 @@ public class PromocaoDAO {
             }
         }
         return Result;
+    }
+
+    public void limparCodantPromocao(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from implantacao.codant_promocao\n"
+                    + "where sistema = '" + sistema + "'\n"
+                    + "and loja = '" + lojaOrigem + "'\n"
+                    + "and id_conexao = " + idConexao + "");
+            stm.execute("do $$\n"
+                    + "declare maxid int;\n"
+                    + "begin\n"
+                    + "    select max(codigoatual)+1 from implantacao.codant_promocao into maxid;\n"
+                    + "   	if maxid = 0 then maxid := 1;\n"
+                    + "   	elseif maxid is null then maxid := 1;\n"
+                    + "   	end if;\n"
+                    + "    execute 'alter SEQUENCE implantacao.codant_promocao_codigoatual_seq RESTART with '|| maxid;   \n"
+                    + "end;\n"
+                    + "$$ language plpgsql");
+        }
+    }
+
+    public void limparFinalizadora(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete\n"
+                    + "from\n"
+                    + "	promocaofinalizadora\n"
+                    + "where\n"
+                    + "	id_promocao in (\n"
+                    + "	select\n"
+                    + "		distinct id_promocao::int\n"
+                    + "	from\n"
+                    + "		implantacao.codant_promocao\n"
+                    + "	where\n"
+                    + "		sistema = '" + sistema + "'\n"
+                    + "		and loja = '" + lojaOrigem + "'\n"
+                    + "		and id_conexao = " + idConexao + ")");
+            stm.execute("do $$\n"
+                    + "declare maxid int;\n"
+                    + "begin\n"
+                    + "    select max(id)+1 from promocaofinalizadora into maxid;\n"
+                    + "   	if maxid = 0 then maxid := 1;\n"
+                    + "   	elseif maxid is null then maxid := 1;\n"
+                    + "   	end if;\n"
+                    + "    execute 'alter SEQUENCE promocaofinalizadora_id_seq RESTART with '|| maxid;   \n"
+                    + "end;\n"
+                    + "$$ language plpgsql");
+        }
     }
 }

@@ -224,7 +224,7 @@ public class PromocaoAnteriorDAO {
                             vo,
                             vo.getSistema(),
                             vo.getLoja(),
-                            vo.getId()
+                            String.valueOf(vo.getCodigoAtual())
                     );
                 }
             }
@@ -258,5 +258,24 @@ public class PromocaoAnteriorDAO {
             }
         }
         return Result;
-    }   
+    }
+
+    List<PromocaoIMP> getCodigoAtual(String sistema) throws Exception {
+        List<PromocaoIMP> Result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigoatual from implantacao.codant_promocao \n"
+                    + "where sistema = " + SQLUtils.stringSQL(sistema) + " \n"
+                    + "order by 2"
+            )) {
+                while (rst.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+                    imp.setId(rst.getString("codigoatual"));
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
+    }
+
 }
