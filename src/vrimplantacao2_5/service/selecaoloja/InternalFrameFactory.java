@@ -19,6 +19,7 @@ import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
+import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
@@ -131,6 +132,9 @@ public abstract class InternalFrameFactory {
                 break;
             case GZPRODADOS:
                 internalFrame = new GZProdados2_5GUI(frame);
+                break;
+            case PRISMAFLEX:
+                internalFrame = new Dellasta_PrismaFlex2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
