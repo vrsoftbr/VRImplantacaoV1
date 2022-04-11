@@ -18,12 +18,11 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -129,23 +128,23 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODITR id,\n"
-                    + " NOMETR descricao,\n"
-                    + " CODICST cst_saida,\n"
-                    + " PERC_ICM aliquota_saida,\n"
-                    + " PERC_RED reducao_saida\n"
+                    "SELECT DISTINCT\n"
+                    + "	i.SITCODIGO id,\n"
+                    + "	i.SITCODTRI||'-'||p.PROICMS||'-'||p.PROBASEREDUCAO descricao,\n"
+                    + "	i.SITCODTRI cst,\n"
+                    + "	p.PROICMS aliquota,\n"
+                    + "	p.PROBASEREDUCAO reducao\n"
                     + "FROM\n"
-                    + "	TRIBUTA TR\n"
-                    + "ORDER BY 1"
+                    + "	SITITRIB i\n"
+                    + "	JOIN PRODUTOS p ON i.SITCODIGO = p.SITCODIGO"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
-                            rs.getInt("cst_saida"),
-                            rs.getDouble("aliquota_saida"),
-                            rs.getDouble("reducao_saida"))
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao"))
                     );
                 }
             }
@@ -160,16 +159,17 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	m1.CODIGRU merc1,\n"
-                    + "	m1.NOMEGRU desc_merc1,\n"
-                    + "	m2.CODISGR merc2,\n"
-                    + "	m2.NOMESGR desc_merc2,\n"
-                    + "	m2.CODISGR merc3,\n"
-                    + "	m2.NOMESGR desc_merc3\n"
+                    + "	LFGCODIGO merc1,\n"
+                    + "	LFGDESCRI desc_merc1,\n"
+                    + "	LFGCODIGO merc2,\n"
+                    + "	LFGDESCRI desc_merc2,\n"
+                    + "	LFGCODIGO merc3,\n"
+                    + "	LFGDESCRI desc_merc3\n"
                     + "FROM\n"
-                    + "	GRUPOS m1\n"
-                    + "JOIN SUBGRUPO m2 ON m2.CODIGRU = m1.CODIGRU\n"
-                    + "ORDER BY 1,3"
+                    + "	LINFAMGRU\n"
+                    + "WHERE\n"
+                    + "	LFGTIPOAV = 'G'\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -197,10 +197,13 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIFAM id_familia,\n"
-                    + "	NOMEFAM familia\n"
+                    + "	LFGCODIGO id_familia,\n"
+                    + "	LFGDESCRI familia\n"
                     + "FROM\n"
-                    + "	FAMILIAS f"
+                    + "	LINFAMGRU\n"
+                    + "WHERE\n"
+                    + "	LFGTIPOAV = 'F'\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -224,18 +227,12 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CASE \n"
-                    + "	  WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
-                    + "	  THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
-                    + "	  ELSE ean.COD_BARR\n"
-                    + "	END ean,\n"
-                    + "	QTD_UNI qtdembalagem,\n"
-                    + "	e.ABRE_EMB tipoembalagem\n"
+                    + "	PROCODIGO id_produto,\n"
+                    + "	BARCBARRA ean,\n"
+                    + "	BARFATOR qtdembalagem,\n"
+                    + "	PROUNIDME tipo_embalagem\n"
                     + "FROM\n"
-                    + "	COD_BARR ean\n"
-                    + "JOIN PRODUTOS p ON p.CODIPRO = ean.CODIPRO\n"
-                    + "JOIN EMBALAG e ON e.CODIEMB = p.CODIEMB_V\n"
+                    + "	CODBARRA\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -243,10 +240,10 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("idproduto"));
+                    imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                    imp.setTipoEmbalagem(rs.getString("tipo_embalagem"));
 
                     result.add(imp);
                 }
@@ -262,130 +259,88 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "WITH estoque AS (\n"
-                    + "SELECT\n"
-                    + "	CODIPRO,\n"
-                    + "	max(CAST(ANO || '-' || MES || '-' || '01' AS date)) AS DATA\n"
-                    + "	FROM ESTOSI\n"
-                    + "	WHERE EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	GROUP BY CODIPRO)\n"
-                    + "SELECT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CASE\n"
-                    + "		WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
-                    + "	  	THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
-                    + "		ELSE ean.COD_BARR\n"
-                    + "	END ean,\n"
-                    + "	DESCRICAO descricaocompleta,\n"
-                    + "	DESCRI_AB descricaoreduzida,\n"
-                    + "	un_v.ABRE_EMB tipoembalagem,\n"
-                    + "	un_c.ABRE_EMB emb_compra,\n"
-                    + "	ean.QTD_UNI qtdembalagem,\n"
-                    + "	PESO_BRU pesobruto,\n"
-                    + "	PESO_LIQ pesoliquido,\n"
-                    + "	CASE\n"
-                    + "		WHEN balanca = 'S' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END e_balanca,\n"
-                    + "	CODIFAM familia,\n"
-                    + "	p.codifab fabricante,\n"
-                    + "	CODIGRU merc1,\n"
-                    + "	CODISGR merc2,\n"
-                    + "	CODISGR merc3,\n"
-                    + "	CODINCM ncm,\n"
-                    + "	p.CEST cest,\n"
-                    + "	p.PERC_LUC margem,\n"
-                    + "	pl.UC_CUSTO_C custocomimposto,\n"
-                    + "	pl.UC_CUSTO_S custosemimposto,\n"
-                    + "	pr.PREVE precovenda,\n"
-                    + "	COALESCE (p.ESTOMIN,\n"
-                    + "	0) estmin,\n"
-                    + "	p.ESTOMAX estmax,\n"
-                    + "	CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) DATA,\n"
-                    + "	a.CODIPRO,\n"
-                    + "	a.ESTOANT estoque,\n"
-                    + "	tc.CODITR id_credito,\n"
-                    + "	td.CODITR id_debito,\n"
-                    + "	tdfe.CODITR id_debito_fe,\n"
-                    + "	DATA_ALTERA data_alteracao,\n"
-                    + "	pcc.CST_PIS piscofinscredito,\n"
-                    + "	pcd.CST_PIS piscofinsdebito,\n"
-                    + "	CASE\n"
-                    + "		WHEN p.atides = 'A' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END situacaocadastro\n"
+                    "SELECT \n"
+                    + "	p.PROCODIGO id,\n"
+                    + "	CASE WHEN barcbarra IS NULL THEN p.PROCODIGO ELSE barcbarra END ean,\n"
+                    + "	PRODESCRI desc_completa,\n"
+                    + "	PRODESRES desc_reduzida,\n"
+                    + "	ean.PROUNIDME tipoembalagem,\n"
+                    + "	ean.BARFATOR qtdembalagem,\n"
+                    + "	FABCODIGO fabricante,\n"
+                    + "	CASE WHEN LINCODIGO = 1 THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	(e.ESTQTDENT - e.ESTQTDSAI) estoque,\n"
+                    + "	COALESCE(PROESTMIN, 0) estoquemin,\n"
+                    + "	COALESCE(PROESTMAX, 0) estoquemax,\n"
+                    + "	PROINCLUS data_cadastro,\n"
+                    + "	PROALTERA data_alteracao,\n"
+                    + "	p2.PRECUSTO custosemimposto,\n"
+                    + "	p2.PRECUSTOR custocomimposto,\n"
+                    + "	p2.PROMARGEM margem,\n"
+                    + "	p2.PREPVENDA precovenda,\n"
+                    + "	FAMCODIGO familia,\n"
+                    + "	GRUCODIGO merc1,\n"
+                    + "	GRUCODIGO merc2,\n"
+                    + "	SITCODIGO id_icms_saida,\n"
+                    + "	PRONCM ncm,\n"
+                    + "	PROCEST cest,\n"
+                    + "	PROCSTPIS piscofins_debito,\n"
+                    + "	PROCSTPISE piscofins_credito\n"
                     + "FROM\n"
                     + "	PRODUTOS p\n"
-                    + "	JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO\n"
-                    + "	JOIN estosi a ON a.CODIPRO = p.CODIPRO AND a.EMP_CODIGO = pl.EMP_CODIGO\n"
-                    + "	JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "	JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
-                    + "	JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
-                    + "	JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO AND pr.AGP_CODIGO = 1\n"
-                    + "	JOIN TRIBUTA_LOJAS ti ON ti.CODIPRO = p.CODIPRO\n"
-                    + "	JOIN TRIBUTA tc ON tc.CODITR = ti.CODITRE \n"
-                    + "	JOIN TRIBUTA td ON td.CODITR = ti.CODITRC\n"
-                    + "	JOIN TRIBUTA tdfe ON tdfe.CODITR = ti.CODITRI\n"
-                    + "	JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
-                    + "	JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
-                    + "	JOIN estoque e ON e.CODIPRO = a.CODIPRO AND CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) = e.data\n"
-                    + "WHERE\n"
-                    + "	pl.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "ORDER BY 1 DESC"
+                    + "	LEFT JOIN CODBARRA ean ON p.PROCODIGO = ean.procodigo\n"
+                    + "	JOIN PRECO p2 ON p.PROCODIGO = p2.PROCODIGO\n"
+                    + "	JOIN ESTOQUE e ON p.PROCODIGO = e.PROCODIGO\n"
+                    + "ORDER BY 1 "
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setFornecedorFabricante(rst.getString("fabricante"));
-
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    
+                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
+                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoReduzida());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemax"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
+                    
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
-
+                    
                     imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setEstoqueMinimo(rst.getDouble("estmin"));
-                    imp.setEstoqueMaximo(rst.getDouble("estmax"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-
-                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-
+                    imp.setCest(rst.getString("cest"));                   
+                    
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
-                    idIcmsDebito = rst.getString("id_debito");
-                    IdIcmsCredito = rst.getString("id_credito");
-                    IdIcmsForaEstado = rst.getString("id_debito_fe");
+                    idIcmsDebito = rst.getString("id_icms_saida");
+                    //IdIcmsCredito = rst.getString("id_credito");
+
 
                     imp.setIcmsDebitoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
-                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
+                    //imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
+                    //imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
                     imp.setIcmsConsumidorId(idIcmsDebito);
-                    imp.setIcmsCreditoId(IdIcmsCredito);
-                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsCreditoId(idIcmsDebito);
+                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
-                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_credito"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_debito"));
 
                     result.add(imp);
                 }
@@ -432,7 +387,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         return result;
     }
 
-    @Override
+    /*@Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
 
@@ -466,8 +421,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         }
 
         return result;
-    }
-
+    }*/
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -475,26 +429,26 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	FOR_CODIGO id,\n"
-                    + "	FOR_RAZAO razao,\n"
-                    + "	FOR_FANTASIA fantasia,\n"
-                    + "	FOR_CGC cnpj,\n"
-                    + "	FOR_INSC ie,\n"
-                    + " COALESCE(FOR_PRODUTOR,'N') produtor,\n"
-                    + " COALESCE(FOR_OPT_SIMPLES,'N') simples_nacional,\n"
-                    + "	FOR_ENDERECO endereco,\n"
-                    + "	FOR_NUMEND numero,\n"
-                    + "	FOR_BAIRRO bairro,\n"
-                    + "	CID_NOME cidade,\n"
-                    + "	UF_SIGLA uf,\n"
-                    + "	FOR_CEP cep,\n"
-                    + "	FOR_FONE telefone,\n"
-                    + " FOR_EMAIL email,\n"
-                    + "	FOR_CONTATO contato,\n"
-                    + "	FOR_OBSERV observacao\n"
+                    + "	FORCODIGO id,\n"
+                    + "	FORRAZAOS razao,\n"
+                    + "	FORFANTAS fantasia,\n"
+                    + "	FORDOCUME cnpj,\n"
+                    + "	FORINSEST ie,\n"
+                    + "	FORENDERE endereco,\n"
+                    + "	FORNUMERO numero,\n"
+                    + "	FORCOMPLE complemento,\n"
+                    + "	FORBAIRRO bairro,\n"
+                    + "	FORCIDADE cidade,\n"
+                    + "	FORESTADO uf,\n"
+                    + "	FORCEP cep,\n"
+                    + "	FORDDDFO1||' '||FORTELFO1 telefone1,\n"
+                    + "	FORDDDFO2||' '||FORTELFO2 telefone2,\n"
+                    + "	FOREMAIL email,\n"
+                    + "	CAST(FORINCLUS AS date) data_cadastro,\n"
+                    + "	FOROBSERV observacao,\n"
+                    + "	FORSIMPLE simples\n"
                     + "FROM\n"
-                    + "	FORNECEDORES f\n"
-                    + "	JOIN CIDADES c ON c.CID_CODIGO = f.CID_CODIGO \n"
+                    + "	FORNECEDOR f\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -509,11 +463,11 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone")));
                     imp.setObservacao(rs.getString("observacao"));
 
                     String email = Utils.acertarTexto(rs.getString("email")).toLowerCase();
@@ -522,13 +476,14 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                                 (email.length() > 50 ? email.substring(0, 50) : email));
                     }
 
-                    if ("S".equals(rs.getString("produtor"))) {
-                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
-                        } else {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
-                        }
-                    } else if ("S".equals(rs.getString("simples_nacional"))) {
+                    imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone1")));
+
+                    if ((rs.getString("telefone2") != null)
+                            && (!rs.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato("2", "Telefone 2", rs.getString("telefone2"), null, TipoContato.COMERCIAL, null);
+                    }
+
+                    if ("S".equals(rs.getString("simples"))) {
                         imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
                     }
 
@@ -546,15 +501,12 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CODIFAB idfornecedor,\n"
-                    + "	ean.QTD_UNI qtdembalagem\n"
+                    "SELECT\n"
+                    + "	PROCODIGO id_produto,\n"
+                    + "	FABCODIGO id_fornecedor\n"
                     + "FROM\n"
                     + "	PRODUTOS p\n"
-                    + "	jOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "WHERE\n"
-                    + "	CODIFAB IS NOT NULL \n"
+                    + "WHERE FABCODIGO != 0\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -562,9 +514,9 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setQtdEmbalagem(1);
 
                     result.add(imp);
                 }
@@ -626,41 +578,33 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CLI_CODIGO id,\n"
-                    + "	CLI_NOME razao,\n"
-                    + "	CLI_FANTASIA fantasia,\n"
-                    + "	CLI_CGC cnpj_cpf,\n"
-                    + "	CLI_RG rg_ie,\n"
-                    + "	CLI_ENDERECO endereco,\n"
-                    + "	CLI_NUMEND numero,\n"
-                    + "	CLI_END_COMPLEMENTO complemento,\n"
-                    + "	CLI_BAIRRO bairro,\n"
-                    + "	m.CID_NOME cidade,\n"
-                    + "	CLI_CEP cep,\n"
-                    + "	m.UF_SIGLA uf,\n"
-                    + "	CASE\n"
-                    + "     WHEN CLI_SITUACAO = '01' THEN 1\n"
-                    + "     ELSE 0\n"
-                    + "	END bloqueado,\n"
-                    + "	TRUNC(CLI_LIMITE,11) limite,\n"
-                    + " vc.vcnv_dia_rece vencimento,\n"
-                    + "	CLI_NASCIMENTO data_nascimento,\n"
-                    + "	CLI_DTULCO data_cadastro,\n"
-                    + "	CLI_EST_CIVIL estadocivil,\n"
-                    + "	CLI_PROFISSAO profissao,\n"
-                    + "	CLI_FONE telefone,\n"
-                    + "	CLI_CELULAR celular,\n"
-                    + "	CLI_E_MAIL email,\n"
-                    + "	CLI_PAI nomepai,\n"
-                    + "	CLI_MAE nomemae,\n"
-                    + "	CLI_CJ_NOME conjuge,\n"
-                    + "	CLI_CJ_NASC data_nasc_conjuge,\n"
-                    + "	CLI_CJ_CPF cpfconjuge,\n"
-                    + "	CLI_OBSERVACAO observacao\n"
+                    + "	CLICODIGO id,\n"
+                    + "	CLIRAZAOS razao,\n"
+                    + "	CLIFANTAS fantasia,\n"
+                    + "	CLIDOCUME cnpj_cpf,\n"
+                    + "	CLIIDENTI rg_ie,\n"
+                    + "	CLIENDERE endereco,\n"
+                    + "	CLINUMERO numero,\n"
+                    + "	CLICOMPLE complemento,\n"
+                    + "	CLIBAIRRO bairro,\n"
+                    + "	CLICIDADE cidade,\n"
+                    + "	CLIESTADO uf,\n"
+                    + "	CLICEP cep,\n"
+                    + "	CLISEXO sexo,\n"
+                    + "	CLINASCIM data_nasc,\n"
+                    + "	CAST(CLIINCLUS as date) data_cadastro,\n"
+                    + "	CASE WHEN CLIATIVO = 'S' THEN 1 ELSE 0 END ativo,\n"
+                    + "	CASE WHEN CLIBLOQUE = 'N' THEN 0 ELSE 1 END bloqueado,\n"
+                    + "	CLIDDDFO1||' '||CLITELFO1 telefone,\n"
+                    + "	CLIDDDFO2||' '||CLITELFO2 telefone2,\n"
+                    + "	CLIDDDCEL||' '||CLITELCEL celular,\n"
+                    + "	CLIEMAIL email,\n"
+                    + "	CLILIMITEP limite,\n"
+                    + "	CLINOMEMAE nomemae,\n"
+                    + "	CLINOMEPAI nomepai,\n"
+                    + "	CLIOBSERV observacao\n"
                     + "FROM\n"
-                    + "	CLIENTES c\n"
-                    + "	JOIN CIDADES m ON c.CID_CODIGO = m.CID_CODIGO \n"
-                    + "	LEFT JOIN VENCIMENTO_CONVENIO vc ON C.VCNV_CODIGO = vc.VCNV_CODIGO AND vc.CNV_CODIGO = c.CNV_CODIGO\n"
+                    + "	CLIENTES\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -680,26 +624,24 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    if (rs.getDouble("limite") > 9999999.0) {
-                        imp.setValorLimite(0);
+                    if ("F".equals(rs.getString("sexo"))) {
+                        imp.setSexo(TipoSexo.FEMININO);
                     } else {
-                        imp.setValorLimite(rs.getDouble("limite"));
+                        imp.setSexo(TipoSexo.MASCULINO);
                     }
 
-                    imp.setDiaVencimento(rs.getInt("vencimento"));
-                    imp.setDataNascimento(rs.getDate("data_nascimento"));
+                    imp.setDataNascimento(rs.getDate("data_nasc"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setEstadoCivil(rs.getString("estadocivil"));
-                    imp.setCargo(rs.getString("profissao"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setNomePai(rs.getString("nomepai"));
-                    imp.setNomeConjuge(rs.getString("conjuge"));
-                    imp.setDataNascimentoConjuge(rs.getDate("data_nasc_conjuge"));
-                    imp.setCpfConjuge(rs.getString("cpfconjuge"));
+
                     imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
@@ -820,7 +762,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "SELECT\n"
+                    = /*"SELECT\n"
                     + "	REPLACE((MOV_LOJA||MOV_COO||MOV_PDV||MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
                     + "	MOV_LOJA loja,\n"
                     + "	MOV_PDV pdv,\n"
@@ -838,7 +780,18 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	PRO_ID IS NOT NULL\n"
                     + "	AND MOV_LOJA = " + idLojaCliente + "\n"
                     + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6";
+                    + "GROUP BY 1, 2, 3, 4, 5, 6"*/ "SELECT\n"
+                    + "	EMPCODIGO || VENNUMECF || VENNUMPDV || VENNCUPOM || VENNUITEM || VENREFCX || VENMODELO AS id_venda,\n"
+                    + "	VENNUMPDV pdv,\n"
+                    + "	VENNUMECF ecf,\n"
+                    + "	VENNCUPOM numerocupom,\n"
+                    + "	VENDATA DATA,\n"
+                    + "	VENHORA hora\n"
+                    + "FROM\n"
+                    + "	ITENS01032022\n"
+                    + "WHERE\n"
+                    + "	a.EMPCODIGO = 1\n"
+                    + "	AND VENDATA BETWEEN '2022-03-01' AND '2022-03-01'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

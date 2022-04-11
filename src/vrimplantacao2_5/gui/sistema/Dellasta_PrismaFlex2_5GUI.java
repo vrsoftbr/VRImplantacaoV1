@@ -14,7 +14,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Dellasta_PrismaFlex2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.TENTACULO.getNome();
+    private static final String SISTEMA = ESistema.PRISMAFLEX.getNome();
     private static Dellasta_PrismaFlex2_5GUI instance;
 
     private final Dellasta_PrismaFlexDAO dao = new Dellasta_PrismaFlexDAO();
@@ -181,7 +181,7 @@ public class Dellasta_PrismaFlex2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Tentaculo");
+        setTitle("PrismaFlex");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
