@@ -264,7 +264,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	CASE WHEN barcbarra IS NULL THEN p.PROCODIGO ELSE barcbarra END ean,\n"
                     + "	PRODESCRI desc_completa,\n"
                     + "	PRODESRES desc_reduzida,\n"
-                    + "	ean.PROUNIDME tipoembalagem,\n"
+                    + "	p.PROUNIDME tipoembalagem,\n"
                     + "	ean.BARFATOR qtdembalagem,\n"
                     + "	FABCODIGO fabricante,\n"
                     + "	CASE WHEN LINCODIGO = 1 THEN 1 ELSE 0 END e_balanca,\n"
@@ -299,7 +299,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    
+
                     imp.setDescricaoCompleta(rst.getString("desc_completa"));
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
@@ -312,25 +312,24 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setEstoqueMaximo(rst.getDouble("estoquemax"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    
+
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    
+
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
-                    
+
                     imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));                   
-                    
+                    imp.setCest(rst.getString("cest"));
+
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
                     idIcmsDebito = rst.getString("id_icms_saida");
                     //IdIcmsCredito = rst.getString("id_credito");
-
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     //imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
@@ -502,11 +501,12 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
+                    + "	FORCODIGO id_fornecedor,\n"
                     + "	PROCODIGO id_produto,\n"
-                    + "	FABCODIGO id_fornecedor\n"
+                    + "	FPRCODPRO cod_externo\n"
                     + "FROM\n"
-                    + "	PRODUTOS p\n"
-                    + "WHERE FABCODIGO != 0\n"
+                    + "	FORNECPRODUTO\n"
+                    + "WHERE FORCODIGO != 0\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -516,6 +516,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("cod_externo"));
                     imp.setQtdEmbalagem(1);
 
                     result.add(imp);
@@ -762,25 +763,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = /*"SELECT\n"
-                    + "	REPLACE((MOV_LOJA||MOV_COO||MOV_PDV||MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	MOV_LOJA loja,\n"
-                    + "	MOV_PDV pdv,\n"
-                    + "	MOV_ECF ecf,\n"
-                    + "	MOV_COO numerocupom,\n"
-                    + "	MOV_DT_MOVIMENTO data,\n"
-                    //+ " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) hora,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CAST(sum(MOV_VLR_TOTAL) AS numeric(11,2)) total,\n"
-                    + "	CAST(sum(MOV_DESCONTO_CUPOM) AS numeric(11,2)) desconto,\n"
-                    + "	CAST(sum(MOV_ACRESCIMO_CUPOM) AS numeric(11,2)) acrescimo\n"
-                    + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA\n"
-                    + "WHERE\n"
-                    + "	PRO_ID IS NOT NULL\n"
-                    + "	AND MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6"*/ "SELECT\n"
+                    = "SELECT\n"
                     + "	EMPCODIGO || VENNUMECF || VENNUMPDV || VENNCUPOM || VENNUITEM || VENREFCX || VENMODELO AS id_venda,\n"
                     + "	VENNUMPDV pdv,\n"
                     + "	VENNUMECF ecf,\n"
