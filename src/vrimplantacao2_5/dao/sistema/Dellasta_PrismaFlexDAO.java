@@ -121,6 +121,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                //OpcaoCliente.OUTRAS_RECEITAS));
     }
 
     @Override
@@ -267,7 +268,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	p.PROUNIDME tipoembalagem,\n"
                     + "	ean.BARFATOR qtdembalagem,\n"
                     + "	FABCODIGO fabricante,\n"
-                    + "	CASE WHEN LINCODIGO = 1 THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	CASE WHEN PROPESADO = 'S' THEN 1 ELSE 0 END e_balanca,\n"
                     + "	(e.ESTQTDENT - e.ESTQTDSAI) estoque,\n"
                     + "	COALESCE(PROESTMIN, 0) estoquemin,\n"
                     + "	COALESCE(PROESTMAX, 0) estoquemax,\n"
@@ -534,32 +535,35 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	NUMELAN id,\n"
-                    + "	cp.FOR_CODIGO id_fornecedor,\n"
-                    + "	f.FOR_CGC cnpj_cpf,\n"
-                    + "	NUMEDO documento,\n"
-                    + "	CP_DATAEM emissao,\n"
-                    + "	CP_DATALAN entrada,\n"
-                    + "	CP_VALORPA valor,\n"
-                    + "	CP_DATAVE vencimento,\n"
-                    + "	CP_OBS observacao\n"
+                    + "	CPGNUMERONF||CPGDUPLIC id,\n"
+                    + "	CLICODIGO id_fornecedor,\n"
+                    + "	f.FORDOCUME cnpj_cpf,\n"
+                    + " CPGNUMERONF documento,\n"
+                    + "	CAST(CPGDATAMV AS date) emissao,\n"
+                    + "	CPGVALLIQ valor,\n"
+                    + "	COALESCE (cast(CPGVENCIM as date), '1900-01-01') vencimento,\n"
+                    + "	CPGOBSERV observacao\n"
                     + "FROM\n"
-                    + "	CP cp\n"
-                    + "	JOIN FORNECEDORES f ON f.FOR_CODIGO = cp.FOR_CODIGO \n"
+                    + "	CONTASPG cp\n"
+                    + "	JOIN FORNECEDOR f ON f.FORCODIGO = cp.CLICODIGO\n"
                     + "WHERE\n"
-                    + "	cp.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cp.CP_DATAPA IS NULL\n"
-                    + "ORDER BY 1"
+                    + "	EMPCODIGO = " + getLojaOrigem() + "\n"
+                    + "	AND CPGBAIXAD = 'N'\n"
+                    + "	AND CLICODIGO NOT IN (1)\n"
+                    + "ORDER BY CPGDATAMV"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-
-                    imp.setId(rs.getString("id"));
+                    imp.setId(Utils.acertarTexto((rs.getString("id"))));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCnpj(rs.getString("cnpj_cpf"));
                     imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataEntrada(rs.getDate("entrada"));
+
+                    SimpleDateFormat formatar = new SimpleDateFormat("yyyy-MM-dd");
+                    Date data = formatar.parse(rs.getString("emissao"));
+                    imp.setDataEmissao(data);
+
+                    imp.setDataEntrada(imp.getDataEmissao());
                     imp.setValor(rs.getDouble("valor"));
                     imp.setVencimento(rs.getDate("vencimento"));
                     imp.setObservacao(rs.getString("observacao"));
@@ -660,21 +664,21 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	REPLACE(NUMELAN||NUMEDO,'/','') id,\n"
-                    + "	NUMEDO numerocupom,\n"
-                    + "	cr.CLI_CODIGO codcli,\n"
-                    + "	c.CLI_CGC cpfcnpj,\n"
-                    + "	PDV_NUMECAI ecf,\n"
-                    + "	CR_VALORPA valor,\n"
-                    + "	CR_DATAEM emissao,\n"
-                    + "	CR_DATAVE vencimento\n"
+                    + "	REPLACE(EMPCODIGO||CRCCODIGO||CRCDUPLIC||CRCDATAMV||CRCPARCTOT,'-','') id,\n"
+                    + "	CRCNUMNF numerocupom,\n"
+                    + "	cr.CLICODIGO codcli,\n"
+                    + "	c.CLIDOCUME cpf_cnpj,\n"
+                    + "	CRCECFREC ecf,\n"
+                    + "	CRCVALORD valor,\n"
+                    + "	CRCDATAMV emissao,\n"
+                    + "	COALESCE (CRCVENCIM,'1900-01-01') vencimento\n"
                     + "FROM\n"
-                    + "	CR cr\n"
-                    + "	JOIN CLIENTES c ON c.CLI_CODIGO = cr.CLI_CODIGO \n"
+                    + "	CONTASRC cr\n"
+                    + "	LEFT JOIN CLIENTES c ON c.CLICODIGO = cr.CLICODIGO \n"
                     + "WHERE\n"
-                    + "	EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cr_datare is null\n"
-                    + "ORDER BY 1"
+                    + "	EMPCODIGO = " + getLojaOrigem() + "\n"
+                    + "	AND CRCDATAREC IS NULL\n"
+                    + "ORDER BY CRCDATAMV"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -682,7 +686,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
                     imp.setIdCliente(rs.getString("codcli"));
-                    imp.setCnpjCliente(rs.getString("cpfcnpj"));
+                    imp.setCnpjCliente(rs.getString("cpf_cnpj"));
                     imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
