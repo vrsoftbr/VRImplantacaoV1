@@ -572,7 +572,9 @@
                           <Component id="chkCliPref" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCliEvent" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="407" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="chkCliCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="313" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -583,8 +585,9 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkCliPref" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliEvent" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="151" max="32767" attributes="0"/>
+                          <EmptySpace pref="186" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -610,6 +613,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkCliEventActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCreditoRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkCliCreditoRotativoActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
@@ -837,7 +851,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="9" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="cmbLojaOrigem" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">

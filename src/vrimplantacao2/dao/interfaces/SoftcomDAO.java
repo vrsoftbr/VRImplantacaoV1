@@ -19,6 +19,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -391,6 +392,48 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " cr.Registro  id,\n"
+                    + "	c.CGC  cnpj,\n"
+                    + "	cast(cr.[Data da Venda] as date)  emissao,\n"
+                    + "	cast(cr.Vencimento as date)  vencimento,\n"
+                    + "	1 ecf,\n"
+                    + "	cr.[Código do Cliente]  idcliente,\n"
+                    + "	cr.Registro cupom,\n"
+                    + "	cr.Pagto  observacao,\n"
+                    + "	1 parcela,\n"
+                    + " cr.[Valor da Parcela]  valor\n"
+                    + "from [contas a receber] as cr\n"
+                    + "join [Cadastro de Clientes] c on cr.[Código do Cliente]  = c.[Código do Cliente] \n"
+                    + "where cr.[Código do Cliente] > 1 and \n"
+                    + " cr.DataPag is null and\n"
+                    + "cr.Pagto = 'DUPLICATA EM CARTEIRA'\n"
+                    + "order by 3"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
