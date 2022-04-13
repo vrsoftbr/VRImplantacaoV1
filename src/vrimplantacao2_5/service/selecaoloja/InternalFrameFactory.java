@@ -28,6 +28,7 @@ import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
+import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
@@ -135,6 +136,9 @@ public abstract class InternalFrameFactory {
                 break;
             case PRISMAFLEX:
                 internalFrame = new Dellasta_PrismaFlex2_5GUI(frame);
+                break;
+            case TOPSYSTEM:
+                internalFrame = new TopSystem2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
