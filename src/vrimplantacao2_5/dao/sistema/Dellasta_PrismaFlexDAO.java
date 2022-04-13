@@ -664,6 +664,14 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+    
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new Dellasta_PrismaFlexDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
@@ -672,14 +680,6 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new Dellasta_PrismaFlexDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    public void setDataInicioVenda(Date date) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date date) {
-        this.dataTerminoVenda = dataTerminoVenda;
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -712,9 +712,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelada"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -725,12 +724,10 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
 
-            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
-            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
                     + "	DISTINCT \n"
-                    + "	v.VENREFCX id,\n"
+                    + "	v.VENREFCX id_venda,\n"
                     + "	v.VENNUMPDV pdv,\n"
                     + "	v.VENNUMECF ecf,\n"
                     + "	CASE\n"
@@ -739,12 +736,15 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	  ELSE v.VENNCUPOM\n"
                     + "	END numerocupom,\n"
                     + "	f.VENCANCELADO cancelada,\n"
-                    + "	v.VENDATA DATA,\n"
+                    + "	v.VENDATA data,\n"
                     + "	f.FINHORA hora,\n"
-                    + "	f.FINSUBTOT valor\n"
+                    + "	f.FINSUBTOT total\n"
                     + "FROM\n"
                     + "	ITENS01032022 v\n"
-                    + "LEFT JOIN FINALIZACAO01032022 f ON v.VENREFCX = f.VENREFCX";
+                    + "LEFT JOIN FINALIZACAO01032022 f ON v.VENREFCX = f.VENREFCX\n"
+                    + "WHERE \n"
+                    + " v.EMPCODIGO = " + idLojaCliente + " AND\n"
+                    + "	v.VENDATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -775,7 +775,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-
+        
         private void obterNext() {
             try {
                 if (next == null) {
@@ -807,8 +807,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	VENREFCX id_venda,\n"
                     + "	VENREFCX || VENNUMPDV || VENNUITEM id_item,\n"
                     + "	VENNUITEM nroitem,\n"
-                    + "	UPPER(PROUNIDME) unidade,\n"
                     + " PROCODIGO produto,\n"
+                    + "	UPPER(PROUNIDME) unidade,\n"
                     + "	VENCBARRA codigobarras,\n"
                     + "	VENPRODUT descricao,\n"
                     + "	VENQUANTI quantidade,\n"
@@ -816,7 +816,10 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	VENTOTALI total,\n"
                     + "	VENCANCELADO cancelada\n"
                     + "FROM\n"
-                    + "	ITENS01032022 v";
+                    + "	ITENS01032022 v"
+                    + "WHERE \n"
+                    + " EMPCODIGO = " + idLojaCliente + " AND\n"
+                    + "	VENDATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
