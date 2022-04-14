@@ -97,6 +97,7 @@ public enum EScriptLojaOrigemSistema {
             + "order by\n"
             + "	l.id"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
+    TOPSYSTEM(176, 8, "SELECT empresa id, Razao_Social descricao FROM cad_filial ORDER BY 1"),
     DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa"),
     WEBSAQ(188, 11, "select \n"
             + "codestabelec id, \n"

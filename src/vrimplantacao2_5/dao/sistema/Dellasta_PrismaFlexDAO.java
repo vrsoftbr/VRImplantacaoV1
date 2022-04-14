@@ -121,7 +121,6 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
-                //OpcaoCliente.OUTRAS_RECEITAS));
     }
 
     @Override
@@ -327,17 +326,13 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
+                    String idIcmsDebito;
 
                     idIcmsDebito = rst.getString("id_icms_saida");
-                    //IdIcmsCredito = rst.getString("id_credito");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
-                    //imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
-                    //imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
                     imp.setIcmsConsumidorId(idIcmsDebito);
                     imp.setIcmsCreditoId(idIcmsDebito);
-                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_debito"));
@@ -356,19 +351,18 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	o.CODIPRO id_produto,\n"
-                    + "	DTINPRO data_ini,\n"
-                    + "	DTFIPRO data_fim,\n"
-                    + "	PRECO_PRO precooferta,\n"
-                    + "	pr.PREVE preconormal\n"
+                    "SELECT DISTINCT\n"
+                    + "	i.PROCODIGO id_produto,\n"
+                    + "	i.IFOOFERIN data_ini,\n"
+                    + "	i.IFOOFERFI data_fim,\n"
+                    + "	i.IFOPRECOV preco_oferta,\n"
+                    + "	p.PREPVENDA preco_normal\n"
                     + "FROM\n"
-                    + "	PROMOCOES o\n"
-                    + "	LEFT JOIN PRODUTOS p ON p.CODIPRO = o.CODIPRO \n"
-                    + "	LEFT JOIN PRECOS_LOJAS pr ON pr.CODIPRO = p.CODIPRO AND pr.AGP_CODIGO = o.EMP_CODIGO \n"
-                    + "WHERE\n"
-                    + "	o.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND DTFIPRO >= 'now'"
+                    + "	OFERTA o\n"
+                    + "	JOIN ITENSOFERTA i ON o.OFECODIGO = i.OFECODIGO\n"
+                    + "	LEFT JOIN PRECO p ON i.PROCODIGO = p.PROCODIGO\n"
+                    + "WHERE \n"
+                    + "	o.OFEOFERFI >= 'now'"
             )) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
@@ -387,41 +381,6 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         return result;
     }
 
-    /*@Override
-    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
-        List<AssociadoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	pa.CODIPRO produto_pai,\n"
-                    + "	p.DESCRICAO descricao_pai,\n"
-                    + "	pa.QTD_RELA qtdembalagem,\n"
-                    + "	pa.COD_RELA produto_filho,\n"
-                    + "	p2.DESCRICAO descricao_filho\n"
-                    + "FROM\n"
-                    + "	PRO_RELA pa\n"
-                    + "	JOIN PRODUTOS p ON p.CODIPRO = pa.CODIPRO\n"
-                    + "	JOIN PRODUTOS p2 ON pa.COD_RELA = p2.CODIPRO \n"
-                    + "ORDER BY\n"
-                    + "	produto_pai, produto_filho"
-            )) {
-                while (rs.next()) {
-                    AssociadoIMP imp = new AssociadoIMP();
-
-                    imp.setId(rs.getString("produto_pai"));
-                    imp.setDescricao(rs.getString("descricao_pai"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setProdutoAssociadoId(rs.getString("produto_filho"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }*/
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -485,6 +444,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
                     if ("S".equals(rs.getString("simples"))) {
                         imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
 
                     result.add(imp);
@@ -703,6 +664,14 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+    
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new Dellasta_PrismaFlexDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
@@ -711,14 +680,6 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new Dellasta_PrismaFlexDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    public void setDataInicioVenda(Date date) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date date) {
-        this.dataTerminoVenda = dataTerminoVenda;
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -751,9 +712,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelada"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -764,21 +724,27 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
 
-            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
-            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
-                    + "	EMPCODIGO || VENNUMECF || VENNUMPDV || VENNCUPOM || VENNUITEM || VENREFCX || VENMODELO AS id_venda,\n"
-                    + "	VENNUMPDV pdv,\n"
-                    + "	VENNUMECF ecf,\n"
-                    + "	VENNCUPOM numerocupom,\n"
-                    + "	VENDATA DATA,\n"
-                    + "	VENHORA hora\n"
+                    + "	DISTINCT \n"
+                    + "	v.VENREFCX id_venda,\n"
+                    + "	v.VENNUMPDV pdv,\n"
+                    + "	v.VENNUMECF ecf,\n"
+                    + "	CASE\n"
+                    + "	  WHEN v.VENNCUPOM = 99999\n"
+                    + "	    THEN v.VENNCUPOM || SUBSTRING(v.VENREFCX FROM 9 FOR 6)\n"
+                    + "	  ELSE v.VENNCUPOM\n"
+                    + "	END numerocupom,\n"
+                    + "	f.VENCANCELADO cancelada,\n"
+                    + "	v.VENDATA data,\n"
+                    + "	f.FINHORA hora,\n"
+                    + "	f.FINSUBTOT total\n"
                     + "FROM\n"
-                    + "	ITENS01032022\n"
-                    + "WHERE\n"
-                    + "	a.EMPCODIGO = 1\n"
-                    + "	AND VENDATA BETWEEN '2022-03-01' AND '2022-03-01'";
+                    + "	ITENS01032022 v\n"
+                    + "LEFT JOIN FINALIZACAO01032022 f ON v.VENREFCX = f.VENREFCX\n"
+                    + "WHERE \n"
+                    + " v.EMPCODIGO = " + idLojaCliente + " AND\n"
+                    + "	v.VENDATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -809,7 +775,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-
+        
         private void obterNext() {
             try {
                 if (next == null) {
@@ -838,33 +804,22 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO || pdv.PRO_ID || pdv.MOV_SEQ_COO), '-', '') AS id_item,\n"
-                    + "	SUBSTRING(pdv.PRO_COD_BARRA FROM 1 FOR CHAR_LENGTH(pdv.PRO_COD_BARRA)-1) ean,\n"
-                    + "	p.PRO_DESCRICAO produto,\n"
-                    + "	pdv.MOV_LOJA AS loja,\n"
-                    + "	pdv.MOV_PDV AS pdv,\n"
-                    + "	pdv.MOV_ECF AS ecf,\n"
-                    + "	pdv.MOV_COO AS numerocupom,\n"
-                    + "	pdv.MOV_SEQ_COO AS sequencia,\n"
-                    + "	pdv.MOV_DT_MOVIMENTO AS DATA,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CASE\n"
-                    + "	 WHEN pdv.MOV_TPO_REGISTRO = 10 THEN 1\n"
-                    + "	 ELSE 0\n"
-                    + "	END cancelado,\n"
-                    + "	p.PRO_UN_REFERENCIA AS unidade,\n"
-                    + "	pdv.MOV_QTD_ITEM AS qtd,\n"
-                    + "	pdv.MOV_VLR_UNIT AS valorunitario,\n"
-                    + "	pdv.MOV_VLR_TOTAL AS valortotal,\n"
-                    + "	pdv.MOV_DESCONTO_ITEM AS desconto\n"
+                    + "	VENREFCX id_venda,\n"
+                    + "	VENREFCX || VENNUMPDV || VENNUITEM id_item,\n"
+                    + "	VENNUITEM nroitem,\n"
+                    + " PROCODIGO produto,\n"
+                    + "	UPPER(PROUNIDME) unidade,\n"
+                    + "	VENCBARRA codigobarras,\n"
+                    + "	VENPRODUT descricao,\n"
+                    + "	VENQUANTI quantidade,\n"
+                    + "	VENPRECOU precovenda,\n"
+                    + "	VENTOTALI total,\n"
+                    + "	VENCANCELADO cancelada\n"
                     + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA pdv\n"
-                    + "JOIN TB_PRODUTOS p ON p.pro_id = pdv.PRO_ID\n"
-                    + "WHERE\n"
-                    + "	pdv.PRO_ID IS NOT NULL\n"
-                    + "	AND pdv.MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND pdv.MOV_DT_MOVIMENTO BETWEEN '" + dataInicio + "' AND '" + dataTermino + "'";
+                    + "	ITENS01032022 v"
+                    + "WHERE \n"
+                    + " EMPCODIGO = " + idLojaCliente + " AND\n"
+                    + "	VENDATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
