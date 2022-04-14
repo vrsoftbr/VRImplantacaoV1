@@ -790,19 +790,27 @@
                               </Group>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="txtUsuario" alignment="1" pref="422" max="32767" attributes="0"/>
-                                  <Component id="vRLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="btnConectar" min="-2" pref="114" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" pref="81" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Component id="txtUsuario" max="32767" attributes="0"/>
+                                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="txtSenha" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
+                                  <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="vRLabel6" max="32767" attributes="0"/>
+                                  <Component id="txtLComplemento" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace pref="303" max="32767" attributes="0"/>
+                              <Component id="btnConectar" min="-2" pref="114" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -842,12 +850,14 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtLComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -964,6 +974,13 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTributActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="vrframework.bean.textField.VRTextField" name="txtLComplemento">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel6">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Complemento"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>

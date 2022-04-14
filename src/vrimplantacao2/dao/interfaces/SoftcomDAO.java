@@ -51,10 +51,16 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
 
     @Override
     public String getSistema() {
-        return "Softcom";
+        return "Softcom" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
     @Override
