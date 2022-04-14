@@ -184,6 +184,17 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFContatos1ActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFComplemento">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Complemento"/>
+                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFComplementoActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="pnlOutrasReceitas">
@@ -294,6 +305,13 @@
                                               <Component id="chkCIE" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkConvenioEmpresa" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="chkConveniado" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="chkTransacaoConvenio" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
@@ -319,7 +337,13 @@
                           <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="106" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkConvenioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkConveniado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTransacaoConvenio" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="76" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -356,7 +380,7 @@
                                       <Component id="jLabel2" pref="155" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="txtRotDtIni" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="txtRotDtIni" alignment="0" pref="225" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -364,7 +388,7 @@
                                       <Component id="jLabel3" pref="167" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="txtRotDtFim" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="txtRotDtFim" alignment="0" pref="225" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           </Group>
@@ -424,6 +448,21 @@
                 <Component class="javax.swing.JCheckBox" name="chkClienteEventual">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConvenioEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Convenio Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConveniado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Conveniado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTransacaoConvenio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Transa&#xe7;&#xe3;o Convenio"/>
                   </Properties>
                 </Component>
               </SubComponents>

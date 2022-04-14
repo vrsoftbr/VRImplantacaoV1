@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -172,7 +173,10 @@ public class ProdutoAnteriorEanDAO {
             sql.setTableName("codant_ean");            
             sql.put("qtdembalagem", anterior.getQtdEmbalagem());
             sql.put("valor", anterior.getValor());
-            sql.put("tipoembalagem", anterior.getTipoEmbalagem() != null ? anterior.getTipoEmbalagem() : "");
+            sql.put("tipoembalagem", 
+                    anterior.getTipoEmbalagem() != null ? 
+                    Utils.acertarTexto(anterior.getTipoEmbalagem()) : 
+                    "");
             
             if (!getEansAnteriores().containsKey(
                     anterior.getImportSistema(),
@@ -184,6 +188,7 @@ public class ProdutoAnteriorEanDAO {
                 sql.put("importloja", anterior.getImportLoja());
                 sql.put("importid", anterior.getImportId());
                 sql.put("ean", anterior.getEan() != null ? anterior.getEan() : "");
+                
                 stm.execute(sql.getInsert());
                 eans.put(anterior,
                    anterior.getImportSistema(),
