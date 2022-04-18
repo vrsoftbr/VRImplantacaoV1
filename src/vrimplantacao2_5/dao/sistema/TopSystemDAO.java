@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -95,19 +97,53 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+    }
+
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODITR id,\n"
-                    + " NOMETR descricao,\n"
-                    + " CODICST cst_saida,\n"
-                    + " PERC_ICM aliquota_saida,\n"
-                    + " PERC_RED reducao_saida\n"
-                    + "FROM\n"
-                    + "	TRIBUTA TR\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	distinct\n"
+                    + "	CONCAT (Sit_Trib,'-',Aliq_icms,'-',Pct_Red_Calc_ICMS) id,\n"
+                    + " CONCAT (Aliq_icms,'% ,','RED ',Pct_Red_Calc_ICMS) descricao,\n"
+                    + "	Sit_Trib cst_saida,\n"
+                    + "	Aliq_icms aliquota_saida,\n"
+                    + "	Pct_Red_Calc_ICMS reducao_saida\n"
+                    + "from\n"
+                    + "	trib_estado te\n"
+                    + "join (\n"
+                    + "	select\n"
+                    + "		Cod_Prod,\n"
+                    + "		max(DtInicioVig)\n"
+                    + "		from trib_estado\n"
+                    + "		where Cod_Prod != 0\n"
+                    + "		group by Cod_Prod) t2 on te.Cod_Prod = t2.cod_prod\n"
+                    + "where UF = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -153,6 +189,46 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
         return Result;
     }
 
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "  distinct\n"
+                    + "  s.codigo merc1,\n"
+                    + "  s.descricao descmerc1,\n"
+                    + "  f.codigo merc2,\n"
+                    + "  f.descricao descmerc2,\n"
+                    + "  1 merc3,\n"
+                    + "  coalesce(f.descricao, s.descricao) descmerc3\n"
+                    + "from\n"
+                    + "  cad_produto p\n"
+                    + "join cad_setor s on (p.grupo = s.codigo)\n"
+                    + "join tab_familia_produto f on (p.familia = f.codigo)\n"
+                    + "order by\n"
+                    + "  s.codigo, f.codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
@@ -234,46 +310,6 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  distinct\n"
-                    + "  s.codigo merc1,\n"
-                    + "  s.descricao descmerc1,\n"
-                    + "  f.codigo merc2,\n"
-                    + "  f.descricao descmerc2,\n"
-                    + "  1 merc3,\n"
-                    + "  coalesce(f.descricao, s.descricao) descmerc3\n"
-                    + "from\n"
-                    + "  cad_produto p\n"
-                    + "join cad_setor s on (p.grupo = s.codigo)\n"
-                    + "join tab_familia_produto f on (p.familia = f.codigo)\n"
-                    + "order by\n"
-                    + "  s.codigo, f.codigo"
-            )) {
-                while (rst.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-
-                    imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("descmerc1"));
-                    imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(rst.getString("descmerc2"));
-                    imp.setMerc3ID(rst.getString("merc3"));
-                    imp.setMerc3Descricao(rst.getString("descmerc3"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -327,79 +363,6 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where p.inativo = 0"
             )) {
                 while (rst.next()) {
-
-                    int cst;
-                    double aliquota = 0, reducao = 0;
-
-                    String icms = rst.getString("st_ecf");
-                    if (icms == null) {
-                        icms = "";
-                    }
-                    icms = icms.trim().toUpperCase();
-
-                    if (!"".equals(icms)) {
-                        switch (icms) {
-                            case "FF":
-                                cst = 60;
-                                break;
-                            case "II":
-                                cst = 40;
-                                break;
-                            case "NN":
-                                cst = 90;
-                                break;
-                            case "7,0":
-                                cst = 0;
-                                aliquota = 7;
-                                break;
-                            case "07":
-                                cst = 0;
-                                aliquota = 7;
-                                break;
-                            case "8,4":
-                                cst = 0;
-                                aliquota = 8.4;
-                                break;
-                            case "12,0":
-                                cst = 0;
-                                aliquota = 12;
-                                break;
-                            case "12":
-                                cst = 0;
-                                aliquota = 12;
-                                break;
-                            case "18,0":
-                                cst = 0;
-                                aliquota = 18;
-                                break;
-                            case "18":
-                                cst = 0;
-                                aliquota = 18;
-                                break;
-                            case "25,0":
-                                cst = 0;
-                                aliquota = 25;
-                                break;
-                            case "25":
-                                cst = 0;
-                                aliquota = 25;
-                                break;
-                            case "0,0":
-                                cst = 90;
-                                break;
-                            case "00":
-                                cst = 90;
-                                break;
-                            default:
-                                cst = 90;
-                                break;
-                        }
-                    } else {
-                        cst = 90;
-                        aliquota = 0;
-                        reducao = 0;
-                    }
-
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
@@ -447,9 +410,14 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setPiscofinsNaturezaReceita(rst.getInt("contrmonaliqdif"));
                     }
-                    imp.setIcmsCstConsumidor(cst);
-                    imp.setIcmsAliqConsumidor(aliquota);
-                    imp.setIcmsReducaoConsumidor(reducao);
+
+                    imp.setIcmsCstSaida(rst.getInt("sit_trib"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliq_icms"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("pct_red_calc_icms"));
+
+                    imp.setIcmsCstConsumidor(rst.getInt("sit_trib"));
+                    imp.setIcmsAliqConsumidor(rst.getInt("aliq_icms"));
+                    imp.setIcmsReducaoConsumidor(rst.getInt("pct_red_calc_icms"));
 
                     Result.add(imp);
                 }
@@ -464,10 +432,13 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "codigo_interno as codProduto,\n"
-                    + "Codigoa as codBarras\n"
-                    + "from cad_produto "
+                    "select\n"
+                    + "	Codigo as codProduto,\n"
+                    + "	Codigoa as codBarras\n"
+                    + "from\n"
+                    + "	cad_produto\n"
+                    + "where\n"
+                    + "	Codigo != 0"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -476,6 +447,7 @@ public class TopSystemDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("codProduto"));
                     imp.setEan(rst.getString("codBarras"));
+                    imp.setQtdEmbalagem(1);
 
                     Result.add(imp);
                 }
