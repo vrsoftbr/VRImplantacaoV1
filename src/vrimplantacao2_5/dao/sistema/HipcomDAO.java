@@ -1483,7 +1483,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrdtvenc vencimento,\n"
                     + "	r.ctrparc parcela,\n"
                     + " r.ctrgrupo,\n"
-                    + " r.ctrsubgr"
+                    + " r.ctrsubgr\n"
                     + "from\n"
                     + "	finctr r\n"
                     + "LEFT JOIN clicli c ON r.ctrcod = c.clicod\n"
@@ -1921,13 +1921,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(               
-                    "select\n"
+                    "select distinct\n"
                     + "	r.grpcodgrp id,\n"
                     + "    p.prodescr descricao,\n"
                     + "    r.grpativo ativo,\n"
@@ -1938,8 +1938,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.grpcodplu id_produto\n"
                     + "from\n"
                     + "	hipgrp r\n"
-                    + "    join hippro p on\n"
-                    + "		r.grpcodgrp = p.procodplu\n"
+                    + "    join hippro p on r.grpcodgrp = p.procodplu\n"
+                    + "  where grptipo = 'Q'\n"
                     + "order by\n"
                     + "	1"
             )) {
@@ -1964,48 +1964,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
-    }*/
-    @Override
-    public List<ReceitaIMP> getReceitas() throws Exception {
-        List<ReceitaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " r.grpcodgrp id_produtopai,\n"
-                    + " r.grpcodplu id_produtofilho,\n"
-                    + " p.prodescr descricao,\n"
-                    + " r.grprendim rendimento,\n"
-                    + " r.grpqtde qtde\n"
-                    + "from hipgrp r\n"
-                    + "join hippro p on p.procodplu = r.grpcodgrp\n"
-                    + "where \n"
-                    + "grploja = " + getLojaOrigem() + "\n"
-                    + "and grptipo = 'Q';"
-            )) {
-                while (rst.next()) {
-                    ReceitaIMP imp = new ReceitaIMP();
-
-                    imp.setImportsistema(getSistema());
-                    imp.setImportloja(getLojaOrigem());
-                    imp.setImportid(rst.getString("id_produtopai"));
-                    imp.setIdproduto(rst.getString("id_produtopai"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    imp.setRendimento(rst.getDouble("rendimento"));
-                    imp.setQtdembalagemreceita(rst.getInt("qtde"));
-                    imp.setQtdembalagemproduto(1000);
-                    imp.setFator(1);
-                    imp.setFichatecnica("");
-                    imp.getProdutos().add(rst.getString("id_produtofilho"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
     }
-
+    
     @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();

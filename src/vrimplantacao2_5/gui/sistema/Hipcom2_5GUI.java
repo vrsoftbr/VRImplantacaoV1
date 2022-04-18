@@ -308,6 +308,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         chkFNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos1 = new vrframework.bean.checkBox.VRCheckBox();
         chkFComplemento = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornCartao = new vrframework.bean.checkBox.VRCheckBox();
         pnlOutrasReceitas = new javax.swing.JPanel();
         chkOutrasReceitas = new vrframework.bean.checkBox.VRCheckBox();
         txtOtRecDtIni = new org.jdesktop.swingx.JXDatePicker();
@@ -410,6 +411,15 @@ public class Hipcom2_5GUI extends VRInternalFrame {
             }
         });
         jPanel3.add(chkFComplemento);
+
+        chkFornCartao.setText("Fornecedor Cartão");
+        chkFornCartao.setEnabled(true);
+        chkFornCartao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFornCartaoActionPerformed(evt);
+            }
+        });
+        jPanel3.add(chkFornCartao);
 
         pnlOutrasReceitas.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -832,6 +842,10 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFComplementoActionPerformed
 
+    private void chkFornCartaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornCartaoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFornCartaoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkBancoUnificado;
@@ -854,6 +868,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
+    private vrframework.bean.checkBox.VRCheckBox chkFornCartao;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

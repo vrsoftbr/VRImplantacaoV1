@@ -195,6 +195,17 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFComplementoActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornCartao">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Fornecedor Cart&#xe3;o"/>
+                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFornCartaoActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="pnlOutrasReceitas">
