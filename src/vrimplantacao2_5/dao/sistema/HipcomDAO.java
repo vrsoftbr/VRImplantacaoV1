@@ -26,6 +26,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -46,6 +47,7 @@ import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -68,6 +70,7 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
@@ -252,7 +255,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.RECEITA,
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
@@ -338,21 +342,21 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
 
-            /*try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	m.depdepto merc1,\n" +
-                    "	m.depsecao merc2,\n" +
-                    "	m.depgrupo merc3,\n" +
-                    "	m.depsubgr merc4,\n" +
-                    "	m.depdescr merc4desc\n" +
-                    "from\n" +
-                    "	hipdep m	\n" +
-                    "where\n" +
-                    "	m.depdepto != 0 and\n" +
-                    "	m.depsecao != 0 and\n" +
-                    "	m.depgrupo != 0 and\n" +
-                    "	m.depsubgr != 0\n" +
-                    "order by 1,2, 3, 4"
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	m.depdepto merc1,\n"
+                    + "	m.depsecao merc2,\n"
+                    + "	m.depgrupo merc3,\n"
+                    + "	m.depsubgr merc4,\n"
+                    + "	m.depdescr merc4desc\n"
+                    + "from\n"
+                    + "	hipdep m	\n"
+                    + "where\n"
+                    + "	m.depdepto != 0 and\n"
+                    + "	m.depsecao != 0 and\n"
+                    + "	m.depgrupo != 0 and\n"
+                    + "	m.depsubgr != 0\n"
+                    + "order by 1,2, 3, 4"
             )) {
                 while (rst.next()) {
                     LOG.fine("NIVEL4: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
@@ -367,7 +371,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         );
                     }
                 }
-            }*/
+            }
         }
 
         return result;
@@ -525,7 +529,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    //imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -1036,7 +1040,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	clicli c\n"
                     + "	left join clisit sit on	c.clicodsitu = sit.sitcod\n"
                     + "where cliloja = " + getLojaOrigem() + "\n"
-                    + " and clicodconv <> 15 and clicodconv > 0\n"
+                    + " and clicodconv not in (0,15)\n"
                     + "order by 1"
             )) {
                 while (rs.next()) {
@@ -1464,7 +1468,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrvalor valor,\n"
                     + "	r.ctrjuros juros,\n"
                     + "	r.ctrdesc desconto,\n"
-                    + "   r.ctralinea alinea, \n"
+                    + " r.ctralinea, \n"
+                    + " case when r.ctrsubgr = 3 then 15\n"
+                    + "	     when r.ctrsubgr = 4 then 70\n"
+                    + "	     else 0 end alinea,\n"
                     + "	r.ctrvalabt abatimento,\n"
                     + "	r.ctrsaldo valorfinal,\n"
                     + "	r.ctrobs observacao,\n"
@@ -1475,7 +1482,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clifoneres fone,\n"
                     + "	r.ctrdtvenc vencimento,\n"
                     + "	r.ctrparc parcela,\n"
-                    + "   r.ctrgrupo\n"
+                    + " r.ctrgrupo,\n"
+                    + " r.ctrsubgr"
                     + "from\n"
                     + "	finctr r\n"
                     + "LEFT JOIN clicli c ON r.ctrcod = c.clicod\n"
@@ -1505,7 +1513,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNome(rs.getString("nome"));
                     imp.setRg(rs.getString("rg"));
                     imp.setTelefone(rs.getString("fone"));
-                    imp.setVistaPrazo(rs.getInt("ctrgrupo") == 2 ? TipoVistaPrazo.A_VISTA : TipoVistaPrazo.PRAZO);
+                    imp.setVistaPrazo(rs.getInt("ctrsubgr") == 1 ? TipoVistaPrazo.A_VISTA : TipoVistaPrazo.PRAZO);
                     imp.setAlinea(rs.getInt("alinea"));
 
                     result.add(imp);
@@ -1913,12 +1921,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(
+            try (ResultSet rs = st.executeQuery(               
                     "select\n"
                     + "	r.grpcodgrp id,\n"
                     + "    p.prodescr descricao,\n"
@@ -1949,6 +1957,87 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdembalagemreceita(rs.getInt("quantidadeproduto"));
                     imp.setFator(rs.getDouble("fator"));
                     imp.getProdutos().add(rs.getString("id_produto"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }*/
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " r.grpcodgrp id_produtopai,\n"
+                    + " r.grpcodplu id_produtofilho,\n"
+                    + " p.prodescr descricao,\n"
+                    + " r.grprendim rendimento,\n"
+                    + " r.grpqtde qtde\n"
+                    + "from hipgrp r\n"
+                    + "join hippro p on p.procodplu = r.grpcodgrp\n"
+                    + "where \n"
+                    + "grploja = " + getLojaOrigem() + "\n"
+                    + "and grptipo = 'Q';"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id_produtopai"));
+                    imp.setIdproduto(rst.getString("id_produtopai"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita(rst.getInt("qtde"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setFator(1);
+                    imp.setFichatecnica("");
+                    imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "  a.grpcodgrp id_produtopai,\n"
+                    + "  p.prodescr descricao_pai,\n"
+                    + "  a.grpcodplu id_produtofilho,\n"
+                    + "  p2.prodescr descricao_filho,\n"
+                    + "  a.grprendim qtde,\n"
+                    + "  a.grppercprv percentualpreco,\n"
+                    + "  a.grpcoefcus percentualcusto,\n"
+                    + "  a.grpcalccus calculacusto\n"
+                    + "from hipgrp a\n"
+                    + "join hippro p on p.procodplu = a.grpcodgrp\n"
+                    + "join hippro p2 on p2.procodplu = a.grpcodplu\n"
+                    + "where \n"
+                    + "grploja = 1\n"
+                    + "and grptipo = 'S'"
+            )) {
+                while (rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+
+                    imp.setId(rs.getString("id_produtopai"));
+                    imp.setDescricao(rs.getString("descricao_pai"));
+                    imp.setQtdEmbalagem(rs.getInt("qtde"));
+                    imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
+                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                    imp.setPercentualPreco(rs.getDouble("percentualpreco"));
+                    imp.setPercentualCusto(rs.getDouble("percentualcusto"));
 
                     result.add(imp);
                 }
