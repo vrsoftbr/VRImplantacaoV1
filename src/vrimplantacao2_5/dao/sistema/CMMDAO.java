@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -134,6 +138,8 @@ public class CMMDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> 
+                produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -231,8 +237,37 @@ public class CMMDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setEan(rst.getString("codigobarras"));
                     imp.setValidade(rst.getInt("validade"));
+                    
+                    imp.setEan(rst.getString("codigobarras"));
+                    
+                    String ean = imp.getEan();
+                    
+                    if (ean != null && !ean.isEmpty()) {
+                        
+                        if (ean.startsWith("0") && ean.length() == 6) {
+                            
+                            imp.seteBalanca(true);
+                            ean = ean.substring(0, ean.length() - 2);
+                            
+                            int eanNumerico = Utils.stringToInt(ean,  0);
+                            
+                            ProdutoBalancaVO balanca = produtosBalanca.get(eanNumerico);
+                            
+                            if (balanca != null) {
+                                
+                                imp.setEan(String.valueOf(balanca.getCodigo()));
+                                imp.setValidade(balanca.getValidade() > 1 ? balanca.getValidade() : rst.getInt("validade"));
+                                imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
+                            }
+                            
+                            imp.setEan(ean);
+                            
+                        } else if (imp.getImportId().equals(imp.getEan())) {
+                            imp.seteBalanca(true);
+                        }
+                    }
+
                     imp.setTipoEmbalagem(rst.getString("embalagemvenda"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcompra"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
