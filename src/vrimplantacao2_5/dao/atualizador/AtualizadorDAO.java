@@ -316,8 +316,8 @@ public class AtualizadorDAO {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("DELETE FROM implantacao2_5.usuario;\n"
                     + "DELETE FROM implantacao2_5.unidade\n;"
-                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) "
-                    + "VALUES (1, 'VR MATRIZ', 3526902, 35);");
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (1, 'VR MATRIZ', 3526902, 35);\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (6, 'VR GOIANIA', 5208707, 52);");
         }
     }
 
@@ -328,7 +328,8 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (6, 'JOSE', 'JOSE', 'VR123', " + EUnidade.VR_GOIANIA.getId() + ");");
         }
     }
 
