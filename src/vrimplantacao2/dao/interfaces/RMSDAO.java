@@ -761,8 +761,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIcmsConsumidorId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
-                        imp.setIcmsCreditoId(rst.getString("icms_id"));
-                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));
+                        
+                        imp.setIcmsCreditoId("E" + rst.getString("icms_id"));
+                        imp.setIcmsCreditoForaEstadoId("E" + rst.getString("icms_id"));
                     }
 
                     result.add(imp);
