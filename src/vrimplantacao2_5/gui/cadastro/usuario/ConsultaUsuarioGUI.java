@@ -58,9 +58,9 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
     private void configurarColuna() throws Exception {
         List<VRColumnTable> column = new ArrayList();
 
+        column.add(new VRColumnTable("Usuário", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Login", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Unidade", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Município", true, SwingConstants.LEFT, false, null));
-        column.add(new VRColumnTable("Estado", true, SwingConstants.LEFT, false, null));
 
         tblConsulta.configurarColuna(column, this, "Consulta", "");
     }
@@ -132,6 +132,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Nome");
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel10, "Unidade");
+        vRLabel10.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         vRLabel10.setName(""); // NOI18N
 
         cboFiltroUnidade.addActionListener(new java.awt.event.ActionListener() {
