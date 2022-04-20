@@ -358,8 +358,9 @@ public class EscritaDAO {
                     "		id_escritanotasaidacomplemento = v_id;\n" +
                     "\n" +
                     "	delete from escritanotasaidacupom where id_escrita = v_id;\n" +
+                    "   delete from escritafinalizadora where id_escrita = v_id;\n" +        
                     "	delete from escritagnre where id_escrita = v_id;\n" +
-                    "	delete from escritaobservacaofiscalajuste where id_escritaobservacaofiscal in (select id from escritaobservacaofiscal where id_escrita = v_id);\n" +
+                    "	delete from escritaobservacaofiscalajuste where id_escrita = v_id;\n" +
                     "	delete from escritaobservacaofiscal where id_escrita = v_id;\n" +
                     "	delete from escritadadoscomplementaresenergiaeletrica where id_escrita = v_id;\n" +
                     "	delete from escritacentrocusto where id_escrita = v_id;\n" +
