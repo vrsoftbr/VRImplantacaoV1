@@ -139,11 +139,17 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     importador.eBancoUnificado = chkBancoUnificado.isSelected();
+                    dao.setFornecedorCartao(chkFornCartao.isSelected());
+                    dao.setInverteAssociado(chkInverteAssociado.isSelected());
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
+                        
+                        if(chkReceitaProduto.isSelected()){
+                            importador.importarReceitasProducao();
+                        }
                         
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -342,6 +348,8 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         rdbVendasV1 = new vrframework.bean.radioButton.VRRadioButton();
         rdbVendasV2 = new vrframework.bean.radioButton.VRRadioButton();
         chkBancoUnificado = new vrframework.bean.checkBox.VRCheckBox();
+        chkInverteAssociado = new javax.swing.JCheckBox();
+        chkReceitaProduto = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
@@ -665,6 +673,10 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        chkInverteAssociado.setText("Inverter Associado");
+
+        chkReceitaProduto.setText("Receita de Produção");
+
         javax.swing.GroupLayout tabOutrasLayout = new javax.swing.GroupLayout(tabOutras);
         tabOutras.setLayout(tabOutrasLayout);
         tabOutrasLayout.setHorizontalGroup(
@@ -672,14 +684,18 @@ public class Hipcom2_5GUI extends VRInternalFrame {
             .addGroup(tabOutrasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(tabOutrasLayout.createSequentialGroup()
-                        .addComponent(chkContasPagar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabOutrasLayout.createSequentialGroup()
+                                .addComponent(chkContasPagar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkInverteAssociado)
+                            .addComponent(chkReceitaProduto))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabOutrasLayout.setVerticalGroup(
@@ -692,7 +708,11 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                     .addComponent(chkContasPagar)
                     .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkInverteAssociado)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkReceitaProduto)
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Outras", tabOutras);
@@ -870,8 +890,10 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornCartao;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private javax.swing.JCheckBox chkInverteAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private javax.swing.JCheckBox chkReceitaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkTransacaoConvenio;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;

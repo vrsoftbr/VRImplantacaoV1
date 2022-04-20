@@ -46,6 +46,7 @@ import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -70,7 +71,6 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
@@ -92,11 +92,26 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date cpDataInicial;
     private Date cpDataFinal;
 
+    private boolean fornecedorCartao = false;
+    private boolean inverteAssociado = false;
+
     private boolean vendaUtilizaDigito = false;
 
     private Integer versaoVenda = 2;
 
     private boolean importarIcmsEntradaCad = false;
+
+    public void setInverteAssociado(boolean inverteAssociado) {
+        this.inverteAssociado = inverteAssociado;
+    }
+
+    private boolean getFornecedorCartao() {
+        return this.fornecedorCartao;
+    }
+
+    public void setFornecedorCartao(boolean fornecedorCartao) {
+        this.fornecedorCartao = fornecedorCartao;
+    }
 
     public Integer getVersaoVenda() {
         return this.versaoVenda;
@@ -637,9 +652,43 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        String SqlFornecedor;
+
+        SqlFornecedor
+                = "select\n"
+                + "	f.forcod id,\n"
+                + "	f.forrazao razao,\n"
+                + "	coalesce(nullif(trim(f.forfantas),''), f.forrazao) fantasia,\n"
+                + "	f.forcnpj cnpj,\n"
+                + "	f.forinsest inscricaoestadual,\n"
+                + "	f.forinsmunic inscricaomunicipal,\n"
+                + "	case f.forforalin when 'S' then 0 else 1 end ativo,\n"
+                + "	f.forendere endereco,\n"
+                + "	f.forbairro bairro,\n"
+                + "	f.formunicip municipio,\n"
+                + "	f.forestado uf,\n"
+                + "	f.forcodmunic ibge_munic,\n"
+                + "	f.forcep cep,\n"
+                + "	f.forfone telefone,\n"
+                + "	f.forqtmincxa qtdminimapedido,\n"
+                + "	f.forfatmin valorminimopedido,\n"
+                + "	f.forobserv observacao,\n"
+                + "	f.forentrega prazoentrega,\n"
+                + "	f.forvisita prazovisita,\n"
+                + "	f.forcondpag condicaopagamento,\n"
+                + "	f.forcontato contato,\n"
+                + "	f.forfonecont fonecontato,\n"
+                + "	f.forsite site,\n"
+                + "	f.foremail email,\n"
+                + "	f.foremailxml emailnfe,\n"
+                + "	f.fortipforn tipofornecedor,\n"
+                + "	case f.forprodutor when 'S' then 1 else 0 end produtorural\n"
+                + "from\n"
+                + "	hipfor f\n"
+                + "order by 1";
+
+        if (fornecedorCartao) {
+            SqlFornecedor = "select\n"
                     + "	f.forcod id,\n"
                     + "	f.forrazao razao,\n"
                     + "	coalesce(nullif(trim(f.forfantas),''), f.forrazao) fantasia,\n"
@@ -669,8 +718,44 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case f.forprodutor when 'S' then 1 else 0 end produtorural\n"
                     + "from\n"
                     + "	hipfor f\n"
-                    + "order by 1"
-            )) {
+                    + "union	\n"
+                    + "   select \n"
+                    + "	concat('card-',ctaid) id,\n"
+                    + "	ctadescr razao,\n"
+                    + "	ctadescr fantasia,\n"
+                    + "	ctaid cnpj,\n"
+                    + "	'' inscricaoestadual,\n"
+                    + "	'' inscricaomunicipal,\n"
+                    + "	1 ativo,\n"
+                    + "	'' endereco,\n"
+                    + "	'' bairro,\n"
+                    + "	'' municipio,\n"
+                    + "	'' uf,\n"
+                    + "	'' ibge_munic,\n"
+                    + "	'' cep,\n"
+                    + "	'' telefone,\n"
+                    + "	0 qtdminimapedido,\n"
+                    + "	0 valorminimopedido,\n"
+                    + "	'' observacao,\n"
+                    + "	0 prazoentrega,\n"
+                    + "	0 prazovisita,\n"
+                    + "	'' condicaopagamento,\n"
+                    + "	'' contato,\n"
+                    + "	'' fonecontato,\n"
+                    + "	'' site,\n"
+                    + "	'' email,\n"
+                    + "	'' emailnfe,\n"
+                    + "	'' tipofornecedor,\n"
+                    + "	0 produtorural\n"
+                    + "   from fincta \n"
+                    + "	where\n"
+                    + "	ctaconta = 1\n"
+                    + "	and \n"
+                    + "	ctagrupo in (3,4,5)";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(SqlFornecedor)) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -1360,7 +1445,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /* "select\n"
                     + "	p.procodplu,\n"
                     + "	p.prodescr,\n"
                     + "	a.reccod,\n"
@@ -1374,7 +1459,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join hippro p on\n"
                     + "		p.procodplu = pl.prlcodplu\n"
                     + "order by\n"
-                    + "	reccod, prlcodplu"
+                    + "	reccod, prlcodplu"*/
+                    "select \n"
+                    + "	 reccod,\n"
+                    + "	 recdescr,\n"
+                    + "	 recmemo\n"
+                    + "	from hiprec"
             )) {
                 Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
 
@@ -1390,7 +1480,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         receitas.put(imp.getId(), imp);
                     }
 
-                    imp.getProdutos().add(rst.getString("procodplu"));
+                    imp.getProdutos().add(rst.getString("reccod"));
                 }
 
                 return new ArrayList<>(receitas.values());
@@ -1403,12 +1493,37 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
         List<ContaReceberIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String sqlReceber;
+
+        sqlReceber
+                = "select\n"
+                + "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n"
+                + "	r.ctrcod idfornecedor,\n"
+                + "	r.ctrdtemiss dataemissao,\n"
+                + "	r.ctrdtvenc vencimento,\n"
+                + "	r.ctrvalor + coalesce(r.ctrjuros, 0) - coalesce(r.ctrdesc, 0) valor,\n"
+                + "	r.ctrvalabt abatimento,\n"
+                + "	r.ctrjuros juros,\n"
+                + "	r.ctrdesc desconto,\n"
+                + "	r.ctrsaldo valorfinal,\n"
+                + "	r.ctrobs observacao\n"
+                + "from\n"
+                + "	finctr r\n"
+                + "where\n"
+                + "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n"
+                + "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n"
+                + "	r.ctrloja = " + getLojaOrigem() + " and\n"
+                + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
+                + "	r.ctrtipo = 'F' and\n"
+                + "   r.ctrcod IN (SELECT forcod FROM hipfor)\n"
+                + "order by\n"
+                + "	r.ctrdtemiss";
+
+        if (fornecedorCartao) {
+            sqlReceber
+                    = "select distinct\n"
                     + "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n"
-                    + "	r.ctrcod idfornecedor,\n"
                     + "	r.ctrdtemiss dataemissao,\n"
                     + "	r.ctrdtvenc vencimento,\n"
                     + "	r.ctrvalor + coalesce(r.ctrjuros, 0) - coalesce(r.ctrdesc, 0) valor,\n"
@@ -1416,19 +1531,55 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrjuros juros,\n"
                     + "	r.ctrdesc desconto,\n"
                     + "	r.ctrsaldo valorfinal,\n"
-                    + "	r.ctrobs observacao\n"
+                    + "	r.ctrobs observacao,\n"
+                    + "	concat('card-',e.ctaid) idfornecedor,\n"
+                    + "	case when r.ctrgrupo = 3 then 7\n"
+                    + "	     when r.ctrgrupo = 4 then 8\n"
+                    + "	     else 1 end tiporeceita\n"
                     + "from\n"
                     + "	finctr r\n"
+                    + "	join fincta e on e.ctagrupo = r.ctrgrupo \n"
+                    + "				and e.ctasubgr = r.ctrsubgr \n"
+                    + "				and e.ctaconta = 1 and e.ctagrupo in (3,4,5)\n"
                     + "where\n"
                     + "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n"
                     + "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n"
-                    + "	r.ctrloja = " + getLojaOrigem() + " and\n"
+                    + "	r.ctrloja = " + getLojaOrigem() + "  and\n"
+                    + "	r.ctrvalor > 0 and\n"
+                    + "	r.ctrtipo in ('F','C')\n"
+                    + "union\n"
+                    + "select distinct\n"
+                    + "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n"
+                    + "	r.ctrdtemiss dataemissao,\n"
+                    + "	r.ctrdtvenc vencimento,\n"
+                    + "	r.ctrvalor + coalesce(r.ctrjuros, 0) - coalesce(r.ctrdesc, 0) valor,\n"
+                    + "	r.ctrvalabt abatimento,\n"
+                    + "	r.ctrjuros juros,\n"
+                    + "	r.ctrdesc desconto,\n"
+                    + "	r.ctrsaldo valorfinal,\n"
+                    + "	r.ctrobs observacao,\n"
+                    + "	r.ctrcod idfornecedor,\n"
+                    + "	case when ctaid = 59 then 3\n"
+                    + "	     when ctaid = 65 then 4\n"
+                    + "	     when ctaid = 70 then 5\n"
+                    + "	     when ctaid = 71 then 6\n"
+                    + "	  else 1 end tiporeceita\n"
+                    + "from\n"
+                    + "	finctr r\n"
+                    + "	join fincta e on e.ctagrupo = r.ctrgrupo \n"
+                    + "				and e.ctasubgr = r.ctrsubgr \n"
+                    + "				and e.ctaconta = 1 and e.ctagrupo not in (3,4,5)\n"
+                    + "where\n"
+                    + "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n"
+                    + "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n"
+                    + "	r.ctrloja = " + getLojaOrigem() + "  and\n"
                     + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
-                    + "	r.ctrtipo = 'F' and\n"
-                    + "   r.ctrcod IN (SELECT forcod FROM hipfor)\n"
-                    + "order by\n"
-                    + "	r.ctrdtemiss"
-            )) {
+                    + "	r.ctrtipo = 'F' and \n"
+                    + "	r.ctrcod IN (SELECT forcod FROM hipfor)";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sqlReceber)) {
                 while (rst.next()) {
                     ContaReceberIMP imp = new ContaReceberIMP();
 
@@ -1438,6 +1589,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("observacao"));
+                    //imp.setTipoReceita(TipoReceita.CR_OUTRAS_UNIDADES);
                     if (rst.getDouble("abatimento") > 0) {
                         imp.add(imp.getId(), rst.getDouble("abatimento"), 0, 0, 0, rst.getDate("vencimento"));
                     }
@@ -1469,8 +1621,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrjuros juros,\n"
                     + "	r.ctrdesc desconto,\n"
                     + " r.ctralinea, \n"
-                    + " case when r.ctrsubgr = 3 then 15\n"
-                    + "	     when r.ctrsubgr = 4 then 70\n"
+                    + " case when r.ctrsubgr = 3 then 46\n"
+                    + "	     when r.ctrsubgr = 4 then 77\n"
                     + "	     else 0 end alinea,\n"
                     + "	r.ctrvalabt abatimento,\n"
                     + "	r.ctrsaldo valorfinal,\n"
@@ -1493,8 +1645,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrloja = " + getLojaOrigem() + " and\n"
                     + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
                     + "	r.ctrtipo = 'C' and\n"
-                    + "	r.ctrgrupo IN (2, 9) and\n"
-                    + "   r.ctralinea IN (11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 28, 29, 35, 37, 62, 63)\n"
+                    + "	r.ctrgrupo IN (2, 9) \n"
+                   // + " and  r.ctralinea IN (11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 28, 29, 35, 37, 62, 63)\n"
                     + "order by\n"
                     + "	r.ctrdtemiss")) {
                 while (rs.next()) {
@@ -1882,6 +2034,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctpforn idfornecedor,\n"
                     + "	r.ctpnf numeroDocumento,\n"
                     + "	r.ctpdtemiss dataemissao,\n"
+                    + " r.ctpdtentr dataentrada,\n"
                     + "	r.ctpvalor + coalesce(r.ctpjuros, 0) - coalesce(r.ctpdesc, 0) valor,\n"
                     + "	r.ctpjuros juros,\n"
                     + "	r.ctpdesc desconto,\n"
@@ -1893,8 +2046,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	finctp r\n"
                     + "where\n"
-                    + "	r.ctpdtemiss >= '" + dateFormat.format(cpDataInicial) + "' and\n"
-                    + "	r.ctpdtemiss <= '" + dateFormat.format(cpDataFinal) + "' and\n"
+                    + "	r.ctpdtentr >= '" + dateFormat.format(cpDataInicial) + "' and\n"
+                    + "	r.ctpdtentr <= '" + dateFormat.format(cpDataFinal) + "' and\n"
                     + "	r.ctploja = " + getLojaOrigem() + " and\n"
                     + "	r.ctpvalor > 0 and\n"
                     + "	r.ctpdtpagto is null and\n"
@@ -1909,6 +2062,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setNumeroDocumento(rst.getString("numeroDocumento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
@@ -1921,12 +2076,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(               
+            try (ResultSet rs = st.executeQuery(
                     "select distinct\n"
                     + "	r.grpcodgrp id,\n"
                     + "    p.prodescr descricao,\n"
@@ -1964,30 +2119,88 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }*/
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " r.grpcodgrp id_produtopai,\n"
+                    + " r.grpcodplu id_produtofilho,\n"
+                    + " p.prodescr descricao,\n"
+                    + " r.grprendim rendimento,\n"
+                    + " r.grpqtde quantidade\n"
+                    + "from hipgrp r\n"
+                    + "join hippro p on p.procodplu = r.grpcodgrp\n"
+                    + "where \n"
+                    + " grptipo = 'P' "
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id_produtopai"));
+                    imp.setIdproduto(rst.getString("id_produtofilho"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita(rst.getInt("quantidade"));
+                    imp.setQtdembalagemproduto(1);
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
-    
+
     @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "  a.grpcodgrp id_produtopai,\n"
-                    + "  p.prodescr descricao_pai,\n"
-                    + "  a.grpcodplu id_produtofilho,\n"
-                    + "  p2.prodescr descricao_filho,\n"
-                    + "  a.grprendim qtde,\n"
-                    + "  a.grppercprv percentualpreco,\n"
+        String sqlAssociado;
+
+        sqlAssociado
+                = "select \n"
+                + "  a.grpcodgrp id_produtopai,\n"
+                + "  p.prodescr descricao_pai,\n"
+                + "  a.grpcodplu id_produtofilho,\n"
+                + "  p2.prodescr descricao_filho,\n"
+                + "  a.grpqtde qtde,\n"
+                + "  case when a.grppercprv >= 100 then (a.grppercprv - 100)\n"
+                + "       else a.grppercprv end percentualpreco,\n"
+                + "  a.grpcoefcus percentualcusto,\n"
+                + "  a.grpcalccus calculacusto\n"
+                + "from hipgrp a\n"
+                + "join hippro p on p.procodplu = a.grpcodgrp\n"
+                + "join hippro p2 on p2.procodplu = a.grpcodplu\n"
+                + "where \n"
+                + " grploja = " + getLojaOrigem() + " and grptipo = 'S'";
+
+        if (inverteAssociado) {
+            sqlAssociado
+                    = "select \n"
+                    + "  a.grpcodgrp id_produtofilho,\n"
+                    + "  p.prodescr descricao_filho,\n"
+                    + "  a.grpcodplu id_produtopai,\n"
+                    + "  p2.prodescr descricao_pai,\n"
+                    + "  a.grpqtde qtde,\n"
+                    + "  case when a.grppercprv >= 100 then  (a.grppercprv - 100)\n"
+                    + "       else a.grppercprv end percentualpreco,\n"
                     + "  a.grpcoefcus percentualcusto,\n"
                     + "  a.grpcalccus calculacusto\n"
                     + "from hipgrp a\n"
                     + "join hippro p on p.procodplu = a.grpcodgrp\n"
                     + "join hippro p2 on p2.procodplu = a.grpcodplu\n"
                     + "where \n"
-                    + "grploja = 1\n"
-                    + "and grptipo = 'S'"
-            )) {
+                    + " grptipo = 'S'";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sqlAssociado)) {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
@@ -1998,6 +2211,18 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
                     imp.setPercentualPreco(rs.getDouble("percentualpreco"));
                     imp.setPercentualCusto(rs.getDouble("percentualcusto"));
+
+                    if (inverteAssociado) {
+                        imp.setId(rs.getString("id_produtopai"));
+                        imp.setDescricao(rs.getString("descricao_pai"));
+                        imp.setQtdEmbalagem(rs.getInt("qtde"));
+                        imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
+                        imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                        imp.setPercentualPreco(rs.getDouble("percentualpreco"));
+                        imp.setPercentualCusto(rs.getDouble("percentualcusto"));
+                        imp.setAplicaEstoque(false);
+                        imp.setAplicaCusto(true);
+                    }
 
                     result.add(imp);
                 }
