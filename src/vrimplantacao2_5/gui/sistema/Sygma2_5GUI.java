@@ -44,7 +44,7 @@ public class Sygma2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override

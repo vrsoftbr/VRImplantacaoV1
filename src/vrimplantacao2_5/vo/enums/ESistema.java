@@ -437,7 +437,7 @@ public enum ESistema {
     STOCK(215, "STOCK", new Stock_PostgresDAO()),
     CMM(216, "CMM", new CMMDAO()),
     GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
-    JNP(218,"JNP", new JnpDAO());
+    JNP(219,"JNP", new JnpDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
 
     

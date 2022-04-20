@@ -22,19 +22,19 @@ import vrimplantacao2_5.vo.sistema.JnpVO;
 public class JNPController extends InterfaceController {
 
     public JnpDAO dao = null;
-    
+
     public JNPController() {
         this.dao = new JnpDAO();
     }
-    
+
     public JNPController(JnpDAO dao) {
         this.dao = dao;
     }
-    
+
     public void setJnp(JnpVO jnpVO) {
         dao.jnpVO = jnpVO;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -49,7 +49,7 @@ public class JNPController extends InterfaceController {
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.DESC_COMPLETA,                    
+                    OpcaoProduto.DESC_COMPLETA,
                     OpcaoProduto.DESC_REDUZIDA,
                     OpcaoProduto.DESC_GONDOLA,
                     OpcaoProduto.PESO_BRUTO,
@@ -81,14 +81,16 @@ public class JNPController extends InterfaceController {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.VENDA_PDV,
                     OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.NUTRICIONAL,
                     OpcaoProduto.RECEITA,
+                    OpcaoProduto.RECEITA_BALANCA,
                     OpcaoProduto.FAMILIA
                 }
         ));
     }
-    
+
     @Override
-    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {        
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
                 OpcaoFornecedor.FORCAR_UNIFICACAO,
                 OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS,
@@ -113,10 +115,11 @@ public class JNPController extends InterfaceController {
                 OpcaoFornecedor.CELULAR,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.OUTRAS_RECEITAS,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(

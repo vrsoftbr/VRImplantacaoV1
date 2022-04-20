@@ -22,10 +22,12 @@ import org.openide.util.Exceptions;
 import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -38,9 +40,12 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -112,6 +117,48 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT \n"
+                    + "	p.SUP002,\n"
+                    + "	trib.CODIGO, \n"
+                    + "	CASE \n"
+                    + "	WHEN p.SUP002 = 1\n"
+                    + "	THEN 60\n"
+                    + "	WHEN p.SUP002 = 2\n"
+                    + "	THEN 40\n"
+                    + "	WHEN p.SUP002 = 3\n"
+                    + "	THEN 41\n"
+                    + "	WHEN p.SUP002 != 1 OR p.SUP002 != 2  OR p.SUP002 != 3 \n"
+                    + "	THEN '00'\n"
+                    + "	ELSE p.SITUACAOTRIB \n"
+                    + "	END cst,\n"
+                    + "	tr.percentual AS aliquota,\n"
+                    + "	p.REDUCAO_BASE AS reducao\n"
+                    + "FROM\n"
+                    + "	SUP001 p\n"
+                    + "LEFT JOIN SUP002 tr ON tr.SUP002 = p.SUP002\n"
+                    + "LEFT JOIN SUP098 trib ON trib.SUP098 = p.SUP098"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst") + "-" + rs.getString("aliquota") + "-" + rs.getString("reducao");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /*@Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	SUP002 id,\n"
@@ -130,8 +177,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
-
+    }*/
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -188,8 +234,8 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DATAALTERACAO,\n"
                     + "	p.status,\n"
                     + "	p.OBSERVACAO,\n"
-                    + "	p.CODIGO_CEST AS cest,\n"
-                    + "	ncm.digitos AS NCM,\n"
+                    + "	TRIM(ncm.COD_CEST) AS cest,\n"
+                    + "	TRIM(ncm.digitos) AS NCM,\n"
                     + "	pr.custo AS custocomimposto,\n"
                     + "	pr.custo_medio AS custosemimposto,\n"
                     + "	pr.margemsug AS margem,\n"
@@ -204,9 +250,19 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tp.MULTIPLICADOR AS qtdembalagem,\n"
                     + "	tp2.DESCRICAO AS tipoembalagemcotacao,\n"
                     + "	tp2.MULTIPLICADOR AS qtdembalagemcotacao,\n"
-                    + "	trib.codigo AS cst_icms,\n"
+                    + "	CASE \n"
+                    + "	WHEN p.SUP002 = 1\n"
+                    + "	THEN 60\n"
+                    + "	WHEN p.SUP002 = 2\n"
+                    + "	THEN 40\n"
+                    + "	WHEN p.SUP002 = 3\n"
+                    + "	THEN 41\n"
+                    + "	WHEN p.SUP002 != 1 OR p.SUP002 != 2  OR p.SUP002 != 3 \n"
+                    + "	THEN '00'\n"
+                    + "	ELSE p.SITUACAOTRIB \n"
+                    + "	END cst_icms,\n"
                     + "	tr.percentual AS aliquota_icms,\n"
-                    + "	p.reducao_base AS red_base_icms,\n"
+                    + "	p.REDUCAO_BASE AS red_base_icms,\n"
                     + "	p.reducao_base_st AS red_base_icms_st,\n"
                     + "	cst.cstpis_s AS cstpis,\n"
                     + "	cst.perpisd AS aliquotapis,\n"
@@ -267,10 +323,10 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setNcm(rst.getString("ncm"));
+                    imp.setNcm(rst.getString("NCM"));
                     imp.setCest(rst.getString("cest"));
 
-                    imp.setIcmsDebitoId(rst.getString("idaliquota"));
+                    /*imp.setIcmsDebitoId(rst.getString("idaliquota"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("idaliquota"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("idaliquota"));
                     imp.setIcmsCreditoId(rst.getString("idaliquota"));
@@ -278,7 +334,15 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(rst.getString("idaliquota"));
                     imp.setIdFamiliaProduto(rst.getString("familiaid"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpis"));
-                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));
+                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));*/
+                    String icmsId = rst.getString("cst_icms") + "-" + rst.getString("aliquota_icms") + "-" + rst.getString("red_base_icms");
+
+                    imp.setIcmsConsumidorId(icmsId);
+                    imp.setIcmsDebitoId(icmsId);
+                    imp.setIcmsCreditoId(icmsId);
+                    imp.setIcmsCreditoForaEstadoId(icmsId);
+                    imp.setIcmsDebitoForaEstadoId(icmsId);
+                    imp.setIcmsDebitoForaEstadoNfId(icmsId);
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -342,7 +406,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
-        try (Statement stm = vrimplantacao.classe.ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	distinct\n"
@@ -379,12 +443,48 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	DATA_INICIAL dataInicio,\n"
+                    + "	DATA_FINAL dataFim,\n"
+                    + "	item.PRODUTO idProduto,\n"
+                    + "	PRECO.VENDA precoNormal,\n"
+                    + "	ITEM.PRECO precoOferta\n"
+                    + "FROM\n"
+                    + "	PROG_MIDIA ofer\n"
+                    + "JOIN PROG_MIDIA_EMPRESAS emp ON emp.PROG_MIDIA = ofer.ID\n"
+                    + "JOIN PROG_MIDIA_ITENS item ON ofer.ID = item.PROG_MIDIA\n"
+                    + "JOIN PRODUTOS_PRECOS preco ON item.PRODUTO = preco.PRODUTO\n"
+                    + "WHERE\n"
+                    + "	emp.CONCLUIDO = 'F'\n"
+                    + "     AND emp.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "     AND DATA_FINAL >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "' "
+                    + "	ORDER BY 1,2"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("idProduto"));
+                    imp.setDataInicio(rst.getDate("dataInicio"));
+                    imp.setDataFim(rst.getDate("dataFim"));
+                    imp.setPrecoNormal(rst.getDouble("precoNormal"));
+                    imp.setPrecoOferta(rst.getDouble("precoOferta"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
-        try (Statement stm = vrimplantacao.classe.ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.SUP001 AS id_produtopai,\n"
@@ -587,12 +687,14 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	c.NOME_MAE as mae,\n"
                 + "	c.CONJUJE as conjuge,\n"
                 + "	c.OBSERVACAO,\n"
+                + "	s.LIMITE limite, \n"
                 + "	CASE WHEN ATIVO = 'S' THEN 1\n"
                 + "	ELSE 0 END AS STATUS\n"
                 + "FROM\n"
                 + "	SUP024 C\n"
                 + "JOIN sup118 Mun ON\n"
                 + "	Mun.sup118 = c.sup118\n"
+                + "LEFT JOIN SUP025 s ON C.SUP024 = s.SUP024 \n"
                 + "ORDER BY 1";
 
         if (utilizarSup025) {
@@ -677,6 +779,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setValorLimite(rs.getDouble("limite"));
 
                     if (utilizarSup025) {
                         imp.setCargo(rs.getString("profissao"));
@@ -818,9 +921,8 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cp.DATA_ENTRADA AS dataentrada,\n"
                     + "	cp.DATALANCAMENTO,\n"
                     + "	cp.HORALANCAMENTO,\n"
-                    + "	cp.VALOR as valor,\n"
+                    + "	cp.VALOR - COALESCE(cp.VLRDEDUCOES, 0) as valor,\n"
                     + "	cp.VALOR_PGTO,\n"
-                    + "	cp.VALOR_DESCONTAR,\n"
                     + "	cp.OBSERVACAO as obs,\n"
                     + "	cp.VENCIMENTO as datavencimento\n"
                     + "FROM\n"
@@ -848,6 +950,73 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "WITH fibra AS (SELECT SUP161 id, SUP001 prod, PORCAO fibra FROM SUP161\n"
+                    + "  	WHERE DESCRICAO = 'Fibra Alimentar'), sodio AS (SELECT SUP161 id, SUP001 prod, PORCAO sodio FROM SUP161\n"
+                    + "  	WHERE DESCRICAO = 'Sodio'), saturadas AS (SELECT SUP161 id, SUP001 prod, PORCAO saturadas FROM SUP161\n"
+                    + "  	WHERE DESCRICAO = 'Gorduras Saturadas'), trans AS (SELECT SUP161 id, SUP001 prod, PORCAO trans FROM SUP161\n"
+                    + "  	WHERE DESCRICAO = 'Gorduras Trans')\n"
+                    + "  SELECT DISTINCT \n"
+                    + "  n.SUP001 id,\n"
+                    + "  n.DESCRICAO_ETIQUETA descritivo,\n"
+                    + "  n.ATIVO id_situacaocadastro,\n"
+                    + "  n.VRENERGETICO caloria,\n"
+                    + "  n.CARBOIDRATOS carboidratos,\n"
+                    + "  n.PROTEINAS proteina,\n"
+                    + "  n.LIPIDIOS gorduras,\n"
+                    + "  saturadas.saturadas saturadas,\n"
+                    + "  trans.trans trans,\n"
+                    + "  CAST (n.NUTRI_QTD_CAS AS int) unidade,\n"
+                    + "  CASE \n"
+                    + "  WHEN substring(n.NUTRI_QTD_CAS FROM 3) = 50000\n"
+                    + "  THEN 3\n"
+                    + "  WHEN substring(n.NUTRI_QTD_CAS FROM 3) = 40000\n"
+                    + "  THEN 1\n"
+                    + "  ELSE 0\n"
+                    + "  END id_tipomedidadecimal,\n"
+                    + "  CAST (n.NUTRI_QTD_POR AS int) peso,\n"
+                    + "  fibra.fibra fibra,\n"
+                    + "  sodio.sodio sodio,\n"
+                    + "  COALESCE(trim(n.SUP185), 5) medida\n"
+                    + "from\n"
+                    + "  SUP001 n\n"
+                    + "  JOIN fibra ON n.SUP001 = fibra.prod\n"
+                    + "  JOIN sodio ON n.SUP001 = sodio.prod\n"
+                    + "  JOIN saturadas ON n.SUP001 = saturadas.prod\n"
+                    + "  JOIN trans ON n.SUP001 = trans.prod\n"
+                    + "  WHERE n.NUTRI_QTD_POR IS NOT NULL "
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setGorduraSaturada(rst.getDouble("saturadas"));
+                    imp.setFibra(rst.getDouble("fibra"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao("0." + rst.getString("peso"));
+                    imp.setId_tipomedidadecimal(rst.getInt("id_tipomedidadecimal"));
+                    imp.setIdTipoMedida(rst.getInt("medida") - 1);
+                    imp.setMedidaInteira(rst.getInt("unidade"));
+                    imp.addProduto(rst.getString("id"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -896,6 +1065,42 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "  select distinct\n"
+                    + " s.SUP001 id, \n"
+                    + " d.DESCRICAO descritivo,\n"
+                    + " p.LINHA1 receita,\n"
+                    + " p.LINHA2 receita2,\n"
+                    + " p.LINHA3 receita3,\n"
+                    + " p.LINHA4 receita4,\n"
+                    + " p.LINHA5 receita5,\n"
+                    + " s.SUP001 produto\n"
+                    + "from SUP040 s\n"
+                    + "JOIN SUP042 p ON p.SUP042 = s.SUP042 \n"
+                    + "JOIN SUP001 d ON s.SUP001 = d.SUP001 \n"
+                    + "order by 2"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setReceita(rst.getString("receita") +
+                                rst.getString("receita2") + 
+                                rst.getString("receita3") +
+                                rst.getString("receita4") + 
+                                rst.getString("receita5"));
+                    imp.getProdutos().add(rst.getString("produto"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
