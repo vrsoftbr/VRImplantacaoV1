@@ -73,6 +73,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.EAN_EM_BRANCO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
             OpcaoProduto.PESAVEL,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.DESC_COMPLETA,
@@ -229,6 +230,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "e.descpdv,\n"
                     + "e.unidade as unidadevenda,\n"
                     + "e.embalagem as unidadecompra,\n"
+                    + "e.embalagem as emb_volume,\n"
                     + "e.produtoflv,\n"
                     + "e.setor,\n"
                     + "e.validade,\n"
@@ -274,6 +276,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("cdprod"));
                     imp.setEan(rst.getString("codbarra"));
                     imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
+                    imp.setTipoEmbalagemVolume(rst.getString("emb_volume"));
 
                     if (rst.getInt("setor") > 0) {
                         imp.seteBalanca(true);
