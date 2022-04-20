@@ -80,7 +80,7 @@ public class UnidadeDAO {
                     + "from implantacao2_5.unidade u\n"
                     + "join municipio m on m.id = u.id_municipio\n"
                     + "join estado e on e.id = u.id_estado\n"
-                    + "order by 2"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     UnidadeVO vo = new UnidadeVO();

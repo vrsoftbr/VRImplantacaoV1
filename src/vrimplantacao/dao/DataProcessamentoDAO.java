@@ -5,7 +5,6 @@ import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao2_5.classe.Global;
 
 public class DataProcessamentoDAO {
 
@@ -15,7 +14,7 @@ public class DataProcessamentoDAO {
 
         stm = Conexao.createStatement();
 
-        rst = stm.executeQuery("SELECT data FROM dataprocessamento WHERE id_loja = " + Global.getIdUnidade());
+        rst = stm.executeQuery("SELECT data FROM dataprocessamento WHERE id_loja = 1");
 
         if (!rst.next()) {
             throw new VRException("Data processamento não configurada!");

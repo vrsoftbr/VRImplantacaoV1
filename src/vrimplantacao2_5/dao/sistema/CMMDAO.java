@@ -520,7 +520,7 @@ public class CMMDAO extends InterfaceDAO {
                     "from \n" +
                     "	ContasReceber cr\n" +
                     "where \n" +
-                    "	cr.CodFil = 1"
+                    "	cr.CodFil = 1 and cr.DataRecebimento is null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
