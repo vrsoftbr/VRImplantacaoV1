@@ -443,7 +443,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
@@ -1072,14 +1072,14 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ReceitaBalancaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "  select distinct\n"
+                    " select distinct\n"
                     + " s.SUP001 id, \n"
                     + " d.DESCRICAO descritivo,\n"
-                    + " p.LINHA1 receita,\n"
-                    + " p.LINHA2 receita2,\n"
-                    + " p.LINHA3 receita3,\n"
-                    + " p.LINHA4 receita4,\n"
-                    + " p.LINHA5 receita5,\n"
+                    + " TRIM('       ' FROM p.LINHA1) receita,\n"
+                    + " trim('          ' FROM  p.LINHA2) receita2,\n"
+                    + " trim('   ' FROM p.LINHA3) receita3,\n"
+                    + " COALESCE(trim('    ' FROM p.LINHA4), '') receita4,\n"
+                    + "  COALESCE(trim('    ' FROM p.LINHA5), '') receita5,\n"
                     + " s.SUP001 produto\n"
                     + "from SUP040 s\n"
                     + "JOIN SUP042 p ON p.SUP042 = s.SUP042 \n"
@@ -1090,11 +1090,11 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
                     imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descritivo"));
-                    imp.setReceita(rst.getString("receita") +
-                                rst.getString("receita2") + 
-                                rst.getString("receita3") +
-                                rst.getString("receita4") + 
-                                rst.getString("receita5"));
+                    imp.setReceita(rst.getString("receita") + "\n"
+                            + rst.getString("receita2") + "\n"
+                            + rst.getString("receita3") + "\n"
+                            + rst.getString("receita4") + "\n"
+                            + rst.getString("receita5"));
                     imp.getProdutos().add(rst.getString("produto"));
                     result.add(imp);
                 }
@@ -1120,7 +1120,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         private final String sql;
 
         public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = vrimplantacao.classe.ConexaoFirebird.getConexao().createStatement();
+            this.stm = ConexaoFirebird.getConexao().createStatement();
             this.sql
                     = "SELECT\n"
                     + "	v.SUP184 AS id,\n"
@@ -1215,7 +1215,7 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
         private String sql;
 
         public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
-            this.stm = vrimplantacao.classe.ConexaoFirebird.getConexao().createStatement();
+            this.stm = ConexaoFirebird.getConexao().createStatement();
             this.sql
                     = "SELECT\n"
                     + "	v.SUP155 AS id,\n"
@@ -1227,14 +1227,14 @@ public class JnpDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.DATA,\n"
                     + "	v.SUP001 AS produtoid,\n"
                     + "	p.EAN AS ean,\n"
-                    + "	v.QUANTIDADE AS qtde,\n"
+                    + "	cast(v.QUANTIDADE as numeric (18,3)) AS qtde,\n"
                     + "	CASE\n"
                     + "		WHEN v.CANCELADO = 'N' THEN 0\n"
                     + "		ELSE 1\n"
                     + "	END AS cancelado,\n"
                     + "	v.DESCONTO,\n"
                     + "	v.ACRESCIMO,\n"
-                    + "	v.UNITARIO AS valor,\n"
+                    + "	cast(v.UNITARIO as numeric (18,3)) AS valor,\n"
                     + "	tr.DESCRICAO AS unidade,\n"
                     + "	v.CST_ICMS AS cst,\n"
                     + "	v.VL_ICMS AS aliquota\n"

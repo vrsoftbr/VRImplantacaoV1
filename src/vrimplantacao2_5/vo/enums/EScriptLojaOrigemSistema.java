@@ -133,7 +133,7 @@ public enum EScriptLojaOrigemSistema {
             + "from \n"
             + "	Filiais f"),
     GZPRODADOS(217, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa;"),
-    JNP(219, 5, "SELECT\n"
+    JNP(218, 5, "SELECT\n"
             + "	SUP999 id,\n"
             + "	FANTASIA descricao\n"
             + "FROM\n"
