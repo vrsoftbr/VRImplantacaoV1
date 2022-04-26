@@ -2,7 +2,6 @@ package vrimplantacao2_5.service.selecaoloja;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
@@ -20,6 +19,7 @@ import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
+import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
@@ -45,7 +45,7 @@ public abstract class InternalFrameFactory {
     /**
      * Build da interface GUI do sistema selecionado
      *
-     * @param sistema Sistema informado na conexão
+     * @param sistema informado na conexão
      * @param frame MenuGUI
      * @return VRInternalFrame desejado
      * @throws Exception
@@ -54,6 +54,12 @@ public abstract class InternalFrameFactory {
         VRInternalFrame internalFrame;
 
         switch (sistema) {
+            case CONSINCO:
+                internalFrame = new Consinco2_5GUI(frame);
+                break;
+            case ARIUS:
+                internalFrame = new Arius2_5GUI(frame);
+                break;
             case SYSPDV:
                 internalFrame = new SysPdv2_5GUI(frame);
                 break;
@@ -125,6 +131,7 @@ public abstract class InternalFrameFactory {
                 break;
             case STOCK:
                 internalFrame = new Stock_Postgres2_5GUI(frame);
+                break;
             case CMM:
                 internalFrame = new CMM2_5GUI(frame);
                 break;
@@ -139,6 +146,9 @@ public abstract class InternalFrameFactory {
                 break;
             case TOPSYSTEM:
                 internalFrame = new TopSystem2_5GUI(frame);
+                break;
+            case ETRADE:
+                internalFrame = new ETrade_VRSystem2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

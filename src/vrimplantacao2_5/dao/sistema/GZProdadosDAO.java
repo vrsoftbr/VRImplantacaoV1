@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.dao.sistema;
 
-import com.sun.imageio.plugins.jpeg.JPEG;
 import vrimplantacao2.dao.interfaces.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,9 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vr.core.utils.StringUtils;
-import static vr.core.utils.StringUtils.LOG;
-import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -737,11 +728,11 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private final Statement stm = ConexaoMySQL.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
+        private final Set<String> uk = new HashSet<>();
 
         private void obterNext() {
             try {
@@ -753,7 +744,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                         next = new VendaIMP();
                         String id = rst.getString("idvenda");
                         if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
+                            LOG.log(Level.WARNING, "Venda {0} ja existe na listagem", id);
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
@@ -817,7 +808,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private final Statement stm = ConexaoMySQL.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -838,7 +829,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -862,7 +853,7 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " join produto p on p.idProduto = iv.idProduto \n"
                     + "where \n"
                     + " v.DataMov between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 

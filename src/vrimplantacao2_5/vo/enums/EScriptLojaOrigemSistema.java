@@ -134,11 +134,9 @@ public enum EScriptLojaOrigemSistema {
                 "from \n" +
                 "	Filiais f"),
     GZPRODADOS(217,8,"select IdEmpresa as id, RazaoSocial as descricao from empresa;"),
-    PRISMAFLEX(218, 5, "SELECT EMPCODIGO id, EMPRAZAOS descricao FROM EMPRESAS ORDER BY 1");
-
+    PRISMAFLEX(218, 5, "SELECT EMPCODIGO id, EMPRAZAOS descricao FROM EMPRESAS ORDER BY 1"),
+    ETRADE(219, 13, "SELECT codigo id, Fantasia descricao FROM Filial");
     
-
-
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;
