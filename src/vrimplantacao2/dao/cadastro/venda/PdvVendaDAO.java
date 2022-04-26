@@ -454,7 +454,7 @@ public class PdvVendaDAO {
             "	   select id from pdv.vendaitem where id_venda = v_id into v_iditem;\n" +
             "	   delete from scanntech.vendaitem where id_venda = v_id;\n" +
             "      delete from scanntech.venda where id_venda = v_id;\n" +        
-            "	   delete from balanca.vendaoperadorbalanca where id_vendaitem = v_iditem;\n" +
+            //"	   delete from balanca.vendaoperadorbalanca where id_vendaitem = v_iditem;\n" +
             "	   delete from pdv.perguntanota where id_venda = v_id;\n" +
             "	   delete from crescevendas.vendacrescevendas where id_venda = v_id;\n" +
             "	   delete from crescevendas.vendaitem where id_vendaitem = v_iditem;	\n" +
