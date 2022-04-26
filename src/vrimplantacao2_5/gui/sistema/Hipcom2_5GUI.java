@@ -131,7 +131,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
-                    dao.setVersaoVenda(rdbVendasV1.isSelected() ? 1 : 2);
+//                    dao.setVersaoVenda(rdbVendasV1.isSelected() ? 1 : 2);
                     
                     Importador importador = new Importador(dao);
                     
@@ -252,9 +252,9 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                         }
                         
                         if (chkVendas.isSelected()) {
-                            dao.setVendaDataInicial(txtDtVendaIni.getDate());
-                            dao.setVendaDataFinal(txtDtVendaFim.getDate());
-                            dao.setVendaUtilizaDigito(chkVendaUtilizaDigito.isSelected());
+                            dao.setDataInicioVenda(txtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(txtDtVendaFim.getDate());
+                            //dao.setVendaUtilizaDigito(chkVendaUtilizaDigito.isSelected());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tabOperacoes.getSelectedIndex() == 1) {

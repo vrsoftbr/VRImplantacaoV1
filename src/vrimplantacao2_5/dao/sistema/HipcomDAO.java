@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static vr.core.utils.StringUtils.LOG;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -83,8 +84,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date rotativoDataInicial;
     private Date rotativoDataFinal;
 
-    private Date vendaDataInicial;
-    private Date vendaDataFinal;
+    //private Date vendaDataInicial;
+    //private Date vendaDataFinal;
 
     private Date receberDataInicial;
     private Date receberDataFinal;
@@ -95,9 +96,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean fornecedorCartao = false;
     private boolean inverteAssociado = false;
 
-    private boolean vendaUtilizaDigito = false;
+    //private boolean vendaUtilizaDigito = false;
 
-    private Integer versaoVenda = 2;
+    //private Integer versaoVenda = 2;
 
     private boolean importarIcmsEntradaCad = false;
 
@@ -113,13 +114,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.fornecedorCartao = fornecedorCartao;
     }
 
-    public Integer getVersaoVenda() {
+    /*public Integer getVersaoVenda() {
         return this.versaoVenda;
-    }
+    }*/
 
-    public void setVersaoVenda(Integer versaoVenda) {
+   /* public void setVersaoVenda(Integer versaoVenda) {
         this.versaoVenda = versaoVenda;
-    }
+    }*/
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -129,13 +130,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.rotativoDataFinal = rotativoDataFinal;
     }
 
-    public void setVendaDataInicial(Date vendaDataInicial) {
+    /*public void setVendaDataInicial(Date vendaDataInicial) {
         this.vendaDataInicial = vendaDataInicial;
     }
 
     public void setVendaDataFinal(Date vendaDataFinal) {
         this.vendaDataFinal = vendaDataFinal;
-    }
+    }*/
 
     public void setReceberDataInicial(Date receberDataInicial) {
         this.receberDataInicial = receberDataInicial;
@@ -153,9 +154,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.cpDataFinal = cpDataFinal;
     }
 
-    public void setVendaUtilizaDigito(boolean vendaUtilizaDigito) {
+    /*public void setVendaUtilizaDigito(boolean vendaUtilizaDigito) {
         this.vendaUtilizaDigito = vendaUtilizaDigito;
-    }
+    }*/
 
     public boolean isImportarIcmsEntradaCad() {
         return this.importarIcmsEntradaCad;
@@ -751,7 +752,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	where\n"
                     + "	ctaconta = 1\n"
                     + "	and \n"
-                    + "	ctagrupo in (3,4,5)";
+                    + "	ctagrupo in (3,4,5,9,7)";
         }
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -1535,17 +1536,20 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	concat('card-',e.ctaid) idfornecedor,\n"
                     + "	case when r.ctrgrupo = 3 then 7\n"
                     + "	     when r.ctrgrupo = 4 then 8\n"
+                    + "      when r.ctrgrupo = 5 then 9\n"
+                    + "      when r.ctrgrupo = 9 and r.ctrsubgr = 1 then 4\n"
+                    + "      when r.ctrgrupo = 7 then 10\n"
                     + "	     else 1 end tiporeceita\n"
                     + "from\n"
                     + "	finctr r\n"
                     + "	join fincta e on e.ctagrupo = r.ctrgrupo \n"
                     + "				and e.ctasubgr = r.ctrsubgr \n"
-                    + "				and e.ctaconta = 1 and e.ctagrupo in (3,4,5)\n"
+                    + "				and e.ctaconta = 1 and e.ctagrupo in (3,4,5,9,7)\n"
                     + "where\n"
                     + "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n"
                     + "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n"
                     + "	r.ctrloja = " + getLojaOrigem() + "  and\n"
-                    + "	r.ctrvalor > 0 and\n"
+                    + "	r.ctrvalor > 0 and R.ctrdtbaixa is null and\n"
                     + "	r.ctrtipo in ('F','C')\n"
                     + "union\n"
                     + "select distinct\n"
@@ -1568,12 +1572,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	finctr r\n"
                     + "	join fincta e on e.ctagrupo = r.ctrgrupo \n"
                     + "				and e.ctasubgr = r.ctrsubgr \n"
-                    + "				and e.ctaconta = 1 and e.ctagrupo not in (3,4,5)\n"
+                    + "				and e.ctaconta = 1 and e.ctagrupo not in (3,4,5,9,7)\n"
                     + "where\n"
                     + "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n"
                     + "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n"
                     + "	r.ctrloja = " + getLojaOrigem() + "  and\n"
-                    + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
+                    + "	r.ctrvalor > 0 and r.ctrdtbaixa is null and\n"
                     + "	r.ctrtipo = 'F' and \n"
                     + "	r.ctrcod IN (SELECT forcod FROM hipfor)";
         }
@@ -1645,8 +1649,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrloja = " + getLojaOrigem() + " and\n"
                     + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
                     + "	r.ctrtipo = 'C' and\n"
-                    + "	r.ctrgrupo IN (2, 9) \n"
-                   // + " and  r.ctralinea IN (11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 28, 29, 35, 37, 62, 63)\n"
+                    + "	r.ctrgrupo IN (2) \n"
+                    // + " and  r.ctralinea IN (11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 28, 29, 35, 37, 62, 63)\n"
                     + "order by\n"
                     + "	r.ctrdtemiss")) {
                 while (rs.next()) {
@@ -1675,7 +1679,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal, this.getVersaoVenda());
     }
@@ -1773,7 +1777,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             str.append("union\n");
             str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
 
-            this.sql = str.toString();
+ /* this.sql = str.toString();
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -2020,8 +2024,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    }
-
+    }*/
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
@@ -2063,7 +2066,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("numeroDocumento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataEntrada(rst.getDate("dataentrada"));
-                    
+
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
@@ -2076,50 +2079,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
-    public List<ReceitaIMP> getReceitas() throws Exception {
-        List<ReceitaIMP> result = new ArrayList<>();
-
-        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(
-                    "select distinct\n"
-                    + "	r.grpcodgrp id,\n"
-                    + "    p.prodescr descricao,\n"
-                    + "    r.grpativo ativo,\n"
-                    + "    r.grprendim rendimento,\n"
-                    + "    1 fator,\n"
-                    + "    1000 quantidadereceita,\n"
-                    + "    r.grpqtde * 1000 quantidadeproduto,\n"
-                    + "    r.grpcodplu id_produto\n"
-                    + "from\n"
-                    + "	hipgrp r\n"
-                    + "    join hippro p on r.grpcodgrp = p.procodplu\n"
-                    + "  where grptipo = 'Q'\n"
-                    + "order by\n"
-                    + "	1"
-            )) {
-                while (rs.next()) {
-                    ReceitaIMP imp = new ReceitaIMP();
-
-                    imp.setImportsistema(getSistema());
-                    imp.setImportloja(getLojaOrigem());
-                    imp.setImportid(rs.getString("id"));
-                    imp.setIdproduto(rs.getString("id"));
-                    imp.setDescricao(rs.getString("descricao"));
-                    imp.setId_situacaocadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setRendimento(rs.getDouble("rendimento"));
-                    imp.setQtdembalagemproduto(rs.getInt("quantidadereceita"));
-                    imp.setQtdembalagemreceita(rs.getInt("quantidadeproduto"));
-                    imp.setFator(rs.getDouble("fator"));
-                    imp.getProdutos().add(rs.getString("id_produto"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }*/
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
@@ -2141,7 +2100,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportsistema(getSistema());
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportid(rst.getString("id_produtopai"));
-                    imp.setIdproduto(rst.getString("id_produtofilho"));
+                    imp.setIdproduto(rst.getString("id_produtopai"));
                     imp.setDescricao(rst.getString("descricao"));
                     imp.setRendimento(rst.getDouble("rendimento"));
                     imp.setQtdembalagemreceita(rst.getInt("quantidade"));
@@ -2230,6 +2189,191 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new HipcomDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new HipcomDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "select distinct\n"
+                    + " concat(pdv.movcup,'.',pdv.movdata,'.',ccf.ccfloja) id,\n"
+                    + " ccf.ccfcup numerocupom,\n"
+                    + " ccf.ccfdata data,\n"
+                    + " pdv.movhora hora,\n"
+                    + " ccf.ccfcxa ecf,\n"
+                    + " sum(ccf.ccfvlr) valor \n"
+                    + "from hipccf ccf\n"
+                    + " join pdvmov pdv on ccf.ccfcup = pdv.movcup and ccf.ccfdata = pdv.movdata and pdv.movtipo = 'F'\n"
+                    + "where \n"
+                    + " ccf.ccfdata between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + " and ccf.ccfloja = " + idLojaCliente + "\n"
+                    + " group by 1,2,3,4,5";
+
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id"));
+                        next.setSequencia(rst.getInt("seq"));
+                        next.setProduto(rst.getString("produtoid"));
+                        //next.setProduto(rst.getString("ean"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("qtde"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
+
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select distinct\n"
+                    + " vi.movid id,\n"
+                    + " vi.movcup numerocupom,\n"
+                    + " vi.movdescr descricao,\n"
+                    + " vi.movcodint produtoid,\n"
+                    + " trim(vi.movplu) ean,\n"
+                    + " vi.movqtd qtde,\n"
+                    + " vi.movvlr valorunitario,\n"
+                    + " cast((vi.movqtd * vi.movvlr) as decimal(10,2)) valor,\n"
+                    + " vi.movdata data,\n"
+                    + " vi.movhora hora,\n"
+                    + " vi.movcxa ecf,\n"
+                    + " (vi.movseq-1) seq,\n"
+                    + " upper(vi.movemb) unidade,\n"
+                    + " concat(vi.movcup,'.',vi.movdata,'.',ccf.ccfloja) id_venda\n"
+                    + "from pdvmov vi\n"
+                    + "join hipccf ccf on ccf.ccfcup = vi.movcup and ccf.ccfdata = vi.movdata\n"
+                    + "join hippro p on p.procodplu  = vi.movcodint \n"
+                    + "where \n"
+                    + "vi.movdata between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "and vi.movtipo = 'C'\n"
+                    + "and ccf.ccfloja = " + idLojaCliente + " ;";
+
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 
 }
