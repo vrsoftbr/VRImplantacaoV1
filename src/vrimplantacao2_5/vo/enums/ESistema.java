@@ -439,7 +439,7 @@ public enum ESistema {
     CMM(216, "CMM", new CMMDAO()),
     GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
     PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()),
-    ETRADE(219,"E-TRADE", new ETradeDAO());
+    ETRADE(219,"ETRADE", new ETradeDAO());
     
     private int id;
     private String nome;

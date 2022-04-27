@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -35,7 +34,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "E-TRADE";
+        return "ETRADE";
     }
 
     @Override

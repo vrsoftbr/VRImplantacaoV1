@@ -4,7 +4,7 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 
@@ -215,10 +215,6 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel implements Configu
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
         try {
-            if (conexao != null) {
-                conexao.close();
-            }
-
             validarDadosAcessoSqlServer();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
