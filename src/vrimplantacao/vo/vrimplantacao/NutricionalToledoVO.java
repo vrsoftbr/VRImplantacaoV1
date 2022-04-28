@@ -42,7 +42,7 @@ public class NutricionalToledoVO {
     private int id_tipounidadeporcao = 0;
     private int medidainteira = 0;
     private int id_tipomedidadecimal = 0;
-    private int id_tipomedida = 0;
+    private int id_tipomedida = 5;
     private List<String> mensagemAlergico = new ArrayList<>(15);
     private Set<String> idProdutos = new HashSet<>();
     public List<NutricionalToledoItemVO> vNutricionalToledoItem = new ArrayList<>();

@@ -208,6 +208,7 @@ import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
@@ -437,7 +438,8 @@ public enum ESistema {
     STOCK(215, "STOCK", new Stock_PostgresDAO()),
     CMM(216, "CMM", new CMMDAO()),
     GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
-    PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO());
+    PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()),
+    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
 
     

@@ -134,7 +134,14 @@ public enum EScriptLojaOrigemSistema {
                 "from \n" +
                 "	Filiais f"),
     GZPRODADOS(217,8,"select IdEmpresa as id, RazaoSocial as descricao from empresa;"),
-    PRISMAFLEX(218, 5, "SELECT EMPCODIGO id, EMPRAZAOS descricao FROM EMPRESAS ORDER BY 1");
+    PRISMAFLEX(218, 5, "SELECT EMPCODIGO id, EMPRAZAOS descricao FROM EMPRESAS ORDER BY 1"),
+    JNP_MSUPER(219, 5, "SELECT\n"
+                    + "	SUP999 id,\n"
+                    + "	FANTASIA descricao,\n"
+                    + "	CNPJ cpfcnpj\n"
+                    + "FROM\n"
+                    + "	SUP999\n"
+                    + "ORDER BY 1");
 
     
 
