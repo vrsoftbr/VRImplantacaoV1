@@ -196,6 +196,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.familia,\n" +
                     "	p.ncm,\n" +
                     "	ce.Codigo cest,\n" +
+                    "   ce.Nome nomecest,\n" +        
                     "	p.fracionado,\n" +
                     "	p.inativo,\n" +
                     "	p.Bloqueado,\n" +
@@ -267,10 +268,6 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setSituacaoCadastro(rst.getInt("inativo") == 0 ? 1 : 0);
 
-                    /*imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));*/
-
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
 
@@ -284,6 +281,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setDescricaoCest(rst.getString("nomecest"));
                     imp.setPiscofinsCstDebito(rst.getString("pisdebito"));
                     
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));

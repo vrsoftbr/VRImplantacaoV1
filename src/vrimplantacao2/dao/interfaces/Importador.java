@@ -946,6 +946,20 @@ public class Importador {
         );
         rep.getCreditoRotativo().salvarPagamentosAgrupados(pags, opcoes);
     }
+    
+    public void importarCestInvalido() throws Exception {
+        ProgressBar.setStatus("Carregando cests...");
+        List<ProdutoIMP> cests = getInterfaceDAO().getProdutos();
+        
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setSistema(getSistema());
+        provider.setLoja(getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        
+        rep.converterCest(cests);
+    }
 
     /**
      * Importa ofertas de acordo com a data de termino.
@@ -955,11 +969,13 @@ public class Importador {
      */
     public void importarOfertas(Date dataTermino) throws Exception {
         ProgressBar.setStatus("Ofertas...Gerando listagem...");
+        
         List<OfertaIMP> ofertas = getInterfaceDAO().getOfertas(dataTermino);
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLoja(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        
         ProdutoRepository rep = new ProdutoRepository(provider);
         rep.salvarOfertas(ofertas);
     }
