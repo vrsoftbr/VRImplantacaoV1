@@ -106,7 +106,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "	codigo,\n"
+                    + "	ide,\n"
                     + "	nome \n"
                     + "from \n"
                     + "	ClasseImposto \n"
@@ -115,7 +115,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by \n"
                     + "	nome")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codigo"), rs.getString("nome")));
+                    result.add(new MapaTributoIMP(rs.getString("ide"), rs.getString("nome")));
                 }
             }
         }
@@ -213,16 +213,19 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.margem margem_pro,\n" +
                     "	p.Peso_Liquido,\n" +
                     "	p.Peso_Bruto,\n" +
-                    "	p.ClasseImposto__Ide id_icms\n" +
+                    "	p.ClasseImposto__Ide id_icms,\n" +
+                    "	ci.PisCofinsTipo pisdebito\n" +
                     "FROM \n" +
                     "	produto p\n" +
                     "left join cest ce on p.cest = ce.ide\n" +
                     "left join ProdutoPreco pp on p.codigo = pp.Produto__Codigo\n" +
                     "left join unidades un on p.Unidade_Venda__Ide = un.Ide\n" +
                     "left join Estoque_Atual ea on p.codigo = ea.Produto\n" +
+                    "left join ClasseImpostoOperacao ci on p.ClasseImposto__Ide = ci.ClasseImposto__Ide\n" +
                     "where \n" +
                     "	pp.id = (select max(id) from produtopreco where p.codigo = Produto__Codigo) and \n" +
-                    "	coalesce(ea.filial, 1) = " + getLojaOrigem()
+                    "	coalesce(ea.filial, 1) = " + getLojaOrigem() + " and \n" +
+                    "	ci.Operacao__Codigo = 500"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -281,8 +284,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    
-                    //imp.setPiscofinsCstDebito(rst.getString("pisdebito"));
+                    imp.setPiscofinsCstDebito(rst.getString("pisdebito"));
                     
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
@@ -490,7 +492,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.Sexo\n" +
                     "from \n" +
                     "	Cli_For c\n" +
-                    "where	\n" +
+                    "where\n" +
                     "	c.tipo = 'C'"
             )) {
                 while (rst.next()) {
@@ -547,7 +549,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	Valor_Final,\n" +
                     "	Parcela_Numero parcela\n" +
                     "from \n" +
-                    "	Financeiro_Conta	\n" +
+                    "	Financeiro_Conta\n" +
                     "where \n" +
                     "	Situacao = 'A' and \n" +
                     "	Pagar_Receber = 'R' and \n" +
@@ -562,7 +564,7 @@ public class ETradeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor_final"));
                     imp.setIdCliente(rst.getString("idcliente"));
-                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setParcela(rst.getInt("parcela"));
 
                     result.add(imp);

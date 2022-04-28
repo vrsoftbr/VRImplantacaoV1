@@ -9,7 +9,7 @@ import vrimplantacao.classe.ConexaoInformix;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.classe.ConexaoPostgres;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 
 /**

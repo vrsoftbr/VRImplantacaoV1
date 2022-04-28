@@ -186,7 +186,7 @@ public class ConexaoSqlServer implements DriverConexao {
             return connectionString
                     .replace("{host}", host)
                     .replace("{port}", String.valueOf(port))
-                    .replace("{database}", database) + ";encrypt=false;trustServerCertificate=false";
+                    .replace("{database}", database) + ";encrypt=true;trustServerCertificate=true";
         }
         
     }
