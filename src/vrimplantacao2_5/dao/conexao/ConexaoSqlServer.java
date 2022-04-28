@@ -19,7 +19,7 @@ public class ConexaoSqlServer implements DriverConexao {
     private String dataBase = "";
     private String usuario = "";
     private String senha = "";
-    public String instance = "SQL2014";
+    public String instance = "";
 
     public static Connection getNewConnection(String host, int port, String database, String user, String pass, String encoding) throws Exception {
         Class.forName(Driver.get().getDriver());
@@ -182,11 +182,12 @@ public class ConexaoSqlServer implements DriverConexao {
             return driver;
         }
 
+        //";encrypt=true;trustServerCertificate=true"
         public String getConnectionString(String host, int port, String database) {
             return connectionString
                     .replace("{host}", host)
                     .replace("{port}", String.valueOf(port))
-                    .replace("{database}", database) + ";encrypt=true;trustServerCertificate=true";
+                    .replace("{database}", database);
         }
         
     }
