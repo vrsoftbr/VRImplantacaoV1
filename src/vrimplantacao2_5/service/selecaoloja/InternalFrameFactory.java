@@ -26,6 +26,7 @@ import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
+import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
@@ -78,6 +79,9 @@ public abstract class InternalFrameFactory {
                 break;
             case AVISTARE:
                 internalFrame = new Avistare2_5GUI(frame);
+                break;
+            case MOBILITY:
+                internalFrame = new Mobility2_5GUI(frame);
                 break;
             case BOMSOFT:
                 internalFrame = new BomSoft2_5GUI(frame);
