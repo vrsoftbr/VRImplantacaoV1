@@ -215,6 +215,7 @@ public class NutricionalRepository {
         nut.setPercentualferro(imp.getPercentualFerro());
         nut.setPercentualsodio(imp.getPercentualSodio());
         nut.setQuantidade(Utils.stringToInt(imp.getPorcao()));
+        nut.setId_tipomedidadecimal(imp.getId_tipomedidadecimal());
         if (imp.getIdTipoMedida() > 0) {
             nut.setId_tipomedida(imp.getIdTipoMedida());
         }

@@ -47,9 +47,9 @@ public class ToledoDAO {
             sql.put("percentualsodio", vo.getPercentualsodio());
             sql.put("quantidade", vo.getQuantidade());
             sql.put("id_tipounidadeporcao", 0);
-            sql.put("medidainteira", 1);
-            sql.put("id_tipomedidadecimal", 0);
-            sql.put("id_tipomedida", 5);
+            sql.put("medidainteira", vo.getMedidainteira());
+            sql.put("id_tipomedidadecimal", vo.getId_tipomedidadecimal());
+            sql.put("id_tipomedida", vo.getId_tipomedida());
             
             for (int i = 0; i < vo.getMensagemAlergico().size(); i++) {
                 sql.put("mensagemalergico" + (i + 1), vo.getMensagemAlergico().get(i));
