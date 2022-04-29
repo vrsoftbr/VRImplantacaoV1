@@ -86,7 +86,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     //private Date vendaDataInicial;
     //private Date vendaDataFinal;
-
     private Date receberDataInicial;
     private Date receberDataFinal;
 
@@ -95,11 +94,11 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private boolean fornecedorCartao = false;
     private boolean inverteAssociado = false;
+    private boolean rotativoBaixado = false;
+    private boolean pagarFornecedorBaixado = false;
 
     //private boolean vendaUtilizaDigito = false;
-
     //private Integer versaoVenda = 2;
-
     private boolean importarIcmsEntradaCad = false;
 
     public void setInverteAssociado(boolean inverteAssociado) {
@@ -114,14 +113,21 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.fornecedorCartao = fornecedorCartao;
     }
 
+    public void setRotativoBaixado(boolean rotativoBaixado) {
+        this.rotativoBaixado = rotativoBaixado;
+    }
+
+    public void setPagarFornecedorBaixado(boolean pagarFornecedorBaixado) {
+        this.pagarFornecedorBaixado = pagarFornecedorBaixado;
+    }
+
     /*public Integer getVersaoVenda() {
         return this.versaoVenda;
     }*/
 
-   /* public void setVersaoVenda(Integer versaoVenda) {
+ /* public void setVersaoVenda(Integer versaoVenda) {
         this.versaoVenda = versaoVenda;
     }*/
-
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
     }
@@ -137,7 +143,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataFinal(Date vendaDataFinal) {
         this.vendaDataFinal = vendaDataFinal;
     }*/
-
     public void setReceberDataInicial(Date receberDataInicial) {
         this.receberDataInicial = receberDataInicial;
     }
@@ -157,7 +162,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     /*public void setVendaUtilizaDigito(boolean vendaUtilizaDigito) {
         this.vendaUtilizaDigito = vendaUtilizaDigito;
     }*/
-
     public boolean isImportarIcmsEntradaCad() {
         return this.importarIcmsEntradaCad;
     }
@@ -1074,7 +1078,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from clicnv cv\n"
                     + "left join clicid ci on ci.cidcod = cv.cnvcodcida\n"
                     + "where\n"
-                    + " cnvcod <> 15"
+                    + " cnvcod not in (15,17)"
             )) {
                 while (rs.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
@@ -1126,7 +1130,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	clicli c\n"
                     + "	left join clisit sit on	c.clicodsitu = sit.sitcod\n"
                     + "where cliloja = " + getLojaOrigem() + "\n"
-                    + " and clicodconv not in (0,15)\n"
+                    + " and clicodconv not in (0,15,17)\n"
                     + "order by 1"
             )) {
                 while (rs.next()) {
@@ -1170,7 +1174,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctrparc parcela\n"
                     + "from\n"
                     + "	finctr r\n"
-                    + "	join clicli c on c.clicod = r.ctrcod and c.clicodconv <> 15\n"
+                    + "	join clicli c on c.clicod = r.ctrcod and c.clicodconv not in (15,17)\n"
                     + "where\n"
                     + "	r.ctrloja = " + getLojaOrigem() + " and\n"
                     + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
@@ -1253,7 +1257,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join clisit sit on\n"
                     + "		c.clicodsitu = sit.sitcod\n"
                     + "where cliloja = " + getLojaOrigem() + "\n"
-                    + " and clicodconv = 15 "
+                    + " and clicodconv in (15,17) "
                     + "order by\n"
                     + "	1"
             )) {
@@ -1326,11 +1330,38 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         //Tabela de plano de contas: "fincta"
         List<CreditoRotativoIMP> result = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        String sqlCreditoRotativo
+                = "select\n"
+                + "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n"
+                + "	r.ctrdtemiss dataemissao,\n"
+                + "	r.ctrdoc numerocupom,\n"
+                + "	r.ctrcaixa ecf,\n"
+                + "	r.ctrvalor valor,\n"
+                + "	r.ctrjuros juros,\n"
+                + "	r.ctrdesc desconto,\n"
+                + "	r.ctrvalabt abatimento,\n"
+                + "	r.ctrsaldo valorfinal,\n"
+                + "	r.ctrobs observacao,\n"
+                + // "	concat(r.ctrclilj,'-',r.ctrcod) idcliente,\n" +
+                "	r.ctrcod idcliente,\n"
+                + "	r.ctrdtvenc vencimento,\n"
+                + "	r.ctrparc parcela\n"
+                + "from\n"
+                + "	finctr r\n"
+                + "where\n"
+                + "	r.ctrdtemiss >= '" + dateFormat.format(rotativoDataInicial) + "' and\n"
+                + "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n"
+                + "	r.ctrloja = " + getLojaOrigem() + " and\n"
+                + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
+                + "	r.ctrtipo = 'C' and\n"
+                + "   r.ctrgrupo in (0, 1, 3, 4, 5, 6, 7, 8, 10) \n"
+                + "order by\n"
+                + "	r.ctrdtemiss";
+        if (rotativoBaixado) {
+            sqlCreditoRotativo
+                    = "select\n"
                     + "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n"
                     + "	r.ctrdtemiss dataemissao,\n"
                     + "	r.ctrdoc numerocupom,\n"
@@ -1344,19 +1375,23 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + // "	concat(r.ctrclilj,'-',r.ctrcod) idcliente,\n" +
                     "	r.ctrcod idcliente,\n"
                     + "	r.ctrdtvenc vencimento,\n"
-                    + "	r.ctrparc parcela\n"
+                    + "	r.ctrparc parcela,\n"
+                    + " r.ctrdtbaixa databaixa\n"
                     + "from\n"
                     + "	finctr r\n"
                     + "where\n"
                     + "	r.ctrdtemiss >= '" + dateFormat.format(rotativoDataInicial) + "' and\n"
                     + "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n"
                     + "	r.ctrloja = " + getLojaOrigem() + " and\n"
-                    + "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n"
+                    + "	r.ctrvalor > 0 and r.ctrdtbaixa is not null and\n"
                     + "	r.ctrtipo = 'C' and\n"
                     + "   r.ctrgrupo in (0, 1, 3, 4, 5, 6, 7, 8, 10) \n"
                     + "order by\n"
-                    + "	r.ctrdtemiss"
-            )) {
+                    + "	r.ctrdtemiss";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sqlCreditoRotativo)) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1369,6 +1404,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setParcela(rst.getInt("parcela"));
+
+                    if (rotativoBaixado) {
+                        imp.addPagamento(imp.getId(), imp.getValor(), 0, 0, rst.getDate("databaixa"), imp.getObservacao() + " - PAGO");
+                    }
 
                     result.add(imp);
                 }
@@ -2028,11 +2067,38 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        String sqlContaPagar
+                = "select\n"
+                + "	concat(r.ctptipo,'-',r.ctpforn,'-',r.ctpclilj,'-',r.ctpnf,'-',r.ctpserie,'-',r.ctpparc,'-',r.ctploja) id,\n"
+                + "	r.ctpforn idfornecedor,\n"
+                + "	r.ctpnf numeroDocumento,\n"
+                + "	r.ctpdtemiss dataemissao,\n"
+                + " r.ctpdtentr dataentrada,\n"
+                + "	r.ctpvalor + coalesce(r.ctpjuros, 0) - coalesce(r.ctpdesc, 0) valor,\n"
+                + "	r.ctpjuros juros,\n"
+                + "	r.ctpdesc desconto,\n"
+                + "	r.ctpvalabt abatimento,\n"
+                + "	r.ctpobs observacao,\n"
+                + "	r.ctpdtvenc vencimento,\n"
+                + "	r.ctpparc parcela,\n"
+                + "	case when r.ctpdtpagto is null then 0 else 1 end pago\n"
+                + "from\n"
+                + "	finctp r\n"
+                + "where\n"
+                + "	r.ctpdtentr >= '" + dateFormat.format(cpDataInicial) + "' and\n"
+                + "	r.ctpdtentr <= '" + dateFormat.format(cpDataFinal) + "' and\n"
+                + "	r.ctploja = " + getLojaOrigem() + " and\n"
+                + "	r.ctpvalor > 0 and\n"
+                + "	r.ctpdtpagto is null and\n"
+                + "	r.ctptipo = 'F'\n"
+                + "order by\n"
+                + "	r.ctpdtemiss";
+
+        if (pagarFornecedorBaixado) {
+            sqlContaPagar
+                    = "select\n"
                     + "	concat(r.ctptipo,'-',r.ctpforn,'-',r.ctpclilj,'-',r.ctpnf,'-',r.ctpserie,'-',r.ctpparc,'-',r.ctploja) id,\n"
                     + "	r.ctpforn idfornecedor,\n"
                     + "	r.ctpnf numeroDocumento,\n"
@@ -2045,7 +2111,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctpobs observacao,\n"
                     + "	r.ctpdtvenc vencimento,\n"
                     + "	r.ctpparc parcela,\n"
-                    + "	case when r.ctpdtpagto is null then 0 else 1 end pago\n"
+                    + "	case when r.ctpdtpagto is null then 0 else 1 end pago,\n"
+                    + " r.ctpdtpagto databaixa,\n"
+                    + "	r.ctpvalorpg valorpago\n"
                     + "from\n"
                     + "	finctp r\n"
                     + "where\n"
@@ -2053,11 +2121,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.ctpdtentr <= '" + dateFormat.format(cpDataFinal) + "' and\n"
                     + "	r.ctploja = " + getLojaOrigem() + " and\n"
                     + "	r.ctpvalor > 0 and\n"
-                    + "	r.ctpdtpagto is null and\n"
+                    + "	r.ctpdtpagto is not null and\n"
                     + "	r.ctptipo = 'F'\n"
                     + "order by\n"
-                    + "	r.ctpdtemiss"
-            )) {
+                    + "	r.ctpdtemiss";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sqlContaPagar)) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
@@ -2069,7 +2140,20 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    //imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+
+                    if (pagarFornecedorBaixado) {
+                        imp.addVencimento(
+                                rst.getDate("vencimento"),
+                                rst.getDouble("valorpago"),
+                                rst.getDate("databaixa")).
+                                setObservacao(rst.getString("observacao") + " - PAGO");
+                    } else {
+                        imp.addVencimento(
+                                rst.getDate("vencimento"),
+                                imp.getValor()).
+                                setObservacao(rst.getString("observacao"));
+                    }
 
                     result.add(imp);
                 }
@@ -2259,14 +2343,15 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select distinct\n"
-                    + " concat(pdv.movcup,'.',pdv.movdata,'.',ccf.ccfloja) id,\n"
+                    + " concat(pdv.movcup,'.',pdv.movdata,'.',ccf.ccfloja,'.',ccf.ccfcxa) id,\n"
                     + " ccf.ccfcup numerocupom,\n"
                     + " ccf.ccfdata data,\n"
                     + " pdv.movhora hora,\n"
                     + " ccf.ccfcxa ecf,\n"
                     + " sum(ccf.ccfvlr) valor \n"
                     + "from hipccf ccf\n"
-                    + " join pdvmov pdv on ccf.ccfcup = pdv.movcup and ccf.ccfdata = pdv.movdata and pdv.movtipo = 'F'\n"
+                    + " join pdvmov pdv on ccf.ccfcup = pdv.movcup \n"
+                    + " and ccf.ccfdata = pdv.movdata and pdv.movcxa = ccf.ccfcxa and pdv.movtipo = 'F'\n"
                     + "where \n"
                     + " ccf.ccfdata between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + " and ccf.ccfloja = " + idLojaCliente + "\n"
@@ -2317,7 +2402,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("qtde"));
-                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setPrecoVenda(rst.getDouble("valorunitario"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
                 }
@@ -2343,9 +2429,11 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " vi.movcxa ecf,\n"
                     + " (vi.movseq-1) seq,\n"
                     + " upper(vi.movemb) unidade,\n"
-                    + " concat(vi.movcup,'.',vi.movdata,'.',ccf.ccfloja) id_venda\n"
+                    + " concat(vi.movcup,'.',vi.movdata,'.',ccf.ccfloja,'.',ccf.ccfcxa) id_venda,\n"
+                    + "case when vi.movcanc = 'S' then 2\n"
+                    + "      else 0 end cancelado\n"
                     + "from pdvmov vi\n"
-                    + "join hipccf ccf on ccf.ccfcup = vi.movcup and ccf.ccfdata = vi.movdata\n"
+                    + "join hipccf ccf on ccf.ccfcup = vi.movcup and ccf.ccfdata = vi.movdata and vi.movcxa = ccf.ccfcxa\n"
                     + "join hippro p on p.procodplu  = vi.movcodint \n"
                     + "where \n"
                     + "vi.movdata between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
