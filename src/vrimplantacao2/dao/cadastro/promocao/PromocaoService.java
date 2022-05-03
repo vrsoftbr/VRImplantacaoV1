@@ -40,5 +40,4 @@ public class PromocaoService {
     public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
         return this.promocaoAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
     }
-
 }
