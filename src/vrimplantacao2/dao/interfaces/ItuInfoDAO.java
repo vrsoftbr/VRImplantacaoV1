@@ -43,7 +43,7 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "ItuInfo";
+        return "ItuInfo" + (!complemento.equals("") ? " - " + complemento : "");
     }
 
     @Override
