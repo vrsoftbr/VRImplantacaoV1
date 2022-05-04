@@ -30,6 +30,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
@@ -270,6 +271,46 @@ public class TslDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<PromocaoIMP> getPromocoes() throws Exception {
+        List<PromocaoIMP> Result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	p.SEQPROMO01 id_promocao,\n"
+                    + "	p.DESCPROMO descricao,\n"
+                    + "	p.dtinipromo inicio,\n"
+                    + "	p.dtfimpromo termino,\n"
+                    + "	t.CODBAR ean,\n"
+                    + "	t.SEQ003 id_produto,\n"
+                    + "	pr.DESCPRO descricaocompleta,\n"
+                    + "	p.LEVAQTD quantidade,\n"
+                    + "	p.VALORFIXO paga\n"
+                    + "from\n"
+                    + "	tspromo01 p\n"
+                    + "join tspromo02 t on t.SEQPROMO01 = p.SEQPROMO01 \n"
+                    + "join tslc003 pr on pr.CODIGO = t.SEQ003 "
+            )) {
+                while (rs.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+
+                    imp.setId_promocao(rs.getString("id_promocao"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setDataInicio(rs.getDate("inicio"));
+                    imp.setDataTermino(rs.getDate("termino"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setId_produto(rs.getString("id_produto"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setQuantidade(rs.getDouble("quantidade"));
+                    imp.setPaga(rs.getDouble("paga"));
+
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
     }
 
     @Override

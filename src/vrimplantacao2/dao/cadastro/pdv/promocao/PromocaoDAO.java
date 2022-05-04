@@ -28,8 +28,8 @@ public class PromocaoDAO {
             )) {
                 while (rst.next()) {
                     PromocaoVO vo = new PromocaoVO();
-                    vo.setId(rst.getInt("id"));
-                    result.put(vo, vo.getId());
+                    vo.setId((rst.getString("id")));
+                    result.put(vo, Integer.parseInt(vo.getId()));
                 }
             }
         }

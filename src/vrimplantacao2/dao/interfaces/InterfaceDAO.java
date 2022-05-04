@@ -50,6 +50,7 @@ import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
@@ -545,6 +546,16 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */
     public List<DivisaoIMP> getDivisoes() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    
+    /**
+     * Retorna uma lista com as promoções para importar.
+     * @return Lista com as promoções a serem importadas.
+     * @throws Exception 
+     */
+    public List<PromocaoIMP> getPromocoes() throws Exception {
         return new ArrayList<>();
     }
     
