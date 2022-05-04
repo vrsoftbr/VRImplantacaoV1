@@ -59,11 +59,11 @@ public class PromocaoRepository {
             try {
                 provider.setStatus("Eliminando cadastros de promoções anteriores.");
                 limparPromocao(provider.getLojaOrigem(), provider.getSistema(), provider.getIdConexao());
-                List<PromocaoIMP> filtrados = provider.getFinalizadora();
+                List<PromocaoIMP> filtrarFinalizadoresCabecalhoPromocao = provider.getFinalizadora();
                 anteriores = provider.getAnteriores();
                 provider.setStatus("Gravando tipos de pagamentos por promoção");
-                provider.setMaximo(filtrados.size());
-                for (PromocaoIMP imp : filtrados) {
+                provider.setMaximo(filtrarFinalizadoresCabecalhoPromocao.size());
+                for (PromocaoIMP imp : filtrarFinalizadoresCabecalhoPromocao) {
                     PromocaoAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),

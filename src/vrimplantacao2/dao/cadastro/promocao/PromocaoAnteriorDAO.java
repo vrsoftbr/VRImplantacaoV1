@@ -172,7 +172,7 @@ public class PromocaoAnteriorDAO {
         return lojaJaMigrada;
     }
 
-    MultiMap<String, PromocaoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
+    MultiMap<String, PromocaoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) throws Exception {
         MultiMap<String, PromocaoAnteriorVO> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -195,7 +195,8 @@ public class PromocaoAnteriorDAO {
                     + "join implantacao.codant_produto p on p.impid = ant.id_produto "
                     + "where\n"
                     + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
-                    + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + "\n"
+                    + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
+                    + " ant.id_conexao = " + conexao + "\n"
                     + "order by\n"
                     + "	ant.sistema,\n"
                     + "	ant.loja,"

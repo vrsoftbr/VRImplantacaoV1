@@ -74,7 +74,7 @@ public class PromocaoRepositoryProvider {
     }
 
     public MultiMap<String, PromocaoAnteriorVO> getAnteriores() throws Exception {
-        return promocaoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
+        return promocaoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem(), getIdConexao());
     }
 
     public int getIdConexao() {
