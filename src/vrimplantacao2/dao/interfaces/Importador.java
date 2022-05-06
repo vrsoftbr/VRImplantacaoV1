@@ -118,6 +118,10 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
+
 public class Importador {
 
     private static final Logger LOG = Logger.getLogger(Importador.class.getName());
@@ -1209,5 +1213,23 @@ public class Importador {
         );
         DivisaoRepository repository = new DivisaoRepository(provider);
         repository.importar(divisoes);
+    }
+
+    /**
+     * Importa as promoções.
+     *
+     * @throws Exception
+     */
+    public void importarPromocao() throws Exception {
+        ProgressBar.setStatus("Carregando Promoções...");
+        List<PromocaoIMP> listaPromocoesVemDoDAO = getInterfaceDAO().getPromocoes();
+        PromocaoRepositoryProvider provider = new PromocaoRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR(),
+                getIdConexao()
+        );
+        PromocaoRepository rep = new PromocaoRepository(provider);
+        rep.salvar(listaPromocoesVemDoDAO);
     }
 }

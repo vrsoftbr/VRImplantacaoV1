@@ -204,7 +204,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
-                    imp.setId(rst.getInt("id"));
+                    imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataTermino(rst.getDate("datatermino"));

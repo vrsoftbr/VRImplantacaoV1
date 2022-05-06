@@ -908,6 +908,8 @@
                                   <Component id="chkEstoqueTroca" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkSituacaoCadastro" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPromocao" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkDescontinuado" min="-2" max="-2" attributes="0"/>
@@ -963,6 +965,7 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkSituacaoCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkEstoqueTroca" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPromocao" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
@@ -1116,6 +1119,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoProduto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPromocao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Promo&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>
