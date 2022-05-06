@@ -79,8 +79,10 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.EAN_EM_BRANCO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
             OpcaoProduto.PESAVEL,
             OpcaoProduto.VALIDADE,
+            OpcaoProduto.VOLUME_QTD,
             OpcaoProduto.DESC_COMPLETA,
             OpcaoProduto.DESC_GONDOLA,
             OpcaoProduto.ATIVO,
@@ -247,6 +249,8 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.pesovariavel,\n"
                     + " p.UnidSaida embalagem,\n"
                     + " p.EmbSaida qtde,\n"
+                    + " p.fator volume,\n"
+                    + " p.UNFATOR embvolume,\n"
                     + " pr.VENDA1 precovenda,\n"
                     + " pr.CUSTO precocusto,\n"
                     + " pr.CUSTO_MEDIO precocustomedio,\n"
@@ -308,8 +312,10 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(rst.getBoolean("pesovariavel"));
                         imp.setTipoEmbalagem(rst.getString("embalagem"));
+                        imp.setTipoEmbalagemVolume(rst.getString("embvolume"));
                         imp.setValidade(rst.getInt("validade"));
                         imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        imp.setVolume(rst.getDouble("volume"));
                     }
 
                     imp.setValidade(rst.getInt("validade"));
@@ -317,6 +323,8 @@ public class GZProdadosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setVolume(rst.getDouble("volume"));
+                    imp.setTipoEmbalagemVolume(rst.getString("embvolume"));
 
                     imp.setCodMercadologico1(rst.getString("mercid1"));
                     imp.setCodMercadologico2(rst.getString("mercid2"));

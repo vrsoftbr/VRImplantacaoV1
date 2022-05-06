@@ -77,7 +77,10 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PRECO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.VALIDADE,
-                OpcaoProduto.VENDA_PDV
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
         ));
     }
 
@@ -174,9 +177,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca
-                = new ProdutoBalancaDAO().getProdutosBalanca();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -204,6 +205,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "	emp_id = " + getLojaOrigem() + "\n"
                     + "order by 1")) {
+                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -219,7 +221,8 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
 
-                    imp.setTipoEmbalagem(rs.getString("tipo_emb"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("tipo_emb"));
+                    imp.setTipoEmbalagemVolume(rs.getString("tipo_emb"));
                     imp.setCustoComImposto(rs.getDouble("custo"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setMargem(rs.getDouble("margem"));
@@ -250,6 +253,7 @@ public class DSICDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setValidade(Utils.stringToInt(rs.getString("validade")));
                         imp.seteBalanca(rs.getString("e_balanca").trim().equals("S"));
+                        imp.setTipoEmbalagem(rs.getString("tipo_emb"));
                     }
 
                     result.add(imp);
