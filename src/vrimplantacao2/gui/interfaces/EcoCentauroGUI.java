@@ -87,6 +87,7 @@ public class EcoCentauroGUI extends VRInternalFrame {
 
             @Override
             public MapaTributoProvider getProvider() {
+                dao.setVersao2Tributacao(chkGrupoID.isSelected());
                 return dao;
             }
 
@@ -177,6 +178,7 @@ public class EcoCentauroGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    dao.setVersao2Tributacao(chkGrupoID.isSelected());
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -278,6 +280,7 @@ public class EcoCentauroGUI extends VRInternalFrame {
         cbxUnifProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
+        chkGrupoID = new vrframework.bean.checkBox.VRCheckBox();
         tabVendas = new vrframework.bean.panel.VRPanel();
         pnlVendas = new vrframework.bean.panel.VRPanel();
         pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
@@ -306,20 +309,20 @@ public class EcoCentauroGUI extends VRInternalFrame {
         setResizable(true);
         setTitle("Importação EcoCentauro");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -436,21 +439,27 @@ public class EcoCentauroGUI extends VRInternalFrame {
 
         chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
 
+        chkGrupoID.setText("Grupo ID para Tributação");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(364, Short.MAX_VALUE))
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkGrupoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(315, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(319, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkGrupoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(282, Short.MAX_VALUE))
         );
 
         tab.addTab("Especiais", vRPanel1);
@@ -474,9 +483,9 @@ public class EcoCentauroGUI extends VRInternalFrame {
         pnlPdvVendaDatasLayout.setHorizontalGroup(
             pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 123, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 123, Short.MAX_VALUE))
         );
         pnlPdvVendaDatasLayout.setVerticalGroup(
             pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -770,6 +779,7 @@ public class EcoCentauroGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
+    private vrframework.bean.checkBox.VRCheckBox chkGrupoID;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;

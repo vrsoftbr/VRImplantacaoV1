@@ -46,6 +46,15 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private boolean importarCodigoPrincipal;
+    private boolean versao2Tributacao;
+    
+    public boolean isVersao2Tributacao() {
+        return this.versao2Tributacao;
+    }
+    
+    public void setVersao2Tributacao(boolean versao2Tributacao) {
+        this.versao2Tributacao = versao2Tributacao;
+    }
 
     public boolean isImportarCodigoPrincipal() {
         return this.importarCodigoPrincipal;
@@ -75,7 +84,27 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
+            
+            if (isVersao2Tributacao()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "SELECT \n" +
+                        "	codigoid,\n" +
+                        "	DESCRICAO,\n" +
+                        "	csf cst\n" +
+                        "FROM \n" +
+                        "	TESTGRUPOICMS \n" +
+                        "WHERE codigoid in\n" +
+                        "(SELECT DISTINCT grupoicms FROM TESTPRODUTOGERAL)")) {
+                    while (rs.next()) {
+                        result.add(new MapaTributoIMP(rs.getString("codigoid"), 
+                                rs.getString("descricao"),
+                                rs.getInt("cst"),
+                                0,
+                                0));
+                    }
+                }
+            } else {
+                try (ResultSet rs = stm.executeQuery(
                     "SELECT DISTINCT\n"
                     + "    icm.vendacsf1 AS cst_saida,\n"
                     + "    icm.vendaicms1 AS aliquota_saida,\n"
@@ -83,44 +112,46 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
                     + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
-            )) {
-                while (rs.next()) {
-                    String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
-                    result.add(new MapaTributoIMP(
-                            id,
-                            id,
-                            rs.getInt("cst_saida"),
-                            rs.getDouble("aliquota_saida"),
-                            rs.getDouble("reducao_saida")
-                    )
-                    );
+                    + "    AND icm.estado = 'MT'"
+                )) {
+                    while (rs.next()) {
+                        String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
+                        result.add(new MapaTributoIMP(
+                                id,
+                                id,
+                                rs.getInt("cst_saida"),
+                                rs.getDouble("aliquota_saida"),
+                                rs.getDouble("reducao_saida")
+                        )
+                        );
+                    }
                 }
-            }
 
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "    icm.compracsf AS cst_entrada,\n"
-                    + "    icm.compraicms AS aliquota_entrada,\n"
-                    + "    icm.comprareducao AS reducao_entrada\n"
-                    + "FROM TESTPRODUTOGERAL pg\n"
-                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
-            )) {
-                while (rs.next()) {
-                    String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
-                    result.add(new MapaTributoIMP(
-                            id,
-                            id,
-                            rs.getInt("cst_entrada"),
-                            rs.getDouble("aliquota_entrada"),
-                            rs.getDouble("reducao_entrada")
-                    )
-                    );
+                try (ResultSet rs = stm.executeQuery(
+                        "SELECT DISTINCT\n"
+                        + "    icm.compracsf AS cst_entrada,\n"
+                        + "    icm.compraicms AS aliquota_entrada,\n"
+                        + "    icm.comprareducao AS reducao_entrada\n"
+                        + "FROM TESTPRODUTOGERAL pg\n"
+                        + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                        + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                        + "    AND icm.estado = 'MT'"
+                )) {
+                    while (rs.next()) {
+                        String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
+                        result.add(new MapaTributoIMP(
+                                id,
+                                id,
+                                rs.getInt("cst_entrada"),
+                                rs.getDouble("aliquota_entrada"),
+                                rs.getDouble("reducao_entrada")
+                        )
+                        );
+                    }
                 }
             }
         }
+            
         return result;
     }
 
@@ -273,6 +304,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
                     + "    CASE p.SETOR WHEN '001' THEN 1 ELSE 0 END ebalanca,\n"
                     + "    coalesce(pg.diasvalidade,0) as validade,\n"
+                    + "    pg.grupoicms id_icms,\n"        
                     + "    icm_s.vendacsf1 AS cst_saida,\n"
                     + "    icm_s.vendaicms1 AS aliquota_saida,\n"
                     + "    icm_s.vendareducao1 AS reducao_saida,\n"
@@ -285,13 +317,14 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
                     + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo\n"
                     + "    AND icm_s.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_s.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "    AND icm_s.estado = 'MT'\n"
                     + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo\n"
                     + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "    AND icm_e.estado = 'MT'\n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
                     + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
+                    + (isVersao2Tributacao() ? " AND icm_s.produto IS NULL " : "")
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -348,17 +381,31 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    String idIcmsDebito, IdIcmsCredito;
+                    if  (isVersao2Tributacao()) {
+                        imp.setIcmsDebitoId(rst.getString("id_icms"));
+                        imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                        imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                        imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                        imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                        imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    } else {
+                        String idIcmsDebito, IdIcmsCredito;
 
-                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliquota_saida") + "-" + rst.getString("reducao_saida");
-                    IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+                        idIcmsDebito = rst.getString("cst_saida") + "-" + 
+                                       rst.getString("aliquota_saida") + "-" + 
+                                       rst.getString("reducao_saida");
+                        
+                        IdIcmsCredito = rst.getString("cst_entrada") + "-" + 
+                                        rst.getString("aliquota_entrada") + "-" + 
+                                        rst.getString("reducao_entrada");
 
-                    imp.setIcmsDebitoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
-                    imp.setIcmsCreditoId(IdIcmsCredito);
-                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
-                    imp.setIcmsConsumidorId(idIcmsDebito);
+                        imp.setIcmsDebitoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
+                        imp.setIcmsCreditoId(IdIcmsCredito);
+                        imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                        imp.setIcmsConsumidorId(idIcmsDebito);
+                    }
 
                     if (rst.getString("referencia") != null && !rst.getString("referencia").trim().isEmpty()) {
                         if (!rst.getString("descricaocompleta").contains(rst.getString("referencia").trim())) {
