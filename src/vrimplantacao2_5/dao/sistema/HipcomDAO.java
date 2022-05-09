@@ -1078,7 +1078,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from clicnv cv\n"
                     + "left join clicid ci on ci.cidcod = cv.cnvcodcida\n"
                     + "where\n"
-                    + " cnvcod not in (15,17)"
+                    + " cnvcod not in (1,15,17)"
             )) {
                 while (rs.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
@@ -1130,7 +1130,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	clicli c\n"
                     + "	left join clisit sit on	c.clicodsitu = sit.sitcod\n"
                     + "where cliloja = " + getLojaOrigem() + "\n"
-                    + " and clicodconv not in (0,15,17)\n"
+                    + " and clicodconv not in (0,1,15,17)\n"
                     + "order by 1"
             )) {
                 while (rs.next()) {
@@ -1257,7 +1257,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join clisit sit on\n"
                     + "		c.clicodsitu = sit.sitcod\n"
                     + "where cliloja = " + getLojaOrigem() + "\n"
-                    + " and clicodconv in (15,17) "
+                    + " and clicodconv in (1,15,17) "
                     + "order by\n"
                     + "	1"
             )) {
