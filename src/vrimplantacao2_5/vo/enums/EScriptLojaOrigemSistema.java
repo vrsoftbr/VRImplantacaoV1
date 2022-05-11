@@ -142,11 +142,9 @@ public enum EScriptLojaOrigemSistema {
                     + "	CNPJ cpfcnpj\n"
                     + "FROM\n"
                     + "	SUP999\n"
-                    + "ORDER BY 1");
-
+                    + "ORDER BY 1"),
+    ETRADE(219, 13, "SELECT codigo id, Fantasia descricao FROM Filial");
     
-
-
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;

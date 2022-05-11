@@ -677,6 +677,4 @@ public abstract class InterfaceDAO {
         }
         return new ArrayList<>(result.values());
     }
-    
-    
 }

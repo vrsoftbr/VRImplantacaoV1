@@ -1,21 +1,24 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Frame;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.CMMDAO;
+import vrimplantacao2_5.dao.sistema.ETradeDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class CMM2_5GUI extends VRInternalFrame {
+public class ETrade_VRSystem2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.CMM.getNome();
-    private static CMM2_5GUI instance;
+    private static final String SISTEMA = ESistema.ETRADE.getNome();
+    private static ETrade_VRSystem2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private final CMMDAO dao = new CMMDAO();
+    private final ETradeDAO dao = new ETradeDAO();
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -40,7 +43,7 @@ public class CMM2_5GUI extends VRInternalFrame {
         params.salvar();
     }
     
-    public CMM2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public ETrade_VRSystem2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -52,12 +55,36 @@ public class CMM2_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
         
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema() + " - " + pnlConn.idConexao;
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+        
         pnlConn.setOnConectar(() -> {
             tabProdutos.btnMapaTribut.setEnabled(true);
             gravarParametros();
         });
         
-        pnlConn.setSistema(ESistema.CMM);
+        pnlConn.setSistema(ESistema.ETRADE);
         pnlConn.getNomeConexao();
         
         centralizarForm();
@@ -68,7 +95,7 @@ public class CMM2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new CMM2_5GUI(i_mdiFrame);
+                instance = new ETrade_VRSystem2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -124,7 +151,6 @@ public class CMM2_5GUI extends VRInternalFrame {
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
-                    ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
             }
@@ -156,7 +182,7 @@ public class CMM2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Importação CMM");
+        setTitle("Importação E-Trade");
         setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {

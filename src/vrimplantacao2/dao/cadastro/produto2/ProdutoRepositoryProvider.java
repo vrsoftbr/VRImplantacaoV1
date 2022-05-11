@@ -314,6 +314,16 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             return dao.getAnterioresPorIdEan(getSistema(), getLoja());
         }
+        
+        public void createCestInvalido() throws Exception {
+            dao.createTableCestInvalido();
+        }
+        
+        public void salvarCestInvalido(ProdutoAnteriorVO anterior) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.salvarCestInvalido(anterior);
+        }
 
     }
     

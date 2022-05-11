@@ -113,6 +113,7 @@ public class ProdutoIMP {
     @DatabaseField private boolean descontinuado = false;
     @DatabaseField private String ncm;
     @DatabaseField private String cest;
+    @DatabaseField private String descricaoCest;
     
     @DatabaseField private int piscofinsCstDebito = 0;
     @DatabaseField private int piscofinsCstCredito = 0;
@@ -319,6 +320,14 @@ public class ProdutoIMP {
 
     public String getCest() {
         return cest;
+    }
+
+    public String getDescricaoCest() {
+        return descricaoCest;
+    }
+
+    public void setDescricaoCest(String descricaoCest) {
+        this.descricaoCest = descricaoCest;
     }
 
     public int getPiscofinsCstDebito() {

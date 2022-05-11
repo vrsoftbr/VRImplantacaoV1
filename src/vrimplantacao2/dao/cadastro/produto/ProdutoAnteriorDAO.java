@@ -143,6 +143,34 @@ public class ProdutoAnteriorDAO {
             );
         }
     }
+    
+    public void createTableCestInvalido() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("do $$\n" +
+                        "declare\n" +
+                        "begin\n" +
+                        "	if not exists(\n" +
+                        "			select \n" +
+                        "				table_name \n" +
+                        "			from \n" +
+                        "				information_schema.tables \n" +
+                        "			where \n" +
+                        "				table_schema = 'implantacao' and \n" +
+                        "				table_name = 'codant_cestinvalido') then\n" +
+                        "		CREATE TABLE implantacao.codant_cestinvalido\n" +
+                        "                    (\n" +
+                        "                      impsistema character varying NOT NULL,\n" +
+                        "                      imploja character varying NOT NULL,\n" +
+                        "                      impid character varying NOT NULL,\n" +
+                        "                      descricao varchar,\n" +
+                        "                      cest varchar(15),\n" +
+                        "                      primary key (impsistema, imploja, impid)\n" +
+                        "                );\n" +
+                        "		raise notice 'tabela criada';\n" +
+                        "	end if;\n" +
+                        "end; $$;");
+        }
+    }
 
     public int getCodigoAnterior2(String sistema, String loja, String id) throws Exception {
         int retorno = -1;
@@ -767,6 +795,25 @@ public class ProdutoAnteriorDAO {
                     + " and imploja = '" + anterior.getImportLoja() + "'"
                     + " and impid = '" + anterior.getImportId() + "'");
 
+            if (!sql.isEmpty()) {
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
+    
+    public void salvarCestInvalido(ProdutoAnteriorVO anterior) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            
+            sql.setSchema("implantacao");
+            sql.setTableName("codant_cestinvalido");
+            
+            sql.put("impsistema", anterior.getImportSistema());
+            sql.put("imploja", anterior.getImportLoja());
+            sql.put("impid", anterior.getImportId());
+            sql.put("cest", anterior.getCest());
+            sql.put("descricao", anterior.getDescricao());
+            
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }

@@ -182,6 +182,7 @@ public class ConexaoSqlServer implements DriverConexao {
             return driver;
         }
 
+        //";encrypt=true;trustServerCertificate=true"
         public String getConnectionString(String host, int port, String database) {
             return connectionString
                     .replace("{host}", host)

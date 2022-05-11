@@ -205,6 +205,7 @@ import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
+import vrimplantacao2_5.dao.sistema.ETradeDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
@@ -439,9 +440,8 @@ public enum ESistema {
     CMM(216, "CMM", new CMMDAO()),
     GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
     PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()),
-    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO());
-    //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
-
+    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO()),
+    ETRADE(219,"ETRADE", new ETradeDAO());
     
     private int id;
     private String nome;

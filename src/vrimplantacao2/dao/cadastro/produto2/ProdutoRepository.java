@@ -21,6 +21,7 @@ import vrframework.classe.VRException;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -448,6 +449,10 @@ public class ProdutoRepository {
                 }
                 if (optSimples.contains(OpcaoProduto.TROCA)) {
                     provider.complemento().criarEstoqueTrocaAnteriorTemporario();
+                }
+                
+                if (optSimples.contains(OpcaoProduto.CEST)) {
+                    converterCest(organizados);
                 }
 
                 for (ProdutoIMP imp : organizados) {
@@ -1944,6 +1949,32 @@ public class ProdutoRepository {
         } catch (Exception e) {
             provider.rollback();
             throw e;
+        }
+    }
+    
+    public void converterCest(List<ProdutoIMP> produtos) throws Exception {
+        setNotify("Inserindo cests...", 0);
+        
+        provider.anterior().createCestInvalido();
+        
+        for (ProdutoIMP cest : produtos) {
+            ProdutoVO vo = converterIMP(cest, 0, TipoEmbalagem.UN, false);
+            
+            if (vo.getCest() == null && 
+                    cest.getCest() != null && 
+                        !cest.getCest().equals("")) {
+                
+                ProdutoAnteriorVO anterior = new ProdutoAnteriorVO();
+                
+                anterior.setCest(cest.getCest());
+                anterior.setImportId(cest.getImportId());
+                
+                if (cest.getDescricaoCest() != null && !cest.getDescricaoCest().isEmpty()) {
+                    anterior.setDescricao(cest.getDescricaoCest());
+                }
+                
+                provider.anterior().salvarCestInvalido(anterior);
+            }
         }
     }
 
