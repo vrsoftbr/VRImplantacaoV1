@@ -441,7 +441,7 @@ public enum ESistema {
     GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
     PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()),
     JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO()),
-    ETRADE(219,"ETRADE", new ETradeDAO());
+    ETRADE(220,"ETRADE", new ETradeDAO());
     
     private int id;
     private String nome;

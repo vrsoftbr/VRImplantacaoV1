@@ -65,6 +65,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
@@ -194,7 +195,8 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	t2.ALQENTRADA aliq_credito,\n"
                     + "	t2.BASEENTRADA red_credito,\n"
                     + "	pc.CSTPISSAI piscofins_debito,\n"
-                    + "	pc.CSTPISENT piscofins_credito\n"
+                    + "	pc.CSTPISENT piscofins_credito,\n"
+                    + " pc.CODNATREC natrec\n"
                     + "FROM\n"
                     + "	TPRODUTO p\n"
                     + "	JOIN TDERIVACAO pd ON pd.CODPRO = p.CODPRO\n"
@@ -239,6 +241,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstDebito(rs.getInt("piscofins_debito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofins_credito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("natrec"));
 
                     result.add(imp);
                 }
