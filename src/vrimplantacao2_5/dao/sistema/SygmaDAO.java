@@ -94,6 +94,11 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
@@ -457,7 +462,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	 CODPESSOA id,\n"
                     + "	 NOME razao,\n"
                     + "	 nome fantasia,\n"
@@ -465,13 +470,13 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 RG rg_ie,\n"
                     + "	 DATA_NASC dt_nascimento,\n"
                     + "	 SUBSTRING(INCLUSAOHORARIO FROM 1 FOR 10) dt_cadastro,\n"
-                    + "	 LOGRA_DOM endereco,\n"
-                    + "	 NUM_DOM numero,\n"
-                    + "	 COMPL_DOM complemento,\n"
-                    + "	 BAIRRODOM bairro,\n"
+                    + "	 LOGRA_COM endereco,\n"
+                    + "	 NUM_COM numero,\n"
+                    + "	 COMPL_COM complemento,\n"
+                    + "	 BAIRRO bairro,\n"
                     + "	 UPPER(c.NOM_CIDADE) cidade,\n"
                     + "	 c.SGL_ESTADO uf,\n"
-                    + "	 CEPDOM cep,\n"
+                    + "	 CEP,\n"
                     + "	 CASE WHEN ATIVO = 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
                     + "	 LIMITECRED valorlimite,\n"
                     + "	 CONJUGE,\n"
@@ -524,6 +529,38 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 LEFT JOIN TCIDADE c ON p.CODCIDADE = c.COD_CIDADE\n"
                     + "WHERE\n"
                     + "	 TIPO = 'J'\n"
+                    + "ORDER BY 1"*/
+                    "SELECT \n"
+                    + "	 CODPESSOA id,\n"
+                    + "	 CASE WHEN tipo = 'F' THEN NOME ELSE razaosocial END razao,\n"
+                    + "	 nome fantasia,\n"
+                    + "	 CASE WHEN tipo = 'F' THEN CPF ELSE CNPJ END cpf_cnpj,\n"
+                    + "	 CASE WHEN tipo = 'F' THEN RG ELSE INSCEST END rg_ie,\n"
+                    + "	 DATA_NASC dt_nascimento,\n"
+                    + "	 SUBSTRING(INCLUSAOHORARIO FROM 1 FOR 10) dt_cadastro,\n"
+                    + "	 CASE WHEN LOGRA_COM IS NOT NULL OR LOGRA_COM = '' THEN LOGRA_COM ELSE logra_DOM END endereco,\n"
+                    + "	 CASE WHEN NUM_COM IS NOT NULL OR num_COM = '' THEN NUM_COM ELSE NUM_DOM END numero,\n"
+                    + "	 CASE WHEN COMPL_COM IS NOT NULL OR COMPL_COM = '' THEN COMPL_COM ELSE COMPL_DOM END complemento,\n"
+                    + "	 CASE WHEN BAIRRO IS NOT NULL OR bairro = '' THEN bairro ELSE bairrodom END bairro,\n"
+                    + "	 UPPER(c.NOM_CIDADE) cidade,\n"
+                    + "	 c.SGL_ESTADO uf,\n"
+                    + "	 CEP,\n"
+                    + "	 CASE WHEN ATIVO = 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
+                    + "	 LIMITECRED valorlimite,\n"
+                    + "	 CONJUGE,\n"
+                    + "	 FILIACAO_MAE nomemae,\n"
+                    + "	 FILIACAO_PAI nomepai,\n"
+                    + "	 LOCALTRABALHO empresa,\n"
+                    + "	 TELEFONETRABALHO empresa_fone,\n"
+                    + "	 PROFTRABALHO cargo,\n"
+                    + "	 RENDA salario,\n"
+                    + "	 EMAIL,\n"
+                    + "	 TELEFONE,\n"
+                    + "	 CELULAR,\n"
+                    + "	 OBSERVACAO\n"
+                    + "FROM\n"
+                    + "	 TPESSOA p\n"
+                    + "	 LEFT JOIN TCIDADE c ON p.CODCIDADE = c.COD_CIDADE\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
