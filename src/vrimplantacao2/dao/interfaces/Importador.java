@@ -1159,7 +1159,7 @@ public class Importador {
     }
 
     /**
-     * Importa o cadastro dos operadores.
+     * Importa o inventário.
      *
      * @throws Exception
      */
