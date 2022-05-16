@@ -560,6 +560,15 @@ public abstract class InterfaceDAO {
     }
     
     /**
+     * Retorna uma lista com as promoções para importar.
+     * @return Lista com as promoções a serem importadas.
+     * @throws Exception 
+     */
+    public List<DemembramentoIMP> getDesmembramento() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
      * Utilize esta classe para casos onde não haja cadastro de família, utilize
      * um sql que ordene por código agrupador e por descrição, depois utilize a
      * classe.<br>
