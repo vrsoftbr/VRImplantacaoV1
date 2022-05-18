@@ -38,6 +38,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
+import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -560,11 +561,11 @@ public abstract class InterfaceDAO {
     }
     
     /**
-     * Retorna uma lista com as promoções para importar.
-     * @return Lista com as promoções a serem importadas.
+     * Retorna uma lista com os desmembramentos para importar.
+     * @return Lista com os desmembramentos a serem importadas.
      * @throws Exception 
      */
-    public List<DemembramentoIMP> getDesmembramento() throws Exception {
+    public List<DesmembramentoIMP> getDesmembramento() throws Exception {
         return new ArrayList<>();
     }
     
