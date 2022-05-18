@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import jxl.Cell;
 import jxl.Sheet;
@@ -187,7 +188,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                             !val(sheet, 4, i).equals("")
                     ) {
                         if (tributos.add(val(sheet, 10, i))) {
-                            LOG.fine("Tributo '" + val(sheet, 10, i) + "' incluso!");
+                            LOG.log(Level.FINE, "Tributo ''{0}'' incluso!", val(sheet, 10, i));
                         }
                     }
                 }
@@ -618,7 +619,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         val(sh, 9, i).equals("Endereço:")
                 ) {
                     imp.setFantasia(val(sh, 2, i));
-                    if (imp.getFantasia().equals("")) {
+                    if (imp.getFantasia().trim().equals("")) {
                         imp.setFantasia(imp.getRazao());
                     }
                     imp.setEndereco(val(sh, 10, i).trim());
