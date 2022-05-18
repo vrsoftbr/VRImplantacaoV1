@@ -45,6 +45,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_FLASH(55, "FLASH", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_FORT(57, "FORT", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_FUTURA(58, "FUTURA", 5, "FIREBIRD", "", "", "", 3050),
+    FIREBIRD_GANSO(221, "GANSO", 5, "FIREBIRD", "", "SYSDBA", "", 3050),
     FIREBIRD_GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_GCOM(61, "GCOM", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_GDI(62, "GDI", 5, "FIREBIRD", "", "", "", 3050),
