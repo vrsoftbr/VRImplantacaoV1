@@ -575,8 +575,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dat_cadastro cadastro,\n"
                     + " pa.cdg_eqv_preco idfamilia,\n"
                     + "	p.dat_desativacao desativacao,\n"
-                  //+ " un.sgl_unidade_medida unidade,\n"
-                    + "	p.dcr_embalagem unidade,\n"        
+                    //+ " un.sgl_unidade_medida unidade,\n"
+                    + "	p.dcr_embalagem unidade,\n"
                     + "	p.qtd_por_emb qtdembalagem,\n"
                     + " p.qtd_da_embalagem as volume,\n"
                     + "	ncm.cdg_ncm ncm,\n"
@@ -1236,6 +1236,10 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setInsc_municipal(rs.getString("inscricaomunicipal"));
+                    if (imp.getInsc_municipal() == null) {
+                        imp.setInsc_municipal("null");
+                    }
+                    
                     imp.setDatacadastro(rs.getDate("cadastro"));
                     imp.setIbge_municipio(rs.getInt("ibgemunicipio"));
                     imp.setMunicipio(rs.getString("cidadeold"));
