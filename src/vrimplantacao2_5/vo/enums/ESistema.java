@@ -5,6 +5,10 @@
  */
 package vrimplantacao2_5.vo.enums;
 
+import org.openide.util.Exceptions;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.Util;
 import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Stock_PostgresDAO;
 import vrimplantacao2.dao.interfaces.ASoftDAO;
@@ -86,7 +90,6 @@ import vrimplantacao2.dao.interfaces.ICommerceDAO;
 import vrimplantacao2.dao.interfaces.IQSistemasDAO;
 import vrimplantacao2.dao.interfaces.IServerDAO;
 import vrimplantacao2.dao.interfaces.InfoBrasilDAO;
-import vrimplantacao2.dao.interfaces.InfoMacDAO;
 import vrimplantacao2.dao.interfaces.InovaDAO;
 import vrimplantacao2.dao.interfaces.IntelliCashDAO;
 import vrimplantacao2.dao.interfaces.IntelliconDAO;
@@ -221,6 +224,41 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
+import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
+import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
+import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
+import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
+import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
+import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
+import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
+import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
+import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
+import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
+import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
+import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
+import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
+import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
+import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
+import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
+import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
+import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
+import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
+import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
+import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
+import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
+import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
+import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
+import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
+import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
+import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
+import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 
 /**
  *
@@ -228,220 +266,1465 @@ import vrimplantacao2_5.dao.sistema.TopSystemDAO;
  */
 public enum ESistema {
 
-    ASOFT(1, "ASOFT", new ASoftDAO()),
-    ACCESYS(2, "ACCESYS", new AccesysDAO()),
-    ACOM(3, "ACOM", new AcomDAO()),
-    ALPHASYS(4, "ALPHASYS", new AlphaSysDAO()),
-    APOLLO(5, "APOLLO", new ApolloDAO()),
-    ARTSYSTEM(6, "ARTSYSTEM", new ArtSystemDAO()),
-    ASEFE(7, "ASEFE", new AsefeDAO()),
-    ATENAS(8, "ATENAS", new AtenasDAO()),
-    ATHOS(9, "ATHOS", new AthosDAO()),
-    ATMA(10, "ATMA", new AtmaDAO()),
-    AUTOADM(11, "AUTOADM", new AutoAdmDAO()),
-    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystemDAO()),
-    AUTOCOM(13, "AUTOCOM", new AutocomDAO()),
-    AUTOMAQ(14, "AUTOMAQ", new AutomaqDAO()),
-    AVANCE(15, "AVANCE", new AvanceDAO()),
-    AVISTARE(16, "AVISTARE", new AvistareDAO()),
-    BASE(17, "BASE", new BaseDAO()),
-    BRAINSOFT(18, "BRAINSOFT", new BrainSoftDAO()),
-    BRAJANGESTORES(19, "BRAJANGESTORES", new BrajanGestoresDAO()),
-    CFSOFTSIAECF(20, "CFSOFTSIAECF", new CFSoftSiaECFDAO()),
-    CPGESTOR(21, "CPGESTOR", new CPGestorDAO()),
-    CPLUS(22, "CPLUS", new CPlusDAO()),
-    CADASTRAFACIL(23, "CADASTRAFACIL", new CadastraFacilDAO()),
-    CEFAS(24, "CEFAS", new CefasDAO()),
-    CEREBRO(25, "CEREBRO", new CerebroDAO()),
-    CERVANTES(26, "CERVANTES", new CervantesDAO()),
-    CGA(27, "CGA", new CgaDAO()),
-    CISS(28, "CISS", new CissDAO()),
-    CLICK(29, "CLICK", new ClickDAO()),
-    CONTECH(30, "CONTECH", new ContechDAO()),
-    CONTROLWARE(31, "CONTROLWARE", new ControlWareDAO()),
-    CONTROLX(32, "CONTROLX", new ControlXDAO()),
-    CRONOS20(33, "CRONOS20", new Cronos20DAO()),
-    CUPERMAX(34, "CUPERMAX", new CupermaxDAO()),
-    DJSYSTEM(35, "DJSYSTEM", new DJSystemDAO()),
-    DLINK(36, "DLINK", new DLinkDAO()),
-    DSOFT(37, "DSOFT", new DSoftDAO()),
-    DATASYNC(38, "DATASYNC", new DataSyncDAO()),
-    DELFI(39, "DELFI", new DelfiDAO()),
-    DESTRO(40, "DESTRO", new DestroDAO()),
-    DEVMASTER(41, "DEVMASTER", new DevMasterDAO()),
-    DIRECTOR(42, "DIRECTOR", new DirectorDAO()),
-    DTCOM(43, "DTCOM", new DtComDAO()),
-    EASYSAC(44, "EASYSAC", new EasySacDAO()),
-    EMPORIO(45, "EMPORIO", new EmporioDAO()),
-    EPTUS(46, "EPTUS", new EptusDAO()),
-    ESSYSTEM(47, "ESSYSTEM", new EsSystemDAO()),
-    ETICA(48, "ETICA", new EticaDAO()),
-    EXODUS(49, "EXODUS", new ExodusDAO()),
-    FHONLINE(50, "FHONLINE", new FHOnlineDAO()),
-    FABTECH(51, "FABTECH", new FabTechDAO()),
-    FACILITE(52, "FACILITE", new FaciliteDAO()),
-    FARM2000(53, "FARM2000", new Farm2000DAO()),
-    FENIX(54, "FENIX", new FenixDAO()),
-    FLASH(55, "FLASH", new FlashDAO()),
-    FLATAN(56, "FLATAN", new FlatanDAO()),
-    FORT(57, "FORT", new FortDAO()),
-    FUTURA(58, "FUTURA", new FuturaDAO()),
-    G10(59, "G10", new G10DAO()),
-    G3(60, "G3", new G3DAO()),
-    GCOM(61, "GCOM", new GComDAO()),
-    GDI(62, "GDI", new GDIDAO()),
-    GDOOR(63, "GDOOR", new GDoorDAO()),
-    GR7(64, "GR7", new GR7DAO()),
-    GTECH(65, "GTECH", new GTechDAO()),
-    GZSISTEMAS(66, "GZSISTEMAS", new GZSistemasDAO()),
-    GESTORPDV(67, "GESTORPDV", new GestorPdvDAO()),
-    GETWAY(68, "GETWAY", new GetWay_ProfitDAO()),
-    GIGATRON(69, "GIGATRON", new GigatronDAO()),
-    GONDOLA(70, "GONDOLA", new GondolaDAO()),
-    GUIASISTEMAS(71, "GUIASISTEMAS", new GuiaSistemasDAO()),
-    HRTECH(72, "HRTECH", new HRTechDAO()),
-    HERCULESINTCASH(73, "HERCULESINTCASH", new HerculesIntCashDAO()),
-    HIPCOM(74, "HIPCOM", new HipcomDAO()),
-    HIPER(75, "HIPER", new HiperDAO()),
-    ICOMMERCE(76, "ICOMMERCE", new ICommerceDAO()),
-    IQSISTEMAS(77, "IQSISTEMAS", new IQSistemasDAO()),
-    ISERVER(78, "ISERVER", new IServerDAO()),
-    INFOBRASIL(79, "INFOBRASIL", new InfoBrasilDAO()),
-    INOVA(81, "INOVA", new InovaDAO()),
-    INTELLICASH(82, "INTELLICASH", new IntelliCashDAO()),
-    INTELLICON(83, "INTELLICON", new IntelliconDAO()),
-    INTERDATA(84, "INTERDATA", new InterDataDAO()),
-    INTERAGE(85, "INTERAGE", new InterageDAO()),
-    INVENTER(86, "INVENTER", new InventerDAO()),
-    JM2ONLINE(87, "JM2ONLINE", new JM2OnlineDAO()),
-    JMASTER(88, "JMASTER", new JMasterDAO()),
-    JACSYS(89, "JACSYS", new JacsysDAO()),
-    JRF(90, "JRF", new JrfDAO()),
-    KAIROS(91, "KAIROS", new KairosDAO()),
-    KCMS(92, "KCMS", new KcmsDAO()),
-    LBSOFTWARE(93, "LBSOFTWARE", new LBSoftwareDAO()),
-    LIDERNETWORK(94, "LIDERNETWORK", new LiderNetWorkDAO()),
-    LINCE(95, "LINCE", new LinceDAO()),
-    LINNER(96, "LINNER", new LinnerDAO()),
-    LITECI(97, "LITECI", new LiteciDAO()),
-    LOGTEC(98, "LOGTEC", new LogTECDAO()),
-    LOGICBOX(99, "LOGICBOX", new LogicboxDAO()),
-    LOGUS(100, "LOGUS", new LogusDAO()),
-    LYNCIS(101, "LYNCIS", new LyncisDAO()),
-    MSIINFOR(102, "MSIINFOR", new MSIInforDAO()),
-    MARKET(103, "MARKET", new MarketDAO()),
-    MASTER(104, "MASTER", new MasterDAO()),
-    MERCALITE(105, "MERCALITE", new MercaLiteDAO()),
-    MILENIO(106, "MILENIO", new MilenioDAO()),
-    MOBILITY(107, "MOBILITY", new MobilityDAO()),
-    MOBNEPDV(108, "MOBNEPDV", new MobnePdvDAO()),
-    MRS(109, "MRS", new MrsDAO()),
-    MULTIPDV(110, "MULTIPDV", new MultiPdvDAO()),
-    NATISISTEMAS(111, "NATISISTEMAS", new NATISistemasDAO()),
-    NCA(112, "NCA", new NCADAO()),
-    OPEN(113, "OPEN", new OpenDAO()),
-    ORION(114, "ORION", new OrionDAO()),
-    ORIONTECH(115, "ORIONTECH", new OrionTechDAO()),
-    ORYON(116, "ORYON", new OryonDAO()),
-    PHIXA(117, "PHIXA", new PhixaDAO()),
-    PLENOKW(118, "PLENOKW", new PlenoKWDAO()),
-    PLENUS(119, "PLENUS", new PlenusDAO()),
-    POLIGON(120, "POLIGON", new PoligonDAO()),
-    POMARES(121, "POMARES", new PomaresDAO()),
-    PROTON(123, "PROTON", new ProtonDAO()),
-    PWGESTOR(124, "PWGESTOR", new PwGestorDAO()),
-    PWS(125, "PWS", new PwsDAO()),
-    RCNET(126, "RCNET", new RCNetDAO()),
-    RKSOFTWARE(127, "RKSOFTWARE", new RKSoftwareDAO()),
-    RMSAUTOMAHELP(128, "RMSAUTOMAHELP", new RMSAutomaHelpDAO()),
-    RMS(129, "RMS", new RMSDAO()),
-    RPINFO(130, "RPINFO", new RPInfoDAO()),
-    RENSOFTWARE(131, "RENSOFTWARE", new RensoftwareDAO()),
-    REPLEIS(132, "REPLEIS", new RepleisDAO()),
-    RESULTMAIS(133, "RESULTMAIS", new ResultMaisDAO()),
-    ROOTAC(134, "ROOTAC", new RootacDAO()),
-    SDINFORMATICA(135, "SDINFORMATICA", new SDInformaticaDAO()),
-    SGMASTER(136, "SGMASTER", new SGMasterDAO()),
-    SIMS(137, "SIMS", new SIMSDAO()),
-    STI(138, "STI", new STIDAO()),
-    STSITEMAS(139, "STSITEMAS", new STSitemasDAO()),
-    SAAC(140, "SAAC", new SaacDAO()),
-    SABTECH(141, "SABTECH", new SabTechDAO()),
-    SAEF(142, "SAEF", new SaefDAO()),
-    SAMBANET(143, "SAMBANET", new SambaNetV2DAO()),
-    SATECFE(144, "SATECFE", new SatecfeDAO()),
-    SAV(145, "SAV", new SavDAO()),
-    SCEF(146, "SCEF", new ScefDAO()),
-    SHI(147, "SHI", new ShiDAO()),
-    SIAC(149, "SIAC", new SiacDAO()),
-    SIFAT(150, "SIFAT", new SifatDAO()),
-    SIGMA(151, "SIGMA", new SigmaDAO()),
-    SIIT(152, "SIIT", new SiitDAO()),
-    SIRCOM(153, "SIRCOM", new SircomDAO()),
-    SISMOURA(154, "SISMOURA", new SisMouraDAO()),
-    SNSISTEMA(155, "SNSISTEMA", new SnSistemaDAO()),
-    SOFTCOM(156, "SOFTCOM", new SoftcomDAO()),
-    SOFTTECH(157, "SOFTTECH", new SofttechDAO()),
-    SOLIDO(158, "SOLIDO", new SolidoDAO()),
-    SOLIDUS(159, "SOLIDUS", new SolidusDAO()),
-    SOLUTIONSUPERA(160, "SOLUTIONSUPERA", new SolutionSuperaDAO()),
-    SOPHYX(161, "SOPHYX", new SophyxDAO()),
-    SRI(162, "SRI", new SriDAO()),
-    SUPER(164, "SUPER", new SuperDAO()),
-    SUPERLOJA10(165, "SUPERLOJA10", new SuperLoja10DAO()),
-    SUPERUS(166, "SUPERUS", new SuperusDAO()),
-    SYNCTEC(167, "SYNCTEC", new SyncTecDAO()),
-    SYSAUT(168, "SYSAUT", new SysAutDAO()),
-    SYSERP(169, "SYSERP", new SysERPDAO()),
-    SYSPDV(170, "SYSPDV", new SysPdvDAO()),
-    TGA(172, "TGA", new TGADAO()),
-    TECNOSOFT(173, "TECNOSOFT", new TecnosoftDAO()),
-    TELECON(174, "TELECON", new TeleconDAO()),
-    TITECNOLOGIA(175, "TITECNOLOGIA", new TiTecnologiaDAO()),
-    TOPSYSTEM(176, "TOPSYSTEM", new TopSystemDAO()),
-    TPAROOTAC(177, "TPAROOTAC", new TpaRootacDAO()),
-    TSTI(178, "TSTI", new TstiDAO()),
-    UNIPLUS(179, "UNIPLUS", new UniplusDAO()),
-    UPFORTI(180, "UPFORTI", new UpFortiDAO()),
-    VCASH(181, "VCASH", new VCashDAO()),
-    VRMASTER(182, "VRMASTER", new VRToVRDAO()),
-    VIASOFT(183, "VIASOFT", new ViaSoftDAO()),
-    VIGGO(184, "VIGGO", new ViggoDAO()),
-    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercioDAO()),
-    VISUALMIX(186, "VISUALMIX", new VisualMixDAO()),
-    W2A(187, "W2A", new W2ADAO()),
-    WEBSAQ(188, "WEBSAQ", new WebSaqDAO()),
-    WEBER(189, "WEBER", new WeberDAO()),
-    WINNEXUS(190, "WINNEXUS", new WinNexusDAO()),
-    WISASOFT(191, "WISASOFT", new WisaSoftDAO()),
-    WMSI(192, "WMSI", new WmsiDAO()),
-    ZOOMBOX(194, "ZOOMBOX", new ZoomboxDAO()),
-    ZPF(195, "ZPF", new ZpfDAO()),
-    LINEAR(196, "LINEAR", new LinearDAO()),
-    ARIUS(197, "ARIUS", new AriusDAO()),
-    GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()),
-    SG(199, "SG", new SGDAO()),
-    SYGMA(200, "SYGMA", new SygmaDAO()),
-    MICROTAB(201, "MICROTAB", new MicroTabDAO()),
-    MRC6(202,"MRC6", new MRC6DAO()),
-    BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
-    ASSIST(204, "ASSIST", new AssistDAO()),
-    DATABYTE(205, "DATABYTE", new DataByteDAO()),
-    DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()),
-    TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
-    FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
-    CONSINCO(209, "CONSINCO", new ConsincoDAO()),
-    VERSATIL(210, "VERSATIL", new VersatilDAO()),
-    DSIC(211, "DSIC", new DSICDAO()),
-    TSL(212, "TSL", new TslDAO()),
-    SATFACIL(213,"SATFACIL",new SatFacilDAO()),
-    WBA(214,"WBA",new WBADAO()),
-    STOCK(215, "STOCK", new Stock_PostgresDAO()),
-    CMM(216, "CMM", new CMMDAO()),
-    GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()),
-    PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()),
-    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO()),
-    ETRADE(220,"ETRADE", new ETradeDAO());
+    ASOFT(1, "ASOFT", new ASoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ACCESYS(2, "ACCESYS", new AccesysDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ACOM(3, "ACOM", new AcomDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ALPHASYS(4, "ALPHASYS", new AlphaSysDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    APOLLO(5, "APOLLO", new ApolloDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ARTSYSTEM(6, "ARTSYSTEM", new ArtSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ASEFE(7, "ASEFE", new AsefeDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ATENAS(8, "ATENAS", new AtenasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ATHOS(9, "ATHOS", new AthosDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ATMA(10, "ATMA", new AtmaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AUTOADM(11, "AUTOADM", new AutoAdmDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AUTOCOM(13, "AUTOCOM", new AutocomDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AUTOMAQ(14, "AUTOMAQ", new AutomaqDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AVANCE(15, "AVANCE", new AvanceDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    AVISTARE(16, "AVISTARE", new AvistareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Avistare2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    BASE(17, "BASE", new BaseDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    BRAINSOFT(18, "BRAINSOFT", new BrainSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    BRAJANGESTORES(19, "BRAJANGESTORES", new BrajanGestoresDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CFSOFTSIAECF(20, "CFSOFTSIAECF", new CFSoftSiaECFDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CPGESTOR(21, "CPGESTOR", new CPGestorDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new CPGestorByView2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    CPLUS(22, "CPLUS", new CPlusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CADASTRAFACIL(23, "CADASTRAFACIL", new CadastraFacilDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CEFAS(24, "CEFAS", new CefasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CEREBRO(25, "CEREBRO", new CerebroDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CERVANTES(26, "CERVANTES", new CervantesDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CGA(27, "CGA", new CgaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CISS(28, "CISS", new CissDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CLICK(29, "CLICK", new ClickDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CONTECH(30, "CONTECH", new ContechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CONTROLWARE(31, "CONTROLWARE", new ControlWareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CONTROLX(32, "CONTROLX", new ControlXDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CRONOS20(33, "CRONOS20", new Cronos20DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    CUPERMAX(34, "CUPERMAX", new CupermaxDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DJSYSTEM(35, "DJSYSTEM", new DJSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DLINK(36, "DLINK", new DLinkDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DSOFT(37, "DSOFT", new DSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DATASYNC(38, "DATASYNC", new DataSyncDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DELFI(39, "DELFI", new DelfiDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DESTRO(40, "DESTRO", new DestroDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DEVMASTER(41, "DEVMASTER", new DevMasterDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DIRECTOR(42, "DIRECTOR", new DirectorDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    DTCOM(43, "DTCOM", new DtComDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    EASYSAC(44, "EASYSAC", new EasySacDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    EMPORIO(45, "EMPORIO", new EmporioDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    EPTUS(46, "EPTUS", new EptusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ESSYSTEM(47, "ESSYSTEM", new EsSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ETICA(48, "ETICA", new EticaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    EXODUS(49, "EXODUS", new ExodusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FHONLINE(50, "FHONLINE", new FHOnlineDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FABTECH(51, "FABTECH", new FabTechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FACILITE(52, "FACILITE", new FaciliteDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FARM2000(53, "FARM2000", new Farm2000DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FENIX(54, "FENIX", new FenixDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FLASH(55, "FLASH", new FlashDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FLATAN(56, "FLATAN", new FlatanDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FORT(57, "FORT", new FortDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    FUTURA(58, "FUTURA", new FuturaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    G10(59, "G10", new G10DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    G3(60, "G3", new G3DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GCOM(61, "GCOM", new GComDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GDI(62, "GDI", new GDIDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GDOOR(63, "GDOOR", new GDoorDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GR7(64, "GR7", new GR7DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GTECH(65, "GTECH", new GTechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GZSISTEMAS(66, "GZSISTEMAS", new GZSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GESTORPDV(67, "GESTORPDV", new GestorPdvDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GETWAY(68, "GETWAY", new GetWay_ProfitDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GIGATRON(69, "GIGATRON", new GigatronDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GONDOLA(70, "GONDOLA", new GondolaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    GUIASISTEMAS(71, "GUIASISTEMAS", new GuiaSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    HRTECH(72, "HRTECH", new HRTechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    HERCULESINTCASH(73, "HERCULESINTCASH", new HerculesIntCashDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    HIPCOM(74, "HIPCOM", new HipcomDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Hipcom2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    HIPER(75, "HIPER", new HiperDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ICOMMERCE(76, "ICOMMERCE", new ICommerceDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    IQSISTEMAS(77, "IQSISTEMAS", new IQSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ISERVER(78, "ISERVER", new IServerDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INFOBRASIL(79, "INFOBRASIL", new InfoBrasilDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INOVA(81, "INOVA", new InovaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INTELLICASH(82, "INTELLICASH", new IntelliCashDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INTELLICON(83, "INTELLICON", new IntelliconDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INTERDATA(84, "INTERDATA", new InterDataDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INTERAGE(85, "INTERAGE", new InterageDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    INVENTER(86, "INVENTER", new InventerDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    JM2ONLINE(87, "JM2ONLINE", new JM2OnlineDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    JMASTER(88, "JMASTER", new JMasterDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    JACSYS(89, "JACSYS", new JacsysDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    JRF(90, "JRF", new JrfDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    KAIROS(91, "KAIROS", new KairosDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    KCMS(92, "KCMS", new KcmsDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new KCMS2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    LBSOFTWARE(93, "LBSOFTWARE", new LBSoftwareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LIDERNETWORK(94, "LIDERNETWORK", new LiderNetWorkDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LINCE(95, "LINCE", new LinceDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LINNER(96, "LINNER", new LinnerDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LITECI(97, "LITECI", new LiteciDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LOGTEC(98, "LOGTEC", new LogTECDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LOGICBOX(99, "LOGICBOX", new LogicboxDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LOGUS(100, "LOGUS", new LogusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Logus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    LYNCIS(101, "LYNCIS", new LyncisDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MSIINFOR(102, "MSIINFOR", new MSIInforDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MARKET(103, "MARKET", new MarketDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MASTER(104, "MASTER", new MasterDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MERCALITE(105, "MERCALITE", new MercaLiteDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MILENIO(106, "MILENIO", new MilenioDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MOBILITY(107, "MOBILITY", new MobilityDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Mobility2_5GUI(frame);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return null;
+        }
+    },
+    MOBNEPDV(108, "MOBNEPDV", new MobnePdvDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MRS(109, "MRS", new MrsDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    MULTIPDV(110, "MULTIPDV", new MultiPdvDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    NATISISTEMAS(111, "NATISISTEMAS", new NATISistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    NCA(112, "NCA", new NCADAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    OPEN(113, "OPEN", new OpenDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ORION(114, "ORION", new OrionDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ORIONTECH(115, "ORIONTECH", new OrionTechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ORYON(116, "ORYON", new OryonDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PHIXA(117, "PHIXA", new PhixaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PLENOKW(118, "PLENOKW", new PlenoKWDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PLENUS(119, "PLENUS", new PlenusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    POLIGON(120, "POLIGON", new PoligonDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    POMARES(121, "POMARES", new PomaresDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PROTON(123, "PROTON", new ProtonDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PWGESTOR(124, "PWGESTOR", new PwGestorDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    PWS(125, "PWS", new PwsDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RCNET(126, "RCNET", new RCNetDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RKSOFTWARE(127, "RKSOFTWARE", new RKSoftwareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RMSAUTOMAHELP(128, "RMSAUTOMAHELP", new RMSAutomaHelpDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RMS(129, "RMS", new RMSDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RPINFO(130, "RPINFO", new RPInfoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RENSOFTWARE(131, "RENSOFTWARE", new RensoftwareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    REPLEIS(132, "REPLEIS", new RepleisDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    RESULTMAIS(133, "RESULTMAIS", new ResultMaisDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ROOTAC(134, "ROOTAC", new RootacDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SDINFORMATICA(135, "SDINFORMATICA", new SDInformaticaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SGMASTER(136, "SGMASTER", new SGMasterDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIMS(137, "SIMS", new SIMSDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    STI(138, "STI", new STIDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    STSITEMAS(139, "STSITEMAS", new STSitemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SAAC(140, "SAAC", new SaacDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SABTECH(141, "SABTECH", new SabTechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SAEF(142, "SAEF", new SaefDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SAMBANET(143, "SAMBANET", new SambaNetV2DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SATECFE(144, "SATECFE", new SatecfeDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SAV(145, "SAV", new SavDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SCEF(146, "SCEF", new ScefDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SHI(147, "SHI", new ShiDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIAC(149, "SIAC", new SiacDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIFAT(150, "SIFAT", new SifatDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIGMA(151, "SIGMA", new SigmaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIIT(152, "SIIT", new SiitDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SIRCOM(153, "SIRCOM", new SircomDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SISMOURA(154, "SISMOURA", new SisMouraDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SNSISTEMA(155, "SNSISTEMA", new SnSistemaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOFTCOM(156, "SOFTCOM", new SoftcomDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOFTTECH(157, "SOFTTECH", new SofttechDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOLIDO(158, "SOLIDO", new SolidoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOLUTIONSUPERA(160, "SOLUTIONSUPERA", new SolutionSuperaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SOPHYX(161, "SOPHYX", new SophyxDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SRI(162, "SRI", new SriDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SUPER(164, "SUPER", new SuperDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SUPERLOJA10(165, "SUPERLOJA10", new SuperLoja10DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SUPERUS(166, "SUPERUS", new SuperusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SYNCTEC(167, "SYNCTEC", new SyncTecDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SYSAUT(168, "SYSAUT", new SysAutDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SYSERP(169, "SYSERP", new SysERPDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    SYSPDV(170, "SYSPDV", new SysPdvDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new SysPdv2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    TGA(172, "TGA", new TGADAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    TECNOSOFT(173, "TECNOSOFT", new TecnosoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    TELECON(174, "TELECON", new TeleconDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    TITECNOLOGIA(175, "TITECNOLOGIA", new TiTecnologiaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    TOPSYSTEM(176, "TOPSYSTEM", new TopSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new TopSystem2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    TPAROOTAC(177, "TPAROOTAC", new TpaRootacDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    TSTI(178, "TSTI", new TstiDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    UNIPLUS(179, "UNIPLUS", new UniplusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Uniplus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    UPFORTI(180, "UPFORTI", new UpFortiDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    VCASH(181, "VCASH", new VCashDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    VRMASTER(182, "VRMASTER", new VRToVRDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new VRToVR2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    VIASOFT(183, "VIASOFT", new ViaSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    VIGGO(184, "VIGGO", new ViggoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercioDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    VISUALMIX(186, "VISUALMIX", new VisualMixDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    W2A(187, "W2A", new W2ADAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    WEBSAQ(188, "WEBSAQ", new WebSaqDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    WEBER(189, "WEBER", new WeberDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    WINNEXUS(190, "WINNEXUS", new WinNexusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    WISASOFT(191, "WISASOFT", new WisaSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    WMSI(192, "WMSI", new WmsiDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ZOOMBOX(194, "ZOOMBOX", new ZoomboxDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    ZPF(195, "ZPF", new ZpfDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    },
+    LINEAR(196, "LINEAR", new LinearDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Linear2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ARIUS(197, "ARIUS", new AriusDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Arius2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new GatewaySistemas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SG(199, "SG", new SGDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new SG2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SYGMA(200, "SYGMA", new SygmaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Sygma2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    MICROTAB(201, "MICROTAB", new MicroTabDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new MicroTab2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    MRC6(202,"MRC6", new MRC6DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new MRC62_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    BOMSOFT(203, "BOMSOFT", new BomSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new BomSoft2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ASSIST(204, "ASSIST", new AssistDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Assist2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    DATABYTE(205, "DATABYTE", new DataByteDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new DataByte2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Dobes_Cga2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Provenco_Tentaculo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new FXSistemas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    CONSINCO(209, "CONSINCO", new ConsincoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Consinco2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    VERSATIL(210, "VERSATIL", new VersatilDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Versatil2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    DSIC(211, "DSIC", new DSICDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new DSIC2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    TSL(212, "TSL", new TslDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Tsl2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SATFACIL(213,"SATFACIL",new SatFacilDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new SatFacil2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    WBA(214,"WBA",new WBADAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new WBA2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    STOCK(215, "STOCK", new Stock_PostgresDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Stock_Postgres2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    CMM(216, "CMM", new CMMDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new CMM2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new GZProdados2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Dellasta_PrismaFlex2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Jnp_MSuper2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ETRADE(220,"ETRADE", new ETradeDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new ETrade_VRSystem2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    };
     
     private int id;
     private String nome;
@@ -488,4 +1771,5 @@ public enum ESistema {
         return null;
     }
 
+    public abstract VRInternalFrame getInternalFrame(VRMdiFrame frame);
 }
