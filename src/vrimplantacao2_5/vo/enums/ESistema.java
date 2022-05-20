@@ -241,6 +241,7 @@ import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
+import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
@@ -823,7 +824,12 @@ public enum ESistema {
     KCMS(92, "KCMS", new KcmsDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new KCMS2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     LBSOFTWARE(93, "LBSOFTWARE", new LBSoftwareDAO()) {

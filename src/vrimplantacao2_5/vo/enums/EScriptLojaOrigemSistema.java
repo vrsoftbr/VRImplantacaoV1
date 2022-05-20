@@ -143,7 +143,11 @@ public enum EScriptLojaOrigemSistema {
                     + "FROM\n"
                     + "	SUP999\n"
                     + "ORDER BY 1"),
-    ETRADE(219, 13, "SELECT codigo id, Fantasia descricao FROM Filial");
+    ETRADE(220, 13, "SELECT codigo id, Fantasia descricao FROM Filial"),
+    KCMS(92, 13, "select \n" +
+                "	codloja id,\n" +
+                "	fantasia descricao\n" +
+                "from empresa");
     
     private int idSistema;
     private int idBancoDados;

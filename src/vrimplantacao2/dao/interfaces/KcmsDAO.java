@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,11 +16,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
@@ -54,7 +58,69 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public String getSistema() {
-        return "KCMS" + id_loja;
+        return "KCMS";
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_EAN,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                }
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
 
     @Override
@@ -63,14 +129,15 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	codtrib,\n" +
-                    "	sittrib,\n" +
-                    "	descricao\n" +
-                    "from\n" +
-                    "	cdtributacao")) {
+                    "select \n" +
+                    "	codaliq id,\n" +
+                    "	DESCRCAD descricao,\n" +
+                    "	percentual\n" +
+                    "from \n" +
+                    "	CDALIQUOTA")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codtrib"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao"), 
+                            0, rs.getDouble("percentual"), 0));
                 }
             }
         }
@@ -195,7 +262,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    P.PRECOVEND, \n" +
                     "    P.CODTRIB, \n" +
                     "    trib.SITTRIB as csticms, \n" +
-                    "    P.CODALIQ, \n" +
+                    "    P.CODALIQ id_icms, \n" +
                     "    P.CODALIQNF, \n" +
                     "    P.PERCICMSCR, \n" +
                     "    P.PERCREDUC, \n" +
@@ -253,6 +320,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codprod"));
@@ -262,7 +330,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dtcadast"));
                     imp.setDescricaoGondola(rs.getString("descrnf"));
                     imp.setValidade(rs.getInt("valbalanca"));
-                    imp.seteBalanca("S".equals(rs.getString("pesavel")) ? true : false);
+                    imp.seteBalanca("S".equals(rs.getString("pesavel")));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembal"));
                     imp.setCodMercadologico1(rs.getString("codgenero"));
@@ -273,34 +341,43 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rs.getDouble("estomin"));
                     imp.setCustoComImposto(rs.getDouble("precocusto"));
                     imp.setCustoSemImposto(rs.getDouble("precoentr"));
+                    
                     if(usarMargemBruta) {
                         imp.setMargem(rs.getDouble("margbrut"));
                     } else {
                         imp.setMargem(rs.getDouble("margparam"));
                     }
+                    
                     imp.setPrecovenda(rs.getDouble("precovend"));
-                    imp.setIcmsCstSaida(rs.getInt("csticms"));
-                    imp.setIcmsAliqSaida(rs.getDouble("percicmscr"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("percicmscr"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("percreduc"));
                     imp.setPiscofinsCstDebito(rs.getString("cod_cst_cofins"));
                     imp.setPiscofinsCstCredito(rs.getString("cod_cst_cofins"));
                     imp.setNcm(rs.getString("codncm"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("cod_natureza_receita"));
+                    
+                    imp.setIcmsDebitoId(rs.getString("id_icms"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
          
-                    if((rs.getString("codbarra") != null) && 
-                            ("S".equals(rs.getString("pesavel"))) && 
-                                (rs.getString("codbarra").length() <= 7)){
-                        if(vBalanca) {
-                            imp.setEan(rs.getString("codbarra").substring(2, rs.getString("codbarra").length()));
+                    if ((rs.getString("codbarra") != null) &&  
+                                (rs.getString("codbarra").length() == 7)) {
+                        if (vBalanca) {
+                            imp.setEan(rs.getString("codbarra")
+                                    .substring(2, rs.getString("codbarra")
+                                            .length()));
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
                             codigoProduto = Long.parseLong(imp.getEan().trim());
+                            
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
                             } else {
                                 produtoBalanca = null;
                             }
+                            
                             if (produtoBalanca != null) {
                                 imp.seteBalanca(true);
                                 imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("valbalanca"));
@@ -309,6 +386,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.seteBalanca(false);
                             }
                         } else {
+                            imp.setEan(rs.getString("codbarra").substring(2, rs.getString("codbarra").length()));
                             imp.seteBalanca(true);
                             imp.setValidade(rs.getInt("valbalanca"));
                         } 
