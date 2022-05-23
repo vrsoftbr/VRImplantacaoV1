@@ -1,9 +1,5 @@
 package vrimplantacao2.vo.cadastro.desmembramento;
 
-/**
- *
- * @author Alan
- */
 public class DesmembramentoAnteriorVO {
     
     private String sistema;

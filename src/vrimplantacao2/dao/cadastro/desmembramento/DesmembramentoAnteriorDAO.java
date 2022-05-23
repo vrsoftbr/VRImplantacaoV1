@@ -175,7 +175,7 @@ public class DesmembramentoAnteriorDAO {
                     + "	ant.quantidade,\n"
                     + "	ant.paga\n"
                     + "from \n"
-                    + "	implantacao.codant_promocao ant\n"
+                    + "	implantacao.codant_desmembramento ant\n"
                     + "join implantacao.codant_produto p on p.impid = ant.id_produto "
                     + "where\n"
                     + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
