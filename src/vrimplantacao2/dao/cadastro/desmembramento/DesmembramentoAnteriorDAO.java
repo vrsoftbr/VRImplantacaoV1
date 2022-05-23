@@ -231,8 +231,8 @@ public class DesmembramentoAnteriorDAO {
             )) {
                 while (rst.next()) {
                     DesmembramentoIMP imp = new DesmembramentoIMP();
-                    imp.setId_produtopai(rst.getString("id_promocao"));
-                    imp.setId_produtofilho(rst.getString("id_produto"));
+                    imp.setId(rst.getString("id_promocao"));
+                    imp.setId(rst.getString("id_produto"));
 
                     Result.add(imp);
                 }

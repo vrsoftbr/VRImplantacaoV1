@@ -6,11 +6,27 @@ package vrimplantacao2.vo.importacao;
  */
 public class DesmembramentoIMP {
     
+    private String impLoja;
+    private String impSistema;
     private String id;
-    private String id_produto;
-    private String id_produtofilho;
-    private int idSituacaocadastro = 1;
-    private double estoque;
+    private String produtoPai;
+    private int idConexao = 0;
+    
+    public String getImpLoja() {
+        return impLoja;
+    }
+    
+    public void setImpLoja(String impLoja) {
+        this.impLoja = impLoja;
+    }
+    
+     public String getImpSistema() {
+        return impSistema;
+    }
+    
+    public void setImpSistema(String impSistema) {
+        this.impSistema = impSistema;
+    }
     
     public String getId() {
         return id;
@@ -20,35 +36,19 @@ public class DesmembramentoIMP {
         this.id = id;
     }
     
-    public String getId_produtopai() {
-        return id_produto;
+    public String getProdutoPai() {
+        return produtoPai;
     }
     
-    public void setId_produtopai(String id_produtopai) {
-        this.id_produto = id_produto;
+    public void setProdutoPai(String produtoPai) {
+        this.produtoPai = produtoPai;
     }
     
-    public String getId_produtofilho() {
-        return id_produtofilho;
-    }
-    
-    public void setId_produtofilho(String id_produtofilho) {
-        this.id_produtofilho = id_produtofilho;
-    }
-    
-    public int getIdSituacaocadastro() {
-        return idSituacaocadastro;
+    public int getIdConexao() {
+        return idConexao;
     }
 
-    public void setIdSituacaocadastro(int idSituacaocadastro) {
-        this.idSituacaocadastro = idSituacaocadastro;
-    }
-    
-    public double getEstoque() {
-        return estoque;
-    }
-    
-    public void setEstoque(double estoque){
-        this.estoque = estoque;
-    }
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
+    }  
 }
