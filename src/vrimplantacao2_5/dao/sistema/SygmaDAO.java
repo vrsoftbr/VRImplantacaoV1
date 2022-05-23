@@ -43,6 +43,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -171,11 +172,12 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	p.CODPRO id,\n"
+                    + "	pd.CODDER id,\n"
                     + "	p.DESCRICAO descricao,\n"
                     + "	pd.DESCRICAOCOMPLETA descricao_completa,\n"
                     + "	pd.REFERENCIA ean,\n"
                     + "	pd.UNIDMED unidade,\n"
+                    + " pd.FRACEMB emb_compra,\n"
                     + "	CASE\n"
                     + "	  WHEN CODSUBGRUPO = 2 THEN 1\n"
                     + "	  ELSE 0\n"
@@ -192,6 +194,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	  ELSE 0\n"
                     + "	END situacaocadastro,\n"
                     + "	pd.CODNCM ncm,\n"
+                    + " pd.CODCEST cest,\n"
                     + " p.CODTABTRIBUT id_icms,\n"
                     + "	SUBSTRING(t2.CSTCONSU FROM 2 FOR 3) cst_debito,\n"
                     + "	t2.ALQCONSU aliq_debito,\n"
@@ -222,6 +225,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rs.getString("descricao"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("emb_compra"));
                     imp.seteBalanca(rs.getBoolean("e_balanca"));
 
                     imp.setEstoque(rs.getDouble("estoque"));
@@ -236,7 +240,8 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
                     imp.setNcm(rs.getString("ncm"));
-
+                    imp.setCest(rs.getString("cest"));
+                    
                     imp.setIcmsDebitoId(rs.getString("id_icms"));
                     imp.setIcmsCreditoId(rs.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
