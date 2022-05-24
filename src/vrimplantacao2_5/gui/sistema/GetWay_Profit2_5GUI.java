@@ -25,7 +25,6 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class GetWay_Profit2_5GUI extends VRInternalFrame {
@@ -253,6 +252,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
                     dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
                     dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
+                    dao.setTipoDocumentoRotativo(rotativoSelecionado);
+                    dao.setTipoDocumentoCheque(chequeSelecionado);
                     
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);

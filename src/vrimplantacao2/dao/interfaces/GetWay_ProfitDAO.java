@@ -94,6 +94,14 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     private Set<Integer> TipoDocumentoRotativo;
     private Set<Integer> TipoDocumentoCheque;    
 
+    public void setTipoDocumentoRotativo(Set<Integer> TipoDocumentoRotativo) {
+        this.TipoDocumentoRotativo = TipoDocumentoRotativo;
+    }
+
+    public void setTipoDocumentoCheque(Set<Integer> TipoDocumentoCheque) {
+        this.TipoDocumentoCheque = TipoDocumentoCheque;
+    }
+    
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
     }
@@ -1402,12 +1410,12 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "   f.pvisita,\n"
                     + "   coalesce(\n"
                     + "   	case \n"
-                    + "               when codtipofornec = 1 then 0 \n"
-                    + "               when codtipofornec = 2 then 1 \n"
-                    + "		    when codtipofornec = 3 then 2 \n"
+                    + "             when codtipofornec = 1 then 1 \n"
+                    + "             when codtipofornec = 2 then 1 \n"
+                    + "		    when codtipofornec = 3 then 0 \n"
                     + "		    when codtipofornec = 4 then 3 \n"
-                    + "		    when codtipofornec = 5 then 5 \n"
-                    + "		    when codtipofornec = 6 then 6 \n"
+                    + "		    when codtipofornec = 5 then 2 \n"
+                    + "		    when codtipofornec = 6 then 3 \n"
                     + "		    when codtipofornec = 7 then 7 \n"
                     + "		    when codtipofornec = 8 then 8 \n"
                     + "		end,\n"
