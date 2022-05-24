@@ -241,7 +241,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    
+
                     imp.setIcmsDebitoId(rs.getString("id_icms"));
                     imp.setIcmsCreditoId(rs.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
@@ -358,7 +358,8 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	pf.COD_FORNECEDOR id_fornecedor,\n"
-                    + "	d.CODPRO id_produto,\n"
+                    + "	d.CODDER id_produto,\n"
+                    + " d.FRACEMB qtdembalagem,\n"
                     + "	pf.REFFORNEC cod_externo\n"
                     + "FROM\n"
                     + "	FORNECPROD pf\n"
@@ -374,6 +375,7 @@ public class SygmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setCodigoExterno(rs.getString("cod_externo"));
 
                     result.add(imp);
