@@ -23,7 +23,7 @@ import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -300,8 +300,9 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
 
-        LOG.config("Parametros:\r\n"
-                + " - Desconsiderar setor de balança:" + desconsiderarSetorBalanca + "\r\n");
+        LOG.log(Level.CONFIG, 
+                "Parametros:\r\n - Desconsiderar setor de balan\u00e7a:{0}\r\n", 
+                desconsiderarSetorBalanca);
 
         StringBuilder rep = new StringBuilder();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -382,18 +383,18 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	prod.CODTRIB_ENT icms_cst_entrada,\n"
                     + "	prod.ulticmscred icms_aliquota_entrada,\n"
                     + "	prod.PER_REDUC_ENT icms_reduzido_entrada,\n"
-                    + "   refativoimob tipo_ativo,\n"
-                    + "   refusoconsumo tipo_usoconsumo,\n"
+                    + " refativoimob tipo_ativo,\n"
+                    + " refusoconsumo tipo_usoconsumo,\n"
                     + "	prod.desativacompra,\n"
                     + " prod.CODANP codigoanp,\n"
                     + " prod.corredor\n"
                     + "from\n"
                     + "	produtos prod\n"
                     + "left outer join prod_familia fam on\n"
-                    + "		fam.codprod = prod.codprod and\n"
-                    + "		prod.codprod > 0\n"
+                    + "	fam.codprod = prod.codprod and\n"
+                    + "	prod.codprod > 0\n"
                     + "join aliquota_icms al on\n"
-                    + "		al.CODALIQ = prod.codaliq_nf\n"
+                    + "	al.CODALIQ = prod.codaliq_nf\n"
                     + "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n"
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
                     + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"
@@ -580,7 +581,9 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     vResult.add(imp);
                 }
             }
-            LOG.fine("Produtos de balança: " + qtdBalanca + " normais: " + qtdNormal);
+            LOG.log(Level.FINE, 
+                    "Produtos de balan\u00e7a: {0} normais: {1}", 
+                    new Object[]{qtdBalanca, qtdNormal});
         }
         return vResult;
     }

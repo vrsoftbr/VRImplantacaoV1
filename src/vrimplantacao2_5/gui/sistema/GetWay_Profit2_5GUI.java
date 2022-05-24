@@ -158,19 +158,16 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private GetWay_Profit2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public GetWay_Profit2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
-        pnlConn.setOnConectar(new ConexaoEvent() {
-            @Override
-            public void executar() throws Exception {
-                tabProdutos.btnMapaTribut.setEnabled(true);
-                carregarTipoDocumento();
-                gravarParametros();
-            }
+        pnlConn.setOnConectar(() -> {
+            tabProdutos.btnMapaTribut.setEnabled(true);
+            carregarTipoDocumento();
+            gravarParametros();
         });
         
         pnlConn.setSistema(ESistema.GETWAY);
@@ -186,8 +183,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                dao.setComplemento(pnlConn.getComplemento());
-                return dao.getSistema();
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -243,18 +239,24 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    dao.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
+                    dao.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUni.isSelected();
                     dao.usarMargemBruta = chkUsarMargemBruta.isSelected();
                     dao.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
                     dao.utilizaMetodoAjustaAliquota = chkMetodoAliquota.isSelected();
                     dao.copiarDescricaoCompletaParaGondola = chkCopiaDescComplGondola.isSelected();
+                    dao.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
 
                     Importador importador = new Importador(dao);
+                    importador.setIdConexao(pnlConn.idConexao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
 
                     dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
                     dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
+                    
+                    tabProdutos.setImportador(importador);
+                    tabFornecedores.setImportador(importador);
+                    tabClientes.setImportador(importador);
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:
@@ -291,18 +293,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                                 default:
                                     break;
                             }   break;
-                        case 2:
-                            if (chkUnifProdutos.isSelected()) {
-                                importador.unificarProdutos();
-                            }   if (chkUnifFornecedor.isSelected()) {
-                                importador.unificarFornecedor();
-                            }   if (chkUnifProdutoFornecedor.isSelected()) {
-                                importador.unificarProdutoFornecedor();
-                            }   if (chkUnifClientePreferencial.isSelected()) {
-                                importador.unificarClientePreferencial();
-                            }   if (chkUnifClienteEventual.isSelected()) {
-                                importador.unificarClienteEventual();
-                            }   break;
                         default:
                             break;
                     }
@@ -318,6 +308,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
                     }
+                    ex.printStackTrace();
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
@@ -353,6 +344,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
         chkUsarMargemLiquidaPraticada = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemSobreVenda = new vrframework.bean.checkBox.VRCheckBox();
+        chkTemArquivoBalanca = new javax.swing.JCheckBox();
+        chkTemArquivoBalancaUni = new javax.swing.JCheckBox();
         tabConvenio1 = new javax.swing.JPanel();
         scrollRotativo = new javax.swing.JScrollPane();
         tblRotativo = new vrframework.bean.table.VRTable();
@@ -378,13 +371,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
-        chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        chkTemArquivoBalancaUnificacao = new vrframework.bean.checkBox.VRCheckBox();
+        tabBalanca = new javax.swing.JPanel();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -466,6 +454,10 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         chkUsarMargemSobreVenda.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
         chkUsarMargemSobreVenda.setEnabled(true);
 
+        chkTemArquivoBalanca.setText("Tem Arquivo de Balança");
+
+        chkTemArquivoBalancaUni.setText("Tem Arquivo de Balança Unificação");
+
         javax.swing.GroupLayout vRPanel10Layout = new javax.swing.GroupLayout(vRPanel10);
         vRPanel10.setLayout(vRPanel10Layout);
         vRPanel10Layout.setHorizontalGroup(
@@ -493,8 +485,10 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkMetodoAliquota)
-                    .addComponent(chkDesconsiderarSetorBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(249, Short.MAX_VALUE))
+                    .addComponent(chkDesconsiderarSetorBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTemArquivoBalanca)
+                    .addComponent(chkTemArquivoBalancaUni))
+                .addContainerGap(279, Short.MAX_VALUE))
         );
         vRPanel10Layout.setVerticalGroup(
             vRPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -518,7 +512,12 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     .addComponent(chkUsarMargemSobreVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkMetodoAliquota)
+                    .addGroup(vRPanel10Layout.createSequentialGroup()
+                        .addComponent(chkMetodoAliquota)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkTemArquivoBalanca)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkTemArquivoBalancaUni))
                     .addGroup(vRPanel10Layout.createSequentialGroup()
                         .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -529,7 +528,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                         .addGroup(vRPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))))
-                .addContainerGap(293, Short.MAX_VALUE))
+                .addContainerGap(380, Short.MAX_VALUE))
         );
 
         pnlParementosSistema.addTab("Produtos", vRPanel10);
@@ -558,7 +557,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabConvenio1Layout.createSequentialGroup()
-                        .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+                        .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE)
                         .addGap(156, 156, 156))
                     .addGroup(tabConvenio1Layout.createSequentialGroup()
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -570,7 +569,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addGap(17, 17, 17)
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
                 .addGap(242, 242, 242))
         );
 
@@ -600,7 +599,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+                        .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE)
                         .addGap(156, 156, 156))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -612,7 +611,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addGap(17, 17, 17)
                 .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
                 .addGap(242, 242, 242))
         );
 
@@ -643,12 +642,12 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         vRPanel7Layout.setHorizontalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel7Layout.createSequentialGroup()
-                .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 842, Short.MAX_VALUE)
+                .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel7Layout.setVerticalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Produtos", vRPanel7);
@@ -660,14 +659,14 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         vRPanel9Layout.setHorizontalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
+                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 901, Short.MAX_VALUE)
                 .addGap(89, 89, 89))
         );
         vRPanel9Layout.setVerticalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
                 .addComponent(tabFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 67, Short.MAX_VALUE))
+                .addGap(0, 164, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", vRPanel9);
@@ -725,7 +724,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(705, Short.MAX_VALUE))
+                .addContainerGap(839, Short.MAX_VALUE))
         );
         tabConvenioLayout.setVerticalGroup(
             tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -736,7 +735,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(419, Short.MAX_VALUE))
+                .addContainerGap(535, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Convênio", tabConvenio);
@@ -807,68 +806,38 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(549, Short.MAX_VALUE))
+                .addContainerGap(674, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(412, Short.MAX_VALUE))
+                .addContainerGap(501, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", tabVendas);
 
         tabs.addTab("Importação", tabImportacao);
 
-        chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
-
-        chkUnifFornecedor.setText("Fornecedor (Somente com CPF/CNPJ)");
-
-        chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
-
-        chkUnifClientePreferencial.setText("Cliente Preferencial (Somente com CPF/CNPJ)");
-
-        chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
-
-        chkTemArquivoBalancaUnificacao.setText("Tem Arquivo Balança");
-
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel2Layout.createSequentialGroup()
-                        .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(chkTemArquivoBalancaUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(519, Short.MAX_VALUE))
+                .addComponent(pnlBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, 621, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(383, Short.MAX_VALUE))
         );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkTemArquivoBalancaUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(396, Short.MAX_VALUE))
+                .addComponent(pnlBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(480, Short.MAX_VALUE))
         );
 
-        tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab("Balança", tabBalanca);
 
         jScrollPane2.setViewportView(tabs);
 
@@ -954,12 +923,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkMetodoAliquota;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPesquisarKG;
-    private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalancaUnificacao;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private javax.swing.JCheckBox chkTemArquivoBalanca;
+    private javax.swing.JCheckBox chkTemArquivoBalancaUni;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemLiquidaPraticada;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemSobreVenda;
@@ -970,11 +935,13 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.tabbedPane.VRTabbedPane pnlParementosSistema;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private javax.swing.JScrollPane scrollRotativo;
     private javax.swing.JScrollPane scrollRotativo1;
+    private javax.swing.JPanel tabBalanca;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private javax.swing.JPanel tabConvenio;
     private javax.swing.JPanel tabConvenio1;
@@ -991,7 +958,6 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private vr.view.components.label.VRLabel vRLabel2;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel10;
-    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.panel.VRPanel vRPanel8;

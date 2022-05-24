@@ -147,7 +147,14 @@ public enum EScriptLojaOrigemSistema {
     KCMS(92, 13, "select \n" +
                 "	codloja id,\n" +
                 "	fantasia descricao\n" +
-                "from empresa");
+                "from empresa"),
+    GETWAY(68, 13, "select\n"
+                    + "	CODLOJA id,\n"
+                    + "	descricao\n"
+                    + "from\n"
+                    + "	LOJA\n"
+                    + "order by\n"
+                    + "	id");
     
     private int idSistema;
     private int idBancoDados;

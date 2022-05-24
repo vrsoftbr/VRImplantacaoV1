@@ -172,8 +172,10 @@
                                       <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkDesconsiderarSetorBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTemArquivoBalancaUni" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="249" max="32767" attributes="0"/>
+                                  <EmptySpace pref="279" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -203,7 +205,13 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkTemArquivoBalancaUni" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                       <Group type="102" attributes="0">
                                           <Component id="chkUsarQtdCotacaoProdFornecedor" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
@@ -217,7 +225,7 @@
                                           </Group>
                                       </Group>
                                   </Group>
-                                  <EmptySpace pref="293" max="32767" attributes="0"/>
+                                  <EmptySpace pref="380" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -321,6 +329,16 @@
                             </Property>
                           </Properties>
                         </Component>
+                        <Component class="javax.swing.JCheckBox" name="chkTemArquivoBalanca">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tem Arquivo de Balan&#xe7;a"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="chkTemArquivoBalancaUni">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tem Arquivo de Balan&#xe7;a Unifica&#xe7;&#xe3;o"/>
+                          </Properties>
+                        </Component>
                       </SubComponents>
                     </Container>
                     <Container class="javax.swing.JPanel" name="tabConvenio1">
@@ -339,7 +357,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="scrollRotativo" pref="613" max="32767" attributes="0"/>
+                                          <Component id="scrollRotativo" pref="771" max="32767" attributes="0"/>
                                           <EmptySpace min="-2" pref="156" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
@@ -356,7 +374,7 @@
                                   <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                                   <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="scrollRotativo" pref="216" max="32767" attributes="0"/>
+                                  <Component id="scrollRotativo" pref="328" max="32767" attributes="0"/>
                                   <EmptySpace min="-2" pref="242" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -410,7 +428,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="scrollRotativo1" pref="613" max="32767" attributes="0"/>
+                                          <Component id="scrollRotativo1" pref="771" max="32767" attributes="0"/>
                                           <EmptySpace min="-2" pref="156" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
@@ -427,7 +445,7 @@
                                   <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                                   <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="scrollRotativo1" pref="216" max="32767" attributes="0"/>
+                                  <Component id="scrollRotativo1" pref="328" max="32767" attributes="0"/>
                                   <EmptySpace min="-2" pref="242" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -509,14 +527,14 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="tabProdutos" pref="842" max="32767" attributes="0"/>
+                              <Component id="tabProdutos" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="tabProdutos" alignment="0" pref="490" max="32767" attributes="0"/>
+                          <Component id="tabProdutos" alignment="0" pref="587" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -545,7 +563,7 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="tabFornecedores" pref="763" max="32767" attributes="0"/>
+                              <Component id="tabFornecedores" pref="901" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="89" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -554,7 +572,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="tabFornecedores" min="-2" pref="423" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="67" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="164" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -622,7 +640,7 @@
                                   <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="705" max="32767" attributes="0"/>
+                              <EmptySpace pref="839" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -635,7 +653,7 @@
                               <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="419" max="32767" attributes="0"/>
+                              <EmptySpace pref="535" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -696,7 +714,7 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="549" max="32767" attributes="0"/>
+                              <EmptySpace pref="674" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -705,7 +723,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="412" max="32767" attributes="0"/>
+                              <EmptySpace pref="501" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -795,11 +813,11 @@
                 </Container>
               </SubComponents>
             </Container>
-            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
+            <Container class="javax.swing.JPanel" name="tabBalanca">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
-                    <Property name="tabTitle" type="java.lang.String" value="Unifica&#xe7;&#xe3;o"/>
+                  <JTabbedPaneConstraints tabName="Balan&#xe7;a">
+                    <Property name="tabTitle" type="java.lang.String" value="Balan&#xe7;a"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
@@ -809,18 +827,8 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkUnifProdutos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                  <Component id="chkTemArquivoBalancaUnificacao" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkUnifFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="519" max="32767" attributes="0"/>
+                          <Component id="pnlBalanca" min="-2" pref="621" max="-2" attributes="0"/>
+                          <EmptySpace pref="383" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -828,53 +836,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkUnifProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkTemArquivoBalancaUnificacao" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkUnifFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkUnifProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="396" max="32767" attributes="0"/>
+                          <Component id="pnlBalanca" min="-2" pref="149" max="-2" attributes="0"/>
+                          <EmptySpace pref="480" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Produtos (Somente com EAN v&#xe1;lido)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifFornecedor">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Fornecedor (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutoFornecedor">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Produto Fornecedor (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClientePreferencial">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cliente Preferencial (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClienteEventual">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cliente Eventual (Somente com CPF/CNPJ)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalancaUnificacao">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
-                  </Properties>
+                <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">
                 </Component>
               </SubComponents>
             </Container>
