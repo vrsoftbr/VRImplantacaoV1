@@ -78,8 +78,14 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                     cpgestorDAO.setViewEan(txtViewEAN.getText());
                     cpgestorDAO.setViewProduto(txtViewProduto.getText());
                     cpgestorDAO.setViewFornecedor(txtViewFornecedor.getText());
+                    cpgestorDAO.setViewVenda(txtViewVenda.getText());
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
+                    
+                    if (!txtImpLojaOrigem.getText().isEmpty()) {
+                        importador.setLojaOrigem(txtImpLojaOrigem.getText());
+                    }
+                    
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
@@ -97,6 +103,9 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                                 cpgestorDAO.getOpcoes().put("delimiter", txtDelimitadorProd.getText());
                                 cpgestorDAO.setArquivo(txtProdutoFile.getArquivo());
                                 cpgestorDAO.setComplemento(pnlConn.idConexao);
+                                
+                                cpgestorDAO.setDataInicioVenda(tabProdutos.edtDtVendaFim.getDate());
+                                cpgestorDAO.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                                 
                                 tabProdutos.executarImportacao();
                                 break;
@@ -123,7 +132,6 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                     pnlConn.fecharConexao();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
-                    ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
             }
@@ -173,6 +181,10 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         vRLabel1 = new vrframework.bean.label.VRLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        lblImpLojaOrigem = new javax.swing.JLabel();
+        txtImpLojaOrigem = new javax.swing.JTextField();
+        lblViewVendas = new javax.swing.JLabel();
+        txtViewVenda = new javax.swing.JTextField();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -239,7 +251,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Clientes", tabCli);
@@ -259,8 +271,18 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Views Vovo Zuzu:\nvw_exp_produtos_zuzu \nvw_exp_barras_zuzu \nvw_exp_forn_zuzu  \n\nSanta Fé \nvw_exp_produtos_sta \nvw_exp_barras_sta \nvw_exp_forn_sta");
+        jTextArea1.setText("Views Vovo Zuzu:\nvw_exp_produtos_zuzu \nvw_exp_barras_zuzu \nvw_exp_forn_zuzu  \n\nSanta Fé \nvw_exp_produtos_sta \nvw_exp_barras_sta \nvw_exp_forn_sta\nvw_exp_vendas_stafe_01");
         jScrollPane1.setViewportView(jTextArea1);
+
+        lblImpLojaOrigem.setText("Imp Loja");
+
+        lblViewVendas.setText("View Vendas");
+
+        txtViewVenda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtViewVendaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
         tabExtras.setLayout(tabExtrasLayout);
@@ -269,61 +291,80 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             .addGroup(tabExtrasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                    .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lblViewEAN)
+                        .addComponent(txtViewEAN, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                        .addComponent(lblViewProduto)
+                        .addComponent(txtViewProduto))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabExtrasLayout.createSequentialGroup()
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblViewProduto)
-                            .addComponent(lblViewEAN)
-                            .addComponent(txtViewEAN, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-                            .addComponent(txtViewProduto))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblViewFornecedor)
-                            .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1))
+                            .addComponent(lblImpLojaOrigem)
+                            .addComponent(txtImpLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabExtrasLayout.createSequentialGroup()
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(vRLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(tabExtrasLayout.createSequentialGroup()
                                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(455, 455, 455))
-                            .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGap(0, 0, 0))))
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtViewVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblViewFornecedor)
+                            .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblViewVendas))
+                        .addGap(8, 8, 8)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabExtrasLayout.setVerticalGroup(
             tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabExtrasLayout.createSequentialGroup()
-                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(tabExtrasLayout.createSequentialGroup()
-                        .addComponent(lblViewProduto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtViewProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblViewEAN)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtViewEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(tabExtrasLayout.createSequentialGroup()
-                        .addComponent(lblViewFornecedor)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(21, 21, 21)
                 .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabExtrasLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(txtProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 41, Short.MAX_VALUE))
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabExtrasLayout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(txtProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addComponent(lblViewFornecedor)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabExtrasLayout.createSequentialGroup()
+                                .addComponent(lblViewProduto)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtViewProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addComponent(lblViewEAN)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtViewEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addComponent(lblViewVendas)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtViewVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(38, 38, 38)
+                        .addComponent(lblImpLojaOrigem)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtImpLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(12, 12, 12))
         );
 
         tabImportacao.addTab("Parametros Extras", tabExtras);
@@ -348,7 +389,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -374,13 +415,19 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
+    private void txtViewVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtViewVendaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtViewVendaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel lblImpLojaOrigem;
     private javax.swing.JLabel lblViewEAN;
     private javax.swing.JLabel lblViewFornecedor;
     private javax.swing.JLabel lblViewProduto;
+    private javax.swing.JLabel lblViewVendas;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
@@ -393,10 +440,12 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTextField txtDelimitadorProd;
+    private javax.swing.JTextField txtImpLojaOrigem;
     private vrframework.bean.fileChooser.VRFileChooser txtProdutoFile;
     private javax.swing.JTextField txtViewEAN;
     private javax.swing.JTextField txtViewFornecedor;
     private javax.swing.JTextField txtViewProduto;
+    private javax.swing.JTextField txtViewVenda;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel8;
     // End of variables declaration//GEN-END:variables

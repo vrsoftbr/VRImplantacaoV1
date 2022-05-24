@@ -288,7 +288,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
 
         if (!opt.contains(OpcaoProduto.PROMOCAO)) {
-            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));;
+            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));
         }
 
         tabParametros.add(pnlResetarIds);
