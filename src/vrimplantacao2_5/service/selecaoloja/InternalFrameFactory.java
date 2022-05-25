@@ -23,6 +23,7 @@ import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
+import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
@@ -43,7 +44,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
  * @author guilhermegomes
  */
 public abstract class InternalFrameFactory {
-    
+
     /**
      * Build da interface GUI do sistema selecionado
      *
@@ -154,9 +155,12 @@ public abstract class InternalFrameFactory {
                 break;
             case JNP_MSUPER:
                 internalFrame = new Jnp_MSuper2_5GUI(frame);
-            break;
+                break;
             case ETRADE:
                 internalFrame = new ETrade_VRSystem2_5GUI(frame);
+                break;
+            case GANSO:
+                internalFrame = new Ganso2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;

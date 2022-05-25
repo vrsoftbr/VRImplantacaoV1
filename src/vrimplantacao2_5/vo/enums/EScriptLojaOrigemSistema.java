@@ -143,7 +143,8 @@ public enum EScriptLojaOrigemSistema {
                     + "FROM\n"
                     + "	SUP999\n"
                     + "ORDER BY 1"),
-    ETRADE(219, 13, "SELECT codigo id, Fantasia descricao FROM Filial");
+    ETRADE(219, 13, "SELECT codigo id, Fantasia descricao FROM Filial"),
+    GANSO(221,5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL");
     
     private int idSistema;
     private int idBancoDados;
