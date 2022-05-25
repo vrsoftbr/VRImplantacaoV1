@@ -62,7 +62,7 @@ public class DesmembramentoAnteriorDAO {
             }
         }
     }
-    
+
     public int getConexaoMigrada(int idConexao, String sistema) throws Exception {
         int conexao = 0;
 
@@ -155,7 +155,7 @@ public class DesmembramentoAnteriorDAO {
 
         return lojaJaMigrada;
     }
-    
+
     MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) throws Exception {
         MultiMap<String, DesmembramentoAnteriorVO> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -199,7 +199,7 @@ public class DesmembramentoAnteriorDAO {
                     if (rst.getString("codigoatual") != null) {
                         DesmembramentoVO atual = new DesmembramentoVO();
                         atual.setId(rst.getInt("codigoatual"));
-                        vo.setCodigoAtual(atual);
+                        vo.setCodigoAtual(conexao);
                     }
                     result.put(
                             vo,
@@ -213,34 +213,6 @@ public class DesmembramentoAnteriorDAO {
         return result;
     }
 
-    public List<DesmembramentoIMP> getDesmembramentoItens(String sistema) throws Exception {
-        List<DesmembramentoIMP> Result = new ArrayList<>();
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "distinct \n"
-                    + "	p.id_promocao,\n"
-                    + "	imp.codigoatual id_produto,\n"
-                    + "	p.paga\n"
-                    + "from\n"
-                    + "	implantacao.codant_desmembramento d\n"
-                    + "inner join implantacao.codant_produto imp on\n"
-                    + "	d.id_produto = imp.impid\n"
-                    + "where p.sistema = " + SQLUtils.stringSQL(sistema) + " \n"
-                    + "order by 2"
-            )) {
-                while (rst.next()) {
-                    DesmembramentoIMP imp = new DesmembramentoIMP();
-                    imp.setId(rst.getString("id_promocao"));
-                    imp.setId(rst.getString("id_produto"));
-
-                    Result.add(imp);
-                }
-            }
-        }
-        return Result;
-    }
-
     List<DesmembramentoIMP> getCodigoAtual(String sistema) throws Exception {
         List<DesmembramentoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -251,8 +223,8 @@ public class DesmembramentoAnteriorDAO {
             )) {
                 while (rst.next()) {
                     DesmembramentoIMP imp = new DesmembramentoIMP();
-                    imp.setId(rst.getString("codigoatual"));
-                    
+                    imp.setImpId(rst.getString("codigoatual"));
+
                     Result.add(imp);
                 }
             }

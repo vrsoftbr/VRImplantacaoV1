@@ -5,7 +5,7 @@ public class DesmembramentoAnteriorVO {
     private String sistema;
     private String loja;
     private String importId;
-    private DesmembramentoVO codigoAtual;
+    private Integer codigoAtual;
     private String produto;
     private double quantidade;
     private String descricao;
@@ -35,11 +35,11 @@ public class DesmembramentoAnteriorVO {
         this.importId = importId;
     }
     
-    public DesmembramentoVO getCodigoAtual() {
+    public Integer getCodigoAtual() {
         return codigoAtual;
     } 
     
-    public void setCodigoAtual(DesmembramentoVO codigoAtual){
+    public void setCodigoAtual(Integer codigoAtual){
         this.codigoAtual = codigoAtual;
     }
     

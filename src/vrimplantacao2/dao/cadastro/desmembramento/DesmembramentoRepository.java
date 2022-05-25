@@ -10,8 +10,6 @@ import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
 
 public class DesmembramentoRepository {
 
-    private static final SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy-MM-dd");
-
     private final DesmembramentoProvider provider;
     private final LogController logController;
 
@@ -35,7 +33,7 @@ public class DesmembramentoRepository {
         MultiMap<String, DesmembramentoIMP> result = new MultiMap<>();
 
         for (DesmembramentoIMP imp : desmembramento) {
-            result.put(imp, imp.getId());
+            result.put(imp, imp.getImpId());
         }
 
         desmembramento.clear();
