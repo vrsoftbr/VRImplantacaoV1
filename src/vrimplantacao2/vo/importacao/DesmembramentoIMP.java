@@ -1,16 +1,17 @@
 package vrimplantacao2.vo.importacao;
 
-/**
- *
- * @author Alan
- */
+import java.util.ArrayList;
+import java.util.List;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+
 public class DesmembramentoIMP {
     
     private String impLoja;
     private String impSistema;
     private String id;
     private String produtoPai;
-    private int idConexao = 0;
+    private List<DesmembramentoItemIMP> itens = new ArrayList<>();
+    private SituacaoCadastro status = SituacaoCadastro.ATIVO;
     
     public String getImpLoja() {
         return impLoja;
@@ -44,11 +45,15 @@ public class DesmembramentoIMP {
         this.produtoPai = produtoPai;
     }
     
-    public int getIdConexao() {
-        return idConexao;
+    public List<DesmembramentoItemIMP> getProdutoFilho() {
+        return itens;
+}
+    
+    public SituacaoCadastro getStatus() {
+        return status;
     }
-
-    public void setIdConexao(int idConexao) {
-        this.idConexao = idConexao;
-    }  
+    
+    public void setStatus(SituacaoCadastro status) {
+        this.status = status == null ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO;
+    }
 }

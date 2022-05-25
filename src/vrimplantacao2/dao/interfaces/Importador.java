@@ -35,7 +35,7 @@ import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepositoryPro
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepository;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepositoryProvider;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepository;
-import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoProvider;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroRepository;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoProvider;
@@ -1255,13 +1255,13 @@ public class Importador {
     public void importarDesmembramento() throws Exception {
         ProgressBar.setStatus("Carregando Desmembramentos...");
         List<DesmembramentoIMP> desmembramento = getInterfaceDAO().getDesmembramento();
-        DesmembramentoRepositoryProvider provider = new DesmembramentoRepositoryProvider (
+        DesmembramentoProvider provider = new DesmembramentoProvider (
                 getSistema(),
                 getLojaOrigem(),
                 getLojaVR(),
                 getIdConexao()
         );
-        DesmembramentoRepository rep = new DesmembramentoRepository(provider);
-        rep.salvar(desmembramento);
+        DesmembramentoRepository repository = new DesmembramentoRepository(provider);
+        repository.salvar(desmembramento);
     }
 }

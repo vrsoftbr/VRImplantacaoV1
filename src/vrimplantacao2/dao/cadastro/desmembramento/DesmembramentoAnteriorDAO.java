@@ -198,7 +198,7 @@ public class DesmembramentoAnteriorDAO {
 
                     if (rst.getString("codigoatual") != null) {
                         DesmembramentoVO atual = new DesmembramentoVO();
-                        atual.setId(rst.getString("codigoatual"));
+                        atual.setId(rst.getInt("codigoatual"));
                         vo.setCodigoAtual(atual);
                     }
                     result.put(
