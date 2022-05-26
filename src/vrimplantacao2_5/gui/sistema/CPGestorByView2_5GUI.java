@@ -104,7 +104,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                                 cpgestorDAO.setArquivo(txtProdutoFile.getArquivo());
                                 cpgestorDAO.setComplemento(pnlConn.idConexao);
                                 
-                                cpgestorDAO.setDataInicioVenda(tabProdutos.edtDtVendaFim.getDate());
+                                cpgestorDAO.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                                 cpgestorDAO.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                                 
                                 tabProdutos.executarImportacao();

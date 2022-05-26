@@ -976,11 +976,15 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     if (rst.next()) {
                         next = new VendaItemIMP();
                         
-                        String id = rst.getString("cupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("cupom") + "-" + 
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("data");
+                        
                         String idVendaItem = rst.getString("cupom") + "-" + 
                                 rst.getString("ecf") + "-" + 
                                 rst.getString("data") + "-" +
-                                rst.getString("codigo_produto");
+                                rst.getString("codigo_produto") + "-" + 
+                                rst.getString("codigo_barras");
 
                         next.setId(idVendaItem);
                         next.setVenda(id);
