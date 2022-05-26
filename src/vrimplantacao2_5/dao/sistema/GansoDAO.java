@@ -4,11 +4,9 @@ import java.util.Map;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 import java.sql.ResultSet;
@@ -771,11 +769,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setNumeroSerie(rst.getString("serie"));
-                        next.setSubTotalImpressora(rst.getDouble("valor"));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setSubTotalImpressora(rst.getDouble("valorliquido"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
@@ -790,26 +784,22 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = ""/*"SELECT\n"
-                    + "	id id_venda,\n"
-                    + "	v.numero,\n"
-                    + "	CASE WHEN vd.NUMERO_CFE IS NULL THEN v.ID||'-'||v.NUMERO ELSE vd.NUMERO_CFE END numerocupom,\n"
-                    + "	COALESCE (id_pdv,1) ecf,\n"
-                    + "	DATA_EMISSAO data,\n"
-                    + "	HORA_EMISSAO hora,\n"
-                    + "	v.serie,\n"
-                    + "	v.VALOR_CONTABIL valor,\n"
-                    + "	v.ID_CLIENTE,\n"
-                    + "	c.CGC cpf,\n"
-                    + "	c.NOME nomecliente,\n"
-                    + "	CASE WHEN SITUACAO = 1 THEN 1 ELSE 0 END cancelado\n"
-                    + "FROM\n"
-                    + "	NF_SAIDA v\n"
-                    + "	JOIN NF_SAIDA_SAT vd ON vd.ID_NF_SAIDA = v.ID\n"
-                    + "	JOIN CADCLI c ON c.CODIGO = v.ID_CLIENTE \n"
-                    + "WHERE\n"
-                    + "	ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND DATA_EMISSAO BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'\n"*/;
+                    = "SELECT \n"
+                    + " CODIGO id_venda,\n"
+                    + " TIPO_VENDA,\n"
+                    + " DATA_VENDA data,\n"
+                    + " HORA_VENDA hora,\n"
+                    + " VENDA_BRUTA valorbruto,\n"
+                    + " VENDA_LIQUIDA valorliquido,\n"
+                    + " DESCONTO_VALOR desconto,\n"
+                    + " CODIGO numerocupom,\n"
+                    + " CODIGO_ECF ecf,\n"
+                    + " CASE WHEN ESTORNO = 'S' THEN 1 ELSE 0 END cancelado,\n"
+                    + " CODIGO_FILIAL\n"
+                    + "FROM VENDA\n"
+                    + "WHERE \n"
+                    + " DATA_VENDA BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'";
+            
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -849,14 +839,15 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nritem"));
-                        next.setProduto(rst.getString("id_produto"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(rst.getString("produtoid"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
                 }
@@ -868,25 +859,23 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = ""/*"SELECT\n"
-                    + "	vi.id nritem,\n"
-                    + "	vi.ID_NF id_venda,\n"
-                    + "	vi.ID||vi.ID_NF||vi.ID_PRODUTO id_item,\n"
-                    + "	vi.ID_PRODUTO,\n"
-                    + "	p.DESCRICAO,\n"
-                    + "	vi.QTD quantidade,\n"
-                    + "	vi.VLR_UNITARIO valor,\n"
-                    + "	vi.VLR_ACRESCIMO acrescimo,\n"
-                    + "	p.COD_BARRAS codigobarras,\n"
-                    + "	un.DESCRICAO unidade\n"
-                    + "FROM\n"
-                    + "	NF_SAIDA_ITENS vi\n"
-                    + " JOIN PRODUTO p ON p.ID = vi.ID_PRODUTO\n"
-                    + " JOIN FNC_EMBALAGENS un ON un.ID = vi.ID_EMBALAGEM \n"
-                    + " JOIN NF_SAIDA v ON v.ID = vi.ID_NF \n"
-                    + "WHERE\n"
-                    + "	vi.ID_EMPRESA = " + idLojaCliente + "\n"
-                    + "	AND v.DATA_EMISSAO BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"*/;
+                    = "SELECT \n"
+                    + "vi.CODIGO_ITEM id_item,\n"
+                    + "vi.CODIGO_VENDA id_venda,\n"
+                    + "vi.CODIGO_PRODUTO produtoid,\n"
+                    + "vi.PAF_DESCRICAO_PRODUTO descricao,\n"
+                    + "vi.CODIGO_BARRA codigobarras,\n"
+                    + "CASE WHEN vi.PAF_UNIDADE_MEDIDA NOT IN ('UN','KG','CX') THEN 'UN'\n"
+                    + "     ELSE vi.PAF_UNIDADE_MEDIDA END unidade,\n"
+                    + "vi.SEQUENCIA,\n"
+                    + "vi.QUANTIDADE,\n"
+                    + "vi.PRECO_UNITARIO valor,\n"
+                    + "vi.DESCONTO_VALOR desconto,\n"
+                    + "CASE WHEN vi.ESTORNO = 'S' THEN 1 ELSE 0 END cancelado\n"
+                    + "FROM VENDA_ITEM vi\n"
+                    + "JOIN VENDA v ON v.CODIGO = vi.CODIGO_VENDA \n"
+                    + "WHERE \n"
+                    + "  v.DATA_VENDA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "';";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
