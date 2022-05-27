@@ -154,7 +154,9 @@ public enum EScriptLojaOrigemSistema {
                     + "from\n"
                     + "	LOJA\n"
                     + "order by\n"
-                    + "	id");
+                    + "	id"),
+    GANSO(221,5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL"),
+    ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja");
     
     private int idSistema;
     private int idBancoDados;

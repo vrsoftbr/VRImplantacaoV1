@@ -9,7 +9,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
  * @author guilhermegomes
  */
 public abstract class InternalFrameFactory {
-    
+
     /**
      * Build da interface GUI do sistema selecionado
      *
@@ -19,6 +19,7 @@ public abstract class InternalFrameFactory {
      * @throws Exception
      */
     public static VRInternalFrame getInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
+
         return sistema.getInternalFrame(frame);
-    }
+  }
 }

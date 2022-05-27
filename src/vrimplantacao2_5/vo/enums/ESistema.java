@@ -211,6 +211,7 @@ import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
+import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
@@ -238,9 +239,11 @@ import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
+import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
+import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
@@ -753,7 +756,12 @@ public enum ESistema {
     ISERVER(78, "ISERVER", new IServerDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new IServer2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     INFOBRASIL(79, "INFOBRASIL", new InfoBrasilDAO()) {
@@ -1726,6 +1734,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new ETrade_VRSystem2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GANSO(221,"GANSO", new GansoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Ganso2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
