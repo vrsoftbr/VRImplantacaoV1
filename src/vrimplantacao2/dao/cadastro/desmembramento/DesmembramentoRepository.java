@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.desmembramento;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoAnteriorVO;

@@ -27,10 +27,11 @@ public class DesmembramentoAnteriorDAO {
                     + "CREATE TABLE implantacao.codant_desmembramento (\n"
                     + "	sistema varchar not null,\n"
                     + "	loja varchar not null,\n"
-                    + "	importId varchar not null,\n"
+                    + "	impid varchar not null,\n"
                     + "	codigoatual serial not null,\n"
-                    + "	produto varchar not null,\n"
-                    + "	descricao varchar null,\n"
+                    + "	produtopai varchar not null,\n"
+                    + "	produtofilho varchar null,\n"
+                    + " percentual varchar not null,\n"
                     + "	id_conexao int not null \n"
                     + ");\n"
                     + "	end if;\n"
@@ -47,10 +48,10 @@ public class DesmembramentoAnteriorDAO {
             sql.setSchema("implantacao");
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
-            sql.put("importid", anterior.getImportId());
-            sql.put("produto", anterior.getProduto());
-            sql.put("descricao", anterior.getDescricao());
-            sql.put("quantidade", anterior.getQuantidade());
+            sql.put("impid", anterior.getImpId());
+            sql.put("produtopai", anterior.getProdutoPai());
+            sql.put("produtofilho", anterior.getProdutoFilho());
+            sql.put("percentual", anterior.getPercentual());
             sql.put("id_conexao", anterior.getIdConexao());
 
             try {
@@ -164,16 +165,9 @@ public class DesmembramentoAnteriorDAO {
                     + "	ant.sistema,\n"
                     + "	ant.loja,\n"
                     + "	ant.id_conexao,\n"
-                    + "	ant.id_promocao,\n"
                     + " ant.codigoatual, \n"
-                    + "	ant.descricao,\n"
-                    + "	ant.datainicio,\n"
-                    + "	ant.datatermino,\n"
-                    + "	ant.ean,\n"
                     + "	p.codigoatual id_produto,\n"
-                    + "	ant.descricaocompleta,\n"
-                    + "	ant.quantidade,\n"
-                    + "	ant.paga\n"
+                    + "	ant.percentual\n"
                     + "from \n"
                     + "	implantacao.codant_desmembramento ant\n"
                     + "join implantacao.codant_produto p on p.impid = ant.id_produto "
@@ -191,10 +185,9 @@ public class DesmembramentoAnteriorDAO {
                     vo.setSistema(rst.getString("sistema"));
                     vo.setLoja(rst.getString("loja"));
                     vo.setIdConexao(rst.getInt("id_conexao"));
-                    vo.setDescricao(rst.getString("descricao"));
-                    vo.setProduto(rst.getString("id_produto"));
-                    vo.setDescricao(rst.getString("descricaocompleta"));
-                    vo.setQuantidade(rst.getDouble("quantidade"));
+                    vo.setProdutoPai(rst.getString("produtopai"));
+                    vo.setProdutoFilho(rst.getString("produtofilho"));
+                    vo.setPercentual(rst.getDouble("percentual"));
 
                     if (rst.getString("codigoatual") != null) {
                         DesmembramentoVO atual = new DesmembramentoVO();

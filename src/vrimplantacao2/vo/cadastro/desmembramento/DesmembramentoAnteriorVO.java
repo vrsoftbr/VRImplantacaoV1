@@ -1,77 +1,81 @@
 package vrimplantacao2.vo.cadastro.desmembramento;
 
+/**
+ * Classe que representa um registro da tabela implantacao.codant_desmembramento
+ */
+
 public class DesmembramentoAnteriorVO {
-    
+
     private String sistema;
     private String loja;
-    private String importId;
+    private String impId;
     private Integer codigoAtual;
-    private String produto;
-    private double quantidade;
-    private String descricao;
+    private String produtoPai;
+    private String produtoFilho;
+    private double percentual;
     private int idConexao;
- 
+
     public String getSistema() {
         return sistema;
     }
-    
+
     public void setSistema(String sistema) {
         this.sistema = sistema;
     }
-    
+
     public String getLoja() {
         return loja;
     }
-    
+
     public void setLoja(String loja) {
         this.loja = loja;
     }
-    
-    public String getImportId() {
-        return importId;
+
+    public String getImpId() {
+        return impId;
     }
-    
-    public void setImportId(String importId) {
-        this.importId = importId;
+
+    public void setImId(String impId) {
+        this.impId = impId;
     }
-    
+
     public Integer getCodigoAtual() {
         return codigoAtual;
-    } 
-    
-    public void setCodigoAtual(Integer codigoAtual){
+    }
+
+    public void setCodigoAtual(Integer codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
-    
-    public String getProduto() {
-        return produto;
+
+    public String getProdutoPai() {
+        return produtoPai;
+    }
+
+    public void setProdutoPai(String produtoPai) {
+        this.produtoPai = produtoPai;
+    }
+
+    public String getProdutoFilho() {
+        return produtoFilho;
     }
     
-    public void setProduto(String produto){
-        this.produto = produto;
+    public void setProdutoFilho(String produtoFilho) {
+        this.produtoFilho = produtoFilho;
     }
     
-    public double getQuantidade() {
-        return quantidade;
+    public double getPercentual() {
+        return percentual;
     }
-    
-    public void setQuantidade(double quantidade) {
-        this.quantidade = quantidade;
+
+    public void setPercentual(double percentual) {
+        this.percentual = percentual;
     }
-    
-    public String getDescricao() {
-        return descricao;
-    }
-    
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-    
+
     public int getIdConexao() {
         return idConexao;
     }
-    
-    public void setIdConexao(int idConexao){
+
+    public void setIdConexao(int idConexao) {
         this.idConexao = idConexao;
     }
 }

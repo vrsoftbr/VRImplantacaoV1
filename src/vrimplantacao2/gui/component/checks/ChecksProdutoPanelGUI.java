@@ -259,7 +259,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoProduto.NUTRICIONAL)
                 || opt.contains(OpcaoProduto.RECEITA)
                 || opt.contains(OpcaoProduto.DIVISAO)
-                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
+                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
+                || opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
                 chkInverterAssociado.setVisible(chkAssociado.isVisible());
@@ -276,6 +277,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
+            chkDesmembramento.setVisible(opt.contains(OpcaoProduto.DESMEMBRAMENTO));
             if (chkNutricionalFilizola.isVisible()
                     || chkNutricionalToledo.isVisible()) {
                 tabParametros.add(pnlOptOptNutricional);
@@ -289,10 +291,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         if (!opt.contains(OpcaoProduto.PROMOCAO)) {
             chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));
-        }
-        
-        if (!opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
-            chkDesmembramento.setVisible(opt.contains(OpcaoProduto.DESMEMBRAMENTO));
         }
 
         tabParametros.add(pnlResetarIds);
@@ -348,6 +346,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         if (opt.contains(OpcaoProduto.PROMOCAO)) {
             pnlImpCompl.add(chkPromocao);
+        }
+
+        if (opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
+            pnlImpCompl.add(chkDesmembramento);
         }
 
         if (opt.contains(OpcaoProduto.PRECO)
@@ -489,7 +491,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoProduto.NUTRICIONAL)
                 || opt.contains(OpcaoProduto.RECEITA)
                 || opt.contains(OpcaoProduto.DIVISAO)
-                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
+                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
+                || opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
                 chkInverterAssociado.setVisible(chkAssociado.isVisible());
@@ -506,6 +509,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
+            chkDesmembramento.setVisible(opt.contains(OpcaoProduto.DESMEMBRAMENTO));
             if (chkNutricionalFilizola.isVisible()
                     || chkNutricionalToledo.isVisible()) {
                 tabParametros.add(pnlOptOptNutricional);
@@ -521,9 +525,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         tabImportacao.revalidate();
 
         if (!opt.contains(OpcaoProduto.PROMOCAO)) {
-            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));;
+            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));
         }
-
     }
 
     public Set<OpcaoProduto> getOpcoesDisponiveis() {
