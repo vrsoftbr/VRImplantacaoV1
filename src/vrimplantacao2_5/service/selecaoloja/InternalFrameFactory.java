@@ -24,6 +24,7 @@ import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
+import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
@@ -161,6 +162,9 @@ public abstract class InternalFrameFactory {
                 break;
             case GANSO:
                 internalFrame = new Ganso2_5GUI(frame);
+                break;
+            case ISERVER:
+                internalFrame = new IServer2_5GUI(frame);
                 break;
             default:
                 internalFrame = null;
