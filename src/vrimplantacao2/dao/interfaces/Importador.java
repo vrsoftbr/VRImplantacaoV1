@@ -750,30 +750,6 @@ public class Importador {
     }
 
     /**
-     * Executa a importação do Nutricional para a impressora Filizola.
-     *
-     * @throws Exception
-     */
-    public void importarNutricionalFilizola() throws Exception {
-        ProgressBar.setStatus("Carregando Nutricional Filizola...");
-        List<NutricionalFilizolaVO> nutri = getInterfaceDAO().getNutricionalFilizola();
-        NutricionalFilizolaDAO dao = new NutricionalFilizolaDAO();
-        dao.salvarV2(nutri, getSistema(), getLojaOrigem());
-    }
-
-    /**
-     * Executa a importação do Nutricional para a impressora Toledo.
-     *
-     * @throws Exception
-     */
-    public void importarNutricionalToledo() throws Exception {
-        ProgressBar.setStatus("Carregando Nutricional Toledo...");
-        List<NutricionalToledoVO> nutri = getInterfaceDAO().getNutricionalToledo();
-        NutricionalToledoDAO dao = new NutricionalToledoDAO();
-        dao.salvarV2(nutri, getSistema(), getLojaOrigem());
-    }
-
-    /**
      * Atualiza informações do cadastro de fornecedores.
      *
      * @param opcoes
@@ -950,18 +926,18 @@ public class Importador {
         );
         rep.getCreditoRotativo().salvarPagamentosAgrupados(pags, opcoes);
     }
-    
+
     public void importarCestInvalido() throws Exception {
         ProgressBar.setStatus("Carregando cests...");
         List<ProdutoIMP> cests = getInterfaceDAO().getProdutos();
-        
+
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLoja(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        
+
         ProdutoRepository rep = new ProdutoRepository(provider);
-        
+
         rep.converterCest(cests);
     }
 
@@ -973,13 +949,13 @@ public class Importador {
      */
     public void importarOfertas(Date dataTermino) throws Exception {
         ProgressBar.setStatus("Ofertas...Gerando listagem...");
-        
+
         List<OfertaIMP> ofertas = getInterfaceDAO().getOfertas(dataTermino);
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLoja(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        
+
         ProdutoRepository rep = new ProdutoRepository(provider);
         rep.salvarOfertas(ofertas);
     }
@@ -1045,6 +1021,30 @@ public class Importador {
             rep.eBancoUnificado = eBancoUnificado;
             rep.importar(opt);
         }
+    }
+
+    /**
+     * Executa a importação do Nutricional para a impressora Filizola.
+     *
+     * @throws Exception
+     */
+    public void importarNutricionalFilizola() throws Exception {
+        ProgressBar.setStatus("Carregando Nutricional Filizola...");
+        List<NutricionalFilizolaVO> nutri = getInterfaceDAO().getNutricionalFilizola();
+        NutricionalFilizolaDAO dao = new NutricionalFilizolaDAO();
+        dao.salvarV2(nutri, getSistema(), getLojaOrigem());
+    }
+
+    /**
+     * Executa a importação do Nutricional para a impressora Toledo.
+     *
+     * @throws Exception
+     */
+    public void importarNutricionalToledo() throws Exception {
+        ProgressBar.setStatus("Carregando Nutricional Toledo...");
+        List<NutricionalToledoVO> nutri = getInterfaceDAO().getNutricionalToledo();
+        NutricionalToledoDAO dao = new NutricionalToledoDAO();
+        dao.salvarV2(nutri, getSistema(), getLojaOrigem());
     }
 
     /**
