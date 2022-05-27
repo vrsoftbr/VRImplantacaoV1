@@ -26,6 +26,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.dao.cadastro.MercadologicoDAO;
 import vrimplantacao.dao.cadastro.NcmDAO;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
+import vrimplantacao.dao.cadastro.NutricionalFilizolaRepository;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.dao.cadastro.PlanoDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -3510,7 +3511,10 @@ public class KairosDAO {
             List<NutricionalFilizolaVO> vNutricionalFilizola = carregarNutricionalFilizola();
 
             if (!vNutricionalFilizola.isEmpty()) {
-                new NutricionalFilizolaDAO().salvar(vNutricionalFilizola);
+                //desabilitar
+                String sistema= "";
+                String loja = "";
+                new NutricionalFilizolaRepository().salvarClassesEspecificas(vNutricionalFilizola, sistema, loja);
             }
         } catch (Exception ex) {
             throw ex;

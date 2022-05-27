@@ -127,9 +127,4 @@ public class NutricionalRepositoryProvider {
     public IDStack getIdsVagosToledo() throws Exception {
         return this.toledoDAO.getIdsVagos(999999);
     }
-
-    
-    
-    
-    
 }
