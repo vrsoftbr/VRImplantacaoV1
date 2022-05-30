@@ -311,7 +311,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         FilizolaSalvarArquivos operacoesSalvar = new FilizolaSalvarArquivos();
                         
                         if (rdbFilizolaRdc360.isSelected()) {
-                            operacoesSalvar.salvarArquivoRdc360(txtNutricional.getArquivo(), sistema, loja);
+                            //operacoesSalvar.salvarArquivoRdc360(txtNutricional.getArquivo(), sistema, loja);
                             operacoesSalvar.salvarArquivo(txtNutricional.getArquivo(), sistema, loja);
                         }
                         if(rdbToledo.isSelected()) {
