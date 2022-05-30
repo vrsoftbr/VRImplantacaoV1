@@ -294,7 +294,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "	p.pr_codigocstsai cstdebito,\n"
                     + " p.FO_CODIG fabricante\n"        
                     + "FROM " + getViewProduto() + " p \n"
-                    + "LEFT JOIN " + getViewEan() + " ean ON p.PR_CODINT = ean.PR_CODINT \n"
+                    + "LEFT JOIN " + getViewEan() + " ean ON p.PR_CODINT = ean.PR_CODINT\n"
                     + "WHERE\n"
                     + "	p.lj_associacao = " + getLojaOrigem())) {
                 while (rs.next()) {
@@ -887,7 +887,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
     
     private static class VendaIterator implements Iterator<VendaIMP> {
 
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yy");
 
         private final Statement stm = ConexaoOracle.createStatement();
         private final ResultSet rst;
@@ -897,8 +897,6 @@ public class CPGestorByViewDAO extends InterfaceDAO {
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -933,7 +931,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     "FROM \n" +
                     ""	+ viewVenda + "\n" +
                     "WHERE \n" +
-                    "	to_char(DATA, 'yyyy-MM-dd') between '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'\n" +
+                    "	DATA between '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'\n" +
                     "GROUP BY \n" +
                     "	id_loja,\n" +
                     "	cupom,\n" +
@@ -1025,7 +1023,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     "FROM \n" +
                     "" + viewVenda + "\n" +
                     "WHERE \n" +
-                    "	to_char(DATA, 'yyyy-MM-dd') between '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+                    "	DATA between '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
