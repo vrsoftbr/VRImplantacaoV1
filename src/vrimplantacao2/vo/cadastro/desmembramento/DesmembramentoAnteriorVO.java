@@ -35,7 +35,7 @@ public class DesmembramentoAnteriorVO {
         return impId;
     }
 
-    public void setImId(String impId) {
+    public void setImpId(String impId) {
         this.impId = impId;
     }
 

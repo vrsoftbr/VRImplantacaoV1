@@ -651,6 +651,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVolumeQtd.setSelected(false);
         chkVrAtacado.setSelected(false);
         chkPromocao.setSelected(false);
+        chkDesmembramento.setSelected(false);
     }
 
     /**
@@ -2129,6 +2130,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             if (chkPromocao.isSelected()) {
                 importador.importarPromocao();
+            }         
+            
+            if (chkDesmembramento.isSelected()) {
+                importador.importarDesmembramento();
             }
 
             importadorMercadologico.importarMercadologico();

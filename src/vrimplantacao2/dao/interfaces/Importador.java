@@ -1261,7 +1261,7 @@ public class Importador {
                 getLojaVR(),
                 getIdConexao()
         );
-        DesmembramentoRepository repository = new DesmembramentoRepository(provider);
-        repository.salvar(desmembramento);
+        DesmembramentoRepository rep = new DesmembramentoRepository(provider);
+        rep.salvar(desmembramento);
     }
 }

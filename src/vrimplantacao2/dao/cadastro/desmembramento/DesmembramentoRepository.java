@@ -3,9 +3,9 @@ package vrimplantacao2.dao.cadastro.desmembramento;
 import java.util.List;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoAnteriorVO;
+import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2_5.controller.migracao.LogController;
-import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
 
 public class DesmembramentoRepository {
 
@@ -18,30 +18,67 @@ public class DesmembramentoRepository {
     }
 
     public void salvar(List<DesmembramentoIMP> desmembramento) throws Exception {
-
-        MultiMap<String, DesmembramentoIMP> organizados = organizar(desmembramento);
-        provider.notificar("Desmembramento - Preparando Importação...");
-        MultiMap<Long, DesmembramentoVO> desmem = provider.getId();
-        MultiMap<Long, DesmembramentoAnteriorDAO> desmem_old = provider.getImpId();
-        
         MultiMap<String, DesmembramentoAnteriorVO> anteriores = provider.getAnteriores();
-        
+        try {
+            provider.setStatus("Eliminando cadastros anteriores.");
+            provider.setStatus("Gravando desmembramentos...");
+            provider.setMaximo(desmembramento.size());
+            for (DesmembramentoIMP imp : desmembramento) {
+                DesmembramentoAnteriorVO anterior = anteriores.get(
+                        provider.getSistema(),
+                        provider.getLojaOrigem(),
+                        imp.getImpId()
+                );
+
+                if (anterior == null) {
+                    anterior = converterDesmembramentoAnteriorVO(imp);
+                    gravar(anterior);
+                    anteriores.put(
+                            anterior,
+                            provider.getSistema(),
+                            provider.getLojaOrigem(),
+                            imp.getImpId()
+                    );
+                }
+                provider.next();
+            }
+
+            provider.commit();
+        } catch (Exception e) {
+            provider.rollback();
+            throw e;
+        }
     }
 
-    private MultiMap<String, DesmembramentoIMP> organizar(List<DesmembramentoIMP> desmembramento) throws Exception {
-        MultiMap<String, DesmembramentoIMP> result = new MultiMap<>();
+    private DesmembramentoAnteriorVO converterDesmembramentoAnteriorVO(DesmembramentoIMP imp) {
+        
+        //int idConexao = promocaoService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema());
+        DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
+        vo.setSistema(provider.getSistema());
+        vo.setLoja(provider.getLojaOrigem());
+        vo.setIdConexao(provider.getIdConexao());
+        vo.setImpId(imp.getImpId());
+        vo.setProdutoPai(imp.getProdutoPai());
+        vo.setProdutoFilho(imp.getProdutoFilho());
+        vo.setPercentual(imp.getPercentual());
 
-        for (DesmembramentoIMP imp : desmembramento) {
-            result.put(imp, imp.getImpId());
-        }
+        return vo;
+    }
 
-        desmembramento.clear();
-        System.gc();
+    public void gravarDesmembramento(DesmembramentoVO desmem) throws Exception {
+        provider.gravarDesmembramento(desmem);
+    }
 
-        result = result.getSortedMap();
-        System.gc();
+    public void gravar(DesmembramentoAnteriorVO anterior) throws Exception {
+        provider.gravarAnterior(anterior);
+    }
 
-        return result;        
+    public void getDesmembramentoItens() throws Exception {
+        provider.getDesmembramentoItens();
+    }
+
+    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
+        provider.gravarDesmembramentoItens(itens);
     }
 
 }

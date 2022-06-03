@@ -38,5 +38,4 @@ public class DesmembramentoItemIMP {
     public void setEstoque(double estoque) {
         this.estoque = estoque;
     }
-
 }

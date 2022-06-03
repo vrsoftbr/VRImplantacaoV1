@@ -5,7 +5,6 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 public class DesmembramentoVO {
 
     private int id;
-    //private int idDesmembramento;
     private int idProduto;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private double percentualEstoque;
@@ -20,14 +19,6 @@ public class DesmembramentoVO {
     public void setId(int id) {
         this.id = id;
     }
-
-    /*public int getIdDesmembramento() {
-        return idDesmembramento;
-    }
-
-    public void setIdDesmembramento(int idDesmembramento) {
-        this.idDesmembramento = idDesmembramento;
-    }*/
 
     public int getIdProduto() {
         return idProduto;

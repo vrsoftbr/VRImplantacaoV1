@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -41,123 +42,7 @@ public class DesmembramentoAnteriorDAO {
         }
     }
 
-    public void salvar(DesmembramentoAnteriorVO anterior) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
-            sql.setTableName("codant_desmembramento");
-            sql.setSchema("implantacao");
-            sql.put("sistema", anterior.getSistema());
-            sql.put("loja", anterior.getLoja());
-            sql.put("impid", anterior.getImpId());
-            sql.put("produtopai", anterior.getProdutoPai());
-            sql.put("produtofilho", anterior.getProdutoFilho());
-            sql.put("percentual", anterior.getPercentual());
-            sql.put("id_conexao", anterior.getIdConexao());
-
-            try {
-                stm.execute(sql.getInsert());
-            } catch (Exception e) {
-                System.out.println(sql.getInsert());
-                e.printStackTrace();
-                throw e;
-            }
-        }
-    }
-
-    public int getConexaoMigrada(int idConexao, String sistema) throws Exception {
-        int conexao = 0;
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select id from implantacao2_5.conexao limit 1")) {
-                if (rs.next()) {
-                    conexao = rs.getInt("id");
-                }
-            }
-        }
-
-        return conexao;
-    }
-
-    public int verificaRegistro() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select count(*) qtd from implantacao.codant_desmembramento limit 100")) {
-                if (rs.next()) {
-                    return rs.getInt("qtd");
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    public boolean verificaMigracaoMultiloja(String lojaOrigem, String sistema, int idConexao) throws Exception {
-        boolean conexao = false;
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	id_conexao \n"
-                    + "from \n"
-                    + "	implantacao.codant_desmembramento \n"
-                    + "where \n"
-                    + "	sistema = " + SQLUtils.stringSQL(sistema) + " and \n"
-                    + "   id_conexao = " + idConexao + " limit 1")) {
-                if (rs.next()) {
-                    conexao = true;
-                }
-            }
-        }
-
-        return conexao;
-    }
-
-    public String getLojaModelo(int idConexao, String sistema) throws Exception {
-        String loja = "";
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	loja \n"
-                    + "from \n"
-                    + "	implantacao.codant_desmembramento \n"
-                    + "where \n"
-                    + "	sistema = '" + sistema + "' and \n"
-                    + "	id_conexao = " + idConexao + "\n"
-                    + "limit 1")) {
-                if (rs.next()) {
-                    loja = rs.getString("loja");
-                }
-            }
-        }
-
-        return loja;
-    }
-
-    public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
-        boolean lojaJaMigrada = false;
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	id_conexao \n"
-                    + "from \n"
-                    + "	implantacao.codant_promocao\n"
-                    + "where \n"
-                    + "	sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
-                    + "   loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
-                    + "   id_conexao = " + idConexao + " limit 1")) {
-                if (rs.next()) {
-                    lojaJaMigrada = true;
-                }
-            }
-        }
-
-        return lojaJaMigrada;
-    }
-
-    MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) throws Exception {
+    /*MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) throws Exception {
         MultiMap<String, DesmembramentoAnteriorVO> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -170,7 +55,7 @@ public class DesmembramentoAnteriorDAO {
                     + "	ant.percentual\n"
                     + "from \n"
                     + "	implantacao.codant_desmembramento ant\n"
-                    + "join implantacao.codant_produto p on p.impid = ant.id_produto "
+                    + "join implantacao.codant_produto p on p.impid = ant.produtopai "
                     + "where\n"
                     + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
                     + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
@@ -178,7 +63,7 @@ public class DesmembramentoAnteriorDAO {
                     + "order by\n"
                     + "	ant.sistema,\n"
                     + "	ant.loja,"
-                    + " ant.id_promocao"
+                    + " ant.codigoatual"
             )) {
                 while (rst.next()) {
                     DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
@@ -204,25 +89,146 @@ public class DesmembramentoAnteriorDAO {
             }
         }
         return result;
-    }
-
+    }*/
     List<DesmembramentoIMP> getCodigoAtual(String sistema) throws Exception {
         List<DesmembramentoIMP> Result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codigoatual from implantacao.codant_promocao \n"
+                    "select codigoatual from implantacao.codant_desmembramento \n"
                     + "where sistema = " + SQLUtils.stringSQL(sistema) + " \n"
-                    + "order by 2"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     DesmembramentoIMP imp = new DesmembramentoIMP();
-                    imp.setImpId(rst.getString("codigoatual"));
+                    imp.setProdutoPai(rst.getString("codigoatual"));
 
                     Result.add(imp);
                 }
             }
         }
         return Result;
+    }
+
+    public void salvar(DesmembramentoAnteriorVO anterior) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("codant_desmembramento");
+            sql.setSchema("implantacao");
+            sql.put("sistema", anterior.getSistema());
+            sql.put("loja", anterior.getLoja());
+            sql.put("impid", anterior.getImpId());
+            sql.put("produtopai", anterior.getProdutoPai());
+            sql.put("produtofilho", anterior.getProdutoFilho());
+            sql.put("percentual", anterior.getPercentual());
+            sql.put("id_conexao", anterior.getIdConexao());
+
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                System.out.println(sql.getInsert());
+                e.printStackTrace();
+                throw e;
+            }
+        }
+    }
+
+    /*MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) throws Exception {
+        MultiMap<String, DesmembramentoAnteriorVO> result = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	ant.sistema,\n"
+                    + "	ant.loja,\n"
+                    + "	ant.id_conexao,\n"
+                    + " ant.codigoatual, \n"
+                    + "	p.codigoatual id_produto,\n"
+                    + "	ant.percentual\n"
+                    + "from \n"
+                    + "	implantacao.codant_desmembramento ant\n"
+                    + "join implantacao.codant_produto p on p.impid = ant.produtopai "
+                    + "where\n"
+                    + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
+                    + " ant.id_conexao = " + conexao + "\n"
+                    + "order by\n"
+                    + "	ant.sistema,\n"
+                    + "	ant.loja,"
+                    + " ant.codigoatual"
+            )) {
+                while (rst.next()) {
+                    DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
+                    vo.setSistema(rst.getString("sistema"));
+                    vo.setLoja(rst.getString("loja"));
+                    vo.setIdConexao(rst.getInt("id_conexao"));
+                    vo.setProdutoPai(rst.getString("produtopai"));
+                    vo.setProdutoFilho(rst.getString("produtofilho"));
+                    vo.setPercentual(rst.getDouble("percentual"));
+
+                    if (rst.getString("codigoatual") != null) {
+                        DesmembramentoVO atual = new DesmembramentoVO();
+                        atual.setId(rst.getInt("codigoatual"));
+                        vo.setCodigoAtual(conexao);
+                    }
+                    result.put(
+                            vo,
+                            vo.getSistema(),
+                            vo.getLoja(),
+                            String.valueOf(vo.getCodigoAtual())
+                    );
+                }
+            }
+        }
+        return result;
+    }*/
+    MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) {
+        MultiMap<String, DesmembramentoAnteriorVO> result = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	ant.sistema,\n"
+                    + "	ant.loja,\n"
+                    + "	ant.id_conexao,\n"
+                    + " ant.codigoatual, \n"
+                    + "	p.codigoatual id_produto,\n"
+                    + "	ant.percentual\n"
+                    + "from \n"
+                    + "	implantacao.codant_desmembramento ant\n"
+                    + "join implantacao.codant_produto p on p.impid = ant.produtopai "
+                    + "where\n"
+                    + "	ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "	ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
+                    + " ant.id_conexao = " + conexao + "\n"
+                    + "order by\n"
+                    + "	ant.sistema,\n"
+                    + "	ant.loja,"
+                    + " ant.codigoatual"
+            )) {
+                while (rst.next()) {
+                    DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
+                    vo.setSistema(rst.getString("sistema"));
+                    vo.setLoja(rst.getString("loja"));
+                    vo.setIdConexao(rst.getInt("id_conexao"));
+                    vo.setProdutoPai(rst.getString("produtopai"));
+                    vo.setProdutoFilho(rst.getString("produtofilho"));
+                    vo.setPercentual(rst.getDouble("percentual"));
+
+                    if (rst.getString("codigoatual") != null) {
+                        DesmembramentoVO atual = new DesmembramentoVO();
+                        atual.setId(rst.getInt("codigoatual"));
+                        vo.setCodigoAtual(conexao);
+                    }
+                    result.put(
+                            vo,
+                            vo.getSistema(),
+                            vo.getLoja(),
+                            String.valueOf(vo.getCodigoAtual())
+                    );
+                }
+            }
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return result;
     }
 
 }
