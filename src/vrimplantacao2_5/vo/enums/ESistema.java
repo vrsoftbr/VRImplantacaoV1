@@ -244,6 +244,7 @@ import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
+import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
@@ -773,7 +774,12 @@ public enum ESistema {
     INOVA(81, "INOVA", new InovaDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Inova2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     INTELLICASH(82, "INTELLICASH", new IntelliCashDAO()) {
