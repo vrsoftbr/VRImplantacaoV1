@@ -156,8 +156,10 @@ public enum EScriptLojaOrigemSistema {
                     + "order by\n"
                     + "	id"),
     GANSO(221,5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL"),
-    ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja"),
-    LCSISTEMAS(222,8,"select id, fantasia descricao from empresa");
+    LCSISTEMAS(222,8,"select id, fantasia descricao from empresa"),
+    INOVA(81,11, "select empresaid id, empresanomefantasia descricao from empresa"),
+    ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja");
+
     
     private int idSistema;
     private int idBancoDados;
