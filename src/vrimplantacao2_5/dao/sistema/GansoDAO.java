@@ -587,7 +587,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("codigo"));
-                    imp.setRazao(rs.getString("razao_social"));
+                    imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("nome"));
 
                     String pessoa = (rs.getString("pessoa"));

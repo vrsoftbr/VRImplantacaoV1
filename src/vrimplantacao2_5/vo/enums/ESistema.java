@@ -214,6 +214,7 @@ import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
+import vrimplantacao2_5.dao.sistema.LCSistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
 import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
@@ -246,6 +247,7 @@ import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
+import vrimplantacao2_5.gui.sistema.LCSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
@@ -1745,6 +1747,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Ganso2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    LCSISTEMAS(222,"LCSISTEMAS", new LCSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new LCSistemas2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

@@ -340,7 +340,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
-                    imp.setInsc_municipal(rst.getString("im"));
+                    //imp.setInsc_municipal(rst.getString("im"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setEndereco(rst.getString("endereco"));
@@ -353,7 +353,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setTel_principal(rst.getString("telefone"));
 
-                    if ((rst.getString("tel2") != null)
+                    /*if ((rst.getString("tel2") != null)
                             && (!rst.getString("tel2").trim().isEmpty())) {
                         imp.addContato(
                                 "1",
@@ -385,7 +385,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                                 TipoContato.COMERCIAL,
                                 rst.getString("email").toLowerCase()
                         );
-                    }
+                    }*/
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setAtivo(rst.getBoolean("situacao"));
 
