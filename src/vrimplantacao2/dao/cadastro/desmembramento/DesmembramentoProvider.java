@@ -105,10 +105,10 @@ public class DesmembramentoProvider {
     }
 
     public void getDesmembramentoItens() throws Exception {
-        List<DesmembramentoIMP> desmembramentoItens = desmembramentoDAO.getDesmembramentoItens();
+        List<DesmembramentoIMP> desmem = desmembramentoDAO.getDesmembramentoItens();
     }
 
-    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO anterior) throws Exception {
-        desmembramentoDAO.salvarDesmembramentoItens(anterior);
+    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
+        desmembramentoDAO.gravarDesmembramentoItens(itens);
     }
 }

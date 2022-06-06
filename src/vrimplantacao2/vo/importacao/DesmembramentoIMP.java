@@ -1,5 +1,7 @@
 package vrimplantacao2.vo.importacao;
 
+import java.util.List;
+
 public class DesmembramentoIMP {
 
     private String impId;

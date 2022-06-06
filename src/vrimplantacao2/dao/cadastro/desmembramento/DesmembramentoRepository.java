@@ -20,7 +20,6 @@ public class DesmembramentoRepository {
     public void salvar(List<DesmembramentoIMP> desmembramento) throws Exception {
         MultiMap<String, DesmembramentoAnteriorVO> anteriores = provider.getAnteriores();
         try {
-            provider.setStatus("Eliminando cadastros anteriores.");
             provider.setStatus("Gravando desmembramentos...");
             provider.setMaximo(desmembramento.size());
             for (DesmembramentoIMP imp : desmembramento) {
