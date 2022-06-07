@@ -26,7 +26,7 @@ import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.LogCustoDAO;
-import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
+import vrimplantacao.dao.cadastro.NutricionalToledoRepository;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
@@ -1687,7 +1687,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             ProgressBar.setStatus("Carregando dados...Nutricional Toledo...");
             List<NutricionalToledoVO> vNutricionalToledo = carregarNutricionalToledo();
             if (!vNutricionalToledo.isEmpty()) {
-                new NutricionalToledoDAO().salvarV2(vNutricionalToledo, getSistema(), getLojaOrigem());
+                new NutricionalToledoRepository().salvarClassesEspecificas(vNutricionalToledo, getSistema(), getLojaOrigem());
             }
         } catch (Exception ex) {
             throw ex;

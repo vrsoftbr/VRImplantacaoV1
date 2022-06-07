@@ -12,9 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaRepository;
-import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
+import vrimplantacao.dao.cadastro.NutricionalToledoRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
@@ -1044,8 +1043,8 @@ public class Importador {
     public void importarNutricionalToledo() throws Exception {
         ProgressBar.setStatus("Carregando Nutricional Toledo...");
         List<NutricionalToledoVO> nutri = getInterfaceDAO().getNutricionalToledo();
-        NutricionalToledoDAO dao = new NutricionalToledoDAO();
-        dao.salvarV2(nutri, getSistema(), getLojaOrigem());
+        NutricionalToledoRepository rep = new NutricionalToledoRepository();
+        rep.salvarClassesEspecificas(nutri, getSistema(), getLojaOrigem());
     }
 
     /**
