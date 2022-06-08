@@ -1,7 +1,7 @@
 package vrimplantacao2.vo.cadastro.desmembramento;
 
 /**
- * Classe que representa a tabela desmembramentoitem.
+ * Classe que representa a tabela desmembramentoitem
  * @author Alan
  */
 public class DesmembramentoItemVO {
