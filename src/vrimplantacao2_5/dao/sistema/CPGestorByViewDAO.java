@@ -53,6 +53,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
     private String viewEan;
     private String viewFornecedor;
     private String viewVenda;
+    private boolean utilizarQtdEmbalamgeIgualAUm = false;
     
     private static final Logger LOG = Logger.getLogger(CPGestorByViewDAO.class.getName());
     
@@ -111,6 +112,10 @@ public class CPGestorByViewDAO extends InterfaceDAO {
 
     public void setViewVenda(String viewVenda) {
         this.viewVenda = viewVenda;
+    }
+    
+    public void setUtilizarQtdEmbalagemIgualAUm(boolean utilizarQtdEmbalagemUm) {
+        this.utilizarQtdEmbalamgeIgualAUm = utilizarQtdEmbalagemUm;
     }
     
     @Override
@@ -256,8 +261,7 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                 }
             }
             
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n"
+            String sql = "SELECT \n"
                     + "	p.pr_codint id,\n"
                     + "	p.pr_nome descricaocompleta,\n"
                     + "	p.PR_NOMEGONDOLA descricaogondola,\n"
@@ -296,7 +300,10 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     + "FROM " + getViewProduto() + " p \n"
                     + "LEFT JOIN " + getViewEan() + " ean ON p.PR_CODINT = ean.PR_CODINT\n"
                     + "WHERE\n"
-                    + "	p.lj_associacao = " + getLojaOrigem())) {
+                    + "	p.lj_associacao = " + getLojaOrigem()
+                    + (this.utilizarQtdEmbalamgeIgualAUm == true ? " and ean.PR_QTDE = 1" : "");
+            
+            try (ResultSet rs = stm.executeQuery(sql)) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
