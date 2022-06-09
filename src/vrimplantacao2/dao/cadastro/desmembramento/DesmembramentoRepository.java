@@ -17,37 +17,37 @@ public class DesmembramentoRepository {
         this.logController = new LogController();
     }
 
-    public void salvar(List<DesmembramentoIMP> desmembramento) throws Exception {
-        MultiMap<String, DesmembramentoAnteriorVO> anteriores = provider.getAnteriores();
-        try {
-            provider.setStatus("Gravando desmembramentos...");
-            provider.setMaximo(desmembramento.size());
-            for (DesmembramentoIMP imp : desmembramento) {
-                DesmembramentoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getImpId()
-                );
-
-                if (anterior == null) {
-                    anterior = converterDesmembramentoAnteriorVO(imp);
-                    gravar(anterior);
-                    anteriores.put(
-                            anterior,
-                            provider.getSistema(),
-                            provider.getLojaOrigem(),
-                            imp.getImpId()
-                    );
-                }
-                provider.next();
-            }
-
-            provider.commit();
-        } catch (Exception e) {
-            provider.rollback();
-            throw e;
-        }
-    }
+//    public void salvar(List<DesmembramentoIMP> desmembramento) throws Exception {
+//        MultiMap<String, DesmembramentoAnteriorVO> anteriores = provider.getAnteriores();
+//        try {
+//            provider.setStatus("Gravando desmembramentos...");
+//            provider.setMaximo(desmembramento.size());
+//            for (DesmembramentoIMP imp : desmembramento) {
+//                DesmembramentoAnteriorVO anterior = anteriores.get(
+//                        provider.getSistema(),
+//                        provider.getLojaOrigem(),
+//                        imp.getId()
+//                );
+//
+//                if (anterior == null) {
+//                    anterior = converterDesmembramentoAnteriorVO(imp);
+//                    gravar(anterior);
+//                    anteriores.put(
+//                            anterior,
+//                            provider.getSistema(),
+//                            provider.getLojaOrigem(),
+//                            imp.getId()
+//                    );
+//                }
+//                provider.next();
+//            }
+//
+//            provider.commit();
+//        } catch (Exception e) {
+//            provider.rollback();
+//            throw e;
+//        }
+//    }
 
     private DesmembramentoAnteriorVO converterDesmembramentoAnteriorVO(DesmembramentoIMP imp) {
         
@@ -56,7 +56,7 @@ public class DesmembramentoRepository {
         vo.setSistema(provider.getSistema());
         vo.setLoja(provider.getLojaOrigem());
         vo.setIdConexao(provider.getIdConexao());
-        vo.setImpId(imp.getImpId());
+        vo.setId(imp.getId());
         vo.setProdutoPai(imp.getProdutoPai());
         vo.setProdutoFilho(imp.getProdutoFilho());
         vo.setPercentual(imp.getPercentual());
@@ -76,8 +76,8 @@ public class DesmembramentoRepository {
         provider.getDesmembramentoItens();
     }
 
-    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
-        provider.gravarDesmembramentoItens(itens);
-    }
+//    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
+//        provider.gravarDesmembramentoItens(itens);
+//    }
 
 }

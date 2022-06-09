@@ -739,7 +739,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     DesmembramentoIMP imp = new DesmembramentoIMP();
 
-                    imp.setImpId(rs.getString("id_desmem"));
+                    imp.setId(rs.getString("id_desmem"));
                     imp.setProdutoPai(rs.getString("prod_pai"));
                     imp.setProdutoFilho(rs.getString("prod_filho"));
                     imp.setPercentual(rs.getDouble("percentual"));

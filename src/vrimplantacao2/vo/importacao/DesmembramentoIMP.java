@@ -2,17 +2,17 @@ package vrimplantacao2.vo.importacao;
 
 public class DesmembramentoIMP {
 
-    private String impId;
+    private String id;
     private String produtoPai;
     private String produtoFilho;
     private Double percentual;
 
-    public String getImpId() {
-        return impId;
+    public String getId() {
+        return id;
     }
 
-    public void setImpId(String impId) {
-        this.impId = impId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getProdutoPai() {

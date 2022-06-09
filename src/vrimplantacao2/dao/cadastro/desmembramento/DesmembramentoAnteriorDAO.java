@@ -69,7 +69,7 @@ public class DesmembramentoAnteriorDAO {
             sql.setSchema("implantacao");
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
-            sql.put("impid", anterior.getImpId());
+            sql.put("impid", anterior.getId());
             sql.put("produtopai", anterior.getProdutoPai());
             sql.put("produtofilho", anterior.getProdutoFilho());
             sql.put("percentual", anterior.getPercentual());
@@ -84,60 +84,4 @@ public class DesmembramentoAnteriorDAO {
             }
         }
     }
-
-    MultiMap<String, DesmembramentoAnteriorVO> getAnteriores(String sistema, String lojaOrigem, int conexao) {
-        MultiMap<String, DesmembramentoAnteriorVO> result = new MultiMap<>();
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	 ant.sistema,\n"
-                    + "	 ant.loja,\n"
-                    + "  ant.codigoatual,\n"
-                    + "  p.impid produtopai,\n"
-                    + "	 p.codigoatual pai_atual,\n"
-                    + "	 ant.produtofilho,\n"
-                    + "  f.codigoatual filho_atual,\n"
-                    + "  ant.percentual,\n"
-                    + "	 ant.id_conexao"
-                    + "from \n"
-                    + "	 implantacao.codant_desmembramento ant\n"
-                    + "join implantacao.codant_produto p on p.impid = ant.produtopai \n"
-                    + "join implantacao.codant_produto f on f.impid = ant.produtofilho \n"
-                    + "where\n"
-                    + "	 ant.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
-                    + "	 ant.loja = " + SQLUtils.stringSQL(lojaOrigem) + " and\n"
-                    + "  ant.id_conexao = " + conexao + "\n"
-                    + "order by\n"
-                    + "	 ant.sistema, "
-                    + "	 ant.loja, "
-                    + "  ant.codigoatual"
-            )) {
-                while (rst.next()) {
-                    DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
-                    vo.setSistema(rst.getString("sistema"));
-                    vo.setLoja(rst.getString("loja"));
-                    vo.setIdConexao(rst.getInt("id_conexao"));
-                    vo.setProdutoPai(rst.getString("produtopai"));
-                    vo.setProdutoFilho(rst.getString("produtofilho"));
-                    vo.setPercentual(rst.getDouble("percentual"));
-
-                    if (rst.getString("codigoatual") != null) {
-                        DesmembramentoVO atual = new DesmembramentoVO();
-                        atual.setId(rst.getInt("codigoatual"));
-                        vo.setCodigoAtual(conexao);
-                    }
-                    result.put(
-                            vo,
-                            vo.getSistema(),
-                            vo.getLoja(),
-                            String.valueOf(vo.getCodigoAtual())
-                    );
-                }
-            }
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return result;
-    }
-
 }

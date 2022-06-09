@@ -8,7 +8,7 @@ public class DesmembramentoAnteriorVO {
 
     private String sistema;
     private String loja;
-    private String impId;
+    private String id;
     private Integer codigoAtual;
     private String produtoPai;
     private String produtoFilho;
@@ -31,12 +31,12 @@ public class DesmembramentoAnteriorVO {
         this.loja = loja;
     }
 
-    public String getImpId() {
-        return impId;
+    public String getId() {
+        return id;
     }
 
-    public void setImpId(String impId) {
-        this.impId = impId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Integer getCodigoAtual() {

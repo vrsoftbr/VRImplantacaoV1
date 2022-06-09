@@ -48,9 +48,9 @@ public class DesmembramentoProvider {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    MultiMap<String, DesmembramentoAnteriorVO> getAnteriores() throws Exception {
-        return desmembramentoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem(), getIdConexao());
-    }
+//    MultiMap<String, DesmembramentoAnteriorVO> getAnteriores() throws Exception {
+//        return desmembramentoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem(), getIdConexao());
+//    }
 
     public String getSistema() {
         return sistema;
@@ -108,7 +108,7 @@ public class DesmembramentoProvider {
         List<DesmembramentoIMP> desmem = desmembramentoDAO.getDesmembramentoItens();
     }
 
-    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
-        desmembramentoDAO.gravarDesmembramentoItens(itens);
-    }
+//    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
+//        desmembramentoDAO.gravarDesmembramentoItens(itens);
+//    }
 }
