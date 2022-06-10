@@ -68,9 +68,7 @@ public class FornecedorRepository {
             if (registro > 0 && idConexao == 0 || 
                     (!impSistema.isEmpty() && 
                         !impSistema.equals(this.provider.getSistema()))) {
-                
                 unificar(fornecedores);
-                
             } else {
                 boolean existeConexao = fornecedorService.
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), 
@@ -319,7 +317,7 @@ public class FornecedorRepository {
             this.contatos = provider.getContatos();
             HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
 
-            provider.setStatus("Fornecedores - Gravando...");
+            provider.setStatus("Fornecedores - Gravando Unificação...");
             provider.setMaximum(filtrados.size());
             for (FornecedorIMP imp : filtrados.values()) {
                 //Localiza as referencias dos fornecedores (anteriores e por cnpj/cpf)
@@ -329,12 +327,16 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 FornecedorVO fornecedorPorCnpj = cnpjExistentes.get(Utils.stringToLong(imp.getCnpj_cpf()));
+                
+                if(Utils.stringToLong(imp.getCnpj_cpf()) == 0) {
+                    fornecedorPorCnpj = null;
+                }
 
                 FornecedorVO vo = null;
                 if (anterior == null) {
                     vo = converter(imp);
 
-                    if (fornecedorPorCnpj == null) {
+                    if (fornecedorPorCnpj == null && vo.getCnpj() >= 99999999) {
                         int id = ids.obterID(imp.getImportId());
 
                         //Obtem um ID válido.
@@ -345,8 +347,10 @@ public class FornecedorRepository {
                         vo.setId(id);
                         gravarFornecedor(vo);
                         cnpjExistentes.put(vo.getCnpj(), vo);
-                    } else {
+                    } else if (fornecedorPorCnpj != null && vo.getCnpj() >= 99999999) {
                         vo.setId(fornecedorPorCnpj.getId());
+                    } else {
+                        vo = null;
                     }
 
                     anterior = converterAnterior(imp);
