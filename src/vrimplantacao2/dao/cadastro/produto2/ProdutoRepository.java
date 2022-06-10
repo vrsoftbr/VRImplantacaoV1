@@ -319,6 +319,14 @@ public class ProdutoRepository {
 
     public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
 
+        System.out.println((new StringBuilder().append("CONEXAO: ")
+                .append(this.provider.getIdConexao())
+                .append(" IMPLOJA: ")
+                .append(this.getLoja())
+                .append(" SISTEMA: ")
+                .append(getSistema())
+                .toString()));
+        
         if (this.provider.isImportarPorPlanilha()) {
             salvar(produtos);
         } else {
