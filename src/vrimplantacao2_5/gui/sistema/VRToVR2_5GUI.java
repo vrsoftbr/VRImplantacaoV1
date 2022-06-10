@@ -92,7 +92,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         tabProdutos.setOpcoesDisponiveis(dao);
 
         carregarParametros();
-        
+
         pnlConn.setSistema(ESistema.VRMASTER);
         pnlConn.getNomeConexao();
 
@@ -102,7 +102,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.carregarParametros(params, SISTEMA);
         chkCvTransacaoBaixados.setSelected(params.getBool(SISTEMA, "CV_BAIXADOS"));
         chkCreditoRotativoBaixados.setSelected(params.getBool(SISTEMA, "CR_BAIXADOS"));
@@ -110,12 +110,12 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(pnlConn.getComplemento(), SISTEMA, "COMPLEMENTO");
         params.put(chkCvTransacaoBaixados.isSelected(), SISTEMA, "CV_BAIXADOS");
         params.put(chkCreditoRotativoBaixados.isSelected(), SISTEMA, "CR_BAIXADOS");
-        
+
         pnlConn.atualizarParametros();
 
         params.salvar();
@@ -139,7 +139,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     importador.setIdConexao(pnlConn.idConexao);
-                    
+
                     dao.eanAtacado = chkEANAtacado.isSelected();
                     dao.apenasAtivo = chkSomenteAtivo.isSelected();
                     dao.setComplemento(pnlConn.getComplemento());
@@ -231,40 +231,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                         if (chkCvTransacao.isSelected()) {
                             importador.importarConvenioTransacao();
                         }
-                    } else if (tabs.getSelectedIndex() == 1) {
-                        if (chkUnifProdutos.isSelected()) {
-                            importador.unificarProdutos();
-                        }
-                        if (chkUnifFornecedor.isSelected()) {
-                            importador.unificarFornecedor();
-                        }
-                        if (chkUnifProdutoFornecedor.isSelected()) {
-                            importador.unificarProdutoFornecedor();
-                        }
-                        if (chkUnifClientePreferencial.isSelected()) {
-                            List<OpcaoCliente> opcoes = new ArrayList<>();
-                            if (chkReiniciarIDClienteUnif.isSelected()) {
-                                opcoes.add(
-                                        OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                                "N_REINICIO",
-                                                Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
-                                        )
-                                );
-                            }
-                            importador.unificarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
-                        }
-                        if (chkClienteEventual.isSelected()) {
-                            List<OpcaoCliente> opcoes = new ArrayList<>();
-                            if (chkReiniciarIDClienteUnif.isSelected()) {
-                                opcoes.add(
-                                        OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                                "N_REINICIO",
-                                                Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
-                                        )
-                                );
-                            }
-                            importador.unificarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
-                        }
                     }
 
                     ProgressBar.dispose();
@@ -324,14 +290,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         chkPdvVendasCustos = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
-        chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
-        txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
         jPanel1 = new javax.swing.JPanel();
         chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
@@ -678,66 +636,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
         tabs.addTab("Importação", tabParametros);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutos, "Produtos (Somente com EAN válido)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifFornecedor, "Fornecedor (Somente com CPF/CNPJ)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutoFornecedor, "Produto Fornecedor (Somente com CPF/CNPJ)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClientePreferencial, "Cliente Preferencial (Somente com CPF/CNPJ)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClienteEventual, "Cliente Eventual (Somente com CPF/CNPJ)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkReiniciarIDClienteUnif, "Reiniciar ID (Clientes)");
-        chkReiniciarIDClienteUnif.setEnabled(true);
-        chkReiniciarIDClienteUnif.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkReiniciarIDClienteUnifActionPerformed(evt);
-            }
-        });
-
-        txtReiniciarIDClienteUnif.setMascara("Numero");
-
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel2Layout.createSequentialGroup()
-                        .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(275, Short.MAX_VALUE))
-        );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
-
-        tabs.addTab("Unificação", vRPanel2);
-
         org.openide.awt.Mnemonics.setLocalizedText(chkEANAtacado, "Importar EAN Atacado");
 
         org.openide.awt.Mnemonics.setLocalizedText(chkSomenteAtivo, "Somente Produto Ativo");
@@ -854,10 +752,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkChequeActionPerformed
 
-    private void chkReiniciarIDClienteUnifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteUnifActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
-
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
@@ -944,13 +838,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendasCustos;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
-    private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteAtivo;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JPanel jPanel1;
@@ -962,9 +850,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
     private vrframework.bean.panel.VRPanel vRPanel1;
-    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 }

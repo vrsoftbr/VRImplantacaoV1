@@ -34,6 +34,7 @@ import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
@@ -661,6 +662,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.inscricaosuframa suframa,\n"
                     + "	f.bloqueado,\n"
                     + "	f.id_situacaocadastro,\n"
+                    + " f.id_tipopagamento,\n"
                     + "	f.endereco,\n"
                     + "	f.numero,\n"
                     + "	f.complemento,\n"
@@ -690,10 +692,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join estado e on f.id_estado = e.id\n"
                     + "	left join municipio cm on f.id_municipiocobranca = cm.id\n"
                     + "	left join estado ce on f.id_estadocobranca = ce.id\n"
-                    /*+ "WHERE f.id IN (\n"
-                    + " SELECT id_fornecedor FROM pagarfornecedor\n"
-                    + " WHERE dataentrada >= '2020-01-01'\n"
-                    + " GROUP BY id_fornecedor)\n"*/
                     + "order by \n"
                     + "	id")) {
                 while (rs.next()) {
@@ -709,6 +707,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInsc_municipal(rs.getString("insc_municipal"));
                     imp.setSuframa(rs.getString("suframa"));
                     imp.setAtivo(rs.getInt("id_situacaocadastro") == 1);
+                    imp.setTipoPagamento(rs.getInt("id_tipopagamento") == 0 ? TipoPagamento.CARTEIRA : TipoPagamento.BOLETO_BANCARIO);
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
