@@ -589,15 +589,14 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("codigo"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("insc_estadual"));
 
                     String pessoa = (rs.getString("pessoa"));
-                    if ("J".equals(pessoa)) {
-                        imp.setCnpj(rs.getString("cnpj"));
-                        imp.setInscricaoestadual(rs.getString("insc_estadual"));
+                    if ("F".equals(pessoa)) {
+                        imp.setCnpj(rs.getString("cpf"));
+                        imp.setInscricaoestadual(rs.getString("rg"));
                     }
-
-                    imp.setCnpj(rs.getString("cpf"));
-                    imp.setInscricaoestadual(rs.getString("rg"));
 
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setDataCadastro(rs.getDate("data_Cadastro"));
@@ -716,6 +715,8 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;

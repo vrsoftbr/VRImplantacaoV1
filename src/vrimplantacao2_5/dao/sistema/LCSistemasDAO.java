@@ -27,6 +27,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
@@ -47,6 +48,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  */
 public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public boolean geraCodigoAtacado = false;
+
+    public void setGeraCodigoAtacado(boolean geraCodigoAtacado) {
+        this.geraCodigoAtacado = geraCodigoAtacado;
+    }
 
     @Override
     public String getSistema() {
@@ -74,7 +81,7 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
-                //OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.ATACADO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -189,28 +196,51 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+
+        String sql;
+        sql = "select \n"
+                + " id,\n"
+                + " codigo ean,\n"
+                + " qtd_embalagem\n"
+                + "from produto \n"
+                + "where \n"
+                + " codigo <> ''\n"
+                + " and\n"
+                + " length(codigo) >= 7";
+        if (geraCodigoAtacado) {
+            sql = "select \n"
                     + " id,\n"
-                    + " codigo ean,\n"
-                    + " qtd_embalagem\n"
-                    + "from produto \n"
-                    + "where \n"
-                    + " codigo <> ''\n"
-                    + " and\n"
-                    + " length(codigo) >= 7"
-            )) {
+                    + " qtd_minimapv2 qtde\n"
+                    + "from produto\n"
+                    + "where qtd_minimapv2 > 1";
+        }
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sql)) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(1);
 
-                    result.add(imp);
+                    if (geraCodigoAtacado) {
+                        String sistema = (getSistema() + " - " + getLojaOrigem());
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, getLojaOrigem(), rs.getString("id"));
+
+                        if (codigoAtual > 0) {
+                            imp.setImportId(rs.getString("id"));
+                            imp.setEan("99999" + String.valueOf(codigoAtual));
+                            imp.setQtdEmbalagem(rs.getInt("qtde"));
+                            result.add(imp);
+                        }
+
+                    } else {
+                        imp.setImportId(rs.getString("id"));
+                        imp.setEan(rs.getString("ean"));
+                        imp.setQtdEmbalagem(1);
+
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -280,8 +310,12 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rs.getDouble("estoque_minimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoque_max"));
 
-                    imp.setCustoSemImposto(rs.getDouble("custo_medio"));
+                    imp.setCustoSemImposto(rs.getDouble("preco_custo"));
                     imp.setCustoComImposto(rs.getDouble("preco_custo"));
+
+                    imp.setCustoMedioComImposto(rs.getDouble("custo_medio"));
+                    imp.setCustoMedioSemImposto(rs.getDouble("custo_medio"));
+
                     imp.setPrecovenda(rs.getDouble("preco_venda"));
 
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
@@ -326,6 +360,45 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + " id produto_id,\n"
+                        + " preco_venda precovenda, \n"
+                        + " preco_venda2 precoatacado,\n"
+                        + " qtd_minimapv2 qtde\n"
+                        + "from produto\n"
+                        + "where qtd_minimapv2 > 1"
+                )) {
+                    while (rst.next()) {
+
+                        String sistema = (getSistema() + " - " + getLojaOrigem());
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, getLojaOrigem(), rst.getString("produto_id"));
+
+                        if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("produto_id"));
+                            imp.setEan("99999" + String.valueOf(codigoAtual));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            imp.setQtdEmbalagem(rst.getInt("qtde"));
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+
+        }
         return result;
     }
 
