@@ -1,7 +1,7 @@
 package vrimplantacao2.vo.cadastro.desmembramento;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class DesmembramentoVO {
@@ -13,7 +13,7 @@ public class DesmembramentoVO {
     private double percentualPerda = 0;
     private double percentualDesossa = 0;
     private double percentualCusto = 0;
-    public List<DesmembramentoItemVO> dProduto = new ArrayList();
+    private final Map<Integer, DesmembramentoItemVO> itens = new HashMap<>();
 
     public int getId() {
         return id;
@@ -71,12 +71,7 @@ public class DesmembramentoVO {
         this.percentualCusto = percentualCusto;
     }
 
-    public List<DesmembramentoItemVO> getdProduto() {
-        return dProduto;
+    public Map<Integer, DesmembramentoItemVO> getItens() {
+        return itens;
     }
-
-    public void setdProduto(List<DesmembramentoItemVO> dProduto) {
-        this.dProduto = dProduto;
-    }
-   
 }

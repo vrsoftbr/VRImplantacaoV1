@@ -1262,6 +1262,6 @@ public class Importador {
                 getIdConexao()
         );
         DesmembramentoRepository rep = new DesmembramentoRepository(provider);
-        rep.salvar(desmembramento);
+        rep.importarDesmembramento(desmembramento);
     }
 }

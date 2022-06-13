@@ -1,6 +1,9 @@
 package vrimplantacao2.dao.cadastro.desmembramento;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoAnteriorVO;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
@@ -9,52 +12,60 @@ import vrimplantacao2_5.controller.migracao.LogController;
 
 public class DesmembramentoRepository {
 
-    private final DesmembramentoProvider provider;
-    private final LogController logController;
+    private static final Logger LOG = Logger.getLogger(DesmembramentoRepository.class.getName());
 
-    public DesmembramentoRepository(DesmembramentoProvider provider) {
+    private final DesmembramentoRepositoryProvider provider;
+    
+    public DesmembramentoRepository(DesmembramentoRepositoryProvider provider) {
         this.provider = provider;
-        this.logController = new LogController();
     }
 
-//    public void salvar(List<DesmembramentoIMP> desmembramento) throws Exception {
-//        MultiMap<String, DesmembramentoAnteriorVO> anteriores = provider.getAnteriores();
-//        try {
-//            provider.setStatus("Gravando desmembramentos...");
-//            provider.setMaximo(desmembramento.size());
-//            for (DesmembramentoIMP imp : desmembramento) {
-//                DesmembramentoAnteriorVO anterior = anteriores.get(
-//                        provider.getSistema(),
-//                        provider.getLojaOrigem(),
-//                        imp.getId()
-//                );
-//
-//                if (anterior == null) {
-//                    anterior = converterDesmembramentoAnteriorVO(imp);
-//                    gravar(anterior);
-//                    anteriores.put(
-//                            anterior,
-//                            provider.getSistema(),
-//                            provider.getLojaOrigem(),
-//                            imp.getId()
-//                    );
-//                }
-//                provider.next();
-//            }
-//
-//            provider.commit();
-//        } catch (Exception e) {
-//            provider.rollback();
-//            throw e;
-//        }
-//    }
+    public void importarDesmembramento(List<DesmembramentoIMP> desmembramento) throws Exception {
+        
+        provider.begin();
+        try {
+            
+            provider.setStatus("Desmembramentos...carregando listagens...");
+            LOG.info("Carregando produtos anteriores");                
+            Map<String, Integer> produtos = provider.getProdutosAnteriores();
+            LOG.info("Carregando os Desmembramentos existentes e seus itens");
+            Map<Integer, DesmembramentoVO> desmembramentosExistentes = provider.getDesmembramentosExistentes();
+            provider.setStatus("Desmembramentos...gravando...", desmembramento.size());
+            LOG.info("Iniciando gravação dos desmembramentos");    
+            
+            
+            for (DesmembramentoIMP imp : desmembramento) {
+                
+                Integer produtoPai = produtos.get(imp.getId());
+                
+                if (produtoPai != null) {
+                    DesmembramentoVO vo = desmembramentosExistentes.get(produtoPai);
+                    if (vo == null) {
+                        
+                        vo = new DesmembramentoVO();
+                        vo.setId(produtoPai);
+                        provider.gravar(vo);
+                        desmembramentosExistentes.put(vo.getIdProduto(), vo);
+                        LOG.finest("Produto pai gravado com sucesso: " + vo.getId());
+                    }
+                    
+                    Integer produtoFilho = produtos.get(imp.getProdutoFilho());
+                }
+            }
+
+            provider.commit();
+        } catch (Exception e) {
+            provider.rollback();
+            throw e;
+        }
+    }
 
     private DesmembramentoAnteriorVO converterDesmembramentoAnteriorVO(DesmembramentoIMP imp) {
-        
+
         //int idConexao = promocaoService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema());
         DesmembramentoAnteriorVO vo = new DesmembramentoAnteriorVO();
         vo.setSistema(provider.getSistema());
-        vo.setLoja(provider.getLojaOrigem());
+        vo.setLoja(provider.getLoja());
         vo.setIdConexao(provider.getIdConexao());
         vo.setId(imp.getId());
         vo.setProdutoPai(imp.getProdutoPai());
@@ -65,19 +76,11 @@ public class DesmembramentoRepository {
     }
 
     public void gravarDesmembramento(DesmembramentoVO desmem) throws Exception {
-        provider.gravarDesmembramento(desmem);
+        provider.gravar(desmem);
     }
 
-    public void gravar(DesmembramentoAnteriorVO anterior) throws Exception {
-        provider.gravarAnterior(anterior);
-    }
-
-    public void getDesmembramentoItens() throws Exception {
-        provider.getDesmembramentoItens();
-    }
-
-//    public void gravarDesmembramentoItens(DesmembramentoAnteriorVO itens) throws Exception {
-//        provider.gravarDesmembramentoItens(itens);
+//    public void getDesmembramentoItens() throws Exception {
+//        provider.getDesmembramentoItens();
 //    }
 
 }
