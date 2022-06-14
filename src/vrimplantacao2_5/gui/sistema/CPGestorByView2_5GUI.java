@@ -72,9 +72,10 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
 
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
-                    cpgestorDAO.setUtilizarQtdEmbalagemIgualAUm(chkEmbalagemIgualAUm.isSelected());
+                    cpgestorDAO.setUtilizarQtdEmbalagemIgualAUm(chkForcarMigracao.isSelected());
                     
                     Importador importador = new Importador(cpgestorDAO);
+                    importador.importarPorPlanilha = chkForcarMigracao.isSelected();
                     
                     cpgestorDAO.setViewEan(txtViewEAN.getText());
                     cpgestorDAO.setViewProduto(txtViewProduto.getText());
@@ -186,7 +187,8 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         txtImpLojaOrigem = new javax.swing.JTextField();
         lblViewVendas = new javax.swing.JLabel();
         txtViewVenda = new javax.swing.JTextField();
-        chkEmbalagemIgualAUm = new javax.swing.JCheckBox();
+        chkForcarMigracao = new javax.swing.JCheckBox();
+        chkEmbalagemIgualAUm1 = new javax.swing.JCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -253,7 +255,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Clientes", tabCli);
@@ -286,7 +288,9 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             }
         });
 
-        chkEmbalagemIgualAUm.setText("Utilizar Qtd. Emb. 1");
+        chkForcarMigracao.setText("Forçar Migração");
+
+        chkEmbalagemIgualAUm1.setText("Utilizar Qtd. Emb. 1");
 
         javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
         tabExtras.setLayout(tabExtrasLayout);
@@ -301,9 +305,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                             .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabExtrasLayout.createSequentialGroup()
-                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(tabExtrasLayout.createSequentialGroup()
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -322,7 +324,11 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                             .addComponent(lblViewFornecedor)
                             .addComponent(txtViewFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblViewVendas)
-                            .addComponent(chkEmbalagemIgualAUm))))
+                            .addGroup(tabExtrasLayout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkEmbalagemIgualAUm1)
+                                    .addComponent(chkForcarMigracao))))))
                 .addGap(8, 8, 8)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                 .addContainerGap())
@@ -354,11 +360,13 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtViewVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImpLojaOrigem)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblImpLojaOrigem)
+                            .addComponent(chkForcarMigracao))
+                        .addGap(8, 8, 8)
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtImpLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkEmbalagemIgualAUm))))
+                            .addComponent(chkEmbalagemIgualAUm1))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -395,7 +403,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -427,7 +435,8 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private javax.swing.JCheckBox chkEmbalagemIgualAUm;
+    private javax.swing.JCheckBox chkEmbalagemIgualAUm1;
+    private javax.swing.JCheckBox chkForcarMigracao;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel lblImpLojaOrigem;

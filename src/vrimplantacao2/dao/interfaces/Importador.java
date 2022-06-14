@@ -344,6 +344,9 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos...");
 
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
+        
+        System.out.println("Qtd. produtos: " + produtos.size());
+        
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
 
         provider.setIdConexao(getIdConexao());
