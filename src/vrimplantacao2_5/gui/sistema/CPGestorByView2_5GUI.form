@@ -331,7 +331,7 @@
                         <Property name="columns" type="int" value="20"/>
                         <Property name="lineWrap" type="boolean" value="true"/>
                         <Property name="rows" type="int" value="5"/>
-                        <Property name="text" type="java.lang.String" value="Views Vovo Zuzu:&#xa;vw_exp_produtos_zuzu &#xa;vw_exp_barras_zuzu &#xa;vw_exp_forn_zuzu  &#xa;&#xa;Santa F&#xe9; &#xa;vw_exp_produtos_sta &#xa;vw_exp_barras_sta &#xa;vw_exp_forn_sta&#xa;vw_exp_vendas_stafe_01"/>
+                        <Property name="text" type="java.lang.String" value="Views Vovo Zuzu:&#xa;vw_exp_produtos_zuzu &#xa;vw_exp_barras_zuzu &#xa;vw_exp_forn_zuzu  &#xa;vw_exp_produtos_panificadora&#xa;vw_exp_barras_panificadora&#xa;&#xa;Santa F&#xe9; &#xa;vw_exp_produtos_sta &#xa;vw_exp_barras_sta &#xa;vw_exp_forn_sta&#xa;vw_exp_vendas_stafe_01"/>
                       </Properties>
                     </Component>
                   </SubComponents>
