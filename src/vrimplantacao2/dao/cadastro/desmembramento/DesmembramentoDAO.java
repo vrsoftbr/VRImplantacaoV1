@@ -3,7 +3,9 @@ package vrimplantacao2.dao.cadastro.desmembramento;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
@@ -37,7 +39,10 @@ public class DesmembramentoDAO {
                     + "	i.id,\n"
                     + "	d.id_produto id_produto_pai,\n"
                     + "	i.id_produto,\n"
-                    + "	i.percentualestoque\n"
+                    + "	i.percentualestoque,\n"
+                    + " 0 percentualperda,\n"
+                    + " 0 percentualdesossa,\n"
+                    + " 0 percentualcusto\n"
                     + "from\n"
                     + "	desmembramento d\n"
                     + "	join desmembramentoitem i on i.id_desmembramento = d.id\n"
@@ -51,7 +56,7 @@ public class DesmembramentoDAO {
                     item.setId(rst.getInt("id"));
                     item.setIdDesmembramento(pai.getId());
                     item.setIdProduto(rst.getInt("id_produto"));
-                    item.setPercentualEstoque(rst.getInt("percentualpreco"));
+                    item.setPercentualEstoque(rst.getInt("percentualestoque"));
 
                     pai.getItens().put(item.getIdProduto(), item);
                 }
@@ -67,11 +72,13 @@ public class DesmembramentoDAO {
 
             sql.setTableName("desmembramento");
             sql.put("id_produto", vo.getIdProduto());
-            //sql.put("percentualestoque", vo.getPercentualEstoque());
+            sql.put("id_situacaocadastro", 1);
+            sql.getReturning().add("id");
+            
             try (ResultSet rst = stm.executeQuery(
                     sql.getInsert()
             )) {
-                while (rst.next()) {
+                if (rst.next()) {
                     vo.setId(rst.getInt("id"));
                 }
             }
@@ -81,15 +88,32 @@ public class DesmembramentoDAO {
     public void gravar(DesmembramentoItemVO vItem) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setTableName("desmembramentoitem");
             sql.put("id_desmembramento", vItem.getIdDesmembramento());
             sql.put("id_produto", vItem.getIdProduto());
             sql.put("percentualestoque", vItem.getPercentualEstoque());
-            
-            stm.executeQuery(sql.getInsert());
+            sql.put("percentualperda", 0.0d);
+            sql.put("percentualdesossa", vItem.getPercentualDesossa());
+            sql.put("percentualcusto", vItem.getPercentualCusto());
 
+            stm.execute(sql.getInsert());
         }
     }
-   
+
+    public Set<Integer> getProdutosAtivos(int lojaVR) throws Exception {
+        Set<Integer> result = new HashSet<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id_produto from produtocomplemento where id_loja = " + lojaVR + " and id_situacaocadastro = 1"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getInt("id_produto"));
+                }
+            }
+        }
+
+        return result;
+    }
 }

@@ -1,18 +1,16 @@
 package vrimplantacao2.vo.cadastro.desmembramento;
 
-/**
- * Classe que representa a tabela desmembramentoitem
- * @author Alan
- */
+import vrimplantacao2.utils.MathUtils;
+
 public class DesmembramentoItemVO {
     
     private int id;
     private int idDesmembramento;
     private int idProduto;
-    private int percentualEstoque;
-    private int percentualPerda;
-    private int percentualDesossa;
-    private int percentualCusto;
+    private double percentualEstoque;
+    private double percentualPerda = 0.0d;
+    private double percentualDesossa = 0.0d;
+    private double percentualCusto = 0.0d;
 
     public int getId() {
         return id;
@@ -38,35 +36,35 @@ public class DesmembramentoItemVO {
         this.idProduto = idProduto;
     }
 
-    public int getPercentualEstoque() {
+    public double getPercentualEstoque() {
         return percentualEstoque;
     }
 
-    public void setPercentualEstoque(int percentualEstoque) {
-        this.percentualEstoque = percentualEstoque;
+    public void setPercentualEstoque(double percentualEstoque) {
+        this.percentualEstoque = MathUtils.round(percentualEstoque, 4);
     }
 
-    public int getPercentualPerda() {
+    public double getPercentualPerda() {
         return percentualPerda;
     }
 
-    public void setPercentualPerda(int percentualPerda) {
+    public void setPercentualPerda(double percentualPerda) {
         this.percentualPerda = percentualPerda;
     }
 
-    public int getPercentualDesossa() {
+    public double getPercentualDesossa() {
         return percentualDesossa;
     }
 
-    public void setPercentualDesossa(int percentualDesossa) {
+    public void setPercentualDesossa(double percentualDesossa) {
         this.percentualDesossa = percentualDesossa;
     }
 
-    public int getPercentualCusto() {
+    public double getPercentualCusto() {
         return percentualCusto;
     }
 
-    public void setPercentualCusto(int percentualCusto) {
+    public void setPercentualCusto(double percentualCusto) {
         this.percentualCusto = percentualCusto;
     }
     

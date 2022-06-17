@@ -1,27 +1,25 @@
 package vrimplantacao2.dao.cadastro.desmembramento;
 
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoItemVO;
 import vrimplantacao2.vo.cadastro.desmembramento.DesmembramentoVO;
 
-
 public class DesmembramentoRepositoryProvider {
-    
-   private final String sistema;
+
+    private final String sistema;
     private final String loja;
     private final int lojaVR;
-    private final int idConexao;
     private final ProdutoAnteriorDAO produtoDAO = new ProdutoAnteriorDAO();
     private final DesmembramentoDAO desmembramentoDAO = new DesmembramentoDAO();
 
-    public DesmembramentoRepositoryProvider(String sistema, String loja, int lojaVR, int idConexao) {
+    public DesmembramentoRepositoryProvider(String sistema, String loja, int lojaVR) {
         this.sistema = sistema;
         this.loja = loja;
         this.lojaVR = lojaVR;
-        this.idConexao = idConexao;
     }
 
     public String getSistema() {
@@ -34,10 +32,6 @@ public class DesmembramentoRepositoryProvider {
 
     public int getLojaVR() {
         return lojaVR;
-    }
-    
-     public int getIdConexao() {
-        return idConexao;
     }
 
     public void begin() throws Exception {
@@ -52,7 +46,7 @@ public class DesmembramentoRepositoryProvider {
         setStatus(mensagem);
         ProgressBar.setMaximum(size);
     }
-    
+
     public void setStatus() throws Exception {
         ProgressBar.next();
     }
@@ -64,7 +58,7 @@ public class DesmembramentoRepositoryProvider {
     public void rollback() throws Exception {
         Conexao.rollback();
     }
-    
+
     public void next() throws Exception {
         ProgressBar.next();
     }
@@ -73,7 +67,7 @@ public class DesmembramentoRepositoryProvider {
         ProgressBar.setMaximum(size);
     }
 
-     public Map<String, Integer> getProdutosAnteriores() throws Exception {
+    public Map<String, Integer> getProdutosAnteriores() throws Exception {
         return produtoDAO.getAnteriores(getSistema(), getLoja());
     }
 
@@ -88,5 +82,8 @@ public class DesmembramentoRepositoryProvider {
     public void gravar(DesmembramentoItemVO vItem) throws Exception {
         desmembramentoDAO.gravar(vItem);
     }
-   
+
+    public Set<Integer> getProdutosAtivos() throws Exception {
+        return desmembramentoDAO.getProdutosAtivos(getLojaVR());
+    }
 }

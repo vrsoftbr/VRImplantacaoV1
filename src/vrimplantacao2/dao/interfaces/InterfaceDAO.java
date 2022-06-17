@@ -562,10 +562,10 @@ public abstract class InterfaceDAO {
     
     /**
      * Retorna uma lista com os desmembramentos para importar.
-     * @return Lista com os desmembramentos a serem importadas.
+     * @return Lista com os desmembramentos a serem importados.
      * @throws Exception 
      */
-    public List<DesmembramentoIMP> getDesmembramento() throws Exception {
+    public List<DesmembramentoIMP> getDesmembramentos() throws Exception {
         return new ArrayList<>();
     }
     

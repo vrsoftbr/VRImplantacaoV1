@@ -717,9 +717,9 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<DesmembramentoIMP> getDesmembramento() throws Exception {
+    public List<DesmembramentoIMP> getDesmembramentos() throws Exception {
         List<DesmembramentoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
