@@ -239,6 +239,8 @@ public class VendaRepository {
                                 produto = produtoPadrao;
                             }
                             if ( produto == null ) {
+                                System.out.println("Produto não localizado: " + impItem.getProduto()
+                                    + " - " + impItem.getDescricaoReduzida() + " - " + impItem.getCodigoBarras());
                                 throw new NullPointerException("Algum produto deveria ter sido ser encontrado");
                             } else {
                                 item.setId_produto(produto);
