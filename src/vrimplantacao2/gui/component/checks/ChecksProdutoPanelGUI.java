@@ -259,7 +259,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoProduto.NUTRICIONAL)
                 || opt.contains(OpcaoProduto.RECEITA)
                 || opt.contains(OpcaoProduto.DIVISAO)
-                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
+                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
+                || opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
                 chkInverterAssociado.setVisible(chkAssociado.isVisible());
@@ -276,6 +277,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
+            chkDesmembramento.setVisible(opt.contains(OpcaoProduto.DESMEMBRAMENTO));
             if (chkNutricionalFilizola.isVisible()
                     || chkNutricionalToledo.isVisible()) {
                 tabParametros.add(pnlOptOptNutricional);
@@ -344,6 +346,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         if (opt.contains(OpcaoProduto.PROMOCAO)) {
             pnlImpCompl.add(chkPromocao);
+        }
+        
+        if (opt.contains(OpcaoProduto.DESMEMBRAMENTO)) {
+            pnlImpCompl.add(chkDesmembramento);
         }
 
         if (opt.contains(OpcaoProduto.PRECO)
@@ -644,6 +650,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVolumeQtd.setSelected(false);
         chkVrAtacado.setSelected(false);
         chkPromocao.setSelected(false);
+        chkDesmembramento.setSelected(false);
     }
 
     /**
@@ -794,6 +801,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkDivisao = new vrframework.bean.checkBox.VRCheckBox();
         chkDivisaoProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkNumeroParcela = new vrframework.bean.checkBox.VRCheckBox();
+        chkDesmembramento = new vrframework.bean.checkBox.VRCheckBox();
         tabImportacaoVendas = new javax.swing.JPanel();
         pnlImpPdvVenda = new vrframework.bean.panel.VRPanel();
         jLabel15 = new javax.swing.JLabel();
@@ -1727,6 +1735,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkNumeroParcela, "Número Parcela");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkDesmembramento, "Desmembramento");
+
         javax.swing.GroupLayout pnlImpOutrosDadosLayout = new javax.swing.GroupLayout(pnlImpOutrosDados);
         pnlImpOutrosDados.setLayout(pnlImpOutrosDadosLayout);
         pnlImpOutrosDadosLayout.setHorizontalGroup(
@@ -1739,6 +1749,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addComponent(jLabel9)
                             .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
                                 .addComponent(chkAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkDesmembramento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkComprador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1775,7 +1787,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkComprador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCompradorProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkReceitaToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkReceitaFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkReceitaFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDesmembramento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlImpOutrosDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1907,6 +1920,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkDescGondola;
     public vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
     public vrframework.bean.checkBox.VRCheckBox chkDescontinuado;
+    public vrframework.bean.checkBox.VRCheckBox chkDesmembramento;
     public vrframework.bean.checkBox.VRCheckBox chkDivisao;
     public vrframework.bean.checkBox.VRCheckBox chkDivisaoProduto;
     public vrframework.bean.checkBox.VRCheckBox chkEAN;
@@ -2118,6 +2132,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             if (chkPromocao.isSelected()) {
                 importador.importarPromocao();
+            }
+            
+            if (chkDesmembramento.isSelected()) {
+                importador.importarDesmembramento();
             }
 
             importadorMercadologico.importarMercadologico();

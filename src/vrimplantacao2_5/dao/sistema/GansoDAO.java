@@ -86,7 +86,8 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.DESMEMBRAMENTO
         ));
     }
 

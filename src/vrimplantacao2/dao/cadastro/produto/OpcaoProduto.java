@@ -322,7 +322,8 @@ public enum OpcaoProduto {
         }
     },
     FAMILIA_PRODUTO, 
-    PRODUTOS, 
+    PRODUTOS,
+    DESMEMBRAMENTO,
     EAN, 
     EAN_EM_BRANCO, 
     MERCADOLOGICO_PRODUTO, 
