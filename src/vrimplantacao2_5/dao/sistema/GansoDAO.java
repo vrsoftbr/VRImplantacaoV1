@@ -4,9 +4,7 @@ import java.util.Map;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
-import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 import java.sql.ResultSet;
@@ -28,12 +26,12 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -74,7 +72,6 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
-                //OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -717,6 +714,41 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
     }
     
     
+    @Override
+    public List<DesmembramentoIMP> getDesmembramentos() throws Exception {
+        List<DesmembramentoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	i.codigo id_desmem,\n"
+                    + "	d.CODIGO_PRODUTO_FRACIONAVEL prod_pai,\n"
+                    + "	i.CODIGO_PRODUTO_FRACIONADO prod_filho,\n"
+                    + "	p.DESCRICAO produto,\n"
+                    + "	i.QUANTIDADE percentual\n"
+                    + "FROM\n"
+                    + "	PRODUTO_FRACIONAMENTO d\n"
+                    + "	JOIN PRODUTO_FRACIONAMENTO_ITEM i ON d.CODIGO = i.CODIGO_FRACIONAMENTO\n"
+                    + "	JOIN produto p ON p.CODIGO = i.CODIGO_PRODUTO_FRACIONADO\n"
+                    + "WHERE\n"
+                    + "	d.CODIGO_FILIAL = " + getLojaOrigem() + "\n"
+                    + " ORDER by 1"
+            )) {
+                while (rs.next()) {
+                    DesmembramentoIMP imp = new DesmembramentoIMP();
+
+                    imp.setId(rs.getString("id_desmem"));
+                    imp.setProdutoPai(rs.getString("prod_pai"));
+                    imp.setProdutoFilho(rs.getString("prod_filho"));
+                    imp.setPercentual(rs.getDouble("percentual"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
