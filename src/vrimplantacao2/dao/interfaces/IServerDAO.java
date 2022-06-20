@@ -221,7 +221,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when Servico_Prod = 'B' then 'S' else 'N' end balanca,\n"
                     + "	case when Pesavel_Prod = 'N' then 0 else 1 end pesavel,\n"
                     + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro,\n"
-                    + " icm.Cod_Classe as idIcms\n"        
+                    + " icm.Cod_Classe as idIcms, Def_PisCofins_Prod piscofins\n"        
                     + "from\n"
                     + "	tbl_produto p\n"
                     + "left join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod\n"
@@ -291,6 +291,9 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("idIcms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
                     imp.setIcmsConsumidorId(rst.getString("idIcms"));
+                    
+                    imp.setPiscofinsCstDebito(rst.getInt("piscofins"));
+                    imp.setPiscofinsCstCredito(rst.getInt("piscofins"));
                     
                     /*imp.setIcmsCstSaida(rst.getInt("cstsaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliqsaida"));
