@@ -605,20 +605,20 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id_venda");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numcupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
 
                         next.setData(rst.getDate("data"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        //next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -632,7 +632,22 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "select\n"
+                    = "select \n"
+                    + " max(id) id,\n"
+                    + " descricao numerocupom,\n"
+                    + " trim(replace(terminal,'CAIXA','')) ecf,\n"
+                    + " data,\n"
+                    + " max(hora) hora,\n"
+                    + " cast(sum(credito) as decimal(10,2)) subtotalimpressora\n"
+                    + "from caixa \n"
+                    + "where \n"
+                    + " descricao not like 'S%'\n"
+                    + " and codigoloja = " + idLojaCliente + "\n"
+                    + " and situacao = 1\n"
+                    + " and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "group by descricao,terminal,data ";
+
+            /*"select\n"
                     + "  max(id) id_venda,\n"
                     + "	 descricao numcupom,\n"
                     + "	 trim(replace (terminal,'CAIXA','')) ecf,\n"
@@ -644,10 +659,10 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 caixa\n"
                     + "where\n"
                     + "	 codigoloja = " + idLojaCliente + "\n"
-                    + "	 and descricao not like 'SANG%'\n"
+                    + "	 and descricao not like 'S%'\n"
                     + "	 and situacao = 1\n"
                     + "	 and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-                    + " group by descricao,terminal,data";
+                    + " group by descricao,terminal,data";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -685,20 +700,21 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("id_item") + "-" + rst.getString("nroitem") + "-" + rst.getString("produto");
+                        String id = rst.getString("id");
+                        /*+ "-" + rst.getString("nroitem") + "-" + rst.getString("produto");*/
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
-                        next.setVenda(rst.getString("id_venda"));
+                        next.setVenda(rst.getString("idvenda"));
                         next.setId(id);
-                        next.setSequencia(rst.getInt("nroitem"));
-                        next.setProduto(rst.getString("produto"));
+                        next.setSequencia(rst.getInt("sequecia"));
+                        next.setProduto(rst.getString("produtoid"));
                         next.setCodigoBarras(rst.getString("codigobarra"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setQuantidade(rst.getDouble("qtde"));
+                        next.setPrecoVenda(rst.getDouble("vrunit"));
+                        //next.setTotalBruto(rst.getDouble("vrtotal"));
                         //next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
@@ -710,7 +726,41 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n"
+                    = "with t_caixa as (\n"
+                    + "select \n"
+                    + " max(id) id,\n"
+                    + " descricao numerocupom,\n"
+                    + " trim(replace(terminal,'CAIXA','')) ecf,\n"
+                    + " data,\n"
+                    + " max(hora) hora,\n"
+                    + " cast(sum(credito) as decimal(10,2)) subtotalimpressora\n"
+                    + "from caixa \n"
+                    + "where \n"
+                    + " descricao not like 'S%'\n"
+                    + " and codigoloja = " + idLojaCliente + "\n"
+                    + " and situacao = 1\n"
+                    + " and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "group by descricao,terminal,data\n"
+                    + ")\n"
+                    + "select \n"
+                    + " c.id,\n"
+                    + " cx.id idvenda,\n"
+                    + " p.id produtoid,\n"
+                    + " p.codigobarra,\n"
+                    + " p.produto descricao,\n"
+                    + " c.item::int sequecia,\n"
+                    + " case when p.mgv5 = 0 then 'UN' else 'KG' end unidade,\n"
+                    + " c.qtde,\n"
+                    + " cast(c.vrunit as decimal(10,2)) vrunit,\n"
+                    + " cast(c.vrtotal as decimal(10,2)) vrtotal\n"
+                    + "from cupom c \n"
+                    + " join produtos p on p.codigobarra = c.produto\n"
+                    + " join t_caixa cx on cx.numerocupom::int  = c.codigo::int\n"
+                    + "where \n"
+                    + "c.loja = " + idLojaCliente + " and c.qtde::varchar not like '789%'\n"
+                    + "and c.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+
+            /*"select\n"
                     + "	max(v.id) id_venda,\n"
                     + "	max(i.id) id_item,\n"
                     + "	max(i.item) nroitem,\n"
@@ -730,7 +780,7 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "group by \n"
                     + "	p.codigobarra ,i.vrunit, i.vrtotal, p.mgv5 \n"
-                    + "order by 1,3";
+                    + "order by 1,3";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -187,18 +188,18 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	distinct\n" +
-                    "	coalesce(e.grupo, g.codigo) merc1,\n" +
-                    "   g.descricao merc1_desc,\n" +
-                    "	coalesce(e.depto, 1) merc2,\n" +
-                    "   coalesce(d.descricao, g.descricao) merc2_desc\n" +
-                    "from\n" +
-                    "   mercodb.grupo g\n" +
-                    "left join mercodb.estoque e on g.codigo = e.grupo\n" +
-                    "left join mercodb.depto d on d.codigo = e.depto\n" +
-                    "order by\n" +
-                    "	coalesce(e.grupo, g.codigo), e.depto;"
+                    "select\n"
+                    + "	distinct\n"
+                    + "	coalesce(e.grupo, g.codigo) merc1,\n"
+                    + "   g.descricao merc1_desc,\n"
+                    + "	coalesce(e.depto, 1) merc2,\n"
+                    + "   coalesce(d.descricao, g.descricao) merc2_desc\n"
+                    + "from\n"
+                    + "   mercodb.grupo g\n"
+                    + "left join mercodb.estoque e on g.codigo = e.grupo\n"
+                    + "left join mercodb.depto d on d.codigo = e.depto\n"
+                    + "order by\n"
+                    + "	coalesce(e.grupo, g.codigo), e.depto;"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -254,7 +255,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "t.aliquota,\n"
                     + "t.reducao,\n"
                     + "s.precovenda,\n"
-                    + "s.termvenda vendaterminal,\n"        
+                    + "s.termvenda vendaterminal,\n"
                     + "s.perclucro,\n"
                     + "s.precocusto,\n"
                     + "s.precocomp,\n"
@@ -268,7 +269,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by e.cdprod"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO()
-                                                                            .getProdutosBalanca();
+                        .getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -289,12 +290,12 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.seteBalanca(true);
                     }
-                    
+
                     imp.setValidade(rst.getInt("validade"));
-                    
-                    if(isTemArquivoBalanca()) {
+
+                    if (isTemArquivoBalanca()) {
                         ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
-                        
+
                         if (bal != null) {
                             imp.seteBalanca(true);
                             imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
@@ -303,7 +304,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.seteBalanca(false);
                         }
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricao").trim());
                     imp.setDescricaoReduzida(rst.getString("descpdv").trim());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -341,7 +342,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("codtrib"));
                     imp.setIcmsCreditoId(rst.getString("codtrib"));
                     imp.setIcmsConsumidorId(imp.getIcmsCreditoId());
-                    
+
                     result.add(imp);
                 }
             }
@@ -407,20 +408,20 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "from mercodb.esttrib\n"
                         + "where uf = 'SP'\n"
                         + "and loja = " + getLojaOrigem()*/
-                        "select\n" +
-                        "  s.cdprod,\n" +
-                        "  coalesce(t.codigo, 1) tributa\n" +
-                        "from\n" +
-                        "  mercodb.saldos s\n" +
-                        "left join mercodb.tributa t on s.icmcompra = t.aliquota and\n" +
-                        "  (case when s.trbcompra = 'T' and s.baseicmcom != 0\n" +
-                        "  then 20\n" +
-                        "  when s.trbcompra = 'T' and s.baseicmcom = 0\n" +
-                        "  then 00\n" +
-                        "  when s.trbcompra = 'I' and s.baseicmcom = 0\n" +
-                        "  then 40 else 60 end) = t.st \n" +
-                        "where\n" +
-                        "  s.loja = " + getLojaOrigem()        
+                        "select\n"
+                        + "  s.cdprod,\n"
+                        + "  coalesce(t.codigo, 1) tributa\n"
+                        + "from\n"
+                        + "  mercodb.saldos s\n"
+                        + "left join mercodb.tributa t on s.icmcompra = t.aliquota and\n"
+                        + "  (case when s.trbcompra = 'T' and s.baseicmcom != 0\n"
+                        + "  then 20\n"
+                        + "  when s.trbcompra = 'T' and s.baseicmcom = 0\n"
+                        + "  then 00\n"
+                        + "  when s.trbcompra = 'I' and s.baseicmcom = 0\n"
+                        + "  then 40 else 60 end) = t.st \n"
+                        + "where\n"
+                        + "  s.loja = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -718,7 +719,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSexo("M".equals(rst.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
-                    if((rst.getString("bloqueado") != null) && (!rst.getString("bloqueado").isEmpty())) {
+                    if ((rst.getString("bloqueado") != null) && (!rst.getString("bloqueado").isEmpty())) {
                         imp.setBloqueado("B".equals(rst.getString("bloqueado").trim()));
                     }
                     if ((rst.getString("endwww") != null)
@@ -785,6 +786,192 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new GZSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new GZSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "select\n"
+                    + "concat(vd.data,'-',vd.hora,'-',vd.caixa,'-',vd.cupom) id,\n"
+                    + "vd.data,\n"
+                    + "min(hora) as horainicio,\n"
+                    + "max(hora) as horatermino,\n"
+                    + "vd.cupom as numerocupom,\n"
+                    + "sum(coalesce(vd.valortot, 0)) as subtotalimpressora,\n"
+                    + "sum(coalesce(vd.desccupom, 0)) as desconto,\n"
+                    + "sum(coalesce(vd.acrescupom, 0)) as acrescimo,\n"
+                    + "vd.caixa as ecf,\n"
+                    + "vd.cancelado\n"
+                    + "from mercodb.movcaixa vd\n"
+                    + "where vd.cdprod <> ''\n"
+                    + "and vd.data >= '"+ strDataInicio +"' and vd.data <= '"+ strDataTermino +"'\n"
+                    + "and vd.loja = "+idLojaCliente+"\n"
+                    + "group by\n"
+                    + "vd.data,vd.cupom,vd.coo,vd.caixa,vd.ecf";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("idvenda"));
+                        next.setId(rst.getString("id"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(rst.getString("produto"));
+                        //next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "vd.id,\n"
+                    + "concat(vd.data,'-',vd.hora,'-',vd.caixa,'-',vd.cupom) idvenda,\n"
+                    + "vd.cupom as numerocupom,\n"
+                    + "vd.cdprod as produto,\n"
+                    + "vd.item as sequencia,\n"
+                    + "e.descricao as descricao,\n"
+                    + "e.unidade,\n"
+                    + "coalesce(vd.quant, 0) as quantidade,\n"
+                    + "coalesce(vd.preco, 0) as precovenda,\n"
+                    + "coalesce(vd.valortot, 0) as total,\n"
+                    + "vd.caixa as ecf,\n"
+                    + "vd.codbarra as codigobarras,\n"
+                    + "vd.descitem as desconto,\n"
+                    + "vd.acresitem as acrescimo,\n"
+                    + "vd.cancelado\n"
+                    + "from mercodb.movcaixa vd\n"
+                    + "inner join mercodb.estoque e on e.cdprod = vd.cdprod and vd.cdprod <> ''\n"
+                    + "where vd.loja = " + idLojaCliente + "\n"
+                    + "and vd.data >= '" + VendaIterator.FORMAT.format(dataInicio) + "' and vd.data <= '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    /*private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
     public void setDataInicioVenda(Date dataInicioVenda) {
@@ -1076,16 +1263,15 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
-        }
-
-        /**
-         * Método temporario, desenvolver um mapeamento eficiente da tributação.
-         *
-         * @param item
-         * @throws SQLException
-         */
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
+        }*/
+    /**
+     * Método temporario, desenvolver um mapeamento eficiente da tributação.
+     *
+     * @param item
+     * @throws SQLException
+     */
+    // public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+    /*
              0700   7.00    ALIQUOTA 07%
              1200   12.00   ALIQUOTA 12%
              1800   18.00   ALIQUOTA 18%
@@ -1094,8 +1280,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
              I      0.00    ISENTO
              F      0.00    SUBST TRIBUTARIA
              N      0.00    NAO INCIDENTE
-             */
-            int cst;
+     */
+ /* int cst;
             double aliq;
             switch (icms) {
                 case "0700":
@@ -1183,5 +1369,5 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    }
+    }*/
 }
