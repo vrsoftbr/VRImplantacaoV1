@@ -275,7 +275,7 @@ public class CPGestorByView2_5GUI extends VRInternalFrame {
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Views Vovo Zuzu:\nvw_exp_produtos_zuzu \nvw_exp_barras_zuzu \nvw_exp_forn_zuzu  \nvw_exp_produtos_panificadora\nvw_exp_barras_panificadora\n\nSanta Fé \nvw_exp_produtos_sta \nvw_exp_barras_sta \nvw_exp_forn_sta\nvw_exp_vendas_stafe_01");
+        jTextArea1.setText("Views Vovo Zuzu:\nvw_exp_produtos_zuzu \nvw_exp_barras_zuzu \nvw_exp_forn_zuzu  \n\nViews Panificadora Vovó\nvw_exp_produtos_panificadora\nvw_exp_barras_panificadora\n\nSanta Fé \nvw_exp_produtos_sta \nvw_exp_barras_sta \nvw_exp_forn_sta\n\nViews de Vendas\nvw_exp_vendas_stafe_01_20;\nvw_exp_vendas_stafe_01_21;\nvw_exp_vendas_stafe_01_22;\n\nvw_exp_vendas_stafe_02_20;\nvw_exp_vendas_stafe_02_21;\nvw_exp_vendas_stafe_02_22;\n\nvw_exp_vendas_stafe_03_20;\nvw_exp_vendas_stafe_03_21;\nvw_exp_vendas_stafe_03_22;\n\nvw_exp_vendas_stafe_04_20;\nvw_exp_vendas_stafe_04_21;\nvw_exp_vendas_stafe_04_22;\n\nvw_exp_vendas_vovo_01_20;\nvw_exp_vendas_vovo_01_21;\nvw_exp_vendas_vovo_01_22;");
         jScrollPane1.setViewportView(jTextArea1);
 
         lblImpLojaOrigem.setText("Imp Loja");

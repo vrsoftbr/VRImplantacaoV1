@@ -331,7 +331,7 @@
                         <Property name="columns" type="int" value="20"/>
                         <Property name="lineWrap" type="boolean" value="true"/>
                         <Property name="rows" type="int" value="5"/>
-                        <Property name="text" type="java.lang.String" value="Views Vovo Zuzu:&#xa;vw_exp_produtos_zuzu &#xa;vw_exp_barras_zuzu &#xa;vw_exp_forn_zuzu  &#xa;vw_exp_produtos_panificadora&#xa;vw_exp_barras_panificadora&#xa;&#xa;Santa F&#xe9; &#xa;vw_exp_produtos_sta &#xa;vw_exp_barras_sta &#xa;vw_exp_forn_sta&#xa;vw_exp_vendas_stafe_01"/>
+                        <Property name="text" type="java.lang.String" value="Views Vovo Zuzu:&#xa;vw_exp_produtos_zuzu &#xa;vw_exp_barras_zuzu &#xa;vw_exp_forn_zuzu  &#xa;&#xa;Views Panificadora Vov&#xf3;&#xa;vw_exp_produtos_panificadora&#xa;vw_exp_barras_panificadora&#xa;&#xa;Santa F&#xe9; &#xa;vw_exp_produtos_sta &#xa;vw_exp_barras_sta &#xa;vw_exp_forn_sta&#xa;&#xa;Views de Vendas&#xa;vw_exp_vendas_stafe_01_20;&#xa;vw_exp_vendas_stafe_01_21;&#xa;vw_exp_vendas_stafe_01_22;&#xa;&#xa;vw_exp_vendas_stafe_02_20;&#xa;vw_exp_vendas_stafe_02_21;&#xa;vw_exp_vendas_stafe_02_22;&#xa;&#xa;vw_exp_vendas_stafe_03_20;&#xa;vw_exp_vendas_stafe_03_21;&#xa;vw_exp_vendas_stafe_03_22;&#xa;&#xa;vw_exp_vendas_stafe_04_20;&#xa;vw_exp_vendas_stafe_04_21;&#xa;vw_exp_vendas_stafe_04_22;&#xa;&#xa;vw_exp_vendas_vovo_01_20;&#xa;vw_exp_vendas_vovo_01_21;&#xa;vw_exp_vendas_vovo_01_22;"/>
                       </Properties>
                     </Component>
                   </SubComponents>
