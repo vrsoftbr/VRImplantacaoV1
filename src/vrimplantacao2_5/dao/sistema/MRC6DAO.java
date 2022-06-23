@@ -90,6 +90,8 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
@@ -112,20 +114,26 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " situacaotributariatributacaoID as id,\n"
-                    + " descricao,\n"
-                    + " situacaotributariatributacaoID as cst\n"
-                    + "from \n"
-                    + " situacaotributariatributacao"
+                    "select distinct\n"
+                    + "concat(t.comerciosituacaotributariatributacaoncID,t.comercioicmssaida,t.comercioicmssaidareducaonc) id,\n"
+                    + "t.comerciosituacaotributariatributacaoncID cst,\n"
+                    + "i.descricao,\n"
+                    + "t.comercioicmssaida aliquota,\n"
+                    + "t.comercioicmssaidareducaonc reducao\n"
+                    + "from taxasicms t\n"
+                    + "join situacaotributariatributacao i \n"
+                    + " on i.situacaotributariatributacaoID = t.comerciosituacaotributariatributacaoncID \n"
+                    + " join produtos p on p.classificacaoID = t.classificacao \n"
+                    + "where \n"
+                    + " t.estado = 'SP'"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
                             rst.getString("descricao"),
                             rst.getInt("cst"),
-                            0,
-                            0
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
                     ));
                 }
             }
@@ -201,38 +209,37 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
-                    + " 	prod.codigo id,\n"
-                    + "	prod.produto descricao,\n"
-                    + "	case when len(replace(prod.codigodebarras, 'NULL', '')) <= 7\n"
-                    + "		and replace(prod.codigodebarras, 'NULL', '') like '200%' \n"
-                    + " 		then cast(SUBSTRING(replace(prod.codigodebarras, 'NULL', ''), 2, len(replace(prod.codigodebarras, 'NULL', ''))) as varchar)\n"
-                    + "		else replace(prod.codigodebarras, 'NULL', '')\n"
+                    + " 	p.codigo id,\n"
+                    + "	p.produto descricao,\n"
+                    + "	case when len(replace(p.codigodebarras, 'NULL', '')) <= 7\n"
+                    + "		and replace(p.codigodebarras, 'NULL', '') like '200%' \n"
+                    + " 		then cast(SUBSTRING(replace(p.codigodebarras, 'NULL', ''), 2, len(replace(p.codigodebarras, 'NULL', ''))) as varchar)\n"
+                    + "		else replace(p.codigodebarras, 'NULL', '')\n"
                     + "	end ean,\n"
-                    + "	prod.referencia,\n"
-                    + "	prod.familiaID familiaid,\n"
-                    + "	prod.grupoID merc1 ,\n"
-                    + "	prod.subgrupoID merc2,\n"
-                    + "	prod.subgrupoID merc3,\n"
-                    + "	prod.precocusto custo,\n"
-                    + "	prod.precotabela precovenda,\n"
-                    + "	prod.peso pesoliquido,\n"
-                    + "	prod.pesobruto pesobruto,\n"
-                    + "	prod.tipo tipo,\n"
-                    + "	prod.volume qtdeEmb,  \n"
-                    + "	prod.validade validade,\n"
-                    + "	prod.dtcadastro datacadastro,\n"
-                    + "	est.estoquereal estoque,\n"
-                    + "	prod.exibir ativo,\n"
-                    + "	prod.situacaotributariaorigemID,\n"
-                    + "	replace(prod.classificacaoID, '.', '') as ncm,\n"
-                    + "	tax.codigocest as cest,\n"
-                    + "	tax.comerciosituacaotributariatributacaoID as idaliquota,\n"
-                    + "	piscofins.situacaotributariapisID piscofins\n"
+                    + "	p.referencia,\n"
+                    + "	p.familiaID familiaid,\n"
+                    + "	p.grupoID merc1 ,\n"
+                    + "	p.subgrupoID merc2,\n"
+                    + "	p.subgrupoID merc3,\n"
+                    + "	p.precocusto custo,\n"
+                    + "	p.precotabela precovenda,\n"
+                    + "	p.peso pesoliquido,\n"
+                    + "	p.pesobruto pesobruto,\n"
+                    + "	p.tipo tipo,\n"
+                    + "	p.volume qtdeEmb,  \n"
+                    + "	p.validade validade,\n"
+                    + "	p.dtcadastro datacadastro,\n"
+                    + "	e.estoquereal estoque,\n"
+                    + "	p.exibir ativo,\n"
+                    + "	p.situacaotributariaorigemID,\n"
+                    + "	replace(p.classificacaoID, '.', '') as ncm,\n"
+                    + "	t.codigocest as cest,\n"
+                    + "	concat(t.comerciosituacaotributariatributacaoncID,t.comercioicmssaida,t.comercioicmssaidareducaonc) as idaliquota,\n"
+                    + "	t.comerciosituacaotributariapisncID piscofins\n"
                     + "from\n"
-                    + "	produtos prod\n"
-                    + "left join estoque est on est.produtoID = prod.codigo\n"
-                    + "left join taxasicms tax on tax.produtoid = prod.codigo\n"
-                    + "left join situacaotributariapis piscofins on piscofins.situacaotributariapisID = prod.situacaotributariaorigemID\n"
+                    + "	produtos p\n"
+                    + "left join estoque e on e.produtoID = p.codigo\n"
+                    + "left join taxasicms t on t.classificacao = p.classificacaoID and t.estado = 'SP'\n"
                     + "order by 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -261,13 +268,15 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getInt("piscofins"));
+                    imp.setPiscofinsCstCredito(imp.getPiscofinsCstDebito());
 
                     imp.setIcmsDebitoId(rst.getString("idaliquota"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("idaliquota"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idaliquota"));
-                    imp.setIcmsCreditoId(rst.getString("idaliquota"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("idaliquota"));
-                    imp.setIcmsConsumidorId(rst.getString("idaliquota"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -281,6 +290,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.setTipoEmbalagem(rst.getString("tipo"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("tipo"));
                         imp.setValidade(rst.getInt("validade"));
                         imp.setQtdEmbalagem(rst.getInt("qtdeEmb"));
                     }
@@ -371,7 +381,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("estado"));
                     imp.setTel_principal(rst.getString("telefone1"));
                     imp.setDatacadastro(rst.getDate("dtcadastro"));
-                    
+
 //                    if ((rst.getString("email") != null)
 //                            && (!rst.getString("email").trim().isEmpty())) {
 //                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.NFE);
@@ -380,7 +390,6 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 //                            && (!rst.getString("telefone2").trim().isEmpty())) {
 //                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
 //                    }
-
                     result.add(imp);
                 }
             }
@@ -431,12 +440,16 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	a.nome as razao,\n"
                     + "	a.nomefantasia as fantasia,\n"
                     + "	case\n"
-                    + "		when a.ativoinativo = 'A' then 1\n"
-                    + "		else 0\n"
+                    + "		when a.desativado = 1 then 0\n"
+                    + "		else 1\n"
                     + "	end as status,\n"
                     + "	a.dtativoinativo,\n"
                     + "	a.endereco,\n"
                     + "	a.complemento,\n"
+                    + "case when \n"
+                    + "	 SUBSTRING(a.endereco, charindex(',', a.endereco)+1, LEN(a.endereco)) like '[a-Z]%' \n"
+                    + "	  then SUBSTRING(a.endereco, patindex('%[0-9]%',a.endereco), len(a.endereco))\n"
+                    + "	   else SUBSTRING(a.endereco, charindex(',', a.endereco)+1, LEN(a.endereco)) end numero,\n"
                     + "	a.bairro,\n"
                     + "	c.codigoibge,\n"
                     + "	c.estado as uf,\n"
@@ -474,6 +487,7 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setComplemento(rst.getString("complemento"));
+                    imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setMunicipioIBGE(rst.getInt("codigoibge"));
