@@ -1030,7 +1030,8 @@ public class CPGestorByViewDAO extends InterfaceDAO {
                     "FROM \n" +
                     "" + viewVenda + "\n" +
                     "WHERE \n" +
-                    "	DATA between '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+                    "	DATA between '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n" + 
+                    "   and valor_unitario is not null";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
