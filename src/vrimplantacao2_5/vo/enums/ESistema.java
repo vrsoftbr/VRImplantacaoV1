@@ -1769,7 +1769,9 @@ public enum ESistema {
             }
             return null;
         }
-    };
+    }
+    
+    ;
     
     private int id;
     private String nome;
