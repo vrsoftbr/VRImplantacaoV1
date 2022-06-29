@@ -181,7 +181,7 @@ public class Nereus2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Nereus");
+        setTitle("Tentaculo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

@@ -18,20 +18,12 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -52,7 +44,6 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
@@ -155,99 +146,31 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	m1.CODIGRU merc1,\n"
-                    + "	m1.NOMEGRU desc_merc1,\n"
-                    + "	m2.CODISGR merc2,\n"
-                    + "	m2.NOMESGR desc_merc2,\n"
-                    + "	m2.CODISGR merc3,\n"
-                    + "	m2.NOMESGR desc_merc3\n"
-                    + "FROM\n"
-                    + "	GRUPOS m1\n"
-                    + "JOIN SUBGRUPO m2 ON m2.CODIGRU = m1.CODIGRU\n"
-                    + "ORDER BY 1,3"
-            )) {
-                while (rs.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-
-                    imp.setMerc1ID(rs.getString("merc1"));
-                    imp.setMerc1Descricao(rs.getString("desc_merc1"));
-                    imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("desc_merc2"));
-                    imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("desc_merc3"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIFAM id_familia,\n"
-                    + "	NOMEFAM familia\n"
-                    + "FROM\n"
-                    + "	FAMILIAS f"
-            )) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-
-                    imp.setImportId(rs.getString("id_familia"));
-                    imp.setDescricao(rs.getString("familia"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CASE \n"
-                    + "	  WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
-                    + "	  THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
-                    + "	  ELSE ean.COD_BARR\n"
-                    + "	END ean,\n"
-                    + "	QTD_UNI qtdembalagem,\n"
-                    + "	e.ABRE_EMB tipoembalagem\n"
-                    + "FROM\n"
-                    + "	COD_BARR ean\n"
-                    + "JOIN PRODUTOS p ON p.CODIPRO = ean.CODIPRO\n"
-                    + "JOIN EMBALAG e ON e.CODIEMB = p.CODIEMB_V\n"
-                    //+ "WHERE ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) IS NOT null\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	e.id_prod id_produto,\n"
+                    + "	ean13 ean,\n"
+                    + "	coalesce(f.fator,1) qtde_emb,\n"
+                    + "	u.sigla tipo_emb\n"
+                    + "from\n"
+                    + "	eq_prod_ean e\n"
+                    + "	join eq_prod p on p.id_prod = e.id_prod \n"
+                    + "	join tb_unid u on u.id_unid = p.id_unid_v \n"
+                    + "	left join tb_fatorcx f on f.id_fatorcx = e.id_fatorcx\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("idproduto"));
+                    imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rs.getInt("qtde_emb"));
+                    imp.setTipoEmbalagem(rs.getString("tipo_emb"));
 
                     result.add(imp);
                 }
@@ -397,106 +320,38 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	o.CODIPRO id_produto,\n"
-                    + "	DTINPRO data_ini,\n"
-                    + "	DTFIPRO data_fim,\n"
-                    + "	PRECO_PRO precooferta,\n"
-                    + "	pr.PREVE preconormal\n"
-                    + "FROM\n"
-                    + "	PROMOCOES o\n"
-                    + "	LEFT JOIN PRODUTOS p ON p.CODIPRO = o.CODIPRO \n"
-                    + "	LEFT JOIN PRECOS_LOJAS pr ON pr.CODIPRO = p.CODIPRO AND pr.AGP_CODIGO = o.EMP_CODIGO \n"
-                    + "WHERE\n"
-                    + "	o.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND DTFIPRO >= 'now'"
-            )) {
-                while (rs.next()) {
-                    OfertaIMP imp = new OfertaIMP();
-
-                    imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setDataInicio(rs.getDate("data_ini"));
-                    imp.setDataFim(rs.getDate("data_fim"));
-                    imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    imp.setPrecoNormal(rs.getDouble("preconormal"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
-        List<AssociadoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	pa.CODIPRO produto_pai,\n"
-                    + "	p.DESCRICAO descricao_pai,\n"
-                    + "	pa.QTD_RELA qtdembalagem,\n"
-                    + "	pa.COD_RELA produto_filho,\n"
-                    + "	p2.DESCRICAO descricao_filho\n"
-                    + "FROM\n"
-                    + "	PRO_RELA pa\n"
-                    + "	JOIN PRODUTOS p ON p.CODIPRO = pa.CODIPRO\n"
-                    + "	JOIN PRODUTOS p2 ON pa.COD_RELA = p2.CODIPRO \n"
-                    + "ORDER BY\n"
-                    + "	produto_pai, produto_filho"
-            )) {
-                while (rs.next()) {
-                    AssociadoIMP imp = new AssociadoIMP();
-
-                    imp.setId(rs.getString("produto_pai"));
-                    imp.setDescricao(rs.getString("descricao_pai"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setProdutoAssociadoId(rs.getString("produto_filho"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	FOR_CODIGO id,\n"
-                    + "	FOR_RAZAO razao,\n"
-                    + "	FOR_FANTASIA fantasia,\n"
-                    + "	FOR_CGC cnpj,\n"
-                    + "	FOR_INSC ie,\n"
-                    + " COALESCE(FOR_PRODUTOR,'N') produtor,\n"
-                    + " COALESCE(FOR_OPT_SIMPLES,'N') simples_nacional,\n"
-                    + "	FOR_ENDERECO endereco,\n"
-                    + "	FOR_NUMEND numero,\n"
-                    + "	FOR_BAIRRO bairro,\n"
-                    + "	CID_NOME cidade,\n"
-                    + "	UF_SIGLA uf,\n"
-                    + "	FOR_CEP cep,\n"
-                    + "	FOR_FONE telefone,\n"
-                    + " FOR_EMAIL email,\n"
-                    + "	FOR_CONTATO contato,\n"
-                    + "	FOR_OBSERV observacao\n"
-                    + "FROM\n"
-                    + "	FORNECEDORES f\n"
-                    + "	JOIN CIDADES c ON c.CID_CODIGO = f.CID_CODIGO \n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	 c.id_pes id,\n"
+                    + "	 razao,\n"
+                    + "	 fantasia,\n"
+                    + "	 case when tipo_fj = 'F' then cpf else cnpj end cnpj,\n"
+                    + "	 case when tipo_fj = 'F' then rg else insc end ie,\n"
+                    + "	 e.n_endereco endereco,\n"
+                    + "	 e.n_nro_endereco numero,\n"
+                    + "	 e.n_complemento complemento,\n"
+                    + "	 e.n_bairro bairro,\n"
+                    + "	 m.municipio cidade,\n"
+                    + "	 u.uf uf,\n"
+                    + "	 e.n_cep cep,\n"
+                    + "	 e.n_fone telefone,\n"
+                    + "	 email,\n"
+                    + "	 dt_cad data_cadastro,\n"
+                    + "	 case id_tipo_situacao when 4  then 1 else 0 end ativo,\n"
+                    + "  obs_v observacao\n"
+                    + "from\n"
+                    + "	 fn_pes c\n"
+                    + "	 join fn_pes_tipo tp on tp.id_pes = c.id_pes\n"
+                    + "	 join fn_pes_end e on e.id_pes = c.id_pes\n"
+                    + "	 join tb_municipio m on m.id_municipio = e.id_n_municipio\n"
+                    + "	 join tb_uf u on u.id_uf = m.id_uf\n"
+                    + "where\n"
+                    + "	 tp.tipo = 'FOR'\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -510,12 +365,12 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone")));
-                    imp.setObservacao(rs.getString("observacao"));
 
                     String email = Utils.acertarTexto(rs.getString("email")).toLowerCase();
                     if (!"".equals(email)) {
@@ -523,15 +378,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                                 (email.length() > 50 ? email.substring(0, 50) : email));
                     }
 
-                    if ("S".equals(rs.getString("produtor"))) {
-                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
-                        } else {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
-                        }
-                    } else if ("S".equals(rs.getString("simples_nacional"))) {
-                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
-                    }
+                    imp.setDatacadastro(rs.getDate("data_cadastro"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -547,70 +396,24 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CODIFAB idfornecedor,\n"
-                    + "	ean.QTD_UNI qtdembalagem\n"
-                    + "FROM\n"
-                    + "	PRODUTOS p\n"
-                    + "	jOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "WHERE\n"
-                    + "	CODIFAB IS NOT NULL \n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	id_prod id_produto,\n"
+                    + "	id_pes id_fornecedor,\n"
+                    + "	codigo codexterno,\n"
+                    + "	f.fator qtde_embalagem\n"
+                    + "from\n"
+                    + "	eq_prod_ref pf\n"
+                    + "	join tb_fatorcx f on pf.id_fatorcx = f.id_fatorcx\n"
+                    + "order by 2,1"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	NUMELAN id,\n"
-                    + "	cp.FOR_CODIGO id_fornecedor,\n"
-                    + "	f.FOR_CGC cnpj_cpf,\n"
-                    + "	NUMEDO documento,\n"
-                    + "	CP_DATAEM emissao,\n"
-                    + "	CP_DATALAN entrada,\n"
-                    + "	CP_VALORPA valor,\n"
-                    + "	CP_DATAVE vencimento,\n"
-                    + "	CP_OBS observacao\n"
-                    + "FROM\n"
-                    + "	CP cp\n"
-                    + "	JOIN FORNECEDORES f ON f.FOR_CODIGO = cp.FOR_CODIGO \n"
-                    + "WHERE\n"
-                    + "	cp.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cp.CP_DATAPA IS NULL\n"
-                    + "ORDER BY 1"
-            )) {
-                while (rs.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-
-                    imp.setId(rs.getString("id"));
+                    imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataEntrada(rs.getDate("entrada"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtde_embalagem"));
 
                     result.add(imp);
                 }
@@ -626,52 +429,53 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CLI_CODIGO id,\n"
-                    + "	CLI_NOME razao,\n"
-                    + "	CLI_FANTASIA fantasia,\n"
-                    + "	CLI_CGC cnpj_cpf,\n"
-                    + "	CLI_RG rg_ie,\n"
-                    + "	CLI_ENDERECO endereco,\n"
-                    + "	CLI_NUMEND numero,\n"
-                    + "	CLI_END_COMPLEMENTO complemento,\n"
-                    + "	CLI_BAIRRO bairro,\n"
-                    + "	m.CID_NOME cidade,\n"
-                    + "	CLI_CEP cep,\n"
-                    + "	m.UF_SIGLA uf,\n"
-                    + "	CASE\n"
-                    + "     WHEN CLI_SITUACAO = '01' THEN 1\n"
-                    + "     ELSE 0\n"
-                    + "	END bloqueado,\n"
-                    + "	TRUNC(CLI_LIMITE,11) limite,\n"
-                    + " vc.vcnv_dia_rece vencimento,\n"
-                    + "	CLI_NASCIMENTO data_nascimento,\n"
-                    + "	CLI_DTULCO data_cadastro,\n"
-                    + "	CLI_EST_CIVIL estadocivil,\n"
-                    + "	CLI_PROFISSAO profissao,\n"
-                    + "	CLI_FONE telefone,\n"
-                    + "	CLI_CELULAR celular,\n"
-                    + "	CLI_E_MAIL email,\n"
-                    + "	CLI_PAI nomepai,\n"
-                    + "	CLI_MAE nomemae,\n"
-                    + "	CLI_CJ_NOME conjuge,\n"
-                    + "	CLI_CJ_NASC data_nasc_conjuge,\n"
-                    + "	CLI_CJ_CPF cpfconjuge,\n"
-                    + "	CLI_OBSERVACAO observacao\n"
-                    + "FROM\n"
-                    + "	CLIENTES c\n"
-                    + "	JOIN CIDADES m ON c.CID_CODIGO = m.CID_CODIGO \n"
-                    + "	LEFT JOIN VENCIMENTO_CONVENIO vc ON C.VCNV_CODIGO = vc.VCNV_CODIGO AND vc.CNV_CODIGO = c.CNV_CODIGO\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	 c.id_pes id,\n"
+                    + "	 case when tipo_fj = 'F' then cpf else cnpj end cpf_cnpj,\n"
+                    + "	 case when tipo_fj = 'F' then rg else insc end rg_ie,\n"
+                    + "	 razao,\n"
+                    + "	 case when fantasia = '(ATUALIZAR)' then razao else fantasia end fantasia,\n"
+                    + "	 e.n_endereco endereco,\n"
+                    + "	 e.n_nro_endereco numero,\n"
+                    + "	 e.n_complemento complemento,\n"
+                    + "	 e.n_bairro bairro,\n"
+                    + "	 m.municipio cidade,\n"
+                    + "	 u.uf uf,\n"
+                    + "	 e.n_cep cep,\n"
+                    + "	 e.n_fone telefone,\n"
+                    + "	 e.n_celular celular,\n"
+                    + "	 email,\n"
+                    + "	 cargo,\n"
+                    + "	 vr_renda salario,\n"
+                    + "	 trabalho_local empresa,\n"
+                    + "	 trabalho_fone tel_empresa,\n"
+                    + "	 dt_nasc data_nasc,\n"
+                    + "	 dt_cad data_cadastro,\n"
+                    + "	 conjuge,\n"
+                    + "	 dt_nasc_conjuge nasc_conjuge,\n"
+                    + "	 mae nomemae,\n"
+                    + "	 pai nomepai,\n"
+                    + "	 case id_tipo_situacao when 4  then 1 else 0 end ativo,\n"
+                    + "	 case id_tipo_situacao when 5 then 1 else 0 end bloqueado,\n"
+                    + "  obs_v observacao\n"
+                    + "from\n"
+                    + "	 fn_pes c\n"
+                    + "	 join fn_pes_tipo tp on tp.id_pes = c.id_pes\n"
+                    + "	 join fn_pes_end e on e.id_pes = c.id_pes\n"
+                    + "	 join tb_municipio m on m.id_municipio = e.id_n_municipio\n"
+                    + "	 join tb_uf u on u.id_uf = m.id_uf\n"
+                    + "where\n"
+                    + "	 tp.tipo in ('CLI','CRC','FUN')\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rs.getString("rg_ie"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
-                    imp.setInscricaoestadual(rs.getString("rg_ie"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -681,70 +485,25 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    if (rs.getDouble("limite") > 9999999.0) {
-                        imp.setValorLimite(0);
-                    } else {
-                        imp.setValorLimite(rs.getDouble("limite"));
-                    }
-
-                    imp.setDiaVencimento(rs.getInt("vencimento"));
-                    imp.setDataNascimento(rs.getDate("data_nascimento"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setEstadoCivil(rs.getString("estadocivil"));
-                    imp.setCargo(rs.getString("profissao"));
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
+
+                    imp.setCargo(rs.getString("cargo"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaTelefone(rs.getString("tel_empresa"));
+
+                    imp.setDataNascimento(rs.getDate("data_nasc"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setDataNascimentoConjuge(rs.getDate("nasc_conjuge"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setNomePai(rs.getString("nomepai"));
-                    imp.setNomeConjuge(rs.getString("conjuge"));
-                    imp.setDataNascimentoConjuge(rs.getDate("data_nasc_conjuge"));
-                    imp.setCpfConjuge(rs.getString("cpfconjuge"));
+
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setObservacao(rs.getString("observacao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	REPLACE(NUMELAN||NUMEDO,'/','') id,\n"
-                    + "	NUMEDO numerocupom,\n"
-                    + "	cr.CLI_CODIGO codcli,\n"
-                    + "	c.CLI_CGC cpfcnpj,\n"
-                    + "	PDV_NUMECAI ecf,\n"
-                    + "	CR_VALORPA valor,\n"
-                    + "	CR_DATAEM emissao,\n"
-                    + "	CR_DATAVE vencimento\n"
-                    + "FROM\n"
-                    + "	CR cr\n"
-                    + "	JOIN CLIENTES c ON c.CLI_CODIGO = cr.CLI_CODIGO \n"
-                    + "WHERE\n"
-                    + "	EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cr_datare is null\n"
-                    + "ORDER BY 1"
-            )) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
-                    imp.setIdCliente(rs.getString("codcli"));
-                    imp.setCnpjCliente(rs.getString("cpfcnpj"));
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
 
                     result.add(imp);
                 }
