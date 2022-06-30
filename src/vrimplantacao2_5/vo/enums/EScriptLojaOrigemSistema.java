@@ -21,7 +21,7 @@ public enum EScriptLojaOrigemSistema {
             + "lojcod as id, "
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
-    LOGUS(100 , 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
+    LOGUS(100, 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
     SYGMA(200, 5,
             "select "
             + "1 as id, "
@@ -136,26 +136,27 @@ public enum EScriptLojaOrigemSistema {
                     "WHERE \n" +
                     "	rownum <= 1"),
     LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS descricao FROM empresa ORDER BY 1"),
-    STOCK(215,11,"select empid as id, empnome as descricao from tbempresas;"),
-    CMM(216, 13, "select \n" +
-                "	f.CodFil id,\n" +
-                "	f.CNPJ + '' - '' + f.Fantasia as descricao\n" +
-                "from \n" +
-                "	Filiais f"),
-    GZPRODADOS(217,8,"select IdEmpresa as id, RazaoSocial as descricao from empresa;"),
+    STOCK(215, 11, "select empid as id, empnome as descricao from tbempresas;"),
+    CMM(216, 13, "select \n"
+            + "	f.CodFil id,\n"
+            + "	f.CNPJ + '' - '' + f.Fantasia as descricao\n"
+            + "from \n"
+            + "	Filiais f"),
+    GZPRODADOS(217, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa;"),
     PRISMAFLEX(218, 5, "SELECT EMPCODIGO id, EMPRAZAOS descricao FROM EMPRESAS ORDER BY 1"),
     JNP_MSUPER(219, 5, "SELECT\n"
-                    + "	SUP999 id,\n"
-                    + "	FANTASIA descricao,\n"
-                    + "	CNPJ cpfcnpj\n"
-                    + "FROM\n"
-                    + "	SUP999\n"
-                    + "ORDER BY 1"),
+            + "	SUP999 id,\n"
+            + "	FANTASIA descricao,\n"
+            + "	CNPJ cpfcnpj\n"
+            + "FROM\n"
+            + "	SUP999\n"
+            + "ORDER BY 1"),
     ETRADE(220, 13, "SELECT codigo id, Fantasia descricao FROM Filial"),
-    KCMS(92, 13, "select \n" +
-                "	codloja id,\n" +
-                "	fantasia descricao\n" +
-                "from empresa"),
+    GESTORA(223, 13, "SELECT EMP_CODIGO id, EMP_NOME descricao from EMPRESA"),
+    KCMS(92, 13, "select \n"
+            + "	codloja id,\n"
+            + "	fantasia descricao\n"
+            + "from empresa"),
     GETWAY(68, 13, "select\n"
                     + "	CODLOJA id,\n"
                     + "	descricao\n"
@@ -167,8 +168,6 @@ public enum EScriptLojaOrigemSistema {
     LCSISTEMAS(222,8,"select id, fantasia descricao from empresa"),
     INOVA(81,11, "select empresaid id, empresanomefantasia descricao from empresa"),
     ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja");
-
-    
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;

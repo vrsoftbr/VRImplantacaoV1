@@ -631,6 +631,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.CONVENIO_CONVENIADO));
     }
 

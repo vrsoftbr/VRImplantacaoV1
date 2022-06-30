@@ -199,6 +199,7 @@ import vrimplantacao2.dao.interfaces.WisaSoftDAO;
 import vrimplantacao2.dao.interfaces.WmsiDAO;
 import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
+import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
@@ -242,6 +243,7 @@ import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
@@ -1754,6 +1756,17 @@ public enum ESistema {
             try {
                 return new Ganso2_5GUI(frame);
             } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GESTORA(223,"GESTORA", new GestoraDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Gestora2_5GUI(frame);} 
+            catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;

@@ -82,6 +82,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.CUSTO_ANTERIOR,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
@@ -93,7 +94,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -120,6 +122,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -268,6 +271,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	ean.BARFATOR qtdembalagem,\n"
                     + "	FABCODIGO fabricante,\n"
                     + "	CASE WHEN PROPESADO = 'S' THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	CASE WHEN PROSITUAC = 'DES' THEN 0 ELSE 1 END ativo,\n"
                     + "	(e.ESTQTDENT - e.ESTQTDSAI) estoque,\n"
                     + "	COALESCE(PROESTMIN, 0) estoquemin,\n"
                     + "	COALESCE(PROESTMAX, 0) estoquemax,\n"
@@ -284,7 +288,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	PRONCM ncm,\n"
                     + "	PROCEST cest,\n"
                     + "	PROCSTPIS piscofins_debito,\n"
-                    + "	PROCSTPISE piscofins_credito\n"
+                    + "	PROCSTPISE piscofins_credito,\n"
+                    + "	p.PROVALIDD validade\n"
                     + "FROM\n"
                     + "	PRODUTOS p\n"
                     + "	LEFT JOIN CODBARRA ean ON p.PROCODIGO = ean.procodigo\n"
@@ -299,10 +304,11 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
 
                     imp.setDescricaoCompleta(rst.getString("desc_completa"));
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoReduzida());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
@@ -317,6 +323,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setValidade(rst.getInt("validade"));
 
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
@@ -370,8 +377,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setDataInicio(rs.getDate("data_ini"));
                     imp.setDataFim(rs.getDate("data_fim"));
-                    imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setPrecoOferta(rs.getDouble("preco_oferta"));
+                    imp.setPrecoNormal(rs.getDouble("preco_normal"));
 
                     result.add(imp);
                 }
@@ -405,6 +412,8 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                     + "	FOREMAIL email,\n"
                     + "	CAST(FORINCLUS AS date) data_cadastro,\n"
                     + "	FOROBSERV observacao,\n"
+                    + "	FORPESSOA ,\n"
+                    + "	FORPRODRURAL produtor,\n"
                     + "	FORSIMPLE simples\n"
                     + "FROM\n"
                     + "	FORNECEDOR f\n"
@@ -442,10 +451,24 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
                         imp.addContato("2", "Telefone 2", rs.getString("telefone2"), null, TipoContato.COMERCIAL, null);
                     }
 
-                    if ("S".equals(rs.getString("simples"))) {
-                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
-                    } else {
-                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    switch (rs.getString("produtor")) {
+                        case "D":
+                            if ("S".equals(rs.getString("simples"))) {
+                                imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                            } else {
+                                imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            }
+                            break;
+                        case "P":
+                            if ("S".equals(rs.getString("simples"))) {
+                                imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                            } else {
+                                imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                            }
+                            break;
+                        default:
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_PRESUMIDO);
+                            System.out.println("Podemos ter um problema no tipo empresa linha 468 do DAO do id: " + rs.getString("id"));
                     }
 
                     result.add(imp);
@@ -671,7 +694,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new Dellasta_PrismaFlexDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
@@ -775,7 +798,7 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-        
+
         private void obterNext() {
             try {
                 if (next == null) {
