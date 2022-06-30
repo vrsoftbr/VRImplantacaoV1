@@ -18,8 +18,14 @@ public enum CondicaoToledo {
     INFNUTRI {
         @Override
         public void importarNutricionalToledo(String arquivo) throws Exception {
+            long antes = System.currentTimeMillis();
             List<NutricionalToledoVO> nutri = carregaDadosInfnutri.getNutricionalToledoINFNUTRI(arquivo);
+            long durante = System.currentTimeMillis();
             gravar.salvarNutricionalToledoINFNUTRI(nutri);
+            long depois = System.currentTimeMillis();
+            System.out.println("Tempo de carregar: " + (durante - antes));
+            System.out.println("Tempo de salvar: " + (depois - durante));
+            System.out.println("Tempo de carregar e salvar: " + (depois - antes));
         }
     }, INTENSMGV {
         @Override

@@ -12,7 +12,6 @@ import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.FilizolaSalvarArquivos;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao2.dao.cadastro.nutricional.CondicaoToledo;
-import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.nutricional.ToledoService;
 
 /**
@@ -23,9 +22,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
     private String sistema;
     private String loja;
-    private CondicaoToledo condicaoToledo;
-    private NutricionalRepositoryProvider provider;
-    private ToledoService servico;
+    private CondicaoToledo condicaoToledo;    
+    private ToledoService servico = new ToledoService();
 
     public String getSistema() {
         return sistema;
@@ -42,6 +40,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     }
 
     public String getLoja() {
+        if (loja.equals(""))
+            loja = "1";
         return loja;
     }
 
@@ -311,8 +311,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                     ProgressBar.setCancel(false);
                     
                     if (!txtNutricional.getArquivo().isEmpty()) {
-                        provider.setSistema(sistema);
-                        provider.setLoja(loja);
+                        servico.setSistema(getSistema());
+                        servico.setLoja(getLoja());
                         FilizolaSalvarArquivos operacoesSalvar = new FilizolaSalvarArquivos();
                         
                         if (rdbFilizolaRdc360.isSelected()) {
@@ -320,13 +320,13 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                             operacoesSalvar.salvarArquivo(txtNutricional.getArquivo(), sistema, loja);
                         }
                         if(rdbToledo.isSelected()) {
-                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INFNUTRI);
+                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INTENSMGV);
                             //NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
                         }
                         if(rdbToledoProduto.isSelected()) {
-                            provider.setIgnorarUltimoDigito(chkIgnorarUltimoDigito.isSelected());
-                            provider.setOpcaoCodigo(rdbCodigoInterno.isSelected() ? 1 : 2);
-                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INTENSMGV);
+                            servico.setIgnorarUltimoDigito(chkIgnorarUltimoDigito.isSelected());
+                            servico.setOpcaoCodigo(rdbCodigoInterno.isSelected() ? 1 : 2);
+                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INFNUTRI);
                            //NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo(), rdbCodigoInterno.isSelected() ? 1 : 2, chkIgnorarUltimoDigito.isSelected());
                         }
                     }                   

@@ -18,7 +18,7 @@ import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 public class OperacoesArquivoToledoInfnutri {
 
     Utils util = new Utils();
-    NutricionalRepositoryProvider provider;
+    public int opcaoCodigo = ToledoService.opcaoCodigo;
 
     public List<NutricionalToledoVO> getNutricionalToledoINFNUTRI(String arquivo) throws Exception {
         ProgressBar.setStatus("Carregando dados Toledo...");
@@ -32,7 +32,7 @@ public class OperacoesArquivoToledoInfnutri {
                 NutricionalToledoVO vo = new NutricionalToledoVO();
                 if (!vToledo.get(i).trim().isEmpty()) {
 
-                    if (provider.getOpcaoCodigo() == 1) {
+                    if (opcaoCodigo == 1) {
                         vo.setId(Utils.stringToInt(vToledo.get(i).substring(1, 7)));
                     } else {
                         vo.setId(Utils.stringToInt(vToledo.get(i).substring(2, 7)));

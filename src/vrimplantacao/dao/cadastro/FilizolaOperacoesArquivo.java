@@ -19,9 +19,6 @@ import vrimplantacao2.utils.arquivo.delimited.ArquivoTXT;
  */
 public class FilizolaOperacoesArquivo {
 
-    NutricionalFilizolaDAO daoNutFilizola = new NutricionalFilizolaDAO();
-    FilizolaSalvarArquivos filizolaSalvarArquivos = new FilizolaSalvarArquivos();
-
     private static final Logger LOG = Logger.getLogger(NutricionalFilizolaDAO.class.getName());
     Utils util = new Utils();
 

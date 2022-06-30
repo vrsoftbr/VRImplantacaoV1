@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.interfaces.gestora;
 
+//import vrimplantacao.classe.ConexaoSqlServer;
+//import vrimplantacao2.utils.sql.SQLUtils;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -13,11 +15,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -42,6 +45,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
@@ -57,7 +61,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Gestora";
     }
-    
+
     private Date vendaDataIni;
     private Date vendaDataFim;
     private boolean migrarMargemProduto;
@@ -69,13 +73,50 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
     }
-    
+
     public boolean isMigrarMargemProduto() {
         return this.migrarMargemProduto;
     }
-    
+
     public void setMigrarMargemProduto(boolean migrarMargemProduto) {
         this.migrarMargemProduto = migrarMargemProduto;
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.TELEFONE
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.EMPRESA,
+                OpcaoCliente.SALARIO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.OBSERVACOES2,
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     @Override
@@ -118,6 +159,10 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.OFERTA,
                 OpcaoProduto.RECEITA
         ));
     }
@@ -300,7 +345,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	end as icmsCst,\n"
                     + "	t.TRI_ALIQUOTA icmsAliq,\n"
                     + "	t.TRI_REDUCAO icmsRed,\n"
-                    + " t.tri_codigo, \n"        
+                    + " t.tri_codigo, \n"
                     + "	p.PRO_CST_PIS_ENTRADA piscofinsCredito,\n"
                     + "	p.PRO_CST_PIS piscofinsSaida,\n"
                     + "	p.natr_codigo piscofinsNatureza\n"
@@ -347,13 +392,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    
+
                     if (isMigrarMargemProduto()) {
                         imp.setMargem(rst.getDouble("p_margem"));
                     } else {
                         imp.setMargem(rst.getDouble("merc_margem"));
                     }
-                    
+
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -370,7 +415,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("tri_codigo"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("tri_codigo"));
                     imp.setIcmsConsumidorId(rst.getString("tri_codigo"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -721,7 +766,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdembalagemreceita(rst.getInt("qtdproduto"));
                     imp.setFator(1);
                     imp.setFichatecnica("");
-                    
+
                     imp.getProdutos().add(rst.getString("idproduto"));
                     result.add(imp);
                 }
@@ -730,7 +775,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     public List<ContaPagarIMP> getContasAPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
 
@@ -772,7 +817,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> Result = new ArrayList<>();
@@ -818,13 +863,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("valorjuros"));
-                    
+
                     if (rst.getString("id_banco") != null && !rst.getString("id_banco").trim().isEmpty()) {
                         imp.setBanco(Integer.parseInt(rst.getString("id_banco").trim()));
                     } else {
                         imp.setBanco(804);
                     }
-                    
+
                     imp.setCmc7(rst.getString("cm7"));
 
                     Result.add(imp);

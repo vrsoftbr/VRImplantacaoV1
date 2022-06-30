@@ -15,7 +15,7 @@ import vrimplantacao2.vo.importacao.NutricionalToledoIMP;
  *
  * @author Michael
  */
-public class OperacoesArquivoToledoItensMGV{
+public class OperacoesArquivoToledoItensMGV {
 
     Utils util = new Utils();
 
@@ -28,17 +28,36 @@ public class OperacoesArquivoToledoItensMGV{
             NutricionalToledoIMP toledo = new NutricionalToledoIMP();
             StringLine ln = new StringLine(vToledo.get(i));
             if (!vToledo.get(i).trim().isEmpty()) {
+                /*ln.jump(4);
+                switch (ln.sbi(1)) {
+                    case 1: toledo.setPesavel("U"); break;
+                    case 5: toledo.setPesavel("U"); break;
+                    default: toledo.setPesavel("P"); break;
+                }
+                toledo.setCodigo(ln.sbi(6));
+                ln.jump(6);
+                toledo.setValidade(ln.sbi(3));
+                toledo.setDescricao(ln.sb(25));
+                ln.sb(25);*/
                 if ("0".equals(vToledo.get(i).substring(2, 3))) {
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
                     toledo.setPesavel("P");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
                     toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setCodigo(toledo.getNutricional());
                     toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 } else {
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
                     toledo.setPesavel("U");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
                     toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setCodigo(toledo.getNutricional());
                     toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 }
             }

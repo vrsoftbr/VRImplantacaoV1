@@ -7,6 +7,7 @@ package vrimplantacao2.dao.cadastro.nutricional;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import vrframework.classe.Conexao;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -120,7 +121,7 @@ public class ArquivoToledoDAO {
         }
     }
 
-    void salvarAnterior(NutricionalToledoIMP vo, String sistema, String loja) throws Exception {
+    public void salvarAnterior(NutricionalToledoIMP vo, String sistema, String loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("implantacao.codant_nutricionaltoledo");

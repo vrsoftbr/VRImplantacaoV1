@@ -19,16 +19,17 @@ import vrimplantacao2.vo.importacao.NutricionalToledoIMP;
 public class ArquivoToledoRepository {
         
     public ArquivoToledoDAO dao = new ArquivoToledoDAO();
-    NutricionalRepositoryProvider provider;
-
+    public String sistema = ToledoService.sistema;
+    public String loja = ToledoService.loja;
+    public boolean ignorarUltimoDigito = ToledoService.ignorarUltimoDigito;
+    public int opcaoCodigo = ToledoService.opcaoCodigo;
         
     public void salvarNutricionalToledoINFNUTRI(List<NutricionalToledoVO> toledo) throws Exception {
+        ProgressBar.setStatus("Importando Info. Nutricional Toledo...");   
         ProgressBar.setMaximum(toledo.size());
-        ProgressBar.setStatus("Importando Info. Nutricional Toledo...");
 
         for (NutricionalToledoVO vo : toledo) {
-
-            final MultiMap<Integer, NutricionalToledoVO> nutricionais = dao.getNutricionalProduto(provider.getSistema(), provider.getLoja());
+            final MultiMap<Integer, NutricionalToledoVO> nutricionais = dao.getNutricionalProduto(sistema, loja);
 
             NutricionalToledoVO prod = nutricionais.get(vo.getId());
 
@@ -39,14 +40,14 @@ public class ArquivoToledoRepository {
 
             int idProduto = -1;
 
-            if (provider.getOpcaoCodigo() == 2) {
-                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(provider.getSistema(), provider.getLoja(), String.valueOf(vo.getId()));
+            if (opcaoCodigo == 2) {
+                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
             } else {
 
-                if (provider.isIgnorarUltimoDigito()) {
-                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(provider.getSistema(), provider.getLoja(), String.valueOf(vo.getId()));
+                if (ignorarUltimoDigito) {
+                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(vo.getId()));
                 } else {
-                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(provider.getSistema(), provider.getLoja(), String.valueOf(vo.getId()));
+                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(vo.getId()));
                 }
             }
 
@@ -56,6 +57,8 @@ public class ArquivoToledoRepository {
             } else {
                 dao.salvarToledoItem(vo, idProduto);
             }
+            
+            ProgressBar.next();
         }
     }
     
@@ -65,9 +68,9 @@ public class ArquivoToledoRepository {
         dao.createTable();
 
         dao.limparAnterior();
-
-        for (NutricionalToledoIMP vo : nutricional) {            
-            dao.salvarAnterior(vo, provider.getSistema(), provider.getLoja());
+        
+        for (NutricionalToledoIMP vo : nutricional) { 
+            dao.salvarAnterior(vo, sistema, loja);
         }
     }
 }

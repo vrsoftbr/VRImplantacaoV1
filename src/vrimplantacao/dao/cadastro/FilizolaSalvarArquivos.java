@@ -22,15 +22,15 @@ import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
  * @author Michael
  */
 public class FilizolaSalvarArquivos {
-    
-    FilizolaOperacoesArquivo filizolaOperacoesArquivo = new FilizolaOperacoesArquivo();
-    NutricionalFilizolaDAO nutricionalFilizolaDAO = new NutricionalFilizolaDAO();
-    
+
+    public FilizolaOperacoesArquivo filizolaOperacoesArquivo = new FilizolaOperacoesArquivo();
+    public NutricionalFilizolaDAO nutricionalFilizolaDAO;
+
     private static final Logger LOG = Logger.getLogger(NutricionalFilizolaDAO.class.getName());
     Utils util = new Utils();
-    
+
     public void salvarArquivoRdc360(String arquivo, String sistema, String loja) throws Exception {
-        NutricionalFilizolaDAO nutricionalFilizolaDAO = new NutricionalFilizolaDAO();
+        nutricionalFilizolaDAO = new NutricionalFilizolaDAO();
         List<NutricionalFilizolaVO> v_nutricionalFilizola = filizolaOperacoesArquivo.getArquivoRdc360(arquivo);
         LOG.fine("Sistema: '" + sistema + "' Loja: '" + loja + "'");
 
@@ -78,13 +78,19 @@ public class FilizolaSalvarArquivos {
     }
 
     public void salvarArquivo(String arquivo, String sistema, String loja) throws Exception {
+        nutricionalFilizolaDAO = new NutricionalFilizolaDAO();
         ProgressBar.setStatus("Carregando dados...Nutricional Filizola...");
         List<NutricionalFilizolaVO> filizola = filizolaOperacoesArquivo.getNutricionalFilizola(arquivo);
-        
+
         ProgressBar.setMaximum(filizola.size());
         ProgressBar.setStatus("Importando Nutricional Filizola...");
         try {
             Conexao.begin();
+
+            System.out.println("\nSe não gravar dados na nutricionalfilizolaitem, \n"
+                    + "provavelmente seja um problema com bigint no método getCodigoAtualEANantCPGestor \n"
+                    + "da classe ProdutoAnteriorDAO\n");
+            
             for (NutricionalFilizolaVO vo : filizola) {
                 nutricionalFilizolaDAO.gravar(vo);
 

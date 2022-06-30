@@ -23,8 +23,6 @@ public class NutricionalRepositoryProvider {
     private ToledoDAO toledoDAO;
     private NutricionalAnteriorDAO anteriorDAO;
     private ProdutoAnteriorDAO produtoDAO;
-    private boolean ignorarUltimoDigito = false;
-    private int opcaoCodigo = 1;
 
     public NutricionalRepositoryProvider(String sistema, String loja, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -35,22 +33,6 @@ public class NutricionalRepositoryProvider {
         this.toledoDAO = new ToledoDAO();
         this.anteriorDAO = new NutricionalAnteriorDAO();
         this.produtoDAO = new ProdutoAnteriorDAO();
-    }
-
-    public boolean isIgnorarUltimoDigito() {
-        return ignorarUltimoDigito;
-    }
-
-    public void setIgnorarUltimoDigito(boolean ignorarUltimoDigito) {
-        this.ignorarUltimoDigito = ignorarUltimoDigito;
-    }
-
-    public int getOpcaoCodigo() {
-        return opcaoCodigo;
-    }
-
-    public void setOpcaoCodigo(int opcaoCodigo) {
-        this.opcaoCodigo = opcaoCodigo;
     }
 
     public String getSistema() {
