@@ -120,15 +120,16 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODITR id,\n"
-                    + " NOMETR descricao,\n"
-                    + " CODICST cst_saida,\n"
-                    + " PERC_ICM aliquota_saida,\n"
-                    + " PERC_RED reducao_saida\n"
-                    + "FROM\n"
-                    + "	TRIBUTA TR\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	aliq.id_grade_trib id,\n"
+                    + "	cst.codigo||'-'||aliq.per_icms||'-'||aliq.per_red_icms descricao,\n"
+                    + "	cst.codigo cst_saida,\n"
+                    + "	aliq.per_icms aliquota_saida,\n"
+                    + "	aliq.per_red_icms reducao_saida\n"
+                    + "from\n"
+                    + "	fs_grade_trib_aliq aliq\n"
+                    + "	join tb_cst cst on aliq.id_cst = cst.id_cst and cst.tipo_imposto = 'ICMS'\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
