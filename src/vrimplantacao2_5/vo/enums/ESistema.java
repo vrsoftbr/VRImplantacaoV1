@@ -259,6 +259,7 @@ import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
+import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
@@ -1194,7 +1195,12 @@ public enum ESistema {
     SIAC(149, "SIAC", new SiacDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Siac2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     SIFAT(150, "SIFAT", new SifatDAO()) {
