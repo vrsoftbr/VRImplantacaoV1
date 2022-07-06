@@ -1,9 +1,7 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,13 +10,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import static vr.core.utils.StringUtils.LOG;
+import javax.swing.JOptionPane;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.dao.interfaces.dellasta.PrismaFlexVendaItemIterator;
+import vrimplantacao2.dao.interfaces.dellasta.PrismaFlexVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -695,175 +694,23 @@ public class Dellasta_PrismaFlexDAO extends InterfaceDAO implements MapaTributoP
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
+    int confirma = 1;
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new Dellasta_PrismaFlexDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        if (confirma == 1) {
+            confirma = JOptionPane.showConfirmDialog(null, "Sugerimos que a importação seja feita mês a mês. \n"
+                    + "Caso tenha selecionado mais de um mês, o sistema pode ficar extremamente lento.\n\n"
+                    + "Ao clicar em sim, essa mensagem não será exibida novamente.\n\n"
+                    + "Deseja presseguir?\n", 
+                    "Atenção!\n", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        }
+        if (confirma == 0) return new PrismaFlexVendaIterator(this.dataInicioVenda, this.dataTerminoVenda);
+        return null;
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new Dellasta_PrismaFlexDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
-
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
-
-        private void obterNext() {
-            try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaIMP();
-                        String id = rst.getString("id_venda");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
-                        next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelada"));
-                    }
-                }
-            } catch (SQLException | ParseException ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-
-            this.sql
-                    = "SELECT\n"
-                    + "	DISTINCT \n"
-                    + "	v.VENREFCX id_venda,\n"
-                    + "	v.VENNUMPDV pdv,\n"
-                    + "	v.VENNUMECF ecf,\n"
-                    + "	CASE\n"
-                    + "	  WHEN v.VENNCUPOM = 99999\n"
-                    + "	    THEN v.VENNCUPOM || SUBSTRING(v.VENREFCX FROM 9 FOR 6)\n"
-                    + "	  ELSE v.VENNCUPOM\n"
-                    + "	END numerocupom,\n"
-                    + "	f.VENCANCELADO cancelada,\n"
-                    + "	v.VENDATA data,\n"
-                    + "	f.FINHORA hora,\n"
-                    + "	f.FINSUBTOT total\n"
-                    + "FROM\n"
-                    + "	ITENS01032022 v\n"
-                    + "LEFT JOIN FINALIZACAO01032022 f ON v.VENREFCX = f.VENREFCX\n"
-                    + "WHERE \n"
-                    + " v.EMPCODIGO = " + idLojaCliente + " AND\n"
-                    + "	v.VENDATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaIMP next() {
-            obterNext();
-            VendaIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    }
-
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaItemIMP next;
-
-        private void obterNext() {
-            try {
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaItemIMP();
-
-                        next.setVenda(rst.getString("id_venda"));
-                        next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nroitem"));
-                        next.setProduto(rst.getString("produto"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
-
-                    }
-                }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "SELECT\n"
-                    + "	VENREFCX id_venda,\n"
-                    + "	VENREFCX || VENNUMPDV || VENNUITEM id_item,\n"
-                    + "	VENNUITEM nroitem,\n"
-                    + " PROCODIGO produto,\n"
-                    + "	UPPER(PROUNIDME) unidade,\n"
-                    + "	VENCBARRA codigobarras,\n"
-                    + "	VENPRODUT descricao,\n"
-                    + "	VENQUANTI quantidade,\n"
-                    + "	VENPRECOU precovenda,\n"
-                    + "	VENTOTALI total,\n"
-                    + "	VENCANCELADO cancelada\n"
-                    + "FROM\n"
-                    + "	ITENS01032022 v"
-                    + "WHERE \n"
-                    + " EMPCODIGO = " + idLojaCliente + " AND\n"
-                    + "	VENDATA BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaItemIMP next() {
-            obterNext();
-            VendaItemIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
+        return new PrismaFlexVendaItemIterator(this.dataInicioVenda, this.dataTerminoVenda);
     }
 }

@@ -1767,23 +1767,23 @@ public enum ESistema {
             return null;
         }
     },
-    GESTORA(223,"GESTORA", new GestoraDAO()) {
-        @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            try {
-                return new Gestora2_5GUI(frame);} 
-            catch (Exception ex) {
-                Util.exibirMensagemErro(ex, "");
-            }
-            return null;
-        }
-    },
     LCSISTEMAS(222,"LCSISTEMAS", new LCSistemasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new LCSistemas2_5GUI(frame);
             } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GESTORA(223,"GESTORA", new GestoraDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Gestora2_5GUI(frame);} 
+            catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
