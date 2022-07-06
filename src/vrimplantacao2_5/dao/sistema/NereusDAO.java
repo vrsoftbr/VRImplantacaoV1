@@ -60,8 +60,6 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
@@ -187,7 +185,35 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	p.id_prod idproduto,\n"
+                    + "	ean.ean13 ean,\n"
+                    + "	p.descricao desc_completa,\n"
+                    + "	descricaor desc_reduzida,\n"
+                    + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
+                    + "	coalesce(f.fator, 1) qtde_emb,\n"
+                    + "	uv.sigla emb_venda,\n"
+                    + "	uc.sigla emb_compra,\n"
+                    + "	ncm.codigo ncm,\n"
+                    + "	cest.cd_cest cest,\n"
+                    + "	dt_cad data_cadastro,\n"
+                    + "	peso pesobruto,\n"
+                    + "	peso_l pesoliquido,\n"
+                    + "	est.qtde estoque,\n"
+                    + "	est.qtde_minima est_min,\n"
+                    + "	est.qtde_maxima est_max,\n"
+                    + " round(pr.vr_custo_efetivo,3) custosemimposto,\n"
+                    + "	round(pr.vr_custo_reposicao,3) custocomimposto,\n"
+                    + "	round(pr.vr_venda_atual,3) precovenda\n"
+                    + "from\n"
+                    + "	eq_prod p\n"
+                    + "	left join eq_prod_ean ean on p.id_prod = ean.id_prod left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
+                    + "	left join tb_unid uv on p.id_unid_v = uv.id_unid left join tb_unid uc on p.id_unid_c = uc.id_unid\n"
+                    + "	left join tb_ncm ncm on p.id_ncm = ncm.id_ncm left join tb_cest cest on ncm.id_cest = cest.id_cest\n"
+                    + "	left join eq_prod_qtde est on p.id_prod = est.id_prod and est.id_emp = " + getLojaOrigem() + "\n"
+                    + "	left join eq_prod_com pr on p.id_prod = pr.id_prod and pr.id_emp = " + getLojaOrigem() + "\n"
+                    + "	left join fs_grade_trib_aliq  i on pr.id_grade_trib = i.id_grade_trib_aliq\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -196,34 +222,33 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
+                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+
+                    imp.setTipoEmbalagem(rst.getString("emb_venda"));
                     imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
+
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
-                    imp.setIdFamiliaProduto(rst.getString("familia"));
-                    
+
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
 
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
                     imp.setEstoque(rst.getDouble("estoque"));
 
-                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-
+//                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
                     idIcmsDebito = rst.getString("id_debito");
