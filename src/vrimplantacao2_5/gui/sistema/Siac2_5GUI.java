@@ -122,8 +122,8 @@ public class Siac2_5GUI extends VRInternalFrame {
                                 break;
                             case 3:
                                 if(chkPdvVendas.isSelected()) {
-                                    //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                                    //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                                    dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                                    dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                                     
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                                 }
