@@ -194,7 +194,7 @@ public class LojaDAO {
                 sql.append(" dataultimaentrada, custosemimposto, custocomimposto, custosemimpostoanterior, custocomimpostoanterior, precovenda, precovendaanterior,");
                 sql.append(" precodiaseguinte, estoque, troca, emiteetiqueta, custosemperdasemimposto, custosemperdasemimpostoanterior, customediocomimposto,");
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
-                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao, id_tipocalculoddv");
+                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao, id_tipocalculoddv, id_normareposicao");
                 if (versao.igualOuMaiorQue(3,17,10)) {
                     sql.append(", id_tipoproduto, fabricacaopropria");
                 }
@@ -209,9 +209,9 @@ public class LojaDAO {
                 sql.append(" " + (i_loja.copiaCusto ? "custocomimposto" : "0") + ", 0, 0, " + (i_loja.copiaPrecoVenda ? "precovenda" : "0") + ",");
                 sql.append("  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,");
                 sql.append(" null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,");
-                sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3");
+                sql.append(" valoricmssubstituicao, null, cestabasica, 0, id_tipocalculoddv, id_normareposicao");
                 if (versao.igualOuMaiorQue(3,17,10)) {
-                    sql.append(", 0, false");
+                    sql.append(", id_tipoproduto, false");
                 }
                 if (versao.igualOuMaiorQue(3, 21)) {
                     sql.append(", dataprimeiraentrada");
