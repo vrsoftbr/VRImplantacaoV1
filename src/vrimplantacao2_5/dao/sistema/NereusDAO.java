@@ -50,6 +50,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.PESAVEL,
