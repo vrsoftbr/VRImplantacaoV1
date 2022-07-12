@@ -853,7 +853,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select\n"
-                    + "concat(vd.data,'-',vd.hora,'-',vd.caixa,'-',vd.cupom) id,\n"
+                    + "concat(vd.data,'-',vd.caixa,'-',vd.cupom) id,\n"
                     + "vd.data,\n"
                     + "min(hora) as horainicio,\n"
                     + "max(hora) as horatermino,\n"
@@ -864,7 +864,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "vd.caixa as ecf,\n"
                     + "vd.cancelado\n"
                     + "from mercodb.movcaixa vd\n"
-                    + "where vd.cdprod <> ''\n"
+                    + "where vd.status = '03' and vd.cancelado = ''\n"
                     + "and vd.data >= '"+ strDataInicio +"' and vd.data <= '"+ strDataTermino +"'\n"
                     + "and vd.loja = "+idLojaCliente+"\n"
                     + "group by\n"
@@ -929,23 +929,23 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n"
                     + "vd.id,\n"
-                    + "concat(vd.data,'-',vd.hora,'-',vd.caixa,'-',vd.cupom) idvenda,\n"
+                    + "concat(vd.data,'-',vd.caixa,'-',vd.cupom) idvenda,\n"
                     + "vd.cupom as numerocupom,\n"
                     + "vd.cdprod as produto,\n"
                     + "vd.item as sequencia,\n"
                     + "e.descricao as descricao,\n"
                     + "e.unidade,\n"
-                    + "coalesce(vd.quant, 0) as quantidade,\n"
-                    + "coalesce(vd.preco, 0) as precovenda,\n"
-                    + "coalesce(vd.valortot, 0) as total,\n"
+                    + "vd.quant as quantidade,\n"
+                    + "vd.preco as precovenda,\n"
+                    + "vd.valortot as total,\n"
                     + "vd.caixa as ecf,\n"
                     + "vd.codbarra as codigobarras,\n"
                     + "vd.descitem as desconto,\n"
                     + "vd.acresitem as acrescimo,\n"
                     + "vd.cancelado\n"
                     + "from mercodb.movcaixa vd\n"
-                    + "inner join mercodb.estoque e on e.cdprod = vd.cdprod and vd.cdprod <> ''\n"
-                    + "where vd.loja = " + idLojaCliente + "\n"
+                    + "join mercodb.estoque e on e.cdprod = vd.cdprod\n"
+                    + "where vd.loja = " + idLojaCliente + " and vd.status = '01' and vd.cancelado = ''\n"
                     + "and vd.data >= '" + VendaIterator.FORMAT.format(dataInicio) + "' and vd.data <= '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
