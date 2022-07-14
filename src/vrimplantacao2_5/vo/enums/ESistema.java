@@ -226,6 +226,7 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
+import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -256,6 +257,7 @@ import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
+import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
@@ -1777,6 +1779,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Nereus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SCORPION(225,"SCORPION", new ScorpionDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Scorpion2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
