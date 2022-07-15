@@ -210,10 +210,35 @@ public class ProdutoDAO {
 
             try {
                 stm.execute(sql.getInsert());
+                
+                if (versao.igualOuMaiorQue(4, 1)) {
+                    salvarProdutoPisCofins(vo);
+                }
+                
             } catch (Exception e) {
                 throw e;
             }
         }
+    }
+    
+     public void salvarProdutoPisCofins(ProdutoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtopiscofins");
+
+            sql.put("id_produto", vo.getId());
+            sql.put("id_grupoeconomico", 1);
+            sql.put("id_piscofinsdebito", vo.getPisCofinsDebito().getId());
+            sql.put("id_piscofinscredito", vo.getPisCofinsCredito().getId());
+            sql.put("codigonaturezareceita", vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+
     }
 
     /**
