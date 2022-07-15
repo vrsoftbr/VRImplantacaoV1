@@ -186,7 +186,7 @@ public class ItuInfoGUI extends VRInternalFrame {
                         if (chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 1) {
                         if (cbxUnifProdutos.isSelected()) {  

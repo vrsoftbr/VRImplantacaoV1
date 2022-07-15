@@ -647,22 +647,6 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "group by descricao,terminal,data ";
 
-            /*"select\n"
-                    + "  max(id) id_venda,\n"
-                    + "	 descricao numcupom,\n"
-                    + "	 trim(replace (terminal,'CAIXA','')) ecf,\n"
-                    + "	 data,\n"
-                    + "	 min(hora) horainicio,\n"
-                    + "	 max(hora) horatermino,\n"
-                    + "	 sum(credito) subtotalimpressora\n"
-                    + "from\n"
-                    + "	 caixa\n"
-                    + "where\n"
-                    + "	 codigoloja = " + idLojaCliente + "\n"
-                    + "	 and descricao not like 'S%'\n"
-                    + "	 and situacao = 1\n"
-                    + "	 and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-                    + " group by descricao,terminal,data";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -708,14 +692,14 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setVenda(rst.getString("idvenda"));
                         next.setId(id);
                         next.setSequencia(rst.getInt("sequecia"));
-                        next.setProduto(rst.getString("produtoid"));
+                        //next.setProduto(rst.getString("produtoid"));
                         next.setCodigoBarras(rst.getString("codigobarra"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        //next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setQuantidade(rst.getDouble("qtde"));
                         next.setPrecoVenda(rst.getDouble("vrunit"));
                         //next.setTotalBruto(rst.getDouble("vrtotal"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCancelado(rst.getBoolean("excluido"));
                     }
                 }
             } catch (Exception ex) {
@@ -745,42 +729,23 @@ public class ItuInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "select \n"
                     + " c.id,\n"
                     + " cx.id idvenda,\n"
-                    + " p.id produtoid,\n"
-                    + " p.codigobarra,\n"
+                    + " c.produto codigobarra,\n"
+                    //+ " p.id produtoid,\n"
+                    //+ " p.codigobarra,\n"
                     + " p.produto descricao,\n"
                     + " c.item::int sequecia,\n"
                     + " case when p.mgv5 = 0 then 'UN' else 'KG' end unidade,\n"
                     + " c.qtde,\n"
                     + " cast(c.vrunit as decimal(10,2)) vrunit,\n"
-                    + " cast(c.vrtotal as decimal(10,2)) vrtotal\n"
+                    + " cast(c.vrtotal as decimal(10,2)) vrtotal,\n"
+                    + " c.excluido\n"
                     + "from cupom c \n"
-                    + " join produtos p on p.codigobarra = c.produto\n"
+                    + " left join produtos p on p.codigobarra = c.produto\n"
                     + " join t_caixa cx on cx.numerocupom::int  = c.codigo::int\n"
                     + "where \n"
                     + "c.loja = " + idLojaCliente + " and c.qtde::varchar not like '789%'\n"
                     + "and c.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
 
-            /*"select\n"
-                    + "	max(v.id) id_venda,\n"
-                    + "	max(i.id) id_item,\n"
-                    + "	max(i.item) nroitem,\n"
-                    + "	max(p.id) produto,\n"
-                    + "	p.codigobarra,\n"
-                    + "	max(p.produto) descricao,\n"
-                    + "	case when p.mgv5 = 0 then 'UN' else 'KG' end unidade,\n"
-                    + "	max(i.qtde) quantidade,\n"
-                    + "	i.vrunit precovenda,\n"
-                    + "	i.vrtotal total\n"
-                    + "from\n"
-                    + "	cupom i\n"
-                    + "	left join caixa v on v.descricao = i.codigo::varchar and v.codigoloja = i.loja\n"
-                    + "	left join produtos p on i.produto = p.codigobarra\n"
-                    + "where\n"
-                    + "	v.codigoloja = " + idLojaCliente + "\n"
-                    + "	and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "group by \n"
-                    + "	p.codigobarra ,i.vrunit, i.vrtotal, p.mgv5 \n"
-                    + "order by 1,3";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
