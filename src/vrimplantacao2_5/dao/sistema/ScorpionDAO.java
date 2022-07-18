@@ -22,7 +22,6 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -261,41 +260,32 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
                     imp.setDescricaoGondola(rst.getString("desc_completa"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-//                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtde_emb_compra"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
-//                    imp.setValidade(rst.getInt("validade"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setMargem(rst.getDouble("margem"));
-                    
+
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
-                    
+
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
-                    
-                    String idIcmsDebito/*, IdIcmsCredito, IdIcmsForaEstado*/;
 
-                    idIcmsDebito = rst.getString("id_debito");
-//                    IdIcmsCredito = rst.getString("id_credito");
-//                    IdIcmsForaEstado = rst.getString("id_debito_fe");
+                    String idIcmsDebito = rst.getString("id_debito");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
-//                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
-//                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
-//                    imp.setIcmsCreditoId(IdIcmsCredito);
-//                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsCreditoId(idIcmsDebito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
@@ -441,53 +431,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	FP.CODigo_financeiro_p id,\n"
-                    + "	COD_CLIENTE_FORNECEDOR id_fornecedor,\n"
-                    + "	p.CNPJ,\n"
-                    + "	CAST (fp.DATA_EMISSAO AS date)  emissao,\n"
-                    + "	CAST (fp.DATA_LANCAMENTO AS date) entrada,\n"
-                    + "	fp.VALOR_PARCELA valor,\n"
-                    + "	CAST (fp.DATA_VENCIMENTO AS date) vencimento,\n"
-                    + "	f.OBS\n"
-                    + "FROM\n"
-                    + "	TB_FINANCEIRO f\n"
-                    + "	LEFT JOIN TB_FINANCEIRO_P fp ON f.CODIGO_FINANCEIRO = fp.COD_FINANCEIRO\n"
-                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = f.COD_CLIENTE_FORNECEDOR AND p.TIPO = 'F'\n"
-                    + "WHERE\n"
-                    + "	LOJA = 1\n"
-                    + "	AND fp.SITUACAO = 'A'\n"
-                    + "	AND fp.DATA_PAGAMENTO IS NULL \n"
-                    + "	AND COD_CLIENTE_FORNECEDOR IN\n"
-                    + "	(SELECT codigo_pessoa FROM TB_PESSOA WHERE tipo = 'F')"
-            )) {
-                while (rs.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataEntrada(rs.getDate("entrada"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("observacao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
@@ -517,8 +460,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	TB_PESSOA P\n"
                     + "WHERE\n"
-                    + "	TIPO <> 'F'\n"
-                    + "	AND p.CODIGO_PESSOA IN (SELECT COD_CLIENTEPESSOA FROM TB_CLIENTES)\n"
+                    + "	p.CODIGO_PESSOA IN (SELECT COD_CLIENTEPESSOA FROM TB_CLIENTES)\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -577,13 +519,13 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	TB_FINANCEIRO_P fp\n"
                     + "	JOIN TB_FINANCEIRO f ON fp.COD_FINANCEIRO = f.CODIGO_FINANCEIRO\n"
-                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = f.COD_CLIENTE_FORNECEDOR AND p.TIPO = 'C'\n"
+                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = fp.COD_CLIENTE\n"
                     + "WHERE\n"
                     + "	f.LOJA = " + getLojaOrigem() + "\n"
-                    + "	AND COD_FORMAPAGAMENTO = 5\n"
-                    + "	AND DATA_PAGAMENTO IS NULL\n"
+                    + "	AND COD_CLIENTE IS NOT NULL\n"
                     + "	AND fp.SITUACAO = 'A'\n"
-                    + "ORDER BY 1"
+                    + "	AND DATA_PAGAMENTO IS NULL\n"
+                    + "ORDER BY CODIGO_FINANCEIRO_P, DATA_EMISSAO"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
