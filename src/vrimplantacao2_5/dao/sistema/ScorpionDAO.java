@@ -21,14 +21,12 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -63,9 +61,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.ATIVO,
@@ -126,61 +121,25 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODITR id,\n"
-                    + " NOMETR descricao,\n"
-                    + " CODICST cst_saida,\n"
-                    + " PERC_ICM aliquota_saida,\n"
-                    + " PERC_RED reducao_saida\n"
+                    "SELECT DISTINCT \n"
+                    + "	p.COD_TRIBUTACAO||'-'||st.COD_SITUACAOFISCAL id,\n"
+                    + "	t.DESCRICAO,\n"
+                    + "	st.COD_SITUACAOFISCAL cst_saida,\n"
+                    + "	t.ALIQUOTA aliq_saida,\n"
+                    + "	t.REDUCAO_BASE red_saida\n"
                     + "FROM\n"
-                    + "	TRIBUTA TR\n"
-                    + "ORDER BY 1"
+                    + "	TB_PRODUTOS p\n"
+                    + "	JOIN TB_TRIBUTACAO t ON p.COD_TRIBUTACAO = t.CODIGO_TRIBUTACAO \n"
+                    + "	JOIN TB_SITUACAO_FISCAL st ON p.COD_SITUACAOTRIBUTARIA = st.CODIGO_SITUACAOFISCAL"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
                             rs.getInt("cst_saida"),
-                            rs.getDouble("aliquota_saida"),
-                            rs.getDouble("reducao_saida"))
+                            rs.getDouble("aliq_saida"),
+                            rs.getDouble("red_saida"))
                     );
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	m1.CODIGRU merc1,\n"
-                    + "	m1.NOMEGRU desc_merc1,\n"
-                    + "	m2.CODISGR merc2,\n"
-                    + "	m2.NOMESGR desc_merc2,\n"
-                    + "	m2.CODISGR merc3,\n"
-                    + "	m2.NOMESGR desc_merc3\n"
-                    + "FROM\n"
-                    + "	GRUPOS m1\n"
-                    + "JOIN SUBGRUPO m2 ON m2.CODIGRU = m1.CODIGRU\n"
-                    + "ORDER BY 1,3"
-            )) {
-                while (rs.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-
-                    imp.setMerc1ID(rs.getString("merc1"));
-                    imp.setMerc1Descricao(rs.getString("desc_merc1"));
-                    imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("desc_merc2"));
-                    imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("desc_merc3"));
-
-                    result.add(imp);
                 }
             }
         }
@@ -228,7 +187,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	1 qtdembalagem\n"
                     + "FROM\n"
                     + "	TB_PRODUTOS tp\n"
-                    + "ORDER BY CODIGO_PRODUTO"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -254,76 +213,41 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "WITH estoque AS (\n"
-                    + "SELECT\n"
-                    + "	CODIPRO,\n"
-                    + "	max(CAST(ANO || '-' || MES || '-' || '01' AS date)) AS DATA\n"
-                    + "	FROM ESTOSI\n"
-                    + "	WHERE EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	GROUP BY CODIPRO)\n"
-                    + "SELECT\n"
-                    + "	p.CODIPRO idproduto,\n"
-                    + "	CASE\n"
-                    + "		WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
-                    + "	  	THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
-                    + "		ELSE ean.COD_BARR\n"
-                    + "	END ean,\n"
-                    + "	DESCRICAO descricaocompleta,\n"
-                    + "	DESCRI_AB descricaoreduzida,\n"
-                    + "	un_v.ABRE_EMB tipoembalagem,\n"
-                    + "	un_c.ABRE_EMB emb_compra,\n"
-                    + "	ean.QTD_UNI qtdembalagem,\n"
-                    + "	PESO_BRU pesobruto,\n"
-                    + "	PESO_LIQ pesoliquido,\n"
-                    + "	CASE\n"
-                    + "		WHEN balanca = 'S' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END e_balanca,\n"
-                    + "	CODIFAM familia,\n"
-                    + "	p.codifab fabricante,\n"
-                    + "	CODIGRU merc1,\n"
-                    + "	CODISGR merc2,\n"
-                    + "	CODISGR merc3,\n"
-                    + "	CODINCM ncm,\n"
-                    + "	p.CEST cest,\n"
-                    + "	p.PERC_LUC margem,\n"
-                    + "	pl.UC_CUSTO_C custocomimposto,\n"
-                    + "	pl.UC_CUSTO_S custosemimposto,\n"
-                    + "	pr.PREVE precovenda,\n"
-                    + "	COALESCE (p.ESTOMIN,\n"
-                    + "	0) estmin,\n"
-                    + "	p.ESTOMAX estmax,\n"
-                    + "	CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) DATA,\n"
-                    + "	a.CODIPRO,\n"
-                    + "	a.ESTOANT estoque,\n"
-                    + "	tc.CODITR id_credito,\n"
-                    + "	td.CODITR id_debito,\n"
-                    + "	tdfe.CODITR id_debito_fe,\n"
-                    + "	DATA_ALTERA data_alteracao,\n"
-                    + "	pcc.CST_PIS piscofinscredito,\n"
-                    + "	pcd.CST_PIS piscofinsdebito,\n"
-                    + "	CASE\n"
-                    + "		WHEN p.atides = 'A' THEN 1\n"
-                    + "		ELSE 0\n"
-                    + "	END situacaocadastro\n"
+                    "SELECT\n"
+                    + "	CODIGO_PRODUTO idproduto,\n"
+                    + "	CODIGO_BARRA ean,\n"
+                    + "	p.DESCRICAO desc_completa,\n"
+                    + "	DESCRICAO_PDV desc_reduzida,\n"
+                    + "	UNIDADE_REFERENCIA tipoembalagem,\n"
+                    + "	QUANTIDADE_PORCAIXA qtde_emb_compra,\n"
+                    + "	CASE WHEN COD_SETORBALANCA IS NOT NULL THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	DIAS_VALIDADE validade,\n"
+                    + "	p.COD_PRECO_PRODUT_EQUIV familia,\n"
+                    + "	PRECO_CUSTO custo,\n"
+                    + "	PRECO_VENDA precovenda,\n"
+                    + "	MARGEM_LUCRO margem,\n"
+                    + "	CAST(p.DATA_ALTERACAO AS date) DATA_ALTERACAO,\n"
+                    + "	CAST(p.DATA_CADASTRO AS date) DATA_CADASTRO,\n"
+                    + "	CASE WHEN p.SITUACAO = 'A' THEN 1 ELSE 0 END ativo,\n"
+                    + "	NCM,\n"
+                    + "	cest.COD_CEST CEST,\n"
+                    + "	est.SALDO estoque,\n"
+                    + "	ESTOQUE_MINIMO estmin,\n"
+                    + "	ESTOQUE_MAXIMO estmax,\n"
+                    + "	PESO_BRUTO,\n"
+                    + "	PESO_LIQUIDO,\n"
+                    + "	p.COD_TRIBUTACAO||'-'||st.COD_SITUACAOFISCAL id_debito,\n"
+                    + "	CST_PIS_ENT piscof_credito,\n"
+                    + "	CST_PIS_ENT piscof_debito\n"
                     + "FROM\n"
-                    + "	PRODUTOS p\n"
-                    + "	JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO\n"
-                    + "	JOIN estosi a ON a.CODIPRO = p.CODIPRO AND a.EMP_CODIGO = pl.EMP_CODIGO\n"
-                    + "	JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "	JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
-                    + "	JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
-                    + "	JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO AND pr.AGP_CODIGO = 1\n"
-                    + "	JOIN TRIBUTA_LOJAS ti ON ti.CODIPRO = p.CODIPRO\n"
-                    + "	JOIN TRIBUTA tc ON tc.CODITR = ti.CODITRE \n"
-                    + "	JOIN TRIBUTA td ON td.CODITR = ti.CODITRC\n"
-                    + "	JOIN TRIBUTA tdfe ON tdfe.CODITR = ti.CODITRI\n"
-                    + "	JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
-                    + "	JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
-                    + "	JOIN estoque e ON e.CODIPRO = a.CODIPRO AND CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) = e.data\n"
+                    + "	TB_PRODUTOS p\n"
+                    + "	LEFT JOIN TB_CEST cest ON p.COD_CEST = cest.ID_CEST\n"
+                    + "	LEFT JOIN TB_PRODUTO_ESTOQUE_LOJA est ON est.COD_PRODUTO = p.CODIGO_PRODUTO \n"
+                    + "	JOIN TB_TRIBUTACAO t ON p.COD_TRIBUTACAO = t.CODIGO_TRIBUTACAO \n"
+                    + "	JOIN TB_SITUACAO_FISCAL st ON p.COD_SITUACAOTRIBUTARIA = st.CODIGO_SITUACAOFISCAL\n"
                     + "WHERE\n"
-                    + "	pl.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "ORDER BY 1 DESC"
+                    + "	est.LOJA = " + getLojaOrigem() + "\n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -332,52 +256,49 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
+                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
+                    imp.setDescricaoGondola(rst.getString("desc_completa"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+//                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtde_emb_compra"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
+//                    imp.setValidade(rst.getInt("validade"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(imp.getCodMercadologico2());
-
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    
+                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-
-                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-
-                    String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
+                    
+                    imp.setPesoBruto(rst.getDouble("peso_bruto"));
+                    imp.setPesoLiquido(rst.getDouble("peso_liquido"));
+                    
+                    String idIcmsDebito/*, IdIcmsCredito, IdIcmsForaEstado*/;
 
                     idIcmsDebito = rst.getString("id_debito");
-                    IdIcmsCredito = rst.getString("id_credito");
-                    IdIcmsForaEstado = rst.getString("id_debito_fe");
+//                    IdIcmsCredito = rst.getString("id_credito");
+//                    IdIcmsForaEstado = rst.getString("id_debito_fe");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
-                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
                     imp.setIcmsConsumidorId(idIcmsDebito);
-                    imp.setIcmsCreditoId(IdIcmsCredito);
-                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+//                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
+//                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
+//                    imp.setIcmsCreditoId(IdIcmsCredito);
+//                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
-                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
 
                     result.add(imp);
                 }
@@ -430,26 +351,26 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	FOR_CODIGO id,\n"
-                    + "	FOR_RAZAO razao,\n"
-                    + "	FOR_FANTASIA fantasia,\n"
-                    + "	FOR_CGC cnpj,\n"
-                    + "	FOR_INSC ie,\n"
-                    + " COALESCE(FOR_PRODUTOR,'N') produtor,\n"
-                    + " COALESCE(FOR_OPT_SIMPLES,'N') simples_nacional,\n"
-                    + "	FOR_ENDERECO endereco,\n"
-                    + "	FOR_NUMEND numero,\n"
-                    + "	FOR_BAIRRO bairro,\n"
-                    + "	CID_NOME cidade,\n"
-                    + "	UF_SIGLA uf,\n"
-                    + "	FOR_CEP cep,\n"
-                    + "	FOR_FONE telefone,\n"
-                    + " FOR_EMAIL email,\n"
-                    + "	FOR_CONTATO contato,\n"
-                    + "	FOR_OBSERV observacao\n"
+                    + "	CODIGO_PESSOA id,\n"
+                    + "	RAZAOSOCIAL razao,\n"
+                    + "	NOMEFANTASIA fantasia,\n"
+                    + "	CNPJ,\n"
+                    + "	INSCESTADUAL ie,\n"
+                    + "	ENDERECO,\n"
+                    + "	NRO numero,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + " cep,\n"
+                    + "	ESTADO uf,\n"
+                    + "	FONE1 telefone,\n"
+                    + "	EMAIL,\n"
+                    + "	DT_CADASTRO data_cad,\n"
+                    + "	OBS\n"
                     + "FROM\n"
-                    + "	FORNECEDORES f\n"
-                    + "	JOIN CIDADES c ON c.CID_CODIGO = f.CID_CODIGO \n"
+                    + "	TB_PESSOA p\n"
+                    + "WHERE\n"
+                    + "	p.CODIGO_PESSOA IN (SELECT COD_FORNECEDORPESSOA FROM TB_FORNECEDORES)\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -468,23 +389,14 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
+                    imp.setDatacadastro(rs.getDate("data_cad"));
+                    imp.setObservacao(rs.getString("obs"));
                     imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone")));
-                    imp.setObservacao(rs.getString("observacao"));
 
                     String email = Utils.acertarTexto(rs.getString("email")).toLowerCase();
                     if (!"".equals(email)) {
                         imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL,
                                 (email.length() > 50 ? email.substring(0, 50) : email));
-                    }
-
-                    if ("S".equals(rs.getString("produtor"))) {
-                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
-                        } else {
-                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
-                        }
-                    } else if ("S".equals(rs.getString("simples_nacional"))) {
-                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
                     }
 
                     result.add(imp);
@@ -535,22 +447,24 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	NUMELAN id,\n"
-                    + "	cp.FOR_CODIGO id_fornecedor,\n"
-                    + "	f.FOR_CGC cnpj_cpf,\n"
-                    + "	NUMEDO documento,\n"
-                    + "	CP_DATAEM emissao,\n"
-                    + "	CP_DATALAN entrada,\n"
-                    + "	CP_VALORPA valor,\n"
-                    + "	CP_DATAVE vencimento,\n"
-                    + "	CP_OBS observacao\n"
+                    + "	FP.CODigo_financeiro_p id,\n"
+                    + "	COD_CLIENTE_FORNECEDOR id_fornecedor,\n"
+                    + "	p.CNPJ,\n"
+                    + "	CAST (fp.DATA_EMISSAO AS date)  emissao,\n"
+                    + "	CAST (fp.DATA_LANCAMENTO AS date) entrada,\n"
+                    + "	fp.VALOR_PARCELA valor,\n"
+                    + "	CAST (fp.DATA_VENCIMENTO AS date) vencimento,\n"
+                    + "	f.OBS\n"
                     + "FROM\n"
-                    + "	CP cp\n"
-                    + "	JOIN FORNECEDORES f ON f.FOR_CODIGO = cp.FOR_CODIGO \n"
+                    + "	TB_FINANCEIRO f\n"
+                    + "	LEFT JOIN TB_FINANCEIRO_P fp ON f.CODIGO_FINANCEIRO = fp.COD_FINANCEIRO\n"
+                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = f.COD_CLIENTE_FORNECEDOR AND p.TIPO = 'F'\n"
                     + "WHERE\n"
-                    + "	cp.EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cp.CP_DATAPA IS NULL\n"
-                    + "ORDER BY 1"
+                    + "	LOJA = 1\n"
+                    + "	AND fp.SITUACAO = 'A'\n"
+                    + "	AND fp.DATA_PAGAMENTO IS NULL \n"
+                    + "	AND COD_CLIENTE_FORNECEDOR IN\n"
+                    + "	(SELECT codigo_pessoa FROM TB_PESSOA WHERE tipo = 'F')"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -580,41 +494,31 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CLI_CODIGO id,\n"
-                    + "	CLI_NOME razao,\n"
-                    + "	CLI_FANTASIA fantasia,\n"
-                    + "	CLI_CGC cnpj_cpf,\n"
-                    + "	CLI_RG rg_ie,\n"
-                    + "	CLI_ENDERECO endereco,\n"
-                    + "	CLI_NUMEND numero,\n"
-                    + "	CLI_END_COMPLEMENTO complemento,\n"
-                    + "	CLI_BAIRRO bairro,\n"
-                    + "	m.CID_NOME cidade,\n"
-                    + "	CLI_CEP cep,\n"
-                    + "	m.UF_SIGLA uf,\n"
-                    + "	CASE\n"
-                    + "     WHEN CLI_SITUACAO = '01' THEN 1\n"
-                    + "     ELSE 0\n"
-                    + "	END bloqueado,\n"
-                    + "	TRUNC(CLI_LIMITE,11) limite,\n"
-                    + " vc.vcnv_dia_rece vencimento,\n"
-                    + "	CLI_NASCIMENTO data_nascimento,\n"
-                    + "	CLI_DTULCO data_cadastro,\n"
-                    + "	CLI_EST_CIVIL estadocivil,\n"
-                    + "	CLI_PROFISSAO profissao,\n"
-                    + "	CLI_FONE telefone,\n"
-                    + "	CLI_CELULAR celular,\n"
-                    + "	CLI_E_MAIL email,\n"
-                    + "	CLI_PAI nomepai,\n"
-                    + "	CLI_MAE nomemae,\n"
-                    + "	CLI_CJ_NOME conjuge,\n"
-                    + "	CLI_CJ_NASC data_nasc_conjuge,\n"
-                    + "	CLI_CJ_CPF cpfconjuge,\n"
-                    + "	CLI_OBSERVACAO observacao\n"
+                    + "	CODIGO_PESSOA id,\n"
+                    + "	RAZAOSOCIAL razao,\n"
+                    + "	NOMEFANTASIA fantasia,\n"
+                    + "	CNPJ cnpj_cpf,\n"
+                    + "	CASE WHEN rg IS NULL THEN INSCESTADUAL ELSE RG END rg_ie,\n"
+                    + "	ENDERECO,\n"
+                    + "	NRO numero,\n"
+                    + " complemento,\n"
+                    + "	BAIRRO,\n"
+                    + "	cep,\n"
+                    + "	CIDADE,\n"
+                    + "	ESTADO uf,\n"
+                    + "	FONE1 telefone,\n"
+                    + "	celular,\n"
+                    + "	CAST (DATANASCIMENTO AS date) dt_nasc,\n"
+                    + "	EMAIL,\n"
+                    + "	CAST (DT_CADASTRO AS date) dt_cad,\n"
+                    + "	LIMITECONVENIO limite,\n"
+                    + "	CASE WHEN STATUS = 'B' THEN 1 ELSE 0 END bloqueado,\n"
+                    + "	OBS \n"
                     + "FROM\n"
-                    + "	CLIENTES c\n"
-                    + "	JOIN CIDADES m ON c.CID_CODIGO = m.CID_CODIGO \n"
-                    + "	LEFT JOIN VENCIMENTO_CONVENIO vc ON C.VCNV_CODIGO = vc.VCNV_CODIGO AND vc.CNV_CODIGO = c.CNV_CODIGO\n"
+                    + "	TB_PESSOA P\n"
+                    + "WHERE\n"
+                    + "	TIPO <> 'F'\n"
+                    + "	AND p.CODIGO_PESSOA IN (SELECT COD_CLIENTEPESSOA FROM TB_CLIENTES)\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -634,27 +538,17 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
 
+                    imp.setValorLimite(rs.getDouble("limite"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    if (rs.getDouble("limite") > 9999999.0) {
-                        imp.setValorLimite(0);
-                    } else {
-                        imp.setValorLimite(rs.getDouble("limite"));
-                    }
 
-                    imp.setDiaVencimento(rs.getInt("vencimento"));
-                    imp.setDataNascimento(rs.getDate("data_nascimento"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setEstadoCivil(rs.getString("estadocivil"));
-                    imp.setCargo(rs.getString("profissao"));
+                    imp.setDataNascimento(rs.getDate("dt_nasc"));
+                    imp.setDataCadastro(rs.getDate("dt_cad"));
+
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setNomeMae(rs.getString("nomemae"));
-                    imp.setNomePai(rs.getString("nomepai"));
-                    imp.setNomeConjuge(rs.getString("conjuge"));
-                    imp.setDataNascimentoConjuge(rs.getDate("data_nasc_conjuge"));
-                    imp.setCpfConjuge(rs.getString("cpfconjuge"));
-                    imp.setObservacao(rs.getString("observacao"));
+
+                    imp.setObservacao(rs.getString("obs"));
 
                     result.add(imp);
                 }
@@ -671,20 +565,24 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	REPLACE(NUMELAN||NUMEDO,'/','') id,\n"
-                    + "	NUMEDO numerocupom,\n"
-                    + "	cr.CLI_CODIGO codcli,\n"
-                    + "	c.CLI_CGC cpfcnpj,\n"
-                    + "	PDV_NUMECAI ecf,\n"
-                    + "	CR_VALORPA valor,\n"
-                    + "	CR_DATAEM emissao,\n"
-                    + "	CR_DATAVE vencimento\n"
+                    + "	CODIGO_FINANCEIRO_P id,\n"
+                    + "	f.NRO_DOCUMENTO numerocupom,\n"
+                    + "	COD_CLIENTE codcli,\n"
+                    + "	p.CNPJ cpfcnpj,\n"
+                    + "	f.NRO_PDV ecf,\n"
+                    + "	VALOR_PARCELA valor,\n"
+                    + "	CAST (DATA_EMISSAO AS date) emissao,\n"
+                    + "	CAST (DATA_VENCIMENTO AS date) vencimento,\n"
+                    + "	fp.obs\n"
                     + "FROM\n"
-                    + "	CR cr\n"
-                    + "	JOIN CLIENTES c ON c.CLI_CODIGO = cr.CLI_CODIGO \n"
+                    + "	TB_FINANCEIRO_P fp\n"
+                    + "	JOIN TB_FINANCEIRO f ON fp.COD_FINANCEIRO = f.CODIGO_FINANCEIRO\n"
+                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = f.COD_CLIENTE_FORNECEDOR AND p.TIPO = 'C'\n"
                     + "WHERE\n"
-                    + "	EMP_CODIGO = " + getLojaOrigem() + "\n"
-                    + "	AND cr_datare is null\n"
+                    + "	f.LOJA = " + getLojaOrigem() + "\n"
+                    + "	AND COD_FORMAPAGAMENTO = 5\n"
+                    + "	AND DATA_PAGAMENTO IS NULL\n"
+                    + "	AND fp.SITUACAO = 'A'\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -698,6 +596,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rs.getDouble("valor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setObservacao(rs.getString("obs"));
 
                     result.add(imp);
                 }
@@ -720,11 +619,11 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         return new ScorpionDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
-    public void setDataInicioVenda(Date date) {
+    public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
 
-    public void setDataTerminoVenda(Date date) {
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
@@ -761,6 +660,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -775,24 +675,20 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
-                    + "	REPLACE((MOV_LOJA||MOV_COO||MOV_PDV||MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	MOV_LOJA loja,\n"
-                    + "	MOV_PDV pdv,\n"
-                    + "	MOV_ECF ecf,\n"
-                    + "	MOV_COO numerocupom,\n"
-                    + "	MOV_DT_MOVIMENTO data,\n"
-                    //+ " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) hora,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CAST(sum(MOV_VLR_TOTAL) AS numeric(11,2)) total,\n"
-                    + "	CAST(sum(MOV_DESCONTO_CUPOM) AS numeric(11,2)) desconto,\n"
-                    + "	CAST(sum(MOV_ACRESCIMO_CUPOM) AS numeric(11,2)) acrescimo\n"
+                    + "	CODIGO_VENDA id_venda,\n"
+                    + "	COO_ECF_NF numerocupom,\n"
+                    + "	SERIE_ECF ecf,\n"
+                    + "	CAST(DATA_VENDA AS DATE) data,\n"
+                    + "	SUBSTRING(DATA_VENDA FROM 12 FOR 8) hora,\n"
+                    + "	VALOR_DESCONTO desconto,\n"
+                    + "	VALOR_ACRESCIMO acrescimo,\n"
+                    + "	VALOR_LIQUIDO_VENDA total,\n"
+                    + "	CASE WHEN v.vendaativa = 'N' THEN 1 ELSE 0 END cancelado\n"
                     + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA\n"
+                    + "	TB_VENDA v\n"
                     + "WHERE\n"
-                    + "	PRO_ID IS NOT NULL\n"
-                    + "	AND MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6";
+                    + "	NUMERO_LOJA = " + idLojaCliente + "\n"
+                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -840,7 +736,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
-
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (Exception ex) {
@@ -852,33 +748,25 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO || pdv.PRO_ID || pdv.MOV_SEQ_COO), '-', '') AS id_item,\n"
-                    + "	SUBSTRING(pdv.PRO_COD_BARRA FROM 1 FOR CHAR_LENGTH(pdv.PRO_COD_BARRA)-1) ean,\n"
-                    + "	p.PRO_DESCRICAO produto,\n"
-                    + "	pdv.MOV_LOJA AS loja,\n"
-                    + "	pdv.MOV_PDV AS pdv,\n"
-                    + "	pdv.MOV_ECF AS ecf,\n"
-                    + "	pdv.MOV_COO AS numerocupom,\n"
-                    + "	pdv.MOV_SEQ_COO AS sequencia,\n"
-                    + "	pdv.MOV_DT_MOVIMENTO AS DATA,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CASE\n"
-                    + "	 WHEN pdv.MOV_TPO_REGISTRO = 10 THEN 1\n"
-                    + "	 ELSE 0\n"
-                    + "	END cancelado,\n"
-                    + "	p.PRO_UN_REFERENCIA AS unidade,\n"
-                    + "	pdv.MOV_QTD_ITEM AS qtd,\n"
-                    + "	pdv.MOV_VLR_UNIT AS valorunitario,\n"
-                    + "	pdv.MOV_VLR_TOTAL AS valortotal,\n"
-                    + "	pdv.MOV_DESCONTO_ITEM AS desconto\n"
+                    + "	COD_VENDA id_venda,\n"
+                    + "	CODIGO_VENDAITEM id_item,\n"
+                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
+                    + "	COD_PRODUTO produto,\n"
+                    + "	p.UNIDADE_REFERENCIA unidade,\n"
+                    + "	COD_BARRA codigobarras,\n"
+                    + "	p.DESCRICAO_PDV descricao,\n"
+                    + "	QUANTIDADE,\n"
+                    + "	VALOR_UNITARIO precovenda,\n"
+                    + "	VALOR_TOTAL total,\n"
+                    + "	CASE WHEN CANCELADO = 'S' THEN 1 ELSE 0 END CANCELADO\n"
                     + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA pdv\n"
-                    + "JOIN TB_PRODUTOS p ON p.pro_id = pdv.PRO_ID\n"
+                    + "	TB_VENDA_ITEM vi\n"
+                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
+                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
                     + "WHERE\n"
-                    + "	pdv.PRO_ID IS NOT NULL\n"
-                    + "	AND pdv.MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND pdv.MOV_DT_MOVIMENTO BETWEEN '" + dataInicio + "' AND '" + dataTermino + "'";
+                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
+                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
