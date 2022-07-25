@@ -58,9 +58,6 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
@@ -248,8 +245,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    
-                    
+
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
                     idIcmsDebito = rst.getString("id_debito");
@@ -481,11 +477,11 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
         return new NereusDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
-    public void setDataInicioVenda(Date date) {
+    public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
 
-    public void setDataTerminoVenda(Date date) {
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
@@ -522,6 +518,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -535,25 +532,22 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "SELECT\n"
-                    + "	REPLACE((MOV_LOJA||MOV_COO||MOV_PDV||MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	MOV_LOJA loja,\n"
-                    + "	MOV_PDV pdv,\n"
-                    + "	MOV_ECF ecf,\n"
-                    + "	MOV_COO numerocupom,\n"
-                    + "	MOV_DT_MOVIMENTO data,\n"
-                    //+ " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) hora,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CAST(sum(MOV_VLR_TOTAL) AS numeric(11,2)) total,\n"
-                    + "	CAST(sum(MOV_DESCONTO_CUPOM) AS numeric(11,2)) desconto,\n"
-                    + "	CAST(sum(MOV_ACRESCIMO_CUPOM) AS numeric(11,2)) acrescimo\n"
-                    + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA\n"
-                    + "WHERE\n"
-                    + "	PRO_ID IS NOT NULL\n"
-                    + "	AND MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6";
+                    = "select\n"
+                    + "	id_cupom id_venda,\n"
+                    + "	nro_ecf ecf,\n"
+                    + "	nro_coo numerocupom,\n"
+                    + "	dt_venda as data,\n"
+                    + "	substring(hr_final::varchar, 1, 8) hora,\n"
+                    + "	vr_total total,\n"
+                    + "	vr_desconto desconto,\n"
+                    + "	vr_acrescimo acrescimo,\n"
+                    + " case when cnc = 'SIM' then 1 else 0 end cancelado"
+                    + "from\n"
+                    + "	vnd_cupom vc\n"
+                    + "where\n"
+                    + "	id_emp = " + idLojaCliente + "\n"
+                    + "	and dt_venda between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "	order by dt_venda, nro_coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -601,6 +595,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
                 }
@@ -612,34 +609,28 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO), '-', '') AS id_venda,\n"
-                    + "	REPLACE((pdv.MOV_LOJA || pdv.MOV_COO || pdv.MOV_PDV || pdv.MOV_DT_MOVIMENTO || pdv.PRO_ID || pdv.MOV_SEQ_COO), '-', '') AS id_item,\n"
-                    + "	SUBSTRING(pdv.PRO_COD_BARRA FROM 1 FOR CHAR_LENGTH(pdv.PRO_COD_BARRA)-1) ean,\n"
-                    + "	p.PRO_DESCRICAO produto,\n"
-                    + "	pdv.MOV_LOJA AS loja,\n"
-                    + "	pdv.MOV_PDV AS pdv,\n"
-                    + "	pdv.MOV_ECF AS ecf,\n"
-                    + "	pdv.MOV_COO AS numerocupom,\n"
-                    + "	pdv.MOV_SEQ_COO AS sequencia,\n"
-                    + "	pdv.MOV_DT_MOVIMENTO AS DATA,\n"
-                    + " '00:00:00' hora,\n"
-                    + "	CASE\n"
-                    + "	 WHEN pdv.MOV_TPO_REGISTRO = 10 THEN 1\n"
-                    + "	 ELSE 0\n"
-                    + "	END cancelado,\n"
-                    + "	p.PRO_UN_REFERENCIA AS unidade,\n"
-                    + "	pdv.MOV_QTD_ITEM AS qtd,\n"
-                    + "	pdv.MOV_VLR_UNIT AS valorunitario,\n"
-                    + "	pdv.MOV_VLR_TOTAL AS valortotal,\n"
-                    + "	pdv.MOV_DESCONTO_ITEM AS desconto\n"
-                    + "FROM\n"
-                    + "	TB_PDV_MOVOUTRA pdv\n"
-                    + "JOIN TB_PRODUTOS p ON p.pro_id = pdv.PRO_ID\n"
-                    + "WHERE\n"
-                    + "	pdv.PRO_ID IS NOT NULL\n"
-                    + "	AND pdv.MOV_LOJA = " + idLojaCliente + "\n"
-                    + "	AND pdv.MOV_DT_MOVIMENTO BETWEEN '" + dataInicio + "' AND '" + dataTermino + "'";
+                    = "select\n"
+                    + "	 vi.id_cupom id_venda,\n"
+                    + "	 id_cupom_prod id_item,\n"
+                    + "	 sequencia nroitem,\n"
+                    + "	 vi.id_prod produto,\n"
+                    + "	 u.sigla unidade,\n"
+                    + "	 ean13 codigobarras,\n"
+                    + "	 p.descricao,\n"
+                    + "	 qtde quantidade,\n"
+                    + "	 vr_venda precovenda,\n"
+                    + "	 vi.vr_total total,\n"
+                    + "	 vi.vr_desconto desconto,\n"
+                    + "	 vi.vr_acrescimo acrescimo,\n"
+                    + "	 case when vi.cnc = 'SIM' then 1 else 0 end cancelado\n"
+                    + "from\n"
+                    + "	 vnd_cupom_prod vi\n"
+                    + "	 join vnd_cupom v on v.id_cupom = vi.id_cupom\n"
+                    + "	 left join eq_prod p on p.id_prod = vi.id_prod\n"
+                    + "	 left join tb_unid u on u.id_unid = p.id_unid_v \n"
+                    + "where\n"
+                    + "	 v.dt_venda between '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	 order by 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
