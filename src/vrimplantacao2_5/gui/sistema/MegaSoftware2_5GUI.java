@@ -174,7 +174,7 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Sygma");
+        setTitle("Mega Software");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
