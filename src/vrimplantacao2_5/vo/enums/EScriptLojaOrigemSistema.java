@@ -168,7 +168,8 @@ public enum EScriptLojaOrigemSistema {
     LCSISTEMAS(222,8,"select id, fantasia descricao from empresa"),
     INOVA(81,11, "select empresaid id, empresanomefantasia descricao from empresa"),
     ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja"),
-    SIAC(149,9,"select empresa_id id, fantasia descricao from empresas");
+    SIAC(149,9,"select empresa_id id, fantasia descricao from empresas"),
+    MEGASOFTWARE(224, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA");
     
     private int idSistema;
     private int idBancoDados;
