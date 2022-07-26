@@ -4,27 +4,17 @@ import java.util.Map;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -32,25 +22,22 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /*
  *
- * @author Michael
+ * @author Guilherme
  *
  */
 public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "FXSistemas";
+        return "MEGA SOFTWARE";
     }
 
     @Override
@@ -162,24 +149,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "WITH cst AS (\n"
-                    + "SELECT \n"
-                    + "	DISTINCT \n"
-                    + "	ID_TRIBUTACAO_SAIDAS,\n"
-                    + "	substring (CST_SAIDA FROM 2 FOR 4) cst\n"
-                    + "FROM\n"
-                    + "	PRODUTO\n"
-                    + "	WHERE ID_TRIBUTACAO_SAIDAS IS NOT null\n"
-                    + "	)\n"
-                    + "SELECT \n"
-                    + "	cst.cst,\n"
-                    + "	ALIQUOTA,\n"
-                    + "	COALESCE (PERCENTUAL, 0) AS REDUCAO\n"
-                    + "FROM\n"
-                    + "	NF_CALCULO i\n"
-                    + "JOIN\n"
-                    + "	cst ON\n"
-                    + "	i.ID = cst.ID_TRIBUTACAO_SAIDAS"
+                    ""
             )) {
                 while (rs.next()) {
                     String id = rs.getString("cst") + "-" + rs.getString("aliquota") + "-" + rs.getString("reducao");

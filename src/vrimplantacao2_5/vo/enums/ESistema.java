@@ -1791,7 +1791,7 @@ public enum ESistema {
             return null;
         }
     },
-    MEGASOFTWARE(224, "MEGASOFTWARE", new MegaSoftwareDAO()) {
+    MEGASOFTWARE(224, "MEGA SOFTWARE", new MegaSoftwareDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
