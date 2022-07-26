@@ -183,6 +183,10 @@ public class ProdutoRepositoryProvider {
     public void salvarLojaVirtual(ProdutoVO prod, long ean) throws Exception {
         produtoDAO.salvarLojaVirtual(prod, ean);
     }
+    
+    public void salvarProdutoPisCofins(ProdutoVO prod) throws Exception{
+        produtoDAO.salvarProdutoPisCofins(prod);
+    }
 
     public void atualizar(ProdutoVO prod, Set<OpcaoProduto> opt) throws Exception {
         produtoDAO.atualizar(prod, opt);

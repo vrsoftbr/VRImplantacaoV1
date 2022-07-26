@@ -54,6 +54,7 @@ import vrimplantacao2_5.vo.enums.EOperacao;
 public class ProdutoRepository {
 
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     private final ProdutoRepositoryProvider provider;
     private final LogController logController;
@@ -248,7 +249,10 @@ public class ProdutoRepository {
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
-
+                        if(versao.igualOuMaiorQue(4,1)){
+                            provider.salvarProdutoPisCofins(prod);
+                        }
+                        
                         if (prod.getDescricaoCompleta() != null 
                                 && !prod.getDescricaoCompleta().trim().isEmpty()
                                     && prod.getDescricaoCompleta().length() >= 3
@@ -693,12 +697,12 @@ public class ProdutoRepository {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+         
             //Executa log de operação
             logController.executar(EOperacao.UNIFICAR_PRODUTO.getId(),
                     sdf.format(new Date()),
                     provider.getLojaVR());
-
+                        
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
