@@ -57,7 +57,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         return "Dobes CGA";
     }
 
-    @Override
+    /*@Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -87,6 +87,40 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }*/
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ret016.\"ALIQCod\" id,\n"
+                    + "	ret016.\"ALIQDesc\" descricao,\n"
+                    + "	CASE \n"
+                    + "	  WHEN ret016.\"ALIQDesc\" LIKE '%RED%' THEN 20\n"
+                    + "	  WHEN ret016.\"ALIQDesc\" LIKE '%SUBST%' THEN 60\n"
+                    + "	  WHEN ret016.\"ALIQDesc\" LIKE '%ISENTO%' THEN 40\n"
+                    + "	  WHEN ret016.\"ALIQDesc\" LIKE '%NÃO TRIB%' THEN 41\n"
+                    + "	  ELSE 0 END cst_saida,\n"
+                    + "	ret016.\"ALIQNFPerc\" aliquota_saida,\n"
+                    + "	ret016.\"ALIQRedNF\" reducao_saida\n"
+                    + "FROM ret016\n"
+                    + "ORDER BY ret016.\"ALIQCod\" ASC"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_saida"),
+                            rs.getDouble("aliquota_saida"),
+                            rs.getDouble("reducao_saida"))
+                    );
+                }
+            }
+        }
+
         return result;
     }
 
@@ -193,7 +227,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	ret018.\"SECCod\",\n"
                     + "	ret018.\"SECDesc\",\n"
                     + "	ret019.\"GRUCod\",\n"
@@ -206,18 +240,28 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
                     + "ORDER BY\n"
                     + "	RET018.\"SECCod\",\n"
-                    + "	RET020.\"GRUCod\""
+                    + "	RET020.\"GRUCod\""*/
+                    "SELECT DISTINCT \n"
+                    + "	ret019.\"GRUCod\" merc1,\n"
+                    + "	ret019.\"GRUDesc\" desc1\n"
+                    + "FROM\n"
+                    + "	ret018\n"
+                    + "LEFT JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
+                    + "LEFT JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("GRUCod"));
-                    imp.setMerc1Descricao(rst.getString("GRUDesc"));
-                    imp.setMerc2ID(rst.getString("SUBGCod"));
-                    imp.setMerc2Descricao(rst.getString("SUBGDesc"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(rst.getString("SUBGDesc"));
+
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc1"));
+                    imp.setMerc2ID(imp.getMerc1ID());
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID(imp.getMerc1ID());
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());
+                    
                     vResult.add(imp);
                 }
             }
@@ -239,19 +283,20 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret051.\"PRODCusto\",\n"
                     + "	ret051.\"PRODMargem\",\n"
                     + "	ret051.\"PRODVenda\",\n"
-                    + "	ret051.\"GRUCod\",\n"
-                    + "	ret051.\"SUBGCod\",\n"
+                    + "	ret051.\"GRUCod\" merc1,\n"
+                    + "	ret051.\"GRUCod\" merc2,\n"
+                    + "	ret051.\"GRUCod\" merc3,\n"
                     + "	ret051.prodai,\n"
-                    + "	ret051.\"SECCod\",\n"
                     + "	ret051.\"PRODBARCod\" ean,\n"
-                    + "	ret051.clasfisccod,\n"
+                    + "	ret041.CLASFISCDESC ncm,\n"
+                    + "	ret041.clasfisccest cest,\n"
                     + "	ret051.natreccod,\n"
                     + "	ret051.prodstcofinsent,\n"
                     + "	ret051.prodstcofins,\n"
                     + "	ret051.\"SUBCod\",\n"
                     + "	ret051.prodsdo,\n"
                     + "	prodqtemb,\n"
-                    + "	ret051.\"ALIQCod\",\n"
+                    + "	ret051.\"ALIQCod\" id_icms_saida,\n"
                     + "	ret051.\"TABBCod\" cstSaida,\n"
                     + "	al1.\"ALIQNFPerc\" aliqDebito,\n"
                     + "	al1.\"ALIQRedNF\" redDebito,\n"
@@ -259,15 +304,13 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret051.tabbcred cstEntrada,\n"
                     + "	al2.\"ALIQNFPerc\" aliqCredito,\n"
                     + "	al2.\"ALIQRedNF\" redCredito,\n"
-                    + "	ret041.clasfisccod ncm,\n"
-                    + "	ret041.clasfisccest CODCEST,\n"
                     + "	ret051.\"PRODUnid\",\n"
                     + "	ret051.prodcustofinal,\n"
                     + "	ret051.prodcustofinalvenda\n"
                     + "FROM\n"
                     + "	RET051\n"
                     + "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n"
-                    + "LEFT JOIN RET053 ON	RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
+                    + "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
                     + "LEFT JOIN ret016 al1 ON	al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "LEFT JOIN ret016 al2 ON	al2.\"ALIQCod\" = ret051.aliqcred\n"
                     + "ORDER BY\n"
@@ -309,12 +352,12 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("PRODVenda"));
                     imp.setEstoque(rst.getDouble("prodsdo"));
-                    imp.setCodMercadologico1(rst.getString("GRUCod"));
-                    imp.setCodMercadologico2(rst.getString("SUBGCod"));
-                    imp.setCodMercadologico3("1");
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setIdFamiliaProduto(rst.getString("SUBCod"));
-                    imp.setNcm(rst.getString("clasfisccod"));
-                    imp.setCest(rst.getString("CODCEST"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
                     imp.setQtdEmbalagem(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
 
@@ -328,12 +371,13 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofins"))));
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofinsent"))));
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
-                    imp.setIcmsDebitoId(rst.getString("ALIQCod"));
-                    imp.setIcmsCreditoId(rst.getString("ALIQCRED"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("ALIQCod"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("ALIQCod"));
-                    imp.setIcmsConsumidorId(rst.getString("ALIQCod"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("ALIQCRED"));
+
+                    imp.setIcmsDebitoId(rst.getString("id_icms_saida"));
+                    imp.setIcmsConsumidorId(rst.getString("id_icms_saida"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms_saida"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms_saida"));
+                    imp.setIcmsCreditoId(rst.getString("id_icms_saida"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_saida"));
 
                     vResult.add(imp);
                     contador++;
