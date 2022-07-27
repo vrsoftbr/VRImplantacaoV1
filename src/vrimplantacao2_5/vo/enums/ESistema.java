@@ -227,6 +227,7 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
+import vrimplantacao2_5.dao.sistema.SISMPlanilhaPgDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -260,6 +261,7 @@ import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.SISMPlanilhaPg2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
@@ -1796,6 +1798,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new MegaSoftware2_5GUI(frame);} 
+            catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SISMPLANILHAPG(225, "SISMPLANILHAPG", new SISMPlanilhaPgDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new SISMPlanilhaPg2_5GUI(frame);} 
             catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
