@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -146,19 +147,19 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n" +
+                    "	distinct\n" +
+                    "	p.aliq aliquota\n" +
+                    "FROM \n" +
+                    "	PRO001 p"
             )) {
                 while (rs.next()) {
-                    String id = rs.getString("cst") + "-" + rs.getString("aliquota") + "-" + rs.getString("reducao");
                     result.add(new MapaTributoIMP(
-                            id,
-                            id,
-                            rs.getInt("cst"),
-                            rs.getDouble("aliquota"),
-                            rs.getDouble("reducao")));
+                            rs.getString("aliquota"),
+                            rs.getString("aliquota")));
                 }
             }
         }
@@ -180,8 +181,8 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "	p.BALANCA,\n" +
                     "	p.EMBALAGEM,\n" +
                     "	p.PRO_BARR ean,\n" +
-                    "	p.PRO_GRUP grupo,\n" +
-                    "	p.PRO_SUBG subgrupo,\n" +
+                    "	p.PRO_GRUP merc1,\n" +
+                    "	p.PRO_SUBG merc2,\n" +
                     "	p.PRO_CUST custo,\n" +
                     "	p.PRO_VEND precovenda,\n" +
                     "	p.PRO_LUCR margem,\n" +
@@ -208,58 +209,33 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setDescricaoCompleta(rs.getString("descricaoCompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                    imp.seteBalanca(rs.getBoolean("e_balanca"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("embalagem"));
+                    imp.seteBalanca(rs.getString("balanca").equals("S"));
                     imp.setDataCadastro(rs.getDate("dataCadastro"));
-                    imp.setDataAlteracao(rs.getDate("dataAlteracao"));
-
-                    imp.setCodMercadologico1(rs.getString("codMercadologico1"));
-                    imp.setCodMercadologico2(rs.getString("codMercadologico2"));
-                    imp.setCodMercadologico3(rs.getString("codMercadologico3"));
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(rs.getString("1"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoqueMaximo"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoqueMinimo"));
-                    imp.setPesoBruto(rs.getDouble("pesoBruto"));
-                    imp.setPesoLiquido(rs.getDouble("pesoLiquido"));
-
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoSemImposto(rs.getDouble("custoSemImposto"));
-                    imp.setCustoComImposto(rs.getDouble("custoComImposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(imp.getCustoSemImposto());
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-
-                    imp.setSituacaoCadastro(rs.getInt("situacaoCadastro"));
+                    imp.setSituacaoCadastro(rs.getString("inativo").equals("") ? 1 : 0);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
+                    imp.setPiscofinsCstDebito(rs.getInt("cst_cofins"));
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("nat_receita"));
 
-                    imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
-                    imp.setPiscofinsCstCredito(rs.getInt("piscofinsCstCredito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsNaturezaReceita"));
-
-                    String icmsId = rs.getString("icmsCstSaida") + "-" + rs.getString("icmsAliqSaida") + "-" + rs.getString("icmsReducaoSaida");
-
+                    String icmsId = rs.getString("aliquota");
+                    
                     imp.setIcmsConsumidorId(icmsId);
                     imp.setIcmsDebitoId(icmsId);
                     imp.setIcmsCreditoId(icmsId);
                     imp.setIcmsCreditoForaEstadoId(icmsId);
                     imp.setIcmsDebitoForaEstadoId(icmsId);
                     imp.setIcmsDebitoForaEstadoNfId(icmsId);
-
-                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
-
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-                        imp.seteBalanca(false);
-                        imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                        imp.setValidade(0);
-                        imp.setQtdEmbalagem(0);
-                    }
+                    
                     result.add(imp);
                 }
             }
@@ -303,8 +279,8 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
-                    imp.setIe_rg(rs.getString("ie_rg"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
                     imp.setInsc_municipal(rs.getString("insc_municipal"));
                     imp.setSuframa(rs.getString("suframa"));
                     imp.setAtivo(rs.getInt("ativo") == 1);
@@ -316,11 +292,10 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setValor_minimo_pedido(rs.getFloat("valor_minimo_pedido"));
-                    imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setDatacadastro(rs.getDate("cadastro"));
+                    imp.setObservacao(rs.getString("obs"));
 
-                    imp.setTel_principal(rs.getString("fone1"));
+                    imp.setTel_principal(rs.getString("fone"));
 
                     String fax = (rs.getString("fax"));
                     if (!"".equals(fax)) {
@@ -389,13 +364,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "  SELECT\n"
-                    + "	ID_FORCLI id_fornecedor,\n"
-                    + "	ID_PRODUTO id_produto,\n"
-                    + "	CODIGO cod_externo\n"
-                    + "FROM\n"
-                    + "	FOR_CLI_PRODUTOS \n"
-                    + "ORDER BY 1,2"
+                    ""
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -429,9 +398,10 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "	c.CLI_TELE fone,\n" +
                     "	c.cli_celular celular,\n" +
                     "	c.CLI__FAX fax,\n" +
+                    "   c.CLI__CGC cnpj,\n" +        
                     "	c.CLI__CPF cpf,\n" +
                     "	c.CLI__IEST ie,\n" +
-                    "	c.CLI___RG,\n" +
+                    "	c.CLI___RG rg,\n" +
                     "	c.CLI_ENDE endereco,\n" +
                     "	c.cli_complemento complemento,\n" +
                     "	c.NUMERO,\n" +
@@ -453,42 +423,34 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj(rs.getString("cnpj"));
+                    
+                    if(imp.getCnpj().isEmpty()) {
+                        imp.setCnpj("cpf");
+                    }
+                    
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
-                    imp.setDataNascimento(rs.getDate("dataNascimento"));
-                    imp.setDataCadastro(rs.getDate("dataCadastro"));
-
+                    
+                    if (imp.getInscricaoestadual().isEmpty()) {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    }
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTelefone(rs.getString("telefone"));
-                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
-
-                    imp.setEstadoCivil(rs.getString("estadoCivil"));
+                    imp.setTelefone(rs.getString("fone"));
+                    imp.setFax(rs.getString("fax"));
                     imp.setAtivo(rs.getBoolean("ativo"));
-                    imp.setNomeConjuge(rs.getString("nomeConjuge"));
-                    imp.setNomeMae(rs.getString("nomeMae"));
-                    imp.setNomePai(rs.getString("nomePai"));
-                    imp.setEmpresa(rs.getString("empresa"));
-                    imp.setEmpresaEndereco(rs.getString("empresaEndereco"));
-                    imp.setEmpresaComplemento(rs.getString("empresaComplemento"));
-                    imp.setEmpresaBairro(rs.getString("empresaBairro"));
-                    imp.setEmpresaMunicipio(rs.getString("empresaMunicipio"));
-                    imp.setEmpresaUf(rs.getString("empresaUf"));
-                    imp.setEmpresaCep(rs.getString("empresaCep"));
-                    imp.setEmpresaTelefone(rs.getString("empresaTelefone"));
-                    imp.setDataAdmissao(rs.getDate("dataAdmissao"));
-                    imp.setCargo(rs.getString("cargo"));
-                    imp.setEmpresaTelefone(rs.getString("empresaTelefone"));
-                    imp.setSalario(rs.getDouble("salario"));
-                    imp.setDiaVencimento(rs.getInt("diaVencimento"));
-
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomePai(rs.getString("pai"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
+                    imp.setSexo(rs.getString("sexo").equals("M") ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setValorLimite(rs.getDouble("limite"));
 
                     result.add(imp);
                 }
@@ -527,14 +489,13 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("idCliente"));
-                    imp.setCnpjCliente(rs.getString("CPFCnpj"));
-                    imp.setNumeroCupom(rs.getString("numeroDocumento"));
-                    imp.setDataEmissao(rs.getDate("dataEmissao"));
-                    imp.setValor(rs.getDouble("valor"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setEcf(rs.getString("caixa"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setValor(rs.getDouble("total"));
 
                     imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
