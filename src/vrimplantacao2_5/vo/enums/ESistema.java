@@ -227,6 +227,7 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
+import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -258,6 +259,7 @@ import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
+import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
@@ -1797,6 +1799,17 @@ public enum ESistema {
             try {
                 return new MegaSoftware2_5GUI(frame);} 
             catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ORION_POSTGRES(227, "ORION_POSTGRES", new Orion_PostgresDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Orion_postgres2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
