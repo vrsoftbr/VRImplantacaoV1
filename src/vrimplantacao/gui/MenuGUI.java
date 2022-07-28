@@ -1196,6 +1196,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImpSistema.setText("Importação");
 
         mnuDatabase.setText("Sistemas");
+        mnuDatabase.setEnabled(false);
 
         mnuAccess.setText("Access");
 

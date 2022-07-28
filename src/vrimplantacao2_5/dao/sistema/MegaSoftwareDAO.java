@@ -36,6 +36,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private ConexaoFirebird stmPessoa;
+    
     @Override
     public String getSistema() {
         return "MEGA SOFTWARE";
@@ -143,6 +145,10 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoCliente.EMAIL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
+    
+    public void setStatementPessoa(ConexaoFirebird stm) {
+        this.stmPessoa = stm;
+    }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
@@ -210,12 +216,14 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("embalagem"));
+                    
+                    int qtdEmbalagem = Utils.stringToInt(rs.getString("embalagem"), 1); 
+                    
+                    imp.setQtdEmbalagemCotacao(qtdEmbalagem);
                     imp.seteBalanca(rs.getString("balanca").equals("S"));
-                    imp.setDataCadastro(rs.getDate("dataCadastro"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("1"));
+                    imp.setCodMercadologico3("1");
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
@@ -225,7 +233,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getInt("cst_cofins"));
-                    imp.setPiscofinsNaturezaReceita(rs.getInt("nat_receita"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("nat_receita"));
 
                     String icmsId = rs.getString("aliquota");
                     
@@ -248,7 +256,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = stmPessoa.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
                     "	f.FOR_CODI id,\n" +
@@ -281,10 +289,6 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("ie"));
-                    imp.setInsc_municipal(rs.getString("insc_municipal"));
-                    imp.setSuframa(rs.getString("suframa"));
-                    imp.setAtivo(rs.getInt("ativo") == 1);
-
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -425,10 +429,10 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCnpj(rs.getString("cnpj"));
                     
                     if(imp.getCnpj().isEmpty()) {
-                        imp.setCnpj("cpf");
+                        imp.setCnpj(rs.getString("cpf"));
                     }
                     
-                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
                     
                     if (imp.getInscricaoestadual().isEmpty()) {
                         imp.setInscricaoestadual(rs.getString("rg"));
@@ -444,12 +448,11 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("fone"));
                     imp.setFax(rs.getString("fax"));
-                    imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setEmail(rs.getString("email"));
                     imp.setCelular(rs.getString("celular"));
-                    imp.setSexo(rs.getString("sexo").equals("M") ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setSexo(rs.getString("sexo") != null && rs.getString("sexo").equals("M") ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setValorLimite(rs.getDouble("limite"));
 
                     result.add(imp);
@@ -464,7 +467,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = stmPessoa.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
                     "	SEQUENCIAL id,\n" +
@@ -483,8 +486,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "FROM \n" +
                     "	CRE001 c\n" +
                     "WHERE \n" +
-                    "	(cre_nota - CRE_REST) > 0"
-            )) {
+                    "	(cre_nota - CRE_REST) > 0")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 

@@ -104,6 +104,8 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    
+                    dao.setStatementPessoa(conexaoFirebirdPanel.getConexaoFirebird());
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -129,6 +131,7 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
 
                     pnlConn.fecharConexao();
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
@@ -168,6 +171,8 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        pnlConexaoExtra = new javax.swing.JPanel();
+        conexaoFirebirdPanel = new vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -254,6 +259,25 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
+        javax.swing.GroupLayout pnlConexaoExtraLayout = new javax.swing.GroupLayout(pnlConexaoExtra);
+        pnlConexaoExtra.setLayout(pnlConexaoExtraLayout);
+        pnlConexaoExtraLayout.setHorizontalGroup(
+            pnlConexaoExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConexaoExtraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(conexaoFirebirdPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        pnlConexaoExtraLayout.setVerticalGroup(
+            pnlConexaoExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConexaoExtraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(conexaoFirebirdPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(96, Short.MAX_VALUE))
+        );
+
+        tabMenu.addTab("Conexão Pessoas", pnlConexaoExtra);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -305,8 +329,10 @@ public class MegaSoftware2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel conexaoFirebirdPanel;
     private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
+    private javax.swing.JPanel pnlConexaoExtra;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
     private javax.swing.JScrollPane scpClientes;
