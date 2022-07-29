@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -47,11 +49,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
 
     private boolean importarCodigoPrincipal;
     private boolean versao2Tributacao;
-    
+
     public boolean isVersao2Tributacao() {
         return this.versao2Tributacao;
     }
-    
+
     public void setVersao2Tributacao(boolean versao2Tributacao) {
         this.versao2Tributacao = versao2Tributacao;
     }
@@ -84,19 +86,19 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            
+
             if (isVersao2Tributacao()) {
                 try (ResultSet rs = stm.executeQuery(
-                        "SELECT \n" +
-                        "	codigoid,\n" +
-                        "	DESCRICAO,\n" +
-                        "	csf cst\n" +
-                        "FROM \n" +
-                        "	TESTGRUPOICMS \n" +
-                        "WHERE codigoid in\n" +
-                        "(SELECT DISTINCT grupoicms FROM TESTPRODUTOGERAL)")) {
+                        "SELECT \n"
+                        + "	codigoid,\n"
+                        + "	DESCRICAO,\n"
+                        + "	csf cst\n"
+                        + "FROM \n"
+                        + "	TESTGRUPOICMS \n"
+                        + "WHERE codigoid in\n"
+                        + "(SELECT DISTINCT grupoicms FROM TESTPRODUTOGERAL)")) {
                     while (rs.next()) {
-                        result.add(new MapaTributoIMP(rs.getString("codigoid"), 
+                        result.add(new MapaTributoIMP(rs.getString("codigoid"),
                                 rs.getString("descricao"),
                                 rs.getInt("cst"),
                                 0,
@@ -105,14 +107,14 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                 }
             } else {
                 try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "    icm.vendacsf1 AS cst_saida,\n"
-                    + "    icm.vendaicms1 AS aliquota_saida,\n"
-                    + "    icm.vendareducao1 AS reducao_saida\n"
-                    + "FROM TESTPRODUTOGERAL pg\n"
-                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = 'MT'"
+                        "SELECT DISTINCT\n"
+                        + "    icm.vendacsf1 AS cst_saida,\n"
+                        + "    icm.vendaicms1 AS aliquota_saida,\n"
+                        + "    icm.vendareducao1 AS reducao_saida\n"
+                        + "FROM TESTPRODUTOGERAL pg\n"
+                        + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                        + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                        + "    AND icm.estado = 'MT'"
                 )) {
                     while (rs.next()) {
                         String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
@@ -151,7 +153,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                 }
             }
         }
-            
+
         return result;
     }
 
@@ -304,7 +306,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
                     + "    CASE p.SETOR WHEN '001' THEN 1 ELSE 0 END ebalanca,\n"
                     + "    coalesce(pg.diasvalidade,0) as validade,\n"
-                    + "    pg.grupoicms id_icms,\n"        
+                    + "    pg.grupoicms id_icms,\n"
                     + "    icm_s.vendacsf1 AS cst_saida,\n"
                     + "    icm_s.vendaicms1 AS aliquota_saida,\n"
                     + "    icm_s.vendareducao1 AS reducao_saida,\n"
@@ -317,14 +319,14 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
                     + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo\n"
                     + "    AND icm_s.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_s.estado = 'MT'\n"
+                    + "    AND icm_s.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo\n"
                     + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_e.estado = 'MT'\n"
+                    + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
-                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
-                    + (isVersao2Tributacao() ? " AND icm_s.produto IS NULL " : "")
+//                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
+//                    + (isVersao2Tributacao() ? " AND icm_s.produto IS NULL " : "")
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -381,7 +383,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    if  (isVersao2Tributacao()) {
+                    if (isVersao2Tributacao()) {
                         imp.setIcmsDebitoId(rst.getString("id_icms"));
                         imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                         imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
@@ -391,13 +393,13 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     } else {
                         String idIcmsDebito, IdIcmsCredito;
 
-                        idIcmsDebito = rst.getString("cst_saida") + "-" + 
-                                       rst.getString("aliquota_saida") + "-" + 
-                                       rst.getString("reducao_saida");
-                        
-                        IdIcmsCredito = rst.getString("cst_entrada") + "-" + 
-                                        rst.getString("aliquota_entrada") + "-" + 
-                                        rst.getString("reducao_entrada");
+                        idIcmsDebito = rst.getString("cst_saida") + "-"
+                                + rst.getString("aliquota_saida") + "-"
+                                + rst.getString("reducao_saida");
+
+                        IdIcmsCredito = rst.getString("cst_entrada") + "-"
+                                + rst.getString("aliquota_entrada") + "-"
+                                + rst.getString("reducao_entrada");
 
                         imp.setIcmsDebitoId(idIcmsDebito);
                         imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
@@ -672,7 +674,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         return result;
     }
 
-    @Override
+    /*@Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -711,6 +713,99 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                 }
             }
         }
+        return result;
+    }*/
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
+            Map<String, List<CreditoRotativoItemIMP>> pagamentos = new HashMap<>();
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT\n"
+                    + "	 cr.IDTRECPARCELA id,\n"
+                    + "	 cr.PARCELA,\n"
+                    + "	 cr.valor valor,\n"
+                    + "	 cr.databaixa data_pag,\n"
+                    + "	 cr.obs observacao\n"
+                    + "FROM\n"
+                    + "	 TRECPARCELA cr\n"
+                    + "LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
+                    + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO\n"
+                    + "WHERE\n"
+                    + "	 cr.EMPRESA = '" + getLojaOrigem() + "'\n"
+                    + "	 AND cr.tipo = '01'\n"
+                    + "  AND DATABAIXA IS NOT NULL\n"
+                    + "ORDER BY 1,2"
+            )) {
+                while (rs.next()) {
+                    final String id = rs.getString("id") + "-" + rs.getString("parcela");
+                    List<CreditoRotativoItemIMP> pag = pagamentos.get(id);
+                    if (pag == null) {
+                        pag = new ArrayList<>();
+                        pagamentos.put(id, pag);
+                    }
+                    CreditoRotativoItemIMP imp = new CreditoRotativoItemIMP();
+
+                    imp.setId(id);
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataPagamento(rs.getDate("data_pag"));
+                    imp.setObservacao(rs.getString("observacao"));
+
+                    pag.add(imp);
+                }
+            }
+
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT\n"
+                    + "  cr.IDTRECPARCELA id,\n"
+                    + "	 cr.PARCELA,\n"
+                    + "  t.EMISSAO emissao,\n"
+                    + "  cr.DOCUMENTO numerocupom,\n"
+                    + "  1 AS ecf,\n"
+                    + "  cr.valorpendente valor,\n"
+                    + "  cr.CLIENTE codcli,\n"
+                    + "  cpfcnpj cnpjcliente,\n"
+                    + "  cr.vencimento,\n"
+                    + "	 cr.obs observacao\n"
+                    + "FROM \n"
+                    + "  TRECPARCELA cr \n"
+                    + "LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
+                    + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO\n"
+                    + "WHERE\n"
+                    + "  cr.EMPRESA = '" + getLojaOrigem() + "'\n"
+                    + "AND cr.tipo = '01'"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    final String id = rs.getString("id") + "-" + rs.getString("parcela");
+
+                    imp.setId(id);
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setIdCliente(rs.getString("codcli"));
+                    imp.setCnpjCliente(rs.getString("cnpjcliente"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    List<CreditoRotativoItemIMP> pag = pagamentos.get(id);
+                    if (pag != null) {
+                        for (CreditoRotativoItemIMP pg : pag) {
+                            pg.setCreditoRotativo(imp);
+                            imp.getPagamentos().add(pg);
+                        }
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -906,7 +1001,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	CODIGO id_venda,\n"
                     + "	CASE \n"
                     + "	  WHEN NUMERONFCE IS NULL THEN CODIGO \n"
-                    + "	  WHEN NUMERONFCE = '0' THEN CODIGO\n" 
+                    + "	  WHEN NUMERONFCE = '0' THEN CODIGO\n"
                     + "	  ELSE NUMERONFCE \n"
                     + " END numerocupom,\n"
                     + "	CLIENTE id_cliente,\n"
