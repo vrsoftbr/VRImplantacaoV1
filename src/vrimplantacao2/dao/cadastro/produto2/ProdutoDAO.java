@@ -201,7 +201,12 @@ public class ProdutoDAO {
             sql.put("pesavel", vo.isPesavel());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
             sql.put("vendacontrolada", vo.isVendaControlada());
-            sql.put("tiponaturezareceita", vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+            
+            sql.put("tiponaturezareceita", 
+                    vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
+                    vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
+                    vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+            
             sql.put("vendapdv", true);
             sql.put("conferido", false);
             sql.put("permitequebra", true);
@@ -244,6 +249,29 @@ public class ProdutoDAO {
                 throw e;
             }
         }
+    }
+    
+    public void salvarProdutoPisCofins(ProdutoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtopiscofins");
+
+            sql.put("id_produto", vo.getId());
+            sql.put("id_grupoeconomico", 1);
+            sql.put("id_piscofinsdebito", vo.getPisCofinsDebito().getId());
+            sql.put("id_piscofinscredito", vo.getPisCofinsCredito().getId());
+            sql.put("codigonaturezareceita", 
+                    vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
+                    vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
+                    vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+
     }
     
     public void salvarLojaVirtual(ProdutoVO vo, long ean) throws Exception {

@@ -49,6 +49,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class ProdutoRepository {
 
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     private final ProdutoRepositoryProvider provider;
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
@@ -83,6 +84,7 @@ public class ProdutoRepository {
     }
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
+        
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
@@ -204,7 +206,10 @@ public class ProdutoRepository {
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
-
+                        if(versao.igualOuMaiorQue(4,1)){
+                            provider.salvarProdutoPisCofins(prod);
+                        }
+                        
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
