@@ -169,8 +169,11 @@ public enum EScriptLojaOrigemSistema {
     INOVA(81,11, "select empresaid id, empresanomefantasia descricao from empresa"),
     ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja"),
     SIAC(149,9,"select empresa_id id, fantasia descricao from empresas"),
-    MEGASOFTWARE(224, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
-    ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config");
+    MEGASOFTWARE(226, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
+    ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
+    NEREUS(224, 11,"select id_emp id, fantasia descricao from cg_emp order by 1"),
+    SCORPION(225, 5,"SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA");
+
     
     private int idSistema;
     private int idBancoDados;

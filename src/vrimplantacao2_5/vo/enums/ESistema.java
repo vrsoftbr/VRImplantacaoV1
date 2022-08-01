@@ -228,6 +228,8 @@ import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
+import vrimplantacao2_5.dao.sistema.NereusDAO;
+import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -260,6 +262,8 @@ import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
+import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
+import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
@@ -700,7 +704,7 @@ public enum ESistema {
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
-            
+
             return null;
         }
     },
@@ -1551,7 +1555,7 @@ public enum ESistema {
             return null;
         }
     },
-    MRC6(202,"MRC6", new MRC6DAO()) {
+    MRC6(202, "MRC6", new MRC6DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1595,7 +1599,7 @@ public enum ESistema {
             return null;
         }
     },
-    DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()) {
+    DOBESCGA(206, "DOBESCGA", new Dobes_CgaDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1672,7 +1676,7 @@ public enum ESistema {
             return null;
         }
     },
-    SATFACIL(213,"SATFACIL",new SatFacilDAO()) {
+    SATFACIL(213, "SATFACIL", new SatFacilDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1683,7 +1687,7 @@ public enum ESistema {
             return null;
         }
     },
-    WBA(214,"WBA",new WBADAO()) {
+    WBA(214, "WBA", new WBADAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1716,7 +1720,7 @@ public enum ESistema {
             return null;
         }
     },
-    GZPRODADOS(217,"GZPRODADOS", new GZProdadosDAO()) {
+    GZPRODADOS(217, "GZPRODADOS", new GZProdadosDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1727,7 +1731,7 @@ public enum ESistema {
             return null;
         }
     },
-    PRISMAFLEX(218,"PRISMAFLEX", new Dellasta_PrismaFlexDAO()) {
+    PRISMAFLEX(218, "PRISMAFLEX", new Dellasta_PrismaFlexDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1738,7 +1742,7 @@ public enum ESistema {
             return null;
         }
     },
-    JNP_MSUPER(219,"JNP-MSUPER", new Jnp_MSuperDAO()) {
+    JNP_MSUPER(219, "JNP-MSUPER", new Jnp_MSuperDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1749,7 +1753,7 @@ public enum ESistema {
             return null;
         }
     },
-    ETRADE(220,"ETRADE", new ETradeDAO()) {
+    ETRADE(220, "ETRADE", new ETradeDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1760,7 +1764,7 @@ public enum ESistema {
             return null;
         }
     },
-    GANSO(221,"GANSO", new GansoDAO()) {
+    GANSO(221, "GANSO", new GansoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1771,7 +1775,7 @@ public enum ESistema {
             return null;
         }
     },
-    LCSISTEMAS(222,"LCSISTEMAS", new LCSistemasDAO()) {
+    LCSISTEMAS(222, "LCSISTEMAS", new LCSistemasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -1782,23 +1786,46 @@ public enum ESistema {
             return null;
         }
     },
-    GESTORA(223,"GESTORA", new GestoraDAO()) {
+    GESTORA(223, "GESTORA", new GestoraDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new Gestora2_5GUI(frame);} 
-            catch (Exception ex) {
+                return new Gestora2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
     },
-    MEGASOFTWARE(224, "MEGA SOFTWARE", new MegaSoftwareDAO()) {
+    NEREUS(224, "NEREUS", new NereusDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new MegaSoftware2_5GUI(frame);} 
-            catch (Exception ex) {
+                return new Nereus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SCORPION(225, "SCORPION", new ScorpionDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Scorpion2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    MEGASOFTWARE(226, "MEGA SOFTWARE", new MegaSoftwareDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new MegaSoftware2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -1815,7 +1842,7 @@ public enum ESistema {
             return null;
         }
     };
-    
+
     private int id;
     private String nome;
     private InterfaceDAO dao;
@@ -1827,11 +1854,11 @@ public enum ESistema {
     public String getNome() {
         return nome;
     }
-    
+
     public InterfaceDAO getDao() {
         return dao;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
@@ -1839,7 +1866,7 @@ public enum ESistema {
     public void setNome(String nome) {
         this.nome = nome;
     }
-    
+
     public void setDao(InterfaceDAO dao) {
         this.dao = dao;
     }
@@ -1849,11 +1876,12 @@ public enum ESistema {
         this.nome = nome;
         this.dao = dao;
     }
-    
-    ESistema() {}
-    
+
+    ESistema() {
+    }
+
     public static ESistema getById(int id) {
-        for (ESistema st: values()) {
+        for (ESistema st : values()) {
             if (st.getId() == id) {
                 return st;
             }
