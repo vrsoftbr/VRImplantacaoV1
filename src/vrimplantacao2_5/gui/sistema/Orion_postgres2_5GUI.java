@@ -105,12 +105,12 @@ public class Orion_postgres2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
                     
-//                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
-//                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
-//                    }
-//                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
-//                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-//                    }
+                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
+                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+                    }
+                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
+                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+                    }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {

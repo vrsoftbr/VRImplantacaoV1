@@ -161,7 +161,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.FORCAR_ATUALIZACAO,}
+                    OpcaoProduto.FORCAR_ATUALIZACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO}
         ));
     }
 
@@ -358,7 +359,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(rst.getString("SUBCod"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setQtdEmbalagem(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
 
                     if ((rst.getString("prodai") != null)

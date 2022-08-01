@@ -96,7 +96,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_FXSISTEMAS(208, "FXSISTEMAS", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_VERSATIL(210, "VERSATIL", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_WBA(214, "WBA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
-    FIREBIRD_PRISMAFLEX(214, "PRISMAFLEX", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
+    FIREBIRD_PRISMAFLEX(218, "PRISMAFLEX", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_JNP_MSUPER(219, "JNP-MSUPER", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_MEGASOFTWARE(224, "MEGA SOFTWARE", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "", 9088),

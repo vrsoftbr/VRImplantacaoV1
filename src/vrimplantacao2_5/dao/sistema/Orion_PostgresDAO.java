@@ -117,7 +117,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select distinct\n"
-                    + "	sittribut||'-'||icms||'-'||reducao id,\n"
+                    + "	replace(sittribut,'','0')||'-'||icms||'-'||reducao id,\n"
                     + "	case\n"
                     + "	  when sittribut like '%00%' then 'TRIB '||icms||'%'\n"
                     + "	  when sittribut like '%10%' then 'SUBS'\n"
@@ -130,8 +130,9 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	  when sittribut like '%90%' then 'OUTRAS'\n"
                     + "   else 'ISENTO'\n"
                     + "	end descricao,\n"
-                    + "	cast(case\n"
-                    + "	  when length(trim(sittribut)) = 3 then substring(sittribut from 2 for 3)\n"
+                    + "	cast (case \n"
+                    + "	  when length(sittribut) = 3 then substring(sittribut from 2 for 3)\n"
+                    + "	  when sittribut = '' then '0'\n"
                     + "	  else sittribut\n"
                     + "	end as int) cst,\n"
                     + "	icms aliq,\n"
@@ -228,7 +229,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	e.plu id_produto,\n"
-                    + "	l.codigo ean,\n"
+                    + "	case when l.codigo = 'SEM GTIN' then e.plu else l.codigo end ean,\n"
                     + "	e.codsetor mercadologico1,\n"
                     + "	e.codgru mercadologico2,\n"
                     + "	e.codsubgru mercadologico3,\n"
@@ -238,7 +239,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	e.custo,\n"
                     + "	e.classfis ncm,\n"
                     + "	e.cest,\n"
-                    + "	e.sittribut,\n"
+                    + "	cast (case when e.sittribut = '' then '40' else e.sittribut end as int)sittribut,\n"
                     + "	e.icms,\n"
                     + "	e.reducao,\n"
                     + "	e.unidade,\n"
@@ -369,7 +370,11 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	e.plu id,\n"
-                    + "	l.codigo ean,\n"
+                    + "	case\n"
+                    + "	  when l.codigo = 'SEM GTIN' \n"
+                    + "   then e.plu\n"
+                    + "	  else l.codigo\n"
+                    + "	end ean,\n"
                     + "	l.qtde quantidade\n"
                     + "from\n"
                     + "	estoque e\n"
@@ -724,14 +729,14 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         return result;
     }
 
-    private String dataInicioVenda;
-    private String dataTerminoVenda;
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
 
-    public void setDataInicioVenda(String dataInicioVenda) {
+    public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
 
-    public void setDataTerminoVenda(String dataTerminoVenda) {
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
@@ -801,7 +806,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             }
         }
 
-        public VendaIterator(String dataInicio, String dataTermino) throws Exception {
+        public VendaIterator(Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select distinct \n"
                     + "	v.codigo as id,\n"
@@ -822,7 +827,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	v.seriesat,\n"
                     + "	v.numcfe\n"
                     + "from vendas v\n"
-                    + "where v.data between #" + dataInicio + "# and #" + dataTermino + "#\n"
+                    + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
                     + "order by v.data";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -983,7 +988,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             item.setIcmsAliq(aliq);
         }
 
-        public VendaItemIterator(String dataInicio, String dataTermino) throws Exception {
+        public VendaItemIterator(Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select distinct\n"
                     + "	i.codvenda as idvenda,\n"
@@ -1003,7 +1008,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	i.sittribut as cst,\n"
                     + "	i.estado as status\n"
                     + "from detaven i\n"
-                    + "where i.datavenda between #" + dataInicio + "# and #" + dataTermino + "#\n"
+                    + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'\n"
                     + "and i.codplu is not null\n"
                     + "order by i.codvenda, i.terminal, i.item";
 
