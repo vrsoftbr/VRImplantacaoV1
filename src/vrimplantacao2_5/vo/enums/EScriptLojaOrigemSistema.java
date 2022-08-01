@@ -165,14 +165,14 @@ public enum EScriptLojaOrigemSistema {
                     + "order by\n"
                     + "	id"),
     GANSO(221,5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL"),
-    LCSISTEMAS(222,8,"select id, fantasia descricao from empresa"),
-    INOVA(81,11, "select empresaid id, empresanomefantasia descricao from empresa"),
-    ISERVER(78,8,"select Codigo id, NomeFantasia descricao from tbl_loja"),
-    SIAC(149,9,"select empresa_id id, fantasia descricao from empresas"),
+    LCSISTEMAS(222, 8, "select id, fantasia descricao from empresa"),
+    INOVA(81, 11, "select empresaid id, empresanomefantasia descricao from empresa"),
+    ISERVER(78, 8, "select Codigo id, NomeFantasia descricao from tbl_loja"),
+    SIAC(149, 9, "select empresa_id id, fantasia descricao from empresas"),
+    NEREUS(224, 11, "select id_emp id, fantasia descricao from cg_emp order by 1"),
+    SCORPION(225, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
     MEGASOFTWARE(226, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
-    ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
-    NEREUS(224, 11,"select id_emp id, fantasia descricao from cg_emp order by 1"),
-    SCORPION(225, 5,"SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA");
+    ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config");
 
     
     private int idSistema;
