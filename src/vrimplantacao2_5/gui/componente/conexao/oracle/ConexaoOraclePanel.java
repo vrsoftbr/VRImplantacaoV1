@@ -4,7 +4,7 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 

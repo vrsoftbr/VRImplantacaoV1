@@ -152,8 +152,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     configuracaoBancoVO.getUsuario(),
                     configuracaoBancoVO.getSenha());
         }
-
-        EOpcoesMigracaoSistema optMigracao = EOpcoesMigracaoSistema.getByIdSistemaBanco(cboSistema.getId(), cboBD.getId());
         
         habilitarBotaoSalvar();
     }

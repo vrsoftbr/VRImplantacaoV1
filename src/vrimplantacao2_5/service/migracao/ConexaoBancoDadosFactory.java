@@ -1,14 +1,12 @@
 package vrimplantacao2_5.service.migracao;
 
 import java.sql.Connection;
-import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.classe.ConexaoDB2;
-import vrimplantacao.classe.ConexaoDBF;
-import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoInformix;
-import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
+import vrimplantacao2_5.dao.conexao.ConexaoInformix;
+import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 
@@ -23,17 +21,11 @@ public abstract class ConexaoBancoDadosFactory {
         Connection conexao = null;
 
         switch (eBancoDados) {
-            case ACCESS:
-                conexao = ConexaoAccess.getConexao();
-                break;
             case ADS:
                 conexao = null;
                 break;
             case CACHE:
                 conexao = null;
-                break;
-            case DBF:
-                conexao = ConexaoDBF.getConexao();
                 break;
             case DB2:
                 conexao = ConexaoDB2.getConexao();
