@@ -111,8 +111,10 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
+        ));
     }
 
     @Override
@@ -142,7 +144,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -170,7 +171,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -202,7 +202,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -294,7 +293,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -330,7 +328,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -393,7 +390,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -407,7 +403,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	COD_FORNECEDOR id_fornecedor,\n"
                     + "	COD_PRODUTO id_produto,\n"
                     + "	CODIGO_PRODFORN cod_externo,\n"
-                    + " VOLUME qtdembalagem\n"
+                    + " COALESCE (VOLUME,1) qtdembalagem\n"
                     + "FROM\n"
                     + "	TB_PRODUTO_FORNECEDOR\n"
                     + "ORDER BY 1,2"
@@ -426,7 +422,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -496,7 +491,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 
@@ -544,7 +538,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-
         return result;
     }
 

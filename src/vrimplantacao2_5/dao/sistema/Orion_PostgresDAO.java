@@ -106,8 +106,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
-        ));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.VALOR_LIMITE));
     }
 
     @Override
@@ -150,7 +150,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -283,6 +282,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setTipoEmbalagemVolume(rst.getString("unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtde"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("vendavare"));
@@ -395,7 +395,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -539,7 +538,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -571,7 +569,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -592,7 +589,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	firma,\n"
                     + "	cargo,\n"
                     + "	salario,\n"
-                    + "	saldo,\n"
+                    + "	compramax,\n"
                     + "	pai,\n"
                     + "	mae,\n"
                     + "	rua,\n"
@@ -623,7 +620,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setEmpresa(rst.getString("firma"));
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
-                    imp.setValorLimite(rst.getDouble("saldo"));
+                    imp.setValorLimite(rst.getDouble("compramax"));
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setEndereco(rst.getString("rua"));
@@ -688,7 +685,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -708,8 +704,9 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from\n"
                     + "	receber\n"
                     + "where\n"
-                    + "	transacao is null\n"
-                    + "	and codigocli is not null"
+                    + "	pagamento is null\n"
+                    + "	and codigocli is not null\n"
+                    + "	and codigocli != ''"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -725,7 +722,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
-
         return result;
     }
 
@@ -852,7 +848,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-
     }
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
