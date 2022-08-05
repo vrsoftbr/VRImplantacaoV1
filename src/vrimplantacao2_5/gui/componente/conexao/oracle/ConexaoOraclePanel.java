@@ -15,7 +15,7 @@ import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 public class ConexaoOraclePanel extends javax.swing.JPanel implements ConfiguracaoPanel {
 
     private String sistema;
-    private ConexaoOracle conexao = new ConexaoOracle();
+    private ConexaoOracle conexao = null;
     private ConexaoEvent onConectar;
 
     @Override
@@ -243,6 +243,8 @@ public class ConexaoOraclePanel extends javax.swing.JPanel implements Configurac
         this.host = txtHost.getText();
         this.user = txtUsuario.getText();
         this.pass = txtSenha.getText();
+        
+        conexao = new ConexaoOracle();
         
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
