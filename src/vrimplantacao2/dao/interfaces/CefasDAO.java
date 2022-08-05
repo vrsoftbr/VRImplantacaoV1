@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;

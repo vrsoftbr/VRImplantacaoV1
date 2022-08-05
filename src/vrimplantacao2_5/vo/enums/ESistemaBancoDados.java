@@ -134,7 +134,7 @@ public enum ESistemaBancoDados {
     MYSQL_TSL(212, "TSL", 8, "MYSQL", "tsl", "tsti", "1234", 3306),
     ORACLE_APOLLO(5, "APOLLO", 9, "ORACLE", "", "", "", 1521),
     ORACLE_ARIUS(197, "ARIUS", 9, "ORACLE", "", "PROREG", "automa", 1521),
-    ORACLE_CEFAS(24, "CEFAS", 9, "ORACLE", "", "", "", 1521),
+    ORACLE_CEFAS(24, "CEFAS", 9, "ORACLE", "ORCL", "rb", "avemaria", 1521),
     ORACLE_CPGESTOR(21, "CPGESTOR", 9, "ORACLE", "", "", "", 1521),
     ORACLE_CUPERMAX(34, "CUPERMAX", 9, "ORACLE", "", "", "", 1521),
     ORACLE_GONDOLA(70, "GONDOLA", 9, "ORACLE", "", "", "", 1521),

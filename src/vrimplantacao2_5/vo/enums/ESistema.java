@@ -237,6 +237,7 @@ import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
+import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
@@ -435,7 +436,12 @@ public enum ESistema {
     CEFAS(24, "CEFAS", new CefasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+             try {
+                return new Cefas_Concretize2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CEREBRO(25, "CEREBRO", new CerebroDAO()) {
