@@ -804,27 +804,26 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
 
         public VendaIterator(Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select distinct \n"
-                    + "	v.codigo as id,\n"
-                    + "	v.codcli as idcliente,\n"
-                    + "	v.cupom as numerocupom,\n"
-                    + "	v.terminal as ecf,\n"
-                    + "	v.operador,\n"
-                    + "	v.data as datavenda,\n"
-                    + "	v.horainicio,\n"
-                    + "	v.horafim,\n"
-                    + "	v.estado as status,\n"
-                    + "	v.desconto,\n"
-                    + "	v.acrescimo,\n"
-                    + "	v.total,\n"
-                    + "	v.totalvenda,\n"
-                    + "	v.chavesat,\n"
-                    + "	v.chasatcanc,\n"
-                    + "	v.seriesat,\n"
-                    + "	v.numcfe\n"
-                    + "from vendas v\n"
-                    + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + "order by v.data";
+                    = "select\n"
+                    + "	codigo||numcfe id,\n"
+                    + "	codcli idcliente,\n"
+                    + "	numcfe numerocupom,\n"
+                    + "	terminal ecf,\n"
+                    + "	operador,\n"
+                    + "	data datavenda,\n"
+                    + "	horainicio,\n"
+                    + "	horafim,\n"
+                    + "	estado status,\n"
+                    + "	desconto,\n"
+                    + "	acrescimo,\n"
+                    + "	totalvenda,\n"
+                    + "	chavesat,\n"
+                    + "	seriesat\n"
+                    + "from\n"
+                    + "	vendas\n"
+                    + "where\n"
+                    + "	data between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "order by data, horainicio, numcfe";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -896,91 +895,13 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("tipoembalagem"));
-
-                        String trib = "";
-
-                        if (i_cst == 40) {
-                            trib = "F";
-                        } else if (i_cst == 41) {
-                            trib = "N";
-                        } else if (i_cst == 60) {
-                            trib = "F";
-                        } else if (i_cst == 0) {
-
-                            if (i_aliquota == 7) {
-                                trib = "0700";
-                            } else if (i_aliquota == 11) {
-                                trib = "1100";
-                            } else if (i_aliquota == 4.5) {
-                                trib = "0450";
-                            } else if (i_aliquota == 12) {
-                                trib = "1200";
-                            } else if (i_aliquota == 18) {
-                                trib = "1800";
-                            } else if (i_aliquota == 25) {
-                                trib = "2500";
-                            } else if (i_aliquota == 27) {
-                                trib = "2700";
-                            } else if (i_aliquota == 17) {
-                                trib = "1700";
-                            } else {
-                                trib = "0";
-                            }
-                        }
-
-                        obterAliquota(next, trib);
                     }
                 }
+
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
-        }
-
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-
-            int cst;
-            double aliq;
-            switch (icms) {
-                case "0450":
-                    cst = 0;
-                    aliq = 4.5;
-                    break;
-                case "0700":
-                    cst = 0;
-                    aliq = 7;
-                    break;
-                case "1100":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "1200":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "1800":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "2500":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "F":
-                    cst = 60;
-                    aliq = 0;
-                    break;
-                case "N":
-                    cst = 41;
-                    aliq = 0;
-                    break;
-                default:
-                    cst = 40;
-                    aliq = 0;
-                    break;
-            }
-            item.setIcmsCst(cst);
-            item.setIcmsAliq(aliq);
         }
 
         public VendaItemIterator(Date dataInicio, Date dataTermino) throws Exception {
@@ -1003,8 +924,10 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	i.sittribut as cst,\n"
                     + "	i.estado as status\n"
                     + "from detaven i\n"
+                    + " join vendas v on v.codigo = i.codvenda\n"
                     + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + "and i.codplu is not null\n"
+                    + " and i.codplu is not null\n"
+                    + " and v.numcfe != ''\n"
                     + "order by i.codvenda, i.terminal, i.item";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
