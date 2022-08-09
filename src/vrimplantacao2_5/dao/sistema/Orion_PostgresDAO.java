@@ -873,8 +873,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                         i_idproduto = rst.getString("idproduto");
                         i_sequencia = rst.getString("sequencia");
                         i_qtdembalagem = rst.getDouble("qtdembalagem");
-                        i_cst = rst.getInt("cst");
-                        i_aliquota = rst.getDouble("aliquota");
+//                        i_cst = rst.getInt("cst");
+//                        i_aliquota = rst.getDouble("aliquota");
 
                         String idVenda = i_idvenda + i_ecf + i_datavenda;
                         String id = i_idvenda

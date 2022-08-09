@@ -236,15 +236,14 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	PESO_LIQUIDO,\n"
                     + "	p.COD_TRIBUTACAO||'-'||st.COD_SITUACAOFISCAL id_debito,\n"
                     + "	CST_PIS_ENT piscof_credito,\n"
-                    + "	CST_PIS_ENT piscof_debito\n"
+                    + "	CST_PIS_ENT piscof_debito,\n"
+                    + " COD_NAT_REC natrec\n"
                     + "FROM\n"
                     + "	TB_PRODUTOS p\n"
                     + "	LEFT JOIN TB_CEST cest ON p.COD_CEST = cest.ID_CEST\n"
                     + "	LEFT JOIN TB_PRODUTO_ESTOQUE_LOJA est ON est.COD_PRODUTO = p.CODIGO_PRODUTO \n"
                     + "	JOIN TB_TRIBUTACAO t ON p.COD_TRIBUTACAO = t.CODIGO_TRIBUTACAO \n"
                     + "	JOIN TB_SITUACAO_FISCAL st ON p.COD_SITUACAOTRIBUTARIA = st.CODIGO_SITUACAOFISCAL\n"
-//                    + "WHERE\n"
-//                    + "	est.LOJA = " + getLojaOrigem() + "\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -272,7 +271,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-
+                    
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
@@ -288,6 +287,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getInt("natrec"));
 
                     result.add(imp);
                 }
@@ -618,12 +618,12 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	VALOR_DESCONTO desconto,\n"
                     + "	VALOR_ACRESCIMO acrescimo,\n"
                     + "	VALOR_LIQUIDO_VENDA total,\n"
-                    + "	CASE WHEN vendaativa = 'N' THEN 1 ELSE 0 END cancelado\n"
+                    + "	CASE WHEN VENDAATIVA = 'N' THEN 1 ELSE 0 END cancelado\n"
                     + "FROM\n"
                     + "	TB_VENDA v\n"
                     + "WHERE\n"
                     + "	NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + " AND COO_ECF_NF != 0\n"
+                    + " AND COD_TIPOMOVIMENTO IN (5,-5)\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -694,14 +694,17 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	QUANTIDADE,\n"
                     + "	VALOR_UNITARIO precovenda,\n"
                     + "	VALOR_TOTAL total,\n"
-                    + "	CASE WHEN CANCELADO = 'S' THEN 1 ELSE 0 END CANCELADO\n"
+                    + "	CASE\n"
+                    + "	  WHEN CANCELADO = 'S' THEN 1\n"
+                    + "	  WHEN CANCELADO = 'C' THEN 1\n"
+                    + "	  ELSE 0\n"
+                    + "	  END CANCELADO\n"
                     + "FROM\n"
                     + "	TB_VENDA_ITEM vi\n"
                     + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
                     + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
                     + "WHERE\n"
                     + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + " AND COO_ECF_NF != 0\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "	ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
