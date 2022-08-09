@@ -725,7 +725,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         return result;
     }
 
-    private Date dataInicioVenda;
+    /*private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
     public void setDataInicioVenda(Date dataInicioVenda) {
@@ -931,6 +931,184 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "order by i.codvenda, i.terminal, i.item";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }*/
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new Orion_PostgresDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new Orion_PostgresDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private final Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private final Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("idvenda");
+                        if (!uk.add(id)) {
+                            LOG.log(Level.WARNING, "Venda {0} ja existe na listagem", id);
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horafim");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "select \n"
+                    + " codigo idvenda,\n"
+                    + " data,\n"
+                    + " terminal ecf,\n"
+                    + " horainicio,\n"
+                    + " case when horafim = '' then horainicio else horafim end horafim,\n"
+                    + " desconto,\n"
+                    + " total valor,\n"
+                    + " seriesat,\n"
+                    + " numcfe numerocupom\n"
+                    + "from vendas \n"
+                    + "where \n"
+                    + " data between '"+ strDataInicio +"' and '"+ strDataTermino +"'\n"
+                    + " and numcfe <> ''\n"
+                    + " order by 1;";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private final Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("vendaid"));
+                        next.setId(rst.getString("itemvendaid"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(rst.getString("produtoid"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+
+                    }
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select \n"
+                    + " iv.codvenda||'.'||iv.item::int itemvendaid,\n"
+                    + " v.codigo vendaid,\n"
+                    + " iv.item::int sequencia,\n"
+                    + " iv.codplu produtoid,\n"
+                    + " iv.lcancelado cancelado,\n"
+                    + " iv.quantpeso quantidade,\n"
+                    + " iv.venda valor,\n"
+                    + " upper(iv.unidade) unidade\n"
+                    + "from detaven iv\n"
+                    + "join vendas v on v.codigo = iv.codvenda\n"
+                    + "where \n"
+                    + " iv.datavenda between '"+ VendaIterator.FORMAT.format(dataInicio) +"' and '"+ VendaIterator.FORMAT.format(dataTermino) +"'\n"
+                    + " and\n"
+                    + " v.data between '"+ VendaIterator.FORMAT.format(dataInicio) +"' and '"+ VendaIterator.FORMAT.format(dataTermino) +"'\n"
+                    + " order by 1";
+                    
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 
