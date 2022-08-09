@@ -40,6 +40,8 @@ public class SISMPlanilhaPg2_5GUI extends VRInternalFrame {
         params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
         params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
         params.put(chkProdTemArquivoBalanca.isSelected(), SISTEMA, "TEM ARQUIVO DE BALANCA");
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(dao.getLojaOrigem());
 
         pnlConn.atualizarParametros();
         

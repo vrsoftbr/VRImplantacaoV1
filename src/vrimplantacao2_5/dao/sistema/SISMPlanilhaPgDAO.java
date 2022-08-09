@@ -21,7 +21,9 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
@@ -88,6 +90,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.NUMERO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
@@ -150,8 +153,8 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("mercid1"));
-                    imp.setMerc1Descricao(rst.getString("desc1"));
+                    imp.setMerc1ID(rst.getString("id"));
+                    imp.setMerc1Descricao(rst.getString("descricao"));
                     imp.setMerc2ID(imp.getMerc1ID());
                     imp.setMerc2Descricao(imp.getMerc1Descricao());
                     imp.setMerc3ID(imp.getMerc1ID());
@@ -176,18 +179,20 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " p.un,\n"
                     + " replace(p.custo,',','.') custo,\n"
                     + " replace(p.venda,',','.') venda,\n"
-                    + " replace(replace(regexp_replace(p.estoque,'[A-z| ]','','g'),',','.'),'',null)::numeric(10,2) estoque,\n"
+                    + " case when replace(replace(regexp_replace(p.estoque,'[A-z]','','g'),',','.'),' ','') = '' then '0'\n"
+                    + "      else replace(replace(regexp_replace(p.estoque,'[A-z]','','g'),',','.'),' ','')\n"
+                    + "      end estoque,\n"
                     + " p.margem::numeric(10,2) margem,\n"
                     + " regexp_replace(p.depto,'[A-Z]|-|\\/','','g') depto,\n"
                     + " p.secao,\n"
                     + " p.grupo,\n"
                     + " p.subgrupo,\n"
                     + " t.tribicms,\n"
-                    + " case when t.piscofins = 'A' then 7 \n"
-                    + "      when t.piscofins = 'M' then 3\n"
-                    + "      when t.piscofins = 'N' then 4\n"
-                    + "      when t.piscofins = 'T' then 0\n"
-                    + " else 2 end piscofins,\n"
+                    + " case when t.piscofins = 'A' then 6\n"
+                    + "      when t.piscofins = 'M' then 4\n"
+                    + "      when t.piscofins = 'N' then 8\n"
+                    + "      when t.piscofins = 'T' then 1\n"
+                    + " else 5 end piscofins,\n"
                     + " t.ncm,\n"
                     + " t.cest\n"
                     + "from produto p\n"
@@ -214,8 +219,10 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                         imp.setEan(rst.getString("codbarra"));
                         imp.setTipoEmbalagem(rst.getString("un"));
                         imp.setTipoEmbalagemVolume(rst.getString("un"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("un"));
                         imp.setQtdEmbalagem(1);
                         imp.setVolume(1);
+                        imp.setQtdEmbalagemCotacao(1);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
@@ -269,7 +276,20 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " uf,\n"
                     + " cep\n"
                     + "from fornecedor\n"
-                    + "order by 1"
+                    + "union\n"
+                    + "select \n"
+                    + " codigo,\n"
+                    + " nome,\n"
+                    + " cnpj_cpf,\n"
+                    + " ie,\n"
+                    + " '',\n"
+                    + " ende,\n"
+                    + " compl,\n"
+                    + " bairro,\n"
+                    + " cidade,\n"
+                    + " uf,\n"
+                    + " cep\n"
+                    + "from fornecedor2"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -287,6 +307,36 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMunicipio(rst.getString("cid"));
                     imp.setUf(rst.getString("uf"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  p.codigo produtoid,\n"
+                    + "  f.codigo fornecedorid,\n"
+                    + "  pf.refe referencia,\n"
+                    + "  replace(replace(replace(ebc,',','.'),'''',''),'/','') qtde\n"
+                    + "  from produtofornecedor pf\n"
+                    + " join produto p on pf.codb = p.codbarra\n"
+                    + " join fornecedor2 f on regexp_replace(f.cnpj_cpf,'[.|/|-]','','g') = regexp_replace(pf.cnpj,'[.|/|-]','','g')"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("produtoid"));
+                    imp.setIdFornecedor(rst.getString("fornecedorid"));
+                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtde"));
                     result.add(imp);
                 }
             }
@@ -314,6 +364,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " bairro,\n"
                     + " cid,\n"
                     + " uf,\n"
+                    + " regexp_replace(ende,'[^0-9]','','g') as numero,\n"
                     + " cep\n"
                     + "from cliente \n"
                     + "order by 1"
@@ -325,6 +376,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCnpj(rst.getString("cnpj_cpf"));
                     imp.setInscricaoestadual(rst.getString("rg"));
                     imp.setEndereco(rst.getString("ende"));
+                    imp.setNumero(rst.getString("numero"));
                     imp.setCep(rst.getString("cep"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cid"));
