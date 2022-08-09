@@ -284,6 +284,8 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
                     imp.setIcmsCreditoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
