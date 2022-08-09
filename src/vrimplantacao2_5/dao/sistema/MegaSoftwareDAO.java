@@ -64,7 +64,6 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.PDV_VENDA,
-                //OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -79,7 +78,8 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
         ));
     }
 
@@ -188,7 +188,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "	p.EMBALAGEM,\n" +
                     "	p.PRO_BARR ean,\n" +
                     "	p.PRO_GRUP merc1,\n" +
-                    "	p.PRO_SUBG merc2,\n" +
+                    "	CASE WHEN p.PRO_SUBG = '' then p.PRO_GRUP ELSE p.PRO_SUBG end merc2,\n" +
                     "	p.PRO_CUST custo,\n" +
                     "	p.PRO_VEND precovenda,\n" +
                     "	p.PRO_LUCR margem,\n" +
@@ -261,6 +261,8 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "SELECT \n" +
                     "	f.FOR_CODI id,\n" +
                     "	f.FOR_NOME razao,\n" +
+                    "   f.FOR__CGC cnpj,\n" +
+                    "	f.FOR__CPF cpf,\n" +
                     "	f.fantasia,\n" +
                     "	f.for_num numero,\n" +
                     "	f.for_complemento complemento,\n" +
@@ -270,7 +272,6 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "	f.FOR__CEP cep,\n" +
                     "	f.FOR_ESTA uf,\n" +
                     "	f.FOR_TELE fone,\n" +
-                    "	f.FOR__CPF cnpj,\n" +
                     "	f.FOR_IEST ie,\n" +
                     "	f.FOR_OBS1 obs,\n" +
                     "	f.EMAIL,\n" +
@@ -288,6 +289,11 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
+                    
+                    if (imp.getCnpj_cpf() == null && imp.getCnpj_cpf().isEmpty()) {
+                        imp.setCnpj_cpf(rs.getString("cpf"));
+                    }
+                    
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -335,11 +341,11 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "SELECT \n" +
                     "	g.GRU_CODI merc1,\n" +
                     "	g.GRU_DESC descmerc1,\n" +
-                    "	sg.SUB_GRUPO merc2,\n" +
-                    "	sg.DESCRICAO descmerc2\n" +
+                    "	COALESCE(sg.SUB_GRUPO, g.GRU_CODI) merc2,\n" +
+                    "	COALESCE(sg.DESCRICAO, g.GRU_DESC) descmerc2\n" +
                     "FROM \n" +
-                    "	SUB_GRUPO sg \n" +
-                    "JOIN GRU001 g ON sg.GRUPO = g.GRU_CODI \n" +
+                    "	GRU001 g \n" +
+                    "LEFT JOIN SUB_GRUPO sg ON sg.GRUPO = g.GRU_CODI \n" +
                     "ORDER BY \n" +
                     "	2, 4"
             )) {
@@ -486,7 +492,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     "FROM \n" +
                     "	CRE001 c\n" +
                     "WHERE \n" +
-                    "	(cre_nota - CRE_REST) > 0")) {
+                    "	CRE_REST > 0")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -495,7 +501,7 @@ public class MegaSoftwareDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setEcf(rs.getString("caixa"));
                     imp.setNumeroCupom(rs.getString("coo"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setValor(rs.getDouble("total"));
+                    imp.setValor(rs.getDouble("restante"));
 
                     imp.setDataVencimento(rs.getDate("vencimento"));
 
