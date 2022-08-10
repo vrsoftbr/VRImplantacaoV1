@@ -90,6 +90,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
@@ -177,6 +178,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " p.descricao,\n"
                     + " p.codbarra,\n"
                     + " p.un,\n"
+                    + " case when p.eb_c = 'I' then 0 else 1 end ativo,\n"
                     + " replace(p.custo,',','.') custo,\n"
                     + " replace(p.venda,',','.') venda,\n"
                     + " case when replace(replace(regexp_replace(p.estoque,'[A-z]','','g'),',','.'),' ','') = '' then '0'\n"
@@ -224,6 +226,8 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                         imp.setVolume(1);
                         imp.setQtdEmbalagemCotacao(1);
                     }
+                    
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
@@ -301,7 +305,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setEndereco(rst.getString("ende"));
-                    imp.setNumero(rst.getString("compl"));
+                    imp.setComplemento(rst.getString("compl"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
                     imp.setMunicipio(rst.getString("cid"));
@@ -357,8 +361,8 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " rg,\n"
                     + " tel1,\n"
                     + " tel2,\n"
-                    + " case when situacao = '5-Bloqueado' then 1\n"
-                    + "   else 0 end situacao,\n"
+                    + " case when situacao = '5-Bloqueado' then 0\n"
+                    + "   else 1 end situacao,\n"
                     + " limite,\n"
                     + " ende,\n"
                     + " bairro,\n"
