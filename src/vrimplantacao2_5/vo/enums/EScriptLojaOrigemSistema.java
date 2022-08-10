@@ -173,7 +173,8 @@ public enum EScriptLojaOrigemSistema {
     SCORPION(225, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
     MEGASOFTWARE(226, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
     ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
-    CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial");
+    CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
+    ARAUTO(228, 5, "select id, nomefantasia descricao from empresa");
     
     private int idSistema;
     private int idBancoDados;
