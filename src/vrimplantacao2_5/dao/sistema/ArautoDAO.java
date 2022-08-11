@@ -99,7 +99,7 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.UF,
                 OpcaoFornecedor.CEP,
                 OpcaoFornecedor.DATA_CADASTRO,
-                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.OBSERVACAO));
     }
 
@@ -230,9 +230,6 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                     int qtdEmbalagem = Utils.stringToInt(rs.getString("qtdembcompra"), 1); 
                     
                     imp.setQtdEmbalagemCotacao(qtdEmbalagem);
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
@@ -319,6 +316,7 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.doc1 cnpj,\n" +
                     "	f.doc2 ie,\n" +
                     "	f.endereco,\n" +
+                    "   f.complemento,\n" +        
                     "	f.bairro,\n" +
                     "	f.cidade,\n" +
                     "	f.mncod id_municipioibge,\n" +
