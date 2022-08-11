@@ -104,8 +104,6 @@ public class Arauto2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
-                    dao.setStatementPessoa(conexaoFirebirdPanel.getConexaoFirebird());
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {

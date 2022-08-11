@@ -35,8 +35,6 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  */
 public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
-
-    private ConexaoFirebird stmPessoa;
     
     @Override
     public String getSistema() {
@@ -145,10 +143,6 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.EMAIL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
-    
-    public void setStatementPessoa(ConexaoFirebird stm) {
-        this.stmPessoa = stm;
-    }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
@@ -219,38 +213,39 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "FROM \n" +
                     "	PRODUTO p"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
 
-                    imp.setImportId(rs.getString("Id"));
+                    imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricaoCompleta"));
-                    imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaocompleta"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("unidade_compra"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
                     
-                    int qtdEmbalagem = Utils.stringToInt(rs.getString("embalagem"), 1); 
+                    int qtdEmbalagem = Utils.stringToInt(rs.getString("qtdembcompra"), 1); 
                     
                     imp.setQtdEmbalagemCotacao(qtdEmbalagem);
-                    imp.seteBalanca(rs.getString("balanca").equals("S"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3("1");
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setMargem(rs.getDouble("markup"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setCustoComImposto(imp.getCustoSemImposto());
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rs.getString("inativo").equals("") ? 1 : 0);
+                    imp.setSituacaoCadastro(rs.getInt("ativo") == 1 ? 1 : 0);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setPiscofinsCstDebito(rs.getInt("cst_cofins"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("nat_receita"));
+                    imp.setPiscofinsCstDebito(rs.getInt("cst_pis_cofins"));
 
-                    String icmsId = rs.getString("aliquota");
+                    String icmsId = rs.getString("idicms");
                     
                     imp.setIcmsConsumidorId(icmsId);
                     imp.setIcmsDebitoId(icmsId);
@@ -268,32 +263,77 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	id, \n" +
+                    "	codigo_caixa ean,\n" +
+                    "	1 qtdembalagem,\n" +
+                    "	unidade\n" +
+                    "FROM \n" +
+                    "	produto p\n" +
+                    "WHERE \n" +
+                    "	codigo_caixa != '' AND \n" +
+                    "	codigo_caixa IS NOT NULL AND \n" +
+                    "	codigo_caixa != 'SEM GTIN'\n" +
+                    "UNION ALL \n" +
+                    "SELECT \n" +
+                    "	pc.PRODID id,\n" +
+                    "	pc.PRODCOD ean,\n" +
+                    "	pc.PRODQTD qtdembalagem,\n" +
+                    "	'UN' unidade\n" +
+                    "FROM \n" +
+                    "	PRODUTO_CODADICIONAL pc")) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = stmPessoa.createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
-                    "	f.FOR_CODI id,\n" +
-                    "	f.FOR_NOME razao,\n" +
-                    "   f.FOR__CGC cnpj,\n" +
-                    "	f.FOR__CPF cpf,\n" +
-                    "	f.fantasia,\n" +
-                    "	f.for_num numero,\n" +
-                    "	f.for_complemento complemento,\n" +
-                    "	f.FOR_CIDA municipio,\n" +
-                    "	f.for_ende endereco,\n" +
-                    "	f.FOR_BAIR bairro,\n" +
-                    "	f.FOR__CEP cep,\n" +
-                    "	f.FOR_ESTA uf,\n" +
-                    "	f.FOR_TELE fone,\n" +
-                    "	f.FOR_IEST ie,\n" +
-                    "	f.FOR_OBS1 obs,\n" +
-                    "	f.EMAIL,\n" +
-                    "	f.DT_CADASTRO cadastro,\n" +
-                    "	f.FOR__FAX fax\n" +
+                    "	f.id,\n" +
+                    "	f.CADASTRO,\n" +
+                    "	f.razao,\n" +
+                    "	f.fantazia,\n" +
+                    "	f.doc1 cnpj,\n" +
+                    "	f.doc2 ie,\n" +
+                    "	f.endereco,\n" +
+                    "	f.bairro,\n" +
+                    "	f.cidade,\n" +
+                    "	f.mncod id_municipioibge,\n" +
+                    "	f.numero,\n" +
+                    "	f.uf,\n" +
+                    "	f.ufcod uf_ibge,\n" +
+                    "	f.cep,\n" +
+                    "	f.tel,\n" +
+                    "	f.fax,\n" +
+                    "	f.contato,\n" +
+                    "	f.celcontato,\n" +
+                    "	f.email,\n" +
+                    "	f.ativo\n" +
                     "FROM \n" +
-                    "	FOR001 f"
+                    "	fornecedor f"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -302,25 +342,20 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setFantasia(rs.getString("fantazia"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
-                    
-                    if (imp.getCnpj_cpf() == null && imp.getCnpj_cpf().isEmpty()) {
-                        imp.setCnpj_cpf(rs.getString("cpf"));
-                    }
                     
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setDatacadastro(rs.getDate("cadastro"));
-                    imp.setObservacao(rs.getString("obs"));
 
-                    imp.setTel_principal(rs.getString("fone"));
+                    imp.setTel_principal(rs.getString("tel"));
 
                     String fax = (rs.getString("fax"));
                     if (!"".equals(fax)) {
@@ -353,16 +388,7 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	g.GRU_CODI merc1,\n" +
-                    "	g.GRU_DESC descmerc1,\n" +
-                    "	COALESCE(sg.SUB_GRUPO, g.GRU_CODI) merc2,\n" +
-                    "	COALESCE(sg.DESCRICAO, g.GRU_DESC) descmerc2\n" +
-                    "FROM \n" +
-                    "	GRU001 g \n" +
-                    "LEFT JOIN SUB_GRUPO sg ON sg.GRUPO = g.GRU_CODI \n" +
-                    "ORDER BY \n" +
-                    "	2, 4"
+                    ""
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -389,7 +415,13 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT \n" +
+                    "	pf.PRODUTO_ID id_produto,\n" +
+                    "	pf.CODIGO codigoexterno,\n" +
+                    "	f.ID id_fornecedor\n" +
+                    "FROM \n" +
+                    "	PRODUTO_POR_FORNECEDOR pf\n" +
+                    "JOIN FORNECEDOR f ON pf.DOC1 = f.DOC1"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -398,7 +430,7 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setCodigoExterno(rs.getString("cod_externo"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
 
                     result.add(imp);
                 }
@@ -414,50 +446,43 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
-                    "	c.CLI_CODI id,\n" +
-                    "	c.CLI_NOME razao,\n" +
-                    "	c.cli_fant fantasia,\n" +
-                    "	c.CLI__PAI pai,\n" +
-                    "	c.CLI__MAE mae,\n" +
-                    "	c.CLI_DTAN nascimento,\n" +
-                    "	c.CLI_TELE fone,\n" +
-                    "	c.cli_celular celular,\n" +
-                    "	c.CLI__FAX fax,\n" +
-                    "   c.CLI__CGC cnpj,\n" +        
-                    "	c.CLI__CPF cpf,\n" +
-                    "	c.CLI__IEST ie,\n" +
-                    "	c.CLI___RG rg,\n" +
-                    "	c.CLI_ENDE endereco,\n" +
-                    "	c.cli_complemento complemento,\n" +
-                    "	c.NUMERO,\n" +
-                    "	c.CLI_BAIR bairro,\n" +
-                    "	c.CLI_CIDA cidade,\n" +
-                    "	c.CLI_ESTA uf,\n" +
-                    "	c.CLI__CEP cep,\n" +
-                    "	c.CLI_DT_C cadastro,\n" +
-                    "	c.CLI_LIMI limite,\n" +
-                    "	c.EMAIL email,\n" +
-                    "	c.sexo\n" +
+                    "	id,\n" +
+                    "	cadastrastrado cadastro,\n" +
+                    "	razao,\n" +
+                    "	fantazia,\n" +
+                    "	doc1 cpfcnpj,\n" +
+                    "	doc2 rg,\n" +
+                    "	endereco,\n" +
+                    "	complemento,\n" +
+                    "	numero,\n" +
+                    "	bairro,\n" +
+                    "	cidade,\n" +
+                    "	estado,\n" +
+                    "	cep,\n" +
+                    "	ddd,\n" +
+                    "	telr fone,\n" +
+                    "	telt, \n" +
+                    "	cel,\n" +
+                    "	site,\n" +
+                    "	email,\n" +
+                    "	obs,\n" +
+                    "	ativa,\n" +
+                    "	fax,\n" +
+                    "	sexo,\n" +
+                    "	nascimento,\n" +
+                    "	pai,\n" +
+                    "	mae\n" +
                     "FROM \n" +
-                    "	CLI001 c"
+                    "	clientes"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setFantasia(rs.getString("fantazia"));
                     imp.setCnpj(rs.getString("cnpj"));
-                    
-                    if(imp.getCnpj().isEmpty()) {
-                        imp.setCnpj(rs.getString("cpf"));
-                    }
-                    
-                    imp.setInscricaoestadual(rs.getString("ie"));
-                    
-                    if (imp.getInscricaoestadual().isEmpty()) {
-                        imp.setInscricaoestadual(rs.getString("rg"));
-                    }
+                    imp.setInscricaoestadual(rs.getString("rg"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setEndereco(rs.getString("endereco"));
@@ -465,16 +490,14 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("uf"));
+                    imp.setUf(rs.getString("estado"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("fone"));
                     imp.setFax(rs.getString("fax"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setCelular(rs.getString("celular"));
-                    imp.setSexo(rs.getString("sexo") != null && rs.getString("sexo").equals("M") ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
-                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setCelular(rs.getString("cel"));
 
                     result.add(imp);
                 }
@@ -488,26 +511,9 @@ public class ArautoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
-        try (Statement stm = stmPessoa.createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	SEQUENCIAL id,\n" +
-                    "	CRE_CODI id_cliente,\n" +
-                    "	nome_c razao,\n" +
-                    "	CRE_NFIS nf,\n" +
-                    "	coo,\n" +
-                    "	caixa,\n" +
-                    "	CRE_D_EM emissao,\n" +
-                    "	CRE_D_VE vencimento,\n" +
-                    "	CRE_CONT contador,\n" +
-                    "	CRE_NOTA valor,\n" +
-                    "	cre_rest restante,\n" +
-                    "	CRE_PAGO pago,\n" +
-                    "	(cre_nota - CRE_REST) total\n" +
-                    "FROM \n" +
-                    "	CRE001 c\n" +
-                    "WHERE \n" +
-                    "	CRE_REST > 0")) {
+                    "")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
