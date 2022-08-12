@@ -725,234 +725,6 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         return result;
     }
 
-    /*private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(dataInicioVenda, dataTerminoVenda);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(dataInicioVenda, dataTerminoVenda);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
-
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
-        private Statement stm = ConexaoPostgres.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
-
-        private void obterNext() {
-            try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaIMP();
-                        String i_id = rst.getString("id");
-                        String i_numerocupom = rst.getString("numerocupom");
-                        String i_ecf = rst.getString("ecf");
-                        Date i_datavenda = rst.getDate("datavenda");
-
-                        String id = i_id + i_ecf + String.valueOf(i_datavenda);
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
-
-                        next.setId(id);
-
-                        next.setNumeroCupom(i_numerocupom == null
-                                ? Utils.stringToInt(i_id)
-                                : Utils.stringToInt(i_numerocupom));
-
-                        next.setEcf(Utils.stringToInt(i_ecf));
-                        next.setData(i_datavenda);
-                        next.setIdClientePreferencial(rst.getString("idcliente"));
-
-                        String horaInicio = timestampDate.format(i_datavenda) + " 00:00:00";
-                        String horaTermino = timestampDate.format(i_datavenda) + " 00:00:00";
-
-                        next.setCancelado("Cancelado".equals(rst.getString("status")));
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("totalvenda"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setNumeroSerie(rst.getString("seriesat"));
-                        next.setChaveCfe(rst.getString("chavesat"));
-                    }
-                }
-            } catch (SQLException | ParseException ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaIterator(Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select\n"
-                    + "	codigo||numcfe id,\n"
-                    + "	codcli idcliente,\n"
-                    + "	numcfe numerocupom,\n"
-                    + "	terminal ecf,\n"
-                    + "	operador,\n"
-                    + "	data datavenda,\n"
-                    + "	horainicio,\n"
-                    + "	horafim,\n"
-                    + "	estado status,\n"
-                    + "	desconto,\n"
-                    + "	acrescimo,\n"
-                    + "	totalvenda,\n"
-                    + "	chavesat,\n"
-                    + "	seriesat\n"
-                    + "from\n"
-                    + "	vendas\n"
-                    + "where\n"
-                    + "	data between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + "order by data, horainicio, numcfe";
-
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaIMP next() {
-            obterNext();
-            VendaIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    }
-
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
-        private Statement stm = ConexaoPostgres.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaItemIMP next;
-        private String i_idvenda, i_ecf, i_datavenda, i_idproduto, i_sequencia;
-        private Double i_qtdembalagem, i_aliquota;
-        private Integer i_cst;
-
-        private void obterNext() {
-            try {
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaItemIMP();
-
-                        i_idvenda = rst.getString("idvenda");
-                        i_ecf = rst.getString("ecf");
-                        i_datavenda = rst.getString("datavenda");
-                        i_idproduto = rst.getString("idproduto");
-                        i_sequencia = rst.getString("sequencia");
-                        i_qtdembalagem = rst.getDouble("qtdembalagem");
-//                        i_cst = rst.getInt("cst");
-//                        i_aliquota = rst.getDouble("aliquota");
-
-                        String idVenda = i_idvenda + i_ecf + i_datavenda;
-                        String id = i_idvenda
-                                + i_ecf
-                                + i_datavenda
-                                + i_idproduto
-                                + i_sequencia
-                                + String.valueOf(i_qtdembalagem);
-
-                        next.setId(id);
-                        next.setVenda(idVenda);
-                        next.setProduto(i_idproduto);
-                        next.setSequencia(Integer.parseInt(i_sequencia));
-                        next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                        next.setQuantidade(i_qtdembalagem);
-                        next.setTotalBruto(rst.getDouble("valortotal"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setCancelado("Cancelado".equals(rst.getString("status")));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("tipoembalagem"));
-                    }
-                }
-
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaItemIterator(Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select distinct\n"
-                    + "	i.codvenda as idvenda,\n"
-                    + "	i.terminal as ecf,\n"
-                    + "	i.item as sequencia,\n"
-                    + "	i.codplu as idproduto,\n"
-                    + "	i.codestoque as codigobarras,\n"
-                    + "	i.descricao as descricaoproduto,\n"
-                    + "	i.unidade as tipoembalagem,\n"
-                    + "	i.quantpeso as qtdembalagem,\n"
-                    + "	i.custo,\n"
-                    + "	i.venda as precovenda,\n"
-                    + "	i.desconto,\n"
-                    + "	i.total as valortotal,\n"
-                    + "	i.datavenda,\n"
-                    + "	i.icms as aliquota,\n"
-                    + "	i.sittribut as cst,\n"
-                    + "	i.estado as status\n"
-                    + "from detaven i\n"
-                    + " join vendas v on v.codigo = i.codvenda\n"
-                    + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + " and i.codplu is not null\n"
-                    + " and v.numcfe != ''\n"
-                    + "order by i.codvenda, i.terminal, i.item";
-
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaItemIMP next() {
-            obterNext();
-            VendaItemIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    }*/
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -1006,7 +778,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1028,8 +801,10 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " case when horafim = '' then horainicio else horafim end horafim,\n"
                     + " desconto,\n"
                     + " total valor,\n"
+                    + " desconto,\n"
                     + " seriesat,\n"
-                    + " numcfe numerocupom\n"
+                    + " case when numcfe = '' then codigo else numcfe end numerocupom,\n"
+                    + " case when estado = 'Cancelada' then 1 else 0 end cancelado\n"
                     + "from vendas \n"
                     + "where \n"
                     + " data between '"+ strDataInicio +"' and '"+ strDataTermino +"'\n"
@@ -1079,6 +854,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
@@ -1096,16 +872,17 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " v.codigo vendaid,\n"
                     + " iv.item::int sequencia,\n"
                     + " iv.codplu produtoid,\n"
-                    + " iv.lcancelado cancelado,\n"
+                    + " case when iv.estado = 'Cancelado' then 1 else 0 end cancelado,\n"
                     + " iv.quantpeso quantidade,\n"
                     + " iv.venda valor,\n"
+                    + " iv.desconto,\n"
                     + " upper(iv.unidade) unidade\n"
                     + "from detaven iv\n"
                     + "join vendas v on v.codigo = iv.codvenda\n"
                     + "where \n"
-                    + " iv.datavenda between '"+ VendaIterator.FORMAT.format(dataInicio) +"' and '"+ VendaIterator.FORMAT.format(dataTermino) +"'\n"
-                    + " and\n"
-                    + " v.data between '"+ VendaIterator.FORMAT.format(dataInicio) +"' and '"+ VendaIterator.FORMAT.format(dataTermino) +"'\n"
+                    + " iv.datavenda between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + " and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + " and iv.estado != 'Cancelado'\n"
                     + " order by 1";
                     
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
