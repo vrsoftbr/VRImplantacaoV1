@@ -595,10 +595,10 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+//                        next.setValorDesconto(rst.getDouble("desconto"));
+//                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+//                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -618,15 +618,15 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	SERIE_ECF ecf,\n"
                     + "	CAST(DATA_VENDA AS DATE) data,\n"
                     + "	SUBSTRING(DATA_VENDA FROM 12 FOR 8) hora,\n"
-                    + "	VALOR_DESCONTO desconto,\n"
-                    + "	VALOR_ACRESCIMO acrescimo,\n"
-                    + "	VALOR_LIQUIDO_VENDA total,\n"
-                    + "	CASE WHEN VENDAATIVA = 'N' THEN 1 ELSE 0 END cancelado\n"
+//                    + "	VALOR_DESCONTO desconto,\n"
+//                    + "	VALOR_ACRESCIMO acrescimo,\n"
+                    + "	VALOR_LIQUIDO_VENDA total\n"
+//                    + "	CASE WHEN VENDAATIVA = 'N' THEN 1 ELSE 0 END cancelado\n"
                     + "FROM\n"
                     + "	TB_VENDA v\n"
                     + "WHERE\n"
                     + "	NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + " AND COD_TIPOMOVIMENTO IN (5,-5)\n"
+                    + " AND COD_TIPOMOVIMENTO = 5\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -674,7 +674,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
+//                        next.setTotalBruto(rst.getDouble("total"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
@@ -708,6 +708,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
                     + "WHERE\n"
                     + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
+                    + " AND v.COD_TIPOMOVIMENTO = 5\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "	ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
