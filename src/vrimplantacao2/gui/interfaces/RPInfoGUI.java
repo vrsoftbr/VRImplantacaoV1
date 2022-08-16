@@ -197,6 +197,12 @@ public class RPInfoGUI extends VRInternalFrame {
                     dao.idLojaVR = idLojaVR;
                     dao.removeDigitoEAN = chkRemoveDigitoBalanca.isSelected();
                     dao.utilizarCustoNota = chkUtilizarCustoNota.isSelected();
+                    dao.apenasBaixadosContasPagar = chkContaPagarBaixados.isSelected();
+                    
+                    if (chkContaPagarBaixados.isSelected()) {
+                        dao.setCpDataInicio(txtDtIInicioCp.getDate());
+                        dao.setCpDataTermino(txtDtTerminoCp.getDate());
+                        }
                     
                     Importador importador = new Importador(dao);
                     
@@ -357,6 +363,9 @@ public class RPInfoGUI extends VRInternalFrame {
         chkNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
         chkFPrazo = new vrframework.bean.checkBox.VRCheckBox();
         chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkContaPagarBaixados = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtIInicioCp = new org.jdesktop.swingx.JXDatePicker();
+        txtDtTerminoCp = new org.jdesktop.swingx.JXDatePicker();
         tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -467,6 +476,14 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkContaPagarBaixados, "Importar Contas a Pagar Baixadas");
+        chkContaPagarBaixados.setEnabled(true);
+        chkContaPagarBaixados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkContaPagarBaixadosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabImpFornecedorLayout = new javax.swing.GroupLayout(tabImpFornecedor);
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
@@ -474,7 +491,6 @@ public class RPInfoGUI extends VRInternalFrame {
             .addGroup(tabImpFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -484,12 +500,19 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addGroup(tabImpFornecedorLayout.createSequentialGroup()
                         .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(73, 73, 73)
                         .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                                .addComponent(chkContaPagarBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(360, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -503,7 +526,12 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(chkContaPagarBaixados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDtIInicioCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtDtTerminoCp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -766,7 +794,7 @@ public class RPInfoGUI extends VRInternalFrame {
                 .addComponent(chkRemoveDigitoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabs.addTab("Parametros Extras", vRPanel1);
@@ -912,6 +940,10 @@ public class RPInfoGUI extends VRInternalFrame {
         
     }//GEN-LAST:event_chkVendasActionPerformed
 
+    private void chkContaPagarBaixadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContaPagarBaixadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkContaPagarBaixadosActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -920,6 +952,7 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkContaPagarBaixados;
     private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private javax.swing.JCheckBox chkEstadoCivil;
@@ -960,6 +993,8 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private org.jdesktop.swingx.JXDatePicker txtDtIInicioCp;
+    private org.jdesktop.swingx.JXDatePicker txtDtTerminoCp;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
