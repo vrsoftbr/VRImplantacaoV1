@@ -735,7 +735,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO\n"
                     + "WHERE\n"
                     + "	 cr.EMPRESA = '" + getLojaOrigem() + "'\n"
-                    + "	 AND cr.tipo = '01'\n"
+                    + "	 AND cr.tipo in ('01','12')\n"
                     + "  AND DATABAIXA IS NOT NULL\n"
                     + "ORDER BY 1,2"
             )) {
@@ -775,7 +775,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO\n"
                     + "WHERE\n"
                     + "  cr.EMPRESA = '" + getLojaOrigem() + "'\n"
-                    + "AND cr.tipo = '01'"
+                    + "	 AND cr.tipo in ('01','12')"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
