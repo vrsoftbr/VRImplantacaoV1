@@ -111,12 +111,12 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
-    @Override
+    /*@Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select distinct\n"
                     + "	aliq.id_grade_trib id,\n"
                     + "	cst.codigo||'-'||aliq.per_icms||'-'||aliq.per_red_icms descricao,\n"
                     + "	cst.codigo cst_saida,\n"
@@ -134,6 +134,42 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                             rs.getInt("cst_saida"),
                             rs.getDouble("aliquota_saida"),
                             rs.getDouble("reducao_saida"))
+                    );
+                }
+            }
+        }
+
+        return result;
+    }*/
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct \n"
+                    + "	ts.id_simbologia id,\n"
+                    + "	case\n"
+                    + "	  when ts.tipo_cf = 'TRIBUTADO'\n"
+                    + "	  then ts.tipo_cf||' '||ts.per_aliquota||'%'\n"
+                    + "	  else ts.tipo_cf\n"
+                    + "	end descricao,\n"
+                    + "	cst.codigo cst_icms,\n"
+                    + "	ts.per_aliquota aliq_icms,\n"
+                    + "	0 red_icms\n"
+                    + "from\n"
+                    + "	fs_grade_trib_aliq al\n"
+                    + "	left join tb_simbologia ts on ts.id_simbologia = al.id_simbologia\n"
+                    + "	left join tb_cst cst on al.id_cst = cst.id_cst and cst.tipo_imposto = 'ICMS'\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms"))
                     );
                 }
             }
@@ -202,7 +238,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.qtde_maxima est_max,\n"
                     + " round(pr.vr_custo_efetivo,3) custosemimposto,\n"
                     + "	round(pr.vr_custo_reposicao,3) custocomimposto,\n"
-                    + "	round(pr.vr_venda_atual,3) precovenda\n"
+                    + "	round(pr.vr_venda_atual,3) precovenda,\n"
+                    + " pr.id_grade_trib id_icms\n"
                     + "from\n"
                     + "	eq_prod p\n"
                     + "	left join eq_prod_ean ean on p.id_prod = ean.id_prod left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
@@ -237,8 +274,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
 
-                    imp.setEstoqueMinimo(rst.getDouble("estmin"));
-                    imp.setEstoqueMaximo(rst.getDouble("estmax"));
+                    imp.setEstoqueMinimo(rst.getDouble("est_min"));
+                    imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
 
 //                    imp.setMargem(rst.getDouble("margem"));
@@ -248,9 +285,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
-                    idIcmsDebito = rst.getString("id_debito");
-                    IdIcmsCredito = rst.getString("id_credito");
-                    IdIcmsForaEstado = rst.getString("id_debito_fe");
+                    idIcmsDebito = rst.getString("id_icms");
+                    IdIcmsCredito = rst.getString("id_icms");
+                    IdIcmsForaEstado = rst.getString("id_icms");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
@@ -259,9 +296,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(IdIcmsCredito);
                     imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
-                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
-
+//                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
+//                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
                     result.add(imp);
                 }
             }
