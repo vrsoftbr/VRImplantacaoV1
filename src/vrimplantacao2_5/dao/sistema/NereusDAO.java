@@ -111,12 +111,12 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
-    @Override
+    /*@Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select distinct\n"
                     + "	aliq.id_grade_trib id,\n"
                     + "	cst.codigo||'-'||aliq.per_icms||'-'||aliq.per_red_icms descricao,\n"
                     + "	cst.codigo cst_saida,\n"
@@ -134,6 +134,41 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                             rs.getInt("cst_saida"),
                             rs.getDouble("aliquota_saida"),
                             rs.getDouble("reducao_saida"))
+                    );
+                }
+            }
+        }
+
+        return result;
+    }*/
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct \n"
+                    + "	ts.id_simbologia id,\n"
+                    + "	case\n"
+                    + "	  when ts.tipo_cf = 'TRIBUTADO'\n"
+                    + "	  then ts.tipo_cf||' '||ts.per_aliquota||'%'\n"
+                    + "	  else ts.tipo_cf\n"
+                    + "	end descricao,\n"
+                    + "	cst.codigo cst_icms,\n"
+                    + "	ts.per_aliquota aliq_icms,\n"
+                    + "	0 red_icms\n"
+                    + "from\n"
+                    + "	fs_grade_trib_aliq al\n"
+                    + "	left join tb_simbologia ts on ts.id_simbologia = al.id_simbologia\n"
+                    + "	left join tb_cst cst on al.id_cst = cst.id_cst and cst.tipo_imposto = 'ICMS'\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms"))
                     );
                 }
             }
@@ -183,7 +218,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "	p.id_prod idproduto,\n"
                     + "	ean.ean13 ean,\n"
                     + "	p.descricao desc_completa,\n"
@@ -202,7 +237,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.qtde_maxima est_max,\n"
                     + " round(pr.vr_custo_efetivo,3) custosemimposto,\n"
                     + "	round(pr.vr_custo_reposicao,3) custocomimposto,\n"
-                    + "	round(pr.vr_venda_atual,3) precovenda\n"
+                    + "	round(pr.vr_venda_atual,3) precovenda,\n"
+                    + " pr.id_grade_trib id_icms\n"
                     + "from\n"
                     + "	eq_prod p\n"
                     + "	left join eq_prod_ean ean on p.id_prod = ean.id_prod left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
@@ -211,6 +247,41 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join eq_prod_qtde est on p.id_prod = est.id_prod and est.id_emp = " + getLojaOrigem() + "\n"
                     + "	left join eq_prod_com pr on p.id_prod = pr.id_prod and pr.id_emp = " + getLojaOrigem() + "\n"
                     + "	left join fs_grade_trib_aliq  i on pr.id_grade_trib = i.id_grade_trib_aliq\n"
+                    + "order by 1"*/
+                    "select distinct\n"
+                    + "	produto.id_prod idproduto,\n"
+                    + "	ean.ean13 ean,\n"
+                    + "	produto.descricao desc_completa,\n"
+                    + "	descricaor desc_reduzida,\n"
+                    + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
+                    + "	coalesce(f.fator, 1) qtde_emb,\n"
+                    + "	uv.sigla emb_venda,\n"
+                    + "	uc.sigla emb_compra,\n"
+                    + "	ncm.codigo ncm,\n"
+                    + "	cest.cd_cest cest,\n"
+                    + "	dt_cad data_cadastro,\n"
+                    + "	peso pesobruto,\n"
+                    + "	peso_l pesoliquido,\n"
+                    + "	estoque.qtde estoque,\n"
+                    + "	estoque.qtde_minima est_min,\n"
+                    + "	estoque.qtde_maxima est_max,\n"
+                    + " round(preco.vr_custo_efetivo,3) custosemimposto,\n"
+                    + "	round(preco.vr_custo_reposicao,3) custocomimposto,\n"
+                    + "	round(preco.vr_venda_atual,3) precovenda,\n"
+                    + " simbol.id_simbologia id_icms\n"
+                    + "from\n"
+                    + "	eq_prod produto\n"
+                    + "	left join eq_prod_com preco on produto.id_prod = preco.id_prod \n"
+                    + "	left join eq_prod_ean ean on produto.id_prod = ean.id_prod\n"
+                    + "	left join eq_prod_qtde estoque on produto.id_prod = estoque.id_prod and estoque.id_emp = 1\n"
+                    + "	left join fs_grade_trib_aliq aliq on aliq.id_grade_trib = preco.id_grade_trib\n"
+                    + "	left join tb_cst cst on aliq.id_cst = cst.id_cst\n"
+                    + "	left join tb_simbologia simbol on aliq.id_simbologia = simbol.id_simbologia\n"
+                    + "	left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
+                    + "	left join tb_unid uv on produto.id_unid_v = uv.id_unid\n"
+                    + "	left join tb_unid uc on produto.id_unid_c = uc.id_unid\n"
+                    + "	left join tb_ncm ncm on produto.id_ncm = ncm.id_ncm\n"
+                    + "	left join tb_cest cest on ncm.id_cest = cest.id_cest\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -237,8 +308,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
 
-                    imp.setEstoqueMinimo(rst.getDouble("estmin"));
-                    imp.setEstoqueMaximo(rst.getDouble("estmax"));
+                    imp.setEstoqueMinimo(rst.getDouble("est_min"));
+                    imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
 
 //                    imp.setMargem(rst.getDouble("margem"));
@@ -248,9 +319,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
-                    idIcmsDebito = rst.getString("id_debito");
-                    IdIcmsCredito = rst.getString("id_credito");
-                    IdIcmsForaEstado = rst.getString("id_debito_fe");
+                    idIcmsDebito = rst.getString("id_icms");
+                    IdIcmsCredito = rst.getString("id_icms");
+                    IdIcmsForaEstado = rst.getString("id_icms");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
@@ -259,9 +330,8 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(IdIcmsCredito);
                     imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
-                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
-
+//                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
+//                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
                     result.add(imp);
                 }
             }
@@ -518,7 +588,6 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -540,12 +609,13 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	substring(hr_final::varchar, 1, 8) hora,\n"
                     + "	vr_total total,\n"
                     + "	vr_desconto desconto,\n"
-                    + "	vr_acrescimo acrescimo,\n"
-                    + " case when cnc = 'SIM' then 1 else 0 end cancelado"
+                    + "	vr_acrescimo acrescimo\n"
                     + "from\n"
-                    + "	vnd_cupom vc\n"
+                    + "	vnd_cupom\n"
                     + "where\n"
                     + "	id_emp = " + idLojaCliente + "\n"
+                    + " and cnc != 'SIM'\n"
+                    + " and status_nfc = 'ENVIADO'\n"
                     + "	and dt_venda between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "	order by dt_venda, nro_coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
