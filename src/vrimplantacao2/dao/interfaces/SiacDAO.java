@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
-import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.classe.ConexaoPostgres;
+//import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -58,7 +58,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO,
+                    //OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
@@ -68,6 +68,9 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                     OpcaoProduto.PESAVEL,
                     OpcaoProduto.VALIDADE,
                     OpcaoProduto.DESC_COMPLETA,
@@ -293,8 +296,9 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_cotacao"));
+                    //imp.setQtdEmbalagemCotacao(rst.getInt("qtd_cotacao"));
                     imp.setQtdEmbalagem(rst.getInt("qtd_embalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_embalagem"));
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -316,6 +320,8 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.seteBalanca(false);
                             imp.setTipoEmbalagem(rst.getString("unidade"));
+                            imp.setTipoEmbalagemVolume(rst.getString("unidade"));
+                            imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
                         }
                     }
 
@@ -345,10 +351,16 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_entrada"));
+                    //imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("pis_natureza_rec"));
+                    
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    imp.setIcmsConsumidorId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
+                    
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
                     imp.setVendaPdv(rst.getBoolean("vendapdv"));
                     imp.setSugestaoCotacao(rst.getBoolean("sugestaocotacao"));

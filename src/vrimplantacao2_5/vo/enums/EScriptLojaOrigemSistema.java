@@ -174,7 +174,8 @@ public enum EScriptLojaOrigemSistema {
     MEGASOFTWARE(226, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
     ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
-    ARAUTO(228, 5, "select id, nomefantasia descricao from empresa");
+    ARAUTO(228, 5, "select id, nomefantasia descricao from empresa"),
+    SUPERCONTROLE(229,13,"select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id");
     
     private int idSistema;
     private int idBancoDados;

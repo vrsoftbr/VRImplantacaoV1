@@ -170,6 +170,7 @@ import vrimplantacao2.dao.interfaces.SolidusDAO;
 import vrimplantacao2.dao.interfaces.SolutionSuperaDAO;
 import vrimplantacao2.dao.interfaces.SophyxDAO;
 import vrimplantacao2.dao.interfaces.SriDAO;
+import vrimplantacao2.dao.interfaces.SuperControle_SuperServerDAO;
 import vrimplantacao2.dao.interfaces.SuperDAO;
 import vrimplantacao2.dao.interfaces.SuperLoja10DAO;
 import vrimplantacao2.dao.interfaces.SuperusDAO;
@@ -272,6 +273,7 @@ import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
+import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
@@ -1855,6 +1857,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Arauto2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SUPERCONTROLE(229, "SUPERCONTROLE", new SuperControle_SuperServerDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new SuperControle_SuperServer2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
