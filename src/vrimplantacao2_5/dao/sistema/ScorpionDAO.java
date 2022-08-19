@@ -595,10 +595,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-//                        next.setValorDesconto(rst.getDouble("desconto"));
-//                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setSubTotalImpressora(rst.getDouble("total"));
-//                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -625,6 +622,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	NUMERO_LOJA = " + idLojaCliente + "\n"
                     + " AND COD_TIPOMOVIMENTO in (5,-5)\n"
+                    + " AND VENDAATIVA = 'S'\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -694,7 +692,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DESCRICAO_PDV descricao,\n"
                     + "	QUANTIDADE,\n"
                     + "	VALOR_UNITARIO precovenda,\n"
-//                    + "	VALOR_TOTAL total,\n"
                     + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
                     + "	CASE\n"
                     + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
@@ -705,7 +702,6 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
                     + "WHERE\n"
                     + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
-//                    + " AND v.COD_TIPOMOVIMENTO = 5\n"
                     + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "	ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
