@@ -20,6 +20,7 @@ import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
@@ -58,8 +59,9 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    //OpcaoProduto.MERCADOLOGICO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    //OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
@@ -137,7 +139,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> result = new LinkedHashMap<>();
 
@@ -162,9 +164,9 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return new ArrayList<>(result.values());
-    }
-
-    /*@Override
+    }*/
+    
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -173,12 +175,13 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "  g.grupo_id merc1, \n"
                     + "  g.descricao desc1,\n"
-                    + "  sg.grupo_id merc2,\n"
+                    + "  substr(sg.grupo_id,6,8) merc2,\n"
                     + "  sg.DESCRICAO desc2\n"
                     + " FROM grupos g\n"
                     + " LEFT JOIN grupos sg ON substr(sg.grupo_id,1,4) = g.GRUPO_ID AND LENGTH(sg.GRUPO_ID) > 4\n"
                     + " WHERE \n"
-                    + "  LENGTH(g.GRUPO_ID) = 4"
+                    + "  LENGTH(g.GRUPO_ID) = 4\n"
+                    + " ORDER BY 1,3"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -196,7 +199,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }*/
+    }
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
@@ -254,6 +257,8 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  coalesce(nullif(trim(p.breve_descricao),''), p.nome_produto) descricaoreduzida,\n"
                     + "  p.validade,\n"
                     + "  coalesce(p.grupo_id, '') grupo_id,\n"
+                    + "  trim(substr(p.grupo_id,1,4)) mercid1,\n"
+                    + "  trim(substr(p.grupo_id,6,8)) mercid2,\n"
                     + "  p.familia_id,\n"
                     + "  p.peso_unidade pesobruto,\n"
                     + "  p.peso_unidade_liquido pesoliquido,\n"
@@ -269,7 +274,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  pe.grupo_icms_id id_icms,\n"
                     + "  p.grupo_pis_id,\n"
                     + "  p.codigo_fabrica id_fabricante,\n"
-                    + "  pis_e.cst_pis piscofins_entrada,\n"
+                    //+ "  pis_e.cst_pis piscofins_entrada,\n"
                     + "  pis_s.cst_pis piscofins_saida,\n"
                     + "  case when p.bloquear_venda = 'N' then 1 else 0 end vendapdv,\n"
                     + "  case when p.exibir_sugestao_compras = 'S' then 1 else 0 end sugestaocotacao,\n"
@@ -281,10 +286,10 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  join estoques est on est.produto_id = p.produto_id and est.empresa_id = emp.empresa_id\n"
                     + "  left join ean on p.produto_id = ean.produto_id\n"
                     + "  left join new_grupo_piscofins pis on pis.grupo_piscofins_id = pe.new_grupo_pis_cofins_id\n"
-                    + "  left join new_itens_grupo_piscofins pis_e on pis_e.grupo_pis_id = pis.grupo_piscofins_id \n"
-                    + "  			and pis_e.movimento = 'E' \n"
+                    // + "  left join new_itens_grupo_piscofins pis_e on pis_e.grupo_pis_id = pis.grupo_piscofins_id \n"
+                    // + "  			and pis_e.movimento = 'E' \n"
                     + "  left join new_itens_grupo_piscofins pis_s on pis_s.grupo_pis_id = pis.grupo_piscofins_id \n"
-                    + "  			and pis_s.movimento = 'S' \n"
+                    + "  			and pis_s.movimento = 'S' and pis_s.cfop = 'Todos' \n"
                     + "order by e_balanca desc, id"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -330,13 +335,18 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setValidade(rst.getInt("validade"));
 
-                    String[] ids = rst.getString("grupo_id").split("\\.");
+                    /*String[] ids = rst.getString("grupo_id").split("\\.");
                     if (ids.length > 0) {
                         imp.setCodMercadologico1(ids[0]);
                         if (ids.length > 1) {
                             imp.setCodMercadologico2(ids[1]);
+                            imp.setCodMercadologico3(ids[1]);
                         }
-                    }
+                    }*/
+                    
+                    imp.setCodMercadologico1(rst.getString("mercid1"));
+                    imp.setCodMercadologico2(rst.getString("mercid2"));
+                    imp.setCodMercadologico3(rst.getString("mercid2"));
 
                     imp.setIdFamiliaProduto(rst.getString("familia_id"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
@@ -350,17 +360,16 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofins_entrada"));
-                    //imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("pis_natureza_rec"));
-                    
+
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
-                    
+
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
                     imp.setVendaPdv(rst.getBoolean("vendapdv"));
                     imp.setSugestaoCotacao(rst.getBoolean("sugestaocotacao"));
@@ -545,6 +554,22 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.CEP,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     @Override
