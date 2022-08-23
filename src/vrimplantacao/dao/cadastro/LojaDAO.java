@@ -61,6 +61,7 @@ public class LojaDAO {
             oLoja.servidorCentral = rst.getBoolean("servidorcentral");
             oLoja.idSituacaoCadastro = rst.getInt("id_situacaocadastro");
             oLoja.situacaoCadastro = rst.getString("situacaocadastro");
+            oLoja.situacao = rst.getInt("id_situacaocadastro") == 1;
             oLoja.idRegiao = rst.getInt("id_regiao");
             oLoja.geraConcentrador = rst.getBoolean("geraconcentrador");
             oLoja.regiao = rst.getString("regiao");
@@ -97,6 +98,7 @@ public class LojaDAO {
         oLoja.servidorCentral = rst.getBoolean("servidorcentral");
         oLoja.idRegiao = rst.getInt("id_regiao");
         oLoja.geraConcentrador = rst.getBoolean("geraconcentrador");
+        oLoja.situacao = rst.getInt("id_situacaocadastro") == 1;
 
         stm.close();
 
@@ -421,11 +423,12 @@ public class LojaDAO {
                 sql.append("UPDATE loja SET");
                 sql.append(" descricao = '" + i_loja.descricao + "',");
                 sql.append(" id_fornecedor = " + i_loja.idFornecedor + ",");
-                sql.append(" id_situacaocadastro = " + SituacaoCadastro.ATIVO.getId() + ",");
                 sql.append(" nomeservidor = '" + i_loja.nomeServidor + "',");
                 sql.append(" servidorcentral = " + i_loja.servidorCentral + ",");
                 sql.append(" id_regiao = " + i_loja.idRegiao + ",");
-                sql.append(" geraconcentrador = " + i_loja.geraConcentrador);
+                sql.append(" geraconcentrador = " + i_loja.geraConcentrador + ",");
+                sql.append(" id_situacaocadastro = " + (i_loja.isSituacao() ? 
+                        SituacaoCadastro.ATIVO.getId() : SituacaoCadastro.EXCLUIDO.getId()));
                 sql.append(" WHERE id = " + i_loja.id);
 
                 stm.execute(sql.toString());

@@ -52,6 +52,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         chkServidorCentral.setSelected(oLoja.servidorCentral);
         cboRegiao.setId(oLoja.idRegiao);
         chkGeraConcentrador.setSelected(oLoja.geraConcentrador);
+        chkSituacao.setSelected(oLoja.situacao);
 
         habilitarTela();
     }
@@ -98,6 +99,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.copiaCusto = chkCopiaCusto.isSelected();
         oLoja.copiaTecladoLayout = chkCopiaTecladoLayout.isSelected();
         oLoja.setCopiaMargem(chkCopiaMargem.isSelected());
+        oLoja.setSituacao(chkSituacao.isSelected());
 
         new LojaDAO().salvar(oLoja);
 
@@ -157,6 +159,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         vRPanel2 = new vr.view.components.panel.VRPanel();
         chkVersao4 = new vr.view.components.checkbox.VRCheckBox();
         chkCopiaMargem = new vrframework.bean.checkBox.VRCheckBox();
+        chkSituacao = new javax.swing.JCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnSalvar = new vrframework.bean.button.VRButton();
@@ -286,6 +289,8 @@ public class LojaCadastroGUI extends VRInternalFrame {
         org.openide.awt.Mnemonics.setLocalizedText(chkCopiaMargem, "Copia Margem");
         chkCopiaMargem.setName(""); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSituacao, "Ativo");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -318,7 +323,10 @@ public class LojaCadastroGUI extends VRInternalFrame {
                             .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSituacao)))
                 .addGap(16, 16, 16))
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -340,7 +348,9 @@ public class LojaCadastroGUI extends VRInternalFrame {
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSituacao, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
@@ -536,6 +546,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCopiaTecladoLayout;
     private vrframework.bean.checkBox.VRCheckBox chkGeraConcentrador;
     private vrframework.bean.checkBox.VRCheckBox chkServidorCentral;
+    private javax.swing.JCheckBox chkSituacao;
     private vr.view.components.checkbox.VRCheckBox chkVersao4;
     private vrframework.bean.textField.VRTextField txtCodigo;
     private vrframework.bean.textField.VRTextField txtDescricao;
