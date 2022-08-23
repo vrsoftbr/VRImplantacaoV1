@@ -141,8 +141,11 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkProdTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="604" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkProdTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkAjustarDigitoVerificador" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace pref="550" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -151,7 +154,9 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkProdTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="162" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkAjustarDigitoVerificador" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="164" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -160,6 +165,11 @@
                         <Component class="vr.view.components.checkbox.VRCheckBox" name="chkProdTemArquivoBalanca">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Tem Arquivo da Balan&#xe7;a"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAjustarDigitoVerificador">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Ajustar C&#xf3;digo de Barras (Digito Verificador)"/>
                           </Properties>
                         </Component>
                       </SubComponents>
