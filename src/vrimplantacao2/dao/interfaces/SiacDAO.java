@@ -165,7 +165,6 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return new ArrayList<>(result.values());
     }*/
-    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -274,8 +273,14 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  pe.grupo_icms_id id_icms,\n"
                     + "  p.grupo_pis_id,\n"
                     + "  p.codigo_fabrica id_fabricante,\n"
-                    //+ "  pis_e.cst_pis piscofins_entrada,\n"
-                    + "  pis_s.cst_pis piscofins_saida,\n"
+                    + "  CASE WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 11 THEN 5\n"
+                    + "       WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 13 THEN 8\n"
+                    + "       WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 1 THEN 1\n"
+                    + "       WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 5 THEN 6\n"
+                    + "       WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 3 THEN 4\n"
+                    + "       WHEN pe.NEW_GRUPO_PIS_COFINS_ID = 6 THEN 9\n"
+                    + "  ELSE 7 END piscofins_saida,\n"
+                    //+ "  pis_s.cst_pis piscofins_saida,\n"
                     + "  case when p.bloquear_venda = 'N' then 1 else 0 end vendapdv,\n"
                     + "  case when p.exibir_sugestao_compras = 'S' then 1 else 0 end sugestaocotacao,\n"
                     + "  case when p.descontinuado = 'S' then 1 else 0 end descontinuado\n"
@@ -288,8 +293,8 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  left join new_grupo_piscofins pis on pis.grupo_piscofins_id = pe.new_grupo_pis_cofins_id\n"
                     // + "  left join new_itens_grupo_piscofins pis_e on pis_e.grupo_pis_id = pis.grupo_piscofins_id \n"
                     // + "  			and pis_e.movimento = 'E' \n"
-                    + "  left join new_itens_grupo_piscofins pis_s on pis_s.grupo_pis_id = pis.grupo_piscofins_id \n"
-                    + "  			and pis_s.movimento = 'S' and pis_s.cfop = 'Todos' \n"
+                    //+ "  left join new_itens_grupo_piscofins pis_s on pis_s.grupo_pis_id = pis.grupo_piscofins_id \n"
+                    //+ "  			and pis_s.movimento = 'S' and pis_s.cfop = 'Todos' \n"
                     + "order by e_balanca desc, id"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -343,7 +348,6 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCodMercadologico3(ids[1]);
                         }
                     }*/
-                    
                     imp.setCodMercadologico1(rst.getString("mercid1"));
                     imp.setCodMercadologico2(rst.getString("mercid2"));
                     imp.setCodMercadologico3(rst.getString("mercid2"));
@@ -555,7 +559,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
