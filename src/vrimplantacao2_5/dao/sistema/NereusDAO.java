@@ -277,7 +277,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join fs_grade_trib_aliq aliq on aliq.id_grade_trib = preco.id_grade_trib\n"
                     + "	left join tb_cst cst on aliq.id_cst = cst.id_cst\n"
                     + "	left join tb_simbologia simbol on aliq.id_simbologia = simbol.id_simbologia\n"
-                    + "	left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
+                    + "	join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
                     + "	left join tb_unid uv on produto.id_unid_v = uv.id_unid\n"
                     + "	left join tb_unid uc on produto.id_unid_c = uc.id_unid\n"
                     + "	left join tb_ncm ncm on produto.id_ncm = ncm.id_ncm\n"
@@ -317,18 +317,18 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
 
-                    String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
+                    String idIcms;
 
-                    idIcmsDebito = rst.getString("id_icms");
-                    IdIcmsCredito = rst.getString("id_icms");
-                    IdIcmsForaEstado = rst.getString("id_icms");
+                    idIcms = rst.getString("id_icms");
+//                    IdIcmsCredito = rst.getString("id_icms");
+//                    IdIcmsForaEstado = rst.getString("id_icms");
 
-                    imp.setIcmsDebitoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
-                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
-                    imp.setIcmsConsumidorId(idIcmsDebito);
-                    imp.setIcmsCreditoId(IdIcmsCredito);
-                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
 
 //                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
 //                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
@@ -434,6 +434,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtde_embalagem"));
 
                     result.add(imp);
