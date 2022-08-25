@@ -119,7 +119,10 @@ public class FornecedorVO {
     }
 
     public String getInscricaoMunicipal() {
-        return inscricaoMunicipal.equals("null") ? "" : inscricaoMunicipal;
+        if (this.inscricaoMunicipal != null && inscricaoMunicipal.equals("null")) {
+            return "";
+        }
+        return  inscricaoMunicipal;
     }
 
     public Date getDataCadastro() {

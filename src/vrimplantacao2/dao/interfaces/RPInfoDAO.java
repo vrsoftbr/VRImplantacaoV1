@@ -19,6 +19,7 @@ import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -78,7 +79,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "RPInfo";
+        return "RPINFO";
     }
 
     @Override
@@ -142,6 +143,47 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.RAZAO,
+                OpcaoCliente.FANTASIA,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.EMPRESA,
+                OpcaoCliente.ENDERECO_EMPRESA,
+                OpcaoCliente.BAIRRO_EMPRESA,
+                OpcaoCliente.COMPLEMENTO_EMPRESA,
+                OpcaoCliente.MUNICIPIO_EMPRESA,
+                OpcaoCliente.UF_EMPRESA,
+                OpcaoCliente.CEP_EMPRESA,
+                OpcaoCliente.TELEFONE_EMPRESA,
+                OpcaoCliente.DATA_ADMISSAO,
+                OpcaoCliente.CARGO,
+                OpcaoCliente.SALARIO,
+                OpcaoCliente.NOME_CONJUGE,
+                OpcaoCliente.DATA_NASCIMENTO_CONJUGE,
+                OpcaoCliente.NOME_PAI,
+                OpcaoCliente.NOME_MAE,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     @Override
