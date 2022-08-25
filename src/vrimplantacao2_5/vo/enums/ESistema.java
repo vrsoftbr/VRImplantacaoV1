@@ -269,6 +269,7 @@ import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
+import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
@@ -1105,7 +1106,12 @@ public enum ESistema {
     RPINFO(130, "RPINFO", new RPInfoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new RPInfo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     RENSOFTWARE(131, "RENSOFTWARE", new RensoftwareDAO()) {

@@ -16,9 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
-import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -127,6 +128,20 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.OFERTA,
             OpcaoProduto.FABRICANTE
         }));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
     }
 
     @Override
