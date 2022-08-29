@@ -512,6 +512,26 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		mprd_prod_codigo,\n"
                     + "		mprd_datamvto desc	\n"
                     + "),\n"
+                    + "nf2022 as (\n"
+                    + "	select\n"
+                    + "		distinct on\n"
+                    + "		(mprd_prod_codigo) mprd_prod_codigo,\n"
+                    + "		mprd_datamvto,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n"
+                    + "	from\n"
+                    + "		movprodd22 m\n"
+                    + "		join loja on loja.id = m.mprd_unid_codigo\n"
+                    + "	where\n"
+                    + "		m.mprd_dcto_tipo like '%EAQ%'\n"
+                    + "	order by\n"
+                    + "		mprd_prod_codigo,\n"
+                    + "		mprd_datamvto desc	\n"
+                    + "),\n"
                     + "nf as (\n"
                     + "	select\n"
                     + "	distinct on (mprd_prod_codigo)\n"
@@ -523,6 +543,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "			select * from nf2020\n"
                     + "                 union all\n"
                     + "                 select * from nf2021\n"
+                    + "                 union all\n"
+                    + "                 select * from nf2022\n"
                     + "		) a\n"
                     + "	order by\n"
                     + "		mprd_prod_codigo,\n"
@@ -549,8 +571,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		join simbologias s on\n"
                     + "			tr.trib_simb = s.simb_codigo\n"
                     + "	where\n"
-                    + "		tr.trib_uforigem = 'MS'\n"
-                    + "		and tr.trib_ufdestino = 'MS'\n"
+                    + "		tr.trib_uforigem = 'SP'\n"
+                    + "		and tr.trib_ufdestino = 'SP'\n"
                     + "		and tr.trib_mvtos like '%EVD%'\n"
                     + "		and s.simb_imposto = 'C'\n"
                     + "	order by\n"
@@ -719,7 +741,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     if (utilizarCustoNota) {
                         imp.setCustoSemImposto(rst.getDouble("custosemimposto_nf"));
@@ -1124,7 +1146,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                         case "P":
-                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                         case "R":
@@ -1288,6 +1310,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("clie_foneres"));
                     imp.setCelular(rst.getString("clie_fonecel"));
                     imp.setEmpresaTelefone(rst.getString("clie_fonecom"));
+                    imp.setEmail(rst.getString("clie_email"));
                     imp.addCelular("CEL COMERCIAL", rst.getString("clie_fonecelcom"));
                     imp.addEmail(rst.getString("clie_email"), TipoContato.COMERCIAL);
                     imp.addEmail(rst.getString("clie_emailnfe"), TipoContato.NFE);
@@ -1478,6 +1501,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTelefone(rst.getString("clie_foneres"));
                         imp.setCelular(rst.getString("clie_fonecel"));
                         imp.setEmpresaTelefone(rst.getString("clie_fonecom"));
+                        imp.setEmail(rst.getString("clie_email"));
                         imp.addCelular("CEL COMERCIAL", rst.getString("clie_fonecelcom"));
                         imp.addEmail(rst.getString("clie_email"), TipoContato.COMERCIAL);
                         imp.addEmail(rst.getString("clie_emailnfe"), TipoContato.NFE);
@@ -1969,12 +1993,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
+//                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+//                        if (!uk.add(id)) {
+//                            LOG.warning("Venda " + id + " já existe na listagem");
+//                        }
 
-                        next.setId(id);
+                        next.setId(rst.getString("id"));
                         next.setNumeroCupom(rst.getInt("numerocupom"));
                         next.setEcf(rst.getInt("ecf"));
                         next.setModeloImpressora(rst.getString("modeloecf"));
@@ -1986,6 +2010,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setChaveNfCe(rst.getString("chavenfce"));
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1995,18 +2022,20 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
-                    + "	v.nfcc_transacao as id,\n"
+            this.sql = "select distinct on (v.nfcc_transacao||'-'||v.nfcc_numerodcto||'-'||v.nfcc_pdv||'-'||v.nfcc_cupom)\n"
+                    + "	v.nfcc_transacao||'-'||v.nfcc_numerodcto||'-'||v.nfcc_pdv||'-'||v.nfcc_cupom as id,\n"
                     + "	v.nfcc_modelo as modeloecf,\n"
                     + "	v.nfcc_serie as serieecf,\n"
                     + "	v.nfcc_numerodcto as numerocupom,\n"
                     + "	v.nfcc_idnfce as chavenfce,\n"
-                    + "	v.nfcc_pdv as ecf,\n"
+                    + "	v.nfcc_transacao as ecf,\n"
                     + "	v.nfcc_cupom,\n"
                     + "	v.nfcc_dataemissao as datavenda,\n"
+                    + " case when vi.vdet_status = 'C' then 1 else 0 end cancelado,\n"
                     + " min(vi.vdet_hora) as horainicio,\n"
                     + "	max(vi.vdet_hora) as horatermino, \n"
-                    + "	sum(vi.vdet_valor) as valortotal\n"
+                    + "	sum(vi.vdet_valor) as valortotal,\n"
+                    + " sum(vi.vdet_valordesc) as desconto\n"
                     + "from nfcc v\n"
                     + "join vdadet" + tabelaVenda + " vi \n"
                     + "	on vi.vdet_transacao = v.nfcc_transacao\n"
@@ -2014,7 +2043,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and vi.vdet_datamvto = v.nfcc_dataemissao\n"
                     + "where v.nfcc_unid_codigo = '" + idLojaCliente + "' \n"
                     + " and vi.vdet_unid_codigo = '" + idLojaCliente + "' \n"
-                    + " and vi.vdet_status = 'N'\n"
+                   // + " and vi.vdet_status in ('N','C')\n"
                     + "group by \n"
                     + "	v.nfcc_transacao,\n"
                     + "	v.nfcc_modelo,\n"
@@ -2023,7 +2052,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.nfcc_idnfce,\n"
                     + "	v.nfcc_pdv,\n"
                     + "	v.nfcc_cupom,\n"
-                    + "	v.nfcc_dataemissao";
+                    + "	v.nfcc_dataemissao,\n"
+                    + " vi.vdet_status";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -2078,9 +2108,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setSequencia(rst.getInt("sequencia"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                         //next.setValorAcrescimo(rst.getDouble("valoracrescimo"));
-                        //next.setValorDesconto(rst.getDouble("valordesconto"));
+                        next.setValorDesconto(rst.getDouble("valordesconto"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("tipoembalagem"));
                         next.setIcmsCst(rst.getInt("csticms"));
@@ -2107,18 +2137,20 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " vi.vdet_pdv pdv,\n"
                     + " v.nfcc_transacao,\n"
                     + " v.nfcc_numerodcto,\n"
-                    + " v.nfcc_transacao||'-'||v.nfcc_numerodcto||'-'||v.nfcc_pdv as idvenda,\n"
+                    + " v.nfcc_transacao||'-'||v.nfcc_numerodcto||'-'||v.nfcc_pdv||'-'||v.nfcc_cupom as idvenda,\n"
                     + "	vi.vdet_qtde as quantidade,\n"
                     + "	vi.vdet_valor as valortotal,\n"
+                    + " vi.vdet_valordesc as valordesconto,\n"
                     + "	trunc((coalesce(vi.vdet_valor, 0) / coalesce(vi.vdet_qtde, 1)), 2) as precovenda,\n"
                     + "	vi.vdet_cst as csticms,\n"
-                    + "	vi.vdet_icms as aliqicms\n"
+                    + "	vi.vdet_icms as aliqicms,\n"
+                    + " case when vi.vdet_status = 'C' then 1 else 0 end cancelado\n"
                     + "from vdadet" + tabelaVenda + " vi \n"
                     + " join nfcc v on vi.vdet_transacao = v.nfcc_transacao and vi.vdet_cupom = v.nfcc_cupom and vi.vdet_datamvto = v.nfcc_dataemissao\n"
                     + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo \n"
                     + " left join produn un on p.prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'\n"
-                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'\n"
-                    + " and vi.vdet_status = 'N'";
+                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'\n";
+                    //+ " and vi.vdet_status in ('N','C')";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

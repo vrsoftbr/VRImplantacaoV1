@@ -169,13 +169,13 @@
                               <Component id="chkContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkFCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                   <Component id="chkContaPagarBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtDtIInicioCp" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtDtTerminoCp" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
@@ -347,18 +347,21 @@
                                       <Component id="chkImportarFuncionario" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkEmail" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkPermiteRotativ" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="276" max="32767" attributes="0"/>
+                              <EmptySpace pref="281" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -386,10 +389,13 @@
                                   <Component id="chkPermiteRotativ" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkLimiteCredito" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkEmail" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="39" max="32767" attributes="0"/>
+                              <EmptySpace pref="17" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -473,6 +479,11 @@
                     <Component class="javax.swing.JCheckBox" name="chkPermiteRotativ">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEmail">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Email"/>
                       </Properties>
                     </Component>
                   </SubComponents>
