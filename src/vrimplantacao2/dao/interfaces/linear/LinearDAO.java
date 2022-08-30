@@ -24,7 +24,6 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -44,7 +43,6 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
@@ -78,13 +76,6 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         this.vendaDataFim = vendaDataFim;
     }
 
-    /*@Override
-    public String getSistema() {
-        if (!"".equals(this.complemento)) {
-            return "Linear - " + this.complemento;
-        }
-        return "Linear";
-    }*/
     @Override
     public String getSistema() {
         return "Linear";

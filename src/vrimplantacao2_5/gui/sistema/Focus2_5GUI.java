@@ -13,7 +13,6 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-//import vrimplantacao2.dao.interfaces.HipcomDAO;
 import vrimplantacao2_5.dao.sistema.HipcomDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -22,10 +21,10 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class Hipcom2_5GUI extends VRInternalFrame {
+public class Focus2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "Hipcom";
-    private static Hipcom2_5GUI instance;
+    private static final String SISTEMA = ESistema.FOCUS.getNome();
+    private static Focus2_5GUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -51,7 +50,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
 
     private HipcomDAO dao = new HipcomDAO();
 
-    public Hipcom2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Focus2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -88,7 +87,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         
         rdbVendasV1.setSelected(true);
         
-        pnlConn.setSistema(ESistema.HIPCOM);
+        pnlConn.setSistema(ESistema.FOCUS);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -99,7 +98,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Hipcom2_5GUI(i_mdiFrame);
+                instance = new Focus2_5GUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -751,7 +750,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabOperacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 612, Short.MAX_VALUE)
+                    .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
