@@ -283,6 +283,7 @@ import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
+import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 
 /**
  *
@@ -1464,9 +1465,14 @@ public enum ESistema {
         }
     },
     WEBSAQ(188, "WEBSAQ", new WebSaqDAO()) {
-        @Override
+       @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new WebSac2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     WEBER(189, "WEBER", new WeberDAO()) {

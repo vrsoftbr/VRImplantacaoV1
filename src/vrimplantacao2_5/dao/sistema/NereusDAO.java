@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -93,7 +94,6 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
-                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
@@ -107,8 +107,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
-                OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.CLIENTE_EVENTUAL));
     }
 
     /*@Override
@@ -218,43 +217,14 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"select\n"
-                    + "	p.id_prod idproduto,\n"
-                    + "	ean.ean13 ean,\n"
-                    + "	p.descricao desc_completa,\n"
-                    + "	descricaor desc_reduzida,\n"
-                    + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
-                    + "	coalesce(f.fator, 1) qtde_emb,\n"
-                    + "	uv.sigla emb_venda,\n"
-                    + "	uc.sigla emb_compra,\n"
-                    + "	ncm.codigo ncm,\n"
-                    + "	cest.cd_cest cest,\n"
-                    + "	dt_cad data_cadastro,\n"
-                    + "	peso pesobruto,\n"
-                    + "	peso_l pesoliquido,\n"
-                    + "	est.qtde estoque,\n"
-                    + "	est.qtde_minima est_min,\n"
-                    + "	est.qtde_maxima est_max,\n"
-                    + " round(pr.vr_custo_efetivo,3) custosemimposto,\n"
-                    + "	round(pr.vr_custo_reposicao,3) custocomimposto,\n"
-                    + "	round(pr.vr_venda_atual,3) precovenda,\n"
-                    + " pr.id_grade_trib id_icms\n"
-                    + "from\n"
-                    + "	eq_prod p\n"
-                    + "	left join eq_prod_ean ean on p.id_prod = ean.id_prod left join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
-                    + "	left join tb_unid uv on p.id_unid_v = uv.id_unid left join tb_unid uc on p.id_unid_c = uc.id_unid\n"
-                    + "	left join tb_ncm ncm on p.id_ncm = ncm.id_ncm left join tb_cest cest on ncm.id_cest = cest.id_cest\n"
-                    + "	left join eq_prod_qtde est on p.id_prod = est.id_prod and est.id_emp = " + getLojaOrigem() + "\n"
-                    + "	left join eq_prod_com pr on p.id_prod = pr.id_prod and pr.id_emp = " + getLojaOrigem() + "\n"
-                    + "	left join fs_grade_trib_aliq  i on pr.id_grade_trib = i.id_grade_trib_aliq\n"
-                    + "order by 1"*/
                     "select distinct\n"
                     + "	produto.id_prod idproduto,\n"
-                    + "	ean.ean13 ean,\n"
+//                  + "	ean.ean13 ean,\n
+                    + " case when balanca = 'SIM' then produto.cd_auxiliar else ean.ean13 end ean,\n"
                     + "	produto.descricao desc_completa,\n"
                     + "	descricaor desc_reduzida,\n"
                     + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
-                    + "	coalesce(f.fator, 1) qtde_emb,\n"
+//                  + "	coalesce(f.fator, 1) qtde_emb,\n"
                     + "	uv.sigla emb_venda,\n"
                     + "	uc.sigla emb_compra,\n"
                     + "	ncm.codigo ncm,\n"
@@ -262,22 +232,27 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	dt_cad data_cadastro,\n"
                     + "	peso pesobruto,\n"
                     + "	peso_l pesoliquido,\n"
+                    + " produto.id_tipo_prod tipoproduto,\n"
                     + "	estoque.qtde estoque,\n"
                     + "	estoque.qtde_minima est_min,\n"
                     + "	estoque.qtde_maxima est_max,\n"
                     + " round(preco.vr_custo_efetivo,3) custosemimposto,\n"
                     + "	round(preco.vr_custo_reposicao,3) custocomimposto,\n"
+                    + " preco.per_lucro_efetivo_r margem,\n"
                     + "	round(preco.vr_venda_atual,3) precovenda,\n"
-                    + " simbol.id_simbologia id_icms\n"
+                    + " simbol.id_simbologia id_icms,\n"
+                    + " pc.codigo piscofins\n"
                     + "from\n"
                     + "	eq_prod produto\n"
                     + "	left join eq_prod_com preco on produto.id_prod = preco.id_prod \n"
                     + "	left join eq_prod_ean ean on produto.id_prod = ean.id_prod\n"
                     + "	left join eq_prod_qtde estoque on produto.id_prod = estoque.id_prod and estoque.id_emp = 1\n"
                     + "	left join fs_grade_trib_aliq aliq on aliq.id_grade_trib = preco.id_grade_trib\n"
+                    + " join fs_grade_trib_dcto dcto on dcto.id_grade_trib_aliq = aliq.id_grade_trib_aliq and dcto.id_tipo_dcto = 59"
+                    + " left join tb_cst pc on aliq.id_cst_pis = pc.id_cst and pc.tipo_imposto = 'PIS'\n"
                     + "	left join tb_cst cst on aliq.id_cst = cst.id_cst\n"
                     + "	left join tb_simbologia simbol on aliq.id_simbologia = simbol.id_simbologia\n"
-                    + "	join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
+//                  + "	join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
                     + "	left join tb_unid uv on produto.id_unid_v = uv.id_unid\n"
                     + "	left join tb_unid uc on produto.id_unid_c = uc.id_unid\n"
                     + "	left join tb_ncm ncm on produto.id_ncm = ncm.id_ncm\n"
@@ -299,7 +274,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setTipoEmbalagem(rst.getString("emb_venda"));
                     imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
+//                  imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
 
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -312,16 +287,57 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
 
-//                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
 
+                    if (rst.getInt("tipoproduto") == 1) {
+                        imp.setTipoProduto(TipoProduto.MERCADORIA_REVENDA);
+                    } else {
+                        switch (rst.getInt("tipoproduto")) {
+                            case 2:
+                                imp.setTipoProduto(TipoProduto.MATERIA_PRIMA);
+                                break;
+                            case 3:
+                                imp.setTipoProduto(TipoProduto.EMBALAGEM);
+                                break;
+                            case 4:
+                                imp.setTipoProduto(TipoProduto.PRODUTO_EM_PROCESSO);
+                                break;
+                            case 5:
+                                imp.setTipoProduto(TipoProduto.PRODUTO_ACABADO);
+                                break;
+                            case 6:
+                                imp.setTipoProduto(TipoProduto.SUBPRODUTO);
+                                break;
+                            case 7:
+                                imp.setTipoProduto(TipoProduto.PRODUTO_INTERMEDIARIO);
+                                break;
+                            case 8:
+                                imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO);
+                                break;
+                            case 9:
+                                imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO);
+                                break;
+                            case 10:
+                                imp.setTipoProduto(TipoProduto.SERVICOS);
+                                break;
+                            case 11:
+                                imp.setTipoProduto(TipoProduto.OUTROS_INSUMOS);
+                                break;
+                            case 12:
+                                imp.setTipoProduto(TipoProduto.OUTROS);
+                                break;
+                            default:
+                                imp.setTipoProduto(TipoProduto.MERCADORIA_REVENDA);
+                                break;
+                        }
+                    }
+
                     String idIcms;
 
                     idIcms = rst.getString("id_icms");
-//                    IdIcmsCredito = rst.getString("id_icms");
-//                    IdIcmsForaEstado = rst.getString("id_icms");
 
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
@@ -330,8 +346,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
-//                    imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
-//                    imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins"));
+                    
                     result.add(imp);
                 }
             }

@@ -1966,7 +1966,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("nfcc_cupom");
+                        String id = rst.getString("id") + "-" + rst.getString("nfcc_cupom") + "-" + rst.getString("ecf");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -2063,9 +2063,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "-" + rst.getString("datavenda")
                                 + "-" + rst.getString("idproduto")
                                 + "-" + rst.getString("codigobarras")
-                                + "-" + rst.getString("sequencia");
+                                + "-" + rst.getString("sequencia")
+                                + "-" + rst.getString("pdv");
                         
-                        String idvenda = rst.getString("id") + "-" + rst.getString("numerocupom");
+                        String idvenda = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("pdv");
 
                         next = new VendaItemIMP();
 
@@ -2093,10 +2094,11 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
-                    + "	vi.vdet_transacao as id,	\n"
+            this.sql = "select distinct\n"
+                    + "	vi.vdet_transacao as id,\n"
                     + "	vi.vdet_cupom as numerocupom,\n"
                     + "	vi.vdet_datamvto as datavenda,\n"
+                    + " vi.vdet_pdv as pdv,\n"
                     + "	vi.vdet_prod_codigo as idproduto,\n"
                     + "	vi.vdet_codbarras as codigobarras,\n"
                     + " un.prun_emb as tipoembalagem, \n"
