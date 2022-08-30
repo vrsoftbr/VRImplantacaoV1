@@ -173,6 +173,7 @@ public class ProdutoDAO {
             sql.put("vendacontrolada", vo.isVendaControlada());
             
             sql.put("tiponaturezareceita", 
+                    vo.getPisCofinsNaturezaReceita() == null ? null :
                     vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
@@ -230,7 +231,8 @@ public class ProdutoDAO {
             sql.put("id_grupoeconomico", 1);
             sql.put("id_piscofinsdebito", vo.getPisCofinsDebito().getId());
             sql.put("id_piscofinscredito", vo.getPisCofinsCredito().getId());
-            sql.put("codigonaturezareceita", 
+            sql.put("codigonaturezareceita",
+                    vo.getPisCofinsNaturezaReceita() == null ? null :
                     vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
