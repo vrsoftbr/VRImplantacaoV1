@@ -133,6 +133,7 @@ public enum ESistemaBancoDados {
     MYSQL_TOPSYSTEM(176, "TOPSYSTEM", 8, "MYSQL", "", "", "", 3006),
     MYSQL_TSTI(178, "TSTI", 8, "MYSQL", "tsl", "tsti", "1234", 3006),
     MYSQL_TSL(212, "TSL", 8, "MYSQL", "tsl", "tsti", "1234", 3306),
+    MYSQL_FOCUS(230, "FOCUS", 8, "MYSQL", "aut_db_me", "root", "root", 3306),
     ORACLE_APOLLO(5, "APOLLO", 9, "ORACLE", "", "", "", 1521),
     ORACLE_ARIUS(197, "ARIUS", 9, "ORACLE", "", "PROREG", "automa", 1521),
     ORACLE_CEFAS(24, "CEFAS", 9, "ORACLE", "ORCL", "rb", "avemaria", 1521),

@@ -9,7 +9,12 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -59,6 +64,49 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	(select depto from deptos where depto = d.depto and secao = 0 and grupo = 0 and subgr = 0) codmerc1,\n" +
+                    "	(select descricao from deptos where depto = d.depto and secao = 0 and grupo = 0 and subgr = 0) merc1,\n" +
+                    "	(select secao from deptos where depto = d.depto and secao = d.secao and grupo = 0 and subgr = 0) codmerc2,\n" +
+                    "	(select descricao from deptos where depto = d.depto and secao = d.secao and grupo = 0 and subgr = 0) merc2,\n" +
+                    "	(select grupo from deptos where depto = d.depto and secao = d.secao and grupo = d.grupo and subgr = 0) codmerc3,\n" +
+                    "	(select descricao from deptos where depto = d.depto and secao = d.secao and grupo = d.grupo and subgr = 0) merc3,\n" +
+                    "	(select subgr from deptos where depto = d.depto and secao = d.secao and grupo = d.grupo and subgr = d.subgr) codmerc4,\n" +
+                    "	(select descricao from deptos where depto = d.depto and secao = d.secao and grupo = d.grupo and subgr = d.subgr) merc4\n" +
+                    "from \n" +
+                    "	deptos d\n" +
+                    "where\n" +
+                    "	d.secao != 0 and \n" +
+                    "	d.grupo != 0 and \n" +
+                    "	d.subgr != 0")) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("codmerc1"));
+                    imp.setMerc1Descricao(rs.getString("merc1"));
+                    imp.setMerc2ID(rs.getString("codmerc2"));
+                    imp.setMerc2Descricao(rs.getString("merc2"));
+                    imp.setMerc3ID(rs.getString("codmerc3"));
+                    imp.setMerc3Descricao(rs.getString("merc3"));
+                    imp.setMerc4ID(rs.getString("codmerc4"));
+                    imp.setMerc4Descricao(rs.getString("merc4"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -74,6 +122,10 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.DESCRICAO_INT descricaocompleta,\n" +
                     "	p.un unidade,\n" +
                     "	p.QTDEMB qtdembalagem,\n" +
+                    "   p.DEPTO merc1,\n" +
+                    "	p.SECAO merc2,\n" +
+                    "	p.NBM merc3,\n" +
+                    "	p.SUBCAT1 merc4," +        
                     "	p.valdias validade,\n" +
                     "	p.datacad cadastro,\n" +
                     "	p.margem,\n" +
@@ -118,10 +170,10 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     
-                    /*imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));*/
+                    
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? 1 : 0);
@@ -148,6 +200,177 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	FORNEC id_fornecedor,\n" +
+                    "	e.ID id_produto,\n" +
+                    "	pf.CODPLU codigoexterno,\n" +
+                    "	pf.EMB embalagem,\n" +
+                    "	pf.QTEMB qtdembalagem\n" +
+                    "from 	\n" +
+                    "	plu pf \n" +
+                    "join estoque e on pf.codigo = e.CODIGO")) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codigo,\n" +
+                    "	cliente razao,\n" +
+                    "	fantasia,\n" +
+                    "	cnpj,\n" +
+                    "	insc ie,\n" +
+                    "	endereco,\n" +
+                    "	bairro,\n" +
+                    "	cidade,\n" +
+                    "	cep,\n" +
+                    "	estado,\n" +
+                    "	numero,\n" +
+                    "	codmunicip municipio_ibge,\n" +
+                    "	telefone,\n" +
+                    "	telefone2,\n" +
+                    "	telefone3,\n" +
+                    "	contato,\n" +
+                    "	contato2,\n" +
+                    "	contato3,\n" +
+                    "	prazo,\n" +
+                    "	vendedor,\n" +
+                    "	regime,\n" +
+                    "	tipocontribuinte,\n" +
+                    "	emailxml,\n" +
+                    "	datacad cadastro\n" +
+                    "from \n" +
+                    "	fornec")) { 
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setIbge_municipio(rs.getInt("municipio_ibge"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    
+                    String email = rs.getString("emailxml");
+                    
+                    if (email != null && !email.trim().isEmpty()) {
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, email);
+                    }
+                    
+                    String telfone3 = rs.getString("telefone3");
+                    
+                    if (telfone3 != null && !telfone3.trim().isEmpty()) {
+                        imp.addContato("2", "TELEFONE2", telfone3, null, TipoContato.NFE, null);
+                    }
+                    
+                    String contato = rs.getString("vendedor");
+                    
+                    if (contato != null && !contato.trim().isEmpty()) {
+                        imp.addContato("3", contato, null, null, TipoContato.NFE, null);
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	c.id,\n" +
+                    "	c.cnpj,\n" +
+                    "	c.ie,\n" +
+                    "	c.datacad,\n" +
+                    "	c.nome,\n" +
+                    "	c.FANTASIA,\n" +
+                    "	c.EMAIL,\n" +
+                    "	c.rua,\n" +
+                    "	c.bairro,\n" +
+                    "	c.NUMERO,\n" +
+                    "	c.Cidade,\n" +
+                    "	c.cep,\n" +
+                    "	c.Uf,\n" +
+                    "	c.TipoPessoa,\n" +
+                    "	c.bloqueio,\n" +
+                    "	c.fone,\n" +
+                    "	c.CELULAR,\n" +
+                    "	c.LimiteCrediito,\n" +
+                    "	c.OBS,\n" +
+                    "	c.CADASTRO,\n" +
+                    "	c.NASC,\n" +
+                    "	c.DEBITO,\n" +
+                    "	c.DIAVENC\n" +
+                    "from \n" +
+                    "	clientes c")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setEndereco(rs.getString("rua"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("fone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setValorLimite(rs.getDouble("limitecredito"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 }

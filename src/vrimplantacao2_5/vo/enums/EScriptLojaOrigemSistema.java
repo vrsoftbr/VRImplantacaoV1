@@ -176,7 +176,8 @@ public enum EScriptLojaOrigemSistema {
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
     ARAUTO(228, 5, "select id, nomefantasia descricao from empresa"),
     SUPERCONTROLE(229,13,"select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id"),
-    RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1");
+    RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1"),
+    FOCUS(230, 8, "select id, razao descricao from empresa");
     
     private int idSistema;
     private int idBancoDados;
