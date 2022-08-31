@@ -11,6 +11,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -365,6 +366,45 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rs.getString("celular"));
                     imp.setValorLimite(rs.getDouble("limitecredito"));
                     imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	id,\n" +
+                    "	codcli idcliente,\n" +
+                    "	cliente,\n" +
+                    "	pedido,\n" +
+                    "	pdv,\n" +
+                    "	duplicata,\n" +
+                    "	valor,\n" +
+                    "	dtvencimento,\n" +
+                    "	dtemissao\n" +
+                    "from \n" +
+                    "	dupreceber d\n" +
+                    "where \n" +
+                    "	ValorPago is null")) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setDataVencimento(rs.getDate("dtvencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setEcf(rs.getString("pdv"));
+                    imp.setNumeroCupom(rs.getString("pedido"));
                     
                     result.add(imp);
                 }
