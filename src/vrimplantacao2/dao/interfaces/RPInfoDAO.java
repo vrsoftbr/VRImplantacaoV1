@@ -1081,9 +1081,47 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        String sqlPessoa = "";
+        
+        if (importarFuncionario) {
+            sqlPessoa = "select \n" +
+                    "	func_codigo id,\n" +
+                    "	func_nome razaosocial,\n" +
+                    "	'' nomefantasia,\n" +
+                    "	'' inscmun,\n" +
+                    "	'N' forn_status,\n" +
+                    "	func_nasci,\n" +
+                    "	m.muni_nome municipio,\n" +
+                    "   m.muni_codigoibge municipioIBGE,\n" +
+                    "	f.func_endereco endereco,\n" +
+                    "	f.func_endereconumero numero,\n" +
+                    "	f.func_enderecocompl complemento,\n" +
+                    "	m.muni_uf uf,\n" +
+                    "	f.func_bairro bairro,\n" +
+                    "	f.func_cep cep,\n" +
+                    "	f.func_telefone forn_fone,\n" +
+                    "	f.func_rg ierg,\n" +
+                    "	f.func_cpf cnpjcpf,\n" +
+                    "	f.func_dtcad datacadastro,\n" +
+                    "	f.func_email email,\n" +
+                    "	f.func_admissao,\n" +
+                    "	f.func_celular celular,\n" +
+                    "	f.func_limiteconv,\n" +
+                    "	f.func_limitecheque,\n" +
+                    "	f.func_limitediario,\n" +
+                    "	'' forn_foneindustria,\n" +
+                    "	'' forn_fax,\n" +
+                    "	'' forn_faxindustria,\n" +
+                    "	'' forn_obspedidos,\n" +
+                    "	'' forn_obstrocas,\n" +
+                    "	'P' tipofornecedor,\n" +
+                    "	0::integer prazo_entrega,\n" +
+                    "	null forma_pagamento\n" +
+                    "from\n" +
+                    "	funcionarios f\n" +
+                    "left join municipios m on m.muni_codigo = f.func_muni_codigo";
+        } else {
+            sqlPessoa = "select\n"
                     + "	f.forn_codigo id,\n"
                     + "	f.forn_nome nomefantasia,\n"
                     + "	f.forn_razaosocial razaosocial,\n"
@@ -1119,8 +1157,11 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join regforn fc on f.forn_codigo = fc.rfor_forn_codigo\n"
                     + "	left join fpgto fp on fc.rfor_fpgt_codigo = fp.fpgt_codigo\n"
                     + "order by\n"
-                    + "	id"
-            )) {
+                    + "	id";
+        }
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sqlPessoa)) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -1744,10 +1785,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pendfin pg\n"
                     + "    join planoger pl on\n"
                     + "    	pg.pfin_pger_conta = pl.pger_conta\n"
-                    + "    join fornecedores f on\n"
+                    + "    left join fornecedores f on\n"
                     + "    	pg.pfin_codentidade = f.forn_codigo\n"
                     + "where\n"
-                    + "	pg.pfin_status = 'P'\n"
+                    + "	pg.pfin_status in ('P', 'G')\n"
                     + "    and pg.pfin_pr = 'P'\n"
                     + "    and pg.pfin_catentidade != 'C'\n"
                     + "    and pg.pfin_seqbaixa is null\n"
