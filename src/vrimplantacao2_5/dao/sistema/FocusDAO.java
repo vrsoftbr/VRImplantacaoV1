@@ -2,10 +2,14 @@ package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import vrimplantacao.utils.Utils;
+import java.util.Set;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -27,6 +31,109 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "FOCUS";
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.OFERTA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.CEST,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.QTD_EMBALAGEM_EAN,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.DESCONTINUADO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.RECEITA,
+            OpcaoProduto.SECAO,
+            OpcaoProduto.PRATELEIRA,
+            OpcaoProduto.OFERTA,
+            OpcaoProduto.FABRICANTE
+        }));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.RAZAO,
+                OpcaoCliente.FANTASIA,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.EMPRESA,
+                OpcaoCliente.ENDERECO_EMPRESA,
+                OpcaoCliente.BAIRRO_EMPRESA,
+                OpcaoCliente.COMPLEMENTO_EMPRESA,
+                OpcaoCliente.MUNICIPIO_EMPRESA,
+                OpcaoCliente.UF_EMPRESA,
+                OpcaoCliente.CEP_EMPRESA,
+                OpcaoCliente.TELEFONE_EMPRESA,
+                OpcaoCliente.DATA_ADMISSAO,
+                OpcaoCliente.CARGO,
+                OpcaoCliente.SALARIO,
+                OpcaoCliente.NOME_CONJUGE,
+                OpcaoCliente.DATA_NASCIMENTO_CONJUGE,
+                OpcaoCliente.NOME_PAI,
+                OpcaoCliente.NOME_MAE,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     @Override
@@ -115,7 +222,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    "select\n" +
                     "	p.id,\n" +
                     "	p.codigo ean,\n" +
                     "	p.CODIGOINTERNO,\n" +
@@ -164,7 +271,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     
-                    if (imp.getDescricaoCompleta() == null & imp.getDescricaoCompleta().isEmpty()) {
+                    if (imp.getDescricaoCompleta() == null || imp.getDescricaoCompleta().isEmpty()) {
                         imp.setDescricaoCompleta(imp.getDescricaoReduzida());
                     }
                     
@@ -185,7 +292,13 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
+                    
                     imp.setMargem(rs.getDouble("margem"));
+                    
+                    if (imp.getMargem() > 99999999) {
+                        imp.setMargem(0d);
+                    }
+                    
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoComImposto(rs.getDouble("custo"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
@@ -193,8 +306,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
-                    imp.setPiscofinsCstCredito(rs.getString("cstpisent"));
+                    imp.setPiscofinsCstDebito(rs.getString("CSTCOFINS"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     result.add(imp);
