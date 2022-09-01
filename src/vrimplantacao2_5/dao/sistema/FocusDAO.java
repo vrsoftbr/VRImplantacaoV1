@@ -393,7 +393,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setMunicipio(rs.getString("cidade"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setCep(rs.getString("cep"));
                     imp.setUf(rs.getString("estado"));
@@ -476,7 +476,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setTelefone(rs.getString("fone"));
                     imp.setCelular(rs.getString("celular"));
-                    imp.setValorLimite(rs.getDouble("limitecredito"));
+                    imp.setValorLimite(rs.getDouble("LimiteCrediito"));
                     imp.setObservacao(rs.getString("obs"));
                     
                     result.add(imp);
