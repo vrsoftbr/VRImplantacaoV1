@@ -1119,7 +1119,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	null forma_pagamento\n" +
                     "from\n" +
                     "	funcionarios f\n" +
-                    "left join municipios m on m.muni_codigo = f.func_muni_codigo";
+                    "left join municipios m on m.muni_codigo = f.func_muni_codigo" + 
+                    "where\n" +
+                    "	f.func_unid_codigo = '" + getLojaOrigem() + "'";
         } else {
             sqlPessoa = "select\n"
                     + "	f.forn_codigo id,\n"
