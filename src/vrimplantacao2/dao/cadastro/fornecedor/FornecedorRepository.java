@@ -25,7 +25,6 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2_5.service.migracao.FornecedorService;
-import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.vo.enums.EOperacao;
 

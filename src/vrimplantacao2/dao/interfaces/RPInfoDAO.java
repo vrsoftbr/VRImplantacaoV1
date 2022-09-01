@@ -141,6 +141,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.TIPO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
@@ -591,8 +592,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		join simbologias s on\n"
                     + "			tr.trib_simb = s.simb_codigo\n"
                     + "	where\n"
-                    + "		tr.trib_uforigem = 'MS'\n"
-                    + "		and tr.trib_ufdestino = 'MS'\n"
+                    + "		tr.trib_uforigem = (select unid_uf from unidades where unid_codigo = '" + getLojaOrigem() + "')\n"
+                    + "		and tr.trib_ufdestino = (select unid_uf from unidades where unid_codigo = '" + getLojaOrigem() + "')\n"
                     + "		and tr.trib_mvtos like '%EVD%'\n"
                     + "		and s.simb_imposto = 'C'\n"
                     + "	order by\n"
@@ -1166,6 +1167,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
+                        case "K":
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            break;    
                         case "P":
                             imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
@@ -1174,7 +1179,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setProdutorRural();
                             break;
                         case "S":
-                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                             break;
                         case "F":
