@@ -23,9 +23,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -53,12 +57,15 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "m1.coddepto cod_m1, m1.nome desc_m1,\n"
-                    + "m2.codgrupo cod_m2, m2.descricao desc_m2,\n"
-                    + "m3.codsubgrupo cod_m3, m3.descricao desc_m3\n"
+                    + " m1.coddepto cod_m1,\n"
+                    + " m1.nome desc_m1,\n"
+                    + " m2.codgrupo cod_m2,\n"
+                    + " m2.descricao desc_m2,\n"
+                    + " m3.codsubgrupo cod_m3,\n"
+                    + " m3.descricao desc_m3\n"
                     + "from departamento m1\n"
-                    + "inner join grupoprod m2 on m2.coddepto = m1.coddepto\n"
-                    + "inner join subgrupo m3 on m3.codgrupo = m2.codgrupo\n"
+                    + " inner join grupoprod m2 on m2.coddepto = m1.coddepto\n"
+                    + " inner join subgrupo m3 on m3.codgrupo = m2.codgrupo\n"
                     + "order by m1.coddepto, m2.codgrupo, m3.codsubgrupo"
             )) {
                 while (rst.next()) {
@@ -278,6 +285,160 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    c.id,\n"
+                    + "    c.cnpj_cpf,\n"
+                    + "    c.inscricao_rg,\n"
+                    + "    c.descritivo,\n"
+                    + "    c.fantasia,\n"
+                    + "    case when c.bloqueado != 'F' then 1 else 0 end ativo,\n"
+                    + "    c.endereco,\n"
+                    + "    c.numero,\n"
+                    + "    c.complemento,\n"
+                    + "    c.bairro,\n"
+                    + "    c.cidade,\n"
+                    + "    c.estado,\n"
+                    + "    c.cep,\n"
+                    + "    c.datahora_cadastro,\n"
+                    + "    c.observacao,\n"
+                    + "    c.telefone1,\n"
+                    + "    c.vencimento1\n"
+                    + "from\n"
+                    + "    conveniadas c\n"
+                    + "order by\n"
+                    + "    c.id"
+            )) {
+                while (rst.next()) {
+
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoEstadual(rst.getString("inscricao_rg"));
+                    imp.setRazao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacoes(rst.getString("observacao"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setDiaPagamento(rst.getInt("vencimento1"));
+                    imp.setDataInicio(rst.getDate("datahora_cadastro"));
+                    imp.setDataTermino(Utils.getDataAtual());
+
+                    result.add(imp);
+
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "    c.id id_cliente,\n"
+                    + "    c.descritivo nome,\n"
+                    + "    c.datahora_cadastro,\n"
+                    + "    c.logradouro,\n"
+                    + "    c.endereco,\n"
+                    + "    c.numero,\n"
+                    + "    c.complemento,\n"
+                    + "    c.bairro,\n"
+                    + "    c.cidade,\n"
+                    + "    c.estado,\n"
+                    + "    c.cep,\n"
+                    + "    c.telefone1,\n"
+                    + "    c.telefone2,\n"
+                    + "    c.observacao,\n"
+                    + "    c.cnpj_cpf,\n"
+                    + "    c.inscricao_rg,\n"
+                    + "    cc.id id_empresa,\n"
+                    + "    cc.descritivo nome_empresa,\n"
+                    + "    cc.bloqueado,\n"
+                    + "    c.limite,\n"
+                    + "    c.situacao\n"
+                    + "from\n"
+                    + "    clientes c,\n"
+                    + "    conveniadas cc\n"
+                    + "where\n"
+                    + "    c.empresa_convenio = cc.id\n"
+                    + "order by\n"
+                    + "    c.id"
+            )) {
+                while (rs.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rs.getString("id_cliente"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setIdEmpresa(rs.getString("id_empresa"));
+                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setConvenioLimite(rs.getDouble("limite"));
+                    imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
+                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	cr.id,\n"
+                    + "	ID_CADASTRO id_convenio,\n"
+                    + " cli.ID id_conveniado,\n"
+                    + "	CAIXA ecf,\n"
+                    + "	NF cupom,\n"
+                    + "	cr.DATAHORA_CADASTRO dataemissao,\n"
+                    + "	VALOR,\n"
+                    + "	cr.OBSERVACAO\n"
+                    + "FROM\n"
+                    + "	VW_CONTAS cr\n"
+                    + "	JOIN CONVENIADAS cv ON cv.id = cr.ID_CADASTRO \n"
+                    + " JOIN CLIENTES cli ON cli.CNPJ_CPF = cr.CPF_CNPJ\n"
+                    + "WHERE\n"
+                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND PLANO_CONTA = 71000\n"
+                    + "	AND PAGAMENTO IS NULL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("id_conveniado"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setDataHora(rst.getTimestamp("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -597,7 +758,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join cidade cid on cid.codcidade = c.codcidaderes\n"
                     + "order by\n"
                     + "	c.codcliente"
-                    /*"select \n"
+            /*"select \n"
                     + "c.codcliente,\n"
                     + "c.nome,\n"
                     + "c.razaosocial,\n"
