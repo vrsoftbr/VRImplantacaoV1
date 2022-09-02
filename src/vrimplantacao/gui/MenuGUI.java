@@ -298,7 +298,7 @@ import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
-import vrimplantacao2.gui.interfaces.WebSaqGUI;
+import vrimplantacao2.gui.interfaces.WebSacGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
 import vrimplantacao2.gui.interfaces.Winthor_PcSistemasGUI;
@@ -836,7 +836,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuUniplus = new javax.swing.JMenuItem();
         mnuVRToVR = new javax.swing.JMenuItem();
         mnuMrs1 = new javax.swing.JMenuItem();
-        mnuWebsaq = new javax.swing.JMenuItem();
+        mnuWebsac = new javax.swing.JMenuItem();
         mnuPostgres2 = new javax.swing.JMenu();
         mnuAthos = new javax.swing.JMenuItem();
         mnuCervantes = new javax.swing.JMenuItem();
@@ -2738,13 +2738,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuPostgres.add(mnuMrs1);
 
-        mnuWebsaq.setText("WebSaq");
-        mnuWebsaq.addActionListener(new java.awt.event.ActionListener() {
+        mnuWebsac.setText("WebSac");
+        mnuWebsac.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuWebsaqActionPerformed(evt);
+                mnuWebsacActionPerformed(evt);
             }
         });
-        mnuPostgres.add(mnuWebsaq);
+        mnuPostgres.add(mnuWebsac);
 
         mnuDatabase.add(mnuPostgres);
 
@@ -4727,9 +4727,9 @@ public final class MenuGUI extends VRMdiFrame {
         RMSAutomaHelpGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoSystem1ActionPerformed
 	
-    private void mnuWebsaqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWebsaqActionPerformed
-        WebSaqGUI.exibir(this);
-    }//GEN-LAST:event_mnuWebsaqActionPerformed
+    private void mnuWebsacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWebsacActionPerformed
+        WebSacGUI.exibir(this);
+    }//GEN-LAST:event_mnuWebsacActionPerformed
 
     private void mnuSiaCriareByFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSiaCriareByFileActionPerformed
         SiaCriareByFileGUI.exibir(this);
@@ -5859,7 +5859,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuVisualMix;
     private javax.swing.JMenuItem mnuW2A;
-    private javax.swing.JMenuItem mnuWebsaq;
+    private javax.swing.JMenuItem mnuWebsac;
     private javax.swing.JMenuItem mnuWinNexus;
     private javax.swing.JMenuItem mnuWinthor_PcSistemas;
     private javax.swing.JMenuItem mnuWmByFile;

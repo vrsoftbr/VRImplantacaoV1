@@ -19,18 +19,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WebSaqDAO;
+import vrimplantacao2.dao.interfaces.WebSacDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonProvider {
+public class WebSacGUI extends VRInternalFrame implements MapaTributacaoButtonProvider {
 
-    private static final Logger LOG = Logger.getLogger(WebSaqGUI.class.getName());
+    private static final Logger LOG = Logger.getLogger(WebSacGUI.class.getName());
 
-    public static final String SISTEMA = "WebSaq";
-    private static WebSaqGUI instance;
+    public static final String SISTEMA = "WebSac";
+    private static WebSacGUI instance;
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -66,21 +66,21 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
         params.salvar();
     }
 
-    private WebSaqDAO dao = new WebSaqDAO();
+    private WebSacDAO dao = new WebSacDAO();
 
-    private WebSaqGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private WebSacGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         conexao.setOnConectar(
                 new ConexaoEvent() {
-                    @Override
-                    public void executar() throws Exception {
-                        gravarParametros();
-                        carregarLojaCliente();
-                        carregarLojaVR();
-                        mapaTributacaoButton1.setEnabled(true);
-                    }
-                }
+            @Override
+            public void executar() throws Exception {
+                gravarParametros();
+                carregarLojaCliente();
+                carregarLojaVR();
+                mapaTributacaoButton1.setEnabled(true);
+            }
+        }
         );
 
         this.title = "Importação " + SISTEMA;
@@ -125,7 +125,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new WebSaqGUI(i_mdiFrame);
+                instance = new WebSacGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -148,7 +148,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                    
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -283,7 +283,16 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                                 opcoes.add(OpcaoCliente.VALOR_LIMITE);
                             }
                             if (chkSituacaoCadastro.isSelected()) {
-                                opcoes.add(OpcaoCliente.SITUACAO_CADASTRO);                                
+                                opcoes.add(OpcaoCliente.SITUACAO_CADASTRO);
+                            }
+                            if (chkCvEmpresa.isSelected()) {
+                                opcoes.add(OpcaoCliente.CONVENIO_EMPRESA);
+                            }
+                            if (chkCvConveniado.isSelected()) {
+                                opcoes.add(OpcaoCliente.CONVENIO_CONVENIADO);
+                            }
+                            if (chkCvTransacao.isSelected()) {
+                                opcoes.add(OpcaoCliente.CONVENIO_TRANSACAO);
                             }
                             importador.importarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                         }
@@ -299,9 +308,9 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                             }
                             importador.importarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
                         }
-                        if (chkCvEmpresa.isSelected()) {
-                            importador.importarCheque();
-                        }
+//                        if (chkCvEmpresa.isSelected()) {
+//                            importador.importarCheque();
+//                        }
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }

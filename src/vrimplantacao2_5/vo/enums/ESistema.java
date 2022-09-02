@@ -193,7 +193,7 @@ import vrimplantacao2.dao.interfaces.ViggoDAO;
 import vrimplantacao2.dao.interfaces.VisualComercioDAO;
 import vrimplantacao2.dao.interfaces.VisualMixDAO;
 import vrimplantacao2.dao.interfaces.W2ADAO;
-import vrimplantacao2.dao.interfaces.WebSaqDAO;
+import vrimplantacao2.dao.interfaces.WebSacDAO;
 import vrimplantacao2.dao.interfaces.WeberDAO;
 import vrimplantacao2.dao.interfaces.WinNexusDAO;
 import vrimplantacao2.dao.interfaces.WisaSoftDAO;
@@ -1466,7 +1466,7 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     },
-    WEBSAQ(188, "WEBSAQ", new WebSaqDAO()) {
+    WEBSAQ(188, "WEBSAQ", new WebSacDAO()) {
        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {

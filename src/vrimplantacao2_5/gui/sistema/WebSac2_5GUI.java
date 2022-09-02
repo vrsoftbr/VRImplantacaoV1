@@ -16,7 +16,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WebSaqDAO;
+import vrimplantacao2.dao.interfaces.WebSacDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -31,7 +31,7 @@ public class WebSac2_5GUI extends VRInternalFrame {
     private static final String SISTEMA = ESistema.WEBSAQ.getNome();
 
     private static WebSac2_5GUI instance;
-    private final WebSaqDAO dao;
+    private final WebSacDAO dao;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -55,7 +55,7 @@ public class WebSac2_5GUI extends VRInternalFrame {
      */
     public WebSac2_5GUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new WebSaqDAO();
+        this.dao = new WebSacDAO();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {

@@ -1692,12 +1692,12 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMrs1ActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuWebsaq">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuWebsac">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="WebSaq"/>
+                            <Property name="text" type="java.lang.String" value="WebSac"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWebsaqActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWebsacActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

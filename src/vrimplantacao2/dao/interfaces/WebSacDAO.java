@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.io.File;
@@ -15,6 +10,7 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -26,7 +22,9 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -37,18 +35,42 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
  *
  * @author lucasrafael
  */
-public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
+public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String v_arquivo = "";
 
     @Override
     public String getSistema() {
-        return "WebSaq";
+        return "WebSac";
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codcf codigo,\n"
+                    + "('NOME: '||descricao||' CST:'||codcst||' ALIQ: '||aliqicms||' REDU: '||aliqredicms) as descricao, \n"
+                    + "aliqicms, \n"
+                    + "aliqredicms, \n"
+                    + "codcst\n"
+                    + "from classfiscal\n"
+                    + "order by codcf"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descricao")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -112,6 +134,32 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codproduto, \n"
+                    + "codean, \n"
+                    + "quantidade \n"
+                    + "from produtoean \n"
+                    + "order by codproduto"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codproduto"));
+                    imp.setEan(rst.getString("codean"));
+                    imp.setQtdEmbalagem(rst.getInt("quantidade"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -263,80 +311,92 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "codproduto, \n"
-                    + "codean, \n"
-                    + "quantidade \n"
-                    + "from produtoean \n"
-                    + "order by codproduto"
+                    "select\n"
+                    + "p.id, \n"
+                    + "p.descritivo,\n"
+                    + "p.receita,\n"
+                    + "c.rendimento,\n"
+                    + "pc.produto,\n"
+                    + "pc.qtde,\n"
+                    + "pc.qtdeemb\n"
+                    + "from produtos p\n"
+                    + "inner join composicao c on c.produto_base = p.id\n"
+                    + "inner join produtos_composicao pc on pc.produto_base = p.id\n"
+                    + "where p.composto = 2\n"
+                    + "order by p.id"
             )) {
                 while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codproduto"));
-                    imp.setEan(rst.getString("codean"));
-                    imp.setQtdEmbalagem(rst.getInt("quantidade"));
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    double qtdEmbUtilizado = 0;
+                    qtdEmbUtilizado = rst.getDouble("qtde");
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita((int) qtdEmbUtilizado);
+                    imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("produto"));
+
                     result.add(imp);
                 }
             }
         }
+
         return result;
     }
-
+    
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    c.id,\n"
-                    + "    c.cnpj_cpf,\n"
-                    + "    c.inscricao_rg,\n"
-                    + "    c.descritivo,\n"
-                    + "    c.fantasia,\n"
-                    + "    case when c.bloqueado != 'F' then 1 else 0 end ativo,\n"
-                    + "    c.endereco,\n"
-                    + "    c.numero,\n"
-                    + "    c.complemento,\n"
-                    + "    c.bairro,\n"
-                    + "    c.cidade,\n"
-                    + "    c.estado,\n"
-                    + "    c.cep,\n"
-                    + "    c.datahora_cadastro,\n"
-                    + "    c.observacao,\n"
-                    + "    c.telefone1,\n"
-                    + "    c.vencimento1\n"
+                    + "	codcliente id,\n"
+                    + "	cpfcnpj cnpj,\n"
+                    + "	rgie ie,\n"
+                    + "	razaosocial razao,\n"
+                    + "	enderfat endereco,\n"
+                    + "	numerofat numero,\n"
+                    + "	complementofat complemento,\n"
+                    + "	bairrofat bairro,\n"
+                    + "	codcidadefat cidade,\n"
+                    + "	uffat uf,\n"
+                    + "	cepfat cep,\n"
+                    + "	fonefat telefone,\n"
+                    + "	codstatus ativo,\n"
+                    + "	observacao\n"
                     + "from\n"
-                    + "    conveniadas c\n"
-                    + "order by\n"
-                    + "    c.id"
+                    + "	cliente c\n"
+                    + "where\n"
+                    + "	convenio = 'S'"
             )) {
                 while (rst.next()) {
 
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
 
                     imp.setId(rst.getString("id"));
-                    imp.setCnpj(rst.getString("cnpj_cpf"));
-                    imp.setInscricaoEstadual(rst.getString("inscricao_rg"));
-                    imp.setRazao(rst.getString("descritivo"));
-                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
-                    imp.setUf(rst.getString("estado"));
+                    imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setObservacoes(rst.getString("observacao"));
-                    imp.setTelefone(rst.getString("telefone1"));
-                    imp.setDiaPagamento(rst.getInt("vencimento1"));
-                    imp.setDataInicio(rst.getDate("datahora_cadastro"));
-                    imp.setDataTermino(Utils.getDataAtual());
 
                     result.add(imp);
 
@@ -353,44 +413,29 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "    c.id id_cliente,\n"
-                    + "    c.descritivo nome,\n"
-                    + "    c.datahora_cadastro,\n"
-                    + "    c.logradouro,\n"
-                    + "    c.endereco,\n"
-                    + "    c.numero,\n"
-                    + "    c.complemento,\n"
-                    + "    c.bairro,\n"
-                    + "    c.cidade,\n"
-                    + "    c.estado,\n"
-                    + "    c.cep,\n"
-                    + "    c.telefone1,\n"
-                    + "    c.telefone2,\n"
-                    + "    c.observacao,\n"
-                    + "    c.cnpj_cpf,\n"
-                    + "    c.inscricao_rg,\n"
-                    + "    cc.id id_empresa,\n"
-                    + "    cc.descritivo nome_empresa,\n"
-                    + "    cc.bloqueado,\n"
-                    + "    c.limite,\n"
-                    + "    c.situacao\n"
+                    + "	codcliente id_cliente,\n"
+                    + "	nome,\n"
+                    + "	codempresa id_empresa,\n"
+                    + "	cpfcnpj cpf_cnpj,\n"
+                    + "	limite1 limite,\n"
+                    + "	case when codstatus = 1 then 1 else 0 end status,\n"
+                    + "	observacao\n"
                     + "from\n"
-                    + "    clientes c,\n"
-                    + "    conveniadas cc\n"
+                    + "	cliente\n"
                     + "where\n"
-                    + "    c.empresa_convenio = cc.id\n"
-                    + "order by\n"
-                    + "    c.id"
+                    + "	codempresa is not null\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
                     imp.setId(rs.getString("id_cliente"));
                     imp.setNome(rs.getString("nome"));
                     imp.setIdEmpresa(rs.getString("id_empresa"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
-                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setSituacaoCadastro(rs.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -689,6 +734,34 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -942,25 +1015,50 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
-        List<MapaTributoIMP> result = new ArrayList<>();
-
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "codcf codigo,\n"
-                    + "('NOME: '||descricao||' CST:'||codcst||' ALIQ: '||aliqicms||' REDU: '||aliqredicms) as descricao, \n"
-                    + "aliqicms, \n"
-                    + "aliqredicms, \n"
-                    + "codcst\n"
-                    + "from classfiscal\n"
-                    + "order by codcf"
+                    "select\n"
+                    + "	codcheque id,\n"
+                    + "	dtemissao emissao,\n"
+                    + "	valorcheque valor,\n"
+                    + "	numcheque nro_cheque,\n"
+                    + "	b.codoficial banco,\n"
+                    + "	b.agencia,\n"
+                    + "	f.rgie,\n"
+                    + "	f.cpfcnpj,\n"
+                    + "	nominal nome,\n"
+                    + "	f.fone1 telefone,\n"
+                    + "	c.observacao\n"
+                    + "from\n"
+                    + "	cheque c\n"
+                    + "	join banco b on b.codbanco = c.codbanco\n"
+                    + "	left join fornecedor f on f.razaosocial like c.nominal\n"
+                    + "where\n"
+                    + "	c.codestabelec = " + getLojaOrigem()
+            //                  + "	--and dtpagto is null"
             )) {
                 while (rst.next()) {
-                    result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descricao")));
+                    ChequeIMP imp = new ChequeIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDate(rst.getDate("emissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCheque(rst.getString("nro_cheque"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setRg(rst.getString("ierg"));
+                    imp.setCpf(rst.getString("cpfcnpj"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
                 }
             }
         }
+
         return result;
     }
 
