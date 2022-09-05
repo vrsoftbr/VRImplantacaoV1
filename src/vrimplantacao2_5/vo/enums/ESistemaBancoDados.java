@@ -174,7 +174,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_UNIPLUS(179, "UNIPLUS", 11, "POSTGRESQL", "", "postgres", "postgres", 5432),
     POSTGRESQL_VIGGO(184, "VIGGO", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_VRMASTER(182, "VRMASTER", 11, "POSTGRESQL", "vr", "postgres", "VrPost@Server", 8745),
-    POSTGRESQL_WEBSAQ(188, "WEBSAQ", 11, "POSTGRESQL", "", "", "", 5432),
+    POSTGRESQL_WEBSAC(188, "WEBSAC", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_ZOOMBOX(194, "ZOOMBOX", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_SG(199, "SG", 11, "POSTGRESQL", "cardoso_dbf", "postgres", "VrPost@Server", 5432),
     POSTGRESQL_ASSIST(204, "ASSIST", 11, "POSTGRESQL", "avenida_dbf", "postgres", "VrPost@Server", 5432),

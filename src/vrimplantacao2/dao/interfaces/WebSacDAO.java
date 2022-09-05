@@ -4,13 +4,16 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -19,6 +22,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -35,7 +39,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -51,6 +55,61 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.SUGESTAO_COTACAO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.VENDA_CONTROLADA,
+                OpcaoProduto.NORMA_REPOSICAO,
+                OpcaoProduto.TIPO_PRODUTO,
+                OpcaoProduto.FABRICACAO_PROPRIA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ASSOCIADO
+        ));
+    }
+
+    /*@Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
@@ -70,6 +129,35 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }*/
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct\n"
+                    + "	codcst||'-'||round(aliqicms,2)||'-'||round(aliqredicms,2) as id,\n"
+                    + "	codcst||'-'||round(aliqicms,2)||'-'||round(aliqredicms,2) as descricao,\n"
+                    + "	codcst cst_icms,\n"
+                    + "	aliqicms aliq_icms,\n"
+                    + "	aliqredicms red_icms	\n"
+                    + "from\n"
+                    + "	classfiscal\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms"))
+                    );
+                }
+            }
+        }
+
         return result;
     }
 
@@ -140,9 +228,9 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "codproduto, \n"
-                    + "codean, \n"
-                    + "quantidade \n"
+                    + " codproduto, \n"
+                    + " codean, \n"
+                    + " quantidade \n"
                     + "from produtoean \n"
                     + "order by codproduto"
             )) {
@@ -159,7 +247,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -187,6 +275,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.codvasilhame,\n"
                     + "p.codfamilia,\n"
                     + "p.custotab,\n"
+                    + "p.custorep,\n"
                     + "p.precoatc,\n"
                     + "p.precovrj,\n"
                     + "p.margematc,\n"
@@ -204,7 +293,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "pce.codcst cstpiscofinsentrada,\n"
                     + "p.natreceita,\n"
                     + "ncm.codigoncm,\n"
-                    + "p.codcfpdv,\n"
+                    //                    + "p.codcfpdv,\n"
+                    + "cf.codcst||'-'||round(cf.aliqicms,2)||'-'||round(cf.aliqredicms,2) id_icms,\n"
                     + "cf.descricao icmsdesc,\n"
                     + "cf.codcst as icmscst,\n"
                     + "cf.aliqicms as icmsaliq,\n"
@@ -258,20 +348,22 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPrecovenda(rst.getDouble("precovrj"));
                     imp.setCustoComImposto(rst.getDouble("custorep"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoSemImposto(rst.getDouble("custotab"));
                     imp.setMargem(rst.getDouble("margemvrj"));
                     imp.setDataCadastro(rst.getDate("datainclusao"));
                     imp.setNcm(rst.getString("codigoncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
-                    imp.setPiscofinsCstCredito(rst.getString("cstpiscofinsentrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
-                    imp.setIcmsDebitoId(rst.getString("codcfpdv"));
-                    imp.setIcmsCreditoId(rst.getString("codcfpdv"));
+
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+
+                    imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstpiscofinsentrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
 
                     result.add(imp);
                 }
@@ -311,49 +403,41 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ReceitaIMP> getReceitas() throws Exception {
-        List<ReceitaIMP> result = new ArrayList<>();
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "p.id, \n"
-                    + "p.descritivo,\n"
-                    + "p.receita,\n"
-                    + "c.rendimento,\n"
-                    + "pc.produto,\n"
-                    + "pc.qtde,\n"
-                    + "pc.qtdeemb\n"
-                    + "from produtos p\n"
-                    + "inner join composicao c on c.produto_base = p.id\n"
-                    + "inner join produtos_composicao pc on pc.produto_base = p.id\n"
-                    + "where p.composto = 2\n"
-                    + "order by p.id"
+                    + "	r.codreceita id,\n"
+                    + "	p.descricao descritivo,\n"
+                    + "	componentes receita,\n"
+                    + "	p.codproduto produto\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	left join receita r on p.codreceita = r.codreceita \n"
+                    + "order by 1"
             )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+
                 while (rst.next()) {
-                    ReceitaIMP imp = new ReceitaIMP();
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("id"));
 
-                    double qtdEmbUtilizado = 0;
-                    qtdEmbUtilizado = rst.getDouble("qtde");
+                    if (imp == null) {
+                        imp = new ReceitaBalancaIMP();
+                        imp.setId(rst.getString("id"));
+                        imp.setDescricao(rst.getString("descritivo"));
+                        imp.setReceita(rst.getString("receita"));
+                        receitas.put(imp.getId(), imp);
+                    }
 
-                    imp.setImportsistema(getSistema());
-                    imp.setImportloja(getLojaOrigem());
-                    imp.setImportid(rst.getString("id"));
-                    imp.setIdproduto(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descritivo"));
-                    imp.setRendimento(rst.getDouble("rendimento"));
-                    imp.setQtdembalagemreceita((int) qtdEmbUtilizado);
-                    imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
-                    imp.setFator(1);
                     imp.getProdutos().add(rst.getString("produto"));
-
-                    result.add(imp);
                 }
+
+                return new ArrayList<>(receitas.values());
             }
         }
-
-        return result;
     }
-    
+
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
@@ -449,33 +533,30 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	cr.id,\n"
-                    + "	ID_CADASTRO id_convenio,\n"
-                    + " cli.ID id_conveniado,\n"
-                    + "	CAIXA ecf,\n"
-                    + "	NF cupom,\n"
-                    + "	cr.DATAHORA_CADASTRO dataemissao,\n"
-                    + "	VALOR,\n"
-                    + "	cr.OBSERVACAO\n"
-                    + "FROM\n"
-                    + "	VW_CONTAS cr\n"
-                    + "	JOIN CONVENIADAS cv ON cv.id = cr.ID_CADASTRO \n"
-                    + " JOIN CLIENTES cli ON cli.CNPJ_CPF = cr.CPF_CNPJ\n"
-                    + "WHERE\n"
-                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND PLANO_CONTA = 71000\n"
-                    + "	AND PAGAMENTO IS NULL\n"
-                    + "ORDER BY 1"
+                    "select\n"
+                    + "	codlancto id,\n"
+                    + "	codparceiro id_conveniado,\n"
+                    + "	case when numnotafis is null then codlancto else numnotafis end documento,\n"
+                    + "	dtemissao emissao,\n"
+                    + "	valorliquido valor,\n"
+                    + "	l.observacao\n"
+                    + "from\n"
+                    + "	lancamento l\n"
+                    + "	join cliente c on c.codcliente = l.codparceiro and c.codempresa is not null\n"
+                    + "where\n"
+                    + "	codestabelec = " + getLojaOrigem() + "\n"
+                    + "	and status = 'A'\n"
+                    + "	and prevreal = 'R'\n"
+                    + " and l.codespecie = 6\n"
+                    + "order by codlancto"
             )) {
                 while (rst.next()) {
-
                     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+
                     imp.setId(rst.getString("id"));
                     imp.setIdConveniado(rst.getString("id_conveniado"));
-                    imp.setEcf(rst.getString("ecf"));
-                    imp.setNumeroCupom(rst.getString("cupom"));
-                    imp.setDataHora(rst.getTimestamp("dataemissao"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setDataHora(rst.getTimestamp("emissao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("observacao"));
 
@@ -738,20 +819,35 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	codlancto id,\n"
+                    + "	codparceiro id_fornecedor,\n"
+                    + "	numnotafis||'-'||parcela documento,\n"
+                    + "	dtemissao emissao,\n"
+                    + "	dtentrada entrada,\n"
+                    + "	dtvencto vencimento,\n"
+                    + "	valorliquido valor,\n"
+                    + "	observacao\n"
+                    + "from\n"
+                    + "	lancamento\n"
+                    + "where\n"
+                    + "	codestabelec = " + getLojaOrigem() + "\n"
+                    + "	and tipoparceiro = 'F'\n"
+                    + "and prevreal = 'R'\n"
+                    + "	and status = 'A'\n"
+                    + "order by codlancto"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
-                    imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataEntrada(rst.getDate("dataentrada"));
-                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("observacao"));
-                    imp.setVencimento(rst.getDate("vencimento"));
 
                     result.add(imp);
                 }
@@ -1048,7 +1144,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCheque(rst.getString("nro_cheque"));
                     imp.setBanco(rst.getInt("banco"));
                     imp.setAgencia(rst.getString("agencia"));
-                    imp.setRg(rst.getString("ierg"));
+                    imp.setRg(rst.getString("rgie"));
                     imp.setCpf(rst.getString("cpfcnpj"));
                     imp.setNome(rst.getString("nome"));
                     imp.setTelefone(rst.getString("telefone"));

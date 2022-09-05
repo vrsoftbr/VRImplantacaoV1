@@ -28,7 +28,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
  */
 public class WebSac2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.WEBSAQ.getNome();
+    private static final String SISTEMA = ESistema.WEBSAC.getNome();
 
     private static WebSac2_5GUI instance;
     private final WebSacDAO dao;
@@ -47,12 +47,6 @@ public class WebSac2_5GUI extends VRInternalFrame {
         }
     }
 
-    /**
-     * Creates new form RPInfoGUI
-     *
-     * @param frame
-     * @throws java.lang.Exception
-     */
     public WebSac2_5GUI(VRMdiFrame frame) throws Exception {
         super(frame);
         this.dao = new WebSacDAO();
@@ -91,8 +85,8 @@ public class WebSac2_5GUI extends VRInternalFrame {
         tabProdutos.setOpcoesDisponiveis(dao);
 
         carregarParametros();
-        
-        pnlConn.setSistema(ESistema.WEBSAQ);
+
+        pnlConn.setSistema(ESistema.WEBSAC);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -101,20 +95,22 @@ public class WebSac2_5GUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.carregarParametros(params, SISTEMA);
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(dao.getLojaOrigem());
         chkCvTransacaoBaixados.setSelected(params.getBool(SISTEMA, "CV_BAIXADOS"));
         chkCreditoRotativoBaixados.setSelected(params.getBool(SISTEMA, "CR_BAIXADOS"));
     }
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(pnlConn.getComplemento(), SISTEMA, "COMPLEMENTO");
         params.put(chkCvTransacaoBaixados.isSelected(), SISTEMA, "CV_BAIXADOS");
         params.put(chkCreditoRotativoBaixados.isSelected(), SISTEMA, "CR_BAIXADOS");
-        
+
         pnlConn.atualizarParametros();
 
         params.salvar();

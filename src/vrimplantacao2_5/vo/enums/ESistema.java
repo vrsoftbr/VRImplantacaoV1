@@ -1466,7 +1466,7 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     },
-    WEBSAQ(188, "WEBSAQ", new WebSacDAO()) {
+    WEBSAC(188, "WEBSAC", new WebSacDAO()) {
        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
