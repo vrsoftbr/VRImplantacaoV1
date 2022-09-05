@@ -1936,7 +1936,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pg.pfin_status in ('P', 'G')\n"
                     + "    and pg.pfin_pr = 'P'\n"
                     + "    and pg.pfin_catentidade != 'C'\n"
-                    + "    and pg.pfin_seqbaixa is null\n"
+                    + "    and (case when pg.pfin_seqbaixa = 0 then null else pg.pfin_seqbaixa end) is null\n"
                     + "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
                     + "order by\n"
                     + "	1, 2"
