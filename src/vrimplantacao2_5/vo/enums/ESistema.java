@@ -285,6 +285,7 @@ import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
+import vrimplantacao2_5.gui.sistema.WebSac22_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 
 /**
@@ -1470,7 +1471,7 @@ public enum ESistema {
        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new WebSac2_5GUI(frame);
+                return new WebSac22_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
