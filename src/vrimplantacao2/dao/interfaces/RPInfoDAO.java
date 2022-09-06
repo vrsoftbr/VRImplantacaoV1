@@ -1122,7 +1122,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	null forma_pagamento\n" +
                     "from\n" +
                     "	funcionarios f\n" +
-                    "left join municipios m on m.muni_codigo = f.func_muni_codigo" + 
+                    "left join municipios m on m.muni_codigo = f.func_muni_codigo\n" + 
                     "where\n" +
                     "	f.func_unid_codigo = '" + getLojaOrigem() + "'";
         } else {
@@ -1158,7 +1158,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	fornecedores f\n"
                     + "	left join municipios m on\n"
-                    + "		f.forn_muni_codigo = m.muni_codigo\n"
+                    + "	f.forn_muni_codigo = m.muni_codigo\n"
                     + "	left join regforn fc on f.forn_codigo = fc.rfor_forn_codigo\n"
                     + "	left join fpgto fp on fc.rfor_fpgt_codigo = fp.fpgt_codigo\n"
                     + "order by\n"
@@ -1917,6 +1917,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	when pg.pfin_codentidade = 0 then 10910 else \n"
                     + "	pg.pfin_codentidade end as id_fornecedor,\n"
                     + "	pg.pfin_numerodcto numerodocumento,\n"
+                    + " pg.pfin_descontos desconto,\n"        
                     + "	pg.pfin_dataemissao dataemissao,\n"
                     + "	pg.pfin_datalcto dataentrada,\n"
                     + "	pg.pfin_valor valor,\n"
@@ -1949,12 +1950,27 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    imp.setValor(rs.getDouble("valor"));
+                    
+                    double desconto = rs.getDouble("desconto");
+                    
+                    imp.setValor(rs.getDouble("valor") - desconto);
                     imp.setVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("observacao"));
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    
+                    String observacao = "";
+                    
+                    if (rs.getString("observacao") != null && !rs.getString("observacao").isEmpty() && desconto > 0) {
+                        observacao = rs.getString("observacao") + 
+                                " - Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
+                    } else if (rs.getString("observacao") == null && desconto > 0) {
+                        observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
+                    } else if (rs.getString("observacao").isEmpty() && desconto > 0) {
+                        observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
+                    }
+                    
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), 
+                            rs.getDouble("valor") - desconto, observacao);
+                    
                     parc.setNumeroParcela(rs.getInt("parcela"));
-                    parc.setObservacao(rs.getString("observacao"));
                     parc.setId_banco(Utils.stringToInt(rs.getString("banco")));
                     parc.setAgencia(rs.getString("agencia"));
 
