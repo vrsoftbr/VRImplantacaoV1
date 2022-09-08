@@ -16,6 +16,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -215,6 +216,29 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select * from familia")) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -230,10 +254,12 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.DESCRICAO_INT descricaocompleta,\n" +
                     "	p.un unidade,\n" +
                     "	p.QTDEMB qtdembalagem,\n" +
+                    "   p.pesaveis,\n" +        
                     "   p.DEPTO merc1,\n" +
                     "	p.SECAO merc2,\n" +
                     "	p.NBM merc3,\n" +
                     "	p.SUBCAT1 merc4," +        
+                    "   p.SUBCAT2 familia,\n" +        
                     "	p.valdias validade,\n" +
                     "	p.datacad cadastro,\n" +
                     "	p.margem,\n" +
@@ -258,6 +284,9 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.PESOLIQUIDO \n" +
                     "from \n" +
                     "	estoque p")) {
+                
+                String merc1, merc2, merc3, merc4;
+                
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -277,11 +306,36 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setIdFamiliaProduto(rs.getString("familia"));
                     
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
+                    merc1 = rs.getString("merc1");
+                    merc2 = rs.getString("merc2");
+                    merc3 = rs.getString("merc3");
+                    merc4 = rs.getString("merc4");
                     
+                    if (merc4 != null && merc4.length() == 2) {
+                        imp.setCodMercadologico1("");
+                        imp.setCodMercadologico2("");
+                        imp.setCodMercadologico3("");
+                        imp.setCodMercadologico4("");
+                    } else {
+                        if (merc1 != null) {
+                            imp.setCodMercadologico1(merc1.replaceAll("[^0-9]", ""));
+                        }
+
+                        if (merc2 != null) {
+                            imp.setCodMercadologico2(merc2.replaceAll("[^0-9]", ""));
+                        }
+
+                        if (merc3 != null) {
+                            imp.setCodMercadologico3(merc3.replaceAll("[^0-9]", ""));
+                        }
+
+                        if (merc4 != null) {
+                            imp.setCodMercadologico4(merc4.replaceAll("[^0-9]", ""));
+                        }
+                    }
+
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? 1 : 0);
@@ -308,6 +362,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setPiscofinsCstDebito(rs.getString("CSTCOFINS"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.seteBalanca(rs.getString("pesaveis") != null);
 
                     result.add(imp);
                 }

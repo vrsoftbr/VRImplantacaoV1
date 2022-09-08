@@ -117,6 +117,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.QTD_EMBALAGEM_COTACAO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+            OpcaoProduto.VOLUME_QTD,
             OpcaoProduto.NCM,
             OpcaoProduto.PESO_BRUTO,
             OpcaoProduto.PESO_LIQUIDO,
@@ -634,6 +636,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.prod_codpreco id_familia,\n"
                     + "	p.prod_peso pesobruto,\n"
                     + "	p.prod_pesoliq pesoliquido,\n"
+                    + " p.prod_funcao emabalagemfuncao,\n"
+                    + "	p.prod_extra8 fatoretiqueta,"        
                     + "	un.prun_estmin estoqueminimo,\n"
                     + "	un.prun_estmax estoquemaximo,\n"
                     + "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n"
@@ -766,6 +770,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemaximo"));
+                    imp.setTipoEmbalagemVolume(rst.getString("emabalagemfuncao"));
+                    imp.setVolume(rst.getDouble("fatoretiqueta"));
+                    
                     imp.setEstoque(rst.getDouble("estoque"));
                     if (utilizarCustoNota) {
                         imp.setCustoSemImposto(rst.getDouble("custosemimposto_nf"));
@@ -810,6 +817,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     long ean = Utils.stringToLong(imp.getEan(), -2);
 
                     imp.setManterEAN(ean <= 999999 && ean > 0 && !imp.isBalanca());
+                    
 
                     result.add(imp);
                 }
@@ -1958,12 +1966,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     String observacao = "";
                     
-                    if (rs.getString("observacao") != null && !rs.getString("observacao").isEmpty() && desconto > 0) {
+                    if (rs.getString("observacao") != null && 
+                            !rs.getString("observacao").isEmpty() && 
+                                desconto > 0) {
                         observacao = rs.getString("observacao") + 
                                 " - Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
-                    } else if (rs.getString("observacao") == null && desconto > 0) {
+                    } else if (rs.getString("observacao") == null && 
+                                    desconto > 0) {
                         observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
-                    } else if (rs.getString("observacao").isEmpty() && desconto > 0) {
+                    } else if (rs.getString("observacao").isEmpty() && 
+                                    desconto > 0) {
                         observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
                     }
                     
