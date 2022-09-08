@@ -784,7 +784,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setDescontinuado(rst.getBoolean("descontinuado"));
+                    imp.setDescontinuado(rst.getInt("descontinuado") == 1);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
