@@ -134,7 +134,9 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
         ));
     }
 
@@ -146,10 +148,12 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.CONDICAO_PAGAMENTO,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
-                OpcaoFornecedor.OUTRAS_RECEITAS
+                OpcaoFornecedor.OUTRAS_RECEITAS,
+                OpcaoFornecedor.PRAZO_FORNECEDOR
         ));
     }
 
@@ -159,6 +163,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_CONVENIADO,
@@ -332,6 +338,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.pesounid,\n"
                     + "p.vasilhame,\n"
                     + "p.codvasilhame,\n"
+                    + "uv.descricao volume,\n"
+                    + "p.qtdeunidadepreco qtde_volume,\n"
                     + "p.codfamilia,\n"
                     + "p.custotab,\n"
                     + "p.custorep,\n"
@@ -346,13 +354,14 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.enviarecommerce,\n"
                     + "p.comprimento,\n"
                     + "p.cest,\n"
-                    + "case when p.pesado = 'S' and p.pesounid = 'P' then 'KG' else u.sigla end as embalagem,\n"
-                    + "e.quantidade as qtdembalagem,\n"
+                    + "case when p.pesado = 'S' and p.pesounid = 'P' then 'KG' else uv.sigla end as embalagem,\n"
+                    + "ev.quantidade as qtdembalagem,\n"
+                    + "uc.sigla embalagemcompra,\n"
                     + "pcs.codcst cstpiscofinssaida,\n"
                     + "pce.codcst cstpiscofinsentrada,\n"
                     + "p.natreceita,\n"
                     + "ncm.codigoncm,\n"
-                    //                  + "p.codcfpdv,\n"
+                    //+ "p.codcfpdv,\n"
                     + "cf.codcst||'-'||round(cf.aliqicms,2)||'-'||round(cf.aliqredicms,2) id_icms,\n"
                     + "cf.descricao icmsdesc,\n"
                     + "cf.codcst as icmscst,\n"
@@ -361,8 +370,10 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from produto p \n"
                     + "left join produtoean pe on p.codproduto = pe.codproduto\n"
                     + "left join produtoestab est on p.codproduto = est.codproduto and est.codestabelec = " + getLojaOrigem() + "\n"
-                    + "left join embalagem e on e.codembal = p.codembalvda\n"
-                    + "left join unidade u on u.codunidade = e.codunidade\n"
+                    + "left join embalagem ev on ev.codembal = p.codembalvda\n"
+                    + "left join unidade uv on uv.codunidade = ev.codunidade\n"
+                    + "left join embalagem ec on ec.codembal = p.codembalcpa\n"
+                    + "left join unidade uc on ec.codunidade = uc.codunidade\n"
                     + "left join piscofins pcs on pcs.codpiscofins = p.codpiscofinssai\n"
                     + "left join piscofins pce on pce.codpiscofins = p.codpiscofinsent\n"
                     + "left join ncm on ncm.idncm = p.idncm\n"
@@ -391,6 +402,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(imp.getImportId());
                     }
 
+                    imp.setTipoEmbalagemCotacao(rst.getString("embalagemcompra"));
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaofiscal"));
@@ -400,6 +412,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("codgrupo"));
                     imp.setCodMercadologico3(rst.getString("codsubgrupo"));
                     imp.setIdFamiliaProduto(rst.getString("codsimilar"));
+                    imp.setTipoEmbalagemVolume(rst.getString("volume"));
+                    imp.setVolume(rst.getDouble("qtde_volume"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -555,8 +569,9 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	nome,\n"
                     + "	codempresa id_empresa,\n"
                     + "	cpfcnpj cpf_cnpj,\n"
-                    + "	limite1 limite,\n"
-                    //                    + "	case when codstatus = 1 then 1 else 0 end status,\n"
+                    + "	case when codstatus = 1 then 1 else 0 end status,\n"
+                    + " case when codstatus = 3 then 1 else 0 end bloqueado,\n"
+                    + "	coalesce(limite1, 0) - coalesce(debito1, 0) as limite,\n"
                     + "	observacao\n"
                     + "from\n"
                     + "	cliente\n"
@@ -572,7 +587,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
-//                    imp.setSituacaoCadastro(rs.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setSituacaoCadastro(rs.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
@@ -600,8 +616,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "	codestabelec = " + getLojaOrigem() + "\n"
                     + "	and status = 'A'\n"
-                    + "	and prevreal = 'R'\n"
-                    + " and l.codespecie = 6\n"
+                    + " and tipoparceiro = 'C'\n"
+                    + "	and codfinaliz = '006'\n"
                     + "order by codlancto"
             )) {
                 while (rst.next()) {
@@ -637,10 +653,18 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    regexp_replace(c.nome,'[^A-z 0-9]','','g') as nomecidade,\n"
                     + "    c.codoficial cidadeibge,\n"
                     + "    f.uf,\n"
-                    + "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato1,\n"
+                    //                  + "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato1,\n"
+                    + "    f.contato1,\n"
                     + "    f.fone1,\n"
+                    + "    f.email1,\n"
+                    //                  + "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato2,\n"
+                    + "    f.contato2,\n"
                     + "    f.fone2,\n"
+                    + "    f.email2,\n"
+                    //                  + "    regexp_replace(f.contato1,'[^A-z 0-9]','','g') as contato3,\n"
+                    + "    f.contato3,\n"
                     + "    f.fone3,\n"
+                    + "    f.email3,\n"
                     + "    f.site,\n"
                     + "    f.email,\n"
                     + "    f.tppessoa,\n"
@@ -651,11 +675,6 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.agencia,\n"
                     + "    f.contacorrente,\n"
                     + "    regexp_replace(f.observacao,'[^A-z 0-9]','','g') as observacao,\n"
-                    + "    f.contato2,\n"
-                    + "    f.contato3,\n"
-                    + "    f.email1,\n"
-                    + "    f.email2,\n"
-                    + "    f.email3,\n"
                     + "    f.fone,\n"
                     + "    f.fax,\n"
                     + "    f.numero,\n"
@@ -702,87 +721,45 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIbge_municipio(rst.getInt("cidadeibge"));
                     imp.setUf(rst.getString("uf"));
                     imp.setDatacadastro(rst.getDate("datainclusao"));
+                    imp.setTel_principal(rst.getString("fone"));
 
                     if ((rst.getString("contato1") != null)
                             && (!rst.getString("contato1").trim().isEmpty())) {
                         imp.setObservacao("CONTATO - " + rst.getString("contato1") + " ");
                     }
-
                     imp.setObservacao(imp.getObservacao() + rst.getString("observacao"));
-                    imp.setTel_principal(rst.getString("fone"));
 
-                    if ((rst.getString("fone1") != null)
-                            && (!rst.getString("fone1").trim().isEmpty())) {
+                    if ((rst.getString("contato1") != null)
+                            && (!rst.getString("contato1").trim().isEmpty())) {
                         imp.addContato(
-                                "1",
-                                "TELEFONE 1",
+                                rst.getString("contato1"),
                                 rst.getString("fone1"),
                                 null,
                                 TipoContato.COMERCIAL,
-                                null
+                                rst.getString("email1")
                         );
                     }
-                    if ((rst.getString("fone2") != null)
-                            && (!rst.getString("fone2").trim().isEmpty())) {
+
+                    if ((rst.getString("contato2") != null)
+                            && (!rst.getString("contato2").trim().isEmpty())) {
                         imp.addContato(
-                                "2",
-                                "TELEFONE 2",
+                                rst.getString("contato2"),
                                 rst.getString("fone2"),
                                 null,
                                 TipoContato.COMERCIAL,
-                                null
+                                rst.getString("email2")
                         );
                     }
-                    if ((rst.getString("fone3") != null)
-                            && (!rst.getString("fone3").trim().isEmpty())) {
+
+                    if ((rst.getString("contato3") != null)
+                            && (!rst.getString("contato3").trim().isEmpty())) {
                         imp.addContato(
-                                "3",
-                                "TELEFONE 3",
+                                rst.getString("contato3"),
                                 rst.getString("fone3"),
                                 null,
                                 TipoContato.COMERCIAL,
-                                null
+                                rst.getString("email3")
                         );
-                    }
-                    if ((rst.getString("email") != null)
-                            && (!rst.getString("email").trim().isEmpty())) {
-                        imp.addContato(
-                                "4",
-                                "EMAIL",
-                                null,
-                                null,
-                                TipoContato.NFE,
-                                rst.getString("email").toLowerCase());
-                    }
-                    if ((rst.getString("email1") != null)
-                            && (!rst.getString("email1").trim().isEmpty())) {
-                        imp.addContato(
-                                "5",
-                                "EMAIL 1",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("email1").toLowerCase());
-                    }
-                    if ((rst.getString("email2") != null)
-                            && (!rst.getString("email2").trim().isEmpty())) {
-                        imp.addContato(
-                                "6",
-                                "EMAIL 2",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("email2").toLowerCase());
-                    }
-                    if ((rst.getString("email3") != null)
-                            && (!rst.getString("email3").trim().isEmpty())) {
-                        imp.addContato(
-                                "6",
-                                "EMAIL 3",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("email3").toLowerCase());
                     }
 
                     if (rst.getString("dia1") != null && (!"".equals(rst.getString("dia1")))) {
@@ -891,13 +868,23 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    /*"select \n"
                     + "codproduto, \n"
                     + "codfornec, \n"
                     + "reffornec,\n"
                     + "principal \n"
                     + "from prodfornec\n"
-                    + "order by principal desc"
+                    + "order by principal desc"*/
+                    "select\n"
+                    + "	codfornec,\n"
+                    + "	pf.codproduto,\n"
+                    + "	reffornec,\n"
+                    + "	round(e.quantidade,2) quantidade\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	join embalagem e on p.codembalcpa = e.codembal\n"
+                    + "	join prodfornec pf on p.codproduto = pf.codproduto\n"
+                    + "order by 1,2"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -907,6 +894,8 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("codproduto"));
                     imp.setIdFornecedor(rst.getString("codfornec"));
                     imp.setCodigoExterno(rst.getString("reffornec"));
+                    imp.setQtdEmbalagem(rst.getDouble("quantidade"));
+                    
                     result.add(imp);
                 }
             }
@@ -933,7 +922,6 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "	codestabelec = " + getLojaOrigem() + "\n"
                     + "	and tipoparceiro = 'F'\n"
-                    + "	and prevreal = 'R'\n"
                     + "	and pagrec = 'R'\n"
                     + "	and status = 'A'\n"
                     + "order by codlancto"
@@ -974,7 +962,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "	codestabelec = " + getLojaOrigem() + "\n"
                     + "	and tipoparceiro = 'F'\n"
-                    + "and prevreal = 'R'\n"
+                    + " and pagrec = 'P'\n"
                     + "	and status = 'A'\n"
                     + "order by codlancto"
             )) {
