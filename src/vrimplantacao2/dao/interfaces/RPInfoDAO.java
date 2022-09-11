@@ -23,6 +23,7 @@ import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -33,6 +34,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -105,6 +107,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -143,7 +146,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.SECAO,
             OpcaoProduto.PRATELEIRA,
             OpcaoProduto.OFERTA,
-            OpcaoProduto.FABRICANTE
+            OpcaoProduto.FABRICANTE,
+            OpcaoProduto.ASSOCIADO
         }));
     }
 
@@ -304,7 +308,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         return new ArrayList<>(merc.values());
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -331,8 +335,46 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rst.getString("merc1_desc"));
                     imp.setMerc2ID(rst.getString("merc2"));
                     imp.setMerc2Descricao(rst.getString("merc2_desc"));
-                    imp.setMerc3ID("1");
+                    imp.setMerc3ID(rst.getString("merc2"));
                     imp.setMerc3Descricao(rst.getString("merc2_desc"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }*/
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " g.grup_classificacao mercid1,\n"
+                    + " g.grup_descricao desc1,\n"
+                    + " g2.grup_classificacao mercid2,\n"
+                    + " g2.grup_descricao desc2,\n"
+                    + " g3.grup_classificacao mercid3,\n"
+                    + " g3.grup_descricao desc3\n"
+                    + "from grupos g\n"
+                    + " left join grupos g2 on substring(g2.grup_classificacao,1,2) = g.grup_classificacao\n"
+                    + " 	and length(g2.grup_classificacao) = 5\n"
+                    + " left join grupos g3 on substring(g3.grup_classificacao,1,5) = g2.grup_classificacao\n"
+                    + " 	and length(g3.grup_classificacao) = 8\n"
+                    + "where length(g.grup_classificacao) = 2;"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("mercid1"));
+                    imp.setMerc1Descricao(rst.getString("desc1"));
+                    imp.setMerc2ID(rst.getString("mercid2"));
+                    imp.setMerc2Descricao(rst.getString("desc2"));
+                    imp.setMerc3ID(rst.getString("mercid3"));
+                    imp.setMerc3Descricao(rst.getString("desc3"));
                     result.add(imp);
                 }
             }
@@ -406,13 +448,45 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "with loja as (\n"
+                    "select \n"
+                    + "	distinct on (tr.trib_codigo)\n"
+                    + "	tr.trib_codigo id_tributacao,\n"
+                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
+                    + "	tr.trib_codnf cst,\n"
+                    + "	tr.trib_icms aliquota,\n"
+                    + "	tr.trib_redbc reducao,\n"
+                    + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
+                    + "from\n"
+                    + "	tributacao tr\n"
+                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "where\n"
+                    + "	tr.trib_uforigem = u.unid_uf\n"
+                    + "	and tr.trib_mvtos = 'EVP'\n"
+                    + " and trib_dtival is null\n"
+                    + "union\n"
+                    + "select \n"
+                    + "	distinct on (tr.trib_codigo)\n"
+                    + "	tr.trib_codigo||'.C' id_tributacao,\n"
+                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
+                    + "	tr.trib_codnf cst,\n"
+                    + "	tr.trib_icmssubtribent aliquota,\n"
+                    + "	0 reducao,\n"
+                    + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
+                    + "from\n"
+                    + "	tributacao tr\n"
+                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "where\n"
+                    + "	tr.trib_uforigem = u.unid_uf\n"
+                    + "	and trib_mvtos = 'EDC;ETS'\n"
+                    + "	and trib_comportamento like '%SP%'\n"
+                    + " 	and trib_dtival is null"
+            /*"with loja as (\n"
                     + "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n"
                     + ")\n"
                     + "select \n"
                     + "	distinct on (tr.trib_codigo)\n"
                     + "	tr.trib_codigo id_tributacao,\n"
-                    + "	tr.trib_descricao descricao,\n"
+                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
                     + "	tr.trib_codnf cst,\n"
                     + "	tr.trib_icms aliquota,\n"
                     + "	tr.trib_redbc reducao,\n"
@@ -422,9 +496,11 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join loja on true\n"
                     + "where\n"
                     + "	tr.trib_uforigem = loja.uf\n"
-                    + "	and tr.trib_mvtos like '%EVP%'\n"
+                    + "	and tr.trib_mvtos = 'EVP'\n"
+                    + " and trib_dtival is null\n"
+                    //+ "	and tr.trib_mvtos like '%EVP%'\n"
                     + "order by\n"
-                    + "	tr.trib_codigo, tr.trib_cstpis desc"
+                    + "	tr.trib_codigo, tr.trib_cstpis desc"*/
             )) {
                 while (rst.next()) {
                     result.add(
@@ -605,8 +681,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n"
                     + "	p.prod_descricao descricaocompleta,        \n"
                     + "	p.prod_descrpdvs descricaoreduzida,\n"
-                    + "	p.prod_dpto_codigo merc1,\n"
-                    + "	p.prod_grup_codigo merc2,\n"
+                    /*+ "	p.prod_dpto_codigo merc1,\n"
+                    + "	p.prod_grup_codigo merc2,\n"*/
+                    + " substring(g.grup_classificacao,1,2) as merc1, \n"
+                    + "	 case when length(g.grup_classificacao)=8 then substring(g.grup_classificacao,1,5)\n"
+                    + "	  else g.grup_classificacao end merc2, \n"
+                    + "	 case when length(g.grup_classificacao)=5 then g.grup_classificacao||substring(g.grup_classificacao,3,5)\n"
+                    + "	  else g.grup_classificacao end merc3,\n"
                     + "	p.prod_codpreco id_familia,\n"
                     + "	p.prod_peso pesobruto,\n"
                     + "	p.prod_pesoliq pesoliquido,\n"
@@ -630,10 +711,15 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	piscofins_s.cstpiscofins piscofins_s,\n"
                     + "	piscofins_s.naturezareceita piscofins_natrec,\n"
                     + "	p.prod_trib_codigo id_icms,\n"
+                    + "	case when tr.trib_codigo||'.C' is null then p.prod_trib_codigo else tr.trib_codigo||'.C' end id_icms_entrada,\n"
                     + "	p.prod_forn_codigo\n"
                     + "from\n"
                     + "	produtos p\n"
                     + "	join loja on true\n"
+                    + " left join tributacao tr on tr.trib_codigo = substring(p.prod_trib_codigo,1,8)\n"
+                    + "		and trib_mvtos = 'EDC;ETS' and trib_comportamento like '%SP%'\n"
+                    + " 		and trib_dtival is null\n"
+                    + " left join grupos g on g.grup_codigo = p.prod_grup_codigo\n"
                     + "	left join cest on\n"
                     + "		p.prod_codigo = cest.id_produto\n"
                     + "	left join produn un on\n"
@@ -736,7 +822,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3("1");
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    //imp.setCodMercadologico3("1");
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -763,8 +850,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms"));
-                    imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoId(rst.getString("id_icms_entrada"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_entrada"));
 
                     imp.setFornecedorFabricante(rst.getString("prod_forn_codigo"));
 
@@ -792,6 +879,37 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	 p.prod_codigo idpai,\n"
+                    + "	 p.prod_descricao,\n"
+                    + "	 p.prod_qemb qtdepai,\n"
+                    + "	 a.prod_codigo idfilho,\n"
+                    + "	 a.prod_descricao,\n"
+                    + "	 a.prod_qemb qtdefilho\n"
+                    + "	from produtos p \n"
+                    + "	 join produtos a on p.prod_codigo = a.prod_codestoque and a.prod_funcao = 'VE';"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+
+                    imp.setId(rst.getString("idpai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdepai"));
+                    imp.setProdutoAssociadoId(rst.getString("idfilho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdefilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -2003,8 +2121,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         //next.setSubTotalImpressora(rst.getDouble("valor"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        //next.setValorDesconto(rst.getDouble("desconto"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -2014,7 +2132,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
+            this.sql
+                    = /*"select \n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'1' as id,\n"
                     + "  vdet_cupom||1 as cupom,\n"
                     + "  1 cancelado,\n"
@@ -2027,9 +2146,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + "\n"
                     + "where vdet_status in ('D') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5,6\n"
-                    + "UNION\n"
-                    + "select \n"
-                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'0' as id,\n"
+                    + "UNION\n"*/ "select\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as id,\n"
                     + "  vdet_cupom||0 as cupom,\n"
                     + "  0 cancelado,\n"
                     + "  vdet_datamvto datavenda,\n"
@@ -2041,7 +2159,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + "\n"
                     + "where vdet_status in ('N') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5,6";
- 
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -2078,7 +2196,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
 
-
                         next = new VendaItemIMP();
 
                         next.setId(rst.getString("id"));
@@ -2087,8 +2204,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setSequencia(rst.getInt("sequencial"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
-                        //next.setTotalBruto(rst.getDouble("valortotal"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setTotalBruto(rst.getDouble("valortotal"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
@@ -2102,23 +2219,23 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql = "select \n"
-                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial as id,\n"
-                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'0' as idvenda,\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
                     + "  vdet_cupom as cupom,\n"
-                    + "  0 cancelado,\n"
+                    + "  case when vdet_status = 'D' then 1 else 0 end cancelado,\n"
                     + "  vdet_pdv ecf,\n"
                     + "  vdet_unid_codigo loja,\n"
                     + "  vdet_prod_codigo idproduto,\n"
                     + "  un.prun_emb unidade,\n"
                     + "  vdet_sequencial sequencial,\n"
                     + "  vdet_qtde quantidade,\n"
-                    + "  (vdet_valor + vdet_valordesc)  valortotal,\n"
+                    + "  (vdet_valor + vdet_valordesc) valortotal,\n"
                     + "  vdet_valordesc desconto,\n"
-                    + "  trunc((coalesce(vdet_valor, 0) / coalesce(vdet_qtde, 1)), 2)precovenda\n"
+                    + "  trunc((coalesce(vdet_valor, 0) / coalesce(vdet_qtde, 1)), 2) precovenda\n"
                     + "from vdadet" + tabelaVenda + " vi\n"
-                    + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '"+ idLojaCliente +"'\n"
-                    + "where vdet_status in ('N') and vdet_unid_codigo = '"+ idLojaCliente +"'\n"
-                    + "union\n"
+                    + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'\n"
+                    + "where vdet_status in ('N', 'D') and vdet_unid_codigo = '" + idLojaCliente + "'\n";
+            /*+ "union\n"
                     + "select \n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial as id,\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'1'  as idvenda,\n"
@@ -2129,13 +2246,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  vdet_prod_codigo idproduto,\n"
                     + "  un.prun_emb unidade,\n"
                     + "  vdet_sequencial sequencial,\n"
-                    + "  vdet_qtde  quantidade,\n"
-                    + "  vdet_valor  valortotal,\n"
+                    + "  vdet_qtde quantidade,\n"
+                    + "  vdet_valor valortotal,\n"
                     + "  vdet_valordesc  desconto,\n"
                     + "  trunc((coalesce(vdet_valor, 0) / coalesce(vdet_qtde, 1)), 2)  precovenda\n"
                     + "from vdadet" + tabelaVenda + " vi\n"
                     + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '"+ idLojaCliente +"'\n"
-                    + "where vdet_status in ('D') and vdet_unid_codigo = '"+ idLojaCliente +"'\n";
+                    + "where vdet_status in ('D') and vdet_unid_codigo = '"+ idLojaCliente +"'\n";*/
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
