@@ -71,6 +71,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_SAAC(140, "SAAC", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_SATFACIL(213, "SATFACIL", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_SCEF(146, "SCEF", 5, "FIREBIRD", "", "", "", 3050),
+    FIREBIRD_SCV(232, "SCV", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_SDINFORMATICA(135, "SDINFORMATICA", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_SGMASTER(136, "SGMASTER", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_SHI(147, "SHI", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),

@@ -233,6 +233,7 @@ import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
+import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
@@ -274,6 +275,7 @@ import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
+import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
@@ -1894,6 +1896,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Focus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SCV(232, "SCV", new ScvDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Scv2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
