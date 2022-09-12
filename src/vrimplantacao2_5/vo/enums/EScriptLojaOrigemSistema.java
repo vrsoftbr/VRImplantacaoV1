@@ -135,7 +135,7 @@ public enum EScriptLojaOrigemSistema {
                     "	vw_exp_produtos_panificadora\n" +
                     "WHERE \n" +
                     "	rownum <= 1"),
-    LINEAR(196, 8, "SELECT emp_codigo AS id, emp_razao AS descricao FROM empresa ORDER BY 1"),
+    LINEAR(196, 8, "SELECT emp_codigo AS id, emp_fantasia AS descricao FROM empresa ORDER BY 1"),
     STOCK(215, 11, "select empid as id, empnome as descricao from tbempresas;"),
     CMM(216, 13, "select \n"
             + "	f.CodFil id,\n"

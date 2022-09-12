@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -129,7 +129,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM_MINIMA,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.PDV_VENDA
                 }
         ));
     }
