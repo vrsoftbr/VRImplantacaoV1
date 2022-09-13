@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -79,6 +77,21 @@ public class PlenusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.CEST,
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.MAPA_TRIBUTACAO
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.TIPO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
     

@@ -130,8 +130,6 @@ public class Plenus2_5GUI extends VRInternalFrame {
 
                     switch (tabs.getSelectedIndex()) {
                         case 0:
-                            break;
-                        case 1:
                             switch (tabImportacao.getSelectedIndex()) {
                                 case 0:
                                     tabProdutos.executarImportacao();
@@ -144,7 +142,7 @@ public class Plenus2_5GUI extends VRInternalFrame {
                                     break;
                                 default:
                                     break;
-                            }   break;
+                            } break;
                         default:
                             break;
                     }
