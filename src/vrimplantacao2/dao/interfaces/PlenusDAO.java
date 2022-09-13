@@ -15,8 +15,11 @@ import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -312,6 +315,142 @@ public class PlenusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    ID_CLIENTE_FORNECEDOR id,\n" +
+                    "    A.ATIVO,\n" +
+                    "    PESSOA,\n" +
+                    "    FANTASIA_APELIDO,\n" +
+                    "    CPF_CNPJ,\n" +
+                    "    RG_INSCR,\n" +
+                    "    FONE1,\n" +
+                    "    CELULAR,\n" +
+                    "    RAZSOCIAL_NOME,\n" +
+                    "    LOGRADOURO,\n" +
+                    "    C.NOME CIDADE,\n" +
+                    "    UF,\n" +
+                    "    D.ID_ESTADO,\n" +
+                    "    E.DESCRICAO BAIRRO,\n" +
+                    "    A.CEP,\n" +
+                    "    A.ID_CIDADE,\n" +
+                    "    A.ID_CIDADE_NASCIMENTO,\n" +
+                    "    A.ID_CIDADE_COBRANCA,\n" +
+                    "    A.DT_CADASTRO,\n" +
+                    "    A.EMAIL,\n" +
+                    "    C.CODMUN_IBGE,\n" +
+                    "    A.INSCR_MUNICIPAL,\n" +
+                    "    A.CONSUMIDORFINAL,\n" +
+                    "    A.FONE2,\n" +
+                    "    A.NUMERO,\n" +
+                    "    A.COMPLEMENTO\n" +
+                    "from\n" +
+                    "    CLIENTES_FORNECEDORES A,\n" +
+                    "    CIDADES C,\n" +
+                    "    ESTADOS D,\n" +
+                    "    BAIRRO E\n" +
+                    "where\n" +
+                    "    A.ID_CIDADE = C.ID_CIDADE\n" +
+                    "    and C.ID_ESTADO = D.ID_ESTADO\n" +
+                    "    and A.ID_BAIRRO = E.ID_BAIRRO\n" +
+                    "    and a.flag_fornecedor = 'T'")) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setAtivo(rs.getString("ativo").equals("T"));
+                    imp.setRazao(rs.getString("razsocial_nome"));
+                    imp.setFantasia(rs.getString("fantasia_apelido"));
+                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
+                    imp.setIe_rg(rs.getString("rg_inscr"));
+                    imp.setTel_principal(rs.getString("fone1"));
+                    
+                    String cel = rs.getString("celular");
+                    
+                    if (cel != null && !cel.isEmpty()) {
+                        imp.addCelular("CELULAR", cel);
+                    }
+                    
+                    imp.setEndereco(rs.getString("logradouro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setDatacadastro(rs.getDate("dt_cadastro"));
+                    
+                    String email = rs.getString("email");
+                    
+                    if (email != null && !email.isEmpty()) {
+                        imp.addEmail("EMAIL", email, TipoContato.NFE);
+                    }
+                    
+                    imp.setInsc_municipal(rs.getString("inscr_municipal"));
+                    
+                    String fone2 = rs.getString("fone2");
+                    
+                    if (fone2 != null && !fone2.isEmpty()) {
+                        imp.addTelefone("FONE2", fone2);
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	ID_CONTAS_PAGAR id,\n" +
+                    "	ID_FORNECEDOR,\n" +
+                    "	titulo,\n" +
+                    "	digito parcela,\n" +
+                    "	DATA_CADASTRAMENTO emissao,\n" +
+                    "	DATA_VENCIMENTO vencimento,\n" +
+                    "	VALOR,\n" +
+                    "	TOT_PARC,\n" +
+                    "	juros,\n" +
+                    "	multa,\n" +
+                    "	DESCONTO,\n" +
+                    "	OBSERVACAO\n" +
+                    "FROM \n" +
+                    "	CONTAS_PAGAR cp\n" +
+                    "WHERE \n" +
+                    "	 LIQUIDADA = 'F' AND \n" +
+                    "	 ID_EMPRESA = " + getLojaOrigem())) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setNumeroDocumento(rs.getString("titulo"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"), rs.getInt("parcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();

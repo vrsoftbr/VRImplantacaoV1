@@ -270,6 +270,7 @@ import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
+import vrimplantacao2_5.gui.sistema.Plenus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
@@ -1052,7 +1053,12 @@ public enum ESistema {
     PLENUS(119, "PLENUS", new PlenusDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Plenus2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     POLIGON(120, "POLIGON", new PoligonDAO()) {
