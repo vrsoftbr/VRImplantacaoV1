@@ -2185,23 +2185,23 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("nfcc_cupom") + "-" + rst.getString("ecf");
+                        String id = rst.getString("id");
+                        
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
 
                         next.setId(id);
-                        next.setNumeroCupom(rst.getInt("numerocupom"));
+                        next.setNumeroCupom(rst.getInt("cupom"));
                         next.setEcf(rst.getInt("ecf"));
-                        next.setModeloImpressora(rst.getString("modeloecf"));
-                        next.setNumeroSerie(rst.getString("serieecf"));
                         next.setData(rst.getDate("datavenda"));
                         String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setChaveNfCe(rst.getString("chavenfce"));
-                        next.setSubTotalImpressora(rst.getDouble("valortotal"));
+                        //next.setSubTotalImpressora(rst.getDouble("valor"));
+                        //next.setValorDesconto(rst.getDouble("desconto"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -2211,35 +2211,19 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
-                    + "	v.nfcc_transacao as id,\n"
-                    + "	v.nfcc_modelo as modeloecf,\n"
-                    + "	v.nfcc_serie as serieecf,\n"
-                    + "	v.nfcc_numerodcto as numerocupom,\n"
-                    + "	v.nfcc_idnfce as chavenfce,\n"
-                    + "	v.nfcc_pdv as ecf,\n"
-                    + "	v.nfcc_cupom,\n"
-                    + "	v.nfcc_dataemissao as datavenda,\n"
-                    + " min(vi.vdet_hora) as horainicio,\n"
-                    + "	max(vi.vdet_hora) as horatermino, \n"
-                    + "	sum(vi.vdet_valor) as valortotal\n"
-                    + "from nfcc v\n"
-                    + "join vdadet" + tabelaVenda + " vi \n"
-                    + "	on vi.vdet_transacao = v.nfcc_transacao\n"
-                    + "	and vi.vdet_cupom = v.nfcc_cupom\n"
-                    + "	and vi.vdet_datamvto = v.nfcc_dataemissao\n"
-                    + "where v.nfcc_unid_codigo = '" + idLojaCliente + "' \n"
-                    + " and vi.vdet_unid_codigo = '" + idLojaCliente + "' \n"
-                    + " and vi.vdet_status = 'N'\n"
-                    + "group by \n"
-                    + "	v.nfcc_transacao,\n"
-                    + "	v.nfcc_modelo,\n"
-                    + "	v.nfcc_serie,\n"
-                    + "	v.nfcc_numerodcto,\n"
-                    + "	v.nfcc_idnfce,\n"
-                    + "	v.nfcc_pdv,\n"
-                    + "	v.nfcc_cupom,\n"
-                    + "	v.nfcc_dataemissao";
+            this.sql = "select\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as id,\n"
+                    + "  vdet_cupom||0 as cupom,\n"
+                    + "  0 cancelado,\n"
+                    + "  vdet_datamvto datavenda,\n"
+                    + "  vdet_pdv||vdet_hora ecf,\n"
+                    + "  vdet_unid_codigo,\n"
+                    + "  sum(vdet_qtde) quantidade,\n"
+                    + "  sum(vdet_valor) valor,\n"
+                    + "  sum(vdet_valordesc) desconto\n"
+                    + "from vdadet" + tabelaVenda + "\n"
+                    + "where vdet_status in ('N') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
+                    + "group by 1,2,3,4,5,6";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);            
         }
@@ -2275,64 +2259,51 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
                 if (next == null) {
                     if (rst.next()) {
-
-                        String id
-                                = rst.getString("id")
-                                + "-" + rst.getString("numerocupom")
-                                + "-" + rst.getString("datavenda")
-                                + "-" + rst.getString("idproduto")
-                                + "-" + rst.getString("codigobarras")
-                                + "-" + rst.getString("sequencia")
-                                + "-" + rst.getString("pdv");
-                        
-                        String idvenda = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("pdv");
-
                         next = new VendaItemIMP();
 
-                        next.setId(id);
-                        next.setVenda(idvenda);
+                        next.setId(rst.getString("id"));
+                        next.setVenda(rst.getString("idvenda"));
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setSequencia(rst.getInt("sequencial"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
                         //next.setCancelado(rst.getBoolean("cancelado"));
-                        //next.setValorAcrescimo(rst.getDouble("valoracrescimo"));
-                        //next.setValorDesconto(rst.getDouble("valordesconto"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("tipoembalagem"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
                         next.setIcmsCst(rst.getInt("csticms"));
                         next.setIcmsAliq(rst.getDouble("aliqicms"));
                         next.setIcmsReduzido(0);
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select distinct\n"
-                    + "	vi.vdet_transacao as id,\n"
-                    + "	vi.vdet_cupom as numerocupom,\n"
-                    + "	vi.vdet_datamvto as datavenda,\n"
-                    + " vi.vdet_pdv as pdv,\n"
-                    + "	vi.vdet_prod_codigo as idproduto,\n"
-                    + "	vi.vdet_codbarras as codigobarras,\n"
-                    + " un.prun_emb as tipoembalagem, \n"
-                    + "	vi.vdet_sequencial as sequencia,\n"
-                    + "	vi.vdet_qtde as quantidade,\n"
-                    + "	vi.vdet_valor as valortotal,\n"
-                    + "	trunc((coalesce(vi.vdet_valor, 0) / coalesce(vi.vdet_qtde, 1)), 2) as precovenda,\n"
-                    + "	vi.vdet_cst as csticms,\n"
-                    + "	vi.vdet_icms as aliqicms\n"
-                    + "from vdadet" + tabelaVenda + " vi \n"
-                    + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo \n"
-                    + " left join produn un on p.prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'"
-                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'\n"
-                    + " and vi.vdet_status = 'N'";
+            this.sql = "select \n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
+                    + "  vdet_cupom as cupom,\n"
+                    + "  case when vdet_status = 'D' then 1 else 0 end cancelado,\n"
+                    + "  vdet_pdv ecf,\n"
+                    + "  vdet_unid_codigo loja,\n"
+                    + "  vdet_prod_codigo idproduto,\n"
+                    + "  un.prun_emb unidade,\n"
+                    + "  vdet_sequencial sequencial,\n"
+                    + "  vdet_qtde quantidade,\n"
+                    + "  (vdet_valor + vdet_valordesc) valortotal,\n"
+                    + "  vdet_valordesc desconto,\n"
+                    + "  trunc((coalesce(vdet_valor, 0) / coalesce(vdet_qtde, 1)), 2) precovenda,\n"
+                    + "  vdet_icms aliqicms,\n"
+                    + "  vdet_cst csticms\n"
+                    + "from vdadet" + tabelaVenda + " vi\n"
+                    + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'\n"
+                    + "where vdet_status in ('N', 'D') and vdet_unid_codigo = '" + idLojaCliente + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
+            System.out.println(sql);
             rst = stm.executeQuery(sql);
         }
 
