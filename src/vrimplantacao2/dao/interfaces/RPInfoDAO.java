@@ -1900,16 +1900,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rs.getDate("databaixa")).
                                 setObservacao(rs.getString("observacao") 
                                                 + " - PAGO - PARCELA " + rs.getInt("parcela")
-                                                + " - VALOR " + rs.getDouble("valor")
-                                                + " - DESCONTO " + rs.getDouble("desconto"));
+                                                + " - Valor Total " + rs.getDouble("valor")
+                                                + " - Desconto " + rs.getDouble("desconto"));
                     } else {
                         imp.addVencimento(
                                 rs.getDate("vencimento"),
                                 imp.getValor()).
                                 setObservacao(rs.getString("observacao") 
                                                 + " - PARCELA " + rs.getInt("parcela")
-                                                + " - VALOR " + rs.getDouble("valor")
-                                                + " - DESCONTO " + rs.getDouble("desconto"));
+                                                + " - Valor Total " + rs.getDouble("valor")
+                                                + " - Desconto " + rs.getDouble("desconto"));
                     }
 
                     result.add(imp);
