@@ -2283,7 +2283,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
+            this.sql = "select distinct\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
                     + "  vdet_cupom as cupom,\n"
