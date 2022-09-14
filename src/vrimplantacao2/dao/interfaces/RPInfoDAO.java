@@ -448,44 +448,36 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	distinct on (tr.trib_codigo)\n"
-                    + "	tr.trib_codigo id_tributacao,\n"
-                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
-                    + "	tr.trib_codnf cst,\n"
-                    + "	tr.trib_icms aliquota,\n"
-                    + "	tr.trib_redbc reducao,\n"
-                    + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
-                    + "from\n"
-                    + "	tributacao tr\n"
-                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '" + getLojaOrigem() + "'\n"
+                    "select distinct\n"
+                    + " case when t.trib_mvtos = 'EAQ' then t.trib_codigo||'.C'\n"
+                    + " 	else t.trib_codigo end id_tributacao,\n"
+                    + " t.trib_simb||'-'||t.trib_descricao descricao,\n"
+                    + " t.trib_mvtos,\n"
+                    + " t.trib_codnf cst,\n"
+                    + " t.trib_icms aliquota,\n"
+                    + " t.trib_redbc reducao,\n"
+                    + " t.trib_controle\n"
+                    + "from tributacao t\n"
+                    + "join produtos p on p.prod_trib_codigo = t.trib_codigo\n"
                     + "where\n"
-                    + "	tr.trib_uforigem = u.unid_uf\n"
-                    + "	and tr.trib_mvtos = 'EVP'\n"
-                    + " and trib_dtival is null\n"
-                    + "union\n"
+                    + "t.trib_controle in (\n"
+                    + "with codigos as(\n"
                     + "select \n"
-                    + "	distinct on (tr.trib_codigo)\n"
-                    + "	tr.trib_codigo||'.C' id_tributacao,\n"
-                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
-                    + "	tr.trib_codnf cst,\n"
-                    + "	tr.trib_icmssubtribent aliquota,\n"
-                    + "	0 reducao,\n"
-                    + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
-                    + "from\n"
-                    + "	tributacao tr\n"
-                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '" + getLojaOrigem() + "'\n"
-                    + "where\n"
-                    + "	tr.trib_uforigem = u.unid_uf\n"
-                    + "	and trib_mvtos = 'EDC;ETS'\n"
-                    + "	and trib_comportamento like '%SP%'\n"
-                    + " 	and trib_dtival is null"
-            /*"with loja as (\n"
-                    + "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + " mprd_icms,\n"
+                    + " mprd_percredbc,\n"
+                    + " mprd_tipo,\n"
+                    + " mprd_dcto_tipo,\n"
+                    + " max(mprd_datamvto) as data\n"
+                    + "from movprodd22 \n"
+                    + "where  mprd_dcto_tipo in ('EAQ','EVP')\n"
+                    + "group by 1,2,3,4\n"
                     + ")\n"
-                    + "select \n"
+                    + "select mprd_tipo from codigos\n"
+                    + ")"
+            /*"select distinct\n"
                     + "	distinct on (tr.trib_codigo)\n"
-                    + "	tr.trib_codigo id_tributacao,\n"
+                    + "	case when tr.trib_mvtos = 'EAQ' then tr.trib_codigo||'.C'\n"
+                    + " 	else tr.trib_codigo end id_tributacao,\n"
                     + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
                     + "	tr.trib_codnf cst,\n"
                     + "	tr.trib_icms aliquota,\n"
@@ -493,14 +485,11 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
                     + "from\n"
                     + "	tributacao tr\n"
-                    + "	join loja on true\n"
+                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '"+ getLojaOrigem() +"'\n"
                     + "where\n"
-                    + "	tr.trib_uforigem = loja.uf\n"
-                    + "	and tr.trib_mvtos = 'EVP'\n"
-                    + " and trib_dtival is null\n"
-                    //+ "	and tr.trib_mvtos like '%EVP%'\n"
-                    + "order by\n"
-                    + "	tr.trib_codigo, tr.trib_cstpis desc"*/
+                    + "	tr.trib_uforigem = u.unid_uf\n"
+                    + "	and tr.trib_mvtos in ('EVD;EVL','EAQ')\n"
+                    + " and trib_dtival is null"*/
             )) {
                 while (rst.next()) {
                     result.add(
@@ -711,14 +700,15 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	piscofins_s.cstpiscofins piscofins_s,\n"
                     + "	piscofins_s.naturezareceita piscofins_natrec,\n"
                     + "	p.prod_trib_codigo id_icms,\n"
-                    + "	case when tr.trib_codigo||'.C' is null then p.prod_trib_codigo else tr.trib_codigo||'.C' end id_icms_entrada,\n"
+                    + " p.prod_trib_codigo||'.C' id_icms_entrada,\n"
+                    //+ "	case when tr.trib_codigo||'.C' is null then p.prod_trib_codigo else tr.trib_codigo||'.C' end id_icms_entrada,\n"
                     + "	p.prod_forn_codigo\n"
                     + "from\n"
                     + "	produtos p\n"
                     + "	join loja on true\n"
-                    + " left join tributacao tr on tr.trib_codigo = substring(p.prod_trib_codigo,1,8)\n"
-                    + "		and trib_mvtos = 'EDC;ETS' and trib_comportamento like '%SP%'\n"
-                    + " 		and trib_dtival is null\n"
+                    //                    + " left join tributacao tr on tr.trib_codigo = substring(p.prod_trib_codigo,1,8)\n"
+                    //                    + "		and trib_mvtos = 'EDC;ETS' and trib_comportamento like '%SP%'\n"
+                    //                    + " 		and trib_dtival is null\n"
                     + " left join grupos g on g.grup_codigo = p.prod_grup_codigo\n"
                     + "	left join cest on\n"
                     + "		p.prod_codigo = cest.id_produto\n"
@@ -1828,12 +1818,14 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pg.pfin_dataemissao dataemissao,\n"
                     + "	pg.pfin_datalcto dataentrada,\n"
                     + "	pg.pfin_valor valor,\n"
+                    + " pg.pfin_descontos desconto,\n"
                     + "	pg.pfin_datavcto vencimento,\n"
                     + "	pg.pfin_parcela parcela,\n"
                     + "	pg.pfin_observacao observacao,\n"
                     + "	pg.pfin_banco banco,\n"
                     + "	pg.pfin_agencia agencia,\n"
-                    + "	pg.pfin_espe_codigo id_especie\n"
+                    + "	pg.pfin_espe_codigo id_especie,\n"
+                    + " (pg.pfin_valor - pg.pfin_descontos) valorliquido\n"
                     + "from\n"
                     + "	pendfin pg\n"
                     + "    join planoger pl on\n"
@@ -1858,6 +1850,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pg.pfin_dataemissao dataemissao,\n"
                         + "	pg.pfin_datalcto dataentrada,\n"
                         + "	pg.pfin_valor valor,\n"
+                        + "     pg.pfin_descontos desconto,\n"
                         + "	pg.pfin_datavcto vencimento,\n"
                         + "	pg.pfin_parcela parcela,\n"
                         + "	pg.pfin_observacao observacao,\n"
@@ -1866,7 +1859,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pg.pfin_espe_codigo id_especie,\n"
                         + "	pg.pfin_abatimentos,\n"
                         + "	pg.pfin_databaixa databaixa,\n"
-                        + "	pg.pfin_seqbaixa\n"
+                        + "	pg.pfin_seqbaixa,\n"
+                        + "     (pg.pfin_valor - pg.pfin_descontos) valorliquido\n"
                         + "from\n"
                         + "	pendfin pg\n"
                         + "    join planoger pl on pg.pfin_pger_conta = pl.pger_conta\n"
@@ -1890,7 +1884,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    imp.setValor(rs.getDouble("valor"));
+                    imp.setValor(rs.getDouble("valorliquido"));
                     //imp.setVencimento(rs.getDate("vencimento"));
                     //imp.setObservacao(rs.getString("observacao"));
                     /*ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
@@ -1904,12 +1898,18 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rs.getDate("vencimento"),
                                 imp.getValor(),
                                 rs.getDate("databaixa")).
-                                setObservacao(rs.getString("observacao") + " - PAGO - PARCELA " + rs.getInt("parcela"));
+                                setObservacao(rs.getString("observacao") 
+                                                + " - PAGO - PARCELA " + rs.getInt("parcela")
+                                                + " - VALOR " + rs.getDouble("valor")
+                                                + " - DESCONTO " + rs.getDouble("desconto"));
                     } else {
                         imp.addVencimento(
                                 rs.getDate("vencimento"),
                                 imp.getValor()).
-                                setObservacao(rs.getString("observacao") + " - PARCELA " + rs.getInt("parcela"));
+                                setObservacao(rs.getString("observacao") 
+                                                + " - PARCELA " + rs.getInt("parcela")
+                                                + " - VALOR " + rs.getDouble("valor")
+                                                + " - DESCONTO " + rs.getDouble("desconto"));
                     }
 
                     result.add(imp);
@@ -2218,7 +2218,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
-            this.sql = "select \n"
+            this.sql = "select distinct\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
                     + "  vdet_cupom as cupom,\n"
