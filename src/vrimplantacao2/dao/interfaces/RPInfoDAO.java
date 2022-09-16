@@ -26,6 +26,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -33,13 +34,17 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoPagamento;
+import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
+import vrimplantacao2.vo.importacao.ContaReceberPagamentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -63,10 +68,20 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean utilizarCustoNota = false;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    
+    public boolean apenasRotativoBaixados = false;
+    private Date dtInicioRotativo;
+    private Date dtFimRotativo;
+    
     public boolean apenasBaixadosContasPagar = false;
     private Date dtInicioContasPagar;
     private Date dtFimContasPagar;
-
+    
+    public boolean apenasContaReceberBaixadas = false;
+    private Date dtInicioContaReceber;
+    private Date dtFimContaReceber;
+    
+    /*Contas a Pagar Baixadas*/
     public boolean isContaPagarBaixada() {
         return apenasBaixadosContasPagar;
     }
@@ -78,6 +93,33 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setCpDataTermino(Date cpDataTermino) {
         this.dtFimContasPagar = cpDataTermino;
     }
+    
+    /*Contas a Receber Baixadas*/
+    public boolean isContaReceberBaixada() {
+        return apenasContaReceberBaixadas;
+    }
+
+    public void setContaReceberDataInicio(Date ContaReceberDataInicio) {
+        this.dtInicioContaReceber = ContaReceberDataInicio;
+    }
+
+    public void setContaReceberDataTermino(Date ContaReceberDataTermino) {
+        this.dtFimContaReceber = ContaReceberDataTermino;
+    }
+    
+    /*Rotativo Baixados*/
+    public boolean isRotativoBaixada() {
+        return apenasRotativoBaixados;
+    }
+
+    public void setRotativoDataInicio(Date RotativoDataInicio) {
+        this.dtInicioRotativo = RotativoDataInicio;
+    }
+
+    public void setRotativoDataTermino(Date RotativoDataTermino) {
+        this.dtFimRotativo = RotativoDataTermino;
+    }
+    
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -448,7 +490,45 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
+                    "with tributacao_ as(\n"
+                    + "select \n"
+                    + "	case when tr.trib_mvtos = 'EAQ' then tr.trib_codigo||'.C'\n"
+                    + " 	else tr.trib_codigo end id,\n"
+                    + "	trib_simb||'-'||tr.trib_descricao descricao,\n"
+                    + "	substring(tr.trib_codnf,2,3) cst,\n"
+                    + "	tr.trib_icms aliquota,\n"
+                    + "	tr.trib_redbc reducao,\n"
+                    + "	coalesce(tr.trib_fcpaliq, 0) fcp,\n"
+                    + "	 trib_controle \n"
+                    + "from\n"
+                    + "	tributacao tr\n"
+                    + "	join unidades u on u.unid_codigo = tr.trib_unidades and u.unid_codigo = '001'\n"
+                    + "where\n"
+                    + "	tr.trib_uforigem = u.unid_uf\n"
+                    + " and tr.trib_mvtos in ('EVD;EVL','EAQ')\n"
+                    + " and trib_dtival is null\n"
+                    + " and trib_caracttrib like 'A%'\n"
+                    + " )\n"
+                    + " select \n"
+                    + "   id,descricao, cst, aliquota, reducao\n"
+                    + " from tributacao_"
+            /*"select distinct \n"
+                    + " m.mprd_tipo id,\n"
+                    + " m.mprd_icms,\n"
+                    + " t.trib_simb descricao,\n"
+                    + " t.trib_icms aliquota,\n"
+                    + " substring(t.trib_codnf,2,3) cst,\n"
+                    + " m.mprd_percredbc,\n"
+                    + " t.trib_redbc reducao,\n"
+                    + " m.mprd_dcto_tipo,\n"
+                    + " t.trib_codigo,\n"
+                    + " max(m.mprd_datamvto) as data \n"
+                    + "from produtos p\n"
+                    + "left join movprodd22 m on m.mprd_prod_codigo = p.prod_codigo \n"
+                    + "left join tributacao t on t.trib_controle = m.mprd_tipo\n"
+                    + "where  m.mprd_dcto_tipo in ('EAQ','EVP')\n"
+                    + "group by 1,2,3,4,5,6,7,8,9"*/
+            /*"select distinct\n"
                     + " case when t.trib_mvtos = 'EAQ' then t.trib_codigo||'.C'\n"
                     + " 	else t.trib_codigo end id_tributacao,\n"
                     + " t.trib_simb||'-'||t.trib_descricao descricao,\n"
@@ -473,7 +553,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "group by 1,2,3,4\n"
                     + ")\n"
                     + "select mprd_tipo from codigos\n"
-                    + ")"
+                    + ")"*/
             /*"select distinct\n"
                     + "	distinct on (tr.trib_codigo)\n"
                     + "	case when tr.trib_mvtos = 'EAQ' then tr.trib_codigo||'.C'\n"
@@ -494,7 +574,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     result.add(
                             new MapaTributoIMP(
-                                    rst.getString("id_tributacao"),
+                                    rst.getString("id"),
                                     rst.getString("descricao"),
                                     rst.getInt("cst"),
                                     rst.getDouble("aliquota"),
@@ -650,6 +730,18 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		prau_cest cest\n"
                     + "	from\n"
                     + "		prodaux p\n"
+                    + "),\n"
+                    + "icms as (\n"
+                    + "	select distinct \n"
+                    + " 		m.mprd_prod_codigo produtoid,\n"
+                    + " 		m.mprd_tipo id_icms,\n"
+                    + " 		m.mprd_dcto_tipo tipo,\n"
+                    + " 		max(m.mprd_datamvto) as data\n"
+                    + "	from produtos p\n"
+                    + "	 left join movprodd22 m on m.mprd_prod_codigo = p.prod_codigo \n"
+                    + "	 left join tributacao t on t.trib_controle = m.mprd_tipo\n"
+                    + "	where  m.mprd_dcto_tipo in ('EAQ','EVP')--,'EDV','EVL')\n"
+                    + "	 group by 1,2,3\n"
                     + ")\n"
                     + "select\n"
                     + "	p.prod_codigo id,\n"
@@ -699,16 +791,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	un.prun_setordep departamento,\n"
                     + "	piscofins_s.cstpiscofins piscofins_s,\n"
                     + "	piscofins_s.naturezareceita piscofins_natrec,\n"
-                    + "	p.prod_trib_codigo id_icms,\n"
+                    + " p.prod_trib_codigo id_icms,\n"
                     + " p.prod_trib_codigo||'.C' id_icms_entrada,\n"
-                    //+ "	case when tr.trib_codigo||'.C' is null then p.prod_trib_codigo else tr.trib_codigo||'.C' end id_icms_entrada,\n"
+                    + " case when i_entrada.id_icms is null then i_saida.id_icms else i_entrada.id_icms end ,\n"
+                    + " case when i_saida.id_icms is null then i_entrada.id_icms else i_saida.id_icms end ,\n"
                     + "	p.prod_forn_codigo\n"
                     + "from\n"
                     + "	produtos p\n"
                     + "	join loja on true\n"
-                    //                    + " left join tributacao tr on tr.trib_codigo = substring(p.prod_trib_codigo,1,8)\n"
-                    //                    + "		and trib_mvtos = 'EDC;ETS' and trib_comportamento like '%SP%'\n"
-                    //                    + " 		and trib_dtival is null\n"
+                    + " left join icms i_entrada on i_entrada.produtoid = p.prod_codigo and i_entrada.tipo = 'EAQ'\n"
+                    + "	left join icms i_saida on i_saida.produtoid = p.prod_codigo and i_saida.tipo = 'EVP'\n"
                     + " left join grupos g on g.grup_codigo = p.prod_grup_codigo\n"
                     + "	left join cest on\n"
                     + "		p.prod_codigo = cest.id_produto\n"
@@ -1673,8 +1765,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             if (importarFuncionario) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select \n"
+                String sql = "select \n"
                         + "	pfin_operacao id,\n"
                         + "	pfin_dataemissao emissao,\n"
                         + "	pfin_datavcto vencimento,\n"
@@ -1685,7 +1776,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_complemento observacao,\n"
                         + "	pfin_numerodcto cupom,\n"
                         + "	pfin_parcela parcela,\n"
-                        + "	pfin_valor valor\n"
+                        + "	pfin_valor valor,\n"
+                        + "     pfin_databaixa databaixa\n"
                         + "from \n"
                         + "	pendfin\n"
                         + "	left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
@@ -1693,7 +1785,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
                         + "	pfin_pr = 'R' and\n"
                         + "	pfin_status = 'P' and\n"
-                        + "	pfin_pger_conta in (112152) \n"
+                        + "	pfin_pger_conta in (112702,112703,112121,112807,112101,112102) \n"
                         + "union all \n"
                         + "select \n"
                         + "	pfin_operacao id,\n"
@@ -1706,7 +1798,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_complemento observacao,\n"
                         + "	pfin_numerodcto cupom,\n"
                         + "	pfin_parcela parcela,\n"
-                        + "	pfin_valor valor\n"
+                        + "	pfin_valor valor,\n"
+                        + "     pfin_databaixa databaixa\n"
                         + "from \n"
                         + "	pendfin\n"
                         + "	left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
@@ -1714,7 +1807,56 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
                         + "	pfin_pr = 'R' and\n"
                         + "	pfin_status = 'P' and\n"
-                        + "	pfin_pger_conta in (112152) ")) {
+                        + "	pfin_pger_conta in (112702,112703,112121,112807,112101,112102) ";
+
+                if (apenasRotativoBaixados) {
+                    sql = "select \n"
+                            + "	pfin_operacao id,\n"
+                            + "	pfin_dataemissao emissao,\n"
+                            + "	pfin_datavcto vencimento,\n"
+                            + "	pfin_pdvs_codigo ecf,\n"
+                            + "	pfin_codentidade::varchar idcliente,\n"
+                            + "	c.clie_razaosocial razao,\n"
+                            + "	c.clie_cnpjcpf cnpj,\n"
+                            + "	pfin_complemento||' - PAGO' observacao,\n"
+                            + "	pfin_numerodcto cupom,\n"
+                            + "	pfin_parcela parcela,\n"
+                            + "	pfin_valor valor,\n"
+                            + "     pfin_databaixa databaixa\n"
+                            + "from \n"
+                            + "	pendfin\n"
+                            + "	left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                            + "where\n"
+                            + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                            + "	pfin_pr = 'R' and\n"
+                            + "	pfin_status = 'B' and\n"
+                            + "	pfin_pger_conta in (112702,112703,112121,112807,112101,112102) \n"
+                            + " and pfin_dataemissao between '" + DATE_FORMAT.format(dtInicioRotativo) + "' and '" + DATE_FORMAT.format(dtFimRotativo) + "'\n"
+                            + "union all \n"
+                            + "select \n"
+                            + "	pfin_operacao id,\n"
+                            + "	pfin_dataemissao emissao,\n"
+                            + "	pfin_datavcto vencimento,\n"
+                            + "	pfin_pdvs_codigo ecf,\n"
+                            + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
+                            + "	f.func_nome razao,\n"
+                            + "	f.func_cpf cnpj,\n"
+                            + "	pfin_complemento||' - PAGO' observacao,\n"
+                            + "	pfin_numerodcto cupom,\n"
+                            + "	pfin_parcela parcela,\n"
+                            + "	pfin_valor valor,\n"
+                            + "     pfin_databaixa databaixa\n"
+                            + "from \n"
+                            + "	pendfin\n"
+                            + "	left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
+                            + "where\n"
+                            + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                            + "	pfin_pr = 'R' and\n"
+                            + "	pfin_status = 'B' and\n"
+                            + "	pfin_pger_conta in (112702,112703,112121,112807,112101,112102) \n"
+                            + " and pfin_dataemissao between '" + DATE_FORMAT.format(dtInicioRotativo) + "' and '" + DATE_FORMAT.format(dtFimRotativo) + "'";
+                }
+                try (ResultSet rs = stm.executeQuery(sql)) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1727,15 +1869,18 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setParcela(rs.getInt("parcela"));
                         imp.setValor(rs.getDouble("valor"));
                         imp.setNumeroCupom(rs.getString("cupom"));
-
+                        
+                        if(apenasRotativoBaixados){
+                            imp.addPagamento(imp.getId(), imp.getValor(), 0, 0, rs.getDate("databaixa"), rs.getString("observacao"));
+                        }
+                      
                         incluirLancamentos(imp);
 
                         result.add(imp);
                     }
                 }
             } else {
-                try (ResultSet rs = stm.executeQuery(
-                        "select \n"
+                String sql = "select \n"
                         + "	pfin_pger_conta conta,\n"
                         + "       pfin_unid_codigo unidade,\n"
                         + "	pfin_operacao id,\n"
@@ -1760,7 +1905,40 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_pr = 'R' and\n"
                         + "	pfin_status = 'P' and\n"
                         + "       pfin_catentidade = 'C' and\n"
-                        + "       not pfin_pger_conta in (117301, 112501)\n"
+                        + "       not pfin_pger_conta in (112702,112703,112121,112807,112101,112102)\n";
+                if (apenasRotativoBaixados) {
+                    sql = "select \n"
+                            + "	pfin_pger_conta conta,\n"
+                            + "       pfin_unid_codigo unidade,\n"
+                            + "	pfin_operacao id,\n"
+                            + "	pfin_dataemissao emissao,\n"
+                            + "	pfin_datavcto vencimento,\n"
+                            + "     pfin_databaixa databaixa,\n"
+                            + "	pfin_pdvs_codigo ecf,\n"
+                            + "	pfin_codentidade::varchar idcliente,\n"
+                            + "	c.clie_razaosocial razao,\n"
+                            + "	c.clie_cnpjcpf cnpj,\n"
+                            + "	pfin_complemento||' - PAGO' observacao,\n"
+                            + "	pfin_numerodcto cupom,\n"
+                            + "	pfin_parcela parcela,\n"
+                            + "	pfin_valor valor,\n"
+                            + "	pfin_baixaparcial valorpago,\n"
+                            + "	pfin_juros juros,\n"
+                            + "	pfin_multa multa\n"
+                            + "from \n"
+                            + "	pendfin\n"
+                            + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                            + "where\n"
+                            + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                            + "	pfin_pr = 'R' and\n"
+                            + "	pfin_status = 'B' and\n"
+                            + "       pfin_catentidade = 'C' and\n"
+                            + "       not pfin_pger_conta in (112702,112703,112121,112807,112101,112102)\n"
+                            + " and pfin_dataemissao between '" + DATE_FORMAT.format(dtInicioRotativo) + "' and '" + DATE_FORMAT.format(dtFimRotativo) + "'";
+                }
+
+                try (ResultSet rs = stm.executeQuery(
+                        sql
                 )) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1783,6 +1961,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         );
                         System.out.println(format);
                         imp.setObservacao(format);
+                        
+                        if(apenasRotativoBaixados){
+                            imp.addPagamento(imp.getId(), imp.getValor(), 0, 0, rs.getDate("databaixa"), rs.getString("observacao"));
+                        }
 
                         double valorPago = rs.getDouble("valorpago");
                         if (valorPago > 0) {
@@ -1898,18 +2080,18 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rs.getDate("vencimento"),
                                 imp.getValor(),
                                 rs.getDate("databaixa")).
-                                setObservacao(rs.getString("observacao") 
-                                                + " - PAGO - PARCELA " + rs.getInt("parcela")
-                                                + " - Valor Total " + rs.getDouble("valor")
-                                                + " - Desconto " + rs.getDouble("desconto"));
+                                setObservacao(rs.getString("observacao")
+                                        + " - PAGO - PARCELA " + rs.getInt("parcela")
+                                        + " - Valor Total " + rs.getDouble("valor")
+                                        + " - Desconto " + rs.getDouble("desconto"));
                     } else {
                         imp.addVencimento(
                                 rs.getDate("vencimento"),
                                 imp.getValor()).
-                                setObservacao(rs.getString("observacao") 
-                                                + " - PARCELA " + rs.getInt("parcela")
-                                                + " - Valor Total " + rs.getDouble("valor")
-                                                + " - Desconto " + rs.getDouble("desconto"));
+                                setObservacao(rs.getString("observacao")
+                                        + " - PARCELA " + rs.getInt("parcela")
+                                        + " - Valor Total " + rs.getDouble("valor")
+                                        + " - Desconto " + rs.getDouble("desconto"));
                     }
 
                     result.add(imp);
@@ -2062,6 +2244,100 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setProdutos(produtos);
     }
 
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            
+            String sql = "   select \n"
+                    + "	pg.pfin_transacao,\n"
+                    + "	pg.pfin_operacao,\n"
+                    + "	pg.pfin_codentidade id_fornecedor,\n"
+                    + "	pg.pfin_numerodcto numerodocumento,\n"
+                    + "	pg.pfin_dataemissao dataemissao,\n"
+                    + "	pg.pfin_datalcto dataentrada,\n"
+                    + "	pg.pfin_valor valor,\n"
+                    + " 	pg.pfin_descontos desconto,\n"
+                    + "	pg.pfin_datavcto vencimento,\n"
+                    + "	pg.pfin_parcela parcela,\n"
+                    + "	pg.pfin_observacao observacao,\n"
+                    + "	pg.pfin_banco banco,\n"
+                    + "	pg.pfin_agencia agencia,\n"
+                    + "	pg.pfin_espe_codigo id_especie,\n"
+                    + " 	(pg.pfin_valor - pg.pfin_descontos) valorliquido\n"
+                    + "from\n"
+                    + "	pendfin pg\n"
+                    + "    join planoger pl on pg.pfin_pger_conta = pl.pger_conta\n"
+                    + "    join fornecedores f on pg.pfin_codentidade = f.forn_codigo\n"
+                    + "where\n"
+                    + "	pg.pfin_status = 'P'\n"
+                    + "    and pg.pfin_pr = 'R'\n"
+                    + "    and pg.pfin_catentidade != 'C'\n"
+                    + "    and pg.pfin_seqbaixa is null\n"
+                    + "    and pg.pfin_unid_codigo = '001'\n"
+                    + "order by\n"
+                    + "	1, 2";
+            if(apenasContaReceberBaixadas){
+                sql = "select \n"
+                        + "	pg.pfin_transacao,\n"
+                        + "	pg.pfin_operacao,\n"
+                        + "	pg.pfin_codentidade id_fornecedor,\n"
+                        + "	pg.pfin_numerodcto numerodocumento,\n"
+                        + "	pg.pfin_dataemissao dataemissao,\n"
+                        + "	pg.pfin_datalcto dataentrada,\n"
+                        + "	pg.pfin_valor valor,\n"
+                        + "     pg.pfin_descontos desconto,\n"
+                        + "	pg.pfin_datavcto vencimento,\n"
+                        + "	pg.pfin_parcela parcela,\n"
+                        + "	pg.pfin_observacao||' - PAGO' observacao,\n"
+                        + "	pg.pfin_banco banco,\n"
+                        + "	pg.pfin_agencia agencia,\n"
+                        + "	pg.pfin_espe_codigo id_especie,\n"
+                        + "	pg.pfin_abatimentos,\n"
+                        + "	pg.pfin_databaixa databaixa,\n"
+                        + "	pg.pfin_seqbaixa,\n"
+                        + "     (pg.pfin_valor - pg.pfin_descontos) valorliquido\n"
+                        + "from\n"
+                        + "	pendfin pg\n"
+                        + "    join planoger pl on pg.pfin_pger_conta = pl.pger_conta\n"
+                        + "    join fornecedores f on pg.pfin_codentidade = f.forn_codigo\n"
+                        + "where\n"
+                        + "	pg.pfin_status = 'B'\n"
+                        + "    and pg.pfin_pr = 'P'\n"
+                        + "    and pg.pfin_catentidade != 'C'\n"
+                        + "    and pg.pfin_seqbaixa is not null\n"
+                        + "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
+                        + "    and pg.pfin_dataemissao between '" + DATE_FORMAT.format(dtInicioContaReceber) + "' and '" + DATE_FORMAT.format(dtFimContaReceber) + "'\n"
+                        + "order by 1, 2";
+            }
+            
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                while (rst.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(String.format("%s-%s", rst.getString("pfin_transacao"), rst.getString("pfin_operacao")));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valorliquido"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    if(apenasContaReceberBaixadas){
+                      imp.add(imp.getId(), imp.getValor(), 0, 0, 0, rst.getDate("databaixa"));
+                      
+                    }
+                    
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /* Migração de vendas */
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
@@ -2146,12 +2422,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + "\n"
                     + "where vdet_status in ('D') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5,6\n"
-                    + "UNION\n"*/ "select\n"
-                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as id,\n"
-                    + "  vdet_cupom||0 as cupom,\n"
+                    + "UNION\n"*/ 
+                    "select\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_pdv as id,\n"
+                    + "  vdet_cupom as cupom,\n"
                     + "  0 cancelado,\n"
                     + "  vdet_datamvto datavenda,\n"
-                    + "  vdet_pdv||vdet_hora ecf,\n"
+                    + "  vdet_pdv ecf,\n"
                     + "  vdet_unid_codigo,\n"
                     + "  sum(vdet_qtde) quantidade,\n"
                     + "  sum(vdet_valor) valor,\n"
@@ -2220,7 +2497,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql = "select distinct\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
-                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
+                    + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_pdv as idvenda,\n"
                     + "  vdet_cupom as cupom,\n"
                     + "  case when vdet_status = 'D' then 1 else 0 end cancelado,\n"
                     + "  vdet_pdv ecf,\n"

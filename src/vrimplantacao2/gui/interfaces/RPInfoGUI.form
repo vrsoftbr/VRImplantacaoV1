@@ -125,9 +125,6 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -136,9 +133,13 @@
                                       <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkFCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="73" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkContasReceber" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
                                           <Component id="chkContaPagarBaixados" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
@@ -148,6 +149,13 @@
                                       </Group>
                                       <Component id="chkContasPagar" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkContaReceberBaixados" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="txtDtIInicioContaReceber" min="-2" pref="117" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="txtDtTerminoContaReceber" min="-2" pref="117" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                           </Group>
@@ -169,18 +177,28 @@
                               <Component id="chkContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="3" groupAlignment="3" attributes="0">
                                   <Component id="chkContaPagarBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtDtIInicioCp" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtDtTerminoCp" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkContasReceber" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkFEmail" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFEmail" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                                  <Component id="chkContaReceberBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtDtIInicioContaReceber" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtDtTerminoContaReceber" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFTipoFornecedor" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -301,6 +319,32 @@
                 </Component>
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoCp">
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContasReceber">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas a Receber"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkContasReceberActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContaReceberBaixados">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas a Receber Baixadas"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkContaReceberBaixadosActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioContaReceber">
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoContaReceber">
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabClientes">
@@ -347,21 +391,28 @@
                                       <Component id="chkImportarFuncionario" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <Component id="chkRotativoBaixados" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="txtDtIInicioRotativo" min="-2" pref="117" max="-2" attributes="0"/>
+                                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                                              <Component id="txtDtTerminoRotativo" min="-2" pref="117" max="-2" attributes="0"/>
+                                          </Group>
                                           <Component id="chkEmail" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkPermiteRotativ" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="281" max="32767" attributes="0"/>
+                              <EmptySpace pref="146" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -394,7 +445,14 @@
                                   <Component id="chkEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                                      <Component id="chkRotativoBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDtIInicioRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDtTerminoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                               <EmptySpace pref="17" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -485,6 +543,21 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Email"/>
                       </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativoBaixados">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Rotaivo Baixados"/>
+                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRotativoBaixadosActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioRotativo">
+                    </Component>
+                    <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoRotativo">
                     </Component>
                   </SubComponents>
                 </Container>
