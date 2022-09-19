@@ -41,13 +41,13 @@ public class ArquivoToledoRepository {
             int idProduto = -1;
 
             if (opcaoCodigo == 2) {
-                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
+                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(prod.getIdProduto()));
             } else {
 
                 if (ignorarUltimoDigito) {
-                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(vo.getId()));
+                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(prod.getIdProduto()));
                 } else {
-                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(vo.getId()));
+                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(prod.getIdProduto()));
                 }
             }
 

@@ -325,7 +325,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         }
                         if(rdbToledoProduto.isSelected()) {
                             servico.setIgnorarUltimoDigito(chkIgnorarUltimoDigito.isSelected());
-                            servico.setOpcaoCodigo(rdbCodigoInterno.isSelected() ? 1 : 2);
+                            servico.setOpcaoCodigo(rdbCodigoInterno.isSelected() ? 2 : 1);
                             servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INFNUTRI);
                            //NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo(), rdbCodigoInterno.isSelected() ? 1 : 2, chkIgnorarUltimoDigito.isSelected());
                         }
