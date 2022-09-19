@@ -266,6 +266,7 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.precovenda,\n" +
                     "	p.precomedio,\n" +
                     "	p.PRECOVENDA3 custo,\n" +
+                    "   p.ULTPRECO custocomimposto,\n" +        
                     "	p.PRECOATACADO,\n" +
                     "	p.QTDE estoque,\n" +
                     "	p.MIN estoqueminimo,\n" +
@@ -354,8 +355,8 @@ public class FocusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
