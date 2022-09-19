@@ -1454,6 +1454,7 @@ public class ProdutoRepository {
         complemento.setMargem(imp.getMargem());
         complemento.setMargemMinima(imp.getMargemMinima());
         complemento.setMargemMaxima(imp.getMargemMaxima());
+        complemento.setOperacional(imp.getOperacional());
 
         return complemento;
     }

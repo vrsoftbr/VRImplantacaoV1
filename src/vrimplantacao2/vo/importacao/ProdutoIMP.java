@@ -185,6 +185,7 @@ public class ProdutoIMP {
     @DatabaseField private boolean produtoECommerce = false;
     @DatabaseField private String codigoAnp = "";
     private int codigoAtual;
+    private int operacional = 0;
     
     public String getImportSistema() {
         return importSistema;
@@ -1116,6 +1117,14 @@ public class ProdutoIMP {
 
     public void setCustoMedioSemImposto(double custoMedioSemImposto) {
         this.custoMedioSemImposto = custoMedioSemImposto;
+    }
+
+    public int getOperacional() {
+        return operacional;
+    }
+
+    public void setOperacional(int operacional) {
+        this.operacional = operacional;
     }
     
     public boolean from(ProdutoBalancaVO bal) {

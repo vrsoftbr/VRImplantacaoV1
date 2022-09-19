@@ -99,6 +99,7 @@ public class ProdutoComplementoVO {
     private double margem;
     private double margemminima;
     private double margemmaxima;
+    private int operacional = 0;
 
     public void setId(int id) {
         this.id = id;
@@ -322,6 +323,14 @@ public class ProdutoComplementoVO {
 
     public void setCustoMedioSemImposto(double custoMedioSemImposto) {
         this.custoMedioSemImposto = custoMedioSemImposto;
+    }
+
+    public int getOperacional() {
+        return operacional;
+    }
+
+    public void setOperacional(int operacional) {
+        this.operacional = operacional;
     }
     
 }

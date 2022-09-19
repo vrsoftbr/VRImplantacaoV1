@@ -178,6 +178,7 @@ public enum EScriptLojaOrigemSistema {
     SUPERCONTROLE(229,13,"select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id"),
     RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1"),
     FOCUS(230, 8, "select id, razao descricao from empresa"),
+    MANAGER(231, 5,"select codigo id, fantasia descricao from empresa"),
     SCV(232, 5,"SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa");
     
