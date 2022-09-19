@@ -35,7 +35,7 @@ public class WebSac22_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
-        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setSistema(dao.getSistema() + " - " + pnlConn.idConexao);
         pnlBalanca.setLoja(dao.getLojaOrigem());
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
