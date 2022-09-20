@@ -967,12 +967,9 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
-//                  imp.setCnpj(rst.getString("cnpj"));
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
-//                  imp.setValor(rst.getDouble("valor"));
-//                    imp.setObservacao(rst.getString("observacao"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
 
                     result.add(imp);
