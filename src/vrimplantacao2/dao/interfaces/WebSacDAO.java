@@ -201,6 +201,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }*/
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -257,6 +258,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rst.getString("desc_m2"));
                     imp.setMerc3ID(rst.getString("cod_m3"));
                     imp.setMerc3Descricao(rst.getString("desc_m3"));
+                    
                     result.add(imp);
                 }
             }
@@ -367,7 +369,7 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "pce.codcst cstpiscofinsentrada,\n"
                     + "p.natreceita,\n"
                     + "ncm.codigoncm,\n"
-                    //+ "p.codcfpdv,\n"
+                  //+ "p.codcfpdv,\n"
                     + "cf.codcst||'-'||round(cf.aliqicms,2)||'-'||round(cf.aliqredicms,2) id_icms,\n"
                     + "cf.descricao icmsdesc,\n"
                     + "cf.codcst as icmscst,\n"
@@ -1195,7 +1197,6 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join fornecedor f on f.razaosocial like c.nominal\n"
                     + "where\n"
                     + "	c.codestabelec = " + getLojaOrigem()
-            //                  + "	--and dtpagto is null"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -1218,129 +1219,6 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
-    }
-
-    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "  v.id,\n"
-                    + "  v.codigobarras,\n"
-                    + "  p.id_tipoembalagem \n"
-                    + "from implantacao.produto_verificador v\n"
-                    + "join produto p on p.id = v.id"
-            )) {
-                while (rst.next()) {
-                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
-                    vo.setIdproduto(rst.getInt("id"));
-                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
-                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
-                    result.add(vo);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public void importarDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-        ProgressBar.setStatus("Carregar Produtos...");
-        try {
-            result = getDigitoVerificador();
-
-            if (!result.isEmpty()) {
-                gravarCodigoBarrasDigitoVerificador(result);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
-
-        Conexao.begin();
-        Statement stm, stm2 = null;
-        ResultSet rst = null;
-
-        stm = Conexao.createStatement();
-        stm2 = Conexao.createStatement();
-
-        String sql = "";
-        ProgressBar.setStatus("Gravando Código de Barras...");
-        ProgressBar.setMaximum(vo.size());
-
-        try {
-
-            for (ProdutoAutomacaoVO i_vo : vo) {
-
-                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
-                rst = stm.executeQuery(sql);
-
-                if (!rst.next()) {
-                    sql = "insert into produtoautomacao ("
-                            + "id_produto, "
-                            + "codigobarras, "
-                            + "id_tipoembalagem, "
-                            + "qtdembalagem) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ", "
-                            + i_vo.getIdTipoEmbalagem() + ", 1);";
-                    stm2.execute(sql);
-                } else {
-                    sql = "insert into implantacao.produtonaogerado ("
-                            + "id_produto, "
-                            + "codigobarras) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ");";
-                    stm2.execute(sql);
-                }
-                ProgressBar.next();
-            }
-
-            stm.close();
-            stm2.close();
-            Conexao.commit();
-        } catch (Exception ex) {
-            Conexao.rollback();
-            throw ex;
-        }
-    }
-
-    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
-        String codigo = String.format("%012d", i_codigo);
-
-        int somaPar = 0;
-        int somaImpar = 0;
-
-        for (int i = 0; i < 12; i += 2) {
-            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
-            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
-        }
-
-        int soma = somaImpar + (3 * somaPar);
-        int digito = 0;
-        boolean verifica = false;
-        int calculo = 0;
-
-        do {
-            calculo = soma % 10;
-
-            if (calculo != 0) {
-                digito += 1;
-                soma += 1;
-            }
-        } while (calculo != 0);
-
-        if (i_digito) {
-            return Long.parseLong(codigo + digito);
-        } else {
-            return Long.parseLong(codigo);
-        }
     }
 
     private Date dataInicioVenda;

@@ -107,10 +107,6 @@ public class WebSac22_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
                     
-                    if (chkAjustarDigitoVerificador.isSelected()) {
-                        dao.importarDigitoVerificador();
-                    }
-
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
                         dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
