@@ -155,64 +155,44 @@ public class UniplusDAO extends InterfaceDAO {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"with merc as (\n" +
-                    "select\n" +
-                    "	codigo,\n" +
-                    "	trim(substring(rpad(codigo,30,' '),1,6)) merc1,\n" +
-                    "	trim(substring(rpad(codigo,30,' '),7,6)) merc2,\n" +
-                    "	trim(substring(rpad(codigo,30,' '),13,6)) merc3,\n" +
-                    "	trim(substring(rpad(codigo,30,' '),19,6)) merc4,\n" +
-                    "	trim(substring(rpad(codigo,30,' '),25,6)) merc5,\n" +
-                    "	nome\n" +
-                    "from\n" +
-                    "	hierarquia\n" +
-                    "order by\n" +
-                    "	codigo\n" +
-                    "),\n" +
-                    "m1 as (select * from merc where merc2 = ''),\n" +
-                    "m2 as (select * from merc where merc2 != '' and merc3 = ''),\n" +
-                    "m3 as (select * from merc where merc3 != '' and merc4 = ''),\n" +
-                    "m4 as (select * from merc where merc4 != '' and merc5 = ''),\n" +
-                    "m5 as (select * from merc where merc5 != '')\n" +
-                    "--select * from m1\n" +
-                    "select\n" +
-                    "	m1.merc1,\n" +
-                    "	m1.nome merc1_desc,\n" +
-                    "	m2.merc2,\n" +
-                    "	m2.nome merc2_desc,\n" +
-                    "	m3.merc3,\n" +
-                    "	m3.nome merc3_desc,\n" +
-                    "	m4.merc4,\n" +
-                    "	m4.nome merc4_desc,\n" +
-                    "	m5.merc5,\n" +
-                    "	m5.nome merc5_desc\n" +
-                    "from\n" +
-                    "	m1\n" +
-                    "	left join m2 on\n" +
-                    "		m1.merc1 = m2.merc1\n" +
-                    "	left join m3 on\n" +
-                    "		m2.merc1 = m3.merc1 and\n" +
-                    "		m2.merc2 = m3.merc2\n" +
-                    "	left join m4 on\n" +
-                    "		m3.merc1 = m4.merc1 and\n" +
-                    "		m3.merc2 = m4.merc2 and\n" +
-                    "		m3.merc3 = m4.merc3\n" +
-                    "	left join m5 on\n" +
-                    "		m4.merc1 = m5.merc1 and\n" +
-                    "		m4.merc2 = m5.merc2 and\n" +
-                    "		m4.merc3 = m5.merc3 and\n" +
-                    "		m4.merc4 = m5.merc4"*/
-                    "select\n"
-                    + "	id merc1,\n"
-                    + "	nome merc1_desc,\n"
-                    + "	id merc2,\n"
-                    + "	nome merc2_desc,\n"
-                    + "	id merc3,\n"
-                    + "	nome merc3_desc	\n"
-                    + "from\n"
-                    + "	hierarquia h\n"
-                    + "order by 1"
-            )) {
+                "with merc as (\n" +
+                "select\n" +
+                "	codigo,\n" +
+                "	trim(substring(rpad(codigo,30,' '),1,6)) merc1,\n" +
+                "	trim(substring(rpad(codigo,30,' '),7,6)) merc2,\n" +
+                "	trim(substring(rpad(codigo,30,' '),13,6)) merc3,\n" +
+                "	--trim(substring(rpad(codigo,30,' '),19,6)) merc4,\n" +
+                "	--trim(substring(rpad(codigo,30,' '),25,6)) merc5,\n" +
+                "	nome\n" +
+                "from\n" +
+                "	hierarquia\n" +
+                "order by\n" +
+                "	codigo\n" +
+                "),\n" +
+                "m1 as (select * from merc where merc2 = ''),\n" +
+                "m2 as (select * from merc where merc2 != '' and merc3 = ''),\n" +
+                "m3 as (select * from merc where merc3 != '')\n" +
+                "--m4 as (select * from merc where merc4 != '' and merc5 = ''),\n" +
+                "--m5 as (select * from merc where merc5 != '')\n" +
+                "--select * from m1\n" +
+                "select\n" +
+                "	m1.merc1,\n" +
+                "	m1.nome merc1_desc,\n" +
+                "	m2.merc2,\n" +
+                "	m2.nome merc2_desc,\n" +
+                "	m3.merc3,\n" +
+                "	m3.nome merc3_desc\n" +
+                "	--m4.merc4,\n" +
+                "	--m4.nome merc4_desc,\n" +
+                "	--m5.merc5,\n" +
+                "	--m5.nome merc5_desc\n" +
+                "from\n" +
+                "	m1\n" +
+                "	left join m2 on\n" +
+                "		m1.merc1 = m2.merc1\n" +
+                "	left join m3 on\n" +
+                "		m2.merc1 = m3.merc1 and\n" +
+                "		m2.merc2 = m3.merc2")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -315,7 +295,10 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	e.quantidade, \n"
                     + "	p.tributacao, \n"
                     + "	p.situacaotributaria as cst, \n"
-                    + " p.tributacaoespecialnfcesat cst_consumidor,\n"
+                    + " case when \n"
+                    + " p.tributacaoespecialnfcesat is null then '00'\n"
+                    + " when p.tributacaoespecialnfcesat = '' then '00'\n"
+                    + " else p.tributacaoespecialnfcesat end cst_consumidor,\n"
                     + "	p.cstpis, \n"
                     + "	p.cstcofins, \n"
                     + "	p.cstpisentrada, \n"
@@ -329,14 +312,14 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	p.cstpisentrada, \n"
                     + "	p.cstpis, \n"
                     + "	p.idfamilia, \n"
-                    + " p.idhierarquia merc1,\n"
+                    /*+ " p.idhierarquia merc1,\n"
                     + " p.idhierarquia merc2,\n"
-                    + " p.idhierarquia merc3,\n"/*
+                    + " p.idhierarquia merc3,\n"*/
                     + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
                     + "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n"
                     + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
-                    + "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
-                    + "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n"*/
+                    //+ "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
+                    //+ "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n"
                     + "	r.codigo naturezareceita\n"
                     + "from \n"
                     + "	produto p\n"

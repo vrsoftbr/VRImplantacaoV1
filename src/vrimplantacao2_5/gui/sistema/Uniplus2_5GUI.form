@@ -268,11 +268,11 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="tabUnificacao">
+        <Container class="javax.swing.JPanel" name="tabBalanca">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
-                <Property name="tabTitle" type="java.lang.String" value="Unifica&#xe7;&#xe3;o"/>
+              <JTabbedPaneConstraints tabName="Balan&#xe7;a">
+                <Property name="tabTitle" type="java.lang.String" value="Balan&#xe7;a"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -280,16 +280,10 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="vRImportaArquivBalancaPanel1" min="-2" pref="549" max="-2" attributes="0"/>
+                      <EmptySpace pref="238" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -297,45 +291,14 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="vRImportaArquivBalancaPanel1" min="-2" pref="121" max="-2" attributes="0"/>
+                      <EmptySpace pref="175" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutos">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar produtos (Somente EANs v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifFornecedores">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Fornecedores (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutoForn">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Produto Fornecedor (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliPreferencial">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Cliente Preferencial (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliEventual">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Cliente Eventual (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
+            <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
             </Component>
           </SubComponents>
         </Container>

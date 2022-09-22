@@ -233,8 +233,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.CST_PIS_COFINS_ENT,\n"
                     + " p.NCM\n"
                     + "FROM PRODUTOS p\n"
-                    + "JOIN UNIDADES_MEDIDA u ON p.ID_UM_ENTRADA = u.ID \n"
-                    + "JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID "
+                    + "LEFT JOIN UNIDADES_MEDIDA u ON p.ID_UM_ENTRADA = u.ID \n"
+                    + "LEFT JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID "
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -254,7 +254,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.setEan(rst.getString("ean"));
-                        imp.seteBalanca("S".equals(rst.getString("balanca")) ? true : false);
+                        imp.seteBalanca("S".equals(rst.getString("balanca")));
                         imp.setTipoEmbalagem(rst.getString("embalagem"));
                         imp.setTipoEmbalagemVolume(rst.getString("embalagem"));
                         imp.setQtdEmbalagem(rst.getInt("qtde"));
@@ -343,7 +343,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.BAIRRO,\n"
                     + " f.TELEFONE\n"
                     + "FROM FORNECEDORES f\n"
-                    + "JOIN CIDADES c ON c.ID = f.ID_CIDADE"
+                    + "LEFT JOIN CIDADES c ON c.ID = f.ID_CIDADE"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -428,7 +428,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " c.CREDITO,\n"
                     + " c.DEBITO\n"
                     + "FROM CLIENTES c\n"
-                    + "JOIN CIDADES ci ON ci.ID = c.RESIDENCIA_CLIENTE_ID_CIDADE"
+                    + "LEFT JOIN CIDADES ci ON ci.ID = c.RESIDENCIA_CLIENTE_ID_CIDADE"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();

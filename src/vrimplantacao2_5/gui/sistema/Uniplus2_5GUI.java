@@ -125,25 +125,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                             default:
                                 break;
                         }
-                    } else if (tab.getSelectedIndex() == 1) {
-                        if (cbxUnifProdutos.isSelected()) {
-                            importador.unificarProdutos();
-                        }
-                        if (cbxUnifFornecedores.isSelected()) {
-                            importador.unificarFornecedor();
-                        }
-                        if (cbxUnifProdutoForn.isSelected()) {
-                            importador.unificarProdutoFornecedor();
-                        }
-                        if (cbxUnifCliPreferencial.isSelected()) {
-                            importador.unificarClientePreferencial();
-                        }
-                        if (cbxUnifCliEventual.isSelected()) {
-                            importador.unificarClienteEventual();
-                        }
-                    }
+                    } 
+                    
                     gravarParametros();
-
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
@@ -197,12 +181,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         chkNewEan = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoNota = new javax.swing.JCheckBox();
-        tabUnificacao = new vrframework.bean.panel.VRPanel();
-        cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
-        cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
-        cbxUnifProdutoForn = new vrframework.bean.checkBox.VRCheckBox();
-        cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
+        tabBalanca = new javax.swing.JPanel();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -258,20 +238,20 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -342,47 +322,24 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         tab.addTab("Importação", tabImportacao);
 
-        cbxUnifProdutos.setText("Unificar produtos (Somente EANs válidos)");
-
-        cbxUnifFornecedores.setText("Unificar Fornecedores (Somente CPF/CNPJ válidos)");
-
-        cbxUnifProdutoForn.setText("Unificar Produto Fornecedor (Somente CPF/CNPJ válidos)");
-
-        cbxUnifCliPreferencial.setText("Unificar Cliente Preferencial (Somente CPF/CNPJ válidos)");
-
-        cbxUnifCliEventual.setText("Unificar Cliente Eventual (Somente CPF/CNPJ válidos)");
-
-        javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
-        tabUnificacao.setLayout(tabUnificacaoLayout);
-        tabUnificacaoLayout.setHorizontalGroup(
-            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxUnifProdutoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxUnifCliEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 549, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(238, Short.MAX_VALUE))
         );
-        tabUnificacaoLayout.setVerticalGroup(
-            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxUnifProdutoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxUnifCliEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(175, Short.MAX_VALUE))
         );
 
-        tab.addTab("Unificação", tabUnificacao);
+        tab.addTab("Balança", tabBalanca);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -439,11 +396,6 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
-    private vrframework.bean.checkBox.VRCheckBox cbxUnifCliEventual;
-    private vrframework.bean.checkBox.VRCheckBox cbxUnifCliPreferencial;
-    private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
-    private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutoForn;
-    private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkDUN14Atacado;
     private vrframework.bean.checkBox.VRCheckBox chkNewEan;
     private javax.swing.JCheckBox chkProdutoNota;
@@ -456,12 +408,13 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vr.view.components.radiobutton.VRRadioButton rbnTabelaFormacaoPrecoProduto;
     private vr.view.components.radiobutton.VRRadioButton rbnTabelaPreco;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
+    private javax.swing.JPanel tabBalanca;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedor;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel9;
     // End of variables declaration//GEN-END:variables
 }
