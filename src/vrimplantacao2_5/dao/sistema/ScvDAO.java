@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -110,6 +111,21 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_TRANSACAO,
                 OpcaoCliente.CONVENIO_CONVENIADO));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
