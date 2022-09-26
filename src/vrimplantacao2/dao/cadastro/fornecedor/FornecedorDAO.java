@@ -619,6 +619,7 @@ public class FornecedorDAO {
             sql.put("tiporegravencimento", -1);// integer NOT NULL DEFAULT '-1'::integer,
             sql.put("nfemitidapostofiscal", false);// boolean DEFAULT false,
             sql.put("id_tipoempresa", vo.getTipoEmpresa().getId());// integer not null,
+            sql.put("id_tipocustodevolucaotroca", 1);
             incluirTipoIndicadorIE(vo, sql);
             stm.execute(sql.getInsert());
         }
