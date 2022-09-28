@@ -9,7 +9,9 @@ import javax.swing.Box;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import org.openide.util.Exceptions;
 import vr.implantacao.App;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
@@ -325,6 +327,8 @@ import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.ConversaoPlanilhaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.relatorios.gerador.GeradorArquivosRepository;
+import vrimplantacao2.relatorios.relatoriosDAO.ExecutaSpedDAO;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -938,6 +942,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFerramentas = new javax.swing.JMenu();
         mnuEditarConexoes = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        mnuRelatorios = new javax.swing.JMenuItem();
         mnuAvancadas = new javax.swing.JMenu();
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
@@ -3557,6 +3562,14 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFerramentas.add(mnuEditarConexoes);
         mnuFerramentas.add(jSeparator1);
 
+        mnuRelatorios.setText("Relatórios e SPED");
+        mnuRelatorios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRelatoriosActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(mnuRelatorios);
+
         mnuAvancadas.setText("Avançadas");
 
         mnuImportarNCM.setText("Importar NCM da Legislação");
@@ -5582,6 +5595,30 @@ public final class MenuGUI extends VRMdiFrame {
         SatFacilGUI.exibir(this);
     }//GEN-LAST:event_chkSatFacilActionPerformed
 
+    private void mnuRelatoriosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRelatoriosActionPerformed
+        Object[] options = {"Relatatórios e Sped", "Sped", "Cancelar"};
+        int decisao = JOptionPane.showOptionDialog(null, "Selecionando a primeira opção, serão gerados relatórios fiscais em vr/implantacao/planilhas. \n"
+                + "E também será inserido as alterações de código na tabela de SPED.\n\n"
+                + "A segunda opção apenas insere dados de SPED.\n"
+                + "\nÉ preciso ter uma importação concluida para os relatórios serem gerados.\n\n",
+                "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (decisao == 0) {
+            try {
+                new GeradorArquivosRepository().geraPlanilha();
+                JOptionPane.showMessageDialog(null, "Relatorios e SPED gerados", "Relatórios e SPED", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } if (decisao == 1) {
+            try {
+                new ExecutaSpedDAO().executaSped();
+                JOptionPane.showMessageDialog(null, "SPED gerado", "SPED", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }//GEN-LAST:event_mnuRelatoriosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5845,6 +5882,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMSistemas;
     private javax.swing.JMenuItem mnuRPInfo;
+    private javax.swing.JMenuItem mnuRelatorios;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSBOnline;

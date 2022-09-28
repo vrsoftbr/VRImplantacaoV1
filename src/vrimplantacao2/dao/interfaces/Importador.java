@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.openide.util.Exceptions;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
@@ -82,6 +84,7 @@ import vrimplantacao2.dao.cadastro.venda.VendaItemImpDao;
 import vrimplantacao2.dao.cadastro.venda.VendaRepository;
 import vrimplantacao2.dao.cadastro.venda.VendaRepositoryProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2.vo.cadastro.divisao.DivisaoRepository;
 import vrimplantacao2.vo.cadastro.divisao.DivisaoRepositoryProvider;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
@@ -320,7 +323,17 @@ public class Importador {
 
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
-
+        
+        Object[] options = {"Gerar", "Cancelar"};
+        int decisao = JOptionPane.showOptionDialog(null, "Deseja gerar SPED e demais relatórios?",
+                "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (decisao == 0) {
+            try {
+                new GeradorArquivosRepository().geraPlanilha();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
     
     public void importarAtacado() throws Exception {
@@ -339,7 +352,7 @@ public class Importador {
 
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
-
+        
     }
 
     public void importarProdutoComplemento(OpcaoProduto... opcoes) throws Exception {
