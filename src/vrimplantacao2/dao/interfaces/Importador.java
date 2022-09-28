@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.openide.util.Exceptions;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaRepository;
@@ -124,6 +126,7 @@ import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
+import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {
 
@@ -347,9 +350,9 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos...");
 
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
-        
+
         System.out.println("Qtd. produtos: " + produtos.size());
-        
+
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
 
         provider.setIdConexao(getIdConexao());
@@ -362,6 +365,17 @@ public class Importador {
         ProdutoRepository repository = new ProdutoRepository(provider);
 
         repository.salvar2_5(produtos);
+
+        Object[] options = {"Gerar", "Cancelar"};
+        int decisao = JOptionPane.showOptionDialog(null, "Deseja gerar SPED e demais relatórios?",
+                "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (decisao == 0) {
+            try {
+                new GeradorArquivosRepository().geraPlanilha();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
 
     public void importarAtacado() throws Exception {
@@ -1255,11 +1269,11 @@ public class Importador {
         PromocaoRepository rep = new PromocaoRepository(provider);
         rep.salvar(listaPromocoesVemDoDAO);
     }
-    
+
     public void importarDesmembramento() throws Exception {
         ProgressBar.setStatus("Carregando Desmembramentos...");
         List<DesmembramentoIMP> desmembramentos = getInterfaceDAO().getDesmembramentos();
-        DesmembramentoRepositoryProvider provider = new DesmembramentoRepositoryProvider (
+        DesmembramentoRepositoryProvider provider = new DesmembramentoRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),
                 getLojaVR()

@@ -1,6 +1,7 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
+import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -44,7 +45,7 @@ public class Manager2_5GUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return dao.getSistema()+ " - " + pnlConn.idConexao;
+                return dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -100,7 +101,7 @@ public class Manager2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
-                    
+
                     dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
                     dao.removeDigitoEAN = chkRemoveDigitoBalanca.isSelected();
                     dao.segundoEan = chkSegundoEan.isSelected();
@@ -189,7 +190,7 @@ public class Manager2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("DataByte");
+        setTitle("Manager");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -355,7 +356,7 @@ public class Manager2_5GUI extends VRInternalFrame {
     private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
         tabProdutos.limparProduto();
         tabClientes.limparCliente();
-        tabFornecedores.limparFornecedor();        
+        tabFornecedores.limparFornecedor();
     }//GEN-LAST:event_jBLimparActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

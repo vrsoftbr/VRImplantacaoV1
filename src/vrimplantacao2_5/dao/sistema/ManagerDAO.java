@@ -567,7 +567,8 @@ public class ManagerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " c.INATIVO ativo,\n"
                     + " c.BLOQUEADO bloqueado\n"
                     + "FROM CLIENTES c\n"
-                    + "LEFT JOIN CIDADES cd ON cd.CODIGO = c.CODIGOCIDADE"
+                    + "LEFT JOIN CIDADES cd ON cd.CODIGO = c.CODIGOCIDADE\n"
+                    + "WHERE c.FILIAL = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();

@@ -9,7 +9,9 @@ import javax.swing.Box;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import org.openide.util.Exceptions;
 import vr.implantacao.main.App;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
@@ -323,6 +325,8 @@ import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
+import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
+import vrimplantacao2_5.relatorios.relatoriosDAO.ExecutaSpedDAO;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -949,6 +953,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDelRegistro = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
+        mnuRelatorios = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -3601,6 +3606,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuFerramentas.add(mnuAvancadas);
 
+        mnuRelatorios.setText("Relatórios e Sped");
+        mnuRelatorios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRelatoriosActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(mnuRelatorios);
+
         mnuMenu.add(mnuFerramentas);
 
         mnuPlanilha.setText("Planilha");
@@ -5531,6 +5544,30 @@ public final class MenuGUI extends VRMdiFrame {
         SuperControle_PostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuSuperControleActionPerformed
 
+    private void mnuRelatoriosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRelatoriosActionPerformed
+        Object[] options = {"Relatatórios e Sped", "Sped", "Cancelar"};
+        int decisao = JOptionPane.showOptionDialog(null, "Selecionando a primeira opção, serão gerados relatórios fiscais em vr/implantacao/planilhas. \n"
+                + "E também será inserido as alterações de código na tabela de SPED.\n\n"
+                + "A segunda opção apenas insere dados de SPED.\n"
+                + "\nÉ preciso ter uma importação concluida para os relatórios serem gerados.\n\n",
+                "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (decisao == 0) {
+            try {
+                new GeradorArquivosRepository().geraPlanilha();
+                JOptionPane.showMessageDialog(null, "Relatorios e SPED gerados", "Relatórios e SPED", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } if (decisao == 1) {
+            try {
+                new ExecutaSpedDAO().executaSped();
+                JOptionPane.showMessageDialog(null, "SPED gerado", "Sped", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }//GEN-LAST:event_mnuRelatoriosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5797,6 +5834,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMSistemas;
     private javax.swing.JMenuItem mnuRPInfo;
+    private javax.swing.JMenuItem mnuRelatorios;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSBOnline;
