@@ -27,14 +27,15 @@ public class GeradorArquivosRepository {
     GeradorBalanca bal = new GeradorBalanca();
 
     public void geraPlanilha() throws Exception {
+        Arquivo.mkdir(Util.getRoot() + "vr/implantacao/planilhas");
+        
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         cest.geraPlanilhaCest(workbook);
         ncm.geraPlanilhaNcm(workbook);
         bal.geraPlanilhaBalanca(workbook);
 
-        try {
-            Arquivo.mkdir(Util.getRoot() + "vr/implantacao/planilhas");
+        try {            
             FileOutputStream out = new FileOutputStream(new File("/vr/implantacao/planilhas/relatorios_fiscais.xls"));
             workbook.write(out);
             out.close();

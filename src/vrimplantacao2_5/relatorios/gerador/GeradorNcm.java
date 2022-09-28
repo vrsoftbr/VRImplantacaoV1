@@ -91,11 +91,13 @@ public class GeradorNcm {
             }
             printWriter.println("|    NCM    |   QTD   |");
             printWriter.println("|-----------|---------|");
-            String espacos = "--------";
+            String espacos = "----------";
             String espacosQ = "--------";
             for (NCMFaltandoVO n : ncm) {
-                    printWriter.print("| " + n.getNcm() + espacos.substring(n.getNcm().length()).replace("-", " ") +
-                                    "  | " + n.getQtd() + espacosQ.substring(n.getQtd().length()).replace("-", " "));
+                String ncmDesign = n.getNcm().trim() + espacos.substring(n.getNcm().trim().length()).replace("-", " ");
+                String qtdDesign = n.getQtd().trim() + espacosQ.substring(n.getQtd().trim().length()).replace("-", " ");
+                    printWriter.print("| " + ncmDesign +
+                                      "| " + qtdDesign);
                     printWriter.println("|");
 
             }

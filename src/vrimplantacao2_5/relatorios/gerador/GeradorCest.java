@@ -89,13 +89,15 @@ public class GeradorCest {
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-            printWriter.println("|    Cest   |    QTD  |");
-            printWriter.println("|-----------|---------|");
-            String espacos = "--------";
+            printWriter.println("|     Cest    |   QTD   |");
+            printWriter.println("|-------------|---------|");
+            String espacos = "----------";
             String espacosQ = "--------";
             for (CestFaltandoVO c : cest) {
-                printWriter.print("| " + c.getCest() + espacos.substring(c.getCest().length()).replace("-", " ") +
-                                    "  | " + c.getQtd() + espacosQ.substring(c.getQtd().length()).replace("-", " "));
+                String cestDesign = c.getCest().trim() + espacos.substring(c.getCest().trim().length()).replace("-", " ");
+                String qtdDesign = c.getQtd().trim() + espacosQ.substring(c.getQtd().trim().length()).replace("-", " ");
+                printWriter.print("| " + cestDesign +
+                                    "  | " + qtdDesign);
                     printWriter.println("|");
 
             }

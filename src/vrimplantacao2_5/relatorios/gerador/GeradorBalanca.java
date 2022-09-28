@@ -82,7 +82,9 @@ public class GeradorBalanca {
 
             cell = row.createCell(cellnum++);
             cell.setCellStyle(textStyle);
+            if(b.getDescricao().length() > 15) {
             cell.setCellValue(b.getDescricao().substring(0, 15));
+            } else cell.setCellValue(b.getDescricao());
 
             cell = row.createCell(cellnum++);
             cell.setCellStyle(textStyle);
@@ -113,19 +115,19 @@ public class GeradorBalanca {
             for (CodBalAlteradoVO b : bal) {
                 if (b.getDescricao().length() < 15){
                     printWriter.print(
-                       "|" + b.getId() + espacos.substring(b.getId().length()).replace("-", " ") +
-                       "| " + b.getDescricao() + espacosD.substring(b.getDescricao().length()).replace("-", " ") +
-                       "|" + b.getEan() + espacos.substring(b.getEan().length()).replace("-", " ") + 
-                       "|" + b.getCodigoAtual() + espacos.substring(b.getCodigoAtual().length()).replace("-", " "));
+                       "|" + b.getId().trim() + espacos.substring(b.getId().trim().length()).replace("-", " ") +
+                       "| " + b.getDescricao().trim() + espacosD.substring(b.getDescricao().trim().length()).replace("-", " ") +
+                       "|" + b.getEan().trim() + espacos.substring(b.getEan().trim().length()).replace("-", " ") + 
+                       "|" + b.getCodigoAtual().trim() + espacos.substring(b.getCodigoAtual().trim().length()).replace("-", " "));
                     printWriter.println("|");
-                }
+                } else {
                printWriter.print(
-                       "|" + b.getId() + espacos.substring(b.getId().length()).replace("-", " ") +
-                       "| " + b.getDescricao().substring(0,15) + espacosD.substring(b.getDescricao().substring(0,15).length()).replace("-", " ") +
-                       "|" + b.getEan() + espacos.substring(b.getEan().length()).replace("-", " ") + 
-                       "|" + b.getCodigoAtual() + espacos.substring(b.getCodigoAtual().length()).replace("-", " "));
+                       "|" + b.getId().trim() + espacos.substring(b.getId().trim().length()).replace("-", " ") +
+                       "| " + b.getDescricao().trim().substring(0,15) + espacosD.substring(b.getDescricao().trim().substring(0,15).length()).replace("-", " ") +
+                       "|" + b.getEan().trim() + espacos.substring(b.getEan().trim().length()).replace("-", " ") + 
+                       "|" + b.getCodigoAtual().trim() + espacos.substring(b.getCodigoAtual().trim().length()).replace("-", " "));
                 printWriter.println("|");
-
+                }
             }
             printWriter.flush();
             printWriter.close();
