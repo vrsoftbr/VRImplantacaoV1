@@ -1,6 +1,7 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
+import javax.swing.DefaultComboBoxModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -10,12 +11,14 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.PlanoContasVO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Cefas_Concretize2_5GUI extends VRInternalFrame {
 
     private static final String SISTEMA = ESistema.CEFAS.getNome();
     private static Cefas_Concretize2_5GUI instance;
+    private String vPlanoContas = "";
 
     private final CefasDAO dao = new CefasDAO();
 
@@ -29,6 +32,20 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
         pnlBalanca.setLoja(dao.getLojaOrigem());
         vTipoVenda = params.getInt(SISTEMA, "TIPO_VENDA");
         vEstoque = params.getInt(SISTEMA, "ESTOQUE");
+    }
+    
+    public void carregarPlanoContasCreditoRotativo() throws Exception {
+        cmbPlanoContaCR.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for(PlanoContasVO plano : dao.getPlanoContas()) {
+            cmbPlanoContaCR.addItem(plano);
+            if(vPlanoContas != null && vPlanoContas.equals(plano.vid)) {
+                index = cont;
+            }
+            cont++;
+        }
+        cmbPlanoContaCR.setSelectedIndex(index);
     }
 
     public Cefas_Concretize2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -71,6 +88,8 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
 
         centralizarForm();
         this.setMaximum(false);
+        
+        carregarPlanoContasCreditoRotativo();
     }
 
     private void gravarParametros() throws Exception {
@@ -100,7 +119,8 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
 
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
-
+                    dao.vPlanoContas = ((PlanoContasVO) cmbPlanoContaCR.getSelectedItem()).vid;
+                    
                     Importador importador = new Importador(dao);
 
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
@@ -173,6 +193,9 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        tabParametros = new javax.swing.JPanel();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        cmbPlanoContaCR = new javax.swing.JComboBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -244,6 +267,31 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        vRLabel1.setText("Plano Contas Crédito Rotativo");
+
+        javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
+        tabParametros.setLayout(tabParametrosLayout);
+        tabParametrosLayout.setHorizontalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbPlanoContaCR, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(519, Short.MAX_VALUE))
+        );
+        tabParametrosLayout.setVerticalGroup(
+            tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbPlanoContaCR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(220, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Parâmetros", tabParametros);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -296,6 +344,7 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JComboBox cmbPlanoContaCR;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
@@ -305,6 +354,8 @@ public class Cefas_Concretize2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
+    private javax.swing.JPanel tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 }
