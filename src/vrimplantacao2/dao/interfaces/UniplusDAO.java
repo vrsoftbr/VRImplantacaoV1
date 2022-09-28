@@ -132,6 +132,7 @@ public class UniplusDAO extends InterfaceDAO {
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO));
     }
@@ -735,7 +736,7 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	e.fornecedor = " + getLojaOrigem() + "\n"
                         + "	or e.id in (select distinct identidade from financeiro where tipo = 'P')\n"
                         + "order by\n"
-                        + "	e.codigo::integer")) {
+                        + "	e.codigo::bigint")) {
                     while (rs.next()) {
                         FornecedorIMP imp = new FornecedorIMP();
                         imp.setImportSistema(getSistema());
@@ -811,8 +812,7 @@ public class UniplusDAO extends InterfaceDAO {
                         + "left join estado es on c.idestado = es.id\n"
                         + "where\n"
                         + "	e.idfilialcadastro = " + getLojaOrigem() + "\n"
-                        + "order by\n"
-                        + "	e.codigo::integer")) {
+                        + "order by 1")) {
                     while (rs.next()) {
                         ClienteIMP imp = new ClienteIMP();
                         imp.setId(rs.getString("codigo"));
@@ -959,16 +959,13 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	f.pagamento\n"
                     + "from\n"
                     + "	financeiro f\n"
-                    + "	left join entidade e on\n"
-                    + "		f.identidade = e.id\n"
-                    + "	left join banco b on\n"
-                    + "		f.idbanco = b.id\n"
+                    + "	left join entidade e on f.identidade = e.id\n"
+                    + "	left join banco b on f.idbanco = b.id\n"
                     + "where\n"
                     + "	f.tipo = 'R'\n"
                     + "	and f.idfilial = " + getLojaOrigem() + "\n"
-                    + "	and f.idtipodocumentofinanceiro in (5)\n"
-                    + "order by\n"
-                    + "	f.id"
+                    + "	and f.idtipodocumentofinanceiro in (-2,5,6)\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -1028,7 +1025,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "		f.idtipodocumentofinanceiro = doc.id\n"
                     + "where\n"
                     + "	f.tipo = 'P'\n"
-                    + "	and f.idfilial = 1\n"
+                    + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
                     + "order by\n"
                     + "	f.id"

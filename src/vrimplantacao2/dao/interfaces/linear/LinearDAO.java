@@ -447,7 +447,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	b.cg2_data dataalteracao,\n"
                     + "	(case when p.es1_convun = 0 then 1 else p.es1_convun end) volume,\n"
                     + "	(case when b.es1_qemb = 0 then 1 else b.es1_qemb end) qtdembalagem,\n"
-                    + "	b.cg2_valor custotabela\n"
+                    + "	round((b.cg2_valor/b.cg2_quant),2) custotabela\n"
                     + "FROM \n"
                     + "	es1i a\n"
                     + "	left join es1h b on\n"
@@ -520,8 +520,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.cg2_prazoentrega prazoentrega,\n"
                     + "	f.cg2_ativo situacao,\n"
                     + "	f.cg2_tipofornecedor tipo,\n"
-                    + "   f.cg2_produtor produtor, \n"
-                    + "   f.cg2_micro tipoempresa \n"
+                    + " f.cg2_produtor produtor, \n"
+                    + " f.cg2_micro tipoempresa \n"
                     + "FROM \n"
                     + "	cg2 f")) {
                 while (rs.next()) {
@@ -831,7 +831,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCnpj(cnpj);
                     }
 
-                    if (ie != null && !"".equals(ie)) {
+                    if (ie != null && !"".equals(ie) && !"ISENTO".equals(ie)) {
                         imp.setInscricaoestadual(ie);
                     } else {
                         imp.setInscricaoestadual(rg);
