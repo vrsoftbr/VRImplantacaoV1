@@ -95,7 +95,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
             OpcaoProduto.MARGEM,
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-            OpcaoProduto.PDV_VENDA
+            OpcaoProduto.PDV_VENDA,
+            OpcaoProduto.FABRICANTE
         }));
     }
 
@@ -124,7 +125,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TELEFONE,
                 OpcaoFornecedor.TIPO_EMPRESA,
-                OpcaoFornecedor.PAGAR_FORNECEDOR
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.CONTATOS
         ));
     }
 
@@ -220,41 +222,56 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " p.ID,\n"
-                    + " p.DESCRICAO descricaocompleta,\n"
-                    + " p.DESCRICAO_REDUZIDA descricaoreduzida,\n"
-                    + " p.PRECO_VAREJO precovenda,\n"
-                    + " p.CUSTO_MEDIO precocustomedio,\n"
-                    + " p.PRECO_CUSTO precocusto,\n"
-                    + " p.PRECO_COMPRA,\n"
-                    + " u.SIGLA embalagem,\n"
-                    + " CASE WHEN p.STATUS = 'A' THEN 1 ELSE 0 END situacao,\n"
-                    + " p.DATA_CADASTRO,\n"
-                    + " p.CODIGO_INTERNO,\n"
-                    + " p.CODIGO_BARRA ean,\n"
-                    + " p.BALANCA,\n"
-                    + " p.ID_GRUPO mercid1,\n"
-                    + " p.ID_SUBGRUPO mercid2,\n"
-                    + " p.ID_SUBGRUPO mercid3,\n"
-                    + " e.ESTOQUE_MINIMO estoquemin,\n"
-                    + " e.ESTOQUE_ATUAL estoque,\n"
-                    + " p.VALOR_MEDIDA qtde,\n"
-                    + " p.CEST,\n"
-                    + " p.NATUREZA_RECEITA_PIS_COFINS naturezareceita,\n"
-                    + " p.ID_ALIQUOTA_CADASTRO,\n"
-                    + " p.CST,\n"
-                    + " p.REDUCAO_BASE_ICMS,\n"
-                    + " p.CST_PIS_COFINS,\n"
-                    + " p.CST_PIS_COFINS_ENT,\n"
-                    + " p.NCM\n"
-                    + "FROM PRODUTOS p\n"
-                    + "LEFT JOIN UNIDADES_MEDIDA u ON p.ID_UM_ENTRADA = u.ID \n"
-                    + "LEFT JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID "
+                    "SELECT \n" +
+                    " p.ID,\n" +
+                    " replace(replace(replace\n" +
+                    " (replace(replace(replace(replace\n" +
+                    " (p.DESCRICAO, 'Ă', 'A'), 'Ő', 'O'), 'Ç', 'C'),\n" +
+                    " 'Ę', 'E'), 'É', 'E'), 'Á', 'A'), 'Ô', 'O') descricaocompleta,\n" +
+                    " replace(replace(replace\n" +
+                    " (replace(replace(replace(replace\n" +
+                    " (p.DESCRICAO_REDUZIDA, 'Ă', 'A'), 'Ő', 'O'), 'Ç', 'C'),\n" +
+                    " 'Ę', 'E'), 'É', 'E'), 'Á', 'A'), 'Ô', 'O') descricaoreduzida," +
+                    " pp.PRECO_VAREJO precovenda,\n" +
+                    " p.PRECO_ATACADO,\n" +
+                    " p.PRECO_VAREJO_SUGERIDO,\n" +
+                    " p.CUSTO_MEDIO precocustomedio,\n" +
+                    " p.PRECO_CUSTO precocusto,\n" +
+                    " pp.PRECO_FORNECEDOR custo,\n" +        
+                    " p.PRECO_COMPRA,\n" +
+                    " pp.LUCRO_VAREJO margem,\n" +        
+                    " u.SIGLA embalagem,\n" +
+                    " CASE WHEN p.STATUS = 'A' THEN 1 ELSE 0 END situacao,\n" +
+                    " p.DATA_CADASTRO,\n" +
+                    " p.CODIGO_INTERNO,\n" +
+                    " p.CODIGO_BARRA ean,\n" +
+                    " p.BALANCA,\n" +
+                    " p.ID_GRUPO mercid1,\n" +
+                    " p.ID_SUBGRUPO mercid2,\n" +
+                    " p.ID_SUBGRUPO mercid3,\n" +
+                    " e.ESTOQUE_MINIMO estoquemin,\n" +
+                    " e.ESTOQUE_ATUAL estoque,\n" +
+                    " p.ID_FORNECEDOR fabricante,\n" +        
+                    " p.VALOR_MEDIDA qtde,\n" +
+                    " p.CEST,\n" +
+                    " p.NATUREZA_RECEITA_PIS_COFINS naturezareceita,\n" +
+                    " p.ID_ALIQUOTA_CADASTRO,\n" +
+                    " p.CST,\n" +
+                    " p.REDUCAO_BASE_ICMS,\n" +
+                    " p.CST_PIS_COFINS,\n" +
+                    " p.CST_PIS_COFINS_ENT,\n" +
+                    " p.NCM\n" +
+                    "FROM PRODUTOS p\n" +
+                    "LEFT JOIN PRODUTOS_PREC_TRIB pp ON p.id = pp.ID_PRODUTO \n" +
+                    "LEFT JOIN UNIDADES_MEDIDA u ON p.ID_UM_ENTRADA = u.ID \n" +
+                    "LEFT JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID\n" +
+                    "WHERE \n" +
+                    "	pp.ID_EMPRESA = " + getLojaOrigem()
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
@@ -276,8 +293,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(rst.getInt("qtde"));
                     }
 
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
 
                     imp.setCodMercadologico1(rst.getString("mercid1"));
@@ -285,11 +302,13 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("mercid3"));
 
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setCustoComImposto(rst.getDouble("precocusto"));
-                    imp.setCustoSemImposto(rst.getDouble("precocustomedio"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
                     imp.setSituacaoCadastro(rst.getInt("situacao"));
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -357,7 +376,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.NUMERO,\n"
                     + " f.COMPLEMENTO,\n"
                     + " f.BAIRRO,\n"
-                    + " f.TELEFONE\n"
+                    + " f.TELEFONE,\n"
+                    + " f.CONTATO\n"          
                     + "FROM FORNECEDORES f\n"
                     + "LEFT JOIN CIDADES c ON c.ID = f.ID_CIDADE"
             )) {
@@ -377,6 +397,12 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("CIDADE"));
                     imp.setUf(rst.getString("UF"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
+                    
+                    String contato = rst.getString("contato");
+                    
+                    if (contato != null && !contato.isEmpty()) {
+                        imp.addContato(contato, null, null, TipoContato.COMERCIAL, null);
+                    }
 
                     result.add(imp);
                 }
@@ -391,21 +417,21 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " ID,\n"
-                    + " CODIGO_INTERNO,\n"
-                    + " ID_FORNECEDOR\n"
-                    + "FROM PRODUTOS\n"
-                    + "WHERE ID_FORNECEDOR IS NOT NULL"
+                    "SELECT \n" +
+                    "	*\n" +
+                    "FROM \n" +
+                    "	FORNECEDORES_PRODUTOS"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rst.getString("ID"));
+                    imp.setIdProduto(rst.getString("ID_PRODUTO"));
                     imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
-                    imp.setCodigoExterno(rst.getString("CODIGO_INTERNO"));
+                    imp.setCodigoExterno(rst.getString("PRODUTO_FORNECEDOR"));
                     imp.setQtdEmbalagem(1);
+                    
                     result.add(imp);
                 }
             }
