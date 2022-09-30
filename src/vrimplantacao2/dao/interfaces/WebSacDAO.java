@@ -454,36 +454,47 @@ public class WebSacDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         if (opcao == OpcaoProduto.ESTOQUE) {
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "with estoque as\n"
-                        + "(\n"
-                        + "  select max(data) as data, codproduto from produtoestabsaldo where codestabelec = " + getLojaOrigem() + " group by codproduto\n"
-                        + ")\n"
-                        + "select pe.codproduto, pe.saldo, pe.data \n"
-                        + "from produtoestabsaldo pe\n"
-                        + "inner join estoque e on e.codproduto = pe.codproduto and pe.data = e.data\n"
-                        + "where codestabelec = " + getLojaOrigem()
+                        "with estoque as (\n"
+                        + "	select\n"
+                        + "	  	max(datalog) as data,\n"
+                        + "	  	codproduto\n"
+                        + "	from\n"
+                        + "		produtoestab\n"
+                        + "	where\n"
+                        + "		codestabelec = " + getLojaOrigem() + " group by codproduto)\n"
+                        + "select\n"
+                        + "	pe.codproduto, pe.sldatual estoque, pe.datalog \n"
+                        + "from\n"
+                        + "	produtoestab pe\n"
+                        + "inner join estoque e on e.codproduto = pe.codproduto and pe.datalog = e.data\n"
+                        + "where\n"
+                        + "	codestabelec = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("codproduto"));
-                        imp.setEstoque(rst.getDouble("saldo"));
                         
+                        imp.setImportId(rst.getString("codproduto"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+
                         result.add(imp);
                     }
                 }
+                
                 return result;
             }
         }
+        
         return null;
-    }*/
+    }
+
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
 

@@ -82,6 +82,36 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.CONVENIO_CONVENIADO));
+    }
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
@@ -145,7 +175,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	emp_fantasia AS fantasia,\n"
                     + "	emp_cgc AS cnpj\n"
                     + "FROM empresa\n"
-                    + "ORDER BY 1")) {
+                    + "ORDER BY 1"
+            )) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("fantasia")));
                 }
@@ -172,7 +203,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE \n"
                     + "	codigo IN (SELECT e.ES1_TRIBUTACAO FROM es1 e WHERE e.es1_empresa = " + getLojaOrigem() + ")\n"
                     + "ORDER BY\n"
-                    + "	codigo")) {
+                    + "	codigo"
+            )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"),
                             rs.getString("descricao"),
@@ -235,7 +267,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tab_cod id,\n"
                     + "	tab_desc descricao\n"
                     + "FROM\n"
-                    + "	st_semelhante")) {
+                    + "	st_semelhante"
+            )) {
                 while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
 
@@ -315,7 +348,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		icmsst.codigo = pc.ES1_TRIBUTACAO\n"
                     + "WHERE \n"
                     + (this.filtrarProdutos ? "   not pr.id_central is null and\n" : "")
-                    + "	pc.es1_empresa = " + getLojaOrigem())) {
+                    + "	pc.es1_empresa = " + getLojaOrigem()
+            )) {
                 //"   length(cast(convert(ean.es1_codbarra, UNSIGNED INTEGER) AS char)) > 6"
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
@@ -523,7 +557,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.cg2_produtor produtor, \n"
                     + " f.cg2_micro tipoempresa \n"
                     + "FROM \n"
-                    + "	cg2 f")) {
+                    + "	cg2 f"
+            )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -599,48 +634,22 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
-        return new HashSet<>(Arrays.asList(
-                OpcaoFornecedor.ENDERECO,
-                OpcaoFornecedor.DADOS,
-                OpcaoFornecedor.CONTATOS,
-                OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.TIPO_EMPRESA,
-                OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
-        ));
-    }
-
-    @Override
-    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
-        return new HashSet<>(Arrays.asList(
-                OpcaoCliente.DADOS,
-                OpcaoCliente.ENDERECO,
-                OpcaoCliente.CONTATOS,
-                OpcaoCliente.DATA_CADASTRO,
-                OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO,
-                OpcaoCliente.CONVENIO_EMPRESA,
-                OpcaoCliente.CONVENIO_TRANSACAO,
-                OpcaoCliente.RECEBER_CHEQUE,
-                OpcaoCliente.CONVENIO_CONVENIADO));
-    }
-
-    @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "   codigo id,\n"
-                    + "   nome razao,\n"
-                    + "   prazo,\n"
-                    + "   diavence diapagamento,\n"
-                    + "   desconto,\n"
-                    + "   bloquear,\n"
-                    + "   multa,\n"
-                    + "   ativo\n"
-                    + "  from carteirasconvenio")) {
+                    "select\n"
+                    + "	codigo id,\n"
+                    + "	nome razao,\n"
+                    + "	prazo,\n"
+                    + "	diavence diapagamento,\n"
+                    + "	desconto,\n"
+                    + "	bloquear,\n"
+                    + "	multa,\n"
+                    + "	ativo\n"
+                    + "from\n"
+                    + "	carteirasconvenio"
+            )) {
                 while (rs.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
 
@@ -715,12 +724,11 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	fn1 f\n"
                     + "	JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
                     + "WHERE \n"
-                    + "    c.cg1_convenio <> 0 and \n"
+                    + " c.cg1_convenio <> 0 and \n"
                     + "	f.fn1_dtbaixa IS null AND\n"
                     + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
                     + "	f.fn1_tipo NOT IN (37, 62, 64)"
             )) {
-
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 while (rs.next()) {
@@ -753,10 +761,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT \n"
                     + "	c.cg1_cod id,\n"
                     + "	c.cg1_dtcad cadastro,\n"
-                    + "	c.cg1_cgc cnpj,\n"
-                    + "	c.cg1_cpf cpf,\n"
-                    + "	c.cg1_rg rg,\n"
-                    + "	c.cg1_inscestadual ie,\n"
+                    //  + "	c.cg1_cgc cnpj,\n"
+                    //  + "	c.cg1_cpf cpf,\n"
+                    //  + "	c.cg1_rg rg,\n"
+                    //  + "	c.cg1_inscestadual ie,\n"
+                    + " case when cg1_tipopessoa = 'F' then c.cg1_rg else c.cg1_inscestadual end rg_ie,\n"
+                    + "	case when cg1_tipopessoa = 'F' then c.cg1_cpf else c.cg1_cgc end cpf_cnpj,\n"
                     + "	c.cg1_inscmunicipal im,\n"
                     + "	c.cg1_nome razao,\n"
                     + "	c.cg1_fantasia fantasia,\n"
@@ -781,10 +791,11 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.cg1_email_boleto emailboleto,\n"
                     + "	c.cg1_pai pai,\n"
                     + "	c.cg1_mae mae,\n"
-                    + "	case \n"
-                    + "		when c.cg1_data < '1999-01-01' then '1995-01-01'\n"
-                    + "		else c.cg1_data \n"
-                    + "	end nascimento,\n"
+                    // + "	case \n"
+                    // + "	  when c.cg1_data < '1999-01-01' then '1995-01-01'\n"
+                    // + "	  else c.cg1_data \n"
+                    // + "	end nascimento,\n"
+                    + " substring(c.cg1_data, 1,10) nascimento,\n"
                     + "	c.cg1_profissao profissao,\n"
                     + "	c.CG1_EstCivil estadocivil,\n"
                     + "	case\n"
@@ -818,7 +829,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rs.getString("id"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
-                    String cpf, cnpj, rg, ie;
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rs.getString("rg_ie"));
+
+                    /*String cpf, cnpj, rg, ie;
 
                     cpf = rs.getString("cpf");
                     cnpj = rs.getString("cnpj");
@@ -835,8 +849,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setInscricaoestadual(ie);
                     } else {
                         imp.setInscricaoestadual(rg);
-                    }
-
+                    }*/
                     imp.setInscricaoMunicipal(rs.getString("im"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
@@ -910,9 +923,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
                     + "WHERE \n"
                     //+ " c.cg1_convenio = 0 AND\n"
-                    + "	f.fn1_dtbaixa IS null AND\n"
-                    + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
-                    + "	f.fn1_tipo NOT IN (37, 62, 64)")) {
+                    + "	f.fn1_dtbaixa IS null\n"
+                    + "	AND f.fn1_empresa = " + getLojaOrigem() + "\n"
+                    + "	AND f.fn1_tipo NOT IN (2,3)"
+            )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -968,11 +982,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN cg1 c ON f.CG1_COD = c.cg1_cod\n"
                     + "LEFT JOIN cg1_banco bc ON f.cg1_banco_num = bc.cg1_banco_num\n"
                     + "WHERE \n"
-                    + "	f.fn1_dtbaixa IS null AND\n"
-                    + "	f.fn1_empresa = " + getLojaOrigem() + " AND \n"
-                    + "	fn1_tipo IN (37, 62, 64)\n"
+                    + "	f.fn1_dtbaixa IS null\n"
+                    + "	AND f.fn1_empresa = " + getLojaOrigem() + " \n"
+                    + "	AND fn1_tipo IN (2,3)\n"
                     + "ORDER BY \n"
-                    + "	f.FN1_VENC")) {
+                    + "	f.FN1_VENC"
+            )) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
 
@@ -1032,8 +1047,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE \n"
                     + "	es1_dtfim > CURRENT_DATE AND \n"
                     + "	o.es1_empresa = " + getLojaOrigem() + "\n"
-                    + "ORDER BY 	\n"
-                    + "	3")) {
+                    + "ORDER BY 3"
+            )) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
 
@@ -1182,5 +1197,4 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             return Long.parseLong(codigo);
         }
     }
-
 }
