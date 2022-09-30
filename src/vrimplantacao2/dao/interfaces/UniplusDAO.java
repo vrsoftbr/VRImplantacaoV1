@@ -117,7 +117,8 @@ public class UniplusDAO extends InterfaceDAO {
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
-            OpcaoProduto.VALIDADE
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.FABRICANTE
         }));
     }
     
@@ -286,7 +287,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	p.precocusto precoproduto,\n"
                     + "	busca_custo_produto(p.id, 1, now()::timestamp) custosemimposto,\n"
                     + "	trunc(round(((p.aliquotapis + p.aliquotacofins) / 100 * p.preco) + \n"
-                    + "    busca_custo_produto(p.id, 1, now()::timestamp), 2), 2) custocomimposto,\n"
+                    + "    busca_custo_produto(p.id, "+ getLojaOrigem() +", now()::timestamp), 2), 2) custocomimposto,\n"
                     + "	pr1.preco p1,\n"
                     + "	pr2.preco p2,\n"
                     + "	p.preco pbkp,\n"
@@ -322,7 +323,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
                     //+ "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
                     //+ "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n"
-                    + "	r.codigo naturezareceita\n"
+                    + "	r.codigo naturezareceita,\n"
+                    + " en.codigo fornecedor\n"        
                     + "from \n"
                     + "	produto p\n"
                     + "	join filial f on\n"
@@ -345,6 +347,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	        p.idfamilia = replace(fp.codigo, ' ', '')::integer\n"
                     + "    left join hierarquia merc on\n"
                     + "    	p.idhierarquia = merc.id\n"
+                    + " left join entidade en on \n"
+                    + "    	p.idfornecedor = en.id\n"        
                     + "order by \n"
                     + "	p.id"
             )) {
@@ -424,6 +428,7 @@ public class UniplusDAO extends InterfaceDAO {
                     //imp.setCodMercadologico4(rs.getString("merc4"));
                     //imp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setFornecedorFabricante(rs.getString("fornecedor"));
                     
                     result.add(imp);
                 }
