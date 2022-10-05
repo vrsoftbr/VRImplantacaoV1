@@ -96,12 +96,15 @@ public class ReceitaRepository {
 
                     ProdutoVO prodItemVO = null;
                     for (String produto : imp.getProdutos()) {
-                        System.out.println("Item Pai: " + imp.getIdproduto()  + " Produto Item -> " + produto);
+                        System.out.println(
+                                "Sistema: " + this.provider.getSistema() +
+                                        " - Item Pai: " + imp.getIdproduto()  + 
+                                        " Produto Item -> " + produto);
                         Integer idProduto = null;
                         idProduto = produtos.get(produto);
                         
                         prodItemVO = prodAntDAO.getCodigoAnterior().get(
-                                imp.getImportsistema(),
+                                this.provider.getSistema(),
                                 imp.getImportloja(),
                                 produto
                         ).getCodigoAtual();
@@ -120,7 +123,7 @@ public class ReceitaRepository {
 
                     ProdutoVO prodReceVO = null;
                     prodReceVO = prodAntDAO.getCodigoAnterior().get(
-                            imp.getImportsistema(),
+                            this.provider.getSistema(),
                             imp.getImportloja(),
                             imp.getIdproduto()
                     ).getCodigoAtual();
