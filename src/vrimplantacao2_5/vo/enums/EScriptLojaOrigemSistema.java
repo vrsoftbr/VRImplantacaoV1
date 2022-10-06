@@ -180,7 +180,8 @@ public enum EScriptLojaOrigemSistema {
     FOCUS(230, 8, "select id, razao descricao from empresa"),
     MANAGER(231, 5,"select codigo id, fantasia descricao from empresa"),
     SCV(232, 5,"SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
-    PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa");
+    PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
+    GUIASISTEMAS_FIREBIRD(233, 5, "select id_empresa id, nome_fantasia descricao from empresa");
     
     private int idSistema;
     private int idBancoDados;
