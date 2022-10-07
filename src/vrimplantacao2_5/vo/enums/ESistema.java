@@ -211,6 +211,8 @@ import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
+import vrimplantacao2_5.dao.sistema.DuplaFace_LivreDAO;
+import vrimplantacao2_5.dao.sistema.DxDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.FocusDAO;
@@ -250,6 +252,8 @@ import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
+import vrimplantacao2_5.gui.sistema.DuplaFace_Livre2_5GUI;
+import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Focus2_5GUI;
@@ -1939,6 +1943,28 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new GuiaSistemas_Firebird2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    DX(234, "DX", new DxDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Dx2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    LIVRE(235, "LIVRE", new DuplaFace_LivreDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new DuplaFace_Livre2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
