@@ -108,7 +108,7 @@ public class GeradorBalanca {
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-            printWriter.println("|  Código Antigo |    Descricao        | Código Antigo  | Código Atual   |");
+            printWriter.println("|  Código Antigo |      Descricao      |       EAN      |  Código Atual  |");
             printWriter.println("|----------------|---------------------|----------------|----------------|");
             String espacos = "----------------";
             String espacosD = "--------------------";
