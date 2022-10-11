@@ -432,6 +432,10 @@ public class LojaDAO {
                 sql.append(" WHERE id = " + i_loja.id);
 
                 stm.execute(sql.toString());
+                
+                sql = new StringBuilder();
+                sql.append("update pdv.parametrovalor set valor = '' where id_parametro = 272");
+                stm.execute(sql.toString());
             }
             
             if (versao.igualOuMaiorQue(4, 0, 0)) {
