@@ -232,7 +232,7 @@
                           </Group>
                           <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                           <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
-                          <EmptySpace pref="15" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -344,6 +344,46 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Container class="javax.swing.JPanel" name="jPanel1">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Clientes">
+                    <Property name="tabTitle" type="java.lang.String" value="Clientes"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="380" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="185" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JCheckBox" name="chkClientePreferencial">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Dialog" size="12" style="0"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
       </SubComponents>
@@ -387,7 +427,7 @@
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="7" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -433,20 +473,29 @@
                                   <Component id="txtPorta" min="-2" pref="37" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDatabase" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <Component id="txtUsuario" min="-2" pref="102" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="vRLabel21" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtSenha" pref="96" max="32767" attributes="0"/>
+                                  <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="vRLabel26" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtDatabase" max="32767" attributes="0"/>
+                                  <Component id="txtDatabasePdv" min="-2" pref="196" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace min="10" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -472,8 +521,10 @@
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDatabase" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel26" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDatabasePdv" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="19" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -506,7 +557,7 @@
                 </Component>
                 <Component class="vrframework.bean.label.VRLabel" name="vRLabel25">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Banco de Dados"/>
+                    <Property name="text" type="java.lang.String" value="DB VR.FDB"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.label.VRLabel" name="vRLabel20">
@@ -539,6 +590,13 @@
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabase">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel26">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="DB PDV.FDB"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabasePdv">
                 </Component>
               </SubComponents>
             </Container>
