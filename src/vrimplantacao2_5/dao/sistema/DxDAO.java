@@ -160,11 +160,12 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    ""
+            /*"select \n"
                     + " c_codtrib id,\n"
                     + " c_nometrib descricao,\n"
                     + " c_percent aliquota\n"
-                    + "from tributacao;"
+                    + "from tributacao;"*/
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -218,12 +219,14 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.c_subgrupo AS mercid2,\n"
                     + "	p.c_subgrupo AS mercid3,\n"
                     + "	p.c_tributaecf AS id_tributacao,\n"
-                    + "	p.c_stributaria,\n"
+                    + "	p.c_stributaria AS cst,\n"
+                    + "	t.c_nometrib AS tributacao,\n"
+                    + " t.c_percent AS aliquota,\n"
+                    + " p.c_basereducao AS reducao,\n"
                     + "	p.c_dtcad AS datacadastro,\n"
-                    + "	p.c_status AS situacao,\n"
+                    + "	CASE WHEN c_status = 0 THEN 1 ELSE 0 END situacao,\n"
                     + "	p.c_empresa,\n"
                     + "	p.c_prodbalanca AS e_balanca,\n"
-                    + "	p.c_basereducao,\n"
                     + "	p.c_classefiscal AS ncm,\n"
                     + "	p.c_st_pis AS pis,\n"
                     + "	p.c_st_cofins AS cofins,\n"
@@ -234,8 +237,17 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	e.c_prcusto AS precocusto\n"
                     + "FROM\n"
                     + "	produtos p\n"
-                    + "JOIN estoque e ON\n"
-                    + "	e.c_codprod = p.c_codprod"
+                    + "JOIN estoque e ON e.c_codprod = p.c_codprod\n"
+                    + "JOIN TRIBUTACAO t ON t.c_codtrib = p.c_tributaecf\n"
+//                    + "WHERE p.c_codprod IN (\n"
+//                    + "29784,474,344,\n"
+//                    + "368,513,31555,\n"
+//                    + "352,483,357,334,\n"
+//                    + "21984,84027,\n"
+//                    + "101306,83623,\n"
+//                    + "83643,84382,\n"
+//                    + "83918,84500,\n"
+//                    + "81322,82856)"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -244,17 +256,15 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
 
                     imp.setImportId(rs.getString("id"));
-                    //imp.setEan(rs.getString("ean"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.seteBalanca(rs.getBoolean("e_balanca"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
 
                     imp.setCodMercadologico1(rs.getString("mercid1"));
-                    imp.setCodMercadologico2(rs.getString("mercid2"));
-                    imp.setCodMercadologico3(rs.getString("mercid3"));
+                    imp.setCodMercadologico2(imp.getCodMercadologico1());
+                    imp.setCodMercadologico3(imp.getCodMercadologico1());
                     imp.setEstoque(rs.getDouble("estoque"));
 
                     imp.setCustoSemImposto(rs.getDouble("precocusto"));
@@ -267,31 +277,42 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstDebito(rs.getString("pis"));
                     imp.setPiscofinsCstCredito(rs.getString("pis"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
-                    imp.setIcmsConsumidorId(rs.getString("id_tributacao"));
-                    imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
+                    imp.setIcmsCstEntrada(rs.getInt("cst"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("aliquota"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao"));
 
-                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+                    imp.setIcmsCstConsumidor(0);
+                    imp.setIcmsAliqConsumidor(rs.getDouble("aliquota"));
+                    imp.setIcmsReducaoConsumidor(0);
 
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } 
-                    else {
-                        imp.setEan(rs.getString("ean"));
-                        imp.seteBalanca(rs.getBoolean("e_balanca"));
-                        imp.setTipoEmbalagem(rs.getString("unidade"));
-                        imp.setValidade(0);
-                        imp.setQtdEmbalagem(0);
+                    imp.setIcmsCstSaida(rs.getInt("cst"));
+                    imp.setIcmsAliqSaida(rs.getDouble("aliquota"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
+
+                    String ean = rs.getString("ean");
+
+                    if (ean.length() == 7 && ean.startsWith("20")) {
+
+                        int codigoProduto = Utils.stringToInt(ean.substring(2, 5), -2);
+                        ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                        if (produtoBalanca != null) {
+                            imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                            imp.setValidade(produtoBalanca.getValidade());
+                            imp.setQtdEmbalagem(1);
+                        } 
                     }
+                    else {
+                            imp.setEan(rs.getString("ean"));
+                            imp.seteBalanca(rs.getBoolean("e_balanca"));
+                            imp.setTipoEmbalagem(rs.getString("unidade"));
+                            imp.setQtdEmbalagem(1);
+                        }
+
                     result.add(imp);
                 }
             }
@@ -349,15 +370,7 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setTel_principal(rs.getString("telefone"));
                     imp.setIe_rg(rs.getString("inscricao"));
-
-                    String pessoa = (rs.getString("pessoa"));
-                    if ("F".equals(pessoa)) {
-                        imp.setTipo_inscricao(TipoInscricao.FISICA);
-                        imp.setCnpj_cpf(rs.getString("cnpj"));
-                    } else {
-                        imp.setTipo_inscricao(TipoInscricao.JURIDICA);
-                        imp.setCnpj_cpf(rs.getString("cnpj"));
-                    }
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
 
                     imp.addContato(
                             rs.getString("contato"),
@@ -470,7 +483,7 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cli.c_celular AS celular,\n"
                     + "	cli.c_fantasia,\n"
                     + "	cli.c_empresa,\n"
-                    + "	cli.c_status AS situacao,\n"
+                    + "	CASE WHEN cli.c_status = 0 THEN 1 ELSE 0 END AS situacao,\n"
                     + "	cli.c_tipo as pessoa\n"
                     + "FROM\n"
                     + "	cad_clientes cli\n"
@@ -484,12 +497,6 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("nome"));
                     imp.setCnpj(rs.getString("cnpjcpf"));
                     imp.setInscricaoestadual(rs.getString("inscrg"));
-
-                    String pessoa = (rs.getString("pessoa"));
-                    if ("F".equals(pessoa)) {
-                        imp.setCnpj(rs.getString("cnpjcpf"));
-                        imp.setInscricaoestadual(rs.getString("inscrg"));
-                    }
 
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
