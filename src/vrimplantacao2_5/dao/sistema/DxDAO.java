@@ -45,6 +45,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private boolean mapaTribEntrada = false;
+
+    public void setMapaTribEntrada(boolean mapaTribEntrada) {
+        this.mapaTribEntrada = mapaTribEntrada;
+    }
+
     @Override
     public String getSistema() {
         return "DX";
@@ -86,7 +92,10 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.DESMEMBRAMENTO
+                OpcaoProduto.DESMEMBRAMENTO,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO
         ));
     }
 
@@ -159,21 +168,33 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    ""
-            /*"select \n"
-                    + " c_codtrib id,\n"
-                    + " c_nometrib descricao,\n"
-                    + " c_percent aliquota\n"
-                    + "from tributacao;"*/
-            )) {
+
+            String sql = "SELECT DISTINCT\n"
+                    + "    p.c_stributaria||'.'||p.c_icms_de||'.'||case when p.c_basereducao = 100 then 0 else p.c_basereducao END AS id,\n"
+                    + "	p.c_stributaria AS cst,\n"
+                    + "    p.c_icms_de AS aliquota,\n"
+                    + "    case when p.c_basereducao = 100 then 0 else p.c_basereducao end AS reducao\n"
+                    + "FROM\n"
+                    + "	produtos p";
+
+            if (mapaTribEntrada) {
+                sql = "SELECT DISTINCT\n"
+                        + "    case when p.c_st_icms_fe = '' then 0 else p.c_st_icms_fe end ||\n"
+                        + "    '.'||p.c_icms_fe||'.'||case when p.c_bc_red_fe = 100 then 0 else p.c_bc_red_fe end||'.E' AS id,\n"
+                        + " 	case when p.c_st_icms_fe = '' then 0 else p.c_st_icms_fe end AS cst,\n"
+                        + " 	p.c_icms_fe AS aliquota,\n"
+                        + " 	case when p.c_bc_red_fe = 100 then 0 else p.c_bc_red_fe end AS reducao\n"
+                        + "FROM\n"
+                        + "	produtos p";
+            }
+            try (ResultSet rs = stm.executeQuery(sql)) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
-                            rs.getString("descricao"),
-                            0,
+                            rs.getString("aliquota"),
+                            rs.getInt("cst"),
                             rs.getDouble("aliquota"),
-                            0));
+                            rs.getDouble("reducao")));
                 }
             }
         }
@@ -218,11 +239,9 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.c_grupo AS mercid1,\n"
                     + "	p.c_subgrupo AS mercid2,\n"
                     + "	p.c_subgrupo AS mercid3,\n"
-                    + "	p.c_tributaecf AS id_tributacao,\n"
                     + "	p.c_stributaria AS cst,\n"
-                    + "	t.c_nometrib AS tributacao,\n"
-                    + " t.c_percent AS aliquota,\n"
-                    + " p.c_basereducao AS reducao,\n"
+                    + "    p.c_icms_de AS aliquota,\n"
+                    + "    case when p.c_basereducao = 100 then 0 else p.c_basereducao end AS reducao,\n"
                     + "	p.c_dtcad AS datacadastro,\n"
                     + "	CASE WHEN c_status = 0 THEN 1 ELSE 0 END situacao,\n"
                     + "	p.c_empresa,\n"
@@ -234,20 +253,17 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.c_cest AS cest,\n"
                     + "	e.c_qtdatu AS estoque,\n"
                     + "	e.c_prvenda AS precovenda,\n"
-                    + "	e.c_prcusto AS precocusto\n"
+                    + "	e.c_prcusto AS precocusto,\n"
+                    + " e.c_unitnota AS precocustoimposto,\n"
+                    + " case when p.c_st_icms_fe = '' then 0 else p.c_st_icms_fe end AS cst_fe,\n"
+                    + " p.c_icms_fe AS aliquota_fe,\n"
+                    + " case when p.c_bc_red_fe = 100 then 0 else p.c_bc_red_fe end AS reducao_fe,\n"
+                    + " case when p.c_st_icms_fe = '' then 0 else p.c_st_icms_fe end ||'.'||p.c_icms_fe||'.'||case when p.c_bc_red_fe = 100 then 0 else p.c_bc_red_fe end||'.E' AS id_tributacao_e,\n"
+                    + " p.c_stributaria||'.'||p.c_icms_de||'.'||case when p.c_basereducao = 100 then 0 else p.c_basereducao END AS id_tributacao_s,\n"
+                    + " '000.'||p.c_icms_de||'.0.00' AS id_tributacao_c\n"
                     + "FROM\n"
                     + "	produtos p\n"
-                    + "JOIN estoque e ON e.c_codprod = p.c_codprod\n"
-                    + "JOIN TRIBUTACAO t ON t.c_codtrib = p.c_tributaecf\n"
-//                    + "WHERE p.c_codprod IN (\n"
-//                    + "29784,474,344,\n"
-//                    + "368,513,31555,\n"
-//                    + "352,483,357,334,\n"
-//                    + "21984,84027,\n"
-//                    + "101306,83623,\n"
-//                    + "83643,84382,\n"
-//                    + "83918,84500,\n"
-//                    + "81322,82856)"
+                    + "JOIN estoque e ON e.c_codprod = p.c_codprod"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -267,8 +283,8 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(imp.getCodMercadologico1());
                     imp.setEstoque(rs.getDouble("estoque"));
 
-                    imp.setCustoSemImposto(rs.getDouble("precocusto"));
-                    imp.setCustoComImposto(imp.getCustoMedioSemImposto());
+                    imp.setCustoSemImposto(rs.getDouble("precocustoimposto"));
+                    imp.setCustoComImposto(rs.getDouble("precocustoimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
 
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
@@ -279,18 +295,14 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pis"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
-                    imp.setIcmsCstEntrada(rs.getInt("cst"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("aliquota"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao"));
-
-                    imp.setIcmsCstConsumidor(0);
-                    imp.setIcmsAliqConsumidor(rs.getDouble("aliquota"));
-                    imp.setIcmsReducaoConsumidor(0);
-
-                    imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setIcmsAliqSaida(rs.getDouble("aliquota"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
-
+                    imp.setIcmsCreditoId(rs.getString("id_tributacao_s"));
+                    imp.setIcmsDebitoId(rs.getString("id_tributacao_s"));
+                    imp.setIcmsConsumidorId(rs.getString("id_tributacao_c"));
+                    
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_tributacao_e"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_tributacao_e"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_tributacao_e"));
+                    
                     String ean = rs.getString("ean");
 
                     if (ean.length() == 7 && ean.startsWith("20")) {
@@ -304,14 +316,13 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
                             imp.setValidade(produtoBalanca.getValidade());
                             imp.setQtdEmbalagem(1);
-                        } 
-                    }
-                    else {
-                            imp.setEan(rs.getString("ean"));
-                            imp.seteBalanca(rs.getBoolean("e_balanca"));
-                            imp.setTipoEmbalagem(rs.getString("unidade"));
-                            imp.setQtdEmbalagem(1);
                         }
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.seteBalanca(rs.getBoolean("e_balanca"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setQtdEmbalagem(1);
+                    }
 
                     result.add(imp);
                 }

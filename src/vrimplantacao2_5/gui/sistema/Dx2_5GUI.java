@@ -37,8 +37,10 @@ public class Dx2_5GUI extends VRInternalFrame {
         tabProdutos.btnMapaTribut.setEnabled(false);
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            
             @Override
             public MapaTributoProvider getProvider() {
+                dao.setMapaTribEntrada(ChkMapaTribEntrada.isSelected());
                 return dao;
             }
 
@@ -174,6 +176,8 @@ public class Dx2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        jPanel1 = new javax.swing.JPanel();
+        ChkMapaTribEntrada = new javax.swing.JCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -258,6 +262,27 @@ public class Dx2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        ChkMapaTribEntrada.setText("Mapa Trib. Entrada");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ChkMapaTribEntrada)
+                .addContainerGap(430, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ChkMapaTribEntrada)
+                .addContainerGap(200, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Opções", jPanel1);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -283,8 +308,6 @@ public class Dx2_5GUI extends VRInternalFrame {
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("DX");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -313,8 +336,10 @@ public class Dx2_5GUI extends VRInternalFrame {
     }//GEN-LAST:event_jBLimparActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox ChkMapaTribEntrada;
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JButton jBLimpar;
+    private javax.swing.JPanel jPanel1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
