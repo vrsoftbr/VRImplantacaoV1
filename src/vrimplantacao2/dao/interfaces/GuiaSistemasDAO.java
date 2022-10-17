@@ -1,35 +1,128 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import vrimplantacao.classe.ConexaoSqlServer;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-public class GuiaSistemasDAO extends InterfaceDAO {
+public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "GuiaSistemas";
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.ASSOCIADO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.DESCONTINUADO,
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.FABRICANTE
+        ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.SEXO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -45,6 +138,35 @@ public class GuiaSistemasDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	vfd_CodICMS id,\n"
+                    + "	vfd_Descricao descricao,\n"
+                    + "	vfd_CST cst_icms,\n"
+                    + "	vfd_Aliquota aliq_icms,\n"
+                    + "	vfd_Base red_icms \n"
+                    + "from\n"
+                    + "	tab_icms ti\n"
+                    + "order by vfd_CodICMS"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms"))
+                    );
+                }
+            }
+        }
         return result;
     }
 
@@ -152,17 +274,17 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "COFINS.VFD_CSTSAIDA,\n"
                     + "VFD_SITUACAO AS ATIVO, \n"
                     + "vfd_TipoInventarioFatorConversao as ProUnid,\n"
-                    + "prod.vfd_icmss,\n"
-                    + "sai.vfd_CodIcms codIcmsS, \n"
-                    + "sai.vfd_Descricao descIcmsS, \n"
-                    + "sai.vfd_Aliquota aliqS, \n"
-                    + "sai.vfd_Base baseS, \n"
-                    + "sai.vfd_CST cstS,\n"
-                    + "ent.vfd_CodIcms codIcmsE, \n"
-                    + "ent.vfd_Descricao descIcmsE, \n"
-                    + "ent.vfd_Aliquota aliqE, \n"
-                    + "ent.vfd_Base baseE, \n"
-                    + "ent.vfd_CST cstE,\n"
+                    + "prod.vfd_icmss id_icms,\n"
+                    // + "sai.vfd_CodIcms codIcmsS, \n"
+                    // + "sai.vfd_Descricao descIcmsS, \n"
+                    // + "sai.vfd_Aliquota aliqS, \n"
+                    // + "sai.vfd_Base baseS, \n"
+                    // + "sai.vfd_CST cstS,\n"
+                    // + "ent.vfd_CodIcms codIcmsE, \n"
+                    // + "ent.vfd_Descricao descIcmsE, \n"
+                    // + "ent.vfd_Aliquota aliqE, \n"
+                    // + "ent.vfd_Base baseE, \n"
+                    // + "ent.vfd_CST cstE,\n"
                     + "prod.vfd_CEST, \n"
                     + "pr.vfd_CustoAquisicao,\n"
                     + "pr.vfd_PrecoVenda, \n"
@@ -175,78 +297,114 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "LEFT OUTER JOIN [Tab_cadCOFINS] AS COFINS ON COFINS.vfd_CodCOFINS = PROD.VFD_CODCOFINS\n"
                     + "LEFT JOIN tab_precoatual pr on pr.vfd_CodProduto = prod.vfd_codproduto and pr.vfd_CodFilial = " + getLojaOrigem() + "\n"
                     + "LEFT JOIN tab_estoqueatual est on est.vfd_CodProduto = prod.vfd_CodProduto and est.vfd_CodFilial = " + getLojaOrigem() + "\n"
+                    + "WHERE pr.vfd_QtdEmb = 1\n"
                     + "ORDER BY prod.vfd_codproduto"
             )) {
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setImportId(rst.getString("vfd_codproduto"));
-                    imp.setEan(rst.getString("VFD_CODBARRA"));
-                    imp.setQtdEmbalagem(rst.getInt("VFD_QTDEMBALAGEM"));
-                    imp.setTipoEmbalagem(rst.getString("ProUnid"));
                     imp.seteBalanca("V".equals(rst.getString("vfd_FlagBalanca")));
+
+                    imp.setEan(rst.getString("VFD_CODBARRA"));
                     imp.setValidade(rst.getInt("vfd_validade"));
+
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
+
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        imp.setValidade(bal.getValidade() > 1
+                                ? bal.getValidade() : rst.getInt("vfd_validade"));
+                        imp.setEan(imp.getImportId());
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("vfd_descricao"));
                     imp.setDescricaoReduzida(rst.getString("vfd_descricaopdv"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setQtdEmbalagem(rst.getInt("VFD_QTDEMBALAGEM"));
+                    imp.setTipoEmbalagem(rst.getString("ProUnid"));
                     imp.setDataCadastro(rst.getDate("vfd_dtcadastro"));
                     imp.setSituacaoCadastro("ATIVO".equals(rst.getString("ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setCodMercadologico1(rst.getString("vfd_coddepartamento"));
                     imp.setCodMercadologico2(rst.getString("vfd_codsecao"));
                     imp.setCodMercadologico3(rst.getString("vfd_codgrupo"));
                     imp.setCodMercadologico4(rst.getString("vfd_codsubgrupo"));
+
+                    imp.setMargem(rst.getDouble("vfd_margem"));
+                    imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
+                    imp.setCustoComImposto(rst.getDouble("vfd_CustoAquisicao"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setEstoque(rst.getDouble("vfd_QtdLoja"));
+
                     imp.setNcm(rst.getString("vfd_classificacaofiscal"));
                     imp.setCest(rst.getString("vfd_CEST"));
                     imp.setPiscofinsCstDebito(rst.getString("VFD_CSTSAIDA"));
                     imp.setPiscofinsCstCredito(rst.getString("VFD_CSTENTRADA"));
+
+                    /*
                     imp.setIcmsCstSaida(rst.getInt("cstS"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliqS"));
                     imp.setIcmsReducaoSaida(imp.getIcmsCstSaida() == 0 ? 0 : rst.getDouble("baseS"));
                     imp.setIcmsCstEntrada(rst.getInt("cstE"));
                     imp.setIcmsAliqEntrada(rst.getDouble("aliqE"));
                     imp.setIcmsReducaoEntrada(imp.getIcmsCstEntrada() == 0 ? 0 : rst.getDouble("baseE"));
-                    imp.setMargem(rst.getDouble("vfd_margem"));
-                    imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
-                    imp.setCustoComImposto(rst.getDouble("vfd_CustoAquisicao"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setEstoque(rst.getDouble("vfd_QtdLoja"));
+                     */
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+
                     vResult.add(imp);
                 }
             }
         }
         return vResult;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
-                    + "fornecedor.vfd_codFornecedor, "
-                    + "fornecedor.vfd_razao, "
-                    + "fornecedor.vfd_Apelido, "
-                    + "fornecedor.vfd_endereco, "
-                    + "fornecedor.vfd_cidade, "
-                    + "fornecedor.vfd_bairro, "
-                    + "fornecedor.vfd_uf, "
-                    + "fornecedor.vfd_cep, "
-                    + "fornecedor.vfd_ie, "
-                    + "fornecedor.vfd_rg, "
-                    + "fornecedor.vfd_fone, "
-                    + "fornecedor.vfd_fax, "
-                    + "fornecedor.vfd_prazo, "
-                    + "fornecedor.vfd_nomevendedor, "
-                    + "fornecedor.vfd_faxvendedor, "
-                    + "fornecedor.vfd_TipoPessoa, "
-                    + "fornecedor.vfd_cpf, "
-                    + "fornecedor.vfd_emailvendedor, "
-                    + "fornecedor.vfd_emailvendas, "
-                    + "prazo.vfd_dias as dias, "
-                    + "fornecedor.VFD_NUMERO, "
-                    + "tipoforn.vfd_codtipfornecedor as tipoforn, "
-                    + "vfd_fonevendedor "
+                    + " fornecedor.vfd_codFornecedor, "
+                    + " fornecedor.vfd_razao, "
+                    + " fornecedor.vfd_Apelido, "
+                    + " fornecedor.vfd_endereco, "
+                    + " fornecedor.vfd_cidade, "
+                    + " fornecedor.vfd_bairro, "
+                    + " fornecedor.vfd_uf, "
+                    + " fornecedor.vfd_cep, "
+                    + " fornecedor.vfd_ie, "
+                    + " fornecedor.vfd_rg, "
+                    + " fornecedor.vfd_fone, "
+                    + " fornecedor.vfd_fax, "
+                    + " fornecedor.vfd_prazo, "
+                    + " fornecedor.vfd_nomevendedor, "
+                    //+ " fornecedor.vfd_faxvendedor, "
+                    + " fornecedor.vfd_TipoPessoa, "
+                    + " fornecedor.vfd_cpf, "
+                    //+ " fornecedor.vfd_emailvendedor, "
+                    //+ " fornecedor.vfd_emailvendas, "
+                    //+ " prazo.vfd_dias as dias, "
+                    + " fornecedor.VFD_NUMERO, "
+                    + " tipoforn.vfd_codtipfornecedor as tipoforn, "
+                    //+ " vfd_fonevendedor, "
+                    + " fornecedor.vfd_PedidoMinimo, "
+                    + " fornecedor.vfd_FreqVisita, "
+                    + " vfd_NomeVendedor contato1, "
+                    + "	vfd_FoneVendedor fone1, "
+                    + "	vfd_EmailVendedor email1, "
+                    + "	vfd_Nomegerente contato2, "
+                    + "	vfd_FoneGerente fone2, "
+                    + "	vfd_EmailGerente email2, "
+                    + "	vfd_NomePromotor contato3, "
+                    + "	vfd_FonePromotor fone3, "
+                    + "	vfd_EmailPromotor email3 "
                     + "from tab_fornecedor as fornecedor "
                     + "inner join tab_prazopagamento as prazo on prazo.vfd_codprazo = fornecedor.vfd_codprazo "
                     + "inner join tab_tipofornecedor as tipoforn on tipoforn.vfd_codtipfornecedor = fornecedor.vfd_codtipofornecedor "
@@ -267,8 +425,9 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setCep(rst.getString("vfd_cep"));
                     imp.setCnpj_cpf(rst.getString("vfd_cpf"));
                     imp.setIe_rg(rst.getString("vfd_ie"));
-                    imp.setPrazoVisita(rst.getInt("dias"));
+                    imp.setPrazoVisita(rst.getInt("vfd_FreqVisita"));
                     imp.setPrazoEntrega(rst.getInt("vfd_prazo"));
+                    imp.setValor_minimo_pedido(rst.getDouble("vfd_PedidoMinimo"));
                     imp.setTel_principal(rst.getString("vfd_fone"));
 
                     if ((rst.getString("vfd_nomevendedor") != null)
@@ -276,7 +435,40 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                         imp.setObservacao("NOME VENDEDOR " + rst.getString("vfd_nomevendedor"));
                     }
 
-                    if ((rst.getString("vfd_emailvendedor") != null)
+                    if ((rst.getString("contato1") != null)
+                            && (!rst.getString("contato1").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato1"),
+                                rst.getString("fone1"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email1")
+                        );
+                    }
+
+                    if ((rst.getString("contato2") != null)
+                            && (!rst.getString("contato2").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato2"),
+                                rst.getString("fone2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email2")
+                        );
+                    }
+
+                    if ((rst.getString("contato3") != null)
+                            && (!rst.getString("contato3").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato3"),
+                                rst.getString("fone3"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email3")
+                        );
+                    }
+
+                    /*if ((rst.getString("vfd_emailvendedor") != null)
                             && (!rst.getString("vfd_emailvendedor").trim().isEmpty())
                             && (rst.getString("vfd_emailvendedor").contains("@"))) {
                         imp.addContato(
@@ -320,8 +512,7 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                                 TipoContato.COMERCIAL,
                                 rst.getString("vfd_fonevendedor").toLowerCase()
                         );
-                    }
-
+                    }*/
                     vResult.add(imp);
                 }
             }
@@ -334,12 +525,18 @@ public class GuiaSistemasDAO extends InterfaceDAO {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "VFD_CODPRODUTO, "
-                    + "VFD_CODFORNECEDOR, "
-                    + "VFD_CODREFERENCIA "
-                    + "FROM TAB_REFPRODUTO "
-                    + "ORDER BY VFD_CODPRODUTO"
+                    "SELECT\n"
+                    + "	VFD_CODPRODUTO,\n"
+                    + "	VFD_CODFORNECEDOR,\n"
+                    + "	VFD_CODREFERENCIA,\n"
+                    + "	case\n"
+                    + "		when vfd_QtdEmbCompra = 0 then 1\n"
+                    + "		else vfd_QtdEmbCompra\n"
+                    + "	end vfd_QtdEmbCompra\n"
+                    + "FROM\n"
+                    + "	TAB_REFPRODUTO\n"
+                    + "ORDER BY\n"
+                    + "	VFD_CODPRODUTO"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -348,11 +545,55 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("VFD_CODPRODUTO"));
                     imp.setIdFornecedor(rst.getString("VFD_CODFORNECEDOR"));
                     imp.setCodigoExterno(rst.getString("VFD_CODREFERENCIA"));
+                    imp.setQtdEmbalagem(rst.getDouble("vfd_QtdEmbCompra"));
+
                     vResult.add(imp);
                 }
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	vfd_CodFilial empresa,\n"
+                    + "	vfd_CodFavorecido id_fornecedor,\n"
+                    + "	vfd_NumDocumento documento,\n"
+                    + "	vfd_NumeroParcela parcela,\n"
+                    + "	vfd_DataEmissao emissao,\n"
+                    + "	vfd_DataEntrada entrada,\n"
+                    + "	vfd_DataVencimento vencimento,\n"
+                    + "	vfd_ValorParcela valor,\n"
+                    + "	vfd_Obs observacao\n"
+                    + "from\n"
+                    + "	tab_Fin_CPagar\n"
+                    + "where\n"
+                    + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
+                    + "	and vfd_CodGrupoPag = 1 and vfd_CodSubGrupoPag = 11\n"
+                    + "	and vfd_DataPagamento is null\n"
+                    + "order BY \n"
+                    + "	 vfd_NumDocumento, vfd_NumeroParcela"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("empresa")+'-'+(rst.getString("id_fornecedor"))+'-'+(rst.getString("documento")));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -367,7 +608,7 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "vfd_rg, "
                     + "vfd_cpf, "
                     + "vfd_nomepdv, "
-                    + "vfd_sexo, "
+                    + "case when vfd_sexo = 'F' then 0 else 1 end vfd_Sexo, "
                     + "vfd_cidade, "
                     + "vfd_estadocivil, "
                     + "vfd_estado, "
@@ -398,6 +639,8 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setFantasia(rst.getString("vfd_nomepdv"));
                     imp.setCnpj(rst.getString("vfd_cpf"));
                     imp.setInscricaoestadual(rst.getString("vfd_rg"));
+                    imp.setSexo(rst.getInt("vfd_Sexo") == 0 ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setEstadoCivil(rst.getInt("vfd_estadocivil"));
                     imp.setEndereco(rst.getString("vfd_endereco"));
                     imp.setNumero(rst.getString("vfd_numero"));
                     imp.setComplemento(rst.getString("vfd_complemento"));
@@ -425,45 +668,47 @@ public class GuiaSistemasDAO extends InterfaceDAO {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "vfd_Caixa, "
-                    + "vfd_Cupom, "
-                    + "vfd_NumDocumento,\n"
-                    + "vfd_DataLancamento, "
-                    + "vfd_NumeroParcela,\n"
-                    + "vfd_CodSacado, "
-                    + "vfd_DataVencimento,\n"
-                    + "vfd_VlrDocumento, "
-                    + "vfd_VlrJuros \n"
-                    + "from tab_fin_contasrec \n"
-                    + "where vfd_DataBaixa is null\n"
-                    + "and vfd_CodFilial = " + getLojaOrigem()
-                    + "and ch.vfd_CodBanco is null\n"
-                    + "and ch.vfd_CodAgencia is null\n"
-                    + "and ch.vfd_NumConta is null\n"
-                    
+                    "select\n"
+                    + "	vfd_CodFilial empresa,\n"
+                    + "	vfd_NumDocumento documento,\n"
+                    + "	vfd_CodSacado id_cliente,\n"
+                    + "	vfd_Caixa ecf,\n"
+                    + "	vfd_Cupom numerocupom,\n"
+                    + "	vfd_DataLancamento emissao,\n"
+                    + "	vfd_NumeroParcela,\n"
+                    + "	vfd_DataVencimento vencimento,\n"
+                    + "	vfd_VlrDocumento valor,\n"
+                    + "	vfd_VlrJuros juros\n"
+                    + "from\n"
+                    + "	tab_fin_contasrec\n"
+                    + "where\n"
+                    + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
+                    + "	and vfd_CodGrupoPag = 7 and vfd_CodSubGrupoPag = 717\n"
+                    + "	and vfd_DataBaixa is null\n"
+                    + "order BY vfd_DataLancamento"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(getLojaOrigem() + rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_CodSacado") + rst.getString("vfd_DataLancamento"));                    
-                    imp.setIdCliente(rst.getString("vfd_CodSacado"));
-                    imp.setNumeroCupom(rst.getString("vfd_Cupom"));
-                    imp.setDataEmissao(rst.getDate("vfd_DataLancamento"));
-                    imp.setDataVencimento(rst.getDate("vfd_DataVencimento"));
-                    imp.setValor(rst.getDouble("vfd_VlrDocumento"));
-                    imp.setJuros(rst.getDouble("vfd_VlrJuros"));
-                    imp.setEcf(rst.getString("vfd_Caixa"));
+                    imp.setId(getLojaOrigem() + rst.getString("empresa") + rst.getString("documento") + rst.getString("id_cliente") + rst.getString("emissao"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setEcf(rst.getString("ecf"));
+
                     vResult.add(imp);
                 }
             }
         }
         return vResult;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
-        try (Statement stm  = ConexaoSqlServer.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "cli.vfd_NomeCliente,\n"
@@ -507,13 +752,13 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setNome(rst.getString("vfd_NomeCliente"));
                     imp.setObservacao("IMPORTADO VR");
                     imp.setAlinea(0);
-                    vResult.add(imp);                    
+                    vResult.add(imp);
                 }
             }
         }
         return vResult;
     }
-    
+
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> vResult = new ArrayList<>();
@@ -561,11 +806,165 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setIdEmpresa(rst.getString("vfd_CodEmpresa"));
                     imp.setBloqueado(false);
                     imp.setConvenioLimite(rst.getDouble("vfd_LimiteConvenio"));
-                    imp.setConvenioDesconto(0); 
+                    imp.setConvenioDesconto(0);
                     vResult.add(imp);
                 }
             }
             return vResult;
-        }        
+        }
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new GuiaSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new GuiaSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
+                        next.setProduto(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }

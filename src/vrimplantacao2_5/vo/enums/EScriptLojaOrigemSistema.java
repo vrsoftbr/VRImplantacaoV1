@@ -181,9 +181,9 @@ public enum EScriptLojaOrigemSistema {
     MANAGER(231, 5,"select codigo id, fantasia descricao from empresa"),
     SCV(232, 5,"SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
-    GUIASISTEMAS_FIREBIRD(233, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
-    LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA");
+    LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
+    GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial");
     
     private int idSistema;
     private int idBancoDados;
