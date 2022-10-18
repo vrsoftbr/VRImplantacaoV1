@@ -807,6 +807,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rst.getString("vfd_codCliente"));
                     imp.setRazao(rst.getString("vfd_nomecliente"));
                     imp.setFantasia(rst.getString("vfd_nomepdv"));
@@ -829,6 +830,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setSalario(rst.getDouble("vfd_renda"));
                     imp.setValorLimite(rst.getDouble("vfd_limitecredito"));
                     imp.setObservacao(rst.getString("vfd_observacoes"));
+                    
                     vResult.add(imp);
                 }
             }
