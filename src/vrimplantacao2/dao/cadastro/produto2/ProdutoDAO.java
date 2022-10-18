@@ -388,6 +388,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.NUMERO_PARCELA)) {
             sql.put("numeroparcela", vo.getNumeroparcela());
         }
+        if (opt.contains(OpcaoProduto.VASILHAME) && vo.getIdVasilhame() != 0) {
+            sql.put("id_produtovasilhame", vo.getIdVasilhame());
+        }
 
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();

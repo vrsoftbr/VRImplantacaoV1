@@ -93,7 +93,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.VASILHAME
         ));
     }
 
@@ -170,7 +171,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -205,6 +206,40 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setMerc3Descricao(rst.getString("merc3_descricao"));
                     imp.setMerc4ID(rst.getString("merc4"));
                     imp.setMerc4Descricao(rst.getString("merc4_descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }*/
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	vm.wrk_coddepartamento merc1,\n" +
+                    "	vm.wrk_DescDepartamento merc1_descricao,\n" +
+                    "	vm.wrk_codsecao merc2,\n" +
+                    "	vm.wrk_DescSecao merc2_descricao,\n" +
+                    "	vm.wrk_codgrupo merc3,\n" +
+                    "	vm.wrk_DescGrupo merc3_descricao\n" +
+                    "from \n" +
+                    "	view_Mercadologico vm"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("merc1_descricao"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("merc2_descricao"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("merc3_descricao"));
+                    
                     vResult.add(imp);
                 }
             }
@@ -253,10 +288,10 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "prod.vfd_codfornecedor,\n"
                     + "prod.vfd_situatributaria,\n"
                     + "prod.vfd_margem,\n"
-                    + "prod.vfd_codgrupo, \n"
+                    + "prod.vfd_codgrupo merc3,\n"
                     + "prod.vfd_codsubgrupo,\n"
-                    + "prod.vfd_codsecao,\n"
-                    + "prod.vfd_coddepartamento, \n"
+                    + "prod.vfd_codsecao merc2,\n"
+                    + "prod.vfd_coddepartamento merc1,\n"      
                     + "prod.vfd_codequival,\n"
                     + "prod.vfd_validade,\n"
                     + "prod.vfd_dtcadastro,\n"
@@ -288,7 +323,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "prod.vfd_CEST, \n"
                     + "pr.vfd_CustoAquisicao,\n"
                     + "pr.vfd_PrecoVenda, \n"
-                    + "est.vfd_QtdLoja\n"
+                    + "est.vfd_QtdLoja,\n"
+                    + "prod.vfd_CodProdVasilhame vasilhame\n"        
                     + "from tab_produto as prod\n"
                     + "LEFT JOIN tab_ICMS sai on sai.vfd_CodIcms = prod.vfd_icmss\n"
                     + "LEFT JOIN tab_ICMS ent on ent.vfd_CodIcms = prod.vfd_icmse\n"
@@ -296,7 +332,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "LEFT JOIN tmp_ListProdBalanca AS BALANCA ON BALANCA.VFD_CODPRODUTO = prod.vfd_codproduto\n"
                     + "LEFT OUTER JOIN [Tab_cadCOFINS] AS COFINS ON COFINS.vfd_CodCOFINS = PROD.VFD_CODCOFINS\n"
                     + "LEFT JOIN tab_precoatual pr on pr.vfd_CodProduto = prod.vfd_codproduto and pr.vfd_CodFilial = " + getLojaOrigem() + "\n"
-                    + "LEFT JOIN tab_estoqueatual est on est.vfd_CodProduto = prod.vfd_CodProduto and est.vfd_CodFilial = " + getLojaOrigem() + "\n"
+                    + "LEFT JOIN tab_estoqueatual est on est.vfd_CodProduto = prod.vfd_CodProduto and est.vfd_CodFilial = " + getLojaOrigem() + "\n"       
                     + "WHERE pr.vfd_QtdEmb = 1\n"
                     + "ORDER BY prod.vfd_codproduto"
             )) {
@@ -328,11 +364,25 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setQtdEmbalagem(rst.getInt("VFD_QTDEMBALAGEM"));
                     imp.setTipoEmbalagem(rst.getString("ProUnid"));
                     imp.setDataCadastro(rst.getDate("vfd_dtcadastro"));
-                    imp.setSituacaoCadastro("ATIVO".equals(rst.getString("ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setCodMercadologico1(rst.getString("vfd_coddepartamento"));
-                    imp.setCodMercadologico2(rst.getString("vfd_codsecao"));
-                    imp.setCodMercadologico3(rst.getString("vfd_codgrupo"));
-                    imp.setCodMercadologico4(rst.getString("vfd_codsubgrupo"));
+                    
+                    String situacao = rst.getString("vfd_situacao");
+                    
+                    if (situacao != null && !situacao.equals("")) {
+                        switch(situacao.trim()) {
+                            case "ATIVO": imp.setSituacaoCadastro(1);
+                            break;
+                            case "FORA DE LINHA": imp.setSituacaoCadastro(0);
+                            break;
+                            case "COMPRA SUSPENSA": imp.setDescontinuado(true);
+                                imp.setSituacaoCadastro(1);
+                            break;
+                            default: imp.setSituacaoCadastro(1); break;
+                        }
+                    }
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    //imp.setCodMercadologico4(rst.getString("vfd_codsubgrupo"));
 
                     imp.setMargem(rst.getDouble("vfd_margem"));
                     imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
@@ -357,12 +407,85 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIdVasilhame(rst.getString("vasilhame"));
 
                     vResult.add(imp);
                 }
             }
         }
         return vResult;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n" +
+                        "	em.vfd_CodProduto idproduto,\n" +
+                        "	em.vfd_CodBarra ean,\n" +
+                        "	em.vfd_QtdEmbalagem qtdembalagem,\n" +
+                        "	tu.vfd_Descricao embalagem\n" +
+                        "from \n" +
+                        "	tab_EMBALAGEM em\n" +
+                        "left join tab_Unidade tu on em.vfd_unidade = tu.vfd_CodUnidade \n" +
+                        "where \n" +
+                        "	vfd_flagembcd = 'V'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("embalagem"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+        
+        if (opt == OpcaoProduto.QTD_EMBALAGEM_COTACAO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n" +
+                        "	em.vfd_CodProduto idproduto,\n" +
+                        "	em.vfd_CodBarra ean,\n" +
+                        "	em.vfd_QtdEmbalagem qtdembalagem,\n" +
+                        "	tu.vfd_Descricao embalagem\n" +
+                        "from \n" +
+                        "	tab_EMBALAGEM em\n" +
+                        "left join tab_Unidade tu on em.vfd_unidade = tu.vfd_CodUnidade \n" +
+                        "where \n" +
+                        "	vfd_flagembcd = 'V'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("embalagem"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
     }
 
     @Override
@@ -404,7 +527,21 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	vfd_EmailGerente email2, "
                     + "	vfd_NomePromotor contato3, "
                     + "	vfd_FonePromotor fone3, "
-                    + "	vfd_EmailPromotor email3 "
+                    + "	vfd_EmailPromotor email3,"
+                    + " vfd_DeptoVendas contato4,\n"
+                    + "	vfd_FoneDepto fone4,\n"
+                    + "	vfd_NomeCobranca contato5,\n"
+                    + "	vfd_FoneCobranca fone5,\n"
+                    + " vfd_EmailVendas email4,\n"
+                    + " vfd_EmailCobranca email5,\n"
+                    + " (select \n" +
+                    "		te.vfd_Email\n" +
+                    "	from \n" +
+                    "		tab_Emails te \n" +
+                    "	where te.vfd_Codigo = fornecedor.vfd_CodFornecedor and \n" +
+                    "		te.vfd_Tipo = 'F' and \n" +
+                    "		te.vfd_IdEmail = 1) emailnfe,\n"        
+                    + " fornecedor.vfd_ObsFor obs\n"        
                     + "from tab_fornecedor as fornecedor "
                     + "inner join tab_prazopagamento as prazo on prazo.vfd_codprazo = fornecedor.vfd_codprazo "
                     + "inner join tab_tipofornecedor as tipoforn on tipoforn.vfd_codtipfornecedor = fornecedor.vfd_codtipofornecedor "
@@ -467,6 +604,39 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                                 rst.getString("email3")
                         );
                     }
+                    
+                    if ((rst.getString("contato4") != null)
+                            && (!rst.getString("contato4").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato4"),
+                                rst.getString("fone4"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email4")
+                        );
+                    }
+                    
+                    if ((rst.getString("contato5") != null)
+                            && (!rst.getString("contato5").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato5"),
+                                rst.getString("fone5"),
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("email5")
+                        );
+                    }
+                    
+                    if ((rst.getString("emailnfe") != null)
+                            && (!rst.getString("emailnfe").trim().isEmpty())) {
+                        imp.addContato(
+                                "XML",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("emailnfe")
+                        );
+                    }
 
                     /*if ((rst.getString("vfd_emailvendedor") != null)
                             && (!rst.getString("vfd_emailvendedor").trim().isEmpty())
@@ -513,6 +683,9 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                                 rst.getString("vfd_fonevendedor").toLowerCase()
                         );
                     }*/
+                    
+                    imp.setObservacao(rst.getString("obs"));
+                    
                     vResult.add(imp);
                 }
             }
