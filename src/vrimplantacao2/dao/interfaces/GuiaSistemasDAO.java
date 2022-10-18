@@ -860,6 +860,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
                     + "	and vfd_CodGrupoPag = 7 and vfd_CodSubGrupoPag = 717\n"
                     + "	and vfd_DataBaixa is null\n"
+                    + " and vfd_id_depara is null \n"
+                    + "	and vfd_Data_DePara is null\n"        
                     + "order BY vfd_DataLancamento"
             )) {
                 while (rst.next()) {
