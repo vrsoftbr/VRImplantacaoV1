@@ -388,6 +388,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
                     imp.setCustoComImposto(rst.getDouble("vfd_CustoAquisicao"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
+                    
                     imp.setEstoque(rst.getDouble("vfd_QtdLoja"));
 
                     imp.setNcm(rst.getString("vfd_classificacaofiscal"));
@@ -408,6 +409,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIdVasilhame(rst.getString("vasilhame"));
+                    imp.setIdFamiliaProduto(rst.getString("vfd_codequival"));
 
                     vResult.add(imp);
                 }
@@ -746,7 +748,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	tab_Fin_CPagar\n"
                     + "where\n"
                     + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
-                    + "	and vfd_CodGrupoPag = 1 and vfd_CodSubGrupoPag = 11\n"
+                    //+ " and vfd_CodGrupoPag = 1 and vfd_CodSubGrupoPag = 11\n"
                     + "	and vfd_DataPagamento is null\n"
                     + "order BY \n"
                     + "	 vfd_NumDocumento, vfd_NumeroParcela"
