@@ -525,6 +525,9 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "			1\n"
                     + "	) pags on\n"
                     + "		c.contasreceberid = pags.id_contareceber\n"
+                    + "where \n"
+                    + "	pags.valorpago is null and\n"
+                    + "	c.contasreceberclienteid is not null\n"        
                     + "order by\n"
                     + "	1"
             )) {
