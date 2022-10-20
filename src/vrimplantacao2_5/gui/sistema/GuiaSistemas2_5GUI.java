@@ -9,22 +9,22 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.GuiaSistemas_FirebirdDAO;
+import vrimplantacao2.dao.interfaces.GuiaSistemasDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class GuiaSistemas_Firebird2_5GUI extends VRInternalFrame {
+public class GuiaSistemas2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.GUIASISTEMAS_FIREBIRD.getNome();
-    private static GuiaSistemas_Firebird2_5GUI instance;
+    private static final String SISTEMA = ESistema.GUIASISTEMAS.getNome();
+    private static GuiaSistemas2_5GUI instance;
 
-    private final GuiaSistemas_FirebirdDAO dao = new GuiaSistemas_FirebirdDAO();
+    private final GuiaSistemasDAO dao = new GuiaSistemasDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public GuiaSistemas_Firebird2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public GuiaSistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -35,6 +35,8 @@ public class GuiaSistemas_Firebird2_5GUI extends VRInternalFrame {
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
+        pnlBalanca.setSistema(dao.getSistema() + " - " + pnlConn.idConexao);
+        pnlBalanca.setLoja(dao.getLojaOrigem());
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -59,7 +61,7 @@ public class GuiaSistemas_Firebird2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.GUIASISTEMAS_FIREBIRD);
+        pnlConn.setSistema(ESistema.GUIASISTEMAS);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -104,13 +106,13 @@ public class GuiaSistemas_Firebird2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-
-                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
-                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
-                    }
-                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
-                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-                    }
+                    
+//                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
+//                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+//                    }
+//                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
+//                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+//                    }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -150,7 +152,7 @@ public class GuiaSistemas_Firebird2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new GuiaSistemas_Firebird2_5GUI(i_mdiFrame);
+                instance = new GuiaSistemas2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

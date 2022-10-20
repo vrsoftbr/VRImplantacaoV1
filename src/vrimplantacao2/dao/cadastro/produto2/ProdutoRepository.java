@@ -1668,6 +1668,15 @@ public class ProdutoRepository {
         }
 
         vo.setNumeroparcela(imp.getNumeroparcela());
+        
+        ProdutoAnteriorVO anteriorVasilhame = provider.anterior().get(
+                                provider.getSistema(),
+                                provider.getLoja(),
+                                imp.getIdVasilhame());
+        
+        if (anteriorVasilhame != null && anteriorVasilhame.getCodigoAtual().getId() != 0) {
+            vo.setIdVasilhame(anteriorVasilhame.getCodigoAtual().getId());
+        }
 
         return vo;
     }

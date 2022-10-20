@@ -202,6 +202,7 @@ import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
+import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
@@ -219,7 +220,6 @@ import vrimplantacao2_5.dao.sistema.FocusDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
-import vrimplantacao2_5.dao.sistema.GuiaSistemas_FirebirdDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
 import vrimplantacao2_5.dao.sistema.LCSistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
@@ -262,7 +262,7 @@ import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
-import vrimplantacao2_5.gui.sistema.GuiaSistemas_Firebird2_5GUI;
+import vrimplantacao2_5.gui.sistema.GuiaSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
@@ -749,7 +749,12 @@ public enum ESistema {
     GUIASISTEMAS(71, "GUIASISTEMAS", new GuiaSistemasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new GuiaSistemas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     HRTECH(72, "HRTECH", new HRTechDAO()) {
@@ -1932,17 +1937,6 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Manager2_5GUI(frame);
-            } catch (Exception ex) {
-                Util.exibirMensagemErro(ex, "");
-            }
-            return null;
-        }
-    },
-    GUIASISTEMAS_FIREBIRD(233, "GUIASISTEMAS_FB", new GuiaSistemas_FirebirdDAO()) {
-        @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            try {
-                return new GuiaSistemas_Firebird2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

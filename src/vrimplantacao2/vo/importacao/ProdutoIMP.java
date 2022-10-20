@@ -184,6 +184,8 @@ public class ProdutoIMP {
     @DatabaseField private String beneficio = "";
     @DatabaseField private boolean produtoECommerce = false;
     @DatabaseField private String codigoAnp = "";
+    @DatabaseField private String idVasilhame;
+    
     private int codigoAtual;
     private int operacional = 0;
     
@@ -1125,6 +1127,14 @@ public class ProdutoIMP {
 
     public void setOperacional(int operacional) {
         this.operacional = operacional;
+    }
+
+    public String getIdVasilhame() {
+        return idVasilhame;
+    }
+
+    public void setIdVasilhame(String idVasilhame) {
+        this.idVasilhame = idVasilhame;
     }
     
     public boolean from(ProdutoBalancaVO bal) {

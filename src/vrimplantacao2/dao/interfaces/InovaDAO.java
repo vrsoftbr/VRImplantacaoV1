@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -18,7 +18,6 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -526,6 +525,9 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "			1\n"
                     + "	) pags on\n"
                     + "		c.contasreceberid = pags.id_contareceber\n"
+                    + "where \n"
+                    + "	pags.valorpago is null and\n"
+                    + "	c.contasreceberclienteid is not null\n"        
                     + "order by\n"
                     + "	1"
             )) {
