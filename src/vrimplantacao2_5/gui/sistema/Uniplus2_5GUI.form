@@ -222,8 +222,9 @@
                               <Component id="chkNewEan" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTemArquivoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutoNota" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTemProdutoAssociado" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="596" max="32767" attributes="0"/>
+                          <EmptySpace pref="529" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -238,7 +239,9 @@
                           <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoNota" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="162" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkTemProdutoAssociado" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="123" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -262,6 +265,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkProdutoNota">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produtos X Fornecedores da NF"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkTemProdutoAssociado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tem Produto Associado"/>
                   </Properties>
                 </Component>
               </SubComponents>

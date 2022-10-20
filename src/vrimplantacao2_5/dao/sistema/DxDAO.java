@@ -153,6 +153,7 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_ADMISSAO,
                 OpcaoCliente.CARGO,
                 OpcaoCliente.SALARIO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.NOME_CONJUGE,
                 OpcaoCliente.DATA_NASCIMENTO_CONJUGE,
                 OpcaoCliente.NOME_PAI,
@@ -521,6 +522,7 @@ public class DxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setOrgaoemissor(rs.getString("uf"));
                     imp.setLimiteCompra(rs.getDouble("limite"));
+                    imp.setValorLimite(rs.getDouble("limite"));
 
                     imp.setAtivo(rs.getBoolean("situacao"));
                     imp.setNomeMae(rs.getString("mae"));

@@ -100,6 +100,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     dao.NewEan = chkNewEan.isSelected();
                     dao.ProdutoFornecedorNotas = chkProdutoNota.isSelected();
                     dao.usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
+                    dao.temProdutoAssociado= chkTemProdutoAssociado.isSelected();
 
                     Importador importador = new Importador(dao);
 
@@ -181,6 +182,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         chkNewEan = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoNota = new javax.swing.JCheckBox();
+        chkTemProdutoAssociado = new javax.swing.JCheckBox();
         tabBalanca = new javax.swing.JPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
@@ -291,6 +293,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         chkProdutoNota.setText("Produtos X Fornecedores da NF");
 
+        chkTemProdutoAssociado.setText("Tem Produto Associado");
+
         javax.swing.GroupLayout pnlParamLayout = new javax.swing.GroupLayout(pnlParam);
         pnlParam.setLayout(pnlParamLayout);
         pnlParamLayout.setHorizontalGroup(
@@ -301,8 +305,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoNota))
-                .addContainerGap(596, Short.MAX_VALUE))
+                    .addComponent(chkProdutoNota)
+                    .addComponent(chkTemProdutoAssociado))
+                .addContainerGap(529, Short.MAX_VALUE))
         );
         pnlParamLayout.setVerticalGroup(
             pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -315,7 +320,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoNota)
-                .addContainerGap(162, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkTemProdutoAssociado)
+                .addContainerGap(123, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parâmetros Extra", pnlParam);
@@ -400,6 +407,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkNewEan;
     private javax.swing.JCheckBox chkProdutoNota;
     private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
+    private javax.swing.JCheckBox chkTemProdutoAssociado;
     private javax.swing.ButtonGroup grbPriorizarPreco;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
