@@ -486,6 +486,45 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
             }
             return vResult;
         }
+        
+        if (opt == OpcaoProduto.ESTOQUE) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT\n" +
+                        "	prod.vfd_codproduto idproduto,\n" +
+                        "	prod.vfd_descricao,\n" +
+                        "	prod.vfd_descricaopdv,\n" +
+                        "	coalesce(est.vfd_QtdLoja + \n" +
+                        "		(select \n" +
+                        "			vfd_qtdloja qtd\n" +
+                        "		from \n" +
+                        "			tab_estoqueatual\n" +
+                        "		where \n" +
+                        "			vfd_codfilial = 43 and \n" +
+                        "			vfd_codproduto = prod.vfd_codproduto), 0) estoque\n" +
+                        "from\n" +
+                        "	tab_produto as prod\n" +
+                        "LEFT JOIN tab_estoqueatual est on\n" +
+                        "	est.vfd_CodProduto = prod.vfd_CodProduto\n" +
+                        "	and est.vfd_CodFilial = " + getLojaOrigem() + "\n" +
+                        "ORDER BY\n" +
+                        "	prod.vfd_codproduto"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
 
         return null;
     }
@@ -743,12 +782,15 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	vfd_DataEntrada entrada,\n"
                     + "	vfd_DataVencimento vencimento,\n"
                     + "	vfd_ValorParcela valor,\n"
+                    + " vfd_ValorParcelaAut valorautorizado,\n"
+                    + " vfd_NumeroParcela parcela,\n"        
                     + "	vfd_Obs observacao\n"
                     + "from\n"
                     + "	tab_Fin_CPagar\n"
                     + "where\n"
                     + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
-                    //+ " and vfd_CodGrupoPag = 1 and vfd_CodSubGrupoPag = 11\n"
+                    + " and vfd_CodGrupoPag in (1, 20, 50, 60, 30) and "
+                    + " vfd_CodSubGrupoPag in (11, 2001, 3006, 5030, 6001, 6003)\n"
                     + "	and vfd_DataPagamento is null\n"
                     + "order BY \n"
                     + "	 vfd_NumDocumento, vfd_NumeroParcela"
@@ -756,12 +798,16 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
-                    imp.setId(rst.getString("empresa")+'-'+(rst.getString("id_fornecedor"))+'-'+(rst.getString("documento")));
+                    imp.setId(rst.getString("empresa") + '-' + 
+                            (rst.getString("id_fornecedor")) + '-' + 
+                            (rst.getString("documento")) + '-' + 
+                            rst.getString("parcela"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valorautorizado"), rst.getInt("parcela"));
+                    //imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valorautorizado"), rst.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -852,9 +898,10 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	vfd_Caixa ecf,\n"
                     + "	vfd_Cupom numerocupom,\n"
                     + "	vfd_DataLancamento emissao,\n"
-                    + "	vfd_NumeroParcela,\n"
+                    + "	vfd_NumeroParcela parcela,\n"
                     + "	vfd_DataVencimento vencimento,\n"
                     + "	vfd_VlrDocumento valor,\n"
+                    + " vfd_VlrParcela valorparcela,\n"        
                     + "	vfd_VlrJuros juros\n"
                     + "from\n"
                     + "	tab_fin_contasrec\n"
@@ -868,13 +915,19 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(getLojaOrigem() + rst.getString("empresa") + rst.getString("documento") + rst.getString("id_cliente") + rst.getString("emissao"));
+                    
+                    imp.setId(getLojaOrigem() + 
+                            rst.getString("empresa") + 
+                            rst.getString("documento") + 
+                            rst.getString("id_cliente") + 
+                            rst.getString("emissao") + 
+                            rst.getInt("parcela"));
                     imp.setIdCliente(rst.getString("id_cliente"));
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setValor(rst.getDouble("valorparcela"));
+                    //imp.setJuros(rst.getDouble("juros"));
                     imp.setEcf(rst.getString("ecf"));
 
                     vResult.add(imp);
