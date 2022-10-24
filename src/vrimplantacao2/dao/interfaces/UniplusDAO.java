@@ -1028,8 +1028,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "left join cidade c on c.id = e.idcidade\n"
                     + "left join estado es on c.idestado = es.id\n"
                     + "where\n"
-                    + "	e.idfilialcadastro = " + getLojaOrigem() + "\n"
-                    + " and e.cliente = 1\n"
+                    //+ "	e.idfilialcadastro = " + getLojaOrigem() + "\n"
+                    + " e.cliente = 1\n"
                     + "order by 1")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -1121,7 +1121,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "where\n"
                     + "	f.tipo = 'R'\n"
                     + "	and f.idfilial = " + getLojaOrigem() + "\n"
-                    + "	and f.idtipodocumentofinanceiro in (1,8,100)\n"
+                    + "	and f.idtipodocumentofinanceiro in (1,8,100,115)\n"
                     + " and f.status = 'A'\n"
                     + "order by\n"
                     + "	f.id"
@@ -1199,15 +1199,19 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	f.numerocheque num,\n"
                     + "	f.emissao date,\n"
                     + "	f.baixa datadeposito,\n"
+                    + "	f.vencimento,\n"
                     + "	0 ecf,\n"
                     + "	e.rg,\n"
                     + "	e.telefone,\n"
                     + "	e.nome,\n"
                     + "	f.historico observacao,\n"
                     + "	f.valor,\n"
+                    + "	f.valorpagorecebido,\n"
+                    + "	f.saldo,\n"
                     + "	f.juros,\n"
                     + "	f.pagamento,\n"
-                    + " f.idtipodocumentofinanceiro tipo\n"
+                    + " f.idtipodocumentofinanceiro tipo,\n"
+                    + " f.idtipocobranca \n"
                     + "from\n"
                     + "	financeiro f\n"
                     + "	left join entidade e on f.identidade = e.id\n"
@@ -1216,7 +1220,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	f.tipo = 'R'\n"
                     + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and f.idtipodocumentofinanceiro in (-2,5,6)\n"
-                    //+ " and f.pagamento is null \n"
+                    + " and f.status = 'A' \n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -1230,14 +1234,18 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setConta(rst.getString("numerocontacorrente"));
                     imp.setNumeroCheque(rst.getString("numerocheque"));
                     imp.setDate(rst.getDate("date"));
-                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setDataDeposito(rst.getDate("vencimento"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setNome(rst.getString("nome"));
                     imp.setObservacao("NUM. CHEQUE: " + rst.getString("numerocheque") + "\r\n" + rst.getString("observacao"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("saldo"));
                     imp.setValorJuros(rst.getDouble("juros"));
+                    
+                    if(rst.getInt("idtipocobranca") > 0 ){
+                        imp.setAlinea(15);
+                    }                    
 
                     if (rst.getInt("tipo") == 6) {
                         imp.setVistaPrazo(TipoVistaPrazo.PRAZO);
@@ -1245,12 +1253,11 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setVistaPrazo(TipoVistaPrazo.A_VISTA);
                     }
 
-                    if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
+                    /*if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
                         imp.setSituacaoCheque(SituacaoCheque.ABERTO);
                     } else {
                         imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
-                    }
-
+                    }*/
                     result.add(imp);
                 }
             }

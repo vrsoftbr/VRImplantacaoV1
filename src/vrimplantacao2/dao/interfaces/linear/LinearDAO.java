@@ -316,7 +316,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pc.ES1_TRIBUTACAO idicms,\n"
                     + "	pc.es1_icmsent idicmsentrada,\n"
                     + "	pc.es1_margemcom margempadrao,\n"
-                    + "	pc.es1_ultmargem margemvarejo,\n"
+                    + "	cast(pc.es1_ultmargem as decimal(10,2)) margemvarejo,\n"
                     + "	pc.es1_prvarejo preco,\n"
                     + "	pc.es1_prcusto custosemimposto,\n"
                     + "	pc.es1_prcompra custocomimposto,\n"
