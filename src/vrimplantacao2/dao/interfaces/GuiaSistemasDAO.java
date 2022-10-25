@@ -1049,16 +1049,6 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new GuiaSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new GuiaSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
@@ -1067,6 +1057,16 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+    
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -1079,28 +1079,34 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         private void obterNext() {
             try {
+                
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id_venda");
+                        
+                        String id = rst.getString("idloja") + "-" + 
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("coo") + "-" +
+                                rst.getString("idcliente") + "-" +
+                                rst.getString("finalizadora") + "-" +
+                                rst.getString("hora") + "-" +
+                                rst.getString("desdo") + "-" +
+                                rst.getString("cro");
+                        
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setSubTotalImpressora(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setData(rst.getDate("hora"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
+                        next.setHoraInicio(timestamp.parse(rst.getString("hora")));
+                        next.setHoraTermino(timestamp.parse(rst.getString("hora")));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1110,12 +1116,25 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-
-            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
-            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+                    = "select \n" +
+                    "	tgc.vfd_CodFilial idloja,\n" +
+                    "	tgc.vfd_Caixa ecf,\n" +
+                    "	tgc.vfd_Cupom coo,\n" +
+                    "	tgc.vfd_CCF ccf,\n" +
+                    "	tgc.vfd_CodCliente idcliente,\n" +
+                    "	tgc.vfd_DataHora hora,\n" +
+                    "	tgc.vfd_Valor subtotalimpressora,\n" +
+                    "	tgc.vfd_DataLancamento emissao,\n" +
+                    "	vfd_CodFinalizadora finalizadora,\n" +
+                    "	vfd_desdobramento desdo,\n" +
+                    "	vfd_CRO cro\n" +
+                    "from \n" +
+                    "	tab_GastosClientes tgc\n" +
+                    "where \n" +
+                    "	tgc.vfd_CodFilial = " + idLojaCliente + " and\n" +
+                    "	convert(varchar, tgc.vfd_DataHora, 23) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 
@@ -1137,6 +1156,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
+
     }
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
@@ -1151,23 +1171,22 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
+                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
-                        next.setVenda(rst.getString("id_venda"));
-                        next.setId(rst.getString("id_item"));
+                        next.setId(rst.getString("id"));
+                        next.setVenda(id);
                         next.setProduto(rst.getString("produto"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
-
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -1176,7 +1195,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 
