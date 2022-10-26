@@ -429,8 +429,7 @@ public class ProdutoDAO {
         int idProduto = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select id from produto \n"
-                    + "limit 1"
+                    "select id from produto limit 1"
             )) {
                 if (rst.next()) {
                     idProduto = rst.getInt("id");

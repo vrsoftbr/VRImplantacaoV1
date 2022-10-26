@@ -151,6 +151,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliBloqueado = new vr.view.components.checkbox.VRCheckBox();
         chkCliTelefone = new vr.view.components.checkbox.VRCheckBox();
         chkCliDtCadastro = new vr.view.components.checkbox.VRCheckBox();
+        chkPontuacao = new vr.view.components.checkbox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -680,6 +681,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCliDtCadastro, "Data Cadastro");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkPontuacao, "Pontuação");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -718,7 +721,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkCliTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkPontuacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -746,8 +751,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                             .addComponent(chkCliDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkCliBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkCliTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkPontuacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente Eventual"));
@@ -798,7 +804,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCliEspec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(170, Short.MAX_VALUE))
+                .addContainerGap(160, Short.MAX_VALUE))
         );
 
         tabsCliente.addTab("Importação", pnlClienteNormal);
@@ -1035,11 +1041,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(txtConvQuote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
@@ -1366,6 +1372,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
     private javax.swing.JCheckBox chkLimiteRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private vr.view.components.checkbox.VRCheckBox chkPontuacao;
     private vrframework.bean.checkBox.VRCheckBox chkPorEanHistorico;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
     private javax.swing.JCheckBox chkTipoForn;
@@ -1583,7 +1590,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         if (chkCliTelefone.isSelected()) {
                                             opcoes.add(OpcaoCliente.TELEFONE);
                                         }
-                                        
                                         if (chkCliEspec.isSelected()) {
                                             opcoes.addAll(Arrays.asList(
                                                     OpcaoCliente.ENDERECO_COMPLETO,
@@ -1611,7 +1617,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     if (chkCliContaReceber.isSelected()) {
                                         importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                                     }
-                                    
+                                    if (chkPontuacao.isSelected()) {
+                                        importador.importarClientePontuacao();
+                                    }
                                     if(chkCNPJCli.isSelected()) {
                                         importador.atualizarClientePreferencial(OpcaoCliente.CNPJ);
                                     }
