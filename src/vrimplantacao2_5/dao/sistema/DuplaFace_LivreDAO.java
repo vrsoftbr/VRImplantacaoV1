@@ -193,8 +193,8 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     + " p.VENDA,\n"
                     + " p.OBSERVACAO,\n"
                     + " p.CODPROD ean,\n"
-                    + " CASE WHEN p.LIBERACAO = 'INATIVO' THEN 1 \n"
-                    + " ELSE 0 END situacao,\n"
+                    + " CASE WHEN p.LIBERACAO = 'INATIVO' THEN 0 \n"
+                    + " ELSE 1 END situacao,\n"
                     + " p.PROMOCAO,\n"
                     + " p.PRECO_PROMOCIONAL,\n"
                     + " p.MARGEN,\n"
@@ -208,7 +208,7 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     + " f.NUM_NCM,\n"
                     + " f.CEST\n"
                     + "FROM PRODUTOS p\n"
-                    + "JOIN PRODUTOS_FISCAL f ON f.CODIGO = p.CODIGO\n"
+                    + "LEFT JOIN PRODUTOS_FISCAL f ON f.CODPROD = p.CODPROD\n"
                     + "ORDER BY p.CODIGO;"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -229,7 +229,7 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setEstoque(rs.getDouble("estoque"));
 
                     imp.setCustoSemImposto(rs.getDouble("custo"));
-                    imp.setCustoComImposto(imp.getCustoMedioSemImposto());
+                    imp.setCustoComImposto(imp.getCustoSemImposto());
                     imp.setPrecovenda(rs.getDouble("venda"));
                     imp.setMargem(rs.getDouble("margen"));
 
@@ -315,6 +315,7 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setCep(rs.getString("cep"));
 
                     imp.setTel_principal(rs.getString("telefone"));
+                    imp.setTipo_inscricao(TipoInscricao.JURIDICA);
                     imp.setIe_rg(rs.getString("insc_est"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
 
@@ -409,10 +410,10 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     + " COMPLEMENTO,\n"
                     + " CIDADE,\n"
                     + " BAIRRO,\n"
-                    + " ESTADO,\n"
+                    + " SUBSTRING(ESTADO FROM 1 FOR 2) estado,\n"
                     + " TELEFONE,\n"
                     + " CELULAR,\n"
-                    + " INSC_EST,\n"
+                    + " replace(replace(INSC_EST,'.',''),'-','') INSC_EST,\n"
                     + " CNPJ,\n"
                     + " LIMITE,\n"
                     + " NIVER,\n"
@@ -430,6 +431,7 @@ public class DuplaFace_LivreDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setDataNascimento(rs.getDate("niver"));
+                    imp.setInscricaoestadual(rs.getString("INSC_EST"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
