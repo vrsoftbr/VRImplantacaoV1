@@ -1396,7 +1396,7 @@ public class ClienteRepository {
 
                 //Se o cliente não tiver sido cadastrado anteriormente, executa.
                 if (anterior == null) {
-                    System.out.println("id: " + imp.getId() + " - nome: " + imp.getRazao() + " não encontrado!");
+                    System.out.println("Sistema: " + provider.getSistema() + " - id: " + imp.getId() + " - nome: " + imp.getRazao() + " não encontrado!");
                     continue;
                 } else {
                     cliente = anterior.getCodigoAtual();
@@ -1451,7 +1451,8 @@ public class ClienteRepository {
                         vendaDAO.gerarVendaPontuacao(vendaVO);
 
                         itemVO.setVenda(vendaVO);
-                        itemVO.setId_produto(provider.getProduto());
+                        //itemVO.setId_produto(provider.getProduto());
+                        itemVO.setId_produto(17456);
                         itemVO.setQuantidade(1);
                         itemVO.setPrecoVenda(0);
                         itemVO.setId_aliquota(6);
@@ -1463,7 +1464,8 @@ public class ClienteRepository {
                         itemVO.setValorAcrescimo(0);
                         itemVO.setValorAcrescimoCupom(0);
                         itemVO.setRegraCalculo("");
-                        itemVO.setCodigoBarras(provider.getEan());
+                        //itemVO.setCodigoBarras(provider.getEan());
+                        itemVO.setCodigoBarras(7897649731005l);
                         itemVO.setUnidadeMedida("");
                         itemVO.setTotalizadorParcial("");
                         itemVO.setSequencia(1);
@@ -1472,7 +1474,7 @@ public class ClienteRepository {
                         vendaItemDAO.gravarItemPontuacao(itemVO);
 
                         pontuacaoVO.setIdVenda(vendaVO.getId());
-                        pontuacaoVO.setIdPromocao(2);
+                        pontuacaoVO.setIdPromocao(1);
                         pontuacaoVO.setPonto(imp.getPonto());
                         pontuacaoVO.setCnpj(Utils.stringToLong(imp.getCnpj()));
                         pontuacaoVO.setIdSituacaoPromocaoPontuacao(1);

@@ -713,6 +713,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setCelular(linha.getString("celular"));
                 imp.setEmail(linha.getString("email"));
                 imp.setPrazoPagamento(linha.getInt("prazopagamento"));
+                imp.setPonto(linha.getDouble("pontos"));
                 //EVENTUAL
                 imp.setFax(linha.getString("fax"));
                 imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));

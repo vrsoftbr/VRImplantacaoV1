@@ -61,6 +61,7 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.EMPRESA,
                 OpcaoCliente.SALARIO,
+                OpcaoCliente.PERMITE_CREDITOROTATIVO,
                 OpcaoCliente.BLOQUEADO,
                 OpcaoCliente.OBSERVACOES2,
                 OpcaoCliente.OBSERVACOES,
@@ -307,7 +308,7 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoComImposto(imp.getCustoSemImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rst.getBoolean("ativo") ? 1 : 0);
                     imp.setNcm(rst.getString("ncm"));
@@ -451,7 +452,8 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clientetelefone,\n"
                     + "	c.clientetelcomercial,\n"
                     + "	c.clienteemail,\n"
-                    + "	c.clienteemailsecundario\n"
+                    + "	c.clienteemailsecundario,\n"
+                    + " c.clientecontato\n"        
                     + "from\n"
                     + "	clientes c\n"
                     + "order by\n"
@@ -465,24 +467,36 @@ public class InovaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rs.getString("ierg"));
                     imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setAtivo(rs.getBoolean("ativo") == false);
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipioIBGE(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setSexo(rs.getString("sexo"));
                     imp.setValorLimite(rs.getDouble("limite"));
-                    imp.setObservacao2(rs.getString("observacao"));
                     imp.setDiaVencimento(Utils.stringToInt(rs.getString("diavencimento")));
                     imp.setTelefone(rs.getString("clientetelefone"));
                     imp.addTelefone("FONE COMERC.", rs.getString("clientetelcomercial"));
                     imp.setEmail(rs.getString("clienteemail"));
                     imp.addEmail(rs.getString("clienteemailsecundario"), TipoContato.COMERCIAL);
+                    
+                    if (imp.getValorLimite() > 0) {
+                        imp.setPermiteCreditoRotativo(true);
+                    }
+                    
+                    String contato = rs.getString("clientecontato");
+                    imp.setObservacao2(rs.getString("observacao"));
+                    
+                    if (contato != null && !contato.isEmpty()) {
+                        imp.addContato(null, contato, null, null, null);
+                        imp.setObservacao(rs.getString("observacao") + " - Contato: " + contato);
+                    }
+                    
 
                     result.add(imp);
                 }

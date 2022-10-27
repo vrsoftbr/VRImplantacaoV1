@@ -941,7 +941,7 @@
                               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCliEspec" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="170" max="32767" attributes="0"/>
+                              <EmptySpace pref="160" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -997,6 +997,8 @@
                                                   <Component id="chkCliTelefone" min="-2" max="-2" attributes="0"/>
                                                   <EmptySpace max="-2" attributes="0"/>
                                                   <Component id="chkCliDtCadastro" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="chkPontuacao" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
                                       </Group>
@@ -1034,10 +1036,11 @@
                                               <Component id="chkCliBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkCliTelefone" alignment="3" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkCliDtCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkPontuacao" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                   </Group>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace pref="16" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -1116,6 +1119,11 @@
                         <Component class="vr.view.components.checkbox.VRCheckBox" name="chkCliDtCadastro">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Data Cadastro"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vr.view.components.checkbox.VRCheckBox" name="chkPontuacao">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Pontua&#xe7;&#xe3;o"/>
                           </Properties>
                         </Component>
                       </SubComponents>
