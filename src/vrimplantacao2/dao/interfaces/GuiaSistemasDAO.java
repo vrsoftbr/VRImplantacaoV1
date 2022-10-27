@@ -123,7 +123,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.RECEBER_CHEQUE));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -1090,10 +1091,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                         String id = rst.getString("idloja") + "-" + 
                                 rst.getString("ecf") + "-" + 
                                 rst.getString("coo") + "-" +
-                                rst.getString("idcliente") + "-" +
-                                rst.getString("finalizadora") + "-" +
-                                rst.getString("hora") + "-" +
-                                rst.getString("desdo") + "-" +
+                                rst.getString("dataemissao") + "-" +
                                 rst.getString("cro");
                         
                         if (!uk.add(id)) {
@@ -1121,19 +1119,24 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     "	tgc.vfd_CodFilial idloja,\n" +
                     "	tgc.vfd_Caixa ecf,\n" +
                     "	tgc.vfd_Cupom coo,\n" +
-                    "	tgc.vfd_CCF ccf,\n" +
-                    "	tgc.vfd_CodCliente idcliente,\n" +
-                    "	tgc.vfd_DataHora hora,\n" +
-                    "	tgc.vfd_Valor subtotalimpressora,\n" +
-                    "	tgc.vfd_DataLancamento emissao,\n" +
-                    "	vfd_CodFinalizadora finalizadora,\n" +
-                    "	vfd_desdobramento desdo,\n" +
-                    "	vfd_CRO cro\n" +
+                    "	max(tgc.vfd_CodCliente) idcliente,\n" +
+                    "	convert(varchar, tgc.vfd_DataHora, 23) dataemissao, \n" +
+                    "	max(tgc.vfd_DataHora) hora,\n" +
+                    "	sum(tgc.vfd_Valor) subtotalimpressora,\n" +
+                    "	max(tgc.vfd_DataLancamento) emissao,\n" +
+                    "	max(vfd_CodFinalizadora) finalizadora,\n" +
+                    "	max(vfd_desdobramento) desdo,\n" +
+                    "	max(vfd_CRO) cro\n" +
                     "from \n" +
                     "	tab_GastosClientes tgc\n" +
                     "where \n" +
-                    "	tgc.vfd_CodFilial = " + idLojaCliente + " and\n" +
-                    "	convert(varchar, tgc.vfd_DataHora, 23) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+                    "	tgc.vfd_CodFilial = " + idLojaCliente + " and \n" +
+                    "	convert(varchar, tgc.vfd_DataHora, 23) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n" +
+                    "group by \n" +
+                    "	vfd_CodFilial, \n" +
+                    "	vfd_Caixa,\n" +
+                    "	vfd_Cupom, \n" +
+                    "	convert(varchar, tgc.vfd_DataHora, 23)"; 
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
@@ -1171,19 +1174,29 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("filial") + "-" + 
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("dataemissao") + 
+                                rst.getString("mov") + 
+                                rst.getString("coo") + 
+                                rst.getString("sequencia") + 
+                                rst.getString("cro") + 
+                                rst.getString("idproduto");
+                        
+                        String idVenda = rst.getString("filial") + "-" + 
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("coo") + "-" +
+                                rst.getString("dataemissao") + "-" +
+                                rst.getString("cro");
 
-                        next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setId(id);
+                        next.setVenda(idVenda);
+                        next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setSequencia(rst.getInt("sequencia"));
                     }
                 }
             } catch (SQLException ex) {
@@ -1194,7 +1207,26 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = "select \n" +
+                    "	vi.vfd_CodFilial filial,\n" +
+                    "	vi.vfd_CodMovimentacao mov,\n" +
+                    "	vi.vfd_CodProduto idproduto,\n" +
+                    "	vi.vfd_CodBarra ean,\n" +
+                    "   pr.vfd_TipoInventarioFatorConversao unidade,\n" +
+                    "	vi.vfd_QtdOperac quantidade,\n" +
+                    "	vi.vfd_ValorTotal total,\n" +
+                    "	convert(varchar, vi.vfd_DTMovimentacao, 23) dataemissao,\n" +
+                    "	vi.vfd_DTMovimentacao movimento,\n" +
+                    "	vi.vfd_Caixa ecf,\n" +
+                    "	vi.vfd_Cupom_NF coo,\n" +
+                    "	vi.vfd_Indice sequencia,\n" +
+                    "	vi.vfd_CRO_Serie cro\n" +
+                    "from\n" +
+                    "	tab_MovimentacaoVendas vi\n" +
+                    "join tab_produto pr on vi.vfd_CodProduto = pr.vfd_CodProduto\n" +
+                    "where\n" +
+                    "	vi.vfd_CodFilial = " + idLojaCliente + " and\n" +
+                    "	vi.vfd_DTMovimentacao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
