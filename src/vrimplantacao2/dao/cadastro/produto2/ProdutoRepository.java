@@ -1482,6 +1482,10 @@ public class ProdutoRepository {
             }
             vo.setPesavel(false);
         }
+        
+        if (imp.isPesavel()) {
+            vo.setPesavel(true);
+        }
 
         vo.setPesoBruto(imp.getPesoBruto());
         vo.setPesoLiquido(imp.getPesoLiquido());

@@ -12,9 +12,6 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.importacao.AcumuladorIMP;
-import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
-import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -103,7 +100,8 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    a.situacaotributaria cstIcms,\n"
                     + "    a.porcentagem,\n"
                     + "    pis.cst cstPis,\n"
-                    + "    p.id_aliquota\n"
+                    + "    p.id_aliquota,\n"
+                    + "    p.pesavel\n"        
                     + "from produto p\n"
                     + "    left join produtoautomacao pa on pa.id_produto = p.id\n"
                     + "    left join aliquota a on a.id_aliquota = p.id_aliquota\n"
@@ -112,6 +110,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
@@ -133,6 +132,8 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("id_aliquota"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliquota"));
                     imp.setIcmsConsumidorId(rst.getString("id_aliquota"));
+                    imp.setPesavel(rst.getInt("pesavel") == 1);
+                    
                     result.add(imp);
                 }
             }

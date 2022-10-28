@@ -438,6 +438,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.NUMERO_PARCELA)) {
             sql.put("numeroparcela", vo.getNumeroparcela());
         }
+        if (opt.contains(OpcaoProduto.PESAVEL)) {
+            sql.put("pesavel", vo.isPesavel());
+        }
 
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();

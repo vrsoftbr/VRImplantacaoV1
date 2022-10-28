@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
@@ -1178,5 +1179,9 @@ public class Importador {
         );
         DivisaoRepository repository = new DivisaoRepository(provider);
         repository.importar(divisoes);
+    }
+    
+    public void atualizarDataProcessamento() throws Exception {
+        DataProcessamentoDAO.atualizaDataProcessamento(getLojaVR());
     }
 }

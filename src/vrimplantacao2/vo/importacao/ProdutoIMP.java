@@ -182,6 +182,7 @@ public class ProdutoIMP {
     @DatabaseField private String prateleira = "";
     @DatabaseField private String beneficio = "";
     @DatabaseField private boolean produtoECommerce = false;
+    @DatabaseField private boolean pesavel = false;
     @DatabaseField private String codigoAnp = "";
     private int codigoAtual;
     
@@ -1122,5 +1123,13 @@ public class ProdutoIMP {
             seteBalanca(false);
         }
         return true;
+    }
+
+    public boolean isPesavel() {
+        return pesavel;
+    }
+
+    public void setPesavel(boolean pesavel) {
+        this.pesavel = pesavel;
     }
 }

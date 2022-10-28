@@ -23,4 +23,10 @@ public class DataProcessamentoDAO {
 
         return Util.formatDataGUI(rst.getDate("data"));
     }
+    
+    public static void atualizaDataProcessamento(int idLoja) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("update dataprocessamento set data = now() where id_loja = " + idLoja);
+        }
+    }
 }
