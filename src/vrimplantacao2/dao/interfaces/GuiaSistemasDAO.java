@@ -124,7 +124,9 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
-                OpcaoCliente.RECEBER_CHEQUE));
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.PERMITE_CHEQUE,
+                OpcaoCliente.VALOR_LIMITE));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -850,6 +852,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "vfd_dddcelular, "
                     + "vfd_celular, "
                     + "vfd_limitecredito, "
+                    + "vfd_limitecheque limitecheque, "        
                     + "vfd_observacoes "
                     + "from tab_clientes "
                     + "order by vfd_codCliente"
@@ -879,6 +882,11 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setSalario(rst.getDouble("vfd_renda"));
                     imp.setValorLimite(rst.getDouble("vfd_limitecredito"));
                     imp.setObservacao(rst.getString("vfd_observacoes"));
+                    
+                    if (rst.getDouble("limitecheque") > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setValorLimite(rst.getDouble("limitecheque"));
+                    }
                     
                     vResult.add(imp);
                 }

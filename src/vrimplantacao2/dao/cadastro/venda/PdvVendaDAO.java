@@ -79,6 +79,8 @@ public class PdvVendaDAO {
             if (vo.getTipoDesconto() != null) {
                 sql.put("id_tipodesconto", vo.getTipoDesconto().getId());
             }
+            /*sql.put("vendaecommercemercafacil", false);
+            sql.put("vendaecommercesitemercado", false);*/
             //sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
             
             LOG.finer(
