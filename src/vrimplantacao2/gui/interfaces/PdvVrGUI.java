@@ -34,7 +34,8 @@ public class PdvVrGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
-        txtDatabase.setArquivo(params.getWithNull("C:\\SHI\\DADOS", SISTEMA, "DATABASE"));
+        txtDatabase.setArquivo(params.getWithNull("C:\\vr\\VR.FDB", SISTEMA, "DATABASE"));
+        txtDatabasePdv.setArquivo(params.getWithNull("C:\\vr\\PDV.FDB", SISTEMA, "DATABASE_PDV"));
         txtPorta.setText(params.getWithNull("3050", SISTEMA, "PORTA"));
         txtUsuario.setText(params.getWithNull("SYSDBA", SISTEMA, "USUARIO"));
         txtSenha.setText(params.getWithNull("masterkey", SISTEMA, "SENHA"));
@@ -46,6 +47,7 @@ public class PdvVrGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
+        params.put(txtDatabasePdv.getArquivo(), SISTEMA, "DATABASE_PDV");
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
@@ -97,6 +99,27 @@ public class PdvVrGUI extends VRInternalFrame {
         }
         if (txtUsuario.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL + "!");
+        }
+        
+        if (!txtDatabase.getArquivo().isEmpty()) {
+            pdvVrDAO.setBancoVr(ConexaoFirebird.getNewConnection(
+                    txtHost.getText(),
+                    txtPorta.getInt(),
+                    txtDatabase.getArquivo(),
+                    txtUsuario.getText(),
+                    txtSenha.getText(),
+                    null
+            ));
+        }
+        if (!txtDatabasePdv.getArquivo().isEmpty()) {
+            pdvVrDAO.setBancoPdv(ConexaoFirebird.getNewConnection(
+                    txtHost.getText(),
+                    txtPorta.getInt(),
+                    txtDatabasePdv.getArquivo(),
+                    txtUsuario.getText(),
+                    txtSenha.getText(),
+                    null
+            ));
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
@@ -226,6 +249,13 @@ public class PdvVrGUI extends VRInternalFrame {
                         if (chkOperador.isSelected()) {
                             importador.importarOperador();
                         }
+                        if(chkClientePreferencial.isSelected()){
+                            if(!txtDatabasePdv.getArquivo().isEmpty()){
+                                importador.importarClientePreferencial();
+                            }else{
+                                throw new VRException("Favor o informar o host banco de dados " + SERVIDOR_SQL + " PDV.FDB !");
+                            }
+                        }
 
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkDataProcessamento.isSelected()) {
@@ -278,6 +308,8 @@ public class PdvVrGUI extends VRInternalFrame {
         chkTipoEmbalagem = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkOperador = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanelCliente = new javax.swing.JPanel();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         pnlParametro = new javax.swing.JPanel();
         chkDataProcessamento = new javax.swing.JCheckBox();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
@@ -294,6 +326,8 @@ public class PdvVrGUI extends VRInternalFrame {
         txtSenha = new vrframework.bean.passwordField.VRPasswordField();
         vRLabel21 = new vrframework.bean.label.VRLabel();
         txtDatabase = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel26 = new vrframework.bean.label.VRLabel();
+        txtDatabasePdv = new vrframework.bean.fileChooser.VRFileChooser();
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
@@ -475,6 +509,27 @@ public class PdvVrGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Operadores", vRPanel1);
 
+        chkClientePreferencial.setText("Cliente Preferencial");
+
+        javax.swing.GroupLayout vRPanelClienteLayout = new javax.swing.GroupLayout(vRPanelCliente);
+        vRPanelCliente.setLayout(vRPanelClienteLayout);
+        vRPanelClienteLayout.setHorizontalGroup(
+            vRPanelClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanelClienteLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(391, Short.MAX_VALUE))
+        );
+        vRPanelClienteLayout.setVerticalGroup(
+            vRPanelClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanelClienteLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(185, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Clientes", vRPanelCliente);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkDataProcessamento.setText("Data Processamento (Data Atual)");
@@ -524,7 +579,7 @@ public class PdvVrGUI extends VRInternalFrame {
 
         vRLabel24.setText("Host");
 
-        vRLabel25.setText("Banco de Dados");
+        vRLabel25.setText("VR.FDB");
 
         vRLabel20.setText("Usuário:");
 
@@ -547,6 +602,8 @@ public class PdvVrGUI extends VRInternalFrame {
 
         vRLabel21.setText("Senha:");
 
+        vRLabel26.setText("PDV.FDB");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -561,19 +618,25 @@ public class PdvVrGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
+                        .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(txtDatabasePdv, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -594,8 +657,10 @@ public class PdvVrGUI extends VRInternalFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDatabasePdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         tabsConn.addTab("Dados da conexão", jPanel4);
@@ -629,7 +694,7 @@ public class PdvVrGUI extends VRInternalFrame {
                     .addComponent(btnConectar)
                     .addComponent(jLabel2)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(7, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -738,6 +803,7 @@ public class PdvVrGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkDataProcessamento;
     private vrframework.bean.checkBox.VRCheckBox chkForcarAtualizacaoPreco;
     private vrframework.bean.checkBox.VRCheckBox chkOperador;
@@ -762,6 +828,7 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
+    private vrframework.bean.fileChooser.VRFileChooser txtDatabasePdv;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
@@ -771,10 +838,12 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel23;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
+    private vrframework.bean.label.VRLabel vRLabel26;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
+    private javax.swing.JPanel vRPanelCliente;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables

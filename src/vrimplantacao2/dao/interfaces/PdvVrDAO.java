@@ -5,6 +5,7 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -22,6 +24,25 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  * @author lucasrafael
  */
 public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    private Connection bancovr;
+    private Connection bancopdv;
+
+    public Connection getBancoPdv() {
+        return bancopdv;
+    }
+
+    public void setBancoPdv(Connection bancopdv) {
+        this.bancopdv = bancopdv;
+    }
+
+    public Connection getBancoVr() {
+        return bancovr;
+    }
+
+    public void setBancoVr(Connection bancovr) {
+        this.bancovr = bancovr;
+    }
 
     @Override
     public String getSistema() {
@@ -31,7 +52,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "id_loja, "
@@ -50,7 +71,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "id,\n"
@@ -79,7 +100,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
 
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -144,7 +165,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OperadorIMP> getOperadores() throws Exception {
         List<OperadorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "matricula,\n"
@@ -173,7 +194,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<PromocaoIMP> getPromocoes() throws Exception {
         List<PromocaoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "id,\n"
@@ -228,6 +249,32 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdLimite(rst.getInt("qtdlimite"));
                     imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
                     imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = bancopdv.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + " CASE WHEN ID_CLIENTEPREFERENCIAL IS NULL THEN CPF\n"
+                    + "   ELSE ID_CLIENTEPREFERENCIAL END id,\n"
+                    + " CPF\n"
+                    + "FROM VENDA \n"
+                    + "WHERE CPF <> 0;"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao("CADASTRO INCOMPLETO");
+                    imp.setCnpj(rs.getString("cpf"));
+
                     result.add(imp);
                 }
             }
