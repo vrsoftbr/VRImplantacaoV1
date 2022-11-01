@@ -186,6 +186,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_STOCK(215, "STOCK", 11, "POSTGRESQL", "orion", "postgres", "VrPost@Server", 8745),
     POSTGRESQL_NEREUS(224, "NEREUS", 11, "POSTGRESQL", "", "ansg", "atma123@#$", 5432),
     POSTGRESQL_ORION(227, "ORION_POSTGRES", 11, "POSTGRESQL", "cli_", "postgres", "VrPost@Server", 8745),
+    POSTGRESQL_SINC(233, "SINC", 11, "POSTGRESQL", "sincprod", "postgres", "postgres", 5432),
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ARTSYSTEM(6, "ARTSYSTEM", 13, "SQLSERVER", "", "", "", 1433),

@@ -160,6 +160,7 @@ import vrimplantacao2.dao.interfaces.SiacDAO;
 import vrimplantacao2.dao.interfaces.SifatDAO;
 import vrimplantacao2.dao.interfaces.SigmaDAO;
 import vrimplantacao2.dao.interfaces.SiitDAO;
+import vrimplantacao2.dao.interfaces.SincDAO;
 import vrimplantacao2.dao.interfaces.SircomDAO;
 import vrimplantacao2.dao.interfaces.SisMouraDAO;
 import vrimplantacao2.dao.interfaces.SnSistemaDAO;
@@ -286,6 +287,7 @@ import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
+import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
@@ -297,7 +299,6 @@ import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac22_5GUI;
-import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 
 /**
  *
@@ -1937,6 +1938,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Manager2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SINC(233, "SINC", new SincDAO()) {
+       @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Sinc2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

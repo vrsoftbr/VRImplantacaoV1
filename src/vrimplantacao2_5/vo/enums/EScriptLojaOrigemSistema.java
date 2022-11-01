@@ -112,29 +112,29 @@ public enum EScriptLojaOrigemSistema {
             + "	tsc008a"),
     SATFACIL(213, 5, "SELECT ID_REGISTRO id, NOME_LOJA descricao FROM PARAMETROS"),
     WBA(214, 5, "SELECT CAST(CODIGO AS integer) AS id, NOME descricao FROM FILIAL ORDER BY 1"),
-    CPGESTOR(21, 9, "SELECT \n" +
-                    "	LJ_ASSOCIACAO id,\n" +
-                    "	''SANTA FE'' descricao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_sta\n" +
-                    "WHERE \n" +
-                    "	rownum <= 1\n" +
-                    "UNION ALL \n" +
-                    "SELECT \n" +
-                    "	lj_associacao id,\n" +
-                    "	''ZUZU'' descricao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_zuzu\n" +
-                    "WHERE \n" +
-                    "	rownum <= 1\n" +
-                    "UNION ALL\n" +
-                    "SELECT \n" +
-                    "	lj_associacao id,\n" +
-                    "	''PANIFICADORA VOVO'' descricao\n" +
-                    "FROM \n" +
-                    "	vw_exp_produtos_panificadora\n" +
-                    "WHERE \n" +
-                    "	rownum <= 1"),
+    CPGESTOR(21, 9, "SELECT \n"
+            + "	LJ_ASSOCIACAO id,\n"
+            + "	''SANTA FE'' descricao\n"
+            + "FROM \n"
+            + "	vw_exp_produtos_sta\n"
+            + "WHERE \n"
+            + "	rownum <= 1\n"
+            + "UNION ALL \n"
+            + "SELECT \n"
+            + "	lj_associacao id,\n"
+            + "	''ZUZU'' descricao\n"
+            + "FROM \n"
+            + "	vw_exp_produtos_zuzu\n"
+            + "WHERE \n"
+            + "	rownum <= 1\n"
+            + "UNION ALL\n"
+            + "SELECT \n"
+            + "	lj_associacao id,\n"
+            + "	''PANIFICADORA VOVO'' descricao\n"
+            + "FROM \n"
+            + "	vw_exp_produtos_panificadora\n"
+            + "WHERE \n"
+            + "	rownum <= 1"),
     LINEAR(196, 8, "SELECT emp_codigo AS id, emp_fantasia AS descricao FROM empresa ORDER BY 1"),
     STOCK(215, 11, "select empid as id, empnome as descricao from tbempresas;"),
     CMM(216, 13, "select \n"
@@ -158,13 +158,13 @@ public enum EScriptLojaOrigemSistema {
             + "	fantasia descricao\n"
             + "from empresa"),
     GETWAY(68, 13, "select\n"
-                    + "	CODLOJA id,\n"
-                    + "	descricao\n"
-                    + "from\n"
-                    + "	LOJA\n"
-                    + "order by\n"
-                    + "	id"),
-    GANSO(221,5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL"),
+            + "	CODLOJA id,\n"
+            + "	descricao\n"
+            + "from\n"
+            + "	LOJA\n"
+            + "order by\n"
+            + "	id"),
+    GANSO(221, 5, "SELECT  CODIGO id, FANTASIA descricao FROM EMPRESA_FILIAL"),
     LCSISTEMAS(222, 8, "select id, fantasia descricao from empresa"),
     INOVA(81, 11, "select empresaid id, empresanomefantasia descricao from empresa"),
     ISERVER(78, 8, "select Codigo id, NomeFantasia descricao from tbl_loja"),
@@ -175,16 +175,24 @@ public enum EScriptLojaOrigemSistema {
     ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
     ARAUTO(228, 5, "select id, nomefantasia descricao from empresa"),
-    SUPERCONTROLE(229,13,"select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id"),
+    SUPERCONTROLE(229, 13, "select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id"),
     RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1"),
     FOCUS(230, 8, "select id, razao descricao from empresa"),
-    MANAGER(231, 5,"select codigo id, fantasia descricao from empresa"),
-    SCV(232, 5,"SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
+    MANAGER(231, 5, "select codigo id, fantasia descricao from empresa"),
+    SCV(232, 5, "SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
+    SINC(233, 11, "select\n"
+            + "	1 as id,\n"
+            + "	ncad_fantasi_2 ||' - '|| ncad_nomecli_2 descricao\n"
+            + "from\n"
+            + "	sincad\n"
+            + "where\n"
+            + "	ncad_tipocad_2 = 'T'\n"
+            + "	and ncad_fantasi_2 = 'LOJA 01'"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial");
-    
+
     private int idSistema;
     private int idBancoDados;
     private String scriptGetLojaOrigem;
