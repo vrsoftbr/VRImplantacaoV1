@@ -180,14 +180,7 @@ public enum EScriptLojaOrigemSistema {
     FOCUS(230, 8, "select id, razao descricao from empresa"),
     MANAGER(231, 5, "select codigo id, fantasia descricao from empresa"),
     SCV(232, 5, "SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
-    SINC(233, 11, "select\n"
-            + "	1 as id,\n"
-            + "	ncad_fantasi_2 ||' - '|| ncad_nomecli_2 descricao\n"
-            + "from\n"
-            + "	sincad\n"
-            + "where\n"
-            + "	ncad_tipocad_2 = 'T'\n"
-            + "	and ncad_fantasi_2 = 'LOJA 01'"),
+    SINC(233, 11, "select ncad_cgcocpf_2 id, ncad_fantasi_2 descricao from sincad where ncad_cgcocpf_2 = 44744589000108"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
