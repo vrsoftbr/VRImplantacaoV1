@@ -550,7 +550,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + " fornecedor.vfd_rg, "
                     + " fornecedor.vfd_fone, "
                     + " fornecedor.vfd_fax, "
-                    + " fornecedor.vfd_prazo, "
+                    + " coalesce(fornecedor.vfd_prazo, 0) prazo, "
                     + " fornecedor.vfd_nomevendedor, "
                     //+ " fornecedor.vfd_faxvendedor, "
                     + " fornecedor.vfd_TipoPessoa, "
@@ -607,7 +607,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCnpj_cpf(rst.getString("vfd_cpf"));
                     imp.setIe_rg(rst.getString("vfd_ie"));
                     imp.setPrazoVisita(rst.getInt("vfd_FreqVisita"));
-                    imp.setPrazoEntrega(rst.getInt("vfd_prazo"));
+                    imp.setPrazoEntrega(rst.getInt("prazo"));
                     imp.setValor_minimo_pedido(rst.getDouble("vfd_PedidoMinimo"));
                     imp.setTel_principal(rst.getString("vfd_fone"));
 
@@ -916,7 +916,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	tab_fin_contasrec\n"
                     + "where\n"
                     + "	vfd_CodFilial = " + getLojaOrigem() + "\n"
-                    + "	and vfd_CodGrupoPag = 7 and vfd_CodSubGrupoPag = 717\n"
+                    + "	and vfd_CodGrupoPag = 5 and vfd_CodSubGrupoPag = 502\n"
                     + "	and vfd_DataBaixa is null\n"
                     + " and vfd_id_depara is null \n"
                     + "	and vfd_Data_DePara is null\n"        
