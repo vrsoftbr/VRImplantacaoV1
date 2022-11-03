@@ -50,12 +50,12 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private String complemento = "";
     private int idRegiaoDentroEstado;
     private int idRegiaoForaEstado;
     private boolean somenteClienteFidelidade = false;
-    
+
     private Date dataVendaInicial;
     private Date dataVendaFinal;
 
@@ -82,7 +82,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     public void setSomenteClienteFidelidade(boolean somenteClienteFidelidade) {
         this.somenteClienteFidelidade = somenteClienteFidelidade;
     }
-    
+
     @Override
     public String getSistema() {
         return "WINTHOR" + (!"".equals(complemento) ? " - " + complemento : "");
@@ -142,13 +142,13 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "SELECT\n" +
-                "    codigo,\n" +
-                "    codigo || ' - ' || coalesce(fantasia, razaosocial) descricao\n" +
-                "FROM \n" +
-                "    pcfilial \n" +
-                "ORDER BY \n" +
-                "    codigo"
+                    "SELECT\n"
+                    + "    codigo,\n"
+                    + "    codigo || ' - ' || coalesce(fantasia, razaosocial) descricao\n"
+                    + "FROM \n"
+                    + "    pcfilial \n"
+                    + "ORDER BY \n"
+                    + "    codigo"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("descricao")));
@@ -157,10 +157,12 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         }
         return result;
     }
-    
+
     public static class Regiao {
+
         public final int id;
         public final String descricao;
+
         public Regiao(int id, String descricao) {
             this.id = id;
             this.descricao = descricao;
@@ -171,21 +173,20 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             return String.format("%04d - %s", id, descricao);
         }
     }
-    
+
     public List<Regiao> getRegioes() {
-        List<Regiao> result = new ArrayList<>();        
+        List<Regiao> result = new ArrayList<>();
         try (
                 Statement st = ConexaoOracle.createStatement();
                 ResultSet rs = st.executeQuery(
-                        "SELECT\n" +
-                        "	r.NUMREGIAO id,\n" +
-                        "	r.REGIAO || ' - '|| r.UF || ' - filial ' || r.CODFILIAL descricao\n" +
-                        "FROM\n" +
-                        "	pcregiao r\n" +
-                        "ORDER BY\n" +
-                        "	NUMREGIAO"
-                )
-                ) {
+                        "SELECT\n"
+                        + "	r.NUMREGIAO id,\n"
+                        + "	r.REGIAO || ' - '|| r.UF || ' - filial ' || r.CODFILIAL descricao\n"
+                        + "FROM\n"
+                        + "	pcregiao r\n"
+                        + "ORDER BY\n"
+                        + "	NUMREGIAO"
+                )) {
             while (rs.next()) {
                 result.add(new Regiao(rs.getInt("id"), rs.getString("descricao")));
             }
@@ -200,22 +201,22 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
-                    "    codprodprinc id,\n" +
-                    "    descricao,\n" +
-                    "    usados\n" +
-                    "from\n" +
-                    "    (SELECT\n" +
-                    "        p.codprod,\n" +
-                    "        p.descricao,\n" +
-                    "        p.CODPRODPRINC,\n" +
-                    "        (SELECT COUNT(*) FROM pcprodut WHERE codprodprinc = p.codprod) usados\n" +
-                    "    FROM \n" +
-                    "        pcprodut p) A\n" +
-                    "WHERE\n" +
-                    "    usados > 1\n" +
-                    "ORDER by\n" +
-                    "    id"
+                    "SELECT \n"
+                    + "    codprodprinc id,\n"
+                    + "    descricao,\n"
+                    + "    usados\n"
+                    + "from\n"
+                    + "    (SELECT\n"
+                    + "        p.codprod,\n"
+                    + "        p.descricao,\n"
+                    + "        p.CODPRODPRINC,\n"
+                    + "        (SELECT COUNT(*) FROM pcprodut WHERE codprodprinc = p.codprod) usados\n"
+                    + "    FROM \n"
+                    + "        pcprodut p) A\n"
+                    + "WHERE\n"
+                    + "    usados > 1\n"
+                    + "ORDER by\n"
+                    + "    id"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -235,29 +236,29 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    dp.codepto merc1,\n" +
-                    "    dp.descricao merc1_descricao,\n" +
-                    "    sc.codsec merc2,\n" +
-                    "    sc.descricao merc2_descricao,\n" +
-                    "    ct.codcategoria merc3,\n" +
-                    "    ct.categoria merc3_descricao,\n" +
-                    "    sc.codsubcategoria merc4,\n" +
-                    "    sc.subcategoria merc4_descricao\n" +
-                    "FROM\n" +
-                    "    pcdepto dp\n" +
-                    "    LEFT JOIN pcsecao sc ON\n" +
-                    "        dp.codepto = sc.codepto\n" +
-                    "    LEFT JOIN pccategoria ct ON\n" +
-                    "        ct.codsec = sc.codsec\n" +
-                    "    LEFT JOIN pcsubcategoria sc ON\n" +
-                    "        sc.codsec = ct.codsec AND\n" +
-                    "        sc.codcategoria = ct.codcategoria\n" +
-                    "order BY\n" +
-                    "    dp.codepto,\n" +
-                    "    sc.codsec,\n" +
-                    "    ct.codcategoria,\n" +
-                    "    sc.codsubcategoria"
+                    "SELECT\n"
+                    + "    dp.codepto merc1,\n"
+                    + "    dp.descricao merc1_descricao,\n"
+                    + "    sc.codsec merc2,\n"
+                    + "    sc.descricao merc2_descricao,\n"
+                    + "    ct.codcategoria merc3,\n"
+                    + "    ct.categoria merc3_descricao,\n"
+                    + "    sc.codsubcategoria merc4,\n"
+                    + "    sc.subcategoria merc4_descricao\n"
+                    + "FROM\n"
+                    + "    pcdepto dp\n"
+                    + "    LEFT JOIN pcsecao sc ON\n"
+                    + "        dp.codepto = sc.codepto\n"
+                    + "    LEFT JOIN pccategoria ct ON\n"
+                    + "        ct.codsec = sc.codsec\n"
+                    + "    LEFT JOIN pcsubcategoria sc ON\n"
+                    + "        sc.codsec = ct.codsec AND\n"
+                    + "        sc.codcategoria = ct.codcategoria\n"
+                    + "order BY\n"
+                    + "    dp.codepto,\n"
+                    + "    sc.codsec,\n"
+                    + "    ct.codcategoria,\n"
+                    + "    sc.codsubcategoria"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -281,25 +282,25 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT\n" +
-                    "	codst id,\n" +
-                    "	mensagem descricao,\n" +
-                    "	sittribut cst,\n" +
-                    "	codicm aliquota,\n" +
-                    "	COALESCE(NULLIF(100-COALESCE(percbasered, 0), 100), 0) reducao\n" +
-                    "FROM\n" +
-                    "	PCTRIBUT\n" +
-                    "ORDER BY\n" +
-                    "	codst"
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	codst id,\n"
+                    + "	mensagem descricao,\n"
+                    + "	sittribut cst,\n"
+                    + "	codicm aliquota,\n"
+                    + "	COALESCE(NULLIF(100-COALESCE(percbasered, 0), 100), 0) reducao\n"
+                    + "FROM\n"
+                    + "	PCTRIBUT\n"
+                    + "ORDER BY\n"
+                    + "	codst"
             )) {
-                while(rs.next()) {
+                while (rs.next()) {
                     result.add(new MapaTributoIMP(
-                            rs.getString("id"), 
-                            rs.getString("descricao"), 
-                            rs.getInt("cst"), 
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
                             MathUtils.round(rs.getDouble("aliquota"), 2),
                             MathUtils.round(rs.getDouble("reducao"), 2)
                     ));
@@ -310,6 +311,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     }
 
     private class Trib {
+
         public int icmsCst;
         public double icmsAliq;
         public double icmsRed;
@@ -321,8 +323,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             this.icmsRed = icmsRed;
             this.pisCofins = pisCofins;
         }
-        
-        
+
     }
 
     //<editor-fold defaultstate="collapsed" desc="Comentado metódo do produto para uma nova versão do select">
@@ -558,35 +559,34 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         return result;
     }*/
     //</editor-fold>
-    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.createStatement()) {            
+        try (Statement stm = ConexaoOracle.createStatement()) {
             Map<String, Trib> tribs = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "      ent.ncm,\n" +
-                    "      case ent.tipofornec\n" +
-                    "      when 'I' then 1\n" +
-                    "      when 'D' then 2\n" +
-                    "      when 'C' then 3\n" +
-                    "      when 'V' then 4\n" +
-                    "      else 10 end tipo,\n" +
-                    "      trib.codsittribpiscofins piscofins,\n" +
-                    "      trib.sittribut icms_cst,\n" +
-                    "      trib.percicm icms_aliquota,\n" +
-                    "      trib.percbaseredent icms_reducao\n" +
-                    "from \n" +
-                    "     PCTRIBENTRADA ent\n" +
-                    "     join PCTRIBFIGURA trib on\n" +
-                    "          ent.codfigura = trib.codfigura\n" +
-                    "     join pcfilial e on\n" +
-                    "          e.codigo = ent.codfilial\n" +
-                    "where\n" +
-                    "     ent.codfilial = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "      ncm, tipo"
+                    "select\n"
+                    + "      ent.ncm,\n"
+                    + "      case ent.tipofornec\n"
+                    + "      when 'I' then 1\n"
+                    + "      when 'D' then 2\n"
+                    + "      when 'C' then 3\n"
+                    + "      when 'V' then 4\n"
+                    + "      else 10 end tipo,\n"
+                    + "      trib.codsittribpiscofins piscofins,\n"
+                    + "      trib.sittribut icms_cst,\n"
+                    + "      trib.percicm icms_aliquota,\n"
+                    + "      trib.percbaseredent icms_reducao\n"
+                    + "from \n"
+                    + "     PCTRIBENTRADA ent\n"
+                    + "     join PCTRIBFIGURA trib on\n"
+                    + "          ent.codfigura = trib.codfigura\n"
+                    + "     join pcfilial e on\n"
+                    + "          e.codigo = ent.codfilial\n"
+                    + "where\n"
+                    + "     ent.codfilial = " + getLojaOrigem() + "\n"
+                    + "order by\n"
+                    + "      ncm, tipo"
             )) {
                 while (rst.next()) {
                     if (!tribs.containsKey(rst.getString("ncm"))) {
@@ -600,118 +600,119 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             try (ResultSet rst = stm.executeQuery(
-                    "WITH \n" +
-                    "icms_dentro_estado AS (\n" +
-                    "	SELECT\n" +
-                    "		ic.CODPROD id_produto,\n" +
-                    "		ic.CODST id_tributacao,\n" +
-                    "		PISCOFINS.SITTRIBUT piscofins_s,\n" +
-                    "		piscofins.SITTRIBUTDEV piscofins_e\n" +
-                    "	FROM\n" +
-                    "		pctabpr ic	\n" +
-                    "		LEFT JOIN pctribpiscofins piscofins ON\n" +
-                    "			piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
-                    "	WHERE\n" +
-                    "		ic.NUMREGIAO = " + idRegiaoDentroEstado + "\n" +
-                    "),\n" +
-                    "icms_fora_estado AS (\n" +
-                    "	SELECT\n" +
-                    "		ic.CODPROD id_produto,\n" +
-                    "		ic.CODST id_tributacao\n" +
-                    "	FROM\n" +
-                    "		pctabpr ic\n" +
-                    "	WHERE\n" +
-                    "		ic.NUMREGIAO = " + idRegiaoForaEstado + "\n" +
-                    "),\n" +
-                    "natrec AS (\n" +
-                    "	SELECT\n" +
-                    "		distinct\n" +
-                    "		t.CODPROD id_produto,\n" +
-                    "		REPLACE(t.NCM, '.','') ncm,\n" +
-                    "		t.CODNATREC natrec\n" +
-                    "	FROM\n" +
-                    "		PCTABESCRSPED t\n" +
-                    "	WHERE\n" +
-                    "		NOT (t.CODPROD IS NULL AND t.ncm IS null) and\n" +
-                    "		T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n" +
-                    "		AND (\n" +
-                    "			(T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n" +
-                    "			OR (\n" +
-                    "				T.DATAINIESCR <= current_date\n" +
-                    "				AND T.DATAFINESCR IS NULL\n" +
-                    "			) OR (\n" +
-                    "				(current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR)\n" +
-                    "				AND T.DATAINIESCR IS NOT NULL\n" +
-                    "				AND T.DATAFINESCR IS NOT NULL\n" +
-                    "			)\n" +
-                    "		)\n" +
-                    ")\n" +
-                    "SELECT\n" +
-                    "	p.codprod id,\n" +
-                    "	p.dtcadastro datacadastro, \n" +
-                    "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n" +
-                    "	p.CODAUXILIAR2,\n" +
-                    "	COALESCE(\n" +
-                    "		(CASE\n" +
-                    "			WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1 THEN ean.QTMINIMAATACADO\n" +
-                    "			WHEN ean.QTUNIT >=2 THEN ean.QTUNIT\n" +
-                    "			ELSE 1\n" +
-                    "		END), \n" +
-                    "		1\n" +
-                    "	) as qtdembalagem,\n" +
-                    "	coalesce(ean.qtunit, 1) embalagemunitario,\n" +
-                    "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n" +
-                    "	p.qtunitcx qtdembalagemcompra,\n" +
-                    "	p.unidademaster tipoembalagemcompra,        \n" +
-                    "	p.aceitavendafracao e_balanca,\n" +
-                    "	ean.prazoval validade,\n" +
-                    "	p.descricao descricaocompleta,\n" +
-                    "	p.codepto merc1,\n" +
-                    "	p.codsec merc2,\n" +
-                    "	p.codcategoria merc3,\n" +
-                    "	p.codsubcategoria merc4,\n" +
-                    "	CASE WHEN p.codprodprinc != p.codprod then p.codprodprinc else null END id_familiaproduto,\n" +
-                    "	round(coalesce(p.pesobruto, 0),2) pesobruto,\n" +
-                    "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n" +
-                    "	coalesce(est.estmin, 0) estoqueminimo,\n" +
-                    "	coalesce(est.estmax, 0) estoquemaximo,    \n" +
-                    "	coalesce(est.qtestger,0) estoque,\n" +
-                    "	coalesce(ean.margem,0) margem,\n" +
-                    "	coalesce(est.CUSTOULTENTCONT,0) custosemimposto,\n" +
-                    "	coalesce(est.VLULTPCOMPRA,0) custocomimposto,\n" +
-                    "	coalesce(est.custofin,0) customedio,\n" +
-                    "	ean.PVENDA,\n" +
-                    "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda,\n" +
-                    "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n" +
-                    "	p.nbm ncm,\n" +
-                    "	coalesce(est.codcest, p.codcest) cest,\n" +
-                    "	icms_dentro_estado.piscofins_s,\n" +
-                    "	icms_dentro_estado.piscofins_e,\n" +
-                    "	(SELECT natrec FROM natrec WHERE (id_produto = p.codprod OR p.nbm LIKE natrec.ncm||'%') AND rownum = 1) piscofins_natrec,\n" +
-                    "	icms_dentro_estado.id_tributacao icms_dentro_estado,\n" +
-                    "	icms_fora_estado.id_tributacao icms_fora_estado,\n" +
-                    "	p.codncmex,\n" +
-                    "	p.codfornec fabricante,\n" +
-                    "	pf.CODFIGURA\n" +
-                    "FROM\n" +
-                    "	pcprodut p\n" +
-                    "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
-                    "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
-                    "	LEFT JOIN PCEMBALAGEM ean ON\n" +
-                    "		ean.codprod = p.codprod AND\n" +
-                    "		ean.codfilial = emp.codigo\n" +
-                    "	LEFT JOIN pcest est ON\n" +
-                    "		est.codprod = p.codprod AND\n" +
-                    "		est.codfilial = emp.codigo\n" +
-                    "	LEFT JOIN pcprodfilial pf ON\n" +
-                    "		pf.codprod = p.codprod AND\n" +
-                    "		pf.codfilial = emp.codigo\n" +
-                    "	LEFT JOIN icms_dentro_estado ON\n" +
-                    "		icms_dentro_estado.id_produto = p.codprod\n" +
-                    "	LEFT JOIN icms_fora_estado ON\n" +
-                    "		icms_fora_estado.id_produto = p.codprod\n" +
-                    "ORDER BY\n" +
-                    "	id, ean"
+                    "WITH \n"
+                    + "icms_dentro_estado AS (\n"
+                    + "	SELECT\n"
+                    + "		ic.CODPROD id_produto,\n"
+                    + "		ic.CODST id_tributacao,\n"
+                    + "		PISCOFINS.SITTRIBUT piscofins_s,\n"
+                    + "		piscofins.SITTRIBUTDEV piscofins_e\n"
+                    + "	FROM\n"
+                    + "		pctabpr ic	\n"
+                    + "		LEFT JOIN pctribpiscofins piscofins ON\n"
+                    + "			piscofins.codtribpiscofins = ic.codtribpiscofins\n"
+                    + "	WHERE\n"
+                    + "		ic.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
+                    + "),\n"
+                    + "icms_fora_estado AS (\n"
+                    + "	SELECT\n"
+                    + "		ic.CODPROD id_produto,\n"
+                    + "		ic.CODST id_tributacao\n"
+                    + "	FROM\n"
+                    + "		pctabpr ic\n"
+                    + "	WHERE\n"
+                    + "		ic.NUMREGIAO = " + idRegiaoForaEstado + "\n"
+                    + "),\n"
+                    + "natrec AS (\n"
+                    + "	SELECT\n"
+                    + "		distinct\n"
+                    + "		t.CODPROD id_produto,\n"
+                    + "		REPLACE(t.NCM, '.','') ncm,\n"
+                    + "		t.CODNATREC natrec\n"
+                    + "	FROM\n"
+                    + "		PCTABESCRSPED t\n"
+                    + "	WHERE\n"
+                    + "		NOT (t.CODPROD IS NULL AND t.ncm IS null) and\n"
+                    + "		T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n"
+                    + "		AND (\n"
+                    + "			(T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n"
+                    + "			OR (\n"
+                    + "				T.DATAINIESCR <= current_date\n"
+                    + "				AND T.DATAFINESCR IS NULL\n"
+                    + "			) OR (\n"
+                    + "				(current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR)\n"
+                    + "				AND T.DATAINIESCR IS NOT NULL\n"
+                    + "				AND T.DATAFINESCR IS NOT NULL\n"
+                    + "			)\n"
+                    + "		)\n"
+                    + ")\n"
+                    + "SELECT\n"
+                    + "	p.codprod id,\n"
+                    + "	p.dtcadastro datacadastro, \n"
+                    + "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n"
+                    + "	p.CODAUXILIAR2,\n"
+                    + "	COALESCE(\n"
+                    + "		(CASE\n"
+                    + "			WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1 THEN ean.QTMINIMAATACADO\n"
+                    + "			WHEN ean.QTUNIT >=2 THEN ean.QTUNIT\n"
+                    + "			ELSE 1\n"
+                    + "		END), \n"
+                    + "		1\n"
+                    + "	) as qtdembalagem,\n"
+                    + "	coalesce(ean.qtunit, 1) embalagemunitario,\n"
+                    + "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n"
+                    + "	p.qtunitcx qtdembalagemcompra,\n"
+                    + "	p.unidademaster tipoembalagemcompra,        \n"
+                    + "	p.aceitavendafracao e_balanca,\n"
+                    + "	ean.prazoval validade,\n"
+                    + "	p.descricao descricaocompleta,\n"
+                    + "	p.codepto merc1,\n"
+                    + "	p.codsec merc2,\n"
+                    + "	p.codcategoria merc3,\n"
+                    + "	p.codsubcategoria merc4,\n"
+                    + "	CASE WHEN p.codprodprinc != p.codprod then p.codprodprinc else null END id_familiaproduto,\n"
+                    + "	round(coalesce(p.pesobruto, 0),2) pesobruto,\n"
+                    + "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n"
+                    + "	coalesce(est.estmin, 0) estoqueminimo,\n"
+                    + "	coalesce(est.estmax, 0) estoquemaximo,    \n"
+                    + "	coalesce(est.qtestger,0) estoque,\n"
+                    + "	coalesce(ean.margem,0) margem,\n"
+                    + "	CAST(coalesce(est.CUSTOULTENTCONT,0)AS numeric(10,2)) custosemimposto,\n"
+                    + "	CAST(coalesce(est.VLULTPCOMPRA,0)AS numeric(10,2)) custocomimposto,\n"
+                    + "	CAST(coalesce(est.custofin,0)AS numeric(10,2)) customedio,\n"
+                    + "	ean.PVENDA,\n"
+                    + "	CAST(coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) \n"
+                    + "		AS NUMERIC(10,2)) precovenda,\n"
+                    + "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n"
+                    + "	p.nbm ncm,\n"
+                    + "	coalesce(est.codcest, p.codcest) cest,\n"
+                    + "	icms_dentro_estado.piscofins_s,\n"
+                    + "	icms_dentro_estado.piscofins_e,\n"
+                    + "	(SELECT natrec FROM natrec WHERE (id_produto = p.codprod OR p.nbm LIKE natrec.ncm||'%') AND rownum = 1) piscofins_natrec,\n"
+                    + "	icms_dentro_estado.id_tributacao icms_dentro_estado,\n"
+                    + "	icms_fora_estado.id_tributacao icms_fora_estado,\n"
+                    + "	p.codncmex,\n"
+                    + "	p.codfornec fabricante,\n"
+                    + "	pf.CODFIGURA\n"
+                    + "FROM\n"
+                    + "	pcprodut p\n"
+                    + "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n"
+                    + "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n"
+                    + "	LEFT JOIN PCEMBALAGEM ean ON\n"
+                    + "		ean.codprod = p.codprod AND\n"
+                    + "		ean.codfilial = emp.codigo\n"
+                    + "	LEFT JOIN pcest est ON\n"
+                    + "		est.codprod = p.codprod AND\n"
+                    + "		est.codfilial = emp.codigo\n"
+                    + "	LEFT JOIN pcprodfilial pf ON\n"
+                    + "		pf.codprod = p.codprod AND\n"
+                    + "		pf.codfilial = emp.codigo\n"
+                    + "	LEFT JOIN icms_dentro_estado ON\n"
+                    + "		icms_dentro_estado.id_produto = p.codprod\n"
+                    + "	LEFT JOIN icms_fora_estado ON\n"
+                    + "		icms_fora_estado.id_produto = p.codprod\n"
+                    + "ORDER BY\n"
+                    + "	id, ean"
             )) {
                 int cont = 0, cont2 = 0;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -725,15 +726,13 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcompra"));
                     imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcompra"));
-                    
-                    
-                    
-                    if(rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
+
+                    if (rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
                         imp.seteBalanca("S".equals(rst.getString("e_balanca").trim()) ? true : false);
                     } else {
                         imp.seteBalanca(false);
                     }
-                    
+
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
                     if (bal != null) {
                         imp.setEan(String.valueOf(bal.getCodigo()));
@@ -746,7 +745,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.seteBalanca("S".equals(rst.getString("e_balanca")));
                         imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.setValidade(rst.getInt("validade"));                        
+                        imp.setValidade(rst.getInt("validade"));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -758,7 +757,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                     imp.setPesoBruto(Utils.stringToDouble(rst.getString("pesoliquido")));
-                    imp.setPesoLiquido(Utils.stringToDouble(rst.getString("pesobruto")));                    
+                    imp.setPesoLiquido(Utils.stringToDouble(rst.getString("pesobruto")));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -780,7 +779,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIcmsConsumidorId(rst.getString("icms_dentro_estado"));
                     imp.setIcmsCreditoId(rst.getString("icms_dentro_estado"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("icms_fora_estado"));
-                    
+
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     result.add(imp);
@@ -792,12 +791,12 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         ProgressBar.setStatus("Carregando produtos...." + cont2);
                         cont = 0;
                     }
-                }                
+                }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
 
@@ -805,49 +804,49 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "SELECT \n" +
-                        "	p.CODPROD idproduto,\n" +
-                        "	p.codauxiliar ean,\n" +
-                        "	varejo.pvenda AS precovarejo,\n" +
-                        "	-- Qtd de atacado por quantidade total\n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.QTMINIMAATACADO\n" +
-                        "	--Qtd embalagem por embalagem\n" +
-                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) AS qtdatacado,\n" +
-                        "	-- Preço do atacado por quantidade total\n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.PVENDAATAC \n" +
-                        "	-- Preço do atacado por embalagem\n" +
-                        "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n" +
-                        "		THEN round((p.PVENDA / p.QTUNIT), 2) END) AS precoatacado, \n" +
-                        "	p.MARGEM,\n" +
-                        "	p.MARGEMIDEALATAC,\n" +
-                        "	p.EMBALAGEM,\n" +
-                        "	p.UNIDADE\n" +
-                        "FROM \n" +
-                        "	pcembalagem p\n" +
-                        "JOIN\n" +
-                        "	(SELECT \n" +
-                        "		a.PVENDA,\n" +
-                        "		a.CODPROD,\n" +
-                        "		a.CODFILIAL,\n" +
-                        "		a.QTUNIT\n" +
-                        "	FROM \n" +
-                        "		PCEMBALAGEM a \n" +
-                        "	WHERE \n" +
-                        "		COALESCE(a.QTUNIT, 1) = 1 and \n" +
-                        "		a.dtinativo IS NULL) varejo ON p.CODPROD = varejo.codprod AND \n" +
-                        "		varejo.codfilial = p.CODFILIAL\n" +
-                        "WHERE \n" +
-                        "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.QTMINIMAATACADO\n" +
-                        "	WHEN p.QTUNIT >= 2 THEN p.QTUNIT ELSE 1 END) > 1 AND \n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.PVENDAATAC \n" +
-                        "	-- Preço do atacado por embalagem\n" +
-                        "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n" +
-                        "		THEN round((p.PVENDA / p.QTUNIT), 2) END) > 0"
+                        "SELECT \n"
+                        + "	p.CODPROD idproduto,\n"
+                        + "	p.codauxiliar ean,\n"
+                        + "	varejo.pvenda AS precovarejo,\n"
+                        + "	-- Qtd de atacado por quantidade total\n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.QTMINIMAATACADO\n"
+                        + "	--Qtd embalagem por embalagem\n"
+                        + "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) AS qtdatacado,\n"
+                        + "	-- Preço do atacado por quantidade total\n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.PVENDAATAC \n"
+                        + "	-- Preço do atacado por embalagem\n"
+                        + "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n"
+                        + "		THEN round((p.PVENDA / p.QTUNIT), 2) END) AS precoatacado, \n"
+                        + "	p.MARGEM,\n"
+                        + "	p.MARGEMIDEALATAC,\n"
+                        + "	p.EMBALAGEM,\n"
+                        + "	p.UNIDADE\n"
+                        + "FROM \n"
+                        + "	pcembalagem p\n"
+                        + "JOIN\n"
+                        + "	(SELECT \n"
+                        + "		a.PVENDA,\n"
+                        + "		a.CODPROD,\n"
+                        + "		a.CODFILIAL,\n"
+                        + "		a.QTUNIT\n"
+                        + "	FROM \n"
+                        + "		PCEMBALAGEM a \n"
+                        + "	WHERE \n"
+                        + "		COALESCE(a.QTUNIT, 1) = 1 and \n"
+                        + "		a.dtinativo IS NULL) varejo ON p.CODPROD = varejo.codprod AND \n"
+                        + "		varejo.codfilial = p.CODFILIAL\n"
+                        + "WHERE \n"
+                        + "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.QTMINIMAATACADO\n"
+                        + "	WHEN p.QTUNIT >= 2 THEN p.QTUNIT ELSE 1 END) > 1 AND \n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.PVENDAATAC \n"
+                        + "	-- Preço do atacado por embalagem\n"
+                        + "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n"
+                        + "		THEN round((p.PVENDA / p.QTUNIT), 2) END) > 0"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -856,11 +855,11 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("idproduto"));
                         imp.setEan(rst.getString("ean"));
-                    
-                        if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+
+                        if (imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
                             imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
                         }
-                        
+
                         imp.setQtdEmbalagem(rst.getInt("qtdatacado"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("precovarejo"));
@@ -874,35 +873,35 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "SELECT \n" +
-                        "	p.CODPROD idproduto,\n" +
-                        "	p.CODAUXILIAR ean,\n" +
-                        "	p.UNIDADE,\n" +
-                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.MARGEMIDEALATAC \n" +
-                        "	WHEN p.QTUNIT >=2 THEN \n" +
-                        "		(SELECT min(margem) FROM pcembalagem\n" +
-                        "		WHERE \n" +
-                        "		 codprod = p.CODPROD AND \n" +
-                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n" +
-                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.margem \n" +
-                        "	WHEN p.QTUNIT >=2 THEN \n" +
-                        "		(SELECT max(margem) FROM pcembalagem\n" +
-                        "		WHERE \n" +
-                        "		 codprod = p.CODPROD AND \n" +
-                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN 'QTD_TOTAL'\n" +
-                        "	--Qtd embalagem por embalagem\n" +
-                        "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n" +
-                        "FROM \n" +
-                        "	pcembalagem p\n" +
-                        "WHERE \n" +
-                        "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.QTMINIMAATACADO\n" +
-                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1"
+                        "SELECT \n"
+                        + "	p.CODPROD idproduto,\n"
+                        + "	p.CODAUXILIAR ean,\n"
+                        + "	p.UNIDADE,\n"
+                        + "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.MARGEMIDEALATAC \n"
+                        + "	WHEN p.QTUNIT >=2 THEN \n"
+                        + "		(SELECT min(margem) FROM pcembalagem\n"
+                        + "		WHERE \n"
+                        + "		 codprod = p.CODPROD AND \n"
+                        + "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n"
+                        + "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.margem \n"
+                        + "	WHEN p.QTUNIT >=2 THEN \n"
+                        + "		(SELECT max(margem) FROM pcembalagem\n"
+                        + "		WHERE \n"
+                        + "		 codprod = p.CODPROD AND \n"
+                        + "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN 'QTD_TOTAL'\n"
+                        + "	--Qtd embalagem por embalagem\n"
+                        + "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n"
+                        + "FROM \n"
+                        + "	pcembalagem p\n"
+                        + "WHERE \n"
+                        + "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.QTMINIMAATACADO\n"
+                        + "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -919,40 +918,40 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             return vResult;
-        } else if(opt == OpcaoProduto.TIPO_ATACADO) {
+        } else if (opt == OpcaoProduto.TIPO_ATACADO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "SELECT \n" +
-                        "	p.CODPROD idproduto,\n" +
-                        "	p.CODAUXILIAR ean,\n" +
-                        "	p.UNIDADE,\n" +
-                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.MARGEMIDEALATAC \n" +
-                        "	WHEN p.QTUNIT >=2 THEN \n" +
-                        "		(SELECT min(margem) FROM pcembalagem\n" +
-                        "		WHERE \n" +
-                        "		 codprod = p.CODPROD AND \n" +
-                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n" +
-                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.margem \n" +
-                        "	WHEN p.QTUNIT >=2 THEN \n" +
-                        "		(SELECT max(margem) FROM pcembalagem\n" +
-                        "		WHERE \n" +
-                        "		 codprod = p.CODPROD AND \n" +
-                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN 'QTD_TOTAL'\n" +
-                        "	--Qtd embalagem por embalagem\n" +
-                        "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n" +
-                        "FROM \n" +
-                        "	pcembalagem p\n" +
-                        "WHERE \n" +
-                        "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
-                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                        "	 THEN p.QTMINIMAATACADO\n" +
-                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1 AND\n" +
-                        "       p.dtinativo IS NULL"        
+                        "SELECT \n"
+                        + "	p.CODPROD idproduto,\n"
+                        + "	p.CODAUXILIAR ean,\n"
+                        + "	p.UNIDADE,\n"
+                        + "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.MARGEMIDEALATAC \n"
+                        + "	WHEN p.QTUNIT >=2 THEN \n"
+                        + "		(SELECT min(margem) FROM pcembalagem\n"
+                        + "		WHERE \n"
+                        + "		 codprod = p.CODPROD AND \n"
+                        + "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n"
+                        + "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.margem \n"
+                        + "	WHEN p.QTUNIT >=2 THEN \n"
+                        + "		(SELECT max(margem) FROM pcembalagem\n"
+                        + "		WHERE \n"
+                        + "		 codprod = p.CODPROD AND \n"
+                        + "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN 'QTD_TOTAL'\n"
+                        + "	--Qtd embalagem por embalagem\n"
+                        + "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n"
+                        + "FROM \n"
+                        + "	pcembalagem p\n"
+                        + "WHERE \n"
+                        + "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n"
+                        + "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                        + "	 THEN p.QTMINIMAATACADO\n"
+                        + "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1 AND\n"
+                        + "       p.dtinativo IS NULL"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -961,17 +960,18 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("idproduto"));
                         imp.setEan(rst.getString("ean"));
-                        
-                        if(rst.getString("tipoatacado") != null &&
-                                !"".equals(rst.getString("tipoatacado"))) {
-                            switch(rst.getString("tipoatacado").trim()) {
+
+                        if (rst.getString("tipoatacado") != null
+                                && !"".equals(rst.getString("tipoatacado"))) {
+                            switch (rst.getString("tipoatacado").trim()) {
                                 case "QTD_TOTAL":
                                     imp.setTipoAtacado(TipoAtacado.QTDE_TOTAL);
                                     break;
                                 case "QTD_EMBALAGEM":
                                     imp.setTipoAtacado(TipoAtacado.QTDE_EMBALAGEM);
                                     break;
-                                default: imp.setTipoAtacado(TipoAtacado.EMBALAGEM);
+                                default:
+                                    imp.setTipoAtacado(TipoAtacado.EMBALAGEM);
                                     break;
                             }
                         }
@@ -989,50 +989,50 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoOracle.createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT * FROM (SELECT \n" +
-                            "	p.CODPROD,\n" +
-                            "	p.codfilial,\n" +
-                            "	p.CODAUXILIAR ean,\n" +
-                            "	p.UNIDADE,\n" +
-                            "	-- Qtd de atacado por quantidade total\n" +
-                            "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
-                            "	 THEN p.QTMINIMAATACADO\n" +
-                            "	--Qtd embalagem por embalagem\n" +
-                            "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END), 0) AS QTUNIT\n" +
-                            "FROM \n" +
-                            "	pcembalagem p \n" +
-                            "union\n" +
-                            "SELECT\n" +
-                            "	a.codprod,\n" +
-                            "	'0' codfilial,\n" +
-                            "	a.ean,\n" +
-                            "	a.unidade,\n" +
-                            "	a.qtunit\n" +
-                            "from\n" +
-                            "	(SELECT codprod, codauxiliar ean, descricao, unidade, qtunit, prazoval FROM pcprodut\n" +
-                            "	UNION\n" +
-                            "	SELECT codprod, codauxiliar2 ean, descricao, unidade, qtunit, prazoval FROM pcprodut) a\n" +
-                            "WHERE \n" +
-                            "	NOT ean IN (SELECT codauxiliar FROM pcembalagem)\n" +
-                            "ORDER BY \n" +
-                            "	codprod) eans WHERE eans.codfilial = '" + getLojaOrigem() + "'")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT * FROM (SELECT \n"
+                    + "	p.CODPROD,\n"
+                    + "	p.codfilial,\n"
+                    + "	p.CODAUXILIAR ean,\n"
+                    + "	p.UNIDADE,\n"
+                    + "	-- Qtd de atacado por quantidade total\n"
+                    + "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n"
+                    + "	 THEN p.QTMINIMAATACADO\n"
+                    + "	--Qtd embalagem por embalagem\n"
+                    + "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END), 0) AS QTUNIT\n"
+                    + "FROM \n"
+                    + "	pcembalagem p \n"
+                    + "union\n"
+                    + "SELECT\n"
+                    + "	a.codprod,\n"
+                    + "	'0' codfilial,\n"
+                    + "	a.ean,\n"
+                    + "	a.unidade,\n"
+                    + "	a.qtunit\n"
+                    + "from\n"
+                    + "	(SELECT codprod, codauxiliar ean, descricao, unidade, qtunit, prazoval FROM pcprodut\n"
+                    + "	UNION\n"
+                    + "	SELECT codprod, codauxiliar2 ean, descricao, unidade, qtunit, prazoval FROM pcprodut) a\n"
+                    + "WHERE \n"
+                    + "	NOT ean IN (SELECT codauxiliar FROM pcembalagem)\n"
+                    + "ORDER BY \n"
+                    + "	codprod) eans WHERE eans.codfilial = '" + getLojaOrigem() + "'")) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codprod"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtunit"));
-                    
-                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+
+                    if (imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
                         imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
                     }
-                    
+
                     result.add(imp);
                 }
             }
@@ -1043,55 +1043,55 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    f.codfornec id,\n" +
-                    "    f.fornecedor razao,\n" +
-                    "    f.fantasia,\n" +
-                    "    f.cgc cnpj,\n" +
-                    "    f.ie ie,\n" +
-                    "    f.inscmunicip,\n" +
-                    "    f.suframa,\n" +
-                    "    CASE f.excluido WHEN 'S' THEN 0 ELSE 1 END ativo,\n" +
-                    "    f.ender endereco,\n" +
-                    "    f.numeroend numero,\n" +
-                    "    f.complementoend complemento,\n" +
-                    "    f.bairro,\n" +
-                    "    f.cidade,\n" +
-                    "    f.estado,\n" +
-                    "    f.cep,\n" +
-                    "    f.endercob cob_endereco,\n" +
-                    "    f.bairrocob cob_bairro,\n" +
-                    "    f.municob cob_cidade,\n" +
-                    "    f.estcob cob_estado,\n" +
-                    "    f.cepcob cob_cep,\n" +
-                    "    f.telefonecom,\n" +
-                    "    f.telefoneadm,\n" +
-                    "    f.telrep,\n" +
-                    "    f.telfab,\n" +
-                    "    f.telcob,\n" +
-                    "    f.prazomin,\n" +
-                    "    f.prazoentrega,\n" +
-                    "    f.email,\n" +
-                    "    f.emailnfe,\n" +
-                    "    CASE f.contribuinteicms WHEN 'S' THEN 1 ELSE 3 END contribuinteicms,\n" +
-                    "    f.vlminpedcompra,\n" +
-                    "    f.vlminpedreposicao,\n" +
-                    "    f.dtcadastro,\n" +
-                    "    f.obs,\n" +
-                    "    f.obs2,\n" +
-                    "    f.observacao,\n" +
-                    "    f.codparcela,\n" +
-                    "    parc.descricao parcela,\n" +
-                    "    f.tipofornec\n" +
-                    "FROM\n" +
-                    "    pcfornec f\n" +
-                    "    LEFT JOIN PCPARCELASC parc ON\n" +
-                    "        f.codparcela = parc.codparcela\n" +
-                    "ORDER BY\n" +
-                    "    f.codfornec"
+                    "SELECT\n"
+                    + "    f.codfornec id,\n"
+                    + "    f.fornecedor razao,\n"
+                    + "    f.fantasia,\n"
+                    + "    f.cgc cnpj,\n"
+                    + "    f.ie ie,\n"
+                    + "    f.inscmunicip,\n"
+                    + "    f.suframa,\n"
+                    + "    CASE f.excluido WHEN 'S' THEN 0 ELSE 1 END ativo,\n"
+                    + "    f.ender endereco,\n"
+                    + "    f.numeroend numero,\n"
+                    + "    f.complementoend complemento,\n"
+                    + "    f.bairro,\n"
+                    + "    f.cidade,\n"
+                    + "    f.estado,\n"
+                    + "    f.cep,\n"
+                    + "    f.endercob cob_endereco,\n"
+                    + "    f.bairrocob cob_bairro,\n"
+                    + "    f.municob cob_cidade,\n"
+                    + "    f.estcob cob_estado,\n"
+                    + "    f.cepcob cob_cep,\n"
+                    + "    f.telefonecom,\n"
+                    + "    f.telefoneadm,\n"
+                    + "    f.telrep,\n"
+                    + "    f.telfab,\n"
+                    + "    f.telcob,\n"
+                    + "    f.prazomin,\n"
+                    + "    f.prazoentrega,\n"
+                    + "    f.email,\n"
+                    + "    f.emailnfe,\n"
+                    + "    CASE f.contribuinteicms WHEN 'S' THEN 1 ELSE 3 END contribuinteicms,\n"
+                    + "    f.vlminpedcompra,\n"
+                    + "    f.vlminpedreposicao,\n"
+                    + "    f.dtcadastro,\n"
+                    + "    f.obs,\n"
+                    + "    f.obs2,\n"
+                    + "    f.observacao,\n"
+                    + "    f.codparcela,\n"
+                    + "    parc.descricao parcela,\n"
+                    + "    f.tipofornec\n"
+                    + "FROM\n"
+                    + "    pcfornec f\n"
+                    + "    LEFT JOIN PCPARCELASC parc ON\n"
+                    + "        f.codparcela = parc.codparcela\n"
+                    + "ORDER BY\n"
+                    + "    f.codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -1117,8 +1117,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCob_municipio(rst.getString("cob_cidade"));
                     imp.setCob_uf(rst.getString("cob_estado"));
                     imp.setCob_cep(rst.getString("cob_cep"));
-                    imp.setTel_principal(rst.getString("telrep"));     
-                    
+                    imp.setTel_principal(rst.getString("telrep"));
+
                     if (Utils.stringToLong(rst.getString("telrep")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
                         cont.setImportSistema(getSistema());
@@ -1127,7 +1127,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         cont.setNome("REPRESENTANTE");
                         cont.setTelefone(Utils.stringLong(rst.getString("telrep")));
                         imp.getContatos().put(cont, "1");
-                    }                    
+                    }
                     if (Utils.stringToLong(rst.getString("telfab")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
                         cont.setImportSistema(getSistema());
@@ -1145,7 +1145,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         cont.setNome("COBRANCA");
                         cont.setTelefone(Utils.stringLong(rst.getString("telcob")));
                         imp.getContatos().put(cont, "3");
-                    }                    
+                    }
                     if (Utils.stringToLong(rst.getString("email")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
                         cont.setImportSistema(getSistema());
@@ -1165,43 +1165,49 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         cont.setTipoContato(TipoContato.NFE);
                         imp.getContatos().put(cont, "5");
                     }
-                    
+
                     imp.setObservacao(
-                            "PRAZO MINIMO: " + Utils.acertarTexto(rst.getString("prazomin")) + "\n" +
-                            "VLR. MINIMO REPOSICAO: " + Utils.stringToDouble(rst.getString("vlminpedreposicao")) + "\n" +
-                            "PARCELAMENTO: " + Utils.stringToDouble(rst.getString("parcela")) + "\n" +
-                            Utils.acertarTexto(rst.getString("obs")) + "\n" +
-                            Utils.acertarTexto(rst.getString("obs2")) + "\n" +
-                            Utils.acertarTexto(rst.getString("observacao"))
+                            "PRAZO MINIMO: " + Utils.acertarTexto(rst.getString("prazomin")) + "\n"
+                            + "VLR. MINIMO REPOSICAO: " + Utils.stringToDouble(rst.getString("vlminpedreposicao")) + "\n"
+                            + "PARCELAMENTO: " + Utils.stringToDouble(rst.getString("parcela")) + "\n"
+                            + Utils.acertarTexto(rst.getString("obs")) + "\n"
+                            + Utils.acertarTexto(rst.getString("obs2")) + "\n"
+                            + Utils.acertarTexto(rst.getString("observacao"))
                     );
                     imp.setValor_minimo_pedido(rst.getDouble("vlminpedcompra"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
                     imp.setDatacadastro(rst.getDate("dtcadastro"));
                     switch (Utils.acertarTexto(rst.getString("tipofornec"))) {
-                        case "I": imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA); break;
-                        case "D": imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR); break;
-                        default: imp.setTipoFornecedor(TipoFornecedor.ATACADO); break;
+                        case "I":
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            break;
+                        case "D":
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            break;
+                        default:
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            break;
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();   
-        
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT m.* from\n" +
-                    "(SELECT codfornec, codprod \n" +
-                    "FROM pcmov GROUP BY codfornec, codprod) m\n" +
-                    "JOIN pcprodut p ON m.codprod = p.codprod\n" +
-                    "JOIN pcfornec f ON m.codfornec = f.codfornec"
+                    "SELECT m.* from\n"
+                    + "(SELECT codfornec, codprod \n"
+                    + "FROM pcmov GROUP BY codfornec, codprod) m\n"
+                    + "JOIN pcprodut p ON m.codprod = p.codprod\n"
+                    + "JOIN pcfornec f ON m.codfornec = f.codfornec"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -1213,83 +1219,81 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     result.add(imp);
                 }
             }
-        }        
-        
+        }
+
         return result;
-    }    
+    }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (Statement stm2 = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "SELECT\n" +
-                        "    c.codcli id,\n" +
-                        "    c.cgcent cnpj,\n" +
-                        "    coalesce(c.ieent, c.rg) inscricaoestadual,\n" +
-                        "    c.orgaorg orgaoemissor,\n" +
-                        "    c.cliente razao,\n" +
-                        "    c.fantasia,    \n" +
-                        "    CASE c.bloqueio WHEN 'S' THEN 1 ELSE 0 END bloqueado,\n" +
-                        "    c.dtbloq databloqueio,\n" +
-                        "    c.enderent endereco,\n" +
-                        "    c.numeroent numero,\n" +
-                        "    c.complementoent complemento,\n" +
-                        "    c.bairroent bairro,\n" +
-                        "    c.municent municipio,\n" +
-                        "    c.estent estado,\n" +
-                        "    c.cepent cep,\n" +
-                        "    c.dtnasc datanascimento,\n" +
-                        "    c.dtcadastro datacadastro,\n" +
-                        "    c.sexo,\n" +
-                        "    c.empresa,\n" +
-                        "    c.enderempr empresaendereco,\n" +
-                        "    c.municempr empresamunicipio,\n" +
-                        "    c.estempr empresauf,\n" +
-                        "    c.telempr empresatelefone,\n" +
-                        "    c.dtadmissao dataadmissao,\n" +
-                        "    c.cargo,\n" +
-                        "    c.rendamensal salario,\n" +
-                        "    c.limcred valorlimite,\n" +
-                        "    c.nomeconjuge,\n" +
-                        "    c.filiacaopai nomepai,\n" +
-                        "    c.filiacaomae nomemae,\n" +
-                        "    c.observacao,\n" +
-                        "    c.obscredito,\n" +
-                        "    c.obs,\n" +
-                        "    c.obs2,\n" +
-                        "    c.obs3,\n" +
-                        "    c.obs4,\n" +
-                        "    c.diafaturar diavencimento,\n" +
-                        "    c.telent,\n" +
-                        "    c.telent1,\n" +
-                        "    c.telcob,\n" +
-                        "    c.telcom,\n" +
-                        "    c.telconjuge,\n" +
-                        "    c.telcelent,\n" +
-                        "    c.email,\n" +
-                        "    c.emailnfe,\n" +
-                        "    c.emailcob,\n" +
-                        "    c.faxcli,\n" +
-                        "    c.endercob,\n" +
-                        "    c.numerocob,\n" +
-                        "    c.complementocob,\n" +
-                        "    c.bairrocob,\n" +
-                        "    c.municcob,\n" +
-                        "    c.estcob,\n" +
-                        "    c.cepcob\n" +
-                        "FROM \n" +
-                        "    PCCLIENT c\n" +
-                        "WHERE\n" +
-                        (
-                                somenteClienteFidelidade ?
-                                "    nvl(c.NUMCARTAOFIDELIDADE,0) > 0" :
-                                "    CODCOB <> 'CONV'\n" 
-                        ) +
-                        "ORDER BY\n" +
-                        "    c.codcli"
+                        "SELECT\n"
+                        + "    c.codcli id,\n"
+                        + "    c.cgcent cnpj,\n"
+                        + "    coalesce(c.ieent, c.rg) inscricaoestadual,\n"
+                        + "    c.orgaorg orgaoemissor,\n"
+                        + "    c.cliente razao,\n"
+                        + "    c.fantasia,    \n"
+                        + "    CASE c.bloqueio WHEN 'S' THEN 1 ELSE 0 END bloqueado,\n"
+                        + "    c.dtbloq databloqueio,\n"
+                        + "    c.enderent endereco,\n"
+                        + "    c.numeroent numero,\n"
+                        + "    c.complementoent complemento,\n"
+                        + "    c.bairroent bairro,\n"
+                        + "    c.municent municipio,\n"
+                        + "    c.estent estado,\n"
+                        + "    c.cepent cep,\n"
+                        + "    c.dtnasc datanascimento,\n"
+                        + "    c.dtcadastro datacadastro,\n"
+                        + "    c.sexo,\n"
+                        + "    c.empresa,\n"
+                        + "    c.enderempr empresaendereco,\n"
+                        + "    c.municempr empresamunicipio,\n"
+                        + "    c.estempr empresauf,\n"
+                        + "    c.telempr empresatelefone,\n"
+                        + "    c.dtadmissao dataadmissao,\n"
+                        + "    c.cargo,\n"
+                        + "    c.rendamensal salario,\n"
+                        + "    c.limcred valorlimite,\n"
+                        + "    c.nomeconjuge,\n"
+                        + "    c.filiacaopai nomepai,\n"
+                        + "    c.filiacaomae nomemae,\n"
+                        + "    c.observacao,\n"
+                        + "    c.obscredito,\n"
+                        + "    c.obs,\n"
+                        + "    c.obs2,\n"
+                        + "    c.obs3,\n"
+                        + "    c.obs4,\n"
+                        + "    c.diafaturar diavencimento,\n"
+                        + "    c.telent,\n"
+                        + "    c.telent1,\n"
+                        + "    c.telcob,\n"
+                        + "    c.telcom,\n"
+                        + "    c.telconjuge,\n"
+                        + "    c.telcelent,\n"
+                        + "    c.email,\n"
+                        + "    c.emailnfe,\n"
+                        + "    c.emailcob,\n"
+                        + "    c.faxcli,\n"
+                        + "    c.endercob,\n"
+                        + "    c.numerocob,\n"
+                        + "    c.complementocob,\n"
+                        + "    c.bairrocob,\n"
+                        + "    c.municcob,\n"
+                        + "    c.estcob,\n"
+                        + "    c.cepcob\n"
+                        + "FROM \n"
+                        + "    PCCLIENT c\n"
+                        + "WHERE\n"
+                        + (somenteClienteFidelidade
+                                ? "    nvl(c.NUMCARTAOFIDELIDADE,0) > 0"
+                                : "    CODCOB <> 'CONV'\n")
+                        + "ORDER BY\n"
+                        + "    c.codcli"
                 )) {
                     while (rst.next()) {
                         ClienteIMP imp = new ClienteIMP();
@@ -1299,7 +1303,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setOrgaoemissor(rst.getString("orgaoemissor"));
                         imp.setRazao(rst.getString("razao"));
                         imp.setFantasia(rst.getString("fantasia"));
-                        imp.setAtivo(true);                        
+                        imp.setAtivo(true);
                         imp.setBloqueado(rst.getBoolean("bloqueado"));
                         imp.setDataBloqueio(rst.getDate("databloqueio"));
                         imp.setEndereco(rst.getString("endereco"));
@@ -1312,8 +1316,12 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setDataNascimento(rst.getDate("datanascimento"));
                         imp.setDataCadastro(rst.getDate("datacadastro"));
                         switch (StringUtils.acertarTexto(rst.getString("sexo"), "M")) {
-                            case "F": imp.setSexo(TipoSexo.FEMININO); break;
-                            default: imp.setSexo(TipoSexo.MASCULINO); break;
+                            case "F":
+                                imp.setSexo(TipoSexo.FEMININO);
+                                break;
+                            default:
+                                imp.setSexo(TipoSexo.MASCULINO);
+                                break;
                         }
                         imp.setEmpresa(rst.getString("empresa"));
                         imp.setEmpresaEndereco(rst.getString("empresaendereco"));
@@ -1328,21 +1336,21 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setNomePai(rst.getString("nomepai"));
                         imp.setNomeMae(rst.getString("nomemae"));
                         imp.setObservacao(
-                                Utils.acertarTexto(rst.getString("observacao")) + "\n" + 
-                                Utils.acertarTexto(rst.getString("obs")) + "\n" +
-                                (rst.getString("telent") != null ?  "\n" + "TEL. PRINC: " + rst.getString("telent") : "") +
-                                (rst.getString("telent1") != null ? "\n" + "CELULAR: " + rst.getString("telent1") : "") +
-                                (rst.getString("telcob") != null ? "\n" + "TEL. COB: " + rst.getString("telcob") : "") +
-                                (rst.getString("telcom") != null ? "\n" + "TEL. COM: " + rst.getString("telcom") : "") +
-                                (rst.getString("telconjuge") != null ? "\n" + "TEL. CONJUGE: " + rst.getString("telconjuge") : "") +
-                                (rst.getString("telcelent") != null ? "\n" + "CELULAR2: " + rst.getString("telcelent") : "") +
-                                (rst.getString("email") != null ? "\n" + "EMAIL: " + rst.getString("email") : "") +
-                                (rst.getString("emailnfe") != null ? "\n" + "EMAIL NF-E: " + rst.getString("emailnfe") : "") +
-                                (rst.getString("emailcob") != null ? "\n" + "EMAIL COB.: " + rst.getString("emailcob") : "") 
+                                Utils.acertarTexto(rst.getString("observacao")) + "\n"
+                                + Utils.acertarTexto(rst.getString("obs")) + "\n"
+                                + (rst.getString("telent") != null ? "\n" + "TEL. PRINC: " + rst.getString("telent") : "")
+                                + (rst.getString("telent1") != null ? "\n" + "CELULAR: " + rst.getString("telent1") : "")
+                                + (rst.getString("telcob") != null ? "\n" + "TEL. COB: " + rst.getString("telcob") : "")
+                                + (rst.getString("telcom") != null ? "\n" + "TEL. COM: " + rst.getString("telcom") : "")
+                                + (rst.getString("telconjuge") != null ? "\n" + "TEL. CONJUGE: " + rst.getString("telconjuge") : "")
+                                + (rst.getString("telcelent") != null ? "\n" + "CELULAR2: " + rst.getString("telcelent") : "")
+                                + (rst.getString("email") != null ? "\n" + "EMAIL: " + rst.getString("email") : "")
+                                + (rst.getString("emailnfe") != null ? "\n" + "EMAIL NF-E: " + rst.getString("emailnfe") : "")
+                                + (rst.getString("emailcob") != null ? "\n" + "EMAIL COB.: " + rst.getString("emailcob") : "")
                         );
                         imp.setTelefone(rst.getString("telent"));
                         imp.setCelular(rst.getString("telent1"));
-                        
+
                         if (rst.getString("emailnfe") != null) {
                             imp.addContato("1", "NFE", "", "", rst.getString("emailnfe"));
                         }
@@ -1360,45 +1368,44 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
+
         try (
                 Statement st = ConexaoOracle.createStatement();
                 ResultSet rs = st.executeQuery(
-                        "SELECT\n" +
-                        "	cp.RECNUM id,\n" +
-                        "	f.CODFORNEC id_fornecedor,\n" +
-                        "	f.cgc cnpj,\n" +
-                        "	cp.NUMNOTA numerodocumento,\n" +
-                        "	cp.DTEMISSAO dataemissao,\n" +
-                        "	cp.DTLANC dataentrada,\n" +
-                        "	cp.DTULTALTER datahoraalteracao,\n" +
-                        "	cp.DTVENC datavencimento,\n" +
-                        "	cp.VALOR,\n" +
-                        "	cp.VALORDEV,\n" +
-                        "	cp.DUPLIC parcela,\n" +
-                        "	coalesce(cp.HISTORICO,'') observacoes,\n" +
-                        "	coalesce(cp.HISTORICO2,'') observacoes2\n" +
-                        "FROM\n" +
-                        "	PCLANC cp\n" +
-                        "	JOIN PCFORNEC f ON\n" +
-                        "		cp.CODFORNEC  = f.CODFORNEC \n" +
-                        "WHERE\n" +
-                        "	cp.vpago IS NULL AND\n" +
-                        "	cp.CODFILIAL = " + getLojaOrigem() + "\n" +
-                        "ORDER BY\n" +
-                        "	cp.RECNUM"
-                )
-        ) {
+                        "SELECT\n"
+                        + "	cp.RECNUM id,\n"
+                        + "	f.CODFORNEC id_fornecedor,\n"
+                        + "	f.cgc cnpj,\n"
+                        + "	cp.NUMNOTA numerodocumento,\n"
+                        + "	cp.DTEMISSAO dataemissao,\n"
+                        + "	cp.DTLANC dataentrada,\n"
+                        + "	cp.DTULTALTER datahoraalteracao,\n"
+                        + "	cp.DTVENC datavencimento,\n"
+                        + "	cp.VALOR,\n"
+                        + "	cp.VALORDEV,\n"
+                        + "	cp.DUPLIC parcela,\n"
+                        + "	coalesce(cp.HISTORICO,'') observacoes,\n"
+                        + "	coalesce(cp.HISTORICO2,'') observacoes2\n"
+                        + "FROM\n"
+                        + "	PCLANC cp\n"
+                        + "	JOIN PCFORNEC f ON\n"
+                        + "		cp.CODFORNEC  = f.CODFORNEC \n"
+                        + "WHERE\n"
+                        + "	cp.vpago IS NULL AND\n"
+                        + "	cp.CODFILIAL = " + getLojaOrigem() + "\n"
+                        + "ORDER BY\n"
+                        + "	cp.RECNUM"
+                )) {
             while (rs.next()) {
                 ContaPagarIMP imp = new ContaPagarIMP();
-                
+
                 imp.setId(rs.getString("id"));
                 imp.setIdFornecedor(rs.getString("id_fornecedor"));
                 imp.setCnpj(rs.getString("cnpj"));
@@ -1406,45 +1413,45 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 imp.setDataEmissao(rs.getDate("dataemissao"));
                 imp.setDataEntrada(rs.getDate("dataentrada"));
                 imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
-                String observacoes = 
-                        rs.getString("observacoes") +
-                        "\n" +
-                        rs.getString("observacoes2");
+                String observacoes
+                        = rs.getString("observacoes")
+                        + "\n"
+                        + rs.getString("observacoes2");
                 ContaPagarVencimentoIMP parcela = imp.addVencimento(
                         rs.getDate("datavencimento"),
                         rs.getDouble("valor"),
-                        StringUtils.toInt(rs.getString("parcela"))                        
+                        StringUtils.toInt(rs.getString("parcela"))
                 );
                 parcela.setObservacao(observacoes);
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
-                    "    r.numtransvenda || '-' || r.prest id,\n" +
-                    "    r.dtemissao emissao,\n" +
-                    "    r.duplic cupom,\n" +
-                    "    r.valor,\n" +
-                    "    r.obsfinanc obs,\n" +
-                    "    r.codcli,\n" +
-                    "    r.dtvenc vencimento\n" +
-                    "FROM \n" +
-                    "    PCPREST r\n" +
-                    "WHERE \n" +
-                    "    r.codfilialnf = " + getLojaOrigem() + " and\n" +
-                    "    r.dtpag IS NULL AND \n" +
-                    "    r.codcli != 1 AND \n" +
-                    "    not r.codcob IN ('CANC', 'BK', 'CHDV', 'CHD1', 'CHP', 'CONV', 'JUR')"
+                    "SELECT \n"
+                    + "    r.numtransvenda || '-' || r.prest id,\n"
+                    + "    r.dtemissao emissao,\n"
+                    + "    r.duplic cupom,\n"
+                    + "    r.valor,\n"
+                    + "    r.obsfinanc obs,\n"
+                    + "    r.codcli,\n"
+                    + "    r.dtvenc vencimento\n"
+                    + "FROM \n"
+                    + "    PCPREST r\n"
+                    + "WHERE \n"
+                    + "    r.codfilialnf = " + getLojaOrigem() + " and\n"
+                    + "    r.dtpag IS NULL AND \n"
+                    + "    r.codcli != 1 AND \n"
+                    + "    not r.codcob IN ('CANC', 'BK', 'CHDV', 'CHD1', 'CHP', 'CONV', 'JUR')"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1459,41 +1466,41 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    r.numtransvenda || '-' || r.prest id,\n" +
-                    "    c.cgcent cnpj,\n" +
-                    "    r.numcheque || CASE WHEN r.dvcheque IS NULL THEN '' ELSE '-' || r.dvcheque END numerocheque,\n" +
-                    "    r.numbanco banco,\n" +
-                    "    r.numagencia || CASE WHEN r.dvagencia IS NULL THEN '' ELSE '-' || r.dvagencia END agencia,\n" +
-                    "    r.numcontacorrente || CASE WHEN r.dvconta IS NULL THEN '' ELSE '-' || r.dvconta END conta,\n" +
-                    "    r.dtemissao data,\n" +
-                    "    r.duplic numerocupom,\n" +
-                    "    r.valor,\n" +
-                    "    coalesce(c.ieent, c.rg) rg,\n" +
-                    "    c.telent telefone,\n" +
-                    "    c.cliente nome,\n" +
-                    "    r.obs observacao,\n" +
-                    "    r.alinea,\n" +
-                    "    r.dtultalter dataHoraAlteracao\n" +
-                    "FROM \n" +
-                    "    PCPREST r\n" +
-                    "    JOIN pcclient c ON\n" +
-                    "        r.codcli = c.codcli\n" +
-                    "WHERE \n" +
-                    "    r.codfilialnf = " + getLojaOrigem() + " and\n" +
-                    "    r.dtpag IS NULL AND \n" +
-                    "    r.codcli != 1 AND \n" +
-                    "    r.codcob IN ('CHP')"
+                    "SELECT\n"
+                    + "    r.numtransvenda || '-' || r.prest id,\n"
+                    + "    c.cgcent cnpj,\n"
+                    + "    r.numcheque || CASE WHEN r.dvcheque IS NULL THEN '' ELSE '-' || r.dvcheque END numerocheque,\n"
+                    + "    r.numbanco banco,\n"
+                    + "    r.numagencia || CASE WHEN r.dvagencia IS NULL THEN '' ELSE '-' || r.dvagencia END agencia,\n"
+                    + "    r.numcontacorrente || CASE WHEN r.dvconta IS NULL THEN '' ELSE '-' || r.dvconta END conta,\n"
+                    + "    r.dtemissao data,\n"
+                    + "    r.duplic numerocupom,\n"
+                    + "    r.valor,\n"
+                    + "    coalesce(c.ieent, c.rg) rg,\n"
+                    + "    c.telent telefone,\n"
+                    + "    c.cliente nome,\n"
+                    + "    r.obs observacao,\n"
+                    + "    r.alinea,\n"
+                    + "    r.dtultalter dataHoraAlteracao\n"
+                    + "FROM \n"
+                    + "    PCPREST r\n"
+                    + "    JOIN pcclient c ON\n"
+                    + "        r.codcli = c.codcli\n"
+                    + "WHERE \n"
+                    + "    r.codfilialnf = " + getLojaOrigem() + " and\n"
+                    + "    r.dtpag IS NULL AND \n"
+                    + "    r.codcli != 1 AND \n"
+                    + "    r.codcob IN ('CHP')"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -1516,55 +1523,55 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    emp.CONV_CODIGO id,\n" +
-                    "    emp.CONV_DESCRICAO razao,\n" +
-                    "    cli.TIP_CGC_CPF cnpj,\n" +
-                    "    cli.TIP_INSC_EST_IDENT inscricaoestadual,\n" +
-                    "    cli.TIP_ENDERECO endereco,\n" +
-                    "    cli.TIP_BAIRRO bairro,\n" +
-                    "    cli.TIP_CIDADE cidade,\n" +
-                    "    cli.TIP_ESTADO uf,\n" +
-                    "    cli.TIP_CEP cep,\n" +
-                    "    cast(cli.TIP_FONE_DDD||cli.TIP_FONE_NUM as numeric) fone1,\n" +
-                    "    cicl.cicl_dta_inicio dataInicio,\n" +
-                    "    cicl.cicl_dta_fim dataTermino,\n" +
-                    "    emp.CONV_DESCONTO desconto,\n" +
-                    "    emp.CONV_DIA_COBRANCA diapagamento,\n" +
-                    "    emp.CONV_DIA_CORTE diainiciorenovacao,\n" +
-                    "    emp.CONV_BLOQUEAR bloquear\n" +
-                    "FROM \n" +
-                    "    AC1CCONV emp\n" +
-                    "    left join AA2CTIPO cli on\n" +
-                    "        emp.conv_emp_codigo = cli.TIP_CODIGO and\n" +
-                    "        emp.conv_emp_digito = cli.TIP_DIGITO\n" +
-                    "    left join (\n" +
-                    "        select\n" +
-                    "            *\n" +
-                    "        from\n" +
-                    "            AC2CVCIC c\n" +
-                    "        where\n" +
-                    "            c.cicl_codigo = \n" +
-                    "            (select max(cicl_codigo) from AC2CVCIC where conv_codigo = c.CONV_CODIGO)\n" +
-                    "    ) cicl on\n" +
-                    "        emp.conv_codigo = cicl.conv_codigo\n" +
-                    "order by \n" +
-                    "    emp.CONV_CODIGO"
+                    "SELECT\n"
+                    + "    emp.CONV_CODIGO id,\n"
+                    + "    emp.CONV_DESCRICAO razao,\n"
+                    + "    cli.TIP_CGC_CPF cnpj,\n"
+                    + "    cli.TIP_INSC_EST_IDENT inscricaoestadual,\n"
+                    + "    cli.TIP_ENDERECO endereco,\n"
+                    + "    cli.TIP_BAIRRO bairro,\n"
+                    + "    cli.TIP_CIDADE cidade,\n"
+                    + "    cli.TIP_ESTADO uf,\n"
+                    + "    cli.TIP_CEP cep,\n"
+                    + "    cast(cli.TIP_FONE_DDD||cli.TIP_FONE_NUM as numeric) fone1,\n"
+                    + "    cicl.cicl_dta_inicio dataInicio,\n"
+                    + "    cicl.cicl_dta_fim dataTermino,\n"
+                    + "    emp.CONV_DESCONTO desconto,\n"
+                    + "    emp.CONV_DIA_COBRANCA diapagamento,\n"
+                    + "    emp.CONV_DIA_CORTE diainiciorenovacao,\n"
+                    + "    emp.CONV_BLOQUEAR bloquear\n"
+                    + "FROM \n"
+                    + "    AC1CCONV emp\n"
+                    + "    left join AA2CTIPO cli on\n"
+                    + "        emp.conv_emp_codigo = cli.TIP_CODIGO and\n"
+                    + "        emp.conv_emp_digito = cli.TIP_DIGITO\n"
+                    + "    left join (\n"
+                    + "        select\n"
+                    + "            *\n"
+                    + "        from\n"
+                    + "            AC2CVCIC c\n"
+                    + "        where\n"
+                    + "            c.cicl_codigo = \n"
+                    + "            (select max(cicl_codigo) from AC2CVCIC where conv_codigo = c.CONV_CODIGO)\n"
+                    + "    ) cicl on\n"
+                    + "        emp.conv_codigo = cicl.conv_codigo\n"
+                    + "order by \n"
+                    + "    emp.CONV_CODIGO"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setCnpj(rst.getString("cnpj"));
@@ -1581,45 +1588,45 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setDiaPagamento(rst.getInt("diapagamento"));
                     imp.setDiaInicioRenovacao(rst.getInt("diainiciorenovacao"));
                     imp.setBloqueado(rst.getBoolean("bloquear"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "    cli.cli_codigo||cli.cli_digito id,\n" +
-                    "    cli.CLI_CPF_CNPJ cnpj,\n" +
-                    "    cli.CLI_NOME razao,\n" +
-                    "    cli.CLI_FIL_CAD loja,\n" +
-                    "    cli.cli_convenio idEmpresa,\n" +
-                    "    case when cli.CLI_STATUS = 0 then 0 else 1 end bloqueado,\n" +
-                    "    coalesce(lim_cv.LIM_LIMITE,0) limite_convenio,\n" +
-                    "    coalesce(conv.CONV_DESCONTO,0) desconto\n" +
-                    "from \n" +
-                    "    CAD_CLIENTE cli\n" +
-                    "    left join END_CLIENTE ender on\n" +
-                    "        cli.cli_codigo = ender.cli_codigo\n" +
-                    "        and ender.end_tpo_end = 1\n" +
-                    "    left join AC1QLIMI lim_cv on\n" +
-                    "        cli.cli_codigo = lim_cv.lim_codigo\n" +
-                    "        and cli.cli_digito = lim_cv.LIM_DIGITO\n" +
-                    "        and lim_cv.LIM_MODALIDADE = 3\n" +
-                    "    left join AC1CCONV conv on\n" +
-                    "        conv.CONV_CODIGO = cli.CLI_convenio\n" +
-                    "where\n" +
-                    "    cli.cli_convenio > 0\n" +
-                    "order by \n" +
-                    "    cli.cli_codigo"
+                    "select \n"
+                    + "    cli.cli_codigo||cli.cli_digito id,\n"
+                    + "    cli.CLI_CPF_CNPJ cnpj,\n"
+                    + "    cli.CLI_NOME razao,\n"
+                    + "    cli.CLI_FIL_CAD loja,\n"
+                    + "    cli.cli_convenio idEmpresa,\n"
+                    + "    case when cli.CLI_STATUS = 0 then 0 else 1 end bloqueado,\n"
+                    + "    coalesce(lim_cv.LIM_LIMITE,0) limite_convenio,\n"
+                    + "    coalesce(conv.CONV_DESCONTO,0) desconto\n"
+                    + "from \n"
+                    + "    CAD_CLIENTE cli\n"
+                    + "    left join END_CLIENTE ender on\n"
+                    + "        cli.cli_codigo = ender.cli_codigo\n"
+                    + "        and ender.end_tpo_end = 1\n"
+                    + "    left join AC1QLIMI lim_cv on\n"
+                    + "        cli.cli_codigo = lim_cv.lim_codigo\n"
+                    + "        and cli.cli_digito = lim_cv.LIM_DIGITO\n"
+                    + "        and lim_cv.LIM_MODALIDADE = 3\n"
+                    + "    left join AC1CCONV conv on\n"
+                    + "        conv.CONV_CODIGO = cli.CLI_convenio\n"
+                    + "where\n"
+                    + "    cli.cli_convenio > 0\n"
+                    + "order by \n"
+                    + "    cli.cli_codigo"
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
@@ -1629,12 +1636,12 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIdEmpresa(rst.getString("idEmpresa"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setConvenioLimite(rst.getDouble("limite_convenio"));
-                    imp.setConvenioDesconto(rst.getDouble("desconto"));    
+                    imp.setConvenioDesconto(rst.getDouble("desconto"));
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1643,47 +1650,47 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    lan.lanc_codigo||'-'||lan.lanc_data||'-'||lan.lanc_seq id,\n" +
-                    "    lan.lanc_loja id_loja,\n" +
-                    "    lan.lanc_codigo idcliente,\n" +
-                    "    lan.lanc_caixa ecf,\n" +
-                    "    case lan.lanc_cupom when 0 then lan.lanc_documento else lan.lanc_cupom end numerocupom,\n" +
-                    "    lan.lanc_data dataHora,\n" +
-                    "    lan.lanc_valor valor,\n" +
-                    "    lan.lanc_historico historico,\n" +
-                    "    emp.CONV_DIA_CORTE,\n" +
-                    "    cicl.cicl_dta_inicio dataInicio,\n" +
-                    "    cicl.cicl_dta_fim dataTermino\n" +
-                    "from\n" +
-                    "    ac1clanc lan\n" +
-                    "    join CAD_CLIENTE c on\n" +
-                    "        lan.lanc_codigo = c.cli_codigo||c.cli_digito\n" +
-                    "    join AC1CCONV emp on\n" +
-                    "        c.cli_convenio = emp.conv_codigo\n" +
-                    "    left join (\n" +
-                    "        select\n" +
-                    "            *\n" +
-                    "        from\n" +
-                    "            AC2CVCIC c\n" +
-                    "        where\n" +
-                    "            c.cicl_codigo = \n" +
-                    "            (select max(cicl_codigo) from AC2CVCIC where conv_codigo = c.CONV_CODIGO)\n" +
-                    "    ) cicl on\n" +
-                    "        emp.conv_codigo = cicl.conv_codigo\n" +
-                    "where\n" +
-                    "    lan.lanc_tipo = 1\n" +
-                    "    and lan.lanc_modalidade = 3\n" +
-                    "    and c.cli_convenio > 0\n" +
-                    "    and lan.lanc_data >= cicl.cicl_dta_inicio\n" +
-                    "    and cicl_dta_fim >= cast('1' || (extract(year from current_date) - 2000) || \n" +
-                    "    (lpad(extract(month from current_date), 2, '0')) ||\n" +
-                    "    (lpad(extract(day from current_date), 2, '0')) as numeric)\n" +
-                    "    and lan.lanc_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
-                    "order by\n" +
-                    "    lan.lanc_codigo,\n" +
-                    "    lan.lanc_data,\n" +
-                    "    lan.lanc_seq"
+                    "select\n"
+                    + "    lan.lanc_codigo||'-'||lan.lanc_data||'-'||lan.lanc_seq id,\n"
+                    + "    lan.lanc_loja id_loja,\n"
+                    + "    lan.lanc_codigo idcliente,\n"
+                    + "    lan.lanc_caixa ecf,\n"
+                    + "    case lan.lanc_cupom when 0 then lan.lanc_documento else lan.lanc_cupom end numerocupom,\n"
+                    + "    lan.lanc_data dataHora,\n"
+                    + "    lan.lanc_valor valor,\n"
+                    + "    lan.lanc_historico historico,\n"
+                    + "    emp.CONV_DIA_CORTE,\n"
+                    + "    cicl.cicl_dta_inicio dataInicio,\n"
+                    + "    cicl.cicl_dta_fim dataTermino\n"
+                    + "from\n"
+                    + "    ac1clanc lan\n"
+                    + "    join CAD_CLIENTE c on\n"
+                    + "        lan.lanc_codigo = c.cli_codigo||c.cli_digito\n"
+                    + "    join AC1CCONV emp on\n"
+                    + "        c.cli_convenio = emp.conv_codigo\n"
+                    + "    left join (\n"
+                    + "        select\n"
+                    + "            *\n"
+                    + "        from\n"
+                    + "            AC2CVCIC c\n"
+                    + "        where\n"
+                    + "            c.cicl_codigo = \n"
+                    + "            (select max(cicl_codigo) from AC2CVCIC where conv_codigo = c.CONV_CODIGO)\n"
+                    + "    ) cicl on\n"
+                    + "        emp.conv_codigo = cicl.conv_codigo\n"
+                    + "where\n"
+                    + "    lan.lanc_tipo = 1\n"
+                    + "    and lan.lanc_modalidade = 3\n"
+                    + "    and c.cli_convenio > 0\n"
+                    + "    and lan.lanc_data >= cicl.cicl_dta_inicio\n"
+                    + "    and cicl_dta_fim >= cast('1' || (extract(year from current_date) - 2000) || \n"
+                    + "    (lpad(extract(month from current_date), 2, '0')) ||\n"
+                    + "    (lpad(extract(day from current_date), 2, '0')) as numeric)\n"
+                    + "    and lan.lanc_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                    + "order by\n"
+                    + "    lan.lanc_codigo,\n"
+                    + "    lan.lanc_data,\n"
+                    + "    lan.lanc_seq"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -1701,33 +1708,33 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         }
         return result;
     }
-    
+
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
-                    "	pr.CODPROD,\n" +
-                    "	pr.DESCRICAO,\n" +
-                    "	rec.CODIGO idreceita,\n" +
-                    "	rec.DESCRICAO descreceita,\n" +
-                    "	rec.INGREDIENTE1,\n" +
-                    "	rec.INGREDIENTE2,\n" +
-                    "	rec.INGREDIENTE3,\n" +
-                    "	rec.INGREDIENTE4,\n" +
-                    "	rec.INGREDIENTE5,\n" +
-                    "	rec.INGREDIENTE6,\n" +
-                    "	rec.INGREDIENTE7\n" +
-                    "FROM \n" +
-                    "	pcprodut pr \n" +
-                    "JOIN pcembalagem emb ON pr.CODPROD = emb.CODPROD\n" +
-                    "JOIN PCINFEXTRA rec ON emb.CODINFEXTRABAL = rec.CODIGO\n" +
-                    "WHERE \n" +
-                    "	emb.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
-                    "	emb.CODINFEXTRABAL IS NOT NULL \n" +
-                    "ORDER BY \n" +
-                    "	pr.CODPROD"
+                    "SELECT \n"
+                    + "	pr.CODPROD,\n"
+                    + "	pr.DESCRICAO,\n"
+                    + "	rec.CODIGO idreceita,\n"
+                    + "	rec.DESCRICAO descreceita,\n"
+                    + "	rec.INGREDIENTE1,\n"
+                    + "	rec.INGREDIENTE2,\n"
+                    + "	rec.INGREDIENTE3,\n"
+                    + "	rec.INGREDIENTE4,\n"
+                    + "	rec.INGREDIENTE5,\n"
+                    + "	rec.INGREDIENTE6,\n"
+                    + "	rec.INGREDIENTE7\n"
+                    + "FROM \n"
+                    + "	pcprodut pr \n"
+                    + "JOIN pcembalagem emb ON pr.CODPROD = emb.CODPROD\n"
+                    + "JOIN PCINFEXTRA rec ON emb.CODINFEXTRABAL = rec.CODIGO\n"
+                    + "WHERE \n"
+                    + "	emb.CODFILIAL = '" + getLojaOrigem() + "' AND \n"
+                    + "	emb.CODINFEXTRABAL IS NOT NULL \n"
+                    + "ORDER BY \n"
+                    + "	pr.CODPROD"
             )) {
                 Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
                 while (rst.next()) {
@@ -1739,13 +1746,13 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setId(rst.getString("idreceita"));
                         imp.setDescricao(rst.getString("descreceita"));
                         imp.setReceita(
-                            rst.getString("INGREDIENTE1") == null ? "" : rst.getString("INGREDIENTE1") + " " +
-                            rst.getString("INGREDIENTE2") == null ? "" : rst.getString("INGREDIENTE2") + " " +
-                            rst.getString("INGREDIENTE3") == null ? "" : rst.getString("INGREDIENTE3") + " " +
-                            rst.getString("INGREDIENTE4") == null ? "" : rst.getString("INGREDIENTE4") + " " +
-                            rst.getString("INGREDIENTE5") == null ? "" : rst.getString("INGREDIENTE5") + " " +
-                            rst.getString("INGREDIENTE6") == null ? "" : rst.getString("INGREDIENTE6") + " " +
-                            rst.getString("INGREDIENTE7")== null ? "" : rst.getString("INGREDIENTE7"));
+                                rst.getString("INGREDIENTE1") == null ? "" : rst.getString("INGREDIENTE1") + " "
+                                + rst.getString("INGREDIENTE2") == null ? "" : rst.getString("INGREDIENTE2") + " "
+                                + rst.getString("INGREDIENTE3") == null ? "" : rst.getString("INGREDIENTE3") + " "
+                                + rst.getString("INGREDIENTE4") == null ? "" : rst.getString("INGREDIENTE4") + " "
+                                + rst.getString("INGREDIENTE5") == null ? "" : rst.getString("INGREDIENTE5") + " "
+                                + rst.getString("INGREDIENTE6") == null ? "" : rst.getString("INGREDIENTE6") + " "
+                                + rst.getString("INGREDIENTE7") == null ? "" : rst.getString("INGREDIENTE7"));
                         receitas.put(imp.getId(), imp);
                     }
 
@@ -1756,7 +1763,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             }
         }
     }
-    
+
     private void testarDatasDaVenda() throws NullPointerException {
         if (this.dataVendaInicial == null && this.dataVendaFinal == null) {
             throw new NullPointerException("Por favor informe o intervalo das vendas a serem importadas");
@@ -1774,6 +1781,5 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         testarDatasDaVenda();
         return new WinthorVendaItemIterator(getLojaOrigem(), this.dataVendaInicial, this.dataVendaFinal);
     }
-    
-    
+
 }
