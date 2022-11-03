@@ -206,6 +206,7 @@ import vrimplantacao2.gui.interfaces.RCNetGUI;
 import vrimplantacao2.gui.interfaces.RKSoftwareGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
+import vrimplantacao2.gui.interfaces.OryonPgGUI;
 import vrimplantacao2.gui.interfaces.RensoftwareGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
@@ -839,6 +840,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCervantes = new javax.swing.JMenuItem();
         mnuControlePlus = new javax.swing.JMenuItem();
         mnuItuInfo = new javax.swing.JMenuItem();
+        mnuOryonPg = new javax.swing.JMenuItem();
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
@@ -2770,6 +2772,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuItuInfo);
+
+        mnuOryonPg.setText("Oryon");
+        mnuOryonPg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOryonPgActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuOryonPg);
 
         mnuPrime.setText("Prime");
         mnuPrime.addActionListener(new java.awt.event.ActionListener() {
@@ -5619,6 +5629,10 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_mnuRelatoriosActionPerformed
 
+    private void mnuOryonPgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOryonPgActionPerformed
+        OryonPgGUI.exibir(this);
+    }//GEN-LAST:event_mnuOryonPgActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5858,6 +5872,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuOracle;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuOryon;
+    private javax.swing.JMenuItem mnuOryonPg;
     private javax.swing.JMenu mnuParadox;
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
