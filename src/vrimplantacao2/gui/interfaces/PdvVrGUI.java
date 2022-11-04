@@ -224,11 +224,11 @@ public class PdvVrGUI extends VRInternalFrame {
                             if (chkTipoEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
                             }
-                            if (chkTipoEmbalagem.isSelected()) {
-                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
-                            }
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
+                            }
+                            if (chkTipoEmbalagemCotacao.isSelected()) {
+                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
                             }
                             if (chkPesavel.isSelected()) {
                                 opcoes.add(OpcaoProduto.PESAVEL);
@@ -305,7 +305,7 @@ public class PdvVrGUI extends VRInternalFrame {
         btnMapaTribut = new vrframework.bean.button.VRButton();
         chkForcarAtualizacaoPreco = new vrframework.bean.checkBox.VRCheckBox();
         chkPesavel = new vrframework.bean.checkBox.VRCheckBox();
-        chkTipoEmbalagem = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoEmbalagemCotacao = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkOperador = new vrframework.bean.checkBox.VRCheckBox();
         vRPanelCliente = new javax.swing.JPanel();
@@ -415,7 +415,7 @@ public class PdvVrGUI extends VRInternalFrame {
 
         chkPesavel.setText("Pesavel");
 
-        chkTipoEmbalagem.setText("Tipo Embalagem Produto");
+        chkTipoEmbalagemCotacao.setText("Tipo Embalagem Cotação");
 
         javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
         vRPanel7.setLayout(vRPanel7Layout);
@@ -445,7 +445,7 @@ public class PdvVrGUI extends VRInternalFrame {
                             .addComponent(chkT1DescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkTipoEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkTipoEmbalagemCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(51, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
@@ -480,7 +480,7 @@ public class PdvVrGUI extends VRInternalFrame {
                             .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(5, 5, 5)
-                .addComponent(chkTipoEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkTipoEmbalagemCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -694,7 +694,7 @@ public class PdvVrGUI extends VRInternalFrame {
                     .addComponent(btnConectar)
                     .addComponent(jLabel2)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(7, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -817,7 +817,7 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1EAN;
     private vrframework.bean.checkBox.VRCheckBox chkT1EANemBranco;
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
-    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
+    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;

@@ -187,7 +187,7 @@
                                       <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkTipoEmbalagem" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoEmbalagemCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="51" max="32767" attributes="0"/>
                       </Group>
@@ -232,7 +232,7 @@
                               </Group>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkTipoEmbalagemCotacao" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
@@ -313,9 +313,9 @@
                     <Property name="text" type="java.lang.String" value="Pesavel"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagem">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemCotacao">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo Embalagem Produto"/>
+                    <Property name="text" type="java.lang.String" value="Tipo Embalagem Cota&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -474,7 +474,7 @@
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="7" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
