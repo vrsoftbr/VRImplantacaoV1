@@ -629,61 +629,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "    f.codfornec,\n"
-                    + "    regexp_replace(f.nome,'[^A-z 0-9]','','g') as fantasia,\n"
-                    + "    regexp_replace(f.razaosocial,'[^A-z 0-9]','','g') as razaosocial,\n"
-                    + "    regexp_replace(f.endereco,'[^A-z 0-9]','','g') endereco,\n"
-                    + "    regexp_replace(f.bairro,'[^A-z 0-9]','','g') bairro,\n"
-                    + "    f.cep,\n"
-                    + "    f.codcidade,\n"
-                    + "    regexp_replace(c.nome,'[^A-z 0-9]','','g') as nomecidade,\n"
-                    + "    c.codoficial cidadeibge,\n"
-                    + "    f.uf,\n"
-                    + "    f.contato1,\n"
-                    + "    f.fone1,\n"
-                    + "    f.email1,\n"
-                    + "    f.contato2,\n"
-                    + "    f.fone2,\n"
-                    + "    f.email2,\n"
-                    + "    f.contato3,\n"
-                    + "    f.fone3,\n"
-                    + "    f.email3,\n"
-                    + "    f.site,\n"
-                    + "    f.email,\n"
-                    + "    f.tppessoa,\n"
-                    + "    f.cpfcnpj,\n"
-                    + "    f.rgie,\n"
-                    + "    f.codatividade,\n"
-                    + "    f.codbanco,\n"
-                    + "    f.agencia,\n"
-                    + "    f.contacorrente,\n"
-                    + "    coalesce(observacao,'') observacao,\n"
-                    + "    f.fone,\n"
-                    + "    f.fax,\n"
-                    + "    f.numero,\n"
-                    + "    f.complemento,\n"
-                    + "    f.suframa,\n"
-                    + "    f.datainclusao,\n"
-                    + "    f.tipocompra,\n"
-                    + "    f.inscmunicipal,\n"
-                    + "    f.status,\n"
-                    + "    cp.dia1,\n"
-                    + "	   cp.dia2,\n"
-                    + "	   cp.dia3,\n"
-                    + "	   cp.dia4,\n"
-                    + "	   cp.dia5,\n"
-                    + "	   cp.dia6,\n"
-                    + "	   cp.dia7,\n"
-                    + "	   cp.dia8,\n"
-                    + "	   cp.dia9,\n"
-                    + "	   cp.dia10,\n"
-                    + "	   cp.dia11\n"
-                    + "from fornecedor f\n"
-                    + "left join cidade c on c.codcidade = f.codcidade\n"
-                    + "left join condpagto cp on f.codcondpagto = cp.codcondpagto\n"
-                    + "order by \n"
-                    + "	codfornec"
+                    ""
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -739,40 +685,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                                 TipoContato.COMERCIAL,
                                 rst.getString("email3")
                         );
-                    }
-
-                    if (rst.getString("dia1") != null && (!"".equals(rst.getString("dia1")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia1"));
-                    }
-                    if (rst.getString("dia2") != null && (!"".equals(rst.getString("dia2")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia2"));
-                    }
-                    if (rst.getString("dia3") != null && (!"".equals(rst.getString("dia3")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia3"));
-                    }
-                    if (rst.getString("dia4") != null && (!"".equals(rst.getString("dia4")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia4"));
-                    }
-                    if (rst.getString("dia5") != null && (!"".equals(rst.getString("dia5")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia5"));
-                    }
-                    if (rst.getString("dia6") != null && (!"".equals(rst.getString("dia6")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia6"));
-                    }
-                    if (rst.getString("dia7") != null && (!"".equals(rst.getString("dia7")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia7"));
-                    }
-                    if (rst.getString("dia8") != null && (!"".equals(rst.getString("dia8")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia8"));
-                    }
-                    if (rst.getString("dia9") != null && (!"".equals(rst.getString("dia9")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia9"));
-                    }
-                    if (rst.getString("dia10") != null && (!"".equals(rst.getString("dia10")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia10"));
-                    }
-                    if (rst.getString("dia11") != null && (!"".equals(rst.getString("dia11")))) {
-                        imp.addCondicaoPagamento(rst.getInt("dia11"));
                     }
 
                     result.add(imp);
