@@ -371,6 +371,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + " p.diasvencimento validade,\n"
                     + " prc.percentuallucromargem margem_atual,\n"
                     + " prc.customercadoriavendida custo_atual,\n"
+                    + " prc.custo custosemimposto,\n"
                     + " prc.preco preco_atual,\n"
                     /*+ " p.idhierarquia merc1,\n"
                     + " p.idhierarquia merc2,\n"
@@ -454,6 +455,7 @@ public class UniplusDAO extends InterfaceDAO {
                         + " 	case when e.idultimoprecoderivadoaplicado is not null then prc2.percentuallucromargem \n"
                         + " 	     else e.lucrobruto end margem_atual,\n"
                         + " 	prc.customercadoriavendida custo_atual,\n"
+                        + "     prc.custo custosemimposto,\n"
                         + "    case when e.idultimoprecoderivadoaplicado is not null then prc2.preco \n"
                         + "        else e.preco end preco_atual,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
@@ -531,7 +533,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
 
                     if (temProdutoAssociado) {
-                        imp.setCustoSemImposto(rs.getDouble("custo_atual"));
+                        imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                         imp.setCustoComImposto(rs.getDouble("custo_atual"));
                         imp.setPrecovenda(rs.getDouble("preco_atual"));
                     } else {
