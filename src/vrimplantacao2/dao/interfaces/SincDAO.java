@@ -203,28 +203,21 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " m1.coddepto cod_m1,\n"
-                    + " m1.nome desc_m1,\n"
-                    + " m2.codgrupo cod_m2,\n"
-                    + " m2.descricao desc_m2,\n"
-                    + " m3.codsubgrupo cod_m3,\n"
-                    + " m3.descricao desc_m3\n"
-                    + "from departamento m1\n"
-                    + " inner join grupoprod m2 on m2.coddepto = m1.coddepto\n"
-                    + " inner join subgrupo m3 on m3.codgrupo = m2.codgrupo\n"
-                    + "order by m1.coddepto, m2.codgrupo, m3.codsubgrupo"
+                    ""
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setMerc1ID(rst.getString("cod_m1"));
                     imp.setMerc1Descricao(rst.getString("desc_m1"));
                     imp.setMerc2ID(rst.getString("cod_m2"));
                     imp.setMerc2Descricao(rst.getString("desc_m2"));
                     imp.setMerc3ID(rst.getString("cod_m3"));
                     imp.setMerc3Descricao(rst.getString("desc_m3"));
+                    imp.setMerc4ID(rst.getString("cod_m4"));
+                    imp.setMerc4Descricao(rst.getString("desc_m4"));
 
                     result.add(imp);
                 }
@@ -233,52 +226,58 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	codsimilar,\n"
-                    + "	descricao\n"
-                    + "from \n"
-                    + "	simprod")) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-
-                    imp.setImportId(rs.getString("codsimilar"));
-                    imp.setDescricao(rs.getString("descricao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
+//    @Override
+//    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+//        List<FamiliaProdutoIMP> result = new ArrayList<>();
+//
+//        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+//            try (ResultSet rs = stm.executeQuery(
+//                    "select \n"
+//                    + "	codsimilar,\n"
+//                    + "	descricao\n"
+//                    + "from \n"
+//                    + "	simprod")) {
+//                while (rs.next()) {
+//                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+//                    imp.setImportSistema(getSistema());
+//                    imp.setImportLoja(getLojaOrigem());
+//
+//                    imp.setImportId(rs.getString("codsimilar"));
+//                    imp.setDescricao(rs.getString("descricao"));
+//
+//                    result.add(imp);
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " codproduto, \n"
-                    + " codean, \n"
-                    + " quantidade \n"
-                    + "from produtoean \n"
-                    + "order by codproduto"
+                    "select\n"
+                    + "	tpro_codprod_1 idproduto,\n"
+                    + "	case\n"
+                    + "	  when tpro_codbarr_1 = 0\n"
+                    + "	  then tpro_codprod_1::varchar\n"
+                    + "	  else tpro_codbarr_1::varchar\n"
+                    + "	end ean,\n"
+                    + "	tpro_embmini_1 quantidade\n"
+                    + "from\n"
+                    + "	estpro p\n"
+                    + "order by tpro_codprod_1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("codproduto"));
-                    imp.setEan(rst.getString("codean"));
+                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("quantidade"));
+
                     result.add(imp);
                 }
             }
@@ -866,7 +865,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rst.getString("rg_ie"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("razao"));
-                    
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -879,7 +878,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rst.getString("ddd_celular") + rst.getString("celular"));
                     imp.setBloqueado("1".equals(rst.getString("bloqueado")));
                     imp.setAtivo("0".equals(rst.getString("bloqueado")));
-                    
+
                     imp.setDataNascimento(rst.getDate("data_nasc"));
                     if ((rst.getString("sexo") != null)
                             && (!rst.getString("sexo").trim().isEmpty())) {
@@ -897,7 +896,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimentoConjuge(rst.getDate("nasc_conjuge"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
 //                    imp.setValorLimite(rst.getDouble("limite"));
-                    
+
                     imp.setObservacao(rst.getString("observacao"));
 
                     result.add(imp);
