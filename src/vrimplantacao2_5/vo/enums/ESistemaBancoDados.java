@@ -154,6 +154,7 @@ public enum ESistemaBancoDados {
     ORACLE_VIASOFT(183, "VIASOFT", 9, "ORACLE", "", "", "", 1521),
     ORACLE_WMSI(192, "WMSI", 9, "ORACLE", "", "", "", 1521),
     ORACLE_CONSINCO(209, "CONSINCO", 9, "ORACLE", "", "", "", 1521),
+    ORACLE_WINTHOR(236, "WINTHOR", 9, "ORACLE", "", "", "", 1521),
     POSTGRESQL_ATHOS(9, "ATHOS", 11, "POSTGRESQL", "", "athos", "j2mhw82dyu1kn5g4", 5432),
     POSTGRESQL_AUTOSYSTEM(12, "AUTOSYSTEM", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_BRAJANGESTORES(19, "BRAJANGESTORES", 11, "POSTGRESQL", "", "", "", 5432),

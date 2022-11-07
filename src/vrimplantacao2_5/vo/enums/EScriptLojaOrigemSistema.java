@@ -184,7 +184,8 @@ public enum EScriptLojaOrigemSistema {
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
-    GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial");
+    GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
+    WINTHOR(236, 9, "select codigo id, coalesce(fantasia, razaosocial) descricao FROM pcfilial ORDER BY codigo");
 
     private int idSistema;
     private int idBancoDados;

@@ -203,6 +203,7 @@ import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
+import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
@@ -299,6 +300,7 @@ import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac22_5GUI;
+import vrimplantacao2_5.gui.sistema.Winthor_PcSistemas2_5GUI;
 
 /**
  *
@@ -1971,6 +1973,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new DuplaFace_Livre2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    WINTHOR(236, "WINTHOR", new Winthor_PcSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Winthor_PcSistemas2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
