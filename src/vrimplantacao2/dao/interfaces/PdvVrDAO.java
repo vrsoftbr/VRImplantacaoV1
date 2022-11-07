@@ -24,7 +24,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  * @author lucasrafael
  */
 public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private Connection bancovr;
     private Connection bancopdv;
 
@@ -122,7 +122,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    a.porcentagem,\n"
                     + "    pis.cst cstPis,\n"
                     + "    p.id_aliquota,\n"
-                    + "    p.pesavel\n"        
+                    + "    p.pesavel\n"
                     + "from produto p\n"
                     + "    left join produtoautomacao pa on pa.id_produto = p.id\n"
                     + "    left join aliquota a on a.id_aliquota = p.id_aliquota\n"
@@ -131,7 +131,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
@@ -155,7 +155,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliquota"));
                     imp.setIcmsConsumidorId(rst.getString("id_aliquota"));
                     imp.setPesavel(rst.getInt("pesavel") == 1);
-                    
+
                     result.add(imp);
                 }
             }
@@ -256,24 +256,28 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = bancopdv.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT DISTINCT\n"
-                    + " CASE WHEN ID_CLIENTEPREFERENCIAL IS NULL THEN CPF\n"
+                    + " CASE WHEN ID_CLIENTEPREFERENCIAL IS NULL THEN CPFCRM\n"
                     + "   ELSE ID_CLIENTEPREFERENCIAL END id,\n"
-                    + " CPF\n"
-                    + "FROM VENDA \n"
-                    + "WHERE CPF <> 0;"
+                    + " CASE WHEN NOMECLIENTE = '' THEN 'CADASTRO INCOMPLETO'\n"
+                    + "   ELSE NOMECLIENTE END nome,\n"
+                    + " CPFCRM cpf\n"
+                    + "FROM VENDA\n"
+                    + "WHERE ID_CLIENTEPREFERENCIAL IS NOT NULL\n"
+                    + "OR NOMECLIENTE <> ''\n"
+                    + "OR CPFCRM <> 0"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setRazao("CADASTRO INCOMPLETO");
+                    imp.setRazao(rs.getString("nome"));
                     imp.setCnpj(rs.getString("cpf"));
 
                     result.add(imp);
