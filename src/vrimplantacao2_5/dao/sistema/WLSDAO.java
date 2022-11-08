@@ -174,7 +174,11 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " SUBCATEGORIA \n"
                     + "FROM PRODUTOS\n"
                     + "WHERE \n"
-                    + "CLASSIFICACAO IS NOT NULL "
+                    + "CLASSIFICACAO IS NOT NULL \n"
+                    + "AND \n"
+                    + "SUBCLASSIFICACAO IS NOT NULL \n"
+                    + "AND \n"
+                    + "SUBCLASSIFICACAO <> ''"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -248,6 +252,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("mercid3"));
                     imp.setCodMercadologico4(rst.getString("mercid4"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(imp.getTipoEmbalagem());
                     imp.setCustoSemImposto(rst.getDouble("CUSTO"));
                     imp.setCustoComImposto(rst.getDouble("CUSTO"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -431,7 +436,8 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " SEXO,\n"
                     + " RENDA,\n"
                     + " DATA_CADASTRO,\n"
-                    + " STATUS,\n"
+                    + " CASE WHEN STATUS = 'ATIVO' THEN 1\n"
+                    + "     ELSE 0 END situacao,\n"
                     + " PESSOA,\n"
                     + " CNPJ,\n"
                     + " IE,\n"
@@ -455,8 +461,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     if ("PESSOA FISICA".equals(rst.getString("pessoa"))) {
                         imp.setCnpj(rst.getString("cpf"));
                         imp.setInscricaoestadual(rst.getString("rg"));
-                    }
-                    else{
+                    } else {
                         imp.setCnpj(rst.getString("cnpj"));
                         imp.setInscricaoestadual(rst.getString("ie"));
                     }
