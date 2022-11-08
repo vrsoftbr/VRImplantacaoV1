@@ -185,7 +185,8 @@ public enum EScriptLojaOrigemSistema {
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
-    WINTHOR(236, 9, "select codigo id, concat(concat(CAST(codigo AS varchar(10)),'' - ''),coalesce(fantasia, razaosocial)) descricao FROM pcfilial ORDER BY codigo");
+    WINTHOR(236, 9, "select codigo id, concat(concat(CAST(codigo AS varchar(10)),'' - ''),coalesce(fantasia, razaosocial)) descricao FROM pcfilial ORDER BY codigo"),
+    WLS(237,5,"SELECT COD_LOJA, NOME_FANTASIA || '' - '' || CNPJ FROM INFORMACOES ORDER BY COD_LOJA");
 
     private int idSistema;
     private int idBancoDados;

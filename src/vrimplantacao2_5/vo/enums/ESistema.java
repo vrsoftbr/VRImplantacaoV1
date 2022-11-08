@@ -241,6 +241,7 @@ import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
+import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -1980,6 +1981,17 @@ public enum ESistema {
         }
     },
     WINTHOR(236, "WINTHOR", new Winthor_PcSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Winthor_PcSistemas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    WLS(237, "WLS", new WLSDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
