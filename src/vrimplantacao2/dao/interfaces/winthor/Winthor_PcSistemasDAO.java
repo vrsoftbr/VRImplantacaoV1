@@ -86,7 +86,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     
     @Override
     public String getSistema() {
-        return "WINTHOR" + (!"".equals(complemento) ? " - " + complemento : "");
+        return "WINTHOR";//+ (!"".equals(complemento) ? " - " + complemento : "");
     }
 
     @Override
@@ -712,7 +712,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "	LEFT JOIN icms_fora_estado ON\n" +
                     "		icms_fora_estado.id_produto = p.codprod\n" +
                     "ORDER BY\n" +
-                    "	id, ean"
+                    "	id"
             )) {
                 int cont = 0, cont2 = 0;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -735,17 +735,23 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.seteBalanca(false);
                     }
                     
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+//                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+//                    if (bal != null) {
+                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    ProdutoBalancaVO bal = produtosBalanca.get(codigoProduto);
+
                     if (bal != null) {
                         imp.setEan(String.valueOf(bal.getCodigo()));
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setTipoEmbalagemCotacao(imp.getTipoEmbalagem());
                         imp.setQtdEmbalagem(1);
                         imp.setValidade(bal.getValidade());
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca("S".equals(rst.getString("e_balanca")));
                         imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                        imp.setTipoEmbalagemCotacao(imp.getTipoEmbalagem());
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setValidade(rst.getInt("validade"));                        
                     }
