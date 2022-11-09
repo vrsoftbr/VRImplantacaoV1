@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,38 +15,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
-import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaReceberIMP;
-import vrimplantacao2.vo.importacao.ConveniadoIMP;
-import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
-import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -59,25 +45,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "WebSac";
-    }
-
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "codestabelec codigo, \n"
-                    + "razaosocial descricao \n"
-                    + "from estabelecimento\n"
-                    + "order by codestabelec"
-            )) {
-                while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("descricao")));
-                }
-            }
-        }
-        return result;
+        return "Sinc";
     }
 
     @Override
@@ -209,7 +177,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setMerc1ID(rst.getString("cod_m1"));
                     imp.setMerc1Descricao(rst.getString("desc_m1"));
                     imp.setMerc2ID(rst.getString("cod_m2"));
@@ -251,7 +219,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 //        }
 //        return result;
 //    }
-
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -461,43 +428,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         return null;
     }
 
-    @Override
-    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	r.codreceita id,\n"
-                    + "	p.descricao descritivo,\n"
-                    + "	componentes receita,\n"
-                    + "	p.codproduto produto\n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "	left join receita r on p.codreceita = r.codreceita \n"
-                    + "order by 1"
-            )) {
-                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
-
-                while (rst.next()) {
-                    ReceitaBalancaIMP imp = receitas.get(rst.getString("id"));
-
-                    if (imp == null) {
-                        imp = new ReceitaBalancaIMP();
-                        imp.setId(rst.getString("id"));
-                        imp.setDescricao(rst.getString("descritivo"));
-                        imp.setReceita(rst.getString("receita"));
-                        receitas.put(imp.getId(), imp);
-                    }
-
-                    imp.getProdutos().add(rst.getString("produto"));
-                }
-
-                return new ArrayList<>(receitas.values());
-            }
-        }
-    }
-
-    @Override
+    /*@Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -621,7 +552,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
@@ -698,16 +629,12 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	codfornec,\n"
-                    + "	pf.codproduto,\n"
-                    + "	reffornec,\n"
-                    + "	round(e.quantidade,2) quantidade\n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "	join embalagem e on p.codembalcpa = e.codembal\n"
-                    + "	join prodfornec pf on p.codproduto = pf.codproduto\n"
-                    + "order by 1,2"
+                    "select \n"
+                    + "	tpro_codprod_1 codproduto,\n"
+                    + "	tpro_fornece_1 codfornec,\n"
+                    + "	1 quantidade\n"
+                    + "from \n"
+                    + "	 estpro p"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -716,47 +643,8 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdProduto(rst.getString("codproduto"));
                     imp.setIdFornecedor(rst.getString("codfornec"));
-                    imp.setCodigoExterno(rst.getString("reffornec"));
+                  //imp.setCodigoExterno(rst.getString("reffornec"));
                     imp.setQtdEmbalagem(rst.getDouble("quantidade"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    // Outras Receitas de Fornecedores
-    @Override
-    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
-        List<ContaReceberIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	codlancto id,\n"
-                    + "	codparceiro id_fornecedor,\n"
-                    + "	dtemissao emissao,\n"
-                    + "	valorliquido valor,\n"
-                    + "	dtvencto vencimento,\n"
-                    + "	observacao\n"
-                    + "from\n"
-                    + "	lancamento\n"
-                    + "where\n"
-                    + "	codestabelec = " + getLojaOrigem() + "\n"
-                    + "	and tipoparceiro = 'F'\n"
-                    + "	and pagrec = 'R'\n"
-                    + "	and status = 'A'\n"
-                    + "order by codlancto"
-            )) {
-                while (rs.next()) {
-                    ContaReceberIMP imp = new ContaReceberIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -864,14 +752,14 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpj(rst.getString("cpf_cnpj"));
                     imp.setInscricaoestadual(rst.getString("rg_ie"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(rst.getString("razao"));
+                    imp.setFantasia(imp.getRazao());
 
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
-//                    imp.setMunicipioIBGE(rst.getInt("cidade"));
+//                  imp.setMunicipioIBGE(rst.getInt("cidade"));
                     imp.setUf(rst.getString("uf"));
 
                     imp.setTelefone(rst.getString("ddd_fone") + rst.getString("fone"));
@@ -895,7 +783,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setDataNascimentoConjuge(rst.getDate("nasc_conjuge"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
-//                    imp.setValorLimite(rst.getDouble("limite"));
+//                  imp.setValorLimite(rst.getDouble("limite"));
 
                     imp.setObservacao(rst.getString("observacao"));
 
@@ -992,129 +880,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
-    }
-
-    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "  v.id,\n"
-                    + "  v.codigobarras,\n"
-                    + "  p.id_tipoembalagem \n"
-                    + "from implantacao.produto_verificador v\n"
-                    + "join produto p on p.id = v.id"
-            )) {
-                while (rst.next()) {
-                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
-                    vo.setIdproduto(rst.getInt("id"));
-                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
-                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
-                    result.add(vo);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public void importarDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-        ProgressBar.setStatus("Carregar Produtos...");
-        try {
-            result = getDigitoVerificador();
-
-            if (!result.isEmpty()) {
-                gravarCodigoBarrasDigitoVerificador(result);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
-
-        Conexao.begin();
-        Statement stm, stm2 = null;
-        ResultSet rst = null;
-
-        stm = Conexao.createStatement();
-        stm2 = Conexao.createStatement();
-
-        String sql = "";
-        ProgressBar.setStatus("Gravando Código de Barras...");
-        ProgressBar.setMaximum(vo.size());
-
-        try {
-
-            for (ProdutoAutomacaoVO i_vo : vo) {
-
-                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
-                rst = stm.executeQuery(sql);
-
-                if (!rst.next()) {
-                    sql = "insert into produtoautomacao ("
-                            + "id_produto, "
-                            + "codigobarras, "
-                            + "id_tipoembalagem, "
-                            + "qtdembalagem) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ", "
-                            + i_vo.getIdTipoEmbalagem() + ", 1);";
-                    stm2.execute(sql);
-                } else {
-                    sql = "insert into implantacao.produtonaogerado ("
-                            + "id_produto, "
-                            + "codigobarras) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ");";
-                    stm2.execute(sql);
-                }
-                ProgressBar.next();
-            }
-
-            stm.close();
-            stm2.close();
-            Conexao.commit();
-        } catch (Exception ex) {
-            Conexao.rollback();
-            throw ex;
-        }
-    }
-
-    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
-        String codigo = String.format("%012d", i_codigo);
-
-        int somaPar = 0;
-        int somaImpar = 0;
-
-        for (int i = 0; i < 12; i += 2) {
-            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
-            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
-        }
-
-        int soma = somaImpar + (3 * somaPar);
-        int digito = 0;
-        boolean verifica = false;
-        int calculo = 0;
-
-        do {
-            calculo = soma % 10;
-
-            if (calculo != 0) {
-                digito += 1;
-                soma += 1;
-            }
-        } while (calculo != 0);
-
-        if (i_digito) {
-            return Long.parseLong(codigo + digito);
-        } else {
-            return Long.parseLong(codigo);
-        }
     }
 
     private Date dataInicioVenda;
