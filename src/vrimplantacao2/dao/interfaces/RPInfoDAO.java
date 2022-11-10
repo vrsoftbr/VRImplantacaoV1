@@ -40,6 +40,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -135,7 +136,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.FABRICANTE
         }));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -150,10 +151,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO,
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CNPJ,
                 OpcaoCliente.INSCRICAO_ESTADUAL,
@@ -537,7 +541,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		mprd_prod_codigo,\n"
                     + "		mprd_datamvto desc	\n"
                     + "),\n"
-
                     + "nf2021 as (\n"
                     + "	select\n"
                     + "		distinct on\n"
@@ -558,8 +561,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		mprd_prod_codigo,\n"
                     + "		mprd_datamvto desc	\n"
                     + "),\n"
-                            
-                            
                     + "nf as (\n"
                     + "	select\n"
                     + "	distinct on (mprd_prod_codigo)\n"
@@ -637,14 +638,14 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.prod_peso pesobruto,\n"
                     + "	p.prod_pesoliq pesoliquido,\n"
                     + " p.prod_funcao emabalagemfuncao,\n"
-                    + "	p.prod_extra8 fatoretiqueta,"        
+                    + "	p.prod_extra8 fatoretiqueta,"
                     + "	un.prun_estmin estoqueminimo,\n"
                     + "	un.prun_estmax estoquemaximo,\n"
                     + "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n"
                     + "	un.prun_prultcomp,\n"
                     + "	un.prun_ctcompra custosemimposto,\n"
                     + "	un.prun_prultcomp custocomimposto,\n"
-                    + " un.prun_prultcomp custo,\n"        
+                    + " un.prun_prultcomp custo,\n"
                     + "	coalesce(custo.custosemimposto_nf, un.prun_ctcompra, 0) custosemimposto_nf,\n"
                     + "	coalesce(custo.custocomimposto_nf, un.prun_prultcomp, 0) custocomimposto_nf,\n"
                     + "	un.prun_margem margem,\n"
@@ -772,7 +773,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rst.getDouble("estoquemaximo"));
                     imp.setTipoEmbalagemVolume(rst.getString("emabalagemfuncao"));
                     imp.setVolume(rst.getDouble("fatoretiqueta"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     if (utilizarCustoNota) {
                         imp.setCustoSemImposto(rst.getDouble("custosemimposto_nf"));
@@ -817,7 +818,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     long ean = Utils.stringToLong(imp.getEan(), -2);
 
                     imp.setManterEAN(ean <= 999999 && ean > 0 && !imp.isBalanca());
-                    
 
                     result.add(imp);
                 }
@@ -1084,7 +1084,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }*/
-
         return null;
     }
 
@@ -1093,46 +1092,46 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
 
         String sqlPessoa = "";
-        
+
         if (importarFuncionario) {
-            sqlPessoa = "select \n" +
-                    "	func_codigo id,\n" +
-                    "	func_nome razaosocial,\n" +
-                    "	'' nomefantasia,\n" +
-                    "	'' inscmun,\n" +
-                    "	'N' forn_status,\n" +
-                    "	func_nasci,\n" +
-                    "	m.muni_nome municipio,\n" +
-                    "   m.muni_codigoibge municipioIBGE,\n" +
-                    "	f.func_endereco endereco,\n" +
-                    "	f.func_endereconumero numero,\n" +
-                    "	f.func_enderecocompl complemento,\n" +
-                    "	m.muni_uf uf,\n" +
-                    "	f.func_bairro bairro,\n" +
-                    "	f.func_cep cep,\n" +
-                    "	f.func_telefone forn_fone,\n" +
-                    "	f.func_rg ierg,\n" +
-                    "	f.func_cpf cnpjcpf,\n" +
-                    "	f.func_dtcad datacadastro,\n" +
-                    "	f.func_email email,\n" +
-                    "	f.func_admissao,\n" +
-                    "	f.func_celular celular,\n" +
-                    "	f.func_limiteconv,\n" +
-                    "	f.func_limitecheque,\n" +
-                    "	f.func_limitediario,\n" +
-                    "	'' forn_foneindustria,\n" +
-                    "	'' forn_fax,\n" +
-                    "	'' forn_faxindustria,\n" +
-                    "	'' forn_obspedidos,\n" +
-                    "	'' forn_obstrocas,\n" +
-                    "	'P' tipofornecedor,\n" +
-                    "	0::integer prazo_entrega,\n" +
-                    "	null forma_pagamento\n" +
-                    "from\n" +
-                    "	funcionarios f\n" +
-                    "left join municipios m on m.muni_codigo = f.func_muni_codigo\n" + 
-                    "where\n" +
-                    "	f.func_unid_codigo = '" + getLojaOrigem() + "'";
+            sqlPessoa = "select \n"
+                    + "	func_codigo id,\n"
+                    + "	func_nome razaosocial,\n"
+                    + "	'' nomefantasia,\n"
+                    + "	'' inscmun,\n"
+                    + "	'N' forn_status,\n"
+                    + "	func_nasci,\n"
+                    + "	m.muni_nome municipio,\n"
+                    + "   m.muni_codigoibge municipioIBGE,\n"
+                    + "	f.func_endereco endereco,\n"
+                    + "	f.func_endereconumero numero,\n"
+                    + "	f.func_enderecocompl complemento,\n"
+                    + "	m.muni_uf uf,\n"
+                    + "	f.func_bairro bairro,\n"
+                    + "	f.func_cep cep,\n"
+                    + "	f.func_telefone forn_fone,\n"
+                    + "	f.func_rg ierg,\n"
+                    + "	f.func_cpf cnpjcpf,\n"
+                    + "	f.func_dtcad datacadastro,\n"
+                    + "	f.func_email email,\n"
+                    + "	f.func_admissao,\n"
+                    + "	f.func_celular celular,\n"
+                    + "	f.func_limiteconv,\n"
+                    + "	f.func_limitecheque,\n"
+                    + "	f.func_limitediario,\n"
+                    + "	'' forn_foneindustria,\n"
+                    + "	'' forn_fax,\n"
+                    + "	'' forn_faxindustria,\n"
+                    + "	'' forn_obspedidos,\n"
+                    + "	'' forn_obstrocas,\n"
+                    + "	'P' tipofornecedor,\n"
+                    + "	0::integer prazo_entrega,\n"
+                    + "	null forma_pagamento\n"
+                    + "from\n"
+                    + "	funcionarios f\n"
+                    + "left join municipios m on m.muni_codigo = f.func_muni_codigo\n"
+                    + "where\n"
+                    + "	f.func_unid_codigo = '" + getLojaOrigem() + "'";
         } else {
             sqlPessoa = "select\n"
                     + "	f.forn_codigo id,\n"
@@ -1172,7 +1171,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by\n"
                     + "	id";
         }
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(sqlPessoa)) {
                 while (rst.next()) {
@@ -1224,7 +1223,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         case "K":
                             imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
-                            break;    
+                            break;
                         case "P":
                             imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
@@ -1603,140 +1602,157 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ConveniadoIMP> getConveniado() throws Exception {
-        List<ConveniadoIMP> result = new ArrayList<>();
-        
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	c.clie_codigo id,\n" +
-                    "	c.clie_cnpjcpf cnpjcpf,\n" +
-                    "	c.clie_rgie inscricaoestadual,\n" +
-                    "	c.clie_orgexprg orgaoemissor,\n" +
-                    "	c.clie_razaosocial razaosocial,\n" +
-                    "	c.clie_nome nomefantasia,\n" +
-                    "	c.clie_status,\n" +
-                    "	c.clie_situacao,\n" +
-                    "	c.clie_endres endereco,\n" +
-                    "	c.clie_endresnumero numero,\n" +
-                    "	c.clie_endrescompl complemento,\n" +
-                    "	c.clie_bairrores bairro,\n" +
-                    "	mr.muni_codigoibge municipioIBGE,\n" +
-                    "	mr.muni_nome municipio,\n" +
-                    "	mr.muni_uf uf,\n" +
-                    "	c.clie_cepres cep,\n" +
-                    "	c.clie_estadocivil estadocivil,\n" +
-                    "	c.clie_dtcad datacadastro,\n" +
-                    "   c.clie_dtnasc datanascimento,\n" +
-                    "	c.clie_sexo sexo,\n" +
-                    "	c.clie_empresa empresa,\n" +
-                    "	c.clie_endcom com_endereco,\n" +
-                    "	c.clie_endcomnumero com_numero,\n" +
-                    "	c.clie_endcomcompl com_compl,\n" +
-                    "	c.clie_bairrocom com_bairro,\n" +
-                    "	mc.muni_codigoibge com_municipioIBGE,\n" +
-                    "	mc.muni_nome com_municipio,\n" +
-                    "	mc.muni_uf com_uf,\n" +
-                    "	c.clie_cepcom com_cep,\n" +
-                    "	c.clie_foneres,\n" +
-                    "	c.clie_fonecel,\n" +
-                    "	c.clie_fonecom,\n" +
-                    "	c.clie_fonecelcom,\n" +
-                    "	c.clie_email,\n" +
-                    "	c.clie_emailnfe,\n" +
-                    "	c.clie_dtadmissao dataadmissao,\n" +
-                    "	c.clie_funcao cargo,\n" +
-                    "	c.clie_rendacomprovada renda,\n" +
-                    "	c.clie_limiteconv limiteconvenio,\n" +
-                    "   c.clie_limitecheque,\n" +
-                    "	c.clie_obs observacao,\n" +
-                    "	c.clie_diavenc diavencimento,\n" +
-                    "	c.clie_sitconv permitecreditorotativo,\n" +
-                    "	c.clie_sitcheque permitecheque,\n" +
-                    "	c.clie_senhapdv senhapdv,\n" +
-                    "   c.clie_descrestadocivil civil,\n" +
-                    "   c.clie_contacontabil,\n" +
-                    "	c.clie_contagerencial\n" +
-                    "from\n" +
-                    "	clientes c\n" +
-                    "	left join municipios mr on\n" +
-                    "		c.clie_muni_codigo_res = mr.muni_codigo\n" +
-                    "	left join municipios mc on\n" +
-                    "		c.clie_muni_codigo_com = mc.muni_codigo\n" +
-                    "where \n" +
-                    "	c.clie_tipo = 'F'\n" +
-                    "order by\n" +
-                    "	id")) {
-                while (rs.next()) {
-                    ConveniadoIMP imp = new ConveniadoIMP();
-                    
-                    imp.setIdEmpresa("1");
-                    imp.setCnpj(rs.getString("cnpjcpf"));
-                    imp.setId(rs.getString("id"));
-                    imp.setConvenioLimite(rs.getDouble("limiteconvenio"));
-                    imp.setNome(rs.getString("nomefantasia"));
-                    
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	unid_codigo id,\n"
+                    + "	unid_cnpj cnpj,\n"
+                    + "	unid_inscricaoestadual ie,\n"
+                    + "	unid_razaosocial razao,\n"
+                    + "	unid_endereco endereco,\n"
+                    + "	unid_endereconumero numero,\n"
+                    + "	unid_enderecocompl complemento,\n"
+                    + "	unid_bairro bairro,\n"
+                    + "	unid_municipio cidade,\n"
+                    + "	unid_uf uf,\n"
+                    + "	unid_cep cep,\n"
+                    + "	unid_fone telefone\n"
+                    + "from\n"
+                    + "	unidades\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+
                     result.add(imp);
                 }
             }
         }
-        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	func_unid_codigo id_empresa,\n"
+                    + "	func_cpf cpfcnpj,\n"
+                    + "	func_codigo id_conveniado,\n"
+                    + "	func_limiteconv limite,\n"
+                    + "	func_nome nome_conveniado,\n"
+                    + "case when func_situacao in ('05','06','08') then 1 else 0 end bloqueado\n"
+                    + "from\n"
+                    + "	funcionarios\n"
+                    + "where\n"
+                    + "	func_unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "order by 1")) {
+                while (rs.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+
+                    imp.setIdEmpresa(rs.getString("id_empresa"));
+                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    imp.setId(rs.getString("id_conveniado"));
+                    imp.setConvenioLimite(rs.getDouble("limite"));
+                    imp.setNome(rs.getString("nome_conveniado"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	pfin_pger_conta conta,\n" +
-                    "   pfin_unid_codigo unidade,\n" +
-                    "	pfin_operacao id,\n" +
-                    "	pfin_dataemissao emissao,\n" +
-                    "	pfin_datavcto vencimento,\n" +
-                    "	pfin_pdvs_codigo ecf,\n" +
-                    "	pfin_codentidade::varchar idcliente,\n" +
-                    "	c.clie_razaosocial razao,\n" +
-                    "	c.clie_cnpjcpf cnpj,\n" +
-                    "	pfin_complemento observacao,\n" +
-                    "	pfin_numerodcto cupom,\n" +
-                    "	pfin_parcela parcela,\n" +
-                    "	pfin_valor valor,\n" +
-                    "	pfin_baixaparcial valorpago,\n" +
-                    "	pfin_juros juros,\n" +
-                    "	pfin_multa multa\n" +
-                    "from \n" +
-                    "	pendfin\n" +
-                    "join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
-                    "where\n" +
-                    "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
-                    "	pfin_pr = 'R' and\n" +
-                    "	pfin_status = 'P' and\n" +
-                    "   pfin_catentidade = 'C' and\n" +
-                    "   not pfin_pger_conta in (117301, 112501) and \n" +
-                    "   c.clie_tipo = 'F'")) {
-                
+                    /*"select \n"
+                    + "	pfin_pger_conta conta,\n"
+                    + "   pfin_unid_codigo unidade,\n"
+                    + "	pfin_operacao id,\n"
+                    + "	pfin_dataemissao emissao,\n"
+                    + "	pfin_datavcto vencimento,\n"
+                    + "	pfin_pdvs_codigo ecf,\n"
+                    + "	pfin_codentidade::varchar idcliente,\n"
+                    + "	c.clie_razaosocial razao,\n"
+                    + "	c.clie_cnpjcpf cnpj,\n"
+                    + "	pfin_complemento observacao,\n"
+                    + "	pfin_numerodcto cupom,\n"
+                    + "	pfin_parcela parcela,\n"
+                    + "	pfin_valor valor,\n"
+                    + "	pfin_baixaparcial valorpago,\n"
+                    + "	pfin_juros juros,\n"
+                    + "	pfin_multa multa\n"
+                    + "from \n"
+                    + "	pendfin\n"
+                    + "join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                    + "where\n"
+                    + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                    + "	pfin_pr = 'R' and\n"
+                    + "	pfin_status = 'P' and\n"
+                    + "   pfin_catentidade = 'C' and\n"
+                    + "   not pfin_pger_conta in (117301, 112501) and \n"
+                    + "   c.clie_tipo = 'F'"*/
+                    "select\n"
+                    + "	pfin_operacao id,\n"
+                    + "	pfin_dataemissao emissao,\n"
+                    + "	pfin_datavcto vencimento,\n"
+                    + "	pfin_pdvs_codigo ecf,\n"
+                    + "	pfin_codentidade id_conveniado,\n"
+                    + "	pfin_cupom cupom,\n"
+                    + "	pfin_valor valor,\n"
+                    + "	pfin_observacao observacao\n"
+                    + "from\n"
+                    + "	pendfin ct\n"
+                    + "	join funcionarios f on f.func_codigo = ct.pfin_codentidade\n"
+                    + "		and f.func_unid_codigo = ct.pfin_unid_codigo \n"
+                    + "where\n"
+                    + "	pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "	and pfin_contabaixa = 0\n"
+                    + "	and pfin_fpgt_codigo = ''\n"
+                    + "order by 1,2")) {
+
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                
+
                 while (rs.next()) {
                     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setDataMovimento(rs.getDate("emissao"));
                     imp.setDataHora(new Timestamp(format.parse(imp.getDataMovimento() + " 00:00:00").getTime()));
                     imp.setEcf(rs.getString("ecf"));
-                    imp.setIdConveniado(rs.getString("idcliente"));
+                    imp.setIdConveniado(rs.getString("id_conveniado"));
                     imp.setNumeroCupom(rs.getString("cupom"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setObservacao(rs.getString("observacao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1925,7 +1941,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	when pg.pfin_codentidade = 0 then 10910 else \n"
                     + "	pg.pfin_codentidade end as id_fornecedor,\n"
                     + "	pg.pfin_numerodcto numerodocumento,\n"
-                    + " pg.pfin_descontos desconto,\n"        
+                    + " pg.pfin_descontos desconto,\n"
                     + "	pg.pfin_dataemissao dataemissao,\n"
                     + "	pg.pfin_datalcto dataentrada,\n"
                     + "	pg.pfin_valor valor,\n"
@@ -1958,30 +1974,30 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    
+
                     double desconto = rs.getDouble("desconto");
-                    
+
                     imp.setValor(rs.getDouble("valor") - desconto);
                     imp.setVencimento(rs.getDate("vencimento"));
-                    
+
                     String observacao = "";
-                    
-                    if (rs.getString("observacao") != null && 
-                            !rs.getString("observacao").isEmpty() && 
-                                desconto > 0) {
-                        observacao = rs.getString("observacao") + 
-                                " - Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
-                    } else if (rs.getString("observacao") == null && 
-                                    desconto > 0) {
+
+                    if (rs.getString("observacao") != null
+                            && !rs.getString("observacao").isEmpty()
+                            && desconto > 0) {
+                        observacao = rs.getString("observacao")
+                                + " - Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
+                    } else if (rs.getString("observacao") == null
+                            && desconto > 0) {
                         observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
-                    } else if (rs.getString("observacao").isEmpty() && 
-                                    desconto > 0) {
+                    } else if (rs.getString("observacao").isEmpty()
+                            && desconto > 0) {
                         observacao = "Valor total: " + rs.getDouble("valor") + " desconto(R$): " + desconto;
                     }
-                    
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), 
+
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"),
                             rs.getDouble("valor") - desconto, observacao);
-                    
+
                     parc.setNumeroParcela(rs.getInt("parcela"));
                     parc.setId_banco(Utils.stringToInt(rs.getString("banco")));
                     parc.setAgencia(rs.getString("agencia"));
@@ -2152,7 +2168,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setTabelaVenda(String tabelaVenda) {
         this.tabelaVenda = tabelaVenda;
     }
-    
+
     public String getTabelaVenda() {
         return this.tabelaVenda;
     }
@@ -2186,7 +2202,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
                         next = new VendaIMP();
                         String id = rst.getString("id");
-                        
+
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -2225,7 +2241,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where vdet_status in ('N') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5,6";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);            
+            rst = stm.executeQuery(sql);
         }
 
         @Override
