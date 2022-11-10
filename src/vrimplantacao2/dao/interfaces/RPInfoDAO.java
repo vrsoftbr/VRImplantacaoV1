@@ -1937,9 +1937,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "	pg.pfin_transacao,\n"
                     + "	pg.pfin_operacao,\n"
-                    + "	case when pg.pfin_codentidade is null then 10910\n"
-                    + "	when pg.pfin_codentidade = 0 then 10910 else \n"
-                    + "	pg.pfin_codentidade end as id_fornecedor,\n"
+                    + "	case\n"
+                    + "		when pfin_codentidade is null then 908924\n"        /* <<-- ID_FORNECEDOR da LOJA MATRIZ */
+                    + "		else pfin_codentidade\n"
+                    + "	end  id_fornecedor,\n"
                     + "	pg.pfin_numerodcto numerodocumento,\n"
                     + " pg.pfin_descontos desconto,\n"
                     + "	pg.pfin_dataemissao dataemissao,\n"
@@ -1958,13 +1959,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join fornecedores f on\n"
                     + "    	pg.pfin_codentidade = f.forn_codigo\n"
                     + "where\n"
-                    + "	pg.pfin_status in ('P', 'G')\n"
+                    + "    pg.pfin_status in ('P', 'G')\n"
                     + "    and pg.pfin_pr = 'P'\n"
-                    + "    and pg.pfin_catentidade != 'C'\n"
+                    + "    and pg.pfin_catentidade in ('F','N')\n"
                     + "    and (case when pg.pfin_seqbaixa = 0 then null else pg.pfin_seqbaixa end) is null\n"
                     + "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
-                    + "order by\n"
-                    + "	1, 2"
+                    + "order by 1, 2"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
