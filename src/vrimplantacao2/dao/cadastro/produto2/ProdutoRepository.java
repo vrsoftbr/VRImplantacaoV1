@@ -226,7 +226,9 @@ public class ProdutoRepository {
                                 ean14 = Long.valueOf(eanStr);
                             }
                             
-                            provider.salvarLojaVirtual(prod, ean14);
+                            if (versao.igualOuMaiorQue(4, 0)) {
+                                provider.salvarLojaVirtual(prod, ean14);
+                            }
                         }
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
@@ -1260,8 +1262,10 @@ public class ProdutoRepository {
 
         aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
 
-        int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
-        aliquota.setBeneficio(idBeneficio);
+        if (versao.igualOuMaiorQue(3, 21)) {
+            int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
+            aliquota.setBeneficio(idBeneficio);
+        }
 
         /*
         if (idBeneficio != 0) {
