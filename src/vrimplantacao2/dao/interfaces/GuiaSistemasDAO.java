@@ -150,16 +150,39 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	vfd_CodICMS id,\n"
-                    + "	vfd_Descricao descricao,\n"
-                    + "	vfd_CST cst_icms,\n"
-                    + "	vfd_Aliquota aliq_icms,\n"
-                    + "	vfd_Base red_icms \n"
-                    + "from\n"
-                    + "	tab_icms ti\n"
-                    + "order by vfd_CodICMS"
+                    "select\n" +
+                    "	vfd_CodICMS id,\n" +
+                    "	vfd_Descricao descricao,\n" +
+                    "	vfd_CST cst_icms,\n" +
+                    "	vfd_Aliquota aliq_icms,\n" +
+                    "	vfd_Base red_icms \n" +
+                    "from\n" +
+                    "	tab_icms ti\n" +
+                    "where \n" +
+                    "	vfd_CodICMS in (select distinct vfd_icmss from tab_produto)"
             )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst_icms"),
+                            rs.getDouble("aliq_icms"),
+                            rs.getDouble("red_icms"))
+                    );
+                }
+            }
+            
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	CONCAT('E', vfd_CodICMS) id,\n" +
+                    "	vfd_Descricao descricao,\n" +
+                    "	vfd_CST cst_icms,\n" +
+                    "	vfd_Aliquota aliq_icms,\n" +
+                    "	vfd_Base red_icms \n" +
+                    "from\n" +
+                    "	tab_icms ti\n" +
+                    "where \n" +
+                    "	vfd_CodICMS in (select distinct vfd_ICMSE from tab_produto)")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
@@ -283,66 +306,70 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "COALESCE(BALANCA.VFD_CODPRODUTOEAN,0) AS BALANCA, \n"
-                    + "PROD.vfd_FlagBalanca,\n"
-                    + "prod.vfd_codproduto, \n"
-                    + "prod.vfd_codbr ean,\n"        
-                    + "EMB.VFD_CODBARRA, \n"
-                    + "EMB.VFD_QTDEMBALAGEM,\n"
-                    + "prod.vfd_descricao,\n"
-                    + "prod.vfd_descricaopdv,\n"
-                    + "prod.vfd_tippeso,\n"
-                    + "prod.vfd_codfornecedor,\n"
-                    + "prod.vfd_situatributaria,\n"
-                    + "prod.vfd_margem,\n"
-                    + "prod.vfd_codgrupo merc3,\n"
-                    + "prod.vfd_codsubgrupo merc4,\n"
-                    + "prod.vfd_codsecao merc2,\n"
-                    + "prod.vfd_coddepartamento merc1,\n"      
-                    + "prod.vfd_codequival,\n"
-                    + "prod.vfd_validade,\n"
-                    + "prod.vfd_dtcadastro,\n"
-                    + "prod.vfd_classificacaofiscal,\n"
-                    + "prod.vfd_flagpiscofins,\n"
-                    + "prod.vfd_codmercadologico, \n"
-                    + "prod.vfd_situacao, \n"
-                    + "prod.vfd_codclassificacao,\n"
-                    + "prod.vfd_idcomprador, \n"
-                    + "prod.vfd_nbmsh ncm,\n"
-                    + "Prod.vfd_SetorBalanca,\n"
-                    + "prod.vfd_codcofins, \n"
-                    + "prod.vfd_codEQUIVAL, \n"
-                    + "COFINS.VFD_CSTENTRADA, \n"
-                    + "COFINS.VFD_CSTSAIDA,\n"
-                    + "VFD_SITUACAO AS ATIVO, \n"
-                    + "vfd_TipoInventarioFatorConversao as ProUnid,\n"
-                    + "prod.vfd_icmss id_icms,\n"
-                    // + "sai.vfd_CodIcms codIcmsS, \n"
-                    // + "sai.vfd_Descricao descIcmsS, \n"
-                    // + "sai.vfd_Aliquota aliqS, \n"
-                    // + "sai.vfd_Base baseS, \n"
-                    // + "sai.vfd_CST cstS,\n"
-                    // + "ent.vfd_CodIcms codIcmsE, \n"
-                    // + "ent.vfd_Descricao descIcmsE, \n"
-                    // + "ent.vfd_Aliquota aliqE, \n"
-                    // + "ent.vfd_Base baseE, \n"
-                    // + "ent.vfd_CST cstE,\n"
-                    + "prod.vfd_CEST, \n"
-                    + "pr.vfd_CustoAquisicao,\n"
-                    + "pr.vfd_PrecoVenda, \n"
-                    + "est.vfd_QtdLoja,\n"
-                    + "prod.vfd_CodProdVasilhame vasilhame\n"        
-                    + "from tab_produto as prod\n"
-                    + "LEFT JOIN tab_ICMS sai on sai.vfd_CodIcms = prod.vfd_icmss\n"
-                    + "LEFT JOIN tab_ICMS ent on ent.vfd_CodIcms = prod.vfd_icmse\n"
-                    + "LEFT JOIN tab_EMBALAGEM AS EMB ON EMB.VFD_CODPRODUTO = prod.vfd_codproduto \n"
-                    + "LEFT JOIN tmp_ListProdBalanca AS BALANCA ON BALANCA.VFD_CODPRODUTO = prod.vfd_codproduto\n"
-                    + "LEFT OUTER JOIN [Tab_cadCOFINS] AS COFINS ON COFINS.vfd_CodCOFINS = PROD.VFD_CODCOFINS\n"
-                    + "LEFT JOIN tab_precoatual pr on pr.vfd_CodProduto = prod.vfd_codproduto and pr.vfd_CodFilial = " + getLojaOrigem() + "\n"
-                    + "LEFT JOIN tab_estoqueatual est on est.vfd_CodProduto = prod.vfd_CodProduto and est.vfd_CodFilial = " + getLojaOrigem() + "\n"       
-                    + "WHERE pr.vfd_QtdEmb = 1\n"
-                    + "ORDER BY prod.vfd_codproduto"
+                    "SELECT\n" +
+                    "	COALESCE(BALANCA.VFD_CODPRODUTOEAN,\n" +
+                    "	0) AS BALANCA,\n" +
+                    "	PROD.vfd_FlagBalanca,\n" +
+                    "	prod.vfd_codproduto,\n" +
+                    "	prod.vfd_codbr ean,\n" +
+                    "	EMB.VFD_CODBARRA,\n" +
+                    "	EMB.VFD_QTDEMBALAGEM,\n" +
+                    "	prod.vfd_descricao,\n" +
+                    "	prod.vfd_descricaopdv,\n" +
+                    "	prod.vfd_tippeso,\n" +
+                    "	prod.vfd_codfornecedor,\n" +
+                    "	prod.vfd_situatributaria,\n" +
+                    "	prod.vfd_margem,\n" +
+                    "	prod.vfd_codgrupo merc3,\n" +
+                    "	prod.vfd_codsubgrupo merc4,\n" +
+                    "	prod.vfd_codsecao merc2,\n" +
+                    "	prod.vfd_coddepartamento merc1,\n" +
+                    "	prod.vfd_codequival,\n" +
+                    "	prod.vfd_validade,\n" +
+                    "	prod.vfd_dtcadastro,\n" +
+                    "	prod.vfd_classificacaofiscal,\n" +
+                    "	prod.vfd_flagpiscofins,\n" +
+                    "	prod.vfd_codmercadologico,\n" +
+                    "	prod.vfd_situacao,\n" +
+                    "	prod.vfd_codclassificacao,\n" +
+                    "	prod.vfd_idcomprador,\n" +
+                    "	prod.vfd_nbmsh ncm,\n" +
+                    "	Prod.vfd_SetorBalanca,\n" +
+                    "	prod.vfd_codcofins,\n" +
+                    "	prod.vfd_codEQUIVAL,\n" +
+                    "	COFINS.VFD_CSTENTRADA,\n" +
+                    "	COFINS.VFD_CSTSAIDA,\n" +
+                    "	VFD_SITUACAO AS ATIVO,\n" +
+                    "	vfd_TipoInventarioFatorConversao as ProUnid,\n" +
+                    "	prod.vfd_icmss id_icms,\n" +
+                    "	prod.vfd_ICMSE id_icmse,\n" +
+                    "	prod.vfd_CEST,\n" +
+                    "	pr.vfd_CustoAquisicao,\n" +
+                    "	pr.vfd_PrecoVenda,\n" +
+                    "	est.vfd_QtdLoja,\n" +
+                    "	prod.vfd_CodProdVasilhame vasilhame\n" +
+                    "from\n" +
+                    "	tab_produto as prod\n" +
+                    "LEFT JOIN tab_ICMS sai on\n" +
+                    "	sai.vfd_CodIcms = prod.vfd_icmss\n" +
+                    "LEFT JOIN tab_ICMS ent on\n" +
+                    "	ent.vfd_CodIcms = prod.vfd_icmse\n" +
+                    "LEFT JOIN tab_EMBALAGEM AS EMB ON\n" +
+                    "	EMB.VFD_CODPRODUTO = prod.vfd_codproduto\n" +
+                    "LEFT JOIN tmp_ListProdBalanca AS BALANCA ON\n" +
+                    "	BALANCA.VFD_CODPRODUTO = prod.vfd_codproduto\n" +
+                    "LEFT OUTER JOIN [Tab_cadCOFINS] AS COFINS ON\n" +
+                    "	COFINS.vfd_CodCOFINS = PROD.VFD_CODCOFINS\n" +
+                    "LEFT JOIN tab_precoatual pr on\n" +
+                    "	pr.vfd_CodProduto = prod.vfd_codproduto\n" +
+                    "	and pr.vfd_CodFilial = " + getLojaOrigem() + "\n" +
+                    "LEFT JOIN tab_estoqueatual est on\n" +
+                    "	est.vfd_CodProduto = prod.vfd_CodProduto\n" +
+                    "	and est.vfd_CodFilial = " + getLojaOrigem() + "\n" +
+                    "WHERE\n" +
+                    "	pr.vfd_QtdEmb = 1\n" +
+                    "ORDER BY\n" +
+                    "	prod.vfd_codproduto"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -417,8 +444,9 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId("E" + rst.getString("id_icmse"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     
                     imp.setIdVasilhame(rst.getString("vasilhame"));
                     imp.setIdFamiliaProduto(rst.getString("vfd_codequival"));
@@ -596,8 +624,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     "		te.vfd_IdEmail = 1) emailnfe,\n"        
                     + " fornecedor.vfd_ObsFor obs\n"        
                     + "from tab_fornecedor as fornecedor "
-                    + "inner join tab_prazopagamento as prazo on prazo.vfd_codprazo = fornecedor.vfd_codprazo "
-                    + "inner join tab_tipofornecedor as tipoforn on tipoforn.vfd_codtipfornecedor = fornecedor.vfd_codtipofornecedor "
+                    + "left join tab_prazopagamento as prazo on prazo.vfd_codprazo = fornecedor.vfd_codprazo "
+                    + "left join tab_tipofornecedor as tipoforn on tipoforn.vfd_codtipfornecedor = fornecedor.vfd_codtipofornecedor "
                     + "order by fornecedor.vfd_codfornecedor"
             )) {
                 while (rst.next()) {

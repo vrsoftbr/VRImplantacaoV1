@@ -162,7 +162,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.FORCAR_ATUALIZACAO,
-                    OpcaoProduto.QTD_EMBALAGEM_COTACAO}
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.FABRICANTE}
         ));
     }
 
@@ -314,8 +315,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	RET051\n" +
                     "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n" +
                     "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n" +
-                    "LEFT JOIN ret016 al1 ON	al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
-                    "LEFT JOIN ret016 al2 ON	al2.\"ALIQCod\" = ret051.aliqcred\n" +
+                    "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
+                    "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n" +
                     "ORDER BY\n" +
                     "	ret051.\"PRODCod\""
             )) {
