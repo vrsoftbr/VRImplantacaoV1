@@ -227,7 +227,9 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     "	vm.wrk_codsecao merc2,\n" +
                     "	vm.wrk_DescSecao merc2_descricao,\n" +
                     "	vm.wrk_codgrupo merc3,\n" +
-                    "	vm.wrk_DescGrupo merc3_descricao\n" +
+                    "	vm.wrk_DescGrupo merc3_descricao,\n" +
+                    "	vm.wrk_codsubgrupo merc4,\n" +
+                    "	vm.wrk_DescSubGrupo merc4_descricao\n" +
                     "from \n" +
                     "	view_Mercadologico vm"
             )) {
@@ -242,6 +244,8 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setMerc2Descricao(rst.getString("merc2_descricao"));
                     imp.setMerc3ID(rst.getString("merc3"));
                     imp.setMerc3Descricao(rst.getString("merc3_descricao"));
+                    imp.setMerc4ID(rst.getString("merc4"));
+                    imp.setMerc4Descricao(rst.getString("merc4_descricao"));
                     
                     vResult.add(imp);
                 }
@@ -283,6 +287,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "COALESCE(BALANCA.VFD_CODPRODUTOEAN,0) AS BALANCA, \n"
                     + "PROD.vfd_FlagBalanca,\n"
                     + "prod.vfd_codproduto, \n"
+                    + "prod.vfd_codbr ean,\n"        
                     + "EMB.VFD_CODBARRA, \n"
                     + "EMB.VFD_QTDEMBALAGEM,\n"
                     + "prod.vfd_descricao,\n"
@@ -292,7 +297,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "prod.vfd_situatributaria,\n"
                     + "prod.vfd_margem,\n"
                     + "prod.vfd_codgrupo merc3,\n"
-                    + "prod.vfd_codsubgrupo,\n"
+                    + "prod.vfd_codsubgrupo merc4,\n"
                     + "prod.vfd_codsecao merc2,\n"
                     + "prod.vfd_coddepartamento merc1,\n"      
                     + "prod.vfd_codequival,\n"
@@ -304,7 +309,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "prod.vfd_situacao, \n"
                     + "prod.vfd_codclassificacao,\n"
                     + "prod.vfd_idcomprador, \n"
-                    + "prod.vfd_nbmsh, \n"
+                    + "prod.vfd_nbmsh ncm,\n"
                     + "Prod.vfd_SetorBalanca,\n"
                     + "prod.vfd_codcofins, \n"
                     + "prod.vfd_codEQUIVAL, \n"
@@ -342,6 +347,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
@@ -350,15 +356,15 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
                     imp.setEan(rst.getString("VFD_CODBARRA"));
                     imp.setValidade(rst.getInt("vfd_validade"));
-
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
 
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setValidade(bal.getValidade() > 1
                                 ? bal.getValidade() : rst.getInt("vfd_validade"));
-                        imp.setEan(imp.getImportId());
+                        imp.setEan(String.valueOf(bal.getCodigo()));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("vfd_descricao"));
@@ -385,7 +391,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
-                    //imp.setCodMercadologico4(rst.getString("vfd_codsubgrupo"));
+                    imp.setCodMercadologico4(rst.getString("merc4"));
 
                     imp.setMargem(rst.getDouble("vfd_margem"));
                     imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
@@ -394,7 +400,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     
                     imp.setEstoque(rst.getDouble("vfd_QtdLoja"));
 
-                    imp.setNcm(rst.getString("vfd_classificacaofiscal"));
+                    imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("vfd_CEST"));
                     imp.setPiscofinsCstDebito(rst.getString("VFD_CSTSAIDA"));
                     imp.setPiscofinsCstCredito(rst.getString("VFD_CSTENTRADA"));
@@ -411,6 +417,9 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
                     imp.setIdVasilhame(rst.getString("vasilhame"));
                     imp.setIdFamiliaProduto(rst.getString("vfd_codequival"));
 
@@ -437,7 +446,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                         "	tab_EMBALAGEM em\n" +
                         "left join tab_Unidade tu on em.vfd_unidade = tu.vfd_CodUnidade \n" +
                         "where \n" +
-                        "	vfd_flagembcd = 'V'"
+                        "	vfd_FlagEmbCompra = 'V'"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -470,7 +479,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                         "	tab_EMBALAGEM em\n" +
                         "left join tab_Unidade tu on em.vfd_unidade = tu.vfd_CodUnidade \n" +
                         "where \n" +
-                        "	vfd_flagembcd = 'V'"
+                        "	vfd_FlagEmbCompra = 'V'"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();

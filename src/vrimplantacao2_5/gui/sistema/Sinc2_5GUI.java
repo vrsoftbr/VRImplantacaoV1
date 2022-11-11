@@ -14,7 +14,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Sinc2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.WEBSAC.getNome();
+    private static final String SISTEMA = ESistema.SINC.getNome();
     private static Sinc2_5GUI instance;
 
     private final SincDAO dao = new SincDAO();
@@ -61,7 +61,7 @@ public class Sinc2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.WEBSAC);
+        pnlConn.setSistema(ESistema.SINC);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -106,10 +106,6 @@ public class Sinc2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
-                    if (chkAjustarDigitoVerificador.isSelected()) {
-                        dao.importarDigitoVerificador();
-                    }
                     
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
                         dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
@@ -181,16 +177,13 @@ public class Sinc2_5GUI extends VRInternalFrame {
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
-        pnlEspecial = new javax.swing.JTabbedPane();
-        tbProdutosEspecial = new javax.swing.JPanel();
-        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
             e1.printStackTrace();
         }
 
-        setTitle("Tentaculo");
+        setTitle("Sinc");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -257,28 +250,6 @@ public class Sinc2_5GUI extends VRInternalFrame {
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
-        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
-
-        javax.swing.GroupLayout tbProdutosEspecialLayout = new javax.swing.GroupLayout(tbProdutosEspecial);
-        tbProdutosEspecial.setLayout(tbProdutosEspecialLayout);
-        tbProdutosEspecialLayout.setHorizontalGroup(
-            tbProdutosEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tbProdutosEspecialLayout.createSequentialGroup()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 356, Short.MAX_VALUE))
-        );
-        tbProdutosEspecialLayout.setVerticalGroup(
-            tbProdutosEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tbProdutosEspecialLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(196, Short.MAX_VALUE))
-        );
-
-        pnlEspecial.addTab("Especial", tbProdutosEspecial);
-
-        tabMenu.addTab("Parâmetros", pnlEspecial);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -324,10 +295,8 @@ public class Sinc2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
-    private javax.swing.JTabbedPane pnlEspecial;
     private vrframework.bean.panel.VRPanel pnlMigrar;
     private javax.swing.JScrollPane scpClientes;
     private javax.swing.JPanel tabCli;
@@ -336,6 +305,5 @@ public class Sinc2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private javax.swing.JPanel tbProdutosEspecial;
     // End of variables declaration//GEN-END:variables
 }
