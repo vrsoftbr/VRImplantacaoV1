@@ -462,6 +462,8 @@ public class UniplusDAO extends InterfaceDAO {
                         + "     prc.custo custosemimposto,\n"
                         + "    case when e.idultimoprecoderivadoaplicado is not null then prc2.preco \n"
                         + "        else e.preco end preco_atual,\n"
+                        + "    case when e.idultimoprecoderivadoaplicado is not null then prc2.preco \n"
+                        + "        else e.preco end precovenda1,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
