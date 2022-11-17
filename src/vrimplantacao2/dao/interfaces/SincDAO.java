@@ -25,7 +25,6 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -327,6 +326,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tpro_precrep_1 precocusto,\n"
                     + "	p3.prod_margens_1 margem,\n"
                     + "	tpro_precven_1 precovenda,\n"
+                    + " prod_qtdtota_1 estoque,\n"
                     + "	ncm.ntab_codclas_10 ncm,\n"
                     + "	ncm.ntab_codcest_10 cest,\n"
                     + "	tpro_embmini_1,\n"
@@ -381,7 +381,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setVolume(rst.getDouble("qtde_volume"));
 //                    imp.setEstoqueMinimo(rst.getDouble("estminimo"));
 //                    imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
-//                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque"));
 //                    imp.setPesoLiquido(rst.getDouble("pesoliq"));
 //                    imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -653,13 +653,17 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	recd_cliente_1 idcliente,\n"
                     + "	recd_numdupl_1 numerocupom,\n"
                     + "	recd_datemis_1 emissao,\n"
-                    + "	recd_valdupl_1 valor,\n"
+                    + "	case\n"
+                    + "     when recd_valpgto_1 < recd_valdupl_1\n"
+                    + "     then recd_valdupl_1 - recd_valpgto_1\n"
+                    + "     else recd_valdupl_1\n"
+                    + "	end valor,\n"
                     + "	recd_datvenc_1 vencimento,\n"
                     + "	recd_refere1_1 observacao\n"
                     + "from\n"
                     + "	recdup cr\n"
                     + "where\n"
-                    + "	recd_valpgto_1 = 0\n"
+                    + "	recd_valpgto_1 < recd_valdupl_1\n"
                     + "order by 2,4"
             )) {
                 while (rst.next()) {
@@ -678,36 +682,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
-    }
-
-    @Override
-    public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "" + getLojaOrigem()
-            )) {
-                while (rst.next()) {
-                    ChequeIMP imp = new ChequeIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setDate(rst.getDate("emissao"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setNumeroCheque(rst.getString("nro_cheque"));
-                    imp.setBanco(rst.getInt("banco"));
-                    imp.setAgencia(rst.getString("agencia"));
-                    imp.setRg(rst.getString("rgie"));
-                    imp.setCpf(rst.getString("cpfcnpj"));
-                    imp.setNome(rst.getString("nome"));
-                    imp.setTelefone(rst.getString("telefone"));
-                    imp.setObservacao(rst.getString("observacao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
     }
 
     private Date dataInicioVenda;
