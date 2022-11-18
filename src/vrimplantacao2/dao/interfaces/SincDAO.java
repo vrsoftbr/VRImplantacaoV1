@@ -25,7 +25,6 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -130,6 +129,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.OUTRAS_RECEITAS));
@@ -262,7 +262,34 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tpro_embmini_1 quantidade\n"
                     + "from\n"
                     + "	estpro p\n"
-                    + "order by tpro_codprod_1"
+                    + "union \n"
+                    + "select\n"
+                    + "	taux_codinte_1 idproduto,\n"
+                    + "	taux_codean2_1::varchar ean,\n"
+                    + "	1 quantidade\n"
+                    + "from\n"
+                    + "	estaux\n"
+                    + "where\n"
+                    + "	taux_codean2_1 != 0\n"
+                    + "union\n"
+                    + "select\n"
+                    + "	taux_codinte_1 idproduto,\n"
+                    + "	taux_codean3_1::varchar ean,\n"
+                    + "	1 quantidade\n"
+                    + "from\n"
+                    + "	estaux\n"
+                    + "where\n"
+                    + "	taux_codean3_1 != 0\n"
+                    + "union\n"
+                    + "select\n"
+                    + "	taux_codinte_1 idproduto,\n"
+                    + "	taux_codean4_1::varchar ean,\n"
+                    + "	1 quantidade\n"
+                    + "from\n"
+                    + "	estaux\n"
+                    + "where\n"
+                    + "	taux_codean4_1 != 0\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -299,6 +326,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tpro_precrep_1 precocusto,\n"
                     + "	p3.prod_margens_1 margem,\n"
                     + "	tpro_precven_1 precovenda,\n"
+                    + " prod_qtdtota_1 estoque,\n"
                     + "	ncm.ntab_codclas_10 ncm,\n"
                     + "	ncm.ntab_codcest_10 cest,\n"
                     + "	tpro_embmini_1,\n"
@@ -353,7 +381,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setVolume(rst.getDouble("qtde_volume"));
 //                    imp.setEstoqueMinimo(rst.getDouble("estminimo"));
 //                    imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
-//                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque"));
 //                    imp.setPesoLiquido(rst.getDouble("pesoliq"));
 //                    imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -387,30 +415,61 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	ncad_cgcocpf_2 id,\n"
+                    + "	ncad_nomecli_2 razao,\n"
+                    + "	ncad_cgcocpf_2 cpfcnpj,\n"
+                    + "	ncad_inscric_2 rgie,\n"
+                    + "	ncad_endere1_2 endereco,\n"
+                    + "	ncad_numeros_2 numero,\n"
+                    + "	ncad_complem_2 complemento,\n"
+                    + "	ncad_bairros_2 bairro,\n"
+                    + " cd.ntab_nomemun_1 cidade,\n"
+                    + "	ncad_numecep_2 cep,\n"
+                    + "	ncad_siglest_2 uf,\n"
+                    + "	ncad_dddfone_2::varchar||ncad_telefon_2 fone,\n"
+                    + "	ncad_dddcelu_2::varchar||ncad_celular_2 celular,\n"
+                    + "	ncad_internt_2 email,\n"
+                    + "	ncad_contato_2 contato,\n"
+                    + "	ncad_observa_2_o1 observacao\n"
+                    + "from\n"
+                    + "	sincad f\n"
+                    + "	left join sintab01 cd on f.ncad_codmuni_2 = cd.ntab_codmuni_1\n"
+                    + "where\n"
+                    + "	ncad_tipocad_2 = 'F'\n"
+                    + "order by 2"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("codfornec"));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("razao"));
                     imp.setCnpj_cpf(rst.getString("cpfcnpj"));
-                    imp.setRazao(rst.getString("razaosocial"));
-                    imp.setFantasia(rst.getString("fantasia"));
                     imp.setIe_rg(rst.getString("rgie"));
-                    imp.setInsc_municipal(rst.getString("inscmunicipal"));
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setMunicipio(rst.getString("nomecidade"));
-                    imp.setIbge_municipio(rst.getInt("cidadeibge"));
+                    imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
-                    imp.setDatacadastro(rst.getDate("datainclusao"));
                     imp.setTel_principal(rst.getString("fone"));
-                    imp.setObservacao(imp.getObservacao() + rst.getString("observacao"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.addContato(
+                                rst.getString("contato"),
+                                null,
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                rst.getString("email")
+                        );
+                    }
 
                     result.add(imp);
                 }
@@ -454,26 +513,17 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	codlancto id,\n"
-                    + "	codparceiro id_fornecedor,\n"
-                    + "	numnotafis||'-'||parcela documento,\n"
-                    + "	dtemissao emissao,\n"
-                    + "	dtentrada entrada,\n"
-                    + "	dtvencto vencimento,\n"
-                    + "	valorparcela valor,\n"
-                    + " case \n"
-                    + "	  when valordescto > 0 then 'DESCONTO DE '||valordescto||' - '||observacao\n"
-                    + "	  when valoracresc > 0 then ' ACRESCIMO DE '||valoracresc||' - '||observacao \n"
-                    + "	else observacao\n"
-                    + "	end observacao\n"
+                    + "	pdup_fornece_1||pdup_numdupl_1 id,\n"
+                    + "	pdup_fornece_1 id_fornecedor,\n"
+                    + "	pdup_numdupl_1 documento,\n"
+                    + "	pdup_valdupl_1 valor,\n"
+                    + "	pdup_datemis_1 emissao,\n"
+                    + "	pdup_datainc_1 lancamento,\n"
+                    + "	pdup_datvenc_1 vencimento\n"
                     + "from\n"
-                    + "	lancamento\n"
+                    + "	pagdup\n"
                     + "where\n"
-                    + "	codestabelec = " + getLojaOrigem() + "\n"
-                    + "	and tipoparceiro = 'F'\n"
-                    + " and pagrec = 'P'\n"
-                    + "	and status = 'A'\n"
-                    + "order by codlancto"
+                    + "	pdup_liquida_1 != 'L'"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -482,8 +532,8 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataEntrada(rst.getDate("entrada"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+                    imp.setDataEntrada(rst.getDate("lancamento"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
 
                     result.add(imp);
                 }
@@ -513,12 +563,14 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ncad_numeros_2 numero,\n"
                     + "	ncad_complem_2 complemento,\n"
                     + "	ncad_bairros_2 bairro,\n"
+                    + " cd.ntab_nomemun_1 cidade,\n"
                     + "	ncad_numecep_2 cep,\n"
                     + "	ncad_siglest_2 uf,\n"
                     + "	ncad_dddfone_2 ddd_fone,\n"
                     + "	ncad_telefon_2 fone,\n"
                     + "	ncad_dddcelu_2 ddd_celular,\n"
                     + "	ncad_celular_2 celular,\n"
+                    + " l.ntab_valfaix_14 limite,\n"
                     + "	case when ncad_credsus_2 = 2 then 1 else 0 end bloqueado,\n"
                     + "	ncad_datsusp_2 data_bloqueio,\n"
                     + "	ncad_sexocli_2 sexo,\n"
@@ -535,7 +587,9 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ncad_datincl_2 data_cadastro,\n"
                     + "	'COD_CONT: '||ncad_codcont_2 ||'  '||ncad_fantasi_2||'  '||ncad_referen_2 as observacao\n"
                     + "from\n"
-                    + "	sincad\n"
+                    + "	sincad c\n"
+                    + " left join sintab01 cd on c.ncad_codmuni_2 = cd.ntab_codmuni_1\n"
+                    + " left join SINTAB14 l on c.ncad_limcred_2 = l.ntab_codfaix_14\n"
                     + "where\n"
                     + "	ncad_tipocad_2 = 'C'\n"
                     + "order by ncad_cgcocpf_2"
@@ -554,7 +608,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
-//                  imp.setMunicipioIBGE(rst.getInt("cidade"));
+                    imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
 
                     imp.setTelefone(rst.getString("ddd_fone") + rst.getString("fone"));
@@ -578,7 +632,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setDataNascimentoConjuge(rst.getDate("nasc_conjuge"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
-//                  imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setValorLimite(rst.getDouble("limite"));
 
                     imp.setObservacao(rst.getString("observacao"));
 
@@ -594,87 +648,40 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "l.codlancto as id,\n"
-                    + "l.parcela,\n"
-                    + "l.codparceiro as codcliente,\n"
-                    + "l.valorparcela as valor,\n"
-                    + "l.valorliquido,\n"
-                    + "l.valorjuros,\n"
-                    + "l.valordescto,\n"
-                    + "l.valoracresc,\n"
-                    + "l.dtemissao as dataemissao,\n"
-                    + "l.dtvencto as datavencimento,\n"
-                    + "l.numnotafis as numerocupom\n"
-                    + "from lancamento l\n"
-                    + "where l.pagrec = 'R' \n"
-                    + "and l.status = 'A' \n"
-                    + "and l.tipoparceiro = 'C'\n"
-                    + "and l.codestabelec = " + getLojaOrigem()
+                    "select\n"
+                    + "	recd_empresa_1||recd_numdupl_1||recd_parcela_1 id,\n"
+                    + "	recd_cliente_1 idcliente,\n"
+                    + "	recd_numdupl_1 numerocupom,\n"
+                    + "	recd_datemis_1 emissao,\n"
+                    + "	case\n"
+                    + "     when recd_valpgto_1 < recd_valdupl_1\n"
+                    + "     then recd_valdupl_1 - recd_valpgto_1\n"
+                    + "     else recd_valdupl_1\n"
+                    + "	end valor,\n"
+                    + "	recd_datvenc_1 vencimento,\n"
+                    + "	recd_refere1_1 observacao\n"
+                    + "from\n"
+                    + "	recdup cr\n"
+                    + "where\n"
+                    + "	recd_valpgto_1 < recd_valdupl_1\n"
+                    + "order by 2,4"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("codcliente"));
-                    imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataVencimento(rst.getDate("datavencimento"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setIdCliente(rst.getString("idcliente"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
-                    imp.setJuros(rst.getDouble("valorjuros"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setObservacao(rst.getString("observacao"));
 
                     result.add(imp);
                 }
             }
             return result;
         }
-    }
-
-    @Override
-    public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	codcheque id,\n"
-                    + "	dtemissao emissao,\n"
-                    + "	valorcheque valor,\n"
-                    + "	numcheque nro_cheque,\n"
-                    + "	b.codoficial banco,\n"
-                    + "	b.agencia,\n"
-                    + "	f.rgie,\n"
-                    + "	f.cpfcnpj,\n"
-                    + "	nominal nome,\n"
-                    + "	f.fone1 telefone,\n"
-                    + "	c.observacao\n"
-                    + "from\n"
-                    + "	cheque c\n"
-                    + "	join banco b on b.codbanco = c.codbanco\n"
-                    + "	left join fornecedor f on f.razaosocial like c.nominal\n"
-                    + "where\n"
-                    + "	c.codestabelec = " + getLojaOrigem()
-            )) {
-                while (rst.next()) {
-                    ChequeIMP imp = new ChequeIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setDate(rst.getDate("emissao"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setNumeroCheque(rst.getString("nro_cheque"));
-                    imp.setBanco(rst.getInt("banco"));
-                    imp.setAgencia(rst.getString("agencia"));
-                    imp.setRg(rst.getString("rgie"));
-                    imp.setCpf(rst.getString("cpfcnpj"));
-                    imp.setNome(rst.getString("nome"));
-                    imp.setTelefone(rst.getString("telefone"));
-                    imp.setObservacao(rst.getString("observacao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
     }
 
     private Date dataInicioVenda;
