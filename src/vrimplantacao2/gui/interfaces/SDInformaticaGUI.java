@@ -173,6 +173,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
                     dao.i_arquivoOferta = txtOferta.getArquivo();
+                    dao.setMercadologico4(chkMercadologico4.isSelected());
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -264,6 +265,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new vrframework.bean.panel.VRPanel();
         txtOferta = new vrframework.bean.fileChooser.VRFileChooser();
+        chkMercadologico4 = new vrframework.bean.checkBox.VRCheckBox();
         tabProduto = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabImpCliente = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -336,21 +338,27 @@ public class SDInformaticaGUI extends VRInternalFrame {
 
         tabParametros.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
+        chkMercadologico4.setText("Marcodológico 4° nivel");
+
         javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
         tabParametros.setLayout(tabParametrosLayout);
         tabParametrosLayout.setHorizontalGroup(
             tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametrosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(txtOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(280, Short.MAX_VALUE))
+                .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkMercadologico4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(292, Short.MAX_VALUE))
         );
         tabParametrosLayout.setVerticalGroup(
             tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametrosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(txtOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkMercadologico4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(158, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Parametros", tabParametros);
@@ -705,6 +713,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkMercadologico4;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
