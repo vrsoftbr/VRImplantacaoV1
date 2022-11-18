@@ -235,7 +235,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " pe.Q07 piscofins\n"
                     + "FROM PRODUTOS p\n"
                     + "JOIN PRODUTOS_ESTOQUE pe ON p.COD_PRODUTO = pe.COD_PRODUTO \n"
-                    + "JOIN ESTOQUE_RETROATIVO_ITENS e ON e.COD_PRODUTO = p.COD_PRODUTO\n"
+                    + "LEFT JOIN ESTOQUE_RETROATIVO_ITENS e ON e.COD_PRODUTO = p.COD_PRODUTO\n"
                     + "WHERE \n"
                     + "p.DESCRICAO IS NOT NULL\n"
                     + "order by p.COD_PRODUTO;"
