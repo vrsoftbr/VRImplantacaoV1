@@ -106,7 +106,9 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.TELEFONE
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.MUNICIPIO
         ));
     }
 
@@ -128,6 +130,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.COMPLEMENTO,
                 OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -137,15 +140,14 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + " N07||'.'||REPLACE(N08,',','.')||'.'||REPLACE(REDUCAOBC_ICMS,',','.') id,\n"
-                    + " N07 cst,\n"
-                    + " REPLACE(N08,',','.') aliquota,\n"
-                    + " REPLACE(REDUCAOBC_ICMS,',','.') reducao\n"
-                    + "FROM PRODUTOS_ESTOQUE   \n"
-                    + " WHERE \n"
-                    + " N07 IS NOT NULL AND N08 IS NOT NULL \n"
-                    + " AND REDUCAOBC_ICMS IS NOT NULL"
+                    " SELECT DISTINCT\n"
+                    + "  N07||'.'||REPLACE(N08,',','.')||'.'||REPLACE(REDUCAOBC_ICMS,',','.') id,\n"
+                    + "  N07 cst,\n"
+                    + "  REPLACE(N08,',','.') aliquota,\n"
+                    + "  REPLACE(REDUCAOBC_ICMS,',','.') reducao\n"
+                    + " FROM ESTOQUE_RETROATIVO_ITENS\n"
+                    + "  WHERE N07 IS NOT NULL AND N08 IS NOT NULL \n"
+                    + "  AND REDUCAOBC_ICMS IS NOT NULL"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -229,10 +231,11 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " pe.LUCRO,\n"
                     + " pe.CEST,\n"
                     + " pe.I05 ncm,\n"
-                    + " pe.N07||'.'||REPLACE(pe.N08,',','.')||'.'||REPLACE(pe.REDUCAOBC_ICMS,',','.') tributacaoid,\n"
+                    + " pe.N07||'.'||CAST(REPLACE(pe.N08,',','.') AS NUMERIC(10,2))||'.'||REPLACE(e.REDUCAOBC_ICMS,',','.') tributacaoid,\n"
                     + " pe.Q07 piscofins\n"
                     + "FROM PRODUTOS p\n"
-                    + "LEFT JOIN PRODUTOS_ESTOQUE pe ON p.COD_PRODUTO = pe.COD_PRODUTO \n"
+                    + "JOIN PRODUTOS_ESTOQUE pe ON p.COD_PRODUTO = pe.COD_PRODUTO \n"
+                    + "JOIN ESTOQUE_RETROATIVO_ITENS e ON e.COD_PRODUTO = p.COD_PRODUTO\n"
                     + "WHERE \n"
                     + "p.DESCRICAO IS NOT NULL\n"
                     + "order by p.COD_PRODUTO;"
@@ -490,14 +493,31 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + " NORDEM id,\n"
+                    + " COD_CLIENTE clienteid,\n"
+                    + " N_PEDIDO numerodocumento,\n"
+                    + " N_PARCELA parcela,\n"
+                    + " DATA,\n"
+                    + " VENCIMENTO,\n"
+                    + " VENDA valor,\n"
+                    + " DESCONTO,\n"
+                    + " CAIXA ecf,\n"
+                    + " N_RECIBO,\n"
+                    + " COD_LOJA,\n"
+                    + " FORMA\n"
+                    + "FROM FICHA\n"
+                    + "WHERE \n"
+                    + "FORMA = 'FICHA'\n"
+                    + "AND DATA_PAGO IS NULL \n"
+                    + "AND STATUS = 'FINALIZADO';"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("idcliente"));
-                    imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setIdCliente(rst.getString("clienteid"));
+                    imp.setDataEmissao(rst.getDate("data"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setNumeroCupom(rst.getString("numerodocumento"));
                     imp.setValor(rst.getDouble("valor"));
 

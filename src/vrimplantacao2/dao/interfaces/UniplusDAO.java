@@ -49,6 +49,11 @@ public class UniplusDAO extends InterfaceDAO {
     public boolean ProdutoFornecedorNotas = false;
     public boolean usar_arquivoBalanca;
     public boolean temProdutoAssociado;
+    public boolean produtosNaoAtualizados;
+
+    public void setProdutosNaoAtualizados(boolean produtosNaoAtualizados) {
+        this.produtosNaoAtualizados = produtosNaoAtualizados;
+    }
 
     public void setTemProdutoAssociado(boolean temProdutoAssociado) {
         this.temProdutoAssociado = temProdutoAssociado;
@@ -369,10 +374,10 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	p.cstpis, \n"
                     + "	p.idfamilia, \n"
                     + " p.diasvencimento validade,\n"
-                    + " prc.percentuallucromargem margem_atual,\n"
-                    + " prc.customercadoriavendida custo_atual,\n"
-                    + " prc.custo custosemimposto,\n"
-                    + " prc.preco preco_atual,\n"
+                    + " coalesce(prc.percentuallucromargem,prc2.percentuallucromargem) margem_atual,\n"
+                    + "	coalesce(prc.customercadoriavendida,prc2.customercadoriavendida) custo_atual,\n"
+                    + "	coalesce(prc.custo,prc2.custo) custosemimposto,\n"
+                    + "	coalesce(prc.preco, prc2.preco) preco_atual,\n"
                     /*+ " p.idhierarquia merc1,\n"
                     + " p.idhierarquia merc2,\n"
                     + " p.idhierarquia merc3,\n"*/
@@ -390,7 +395,7 @@ public class UniplusDAO extends InterfaceDAO {
                     //+ " left join precoproduto prc on prc.id = p.idultimoprecoprodutoaplicado \n"
                     + " left join custoproduto c on p.id = c.idproduto \n"
                     //+ "		and p.dataultimacomposicaopreco::varchar = substring(c.datahora::varchar,1,10) \n"
-                    + "		and c.status = 2 and c.idfilial = "+ getLojaOrigem() +"\n"
+                    + "		and c.status = 2 and c.idfilial = " + getLojaOrigem() + "\n"
                     + "	left join precoproduto prc on prc.idproduto = p.id and prc.idcusto = c.id \n"
                     + "	left join formacaoprecoproduto pr1 on\n"
                     + "		pr1.idproduto = p.id and\n"
@@ -398,6 +403,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	left join preco pr2 on\n"
                     + "		pr2.produto = p.codigo and\n"
                     + "		pr2.filial = f.codigo \n"
+                    + " left join precoproduto prc2 on prc2.id = pr1.idultimoprecoprodutoaplicado\n"
                     + "	left join saldoestoque e on\n"
                     + "		e.idproduto = p.id and\n"
                     + "		e.codigoproduto = p.codigo and\n"
@@ -414,6 +420,111 @@ public class UniplusDAO extends InterfaceDAO {
                     + "    	p.idfornecedor = en.id\n"
                     + "order by \n"
                     + "	c.id asc";
+
+            if (produtosNaoAtualizados) {
+                sql = "with \n"
+                        + "saldoestoque as (\n"
+                        + "	select\n"
+                        + "	distinct on (idfilial, idproduto,codigoproduto)\n"
+                        + "		idfilial,\n"
+                        + "		idproduto,\n"
+                        + "		codigoproduto,\n"
+                        + "		TO_CHAR(TO_TIMESTAMP(currenttimemillis / 1000), 'DD/MM/YYYY HH24:MI:SS') ultimaalteracao,\n"
+                        + "		quantidade\n"
+                        + "	from\n"
+                        + "		saldoestoque\n"
+                        + "	order by \n"
+                        + "		idfilial,\n"
+                        + "		idproduto,\n"
+                        + "		codigoproduto,\n"
+                        + "		currenttimemillis desc\n"
+                        + ")\n"
+                        + "select \n"
+                        + "	p.id,\n"
+                        + "	p.codigo, \n"
+                        + "    p.ean,\n"
+                        + "	p.inativo, \n"
+                        + "	p.diasvencimento as validade,\n"
+                        + "	p.nome as descricaocompleta, \n"
+                        + "	p.nomeecf as descricaoreduzida, \n"
+                        + "	p.nome as descricaogondola, \n"
+                        + "	p.datacadastro, \n"
+                        + "	p.unidademedida as unidade, \n"
+                        + "	1 qtdembalagem, \n"
+                        + "	p.custoindireto custooperacional,\n"
+                        + "	p.lucrobruto margemlucro,\n"
+                        + "	fp.codigo codigofamilia,\n"
+                        + "	p.percentualmarkupajustado margem,\n"
+                        + "	pr1.precoultimacompra csimp,\n"
+                        + "	pr1.precocusto ccimp,\n"
+                        + "	p.precocusto precoproduto,\n"
+                        + "	pr1.preco p1,\n"
+                        + "	pr2.preco p2,\n"
+                        + "	p.preco pbkp,\n"
+                        + "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda1,\n"
+                        + "	coalesce(pr2.preco, pr1.preco, p.preco) as precovenda2,\n"
+                        + "	p.quantidademinima, \n"
+                        + "	p.quantidademaxima, \n"
+                        + "	e.quantidade, \n"
+                        + "	p.tributacao, \n"
+                        + "	p.situacaotributaria as cst, \n"
+                        + " 	case when \n"
+                        + " 	p.tributacaoespecialnfcesat is null then '00'\n"
+                        + " 	when p.tributacaoespecialnfcesat = '' then '00'\n"
+                        + " 	else p.tributacaoespecialnfcesat end cst_consumidor,\n"
+                        + "	p.cstpis, \n"
+                        + "	p.cstcofins, \n"
+                        + "	p.cstpisentrada, \n"
+                        + "	p.icmsentrada as icmscredito, \n"
+                        + "	p.icmssaida as icmsdebito, \n"
+                        + "	p.aliquotaicmsinterna, \n"
+                        + "	p.pesavel, \n"
+                        + "	p.ncm, \n"
+                        + "	p.idcest, \n"
+                        + "	cest.codigo as cest, \n"
+                        + "	p.cstpisentrada, \n"
+                        + "	p.cstpis, \n"
+                        + "	p.idfamilia, \n"
+                        + " 	p.diasvencimento validade,\n"
+                        + " 	prc3.percentuallucromargem margem_atual,\n"
+                        + "	prc3.customercadoriavendida custo_atual,\n"
+                        + "	prc3.custo custosemimposto,\n"
+                        + "	prc3.preco preco_atual,\n"
+                        + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
+                        + "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n"
+                        + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
+                        + "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
+                        + "	r.codigo naturezareceita,\n"
+                        + " 	en.codigo fornecedor\n"
+                        + "from \n"
+                        + "	produto p\n"
+                        + "	join filial f on f.id = " + getLojaOrigem() + "\n"
+                        + " 	left join precoproduto prc3 on prc3.idproduto = p.id\n"
+                        + "	left join formacaoprecoproduto pr1 on pr1.idproduto = p.id and\n"
+                        + "		pr1.idfilial = f.id\n"
+                        + "	left join preco pr2 on pr2.produto = p.codigo and\n"
+                        + "		pr2.filial = f.codigo \n"
+                        + "	left join saldoestoque e on	e.idproduto = p.id and\n"
+                        + "		e.codigoproduto = p.codigo and	e.idfilial = f.id\n"
+                        + "	left join cest on cest.id = p.idcest\n"
+                        + "	left join receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n"
+                        + "	left join familiaproduto fp on p.idfamilia = fp.id \n"
+                        + "    left join hierarquia merc on p.idhierarquia = merc.id\n"
+                        + " 	left join entidade en on p.idfornecedor = en.id\n"
+                        + " 	where p.id not in (\n"
+                        + "					 	select \n"
+                        + "							p.id\n"
+                        + "						from produto p\n"
+                        + "						join filial f on f.id = " + getLojaOrigem() + "\n"
+                        + "					 	left join custoproduto c on p.id = c.idproduto \n"
+                        + "							and c.status = 2 and c.idfilial = " + getLojaOrigem() + "\n"
+                        + "						left join precoproduto prc on prc.idproduto = p.id and prc.idcusto = c.id \n"
+                        + "					 	where prc.preco is not null\n"
+                        + "							order by c.id asc\n"
+                        + "							)\n"
+                        + "		order by  prc3.datahora  asc";
+
+            }
 
             if (temProdutoAssociado) {
                 sql = "select \n"
@@ -456,14 +567,11 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	p.cstpis, \n"
                         + "	p.idfamilia, \n"
                         + " 	p.diasvencimento validade,\n"
-                        + " 	case when e.idultimoprecoderivadoaplicado is not null then prc2.percentuallucromargem \n"
-                        + " 	     else e.lucrobruto end margem_atual,\n"
+                        + " 	prc.percentuallucromargem margem_atual,\n"
                         + " 	prc.customercadoriavendida custo_atual,\n"
-                        + "     prc.custo custosemimposto,\n"
-                        + "    case when e.idultimoprecoderivadoaplicado is not null then prc2.preco \n"
-                        + "        else e.preco end preco_atual,\n"
-                        + "    case when e.idultimoprecoderivadoaplicado is not null then prc2.preco \n"
-                        + "        else e.preco end precovenda1,\n"
+                        + " 	prc.custo custosemimposto,\n"
+                        + " 	prc.preco preco_atual,\n"
+                        + " 	prc.preco precovenda1,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n"
                         + "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n"
@@ -472,18 +580,17 @@ public class UniplusDAO extends InterfaceDAO {
                         + " 	en.codigo fornecedor\n"
                         + "from \n"
                         + "	produto p\n"
-                        + "	join filial f on f.id =  "+getLojaOrigem()+"\n"
+                        + "	join filial f on f.id =  " + getLojaOrigem() + "\n"
                         + "	join embalagem e on e.idproduto = p.id and e.exportarbalanca = 1\n"
                         + "	join unidademedida u on u.id = e.idunidademedida \n"
-                        + " left join precoproduto prc on prc.id = p.idultimoprecoprodutoaplicado\n"
-                        + " left join precoproduto prc2 on prc2.id = e.idultimoprecoderivadoaplicado  \n"
+                        + "	join precoprodutoderivado prc on prc.ean = e.codigobarras\n"
                         + " left join cest on cest.id = p.idcest\n"
                         + " left join receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n"
                         + " left join familiaproduto fp on p.idfamilia = fp.id \n"
                         + " left join hierarquia merc on p.idhierarquia = merc.id\n"
                         + " left join entidade en on p.idfornecedor = en.id\n"
                         + " order by \n"
-                        + "	p.id";
+                        + "	prc.id";
             }
 
             try (ResultSet rs = stm.executeQuery(sql)) {
@@ -537,13 +644,13 @@ public class UniplusDAO extends InterfaceDAO {
                     }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    
+
                     if (priorizarPrecoDaTabelaFormacaoPrecoProduto()) {
-                            imp.setPrecovenda(rs.getDouble("precovenda1"));
-                        } else {
-                            imp.setPrecovenda(rs.getDouble("preco_atual"));
-                        }
-                    
+                        imp.setPrecovenda(rs.getDouble("precovenda1"));
+                    } else {
+                        imp.setPrecovenda(rs.getDouble("preco_atual"));
+                    }
+
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rs.getDouble("custo_atual"));
                     imp.setMargem(rs.getDouble("margem_atual"));
@@ -553,9 +660,8 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setCustoComImposto(rs.getDouble("custo_atual"));
                         imp.setPrecovenda(rs.getDouble("preco_atual"));
                         imp.setMargem(rs.getDouble("margem_atual"));
-                    } 
+                    }
 
-                    
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
                     imp.setEstoque(rs.getDouble("quantidade"));
@@ -645,8 +751,8 @@ public class UniplusDAO extends InterfaceDAO {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "  codigobarras id_filho,\n"
-                    + "  codigoproduto id_pai,\n"
+                    + "  codigobarras id_pai,\n"
+                    + "  codigoproduto id_filho,\n"
                     + "  fatorconversao qtde\n"
                     + " from embalagem \n"
                     + " where exportarbalanca = 1"
@@ -1119,6 +1225,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	f.documento cupom,\n"
                     + "	0 ecf,\n"
                     + "	f.valor,\n"
+                    + "	f.saldo,\n"
                     + "	f.historico observacao,\n"
                     + "	e.codigo id_cliente,\n"
                     + "	f.vencimento,\n"
@@ -1145,16 +1252,15 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setEcf(rst.getString("ecf"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("saldo"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setIdCliente(rst.getString("id_cliente"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setParcela(rst.getInt("parcela"));
-                    imp.setJuros(rst.getDouble("juros"));
-                    imp.setMulta(rst.getDouble("multa"));
+//                    imp.setJuros(rst.getDouble("juros"));
+//                    imp.setMulta(rst.getDouble("multa"));
 
-                    incluirLancamentos(imp);
-
+                    //incluirLancamentos(imp);
                     result.add(imp);
                 }
             }
@@ -1163,7 +1269,7 @@ public class UniplusDAO extends InterfaceDAO {
         return result;
     }
 
-    private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
+    /*private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -1192,8 +1298,7 @@ public class UniplusDAO extends InterfaceDAO {
                 }
             }
         }
-    }
-
+    }*/
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
