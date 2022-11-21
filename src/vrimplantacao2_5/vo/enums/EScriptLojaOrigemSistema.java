@@ -180,13 +180,14 @@ public enum EScriptLojaOrigemSistema {
     FOCUS(230, 8, "select id, razao descricao from empresa"),
     MANAGER(231, 5, "select codigo id, fantasia descricao from empresa"),
     SCV(232, 5, "SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
-    SINC(233, 11, "select ncad_cgcocpf_2 id, ncad_fantasi_2 descricao from sincad where ncad_cgcocpf_2 = 44744589000108"),
+    SINC(233, 11, "select ncad_cgcocpf_2 id, ncad_fantasi_2 descricao from sincad where ncad_cgcocpf_2 = 44744589000108"),  /*<-- CNPJ do cliente, alterar em novo projeto*/
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
     WINTHOR(236, 9, "select codigo id, concat(concat(CAST(codigo AS varchar(10)),'' - ''),coalesce(fantasia, razaosocial)) descricao FROM pcfilial ORDER BY codigo"),
-    WLS(237,5,"SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA");
+    WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
+    GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa");
 
     private int idSistema;
     private int idBancoDados;

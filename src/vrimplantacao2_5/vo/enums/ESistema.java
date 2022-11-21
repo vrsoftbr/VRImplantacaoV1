@@ -75,6 +75,7 @@ import vrimplantacao2.dao.interfaces.GComDAO;
 import vrimplantacao2.dao.interfaces.GDIDAO;
 import vrimplantacao2.dao.interfaces.GDoorDAO;
 import vrimplantacao2.dao.interfaces.GR7DAO;
+import vrimplantacao2.dao.interfaces.GSoftDAO;
 import vrimplantacao2.dao.interfaces.GTechDAO;
 import vrimplantacao2.dao.interfaces.GZSistemasDAO;
 import vrimplantacao2.dao.interfaces.GestorPdvDAO;
@@ -260,6 +261,7 @@ import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Focus2_5GUI;
+import vrimplantacao2_5.gui.sistema.GSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
@@ -1997,6 +1999,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new WLS2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    GSOFT(238, "GSOFT", new GSoftDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new GSoft2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
