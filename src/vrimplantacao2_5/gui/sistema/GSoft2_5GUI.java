@@ -9,15 +9,15 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.dao.interfaces.GuiaSistemasDAO;
+import vrimplantacao2.dao.interfaces.GSoftDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class GSoft2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.GUIASISTEMAS.getNome();
+    private static final String SISTEMA = ESistema.GSOFT.getNome();
     private static GSoft2_5GUI instance;
 
-    private final GuiaSistemasDAO dao = new GuiaSistemasDAO();
+    private final GSoftDAO dao = new GSoftDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -61,7 +61,7 @@ public class GSoft2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.GUIASISTEMAS);
+        pnlConn.setSistema(ESistema.GSOFT);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -183,7 +183,7 @@ public class GSoft2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("GuiaSistemas");
+        setTitle("GSoft");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
