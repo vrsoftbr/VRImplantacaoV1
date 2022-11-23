@@ -19,6 +19,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -137,6 +138,26 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.MARGEM_MINIMA
         ));
+    }
+    
+     @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -1289,12 +1310,12 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         "    c.cepcob\n" +
                         "FROM \n" +
                         "    PCCLIENT c\n" +
-                        "WHERE\n" +
-                        (
-                                somenteClienteFidelidade ?
-                                "    nvl(c.NUMCARTAOFIDELIDADE,0) > 0" :
-                                "    CODCOB <> 'CONV'\n" 
-                        ) +
+//                        "WHERE\n" +
+//                        (
+//                                somenteClienteFidelidade ?
+//                                "    nvl(c.NUMCARTAOFIDELIDADE,0) > 0" :""
+//                                //"    CODCOB <> 'CONV'\n" 
+//                        ) +
                         "ORDER BY\n" +
                         "    c.codcli"
                 )) {
@@ -1451,7 +1472,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "    r.codfilialnf = " + getLojaOrigem() + " and\n" +
                     "    r.dtpag IS NULL AND \n" +
                     "    r.codcli != 1 AND \n" +
-                    "    not r.codcob IN ('CANC', 'BK', 'CHDV', 'CHD1', 'CHP', 'CONV', 'JUR')"
+                    "    not r.codcob IN ('CANC', 'BK', 'CHDV', 'CHD1', 'CHP', 'JUR')"//'CONV', 'JUR')"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

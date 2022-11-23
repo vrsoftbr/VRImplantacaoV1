@@ -322,6 +322,19 @@ public class UniplusDAO extends InterfaceDAO {
                     + "		idproduto,\n"
                     + "		codigoproduto,\n"
                     + "		currenttimemillis desc\n"
+                    + "),\n"
+                    + "valores as (\n"
+                    + "select \n"
+                    + " id, \n"
+                    + " codigo, \n"
+                    + " nome, \n"
+                    + " inativo, \n"
+                    + " custo_sem_imposto, \n"
+                    + " custo_com_imposto,\n"
+                    + " preco_venda,\n"
+                    + " margem,\n"
+                    + " estoque\n"
+                    + "from lista_VR(" + getLojaOrigem() + ")\n"
                     + ")\n"
                     + "select \n"
                     + "	p.id,\n"
@@ -387,7 +400,12 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n"
                     //+ "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n"
                     + "	r.codigo naturezareceita,\n"
-                    + " en.codigo fornecedor\n"
+                    + " en.codigo fornecedor,\n"
+                    + " v.custo_sem_imposto, \n"
+                    + " v.custo_com_imposto,\n"
+                    + " v.preco_venda,\n"
+                    + " v.margem,\n"
+                    + " v.estoque\n"
                     + "from \n"
                     + "	produto p\n"
                     + "	join filial f on\n"
@@ -418,10 +436,11 @@ public class UniplusDAO extends InterfaceDAO {
                     + "    	p.idhierarquia = merc.id\n"
                     + " left join entidade en on \n"
                     + "    	p.idfornecedor = en.id\n"
+                    + " left join valores v on v.id = p.id\n"
                     + "order by \n"
                     + "	c.id asc";
 
-            if (produtosNaoAtualizados) {
+            /*if (produtosNaoAtualizados) {
                 sql = "with \n"
                         + "saldoestoque as (\n"
                         + "	select\n"
@@ -524,7 +543,7 @@ public class UniplusDAO extends InterfaceDAO {
                         + "							)\n"
                         + "		order by  prc3.datahora  asc";
 
-            }
+            }*/
 
             if (temProdutoAssociado) {
                 sql = "select \n"
@@ -648,12 +667,12 @@ public class UniplusDAO extends InterfaceDAO {
                     if (priorizarPrecoDaTabelaFormacaoPrecoProduto()) {
                         imp.setPrecovenda(rs.getDouble("precovenda1"));
                     } else {
-                        imp.setPrecovenda(rs.getDouble("preco_atual"));
+                        imp.setPrecovenda(rs.getDouble("preco_venda"));
                     }
 
-                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rs.getDouble("custo_atual"));
-                    imp.setMargem(rs.getDouble("margem_atual"));
+                    imp.setCustoSemImposto(rs.getDouble("custo_sem_imposto"));
+                    imp.setCustoComImposto(rs.getDouble("custo_com_imposto"));
+                    imp.setMargem(rs.getDouble("margem"));
 
                     if (temProdutoAssociado) {
                         imp.setCustoSemImposto(rs.getDouble("custosemimposto"));

@@ -68,10 +68,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
     public boolean apenasAtivo = false;
-    
+
     public boolean importarRotativoBaixados = false;
     public boolean importarConveniosBaixados = false;
-    
+
     private String complemento = "";
 
     public void setComplemento(String complemento) {
@@ -145,30 +145,30 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	a2.id id,\n" +
-                    "	a2.id_produto idproduto,\n" +
-                    "   a2.qtdembalagem,\n" +        
-                    "	p2.descricaocompleta descricaoassociado,\n" +
-                    "	a.id_produto idprodutoitem,\n" +
-                    "	p.descricaocompleta descricaoassociadoitem,\n" +
-                    "	a.aplicacusto,\n" +
-                    "	a.aplicaestoque,\n" +
-                    "	a.aplicapreco,\n" +
-                    "	a.percentualcustoestoque,\n" +
-                    "	a.percentualpreco,\n" +
-                    "	a.qtdembalagem qtdembalagemitem\n" +
-                    "from\n" +
-                    "	associadoitem a\n" +
-                    "join produto p on a.id_produto = p.id\n" +
-                    "join associado a2 on a.id_associado = a2.id\n" +
-                    "join produto p2 on a2.id_produto = p2.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	a2.id id,\n"
+                    + "	a2.id_produto idproduto,\n"
+                    + "   a2.qtdembalagem,\n"
+                    + "	p2.descricaocompleta descricaoassociado,\n"
+                    + "	a.id_produto idprodutoitem,\n"
+                    + "	p.descricaocompleta descricaoassociadoitem,\n"
+                    + "	a.aplicacusto,\n"
+                    + "	a.aplicaestoque,\n"
+                    + "	a.aplicapreco,\n"
+                    + "	a.percentualcustoestoque,\n"
+                    + "	a.percentualpreco,\n"
+                    + "	a.qtdembalagem qtdembalagemitem\n"
+                    + "from\n"
+                    + "	associadoitem a\n"
+                    + "join produto p on a.id_produto = p.id\n"
+                    + "join associado a2 on a.id_associado = a2.id\n"
+                    + "join produto p2 on a2.id_produto = p2.id")) {
+                while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    
+
                     imp.setId(rs.getString("idproduto"));
                     imp.setDescricao(rs.getString("descricaoassociado"));
                     imp.setDescricaoProdutoAssociado(rs.getString("descricaoassociadoitem"));
@@ -180,7 +180,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAplicaCusto(rs.getBoolean("aplicacusto"));
                     imp.setAplicaEstoque(rs.getBoolean("aplicaestoque"));
                     imp.setAplicaPreco(rs.getBoolean("aplicapreco"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -240,36 +240,36 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with aliquotasusadas as (\n" +
-                    "	select p.id_aliquotadebito id from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotadebitoforaestado from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotadebitoforaestadonf from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotaconsumidor from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotacredito from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotacreditocusto from produtoaliquota p\n" +
-                    "	union\n" +
-                    "	select p.id_aliquotacreditoforaestado from produtoaliquota p\n" +
-                    ")\n" +
-                    "select \n" +
-                    "	id,\n" +
-                    "	descricao,\n" +
-                    "	situacaotributaria,\n" +
-                    "	porcentagem,\n" +
-                    "	reduzido,\n" +
-                    "	porcentagemfcp,\n" +
-                    "	icmsdesonerado,\n" +
-                    "	percentualicmsdesonerado \n" +
-                    "from 	\n" +
-                    "	aliquota\n" +
-                    "where \n" +
-                    "	id in (select id from aliquotasusadas)\n" +
-                    "order by\n" +
-                    "	descricao"
+                    "with aliquotasusadas as (\n"
+                    + "	select p.id_aliquotadebito id from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotadebitoforaestado from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotadebitoforaestadonf from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotaconsumidor from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotacredito from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotacreditocusto from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select p.id_aliquotacreditoforaestado from produtoaliquota p\n"
+                    + ")\n"
+                    + "select \n"
+                    + "	id,\n"
+                    + "	descricao,\n"
+                    + "	situacaotributaria,\n"
+                    + "	porcentagem,\n"
+                    + "	reduzido,\n"
+                    + "	porcentagemfcp,\n"
+                    + "	icmsdesonerado,\n"
+                    + "	percentualicmsdesonerado \n"
+                    + "from 	\n"
+                    + "	aliquota\n"
+                    + "where \n"
+                    + "	id in (select id from aliquotasusadas)\n"
+                    + "order by\n"
+                    + "	descricao"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -491,97 +491,96 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         Versao versao = Versao.createFromConnectionInterface(ConexaoPostgres.getConexao());
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with \n" +
-                    "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + ")\n" +
-                    "select\n" +
-                    "	p.id,\n" +
-                    "	p.datacadastro,\n" +
-                    "	ean.codigobarras,\n" +
-                    "	p.qtdembalagem qtdembalagemcotacao,\n" +
-                    "	ean.qtdembalagem,\n" +
-                    "	ean_un.descricao unidade,\n" +
-                    "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n" +
-                    "	p.validade,\n" +
-                    "	p.descricaocompleta,\n" +
-                    "	p.descricaoreduzida,\n" +
-                    "	p.descricaogondola,\n" +
-                    "	p.mercadologico1,\n" +
-                    "	p.mercadologico2,\n" +
-                    "	p.mercadologico3,\n" +
-                    "	p.mercadologico4,\n" +
-                    "	p.mercadologico5,\n" +
-                    "	p.id_familiaproduto,\n" +
-                    "	p.pesobruto,\n" +
-                    "	p.pesoliquido,\n" +
-                    "	vend.estoquemaximo,\n" +
-                    "	vend.estoqueminimo,\n" +
-                    "	vend.estoque,\n" +
-                    "	vend.troca,\n" +
-                    "	vend.custosemimposto,\n" +
-                    "	vend.custocomimposto,\n" +
-                    "	vend.precovenda,\n" +
-                    (
-                            versao.igualOuMaiorQue(4) ?
-                                    
-                            " 	vend.margem,\n" +
-                            " 	vend.margemmaxima,\n" +
-                            " 	vend.margemminima,\n" :
-                                    
-                            " 	p.margem,\n"
-                    ) +
-                    "	vend.id_situacaocadastro,\n" +
-                    "	vend.descontinuado,\n" +
-                    "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n" +
-                    "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n" +
-                    "	piscofdeb.cst piscofins_cst_debito,\n" +
-                    "	piscofcred.cst piscofins_cst_credito,\n" +
-                    "	p.tiponaturezareceita piscofins_natureza_receita,\n" +
-                    " 	aliq.id_aliquotadebito,\n" +
-                    " 	aliq.id_aliquotadebitoforaestado,\n" +
-                    " 	aliq.id_aliquotadebitoforaestadonf,\n" +
-                    " 	aliq.id_aliquotaconsumidor,\n" +
-                    " 	aliq.id_aliquotacredito,\n" +
-                    " 	aliq.id_aliquotacreditocusto,\n" +
-                    " 	aliq.id_aliquotacreditoforaestado,\n" +
-                    "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n" +
-                    "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n" +
-                    "	pad.desconto atacadodesconto,\n" +
-                    "	pf.id id_pautafiscal,\n" +
-                    "	p.id_fornecedorfabricante,\n" +
-                    "	p.numeroparcela\n" +
-                    "from\n" +
-                    "	produto p\n" +
-                    "	join lj on true\n" +
-                    "	left join produtoautomacao ean on\n" +
-                    "		ean.id_produto = p.id\n" +
-                    "	left join tipoembalagem ean_un on\n" +
-                    "		ean_un.id = ean.id_tipoembalagem\n" +
-                    "	join produtocomplemento vend on\n" +
-                    "		p.id = vend.id_produto and vend.id_loja = lj.id\n" +
-                    "	left join cest on\n" +
-                    "		cest.id = p.id_cest\n" +
-                    "	left join tipopiscofins piscofcred on \n" +
-                    "		p.id_tipopiscofinscredito = piscofcred.id\n" +
-                    "	left join tipopiscofins piscofdeb on \n" +
-                    "		p.id_tipopiscofins = piscofdeb.id\n" +
-                    "	join produtoaliquota aliq on \n" +
-                    "		p.id = aliq.id_produto and \n" +
-                    "		aliq.id_estado = lj.id_estado\n" +
-                    "	left join produtoautomacaodesconto pad on\n" +
-                    "		pad.codigobarras = ean.codigobarras and\n" +
-                    "		pad.id_loja = lj.id\n" +
-                    "	left join pautafiscal pf on\n" +
-                    "		p.ncm1 = pf.ncm1 and\n" +
-                    "		p.ncm2 = pf.ncm2 and\n" +
-                    "		p.ncm3 = pf.ncm3 and\n" +
-                    "		aliq.excecao = pf.excecao\n" +
-                    "order by\n" +
-                    "	p.id"
+                    "with \n"
+                    + "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + ")\n"
+                    + "select\n"
+                    + "	p.id,\n"
+                    + "	p.datacadastro,\n"
+                    + "	ean.codigobarras,\n"
+                    + "	p.qtdembalagem qtdembalagemcotacao,\n"
+                    + "   emb.descricao embalagemcotacao,\n"
+                    + "	ean.qtdembalagem,\n"
+                    + "	ean_un.descricao unidade,\n"
+                    + "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n"
+                    + "	p.validade,\n"
+                    + "	p.descricaocompleta,\n"
+                    + "	p.descricaoreduzida,\n"
+                    + "	p.descricaogondola,\n"
+                    + "	p.mercadologico1,\n"
+                    + "	p.mercadologico2,\n"
+                    + "	p.mercadologico3,\n"
+                    + "	p.mercadologico4,\n"
+                    + "	p.mercadologico5,\n"
+                    + "	p.id_familiaproduto,\n"
+                    + "	p.pesobruto,\n"
+                    + "	p.pesoliquido,\n"
+                    + "	vend.estoquemaximo,\n"
+                    + "	vend.estoqueminimo,\n"
+                    + "	vend.estoque,\n"
+                    + "	vend.troca,\n"
+                    + "	vend.custosemimposto,\n"
+                    + "	vend.custocomimposto,\n"
+                    + "	vend.precovenda,\n"
+                    + (versao.igualOuMaiorQue(4)
+                    ? " 	vend.margem,\n"
+                    + " 	vend.margemmaxima,\n"
+                    + " 	vend.margemminima,\n"
+                    : " 	p.margem,\n")
+                    + "	vend.id_situacaocadastro,\n"
+                    + "	vend.descontinuado,\n"
+                    + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
+                    + "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n"
+                    + "	piscofdeb.cst piscofins_cst_debito,\n"
+                    + "	piscofcred.cst piscofins_cst_credito,\n"
+                    + "	p.tiponaturezareceita piscofins_natureza_receita,\n"
+                    + " 	aliq.id_aliquotadebito,\n"
+                    + " 	aliq.id_aliquotadebitoforaestado,\n"
+                    + " 	aliq.id_aliquotadebitoforaestadonf,\n"
+                    + " 	aliq.id_aliquotaconsumidor,\n"
+                    + " 	aliq.id_aliquotacredito,\n"
+                    + " 	aliq.id_aliquotacreditocusto,\n"
+                    + " 	aliq.id_aliquotacreditoforaestado,\n"
+                    + "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n"
+                    + "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n"
+                    + "	pad.desconto atacadodesconto,\n"
+                    + "	pf.id id_pautafiscal,\n"
+                    + "	p.id_fornecedorfabricante,\n"
+                    + "	p.numeroparcela\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	join lj on true\n"
+                    + "	left join produtoautomacao ean on\n"
+                    + "		ean.id_produto = p.id\n"
+                    + "	left join tipoembalagem ean_un on\n"
+                    + "		ean_un.id = ean.id_tipoembalagem\n"
+                    + "left join tipoembalagem emb on\n"
+                    + "		emb.id = p.id_tipoembalagem\n"
+                    + "	join produtocomplemento vend on\n"
+                    + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
+                    + "	left join cest on\n"
+                    + "		cest.id = p.id_cest\n"
+                    + "	left join tipopiscofins piscofcred on \n"
+                    + "		p.id_tipopiscofinscredito = piscofcred.id\n"
+                    + "	left join tipopiscofins piscofdeb on \n"
+                    + "		p.id_tipopiscofins = piscofdeb.id\n"
+                    + "	join produtoaliquota aliq on \n"
+                    + "		p.id = aliq.id_produto and \n"
+                    + "		aliq.id_estado = lj.id_estado\n"
+                    + "	left join produtoautomacaodesconto pad on\n"
+                    + "		pad.codigobarras = ean.codigobarras and\n"
+                    + "		pad.id_loja = lj.id\n"
+                    + "	left join pautafiscal pf on\n"
+                    + "		p.ncm1 = pf.ncm1 and\n"
+                    + "		p.ncm2 = pf.ncm2 and\n"
+                    + "		p.ncm3 = pf.ncm3 and\n"
+                    + "		aliq.excecao = pf.excecao\n"
+                    + "order by\n"
+                    + "	p.id"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -594,6 +593,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("embalagemcotacao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
                     imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
@@ -1174,46 +1174,45 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
+
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "select\n" +
-                        "	c.id,\n" +
-                        "	c.cpf,\n" +
-                        "	c.numerocheque,\n" +
-                        "	c.id_banco,\n" +
-                        "	c.agencia,\n" +
-                        "	c.conta,\n" +
-                        "	c.data,\n" +
-                        "	c.datadeposito,\n" +
-                        "	c.numerocupom,\n" +
-                        "	c.ecf,\n" +
-                        "	c.valor,\n" +
-                        "	c.rg,\n" +
-                        "	c.telefone,\n" +
-                        "	c.nome,\n" +
-                        "	c.observacao,\n" +
-                        "	c.id_situacaorecebercheque,\n" +
-                        "	c.cmc7,\n" +
-                        "	c.id_tipoalinea,\n" +
-                        "	c.valorjuros,\n" +
-                        "	c.valoracrescimo,\n" +
-                        "	c.id_tipolocalcobranca,\n" +
-                        "	c.datahoraalteracao,\n" +
-                        "	c.id_tipovistaprazo\n" +
-                        "from\n" +
-                        "	recebercheque c\n" +
-                        "where\n" +
-                        "	c.id_loja = " + getLojaOrigem() + "\n" +
-                        "	and c.id_situacaorecebercheque = 0\n" +
-                        "order by\n" +
-                        "	c.id"
-                )
-                ) {
+                        "select\n"
+                        + "	c.id,\n"
+                        + "	c.cpf,\n"
+                        + "	c.numerocheque,\n"
+                        + "	c.id_banco,\n"
+                        + "	c.agencia,\n"
+                        + "	c.conta,\n"
+                        + "	c.data,\n"
+                        + "	c.datadeposito,\n"
+                        + "	c.numerocupom,\n"
+                        + "	c.ecf,\n"
+                        + "	c.valor,\n"
+                        + "	c.rg,\n"
+                        + "	c.telefone,\n"
+                        + "	c.nome,\n"
+                        + "	c.observacao,\n"
+                        + "	c.id_situacaorecebercheque,\n"
+                        + "	c.cmc7,\n"
+                        + "	c.id_tipoalinea,\n"
+                        + "	c.valorjuros,\n"
+                        + "	c.valoracrescimo,\n"
+                        + "	c.id_tipolocalcobranca,\n"
+                        + "	c.datahoraalteracao,\n"
+                        + "	c.id_tipovistaprazo\n"
+                        + "from\n"
+                        + "	recebercheque c\n"
+                        + "where\n"
+                        + "	c.id_loja = " + getLojaOrigem() + "\n"
+                        + "	and c.id_situacaorecebercheque = 0\n"
+                        + "order by\n"
+                        + "	c.id"
+                )) {
             while (rs.next()) {
                 ChequeIMP imp = new ChequeIMP();
-                
+
                 imp.setId(rs.getString("id"));
                 imp.setCpf(rs.getString("cpf"));
                 imp.setNumeroCheque(rs.getString("numerocheque"));
@@ -1237,53 +1236,52 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 //imp.setIdLocalCobranca(rs.getInt("id_tipolocalcobranca"));
                 imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
                 imp.setVistaPrazo(TipoVistaPrazo.getById(rs.getInt("id_tipovistaprazo")));
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        
+
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "select\n" +
-                        "	e.id,\n" +
-                        "	e.razaosocial,\n" +
-                        "	e.cnpj,\n" +
-                        "	e.inscricaoestadual,\n" +
-                        "	e.endereco,\n" +
-                        "	e.numero,\n" +
-                        "	e.complemento,\n" +
-                        "	e.bairro,\n" +
-                        "	e.id_municipio,\n" +
-                        "	e.cep,\n" +
-                        "	e.telefone,\n" +
-                        "	e.datainicio,\n" +
-                        "	e.datatermino,\n" +
-                        "	e.id_situacaocadastro,\n" +
-                        "	e.percentualdesconto,\n" +
-                        "	e.renovacaoautomatica,\n" +
-                        "	e.diapagamento,\n" +
-                        "	e.bloqueado,\n" +
-                        "	e.databloqueio,\n" +
-                        "	e.diainiciorenovacao,\n" +
-                        "	e.diaterminorenovacao,\n" +
-                        "	e.observacao\n" +
-                        "from\n" +
-                        "	empresa e\n" +
-                        "order by\n" +
-                        "	e.id"
-                )
-                ) {
+                        "select\n"
+                        + "	e.id,\n"
+                        + "	e.razaosocial,\n"
+                        + "	e.cnpj,\n"
+                        + "	e.inscricaoestadual,\n"
+                        + "	e.endereco,\n"
+                        + "	e.numero,\n"
+                        + "	e.complemento,\n"
+                        + "	e.bairro,\n"
+                        + "	e.id_municipio,\n"
+                        + "	e.cep,\n"
+                        + "	e.telefone,\n"
+                        + "	e.datainicio,\n"
+                        + "	e.datatermino,\n"
+                        + "	e.id_situacaocadastro,\n"
+                        + "	e.percentualdesconto,\n"
+                        + "	e.renovacaoautomatica,\n"
+                        + "	e.diapagamento,\n"
+                        + "	e.bloqueado,\n"
+                        + "	e.databloqueio,\n"
+                        + "	e.diainiciorenovacao,\n"
+                        + "	e.diaterminorenovacao,\n"
+                        + "	e.observacao\n"
+                        + "from\n"
+                        + "	empresa e\n"
+                        + "order by\n"
+                        + "	e.id"
+                )) {
             while (rs.next()) {
                 ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-                
+
                 imp.setId(rs.getString("id"));
                 imp.setRazao(rs.getString("razaosocial"));
                 imp.setCnpj(rs.getString("cnpj"));
@@ -1306,44 +1304,43 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDiaInicioRenovacao(rs.getInt("diainiciorenovacao"));
                 imp.setDiaFimRenovacao(rs.getInt("diaterminorenovacao"));
                 imp.setObservacoes(rs.getString("observacao"));
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
-        
+
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "select\n" +
-                        "	c.id,\n" +
-                        "	c.nome,\n" +
-                        "	c.id_empresa,\n" +
-                        "	c.bloqueado,\n" +
-                        "	c.id_situacaocadastro,\n" +
-                        "	c.senha,\n" +
-                        "	c.cnpj,\n" +
-                        "	c.observacao,\n" +
-                        "	c.datavalidadecartao,\n" +
-                        "	c.datadesbloqueio,\n" +
-                        "	c.visualizasaldo,\n" +
-                        "	c.databloqueio,\n" +
-                        "	c.id_loja\n" +
-                        "from\n" +
-                        "	conveniado c\n" +
-                        "order by\n" +
-                        "	c.id"
-                )
-                ) {
+                        "select\n"
+                        + "	c.id,\n"
+                        + "	c.nome,\n"
+                        + "	c.id_empresa,\n"
+                        + "	c.bloqueado,\n"
+                        + "	c.id_situacaocadastro,\n"
+                        + "	c.senha,\n"
+                        + "	c.cnpj,\n"
+                        + "	c.observacao,\n"
+                        + "	c.datavalidadecartao,\n"
+                        + "	c.datadesbloqueio,\n"
+                        + "	c.visualizasaldo,\n"
+                        + "	c.databloqueio,\n"
+                        + "	c.id_loja\n"
+                        + "from\n"
+                        + "	conveniado c\n"
+                        + "order by\n"
+                        + "	c.id"
+                )) {
             while (rs.next()) {
                 ConveniadoIMP imp = new ConveniadoIMP();
-                
+
                 imp.setId(rs.getString("id"));
                 imp.setNome(rs.getString("nome"));
                 imp.setIdEmpresa(rs.getString("id_empresa"));
@@ -1357,44 +1354,43 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
                 imp.setDataBloqueio(rs.getDate("databloqueio"));
                 imp.setLojaCadastro(rs.getInt("id_loja"));
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        
+
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "select\n" +
-                        "	t.id,\n" +
-                        "	t.id_conveniado,\n" +
-                        "	t.ecf,\n" +
-                        "	t.numerocupom,\n" +
-                        "	t.datahora,\n" +
-                        "	t.valor,\n" +
-                        "	t.id_situacaotransacaoconveniado,\n" +
-                        "	t.datamovimento,\n" +
-                        "	t.finalizado,\n" +
-                        "	t.observacao\n" +
-                        "from\n" +
-                            "	conveniadotransacao t\n" +
-                        "where\n" +
-                        "	t.id_loja = " + getLojaOrigem() + "\n" +
-                        (!importarConveniosBaixados ? "	and t.id_situacaotransacaoconveniado = 1\n" : "") +
-                        "order by\n" +
-                        "	t.id"
-                )
-                ) {
+                        "select\n"
+                        + "	t.id,\n"
+                        + "	t.id_conveniado,\n"
+                        + "	t.ecf,\n"
+                        + "	t.numerocupom,\n"
+                        + "	t.datahora,\n"
+                        + "	t.valor,\n"
+                        + "	t.id_situacaotransacaoconveniado,\n"
+                        + "	t.datamovimento,\n"
+                        + "	t.finalizado,\n"
+                        + "	t.observacao\n"
+                        + "from\n"
+                        + "	conveniadotransacao t\n"
+                        + "where\n"
+                        + "	t.id_loja = " + getLojaOrigem() + "\n"
+                        + (!importarConveniosBaixados ? "	and t.id_situacaotransacaoconveniado = 1\n" : "")
+                        + "order by\n"
+                        + "	t.id"
+                )) {
             while (rs.next()) {
                 ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-                
+
                 imp.setId(rs.getString("id"));
                 imp.setIdConveniado(rs.getString("id_conveniado"));
                 imp.setEcf(rs.getString("ecf"));
@@ -1405,11 +1401,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDataMovimento(rs.getDate("datamovimento"));
                 imp.setFinalizado(rs.getBoolean("finalizado"));
                 imp.setObservacao(rs.getString("observacao"));
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
@@ -1419,23 +1415,23 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	distinct\n" +
-                    "	p.id,\n" +
-                    "	p.id_fornecedor,\n" +
-                    "	p.numerodocumento,\n" +
-                    " 	p.id_tipoentrada,\n" +
-                    "	p.dataentrada,\n" +
-                    "	p.dataemissao\n" +
-                    "from \n" +
-                    "	pagarfornecedor p \n" +
-                    "    join pagarfornecedorparcela pp\n" +
-                    "       on p.id = pp.id_pagarfornecedor\n" +
-                    "    join tipoentrada t2 on\n" +
-                    "       p.id_tipoentrada = t2.id\n" +
-                    "where\n" +
-                    "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
-                    "	p.id_loja = " + getLojaOrigem())) {
+                    "select\n"
+                    + "	distinct\n"
+                    + "	p.id,\n"
+                    + "	p.id_fornecedor,\n"
+                    + "	p.numerodocumento,\n"
+                    + " 	p.id_tipoentrada,\n"
+                    + "	p.dataentrada,\n"
+                    + "	p.dataemissao\n"
+                    + "from \n"
+                    + "	pagarfornecedor p \n"
+                    + "    join pagarfornecedorparcela pp\n"
+                    + "       on p.id = pp.id_pagarfornecedor\n"
+                    + "    join tipoentrada t2 on\n"
+                    + "       p.id_tipoentrada = t2.id\n"
+                    + "where\n"
+                    + "	pp.id_situacaopagarfornecedorparcela = 0 and \n"
+                    + "	p.id_loja = " + getLojaOrigem())) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
@@ -1444,7 +1440,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
                     //imp.setIdTipoEntradaVR(rs.getInt("id_tipoentrada"));
-                    imp.setNumeroDocumento(rs.getString("numerodocumento"));             
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     //imp.setValor(rs.getDouble("valor"));
 
                     incluirVencimentos(imp);
@@ -1455,32 +1451,32 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-        
+
     private void incluirVencimentos(ContaPagarIMP imp) throws Exception {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	pp.id,\n" +
-                    "	pp.id_pagarfornecedor,\n" +
-                    "	pp.numeroparcela,\n" +
-                    "	pp.datavencimento,\n" +
-                    "	pp.datapagamento,\n" +
-                    "	pp.valor,\n" +
-                    "	pp.observacao,\n" +
-                    "	pp.id_banco,\n" +
-                    "	pp.agencia,\n" +
-                    "	pp.conta,\n" +
-                    "	pp.conferido,\n" +
-                    "	'TE '||t2.id || ' - ' || t2.descricao tipoentrada\n" +
-                    "from \n" +
-                    "	pagarfornecedor p \n" +
-                    "    join pagarfornecedorparcela pp\n" +
-                    "       on p.id = pp.id_pagarfornecedor\n" +
-                    "    join tipoentrada t2 on\n" +
-                    "       p.id_tipoentrada = t2.id\n" +
-                    "where\n" +
-                    "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
-                    "	pp.id_pagarfornecedor = " + imp.getId()
+                    "select\n"
+                    + "	pp.id,\n"
+                    + "	pp.id_pagarfornecedor,\n"
+                    + "	pp.numeroparcela,\n"
+                    + "	pp.datavencimento,\n"
+                    + "	pp.datapagamento,\n"
+                    + "	pp.valor,\n"
+                    + "	pp.observacao,\n"
+                    + "	pp.id_banco,\n"
+                    + "	pp.agencia,\n"
+                    + "	pp.conta,\n"
+                    + "	pp.conferido,\n"
+                    + "	'TE '||t2.id || ' - ' || t2.descricao tipoentrada\n"
+                    + "from \n"
+                    + "	pagarfornecedor p \n"
+                    + "    join pagarfornecedorparcela pp\n"
+                    + "       on p.id = pp.id_pagarfornecedor\n"
+                    + "    join tipoentrada t2 on\n"
+                    + "       p.id_tipoentrada = t2.id\n"
+                    + "where\n"
+                    + "	pp.id_situacaopagarfornecedorparcela = 0 and \n"
+                    + "	pp.id_pagarfornecedor = " + imp.getId()
             )) {
                 while (rs.next()) {
                     ContaPagarVencimentoIMP i = imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor"));
@@ -1502,8 +1498,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-    }    
-    
+    }
 
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
@@ -1833,7 +1828,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void deletaLogEstoque(Date data, int idLoja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
+            stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data)
                     + " and id_loja = " + idLoja);
         }
     }
