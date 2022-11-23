@@ -80,7 +80,6 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -607,11 +606,6 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("valor"));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -625,7 +619,19 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "";
+                    = " SELECT \n"
+                    + "  N_PEDIDO||'-'||CAIXA id_venda,\n"
+                    + "  CAIXA ecf,\n"
+                    + "  DATA,\n"
+                    + "  HORA,\n"
+                    + "  STATUS,\n"
+                    + "  TOTAL valor,\n"
+                    + "  coalesce(CUPOM_FISCAL,N_PEDIDO) numerocupom\n"
+                    + "FROM VENDAS\n"
+                    + "WHERE\n"
+                    + " DATA >= '" + strDataInicio + "'\n"
+                    + " AND \n"
+                    + " DATA <= '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -665,13 +671,10 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nritem"));
-                        next.setProduto(rst.getString("id_produto"));
+                        next.setProduto(rst.getString("produtoid"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setQuantidade(rst.getDouble("QTD"));
                         next.setPrecoVenda(rst.getDouble("valor"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
 
                     }
                 }
@@ -683,7 +686,25 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = "SELECT \n"
+                    + "  v.NORDEM id_item,\n"
+                    + "  v.N_PEDIDO||'-'||v.CAIXA id_venda,\n"
+                    + "  v.CAIXA ecf,\n"
+                    + "  v.DATA,\n"
+                    + "  v.HORA,\n"
+                    + "  v.COD_PRODUTO produtoid,\n"
+                    + "  v.COD_BARRAS codigobarras,\n"
+                    + "  v.QTD,\n"
+                    + "  v.VENDA valor,\n"
+                    + "  substring(p.UNIDADE_MEDIDA FROM 1 FOR 2) unidade\n"
+                    + "  FROM VENDAS_DETALHES v\n"
+                    + "  JOIN PRODUTOS p ON p.COD_PRODUTO = v.COD_PRODUTO\n"
+                    + " WHERE \n"
+                    + " v.DATA >= '"+VendaIterator.FORMAT.format(dataInicio)+"'\n"
+                    + " AND \n"
+                    + " v.DATA <= '"+VendaIterator.FORMAT.format(dataTermino)+"'\n"
+                    + " AND \n"
+                    + " STATUS = 'FINALIZADO' OR STATUS IS NULL";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
