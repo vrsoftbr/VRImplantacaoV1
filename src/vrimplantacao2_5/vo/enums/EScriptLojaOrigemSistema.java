@@ -22,6 +22,7 @@ public enum EScriptLojaOrigemSistema {
             + "concat(lojcod,'' - '', lojfantas) descricao, "
             + "lojcnpj from hiploj order by 1"),
     LOGUS(100, 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
+    MRS(109, 11, "select loja id, nome_fantasia descricao from parametros order by loja"),
     SYGMA(200, 5,
             "select "
             + "1 as id, "
@@ -185,9 +186,11 @@ public enum EScriptLojaOrigemSistema {
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
+    HIPER(75, 13, "select id_filial id, razao_social descricao from filial order by id_filial"),
     WINTHOR(236, 9, "select codigo id, concat(concat(CAST(codigo AS varchar(10)),'' - ''),coalesce(fantasia, razaosocial)) descricao FROM pcfilial ORDER BY codigo"),
     WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
-    GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa");
+    GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa"),
+    FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS");
 
     private int idSistema;
     private int idBancoDados;

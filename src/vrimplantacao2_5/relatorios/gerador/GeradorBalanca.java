@@ -113,7 +113,7 @@ public class GeradorBalanca {
             String espacos = "----------------";
             String espacosD = "--------------------";
             for (CodBalAlteradoVO b : bal) {
-                if (b.getDescricao().length() < 15){
+                if (b.getDescricao().length() <= 15){
                     printWriter.print(
                        "|" + b.getId().trim() + espacos.substring(b.getId().trim().length()).replace("-", " ") +
                        "| " + b.getDescricao().trim() + espacosD.substring(b.getDescricao().trim().length()).replace("-", " ") +
