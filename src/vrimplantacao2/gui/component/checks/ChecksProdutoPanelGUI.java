@@ -261,6 +261,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             tabImportacao.add(pnlImpInfoAdic);
         }
         
+        if (!opt.contains(OpcaoProduto.PROMOCAO)) {
+            chkPromocao.setVisible(opt.contains(OpcaoProduto.PROMOCAO));
+        }
+        
         if (
                 opt.contains(OpcaoProduto.ASSOCIADO) ||
                 opt.contains(OpcaoProduto.COMPRADOR) ||
@@ -406,6 +410,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkTeclaAssociada = new vrframework.bean.checkBox.VRCheckBox();
         chkEstoqueTroca = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkPromocao = new javax.swing.JCheckBox();
         pnlImpTributacao = new vrframework.bean.panel.VRPanel();
         jLabel4 = new javax.swing.JLabel();
         chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
@@ -955,6 +960,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkTipoProduto, "Tipo Produto");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkPromocao, "Promoção");
+
         javax.swing.GroupLayout pnlImpComplLayout = new javax.swing.GroupLayout(pnlImpCompl);
         pnlImpCompl.setLayout(pnlImpComplLayout);
         pnlImpComplLayout.setHorizontalGroup(
@@ -975,7 +982,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkEstoqueTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPromocao))
                     .addGroup(pnlImpComplLayout.createSequentialGroup()
                         .addComponent(chkDescontinuado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
@@ -1024,7 +1033,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkEstoqueTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkEstoqueTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkPromocao)))
                 .addGap(5, 5, 5)
                 .addGroup(pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkDescontinuado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1535,6 +1545,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
     public vrframework.bean.checkBox.VRCheckBox chkProdutos;
     public vrframework.bean.checkBox.VRCheckBox chkProdutosBalanca;
+    public javax.swing.JCheckBox chkPromocao;
     public vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     public vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemProd;
     public vrframework.bean.checkBox.VRCheckBox chkReceitaFilizola;

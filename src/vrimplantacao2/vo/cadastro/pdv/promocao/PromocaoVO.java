@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class PromocaoVO {
 
-    private int id;
+    private String id;
     private int idLoja;
     private String descricao;
     private Date dataInicio = new Date();
@@ -21,7 +21,7 @@ public class PromocaoVO {
     private int pontuacao;
     private double quantidade;
     private int qtdcupom;
-    private int idSituacaocadastro;
+    private int idSituacaocadastro = 1;
     private int idTipopromocao;
     private double valor;
     private int controle;
@@ -39,18 +39,19 @@ public class PromocaoVO {
     private int qtdLimite;
     private boolean somenteClubeVantagens = false;
     private int diasExpiracao;
+    private boolean utilizaQuantidadeProporcional = false;
 
     /**
      * @return the id
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -209,6 +210,13 @@ public class PromocaoVO {
     }
 
     /**
+     * @param controle the controle to set
+     */
+    public void setControle(String controle) {
+        this.controle = Integer.parseInt(controle);
+    }
+
+    /**
      * @return the idTipopercentualvalor
      */
     public int getIdTipopercentualvalor() {
@@ -328,7 +336,8 @@ public class PromocaoVO {
     }
 
     /**
-     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to set
+     * @param idTipoPercentualValorDesconto the idTipoPercentualValorDesconto to
+     * set
      */
     public void setIdTipoPercentualValorDesconto(int idTipoPercentualValorDesconto) {
         this.idTipoPercentualValorDesconto = idTipoPercentualValorDesconto;
@@ -402,5 +411,13 @@ public class PromocaoVO {
      */
     public void setDiasExpiracao(int diasExpiracao) {
         this.diasExpiracao = diasExpiracao;
+    }
+
+    public boolean isUtilizaQuantidadeProporcional() {
+        return utilizaQuantidadeProporcional;
+    }
+
+    public void setUtilizaQuantidadeProporcional(boolean utilizaQuantidadeProporcional) {
+        this.utilizaQuantidadeProporcional = utilizaQuantidadeProporcional;
     }
 }

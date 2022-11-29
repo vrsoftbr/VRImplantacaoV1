@@ -361,6 +361,7 @@ public enum OpcaoProduto {
     IMPORTAR_PDV_VR,
     RECEITA,
     PRODUTOS_BALANCA,
+    PROMOCAO,
     ACEITA_MULTIPLICACAO_PDV {
         @Override
         public String toString() {

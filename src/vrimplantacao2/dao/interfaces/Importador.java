@@ -73,6 +73,8 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepository;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
+import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepository;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.receita.ReceitaRepository;
@@ -118,6 +120,7 @@ import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
@@ -382,6 +385,23 @@ public class Importador {
         repository.salvar(produtos);
 
     }
+    
+    /**
+     * Importa as promoções.
+     *
+     * @throws Exception
+     */
+    public void importarPromocao() throws Exception {
+        ProgressBar.setStatus("Carregando Promoções...");
+        List<PromocaoIMP> listaPromocoesVemDoDAO = getInterfaceDAO().getPromocoes();
+        PromocaoRepositoryProvider provider = new PromocaoRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        PromocaoRepository rep = new PromocaoRepository(provider);
+        rep.salvar(listaPromocoesVemDoDAO);
+}
     
     public void importarFornecedor(OpcaoFornecedor... opt) throws Exception {
         this.importarFornecedor(new HashSet<>(Arrays.asList(opt)));

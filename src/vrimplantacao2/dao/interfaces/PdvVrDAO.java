@@ -197,37 +197,43 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         List<PromocaoIMP> result = new ArrayList<>();
         try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "id,\n"
-                    + "descricao,\n"
-                    + "datainicio,\n"
-                    + "datatermino,\n"
-                    + "pontuacao,\n"
-                    + "quantidade,\n"
-                    + "qtdcupom,\n"
-                    + "id_situacaocadastro,\n"
-                    + "verificaprodutosauditados,\n"
-                    + "id_tipopromocao,\n"
-                    + "valor,\n"
-                    + "controle,\n"
-                    + "id_tipopercentualvalor,\n"
-                    + "id_tipoquantidade,\n"
-                    + "aplicatodos,\n"
-                    + "valorreferenteitenslista,\n"
-                    + "valordesconto,\n"
-                    + "codigoscanntech,\n"
-                    + "valorpaga,\n"
-                    + "id_tipopercentualvalordesconto,\n"
-                    + "desconsideraritem,\n"
-                    + "qtdlimite,\n"
-                    + "somenteclubevantagens,\n"
-                    + "diasexpiracao\n"
-                    + "from promocao\n"
-                    + "order by id"
+                    "SELECT \n"
+                    + "p.id,\n"
+                    + "p.descricao,\n"
+                    + "p.datainicio,\n"
+                    + "p.datatermino,\n"
+                    + "p.pontuacao,\n"
+                    + "p.quantidade,\n"
+                    + "p.qtdcupom,\n"
+                    + "p.id_situacaocadastro,\n"
+                    + "p.verificaprodutosauditados,\n"
+                    + "p.id_tipopromocao,\n"
+                    + "p.valor,\n"
+                    + "p.controle,\n"
+                    + "p.id_tipopercentualvalor,\n"
+                    + "p.id_tipoquantidade,\n"
+                    + "p.aplicatodos,\n"
+                    + "p.valorreferenteitenslista,\n"
+                    + "p.valordesconto,\n"
+                    + "p.codigoscanntech,\n"
+                    + "p.valorpaga,\n"
+                    + "p.id_tipopercentualvalordesconto,\n"
+                    + "p.desconsideraritem,\n"
+                    + "p.qtdlimite,\n"
+                    + "p.somenteclubevantagens,\n"
+                    + "p.diasexpiracao,\n"
+                    + "i.ID_PRODUTO,\n"
+                    + "i.PRECOVENDA, \n"
+                    + "p2.DESCRICAOCOMPLETA,\n"
+                    + "p3.CODIGOBARRAS \n"
+                    + "from promocao p\n"
+                    + "LEFT JOIN PROMOCAOITEM i ON p.ID = i.ID_PROMOCAO\n"
+                    + "LEFT JOIN PRODUTO p2 ON i.ID_PRODUTO = p2.ID \n"
+                    + "LEFT JOIN PRODUTOAUTOMACAO p3 ON i.ID_PRODUTO = p3.ID_PRODUTO "
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
-                    imp.setId(rst.getInt("id"));
+                    imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataTermino(rst.getDate("datatermino"));
@@ -245,11 +251,15 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorReferenteItensLista(rst.getBoolean("valorreferenteitenslista"));
                     imp.setValordesconto(rst.getDouble("valordesconto"));
                     imp.setValorPaga(rst.getDouble("valorpaga"));
+                    imp.setPaga(rst.getDouble("valorpaga"));
                     imp.setIdTipoPercentualValorDesconto(rst.getInt("id_tipopercentualvalordesconto"));
                     imp.setDesconsiderarItem(rst.getBoolean("desconsideraritem"));
                     imp.setQtdLimite(rst.getInt("qtdlimite"));
                     imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
                     imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
+                    imp.setId_produto(rst.getString("id_produto"));
+                    imp.setEan(rst.getString("CODIGOBARRAS"));
+                    imp.setDescricaoCompleta(rst.getString("DESCRICAOCOMPLETA"));
                     result.add(imp);
                 }
             }

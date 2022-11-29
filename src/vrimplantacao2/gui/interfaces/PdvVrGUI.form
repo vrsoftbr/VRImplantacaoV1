@@ -27,7 +27,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Component id="tabs" pref="540" max="32767" attributes="0"/>
+                  <Component id="tabs" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -166,30 +166,32 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" attributes="0">
-                                          <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
-                                          <Component id="chkForcarAtualizacaoPreco" min="-2" max="-2" attributes="0"/>
-                                      </Group>
                                       <Component id="chkProdutos" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkForcarAtualizacaoPreco" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTipoEmbalagemCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1EAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkPesavel" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkPromocao" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1EAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkPesavel" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
                                   </Group>
                               </Group>
-                              <Component id="chkTipoEmbalagemCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="51" max="32767" attributes="0"/>
+                          <EmptySpace pref="101" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -232,7 +234,10 @@
                               </Group>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          <Component id="chkTipoEmbalagemCotacao" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkTipoEmbalagemCotacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPromocao" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
@@ -316,6 +321,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemCotacao">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Embalagem Cota&#xe7;&#xe3;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPromocao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Promo&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -474,7 +484,7 @@
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="7" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
