@@ -1661,9 +1661,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "case when func_situacao in ('05','06','08') then 1 else 0 end bloqueado\n"
                     + "from\n"
                     + "	funcionarios"
-//                    + "where\n"
-//                    + "	func_unid_codigo = '" + getLojaOrigem() + "'\n"
-//                    + "order by 1"
+            //                    + "where\n"
+            //                    + "	func_unid_codigo = '" + getLojaOrigem() + "'\n"
+            //                    + "order by 1"
             )) {
                 while (rs.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();

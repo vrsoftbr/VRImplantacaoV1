@@ -34,8 +34,6 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -51,7 +49,6 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
@@ -72,10 +69,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
-                OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.VENDA_PDV,
-                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -87,11 +81,9 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
-                OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         ));
     }
 
@@ -235,7 +227,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	Grupo merc2,\n"
                     + "	Grupo merc3,\n"
                     + "	Unidade tipo_emb,\n"
-                    + " COALESCE (VendaPorKilo, 'N') pesavel,\n"
+                    + " case when Prix4 = 'S' then 1 else 0 end pesavel,\n"
                     + "	data data_cad,\n"
                     + "	Data_Modificacao data_alt,\n"
                     + "	Ativo,\n"
@@ -244,8 +236,8 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	EstoqueMaximo estmax,\n"
                     + "	EstoqueLoja estoque,\n"
                     + "	PrecoVenda,\n"
-                    + "	CAST(CustoRealUnitario as numeric (10,2)) precocusto,\n"
-                    + "	CAST(MargemLucro as numeric (10,2)) margem,\n"
+                    + " ROUND(CONVERT (money, CustoRealUnitario), 2) precocusto,\n"
+                    + "	ROUND(CONVERT (money, MargemLucro), 2) margem,\n"
                     + "	PesoBruto,\n"
                     + "	PesoLiquido,\n"
                     + "	Observacao,\n"
@@ -264,7 +256,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
-                    imp.seteBalanca("S".equals(rst.getString("pesavel")));
+                    imp.seteBalanca(rst.getBoolean("pesavel"));
 
                     imp.setEan(rst.getString("ean"));
 
@@ -309,8 +301,8 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-//                    imp.setIcmsCreditoId(rst.getString("id_icms"));
-//                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
+                    imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
 
                     Result.add(imp);
                 }
@@ -388,15 +380,16 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	CodFornecedor id_fornecedor,\n"
-                    + "	Codigo id_produto,\n"
-                    + "	1 qtde_emb\n"
+                    + "	pf.CodFornecedor id_fornecedor,\n"
+                    + "	pf.CodProduto id_produto,\n"
+                    + "	pf.CodProdForn cod_externo,\n"
+                    + "	p.QuantCaixa qtde_embalagem\n"
                     + "from\n"
-                    + "	MC_Produtos\n"
+                    + "	MC_ProdForn pf\n"
+                    + "	join MC_Produtos p on p.Codigo = pf.Codigo \n"
                     + "where\n"
-                    + "	CodFornecedor is not NULL\n"
-                    + "	and CodFornecedor <> 0\n"
-                    + "order by 1 ,2"
+                    + "	pf.CodFornecedor is not null\n"
+                    + "order by 1,2"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -404,7 +397,8 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setQtdEmbalagem(rst.getDouble("qtde_emb"));
+                    imp.setCodigoExterno(rst.getString("cod_externo"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtde_embalagem"));
 
                     Result.add(imp);
                 }
@@ -418,23 +412,29 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
+                    /*
+                    CASE 
+                        when NumDocto like '%/%'
+                            then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'/','')
+                        when NumDocto like '% - %'
+                            then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'-','')
+			else 1
+                    END parcela,
+                     */
                     "select\n"
                     + "	Codigo id,\n"
                     + "	CodFornece id_fornecedor,\n"
                     + "	NumDocto documento,\n"
-                    + "	CASE \n"
-                    + "     when NumDocto like '%/%'\n"
-                    + "		then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'/','')\n"
-                    + "     when NumDocto like '% - %'\n"
-                    + "         then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'-','')\n"
-                    + "     else 1\n"
-                    + "	END parcela,\n"
-                    + "	Emissao Emissao,\n"
+                    + " 1 as parcela,\n"
+                    + "	Emissao,\n"
                     + "	Valor,\n"
-                    + "	Vencimento Vencimento,\n"
-                    + "	DataPagamento pagamento\n"
+                    + "	Vencimento,\n"
+                    + "	DataPagamento pagamento,\n"
+                    + " NumDocto as observacao\n"
                     + "from\n"
-                    + "	MC_ContasMovimento cp"
+                    + "	MC_ContasMovimento cp\n"
+                    + "where\n"
+                    + "	CodFornece is not NULL and Emissao is not NULL"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -444,6 +444,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(imp.getDataEmissao());
+                    imp.setObservacao(rst.getString("observacao"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("Valor"), rst.getDate("pagamento"));
 
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("vencimento"), (rst.getDouble("valor")));
@@ -464,60 +465,59 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	Codigo id,\n"
-                    + "	CPF_CGC cpf_cnpj,\n"
-                    + "	RG rg_ie,\n"
-                    + "	nome razao,\n"
-                    + "	case when Condicao = 'BLOQUEADO' then 1 else 0 end bloqueado,\n"
-                    + "	case when Ativo = 'SIM' then 1 else 0 end situacaocadastro,\n"
-                    + "	CONVERT (date, DataNascimento) data_nasc,\n"
+                    + "	Nome fantasia,\n"
+                    + "	RazaoSocial,\n"
+                    + "	CPF_CGC,\n"
+                    + "	RG,\n"
+                    + "	DataNascimento data_nasc,\n"
+                    + "	DataCadastro data_cad,\n"
+                    + "	case when Ativo = 'SIM' then 1 else 0 end ativo,\n"
                     + "	Endereco,\n"
                     + "	Numero,\n"
+                    + "	Complemento,\n"
                     + "	Bairro,\n"
                     + "	Cidade,\n"
-                    + "	CodMunicipio mun_ibge,\n"
                     + "	uf,\n"
-                    + "	Fone,\n"
-                    + "	Celular,\n"
-                    + "	Limite,\n"
-                    + "	DataCadastro,\n"
+                    + " CEP,\n"
                     + "	NomeMae,\n"
                     + "	NomePai,\n"
-                    + "	Conjuge,\n"
-                    + "	Obs1 observacao\n"
+                    + "	Fone,\n"
+                    + "	Celular,\n"
+                    + " EMail,\n"
+                    + "	Contato,\n"
+                    + "	Limite,\n"
+                    + " Obs1\n"
                     + "from\n"
-                    + "	MC_Clientes mc\n"
-                    + "order by Codigo"
+                    + "	MC_Clientes"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rst.getString("vfd_codCliente"));
-                    imp.setRazao(rst.getString("vfd_nomecliente"));
-                    imp.setFantasia(rst.getString("vfd_nomepdv"));
-                    imp.setCnpj(rst.getString("vfd_cpf"));
-                    imp.setInscricaoestadual(rst.getString("vfd_rg"));
-                    imp.setSexo(rst.getInt("vfd_Sexo") == 0 ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                    imp.setEstadoCivil(rst.getInt("vfd_estadocivil"));
-                    imp.setEndereco(rst.getString("vfd_endereco"));
-                    imp.setNumero(rst.getString("vfd_numero"));
-                    imp.setComplemento(rst.getString("vfd_complemento"));
-                    imp.setCep(rst.getString("vfd_cep"));
-                    imp.setBairro(rst.getString("vfd_bairro"));
-                    imp.setMunicipio(rst.getString("vfd_cidade"));
-                    imp.setUf(rst.getString("vfd_estado"));
-                    imp.setEmail(rst.getString("vfd_email"));
-                    imp.setTelefone(rst.getString("vfd_ddd") + rst.getString("vfd_fone"));
-                    imp.setCelular(rst.getString("vfd_dddcelular") + rst.getString("vfd_celular"));
-                    imp.setDataCadastro(rst.getDate("vfd_datacadastro"));
-                    imp.setDataNascimento(rst.getDate("vfd_datanascimento"));
-                    imp.setSalario(rst.getDouble("vfd_renda"));
-                    imp.setValorLimite(rst.getDouble("vfd_limitecredito"));
-                    imp.setObservacao(rst.getString("vfd_observacoes"));
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("RazaoSocial"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("CPF_CGC"));
+                    imp.setInscricaoestadual(rst.getString("RG"));
+                    imp.setDataCadastro(rst.getDate("data_cad"));
+                    imp.setDataNascimento(rst.getDate("data_nasc"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
 
-                    if (rst.getDouble("limitecheque") > 0) {
-                        imp.setPermiteCheque(true);
-                        imp.setValorLimite(rst.getDouble("limitecheque"));
-                    }
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setUf(rst.getString("uf"));
+
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+
+                    imp.setNomeMae(rst.getString("NomeMae"));
+                    imp.setNomePai(rst.getString("NomePai"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setObservacao(rst.getString("Obs1"));
 
                     Result.add(imp);
                 }
@@ -531,22 +531,30 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	Codigo id,\n"
+                    + "	CodCliente id_cliente,\n"
+                    + "	NumDocto documento,\n"
+                    + "	Emissao,\n"
+                    + "	valor,\n"
+                    + "	Vencimento,\n"
+                    + "	ItemPosicao parcela,\n"
+                    + "	1 as ecf\n"
+                    + "from\n"
+                    + "	MC_Titulos mt\n"
+                    + "where\n"
+                    + "	Recebimento is null\n"
+                    + "order by Codigo,Emissao"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(getLojaOrigem()
-                            + rst.getString("empresa")
-                            + rst.getString("documento")
-                            + rst.getString("id_cliente")
-                            + rst.getString("emissao")
-                            + rst.getInt("parcela"));
+                    imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("id_cliente"));
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setValor(rst.getDouble("valorparcela"));
                     imp.setEcf(rst.getString("ecf"));
 
                     Result.add(imp);
@@ -554,209 +562,5 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return Result;
-    }
-
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
-
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
-
-        private void obterNext() {
-            try {
-
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaIMP();
-
-                        String id = rst.getString("idloja") + "-"
-                                + rst.getString("ecf") + "-"
-                                + rst.getString("coo") + "-"
-                                + rst.getString("dataemissao") + "-"
-                                + rst.getString("cro");
-
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
-                        next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("hora"));
-                        next.setIdClientePreferencial(rst.getString("idcliente"));
-                        next.setHoraInicio(timestamp.parse(rst.getString("hora")));
-                        next.setHoraTermino(timestamp.parse(rst.getString("hora")));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                    }
-                }
-            } catch (SQLException | ParseException ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select \n"
-                    + "	tgc.vfd_CodFilial idloja,\n"
-                    + "	tgc.vfd_Caixa ecf,\n"
-                    + "	tgc.vfd_Cupom coo,\n"
-                    + "	max(tgc.vfd_CodCliente) idcliente,\n"
-                    + "	convert(varchar, tgc.vfd_DataHora, 23) dataemissao, \n"
-                    + "	max(tgc.vfd_DataHora) hora,\n"
-                    + "	sum(tgc.vfd_Valor) subtotalimpressora,\n"
-                    + "	max(tgc.vfd_DataLancamento) emissao,\n"
-                    + "	max(vfd_CodFinalizadora) finalizadora,\n"
-                    + "	max(vfd_desdobramento) desdo,\n"
-                    + "	max(vfd_CRO) cro\n"
-                    + "from \n"
-                    + "	tab_GastosClientes tgc\n"
-                    + "where \n"
-                    + "	tgc.vfd_CodFilial = " + idLojaCliente + " and \n"
-                    + "	convert(varchar, tgc.vfd_DataHora, 23) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + "group by \n"
-                    + "	vfd_CodFilial, \n"
-                    + "	vfd_Caixa,\n"
-                    + "	vfd_Cupom, \n"
-                    + "	convert(varchar, tgc.vfd_DataHora, 23)";
-            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaIMP next() {
-            obterNext();
-            VendaIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-
-    }
-
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaItemIMP next;
-
-        private void obterNext() {
-            try {
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaItemIMP();
-                        String id = rst.getString("filial") + "-"
-                                + rst.getString("ecf") + "-"
-                                + rst.getString("dataemissao")
-                                + rst.getString("mov")
-                                + rst.getString("coo")
-                                + rst.getString("sequencia")
-                                + rst.getString("cro")
-                                + rst.getString("idproduto");
-
-                        String idVenda = rst.getString("filial") + "-"
-                                + rst.getString("ecf") + "-"
-                                + rst.getString("coo") + "-"
-                                + rst.getString("dataemissao") + "-"
-                                + rst.getString("cro");
-
-                        next.setId(id);
-                        next.setVenda(idVenda);
-                        next.setProduto(rst.getString("idproduto"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
-                        next.setCodigoBarras(rst.getString("ean"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setSequencia(rst.getInt("sequencia"));
-                    }
-                }
-            } catch (SQLException ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select \n"
-                    + "	vi.vfd_CodFilial filial,\n"
-                    + "	vi.vfd_CodMovimentacao mov,\n"
-                    + "	vi.vfd_CodProduto idproduto,\n"
-                    + "	vi.vfd_CodBarra ean,\n"
-                    + "   pr.vfd_TipoInventarioFatorConversao unidade,\n"
-                    + "	vi.vfd_QtdOperac quantidade,\n"
-                    + "	vi.vfd_ValorTotal total,\n"
-                    + "	convert(varchar, vi.vfd_DTMovimentacao, 23) dataemissao,\n"
-                    + "	vi.vfd_DTMovimentacao movimento,\n"
-                    + "	vi.vfd_Caixa ecf,\n"
-                    + "	vi.vfd_Cupom_NF coo,\n"
-                    + "	vi.vfd_Indice sequencia,\n"
-                    + "	vi.vfd_CRO_Serie cro\n"
-                    + "from\n"
-                    + "	tab_MovimentacaoVendas vi\n"
-                    + "join tab_produto pr on vi.vfd_CodProduto = pr.vfd_CodProduto\n"
-                    + "where\n"
-                    + "	vi.vfd_CodFilial = " + idLojaCliente + " and\n"
-                    + "	vi.vfd_DTMovimentacao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
-            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaItemIMP next() {
-            obterNext();
-            VendaItemIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
     }
 }
