@@ -32,7 +32,7 @@ public class ExecutaSpedDAO {
                     + "	trim(ca.impid) similar to '[0-9]+'\n"
                     + "	and length(trim(regexp_replace(ca.impid,'[^0-9]','','g'))) < 19\n"
                     + "	and not ca.codigoatual in (select distinct id_produto from sped.produtoalteracao))\n"
-                    + "select\n"
+                    + "select distinct\n"
                     + "	*\n"
                     + "from alt \n"
                     + "where\n"

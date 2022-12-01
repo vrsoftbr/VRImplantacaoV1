@@ -22,7 +22,7 @@ public class RelatorioCodigoBalancaAlteradoDAO {
         List<CodBalAlteradoVO> dadosCodBal = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select 	\n"
+                    "select distinct	\n"
                     + "	ce.importid,\n"
                     + "	cp.descricao,\n"
                     + "	ce.ean,\n"
