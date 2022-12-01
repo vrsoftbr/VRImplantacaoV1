@@ -17,6 +17,7 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO.Regiao;
+import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO.TipoRotativo;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
@@ -39,6 +40,7 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         carregarRegioes();
+        carregaTipoRotativo();
         tabProdutos.setOpcoesDisponiveis(dao);
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
@@ -72,6 +74,45 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
 
         centralizarForm();
         this.setMaximum(false);
+    }
+    
+    private class TipoRotativoListModel extends AbstractListModel<TipoRotativo> implements ComboBoxModel<TipoRotativo> {
+
+        List<TipoRotativo> rotativo = dao.getTipoRotativo();
+        private TipoRotativo selecionado;
+
+        @Override
+        public int getSize() {
+            return rotativo.size();
+        }
+
+        @Override
+        public TipoRotativo getElementAt(int index) {
+            return rotativo.get(index);
+        }
+
+        @Override
+        public void setSelectedItem(Object selecionado) {
+            if (selecionado instanceof Integer) {
+                for (TipoRotativo rotativo : rotativo) {
+                    if (rotativo.descricaocobranca == (String) selecionado) {
+                        this.selecionado = rotativo;
+                        return;
+                    }
+                }
+            }
+            if (selecionado instanceof TipoRotativo) {
+                this.selecionado = (TipoRotativo) selecionado;
+                return;
+            }
+            this.selecionado = null;
+        }
+
+        @Override
+        public TipoRotativo getSelectedItem() {
+            return this.selecionado;
+        }
+
     }
 
     private class RegiaoListModel extends AbstractListModel<Regiao> implements ComboBoxModel<Regiao> {
@@ -111,6 +152,11 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
             return this.selectionado;
         }
 
+    }
+    
+    public void carregaTipoRotativo() throws Exception{
+        cmbTipoRotativo.setModel(new TipoRotativoListModel());
+        cmbTipoRotativo.getModel().setSelectedItem(Parametros.get().get(SISTEMA, "TIPO_ROTATIVO"));
     }
 
     public void carregarRegioes() throws Exception {
@@ -152,6 +198,8 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                     dao.setIdRegiaoDentroEstado(((Regiao) cmbDentroUf.getModel().getSelectedItem()).id);
                     dao.setIdRegiaoForaEstado(((Regiao) cmbForaUf.getModel().getSelectedItem()).id);
                     dao.setSomenteClienteFidelidade(chkClientePreferenciaSomenteClube.isSelected());
+                    dao.setTipoRotativo(((TipoRotativo) cmbTipoRotativo.getModel().getSelectedItem()).descricaocobranca);
+                    dao.setTributacaoNcmFigura(chkTributacaoNcmFigura.isSelected());
 
                     Importador importador = new Importador(dao);
 
@@ -246,6 +294,9 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
         lblLojaOrigem2 = new javax.swing.JLabel();
         cmbForaUf = new javax.swing.JComboBox();
         chkClientePreferenciaSomenteClube = new vrframework.bean.checkBox.VRCheckBox();
+        lblLojaOrigem3 = new javax.swing.JLabel();
+        cmbTipoRotativo = new javax.swing.JComboBox();
+        chkTributacaoNcmFigura = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -402,6 +453,19 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
             }
         });
 
+        lblLojaOrigem3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        lblLojaOrigem3.setText("Tipo Rotativo");
+
+        cmbTipoRotativo.setModel(new DefaultComboBoxModel());
+
+        chkTributacaoNcmFigura.setText("Tributação por NCM/Figura Tributária");
+        chkTributacaoNcmFigura.setEnabled(true);
+        chkTributacaoNcmFigura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkTributacaoNcmFiguraActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
         tabExtras.setLayout(tabExtrasLayout);
         tabExtrasLayout.setHorizontalGroup(
@@ -417,7 +481,12 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                         .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(cmbDentroUf, 0, 430, Short.MAX_VALUE)
                             .addComponent(cmbForaUf, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(chkClientePreferenciaSomenteClube, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClientePreferenciaSomenteClube, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabExtrasLayout.createSequentialGroup()
+                        .addComponent(lblLojaOrigem3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbTipoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkTributacaoNcmFigura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(47, Short.MAX_VALUE))
         );
         tabExtrasLayout.setVerticalGroup(
@@ -433,7 +502,13 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                     .addComponent(lblLojaOrigem2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkClientePreferenciaSomenteClube, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(146, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabExtrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cmbTipoRotativo)
+                    .addComponent(lblLojaOrigem3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkTributacaoNcmFigura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(73, Short.MAX_VALUE))
         );
 
         tabMenu.addTab("Parametros Extras", tabExtras);
@@ -497,17 +572,24 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkClientePreferenciaSomenteClubeActionPerformed
 
+    private void chkTributacaoNcmFiguraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkTributacaoNcmFiguraActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkTributacaoNcmFiguraActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferenciaSomenteClube;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private vrframework.bean.checkBox.VRCheckBox chkTributacaoNcmFigura;
     private javax.swing.JComboBox cmbDentroUf;
     private javax.swing.JComboBox cmbForaUf;
+    private javax.swing.JComboBox cmbTipoRotativo;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel lblLojaOrigem1;
     private javax.swing.JLabel lblLojaOrigem2;
+    private javax.swing.JLabel lblLojaOrigem3;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlImpPdvVenda;

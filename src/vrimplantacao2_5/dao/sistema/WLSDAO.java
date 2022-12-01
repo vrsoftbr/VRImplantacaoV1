@@ -619,7 +619,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = " SELECT \n"
+                    = " SELECT\n"
                     + "  N_PEDIDO||'-'||CAIXA id_venda,\n"
                     + "  CAIXA ecf,\n"
                     + "  DATA,\n"
@@ -631,7 +631,8 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + " DATA >= '" + strDataInicio + "'\n"
                     + " AND \n"
-                    + " DATA <= '" + strDataTermino + "'";
+                    + " DATA <= '" + strDataTermino + "'\n"
+                    + " AND  N_PEDIDO||'-'||CAIXA IS NOT NULL ";//AND STATUS <> 'CANCELADO'"; PdvVendaDAO
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -704,7 +705,7 @@ public class WLSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " AND \n"
                     + " v.DATA <= '"+VendaIterator.FORMAT.format(dataTermino)+"'\n"
                     + " AND \n"
-                    + " STATUS = 'FINALIZADO' OR STATUS IS NULL";
+                    + " STATUS = 'FINALIZADO' OR STATUS IS NULL"; //PdvVendaItemDAO
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

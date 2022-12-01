@@ -92,6 +92,7 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.VASILHAME
@@ -526,6 +527,47 @@ public class GuiaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
             }
             return vResult;
         }
+        
+        if (opt == OpcaoProduto.VOLUME_TIPO_EMBALAGEM || opt == OpcaoProduto.VOLUME_QTD) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT\n" +
+                        "	prod.vfd_codproduto idproduto,\n" +
+                        "	prod.vfd_FatorConversaoEtiq volume,\n" +
+                        "	SUBSTRING(tu.vfd_Descricao,1,2) unidadevolume\n" +
+                        "from\n" +
+                        "	tab_produto as prod\n" +
+                        "LEFT JOIN tab_Unidade tu on tu.vfd_CodUnidade = prod.vfd_UnidMedidaEtiq\n" +
+                        "LEFT JOIN tab_precoatual pr on pr.vfd_CodProduto = prod.vfd_codproduto\n" +
+                        "	and pr.vfd_CodFilial = "+getLojaOrigem()+"\n" +
+                        "LEFT JOIN tab_estoqueatual est on est.vfd_CodProduto = prod.vfd_CodProduto\n" +
+                        "	and est.vfd_CodFilial = "+getLojaOrigem()+"\n" +
+                        "WHERE\n" +
+                        "	pr.vfd_QtdEmb = 1\n" +
+                        "	and \n" +
+                        "	tu.vfd_Descricao is not null \n" +
+                        "	and \n" +
+                        "	prod.vfd_FatorConversaoEtiq is not null\n" +
+                        "ORDER BY\n" +
+                        "	prod.vfd_codproduto"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setVolume(rst.getDouble("volume"));
+                        imp.setTipoEmbalagemVolume(rst.getString("unidadevolume"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+        
         
         if (opt == OpcaoProduto.ESTOQUE) {
             List<ProdutoIMP> vResult = new ArrayList<>();
