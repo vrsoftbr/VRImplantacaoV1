@@ -94,6 +94,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO
@@ -111,7 +112,8 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.TELEFONE
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.SITUACAO_CADASTRO
         ));
     }
 
@@ -237,6 +239,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return new ArrayList<>(merc.values());
     }
+
     /*
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
@@ -274,8 +277,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    */
-
+     */
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -285,7 +287,8 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.id_produto, \n"
                     + "    e.codigo_barras,\n"
                     + "    e.sigla_unidade_logistica,\n"
-                    + "    '1' as qtdembalagem,\n"
+                    + "    cad.multiplicador as qtdembalagem,\n"
+                    + "    '1' as qtdembalagemean, \n"
                     + "    p.nome as descricao, \n"
                     + "    p.situacao,\n"
                     + "    u.sigla as tipoembalagem,\n"
@@ -316,6 +319,8 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    substring(rt.nome, 0, 3) cst_regra\n"
                     + "from produto p\n"
                     + "    inner join unidade_medida u on u.id_unidade_medida = p.id_unidade_medida\n"
+                    + "LEFT JOIN cadastro_logistico_produto cad on p.id_produto = cad.id_produto\n"
+                    + "    and cad.multiplicador = (SELECT MAX(multiplicador) from cadastro_logistico_produto c where c.id_produto = cad.id_produto) \n"
                     + "    left join produto_sinonimo e on e.id_produto = p.id_produto\n"
                     + "    left join hierarquia_produto m on m.id_hierarquia_produto = p.id_hierarquia_produto\n"
                     + "    left join situacao_tributaria_pis pis on pis.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis\n"
@@ -340,6 +345,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("codigo_barras"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
+                    imp.setSituacaoCadastro(rst.getInt("situacao") == 1 ? 1 : 0);
 
                     if (imp.isBalanca()) {
                         imp.setEan(imp.getImportId());
@@ -354,7 +360,10 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagemean"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemVolume(rst.getString("tipoembalagem"));
 
                     /*String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
                     String[] cods = merc.split("\\.");
@@ -486,7 +495,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
-                    imp.setAtivo(rst.getInt("inativo") == 1);
+                    imp.setAtivo(rst.getInt("inativo") == 0);
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero_endereco"));
@@ -625,7 +634,7 @@ public class HiperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj") == null ? rst.getString("cpf") : rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("ie"));
-                    imp.setAtivo(rst.getInt("inativo") == 1);
+                    imp.setAtivo(rst.getInt("inativo") == 0);
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero_endereco"));

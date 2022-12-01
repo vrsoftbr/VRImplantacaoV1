@@ -884,7 +884,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "SELECT\n"
-                    + "	c.codigo_controle_sat id_venda,\n"
+                    + "	c.codigo_controle_sat ||c.pdv id_venda,\n"
                     + "	c.numero_cupom numerocupom,\n"
                     + "	c.pdv ecf,\n"
                     + "	c.data as data,\n"
@@ -956,7 +956,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT  \n"
                     + " v.item nritem,\n"
-                    + "	v.codigo_controle_sat id_venda,\n"
+                    + "	v.codigo_controle_sat || v.pdv id_venda,\n"
                     + "	v.sequencia_reg id_item,\n"
                     + "	v.codigo_interno_produto id_produto,\n"
                     + "	v.descricao descricao,\n"
