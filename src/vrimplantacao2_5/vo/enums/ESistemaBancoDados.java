@@ -196,6 +196,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_ASEFE(7, "ASEFE", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ATMA(10, "ATMA", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_AVISTARE(16, "AVISTARE", 13, "SQLSERVER", "Avistare", "sa", "@vs2008", 1433),
+    SQLSERVER_BRDATA(240, "BRDATA", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_CONTROLX(32, "CONTROLX", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_DATASYNC(38, "DATASYNC", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_DIRECTOR(42, "DIRECTOR", 13, "SQLSERVER", "", "sa", "#1qwer0987", 1433),
