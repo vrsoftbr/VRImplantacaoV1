@@ -423,7 +423,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                      */
                     "select\n"
                     + "	Codigo id,\n"
-                    + "	CodFornece id_fornecedor,\n"
+                    + "	COALESCE(CodFornece, 264) id_fornecedor,\n"
                     + "	NumDocto documento,\n"
                     + " 1 as parcela,\n"
                     + "	Emissao,\n"
@@ -434,7 +434,7 @@ public class GSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	MC_ContasMovimento cp\n"
                     + "where\n"
-                    + "	CodFornece is not NULL and Emissao is not NULL"
+                    + "	Emissao is not NULL"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
