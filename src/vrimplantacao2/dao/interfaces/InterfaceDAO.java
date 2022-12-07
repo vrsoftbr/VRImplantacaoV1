@@ -16,6 +16,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.cadastro.pdv.ecf.EcfPdvVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
@@ -204,6 +205,15 @@ public abstract class InterfaceDAO {
      */   
     public List<ProdutoIMP> getEANsAtacado() throws Exception {
         return getProdutos();
+    }
+    
+     /**
+     * Retorna uma lista com os EANs dos produtos
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public List<EcfPdvVO> getECF() throws Exception {
+        return new ArrayList<>();
     }
     
     /**

@@ -245,13 +245,19 @@ public class PdvVrGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        
+                        if (chkEcf.isSelected()) {
+                            importador.importarECFPdv();
+                        }
 
                         if (chkOperador.isSelected()) {
                             importador.importarOperador();
                         }
+                        
                         if (chkPromocao.isSelected()){
                             importador.importarPromocao();
                         }
+                        
                         if(chkClientePreferencial.isSelected()){
                             if(!txtDatabasePdv.getArquivo().isEmpty()){
                                 importador.importarClientePreferencial();
@@ -312,6 +318,7 @@ public class PdvVrGUI extends VRInternalFrame {
         chkPromocao = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkOperador = new vrframework.bean.checkBox.VRCheckBox();
+        chkEcf = new javax.swing.JCheckBox();
         vRPanelCliente = new javax.swing.JPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         pnlParametro = new javax.swing.JPanel();
@@ -499,21 +506,27 @@ public class PdvVrGUI extends VRInternalFrame {
 
         chkOperador.setText("Operadores");
 
+        chkEcf.setText("ECF's");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(437, Short.MAX_VALUE))
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEcf))
+                .addContainerGap(443, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkEcf)
+                .addContainerGap(147, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Operadores", vRPanel1);
@@ -814,6 +827,7 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkDataProcessamento;
+    private javax.swing.JCheckBox chkEcf;
     private vrframework.bean.checkBox.VRCheckBox chkForcarAtualizacaoPreco;
     private vrframework.bean.checkBox.VRCheckBox chkOperador;
     private vrframework.bean.checkBox.VRCheckBox chkPesavel;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.pdv.ecf.EcfPdvVO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -290,6 +291,31 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rs.getString("nome"));
                     imp.setCnpj(rs.getString("cpf"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<EcfPdvVO> getECF() throws Exception {
+        List<EcfPdvVO> result = new ArrayList<>();
+        try (Statement stm = bancovr.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	e.id,\n"
+                    + "	e.ecf ecf,\n"
+                    + "	e.ID_SITUACAOCADASTRO ativo\n"
+                    + "FROM\n"
+                    + "	ECF e "
+            )) {
+                while (rst.next()) {
+                    EcfPdvVO imp = new EcfPdvVO();
+                    imp.setId(rst.getInt("id"));
+                    imp.setId_loja(Integer.parseInt(getLojaOrigem()));
+                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setId_situacaocadastro(rst.getInt("ativo"));
                     result.add(imp);
                 }
             }

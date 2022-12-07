@@ -63,6 +63,8 @@ import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepository;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepositoryProvider;
+import vrimplantacao2.dao.cadastro.pdv.ecf.EcfPdvVO;
+import vrimplantacao2.dao.cadastro.pdv.ecf.EcfRepository;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepository;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -238,6 +240,17 @@ public class Importador {
                 getLojaVR()
         );
         repository.salvar(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
+    }
+    
+    /**
+     * Importa os ECFs do banquinho pdv Firebird.
+     *
+     * @throws Exception
+     */
+    public void importarECFPdv() throws Exception {
+        List<EcfPdvVO> ecfs = getInterfaceDAO().getECF();
+        EcfRepository rep  = new EcfRepository();
+        rep.salvarECFPdv(ecfs);
     }
 
     /**
