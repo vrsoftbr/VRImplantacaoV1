@@ -6,21 +6,14 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -29,7 +22,6 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -40,8 +32,6 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
@@ -99,9 +89,6 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.PDV_VENDA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO
         ));
@@ -172,15 +159,16 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "s.SUBGRUPOS_ID as merc1,\n"
-                    + "s.SUBGRUPO_NOME merc1_descricao\n"
-                    + "from SUBGRUPOS s "
+                    + "g.GRUPOS_ID  as merc1,\n"
+                    + "g.GRUPO_NOME merc1_descricao\n"
+                    + "from GRUPOS g"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
@@ -192,11 +180,11 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
 
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "s.SUBGRUPOS_ID as merc1,\n"
-                    + "s.GRUPOS_ID as merc2,\n"
-                    + "g.GRUPO_NOME as merc2_descricao\n"
+                    + "g.GRUPOS_ID as merc1,\n"
+                    + "s.SUBGRUPOS_ID as merc2,\n"
+                    + "s.SUBGRUPO_NOME as merc2_descricao\n"
                     + "from SUBGRUPOS s\n"
-                    + "JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID "
+                    + "JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
@@ -211,12 +199,12 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
 
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "s.SUBGRUPOS_ID as merc1,\n"
-                    + "s.GRUPOS_ID as merc2,\n"
+                    + "g.GRUPOS_ID as merc1,\n"
+                    + "s.SUBGRUPOS_ID as merc2,\n"
                     + "'1' as merc3,\n"
-                    + "g.GRUPO_NOME as merc3_descricao\n"
+                    + "s.SUBGRUPO_NOME as merc3_descricao\n"
                     + "from SUBGRUPOS s\n"
-                    + "JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID  "
+                    + "JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
@@ -234,23 +222,22 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return new ArrayList<>(merc.values());
     }
-
-    /*
+     */
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select 
-                        s.SUBGRUPOS_ID as merc1,
-                        s.SUBGRUPO_NOME AS merc1_descricao,
-                        s.GRUPOS_ID as merc2,
-                        g.GRUPO_NOME AS merc2_descricao,
-                        g.GRUPOS_ID AS merc3,
-                        g.GRUPO_NOME as merc3_descricao
-                        from SUBGRUPOS s
-                        JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID "
+                    "select DISTINCT \n"
+                    + "g.GRUPOS_ID  as merc1,\n"
+                    + "g.GRUPO_NOME AS merc1_descricao,\n"
+                    + "s.SUBGRUPOS_ID as merc2,\n"
+                    + "s.SUBGRUPO_NOME AS merc2_descricao,\n"
+                    + "'1' AS merc3,\n"
+                    + "s.SUBGRUPO_NOME as merc3_descricao\n"
+                    + "from SUBGRUPOS s\n"
+                    + "JOIN GRUPOS g ON s.GRUPOS_ID = g.GRUPOS_ID"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -269,7 +256,7 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-     */
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -288,7 +275,9 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    END situacao,\n"
                     + "    p.FAMILIAS_ID familia, \n"
                     + "    u.UNIDADE_NOME as tipoembalagem,\n"
-                    + "    p.SUBGRUPOS_ID as mercadologico,\n"
+                    + "    g.GRUPOS_ID as merc1,\n"
+                    + "    s.SUBGRUPOS_ID merc2,\n"
+                    + "    '1' merc3,\n"
                     + "    p.PRODUTO_CADASTRO as datacadastro,\n"
                     + "    p.PRODUTO_PRECO_CUSTO preco_custo,\n"
                     + "    p.PRODUTO_CUSTO_MEDIO custo_medio,\n"
@@ -313,7 +302,9 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.ALIQUOTAS_ID icmsid,\n"
                     + "    p.PRODUTO_ICMS_RED red_icms\n"
                     + "from PRODUTOS p \n"
-                    + "LEFT JOIN UNIDADES u ON p.UNIDADES_ID = u.UNIDADES_ID"
+                    + "LEFT JOIN UNIDADES u ON p.UNIDADES_ID = u.UNIDADES_ID \n"
+                    + "LEFT JOIN SUBGRUPOS s ON p.SUBGRUPOS_ID = s.SUBGRUPOS_ID \n"
+                    + "LEFT JOIN GRUPOS g ON g.GRUPOS_ID = s.GRUPOS_ID"
             )) {
                 while (rst.next()) {
                     Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -330,7 +321,9 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
 
-                    imp.setCodMercadologico1(rst.getString("mercadologico"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("preco_custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
@@ -360,12 +353,14 @@ public class FacilDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                        imp.setTipoEmbalagemCotacao("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
                         imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.setEan(rst.getString("codigo_barras"));
                         imp.seteBalanca(false);
                         imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("tipoEmbalagem"));
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(0);
                     }
