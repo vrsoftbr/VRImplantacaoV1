@@ -6,11 +6,13 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.pdv.ecf.EcfPdvVO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
@@ -133,6 +135,31 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("id_aliquota"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliquota"));
                     imp.setIcmsConsumidorId(rst.getString("id_aliquota"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<EcfPdvVO> getECF() throws SQLException {
+        List<EcfPdvVO> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	e.id,\n"
+                    + "	e.ecf ecf,\n"
+                    + "	e.ID_SITUACAOCADASTRO ativo\n"
+                    + "FROM\n"
+                    + "	ECF e "
+            )) {
+                while (rst.next()) {
+                    EcfPdvVO imp = new EcfPdvVO();
+                    imp.setId(rst.getInt("id"));
+                    imp.setId_loja(Integer.parseInt(getLojaOrigem()));
+                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setId_situacaocadastro(rst.getInt("ativo"));
                     result.add(imp);
                 }
             }
