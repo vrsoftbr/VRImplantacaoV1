@@ -209,6 +209,7 @@ import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
@@ -249,6 +250,7 @@ import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
+import vrimplantacao2_5.gui.sistema.BrData2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
@@ -2035,6 +2037,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Facil2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    BRDATA(240, "BRDATA", new BrDataDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new BrData2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
