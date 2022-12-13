@@ -727,18 +727,14 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("cupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
+                        next.setData(rst.getDate("datavenda"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setSubTotalImpressora(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -752,7 +748,24 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "";
+                    = "select\n"
+                    + "	tsai_emitent_1::varchar || '-' || tsai_nronota_1::varchar || '-' || tsai_sernota_1 id_venda,\n"
+                    + "	tsai_nronota_1 cupom,\n"
+                    + "	tsai_sernota_1 ecf,\n"
+                    + "	tsai_datemis_1 datavenda,\n"
+                    + "	case\n"
+                    + "     when length(tsai_horaemi_1::varchar) < 8\n"
+                    + "     then substring('0'||tsai_horaemi_1::varchar, 1,2)||':'||substring(tsai_horaemi_1::varchar, 3,2)\n"
+                    + "     else substring(tsai_horaemi_1::varchar, 1,2)||':'||substring(tsai_horaemi_1::varchar, 3,2)\n"
+                    + "	end hora\n"
+                    + "from\n"
+                    + "	notsai v\n"
+                    + "where\n"
+                    + "	tsai_vendedo_1 = " + idLojaCliente + "\n"
+                    + "	and tsai_descnat_1 = 'VENDAS'\n"
+                    + " and tsai_emitent_1 = 1\n"
+                    + "	and tsai_datemis_1 between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "order by 4,5";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -793,16 +806,13 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
                         next.setProduto(rst.getString("produto"));
+                        next.setSequencia(rst.getInt("sequencial"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-
                     }
                 }
             } catch (Exception ex) {
@@ -813,7 +823,31 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = "select\n"
+                    + "	tsai_emitent_1::varchar || '-' || tsai_nronota_1::varchar || '-' || tsai_sernota_1 id_venda,\n"
+                    + "	saii_emitent_1::varchar || saii_nronota_1 || saii_sernota_1 || saii_codprod_1 || saii_emiprod_1 || saii_seqnota_1 id_item,\n"
+                    + "	vi.saii_seqnota_1 sequencial,\n"
+                    + "	saii_uniemba_1 unidade,\n"
+                    + "	vi.saii_codprod_1 produto,\n"
+                    + "	case\n"
+                    + "	  when tpro_codbarr_1 = 0\n"
+                    + "	  then tpro_codprod_1::varchar\n"
+                    + "	  else tpro_codbarr_1::varchar\n"
+                    + "	end codigobarras,\n"
+                    + "	saii_descric_1 descricao,\n"
+                    + "	vi.saii_quantid_1 quantidade,\n"
+                    + "	round(vi.saii_valunit_1,2) precovenda,\n"
+                    + "	vi.saii_totitem_1 total\n"
+                    + "from\n"
+                    + "	notsaii vi\n"
+                    + "	join notsai v on v.tsai_emitent_1 = vi.saii_emitent_1 and v.tsai_nronota_1 = vi.saii_nronota_1 and v.tsai_sernota_1 = vi.saii_sernota_1\n"
+                    + "	join estpro p on p.tpro_codprod_1 = vi.saii_codprod_1\n"
+                    + "where\n"
+                    + "	tsai_vendedo_1 = " + idLojaCliente + "\n"
+                    + "	and tsai_descnat_1 = 'VENDAS'\n"
+                    + " and tsai_emitent_1 = 1\n"
+                    + "	and tsai_datemis_1 between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "order by 3,4";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
