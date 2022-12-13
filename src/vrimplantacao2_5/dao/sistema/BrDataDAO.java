@@ -113,7 +113,6 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
 
@@ -166,14 +165,15 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
-                    + " g.C003_Codigo merc1,\n"
-                    + " g.C003_Descricao mercdesc1,\n"
-                    + " sb.C004_Codigo merc2,\n"
-                    + " sb.C004_Descricao mercdesc2,\n"
+                    + " l.C191_Codigo merc1,\n"
+                    + " l.C191_Descricao mercdesc1,\n"
+                    + " g.C003_Codigo merc2,\n"
+                    + " g.C003_Descricao mercdesc2,\n"
                     + " sb.C004_Codigo merc3,\n"
                     + " sb.C004_Descricao mercdesc3\n"
                     + "from C001_Produto p\n"
                     + "join C003_ProdutoGrupo g on g.C003_Codigo  = p.C003_CodigoGrupo\n"
+                    + "join C191_LinhaProdutos l on l.C191_Codigo  = g.C190_CodigoLinha \n"
                     + "left join C004_ProdutoSubGrupo sb on sb.C004_Codigo = p.C004_CodigoSubGrupo\n"
                     + "order by 1,3"
             )) {
@@ -205,9 +205,9 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.C001_Codigo id,\n"
                     + " p.C001_Descricao descricao,\n"
                     + " p.C028_CodigoGrupoTributario idaliquota,\n"
-                    + " p.C003_CodigoGrupo merc1,\n"
-                    + " p.C004_CodigoSubGrupo merc2,\n"
-                    + " p.C005_CodigoMarca merc3,\n"
+                    + " l.C191_Codigo merc1,\n"
+                    + " g.C003_Codigo merc2,\n"
+                    + " sb.C004_Codigo merc3,\n"
                     + " case when e.T030_PrecoVenda > 0 then e.T030_PrecoVenda\n"
                     + "   else  p.C001_PrecoVenda end precovenda,\n"
                     + " p.C001_PrecoVenda,\n"
@@ -238,7 +238,10 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join C255_ParametroPisCofinsItems pci on pci.C254_Codigo = pc.C254_Codigo\n"
                     + "	and pci.C255_Tipo = 1\n"
                     + "left join C029_CodigoOperacaoItens coi on coi.C028_CodigoGrupoTributario = p.C028_CodigoGrupoTributario \n"
-                    + "    and coi.C015_CodigoOperacao = '000004'"
+                    + "    and coi.C015_CodigoOperacao = '000004'\n"
+                    + "left join C003_ProdutoGrupo g on g.C003_Codigo  = p.C003_CodigoGrupo\n"
+                    + "left join C191_LinhaProdutos l on l.C191_Codigo  = g.C190_CodigoLinha \n"
+                    + "left join C004_ProdutoSubGrupo sb on sb.C004_Codigo = p.C004_CodigoSubGrupo\n"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -480,7 +483,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where \n"
                     + " T014_SaldoTitulo <> 0\n"
                     + " and \n"
-                    + " C008_CodigoFilial = '"+getLojaOrigem()+"'"
+                    + " C008_CodigoFilial = '" + getLojaOrigem() + "'"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
