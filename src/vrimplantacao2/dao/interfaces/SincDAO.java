@@ -735,6 +735,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -757,12 +758,13 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     when length(tsai_horaemi_1::varchar) < 8\n"
                     + "     then substring('0'||tsai_horaemi_1::varchar, 1,2)||':'||substring(tsai_horaemi_1::varchar, 3,2)\n"
                     + "     else substring(tsai_horaemi_1::varchar, 1,2)||':'||substring(tsai_horaemi_1::varchar, 3,2)\n"
-                    + "	end hora\n"
+                    + "	end hora,\n"
+                    + " case when tsai_situaca_1 = 'E' then 0 else 1 end cancelado\n"
                     + "from\n"
                     + "	notsai v\n"
                     + "where\n"
                     + "	tsai_vendedo_1 = " + idLojaCliente + "\n"
-                    + "	and tsai_descnat_1 = 'VENDAS'\n"
+                    + "	and tsai_tiponot_1_o1 = 641\n"
                     + " and tsai_emitent_1 = 1\n"
                     + "	and tsai_datemis_1 between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "order by 4,5";
@@ -844,7 +846,7 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join estpro p on p.tpro_codprod_1 = vi.saii_codprod_1\n"
                     + "where\n"
                     + "	tsai_vendedo_1 = " + idLojaCliente + "\n"
-                    + "	and tsai_descnat_1 = 'VENDAS'\n"
+                    + "	and tsai_tiponot_1_o1 = 641\n"
                     + " and tsai_emitent_1 = 1\n"
                     + "	and tsai_datemis_1 between '" + dataInicio + "' and '" + dataTermino + "'\n"
                     + "order by 3,4";
