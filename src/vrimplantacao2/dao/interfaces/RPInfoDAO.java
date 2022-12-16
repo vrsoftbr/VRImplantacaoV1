@@ -2243,8 +2243,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + "\n"
                     + "where vdet_status in ('N') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5,6"
-                    */
-                    "select \n"
+                     */ "select \n"
                     + " v.tvd_unidade ||'-'||v.tvd_pdv || v.tvd_cupom ||v.tvd_operador id,\n"
                     + " v.tvd_pdv ecf,\n"
                     + " v.tvd_cupom cupom,\n"
@@ -2340,10 +2339,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + " vi\n"
                     + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'\n"
                     + "where vdet_status in ('N', 'D') and vdet_unid_codigo = '" + idLojaCliente + "'"
-                    */ 
-                    "select\n"
+                     */ "select distinct\n"
                     + "	v.tvd_unidade ||'-'|| v.tvd_pdv || v.tvd_cupom ||v.tvd_operador idvenda,\n"
-                    + "	v.tvd_unidade ||'-'|| v.tvd_cupom || '-' || tvd_cpseq::int-1 || '-' || v.tvd_operador id,\n"
+                    + "	v.tvd_unidade ||'-'|| v.tvd_cupom || '-' || tvd_cpseq::int-1 || '-' || v.tvd_operador || tvd_data_hora  id,\n"
                     + "	tvd_cupom cupom,\n"
                     + "	tvd_cpseq::int -1 sequencial,\n"
                     + "	split_part(tvd_registro,'|',11)::bigint as idproduto,\n"
@@ -2354,7 +2352,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tab_venda_" + tabelaVenda + " v \n"
                     + "where\n"
                     + "	tvd_unidade = '" + idLojaCliente + "'\n"
-                    + "	and tvd_tipo_reg = 'VITN'";
+                    + "	and tvd_tipo_reg = 'VITN'\n"
+                    + " and v.tvd_unidade ||'-'|| v.tvd_cupom || '-' || tvd_cpseq::int-1 || '-' || v.tvd_operador || tvd_data_hora is not null \n"
+                    + "	order by 1,2,3,4";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             System.out.println(sql);
             rst = stm.executeQuery(sql);
