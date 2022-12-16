@@ -830,7 +830,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda,\n"
                     + "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n"
                     + "	p.nbm ncm,\n"
-                    + "	coalesce(est.codcest, p.codcest, cest.CODCEST) cest,\n"
+                    + "	coalesce(est.codcest, p.codcest) cest,\n"
+                    + " cest.CODCEST new_cest,\n"
                     + "	icms_dentro_estado.piscofins_s,\n"
                     + "	icms_dentro_estado.piscofins_e,\n"
                     + "	(SELECT natrec FROM natrec WHERE (id_produto = p.codprod OR p.nbm LIKE natrec.ncm||'%') AND rownum = 1) piscofins_natrec,\n"
@@ -930,7 +931,9 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
-
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("new_cest"));
+                    
                     if (tributacaoNcmFigura) {
                         imp.setPiscofinsCstDebito(rst.getInt("piscofinscst"));
                         imp.setIcmsDebitoId(rst.getString("idtributacao"));
@@ -940,8 +943,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setIcmsCreditoId(rst.getString("idtributacao"));
                         imp.setIcmsCreditoForaEstadoId(rst.getString("idtributacao"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
-                        imp.setNcm(rst.getString("ncm"));
-                        imp.setCest(rst.getString("cest"));
                     } else {
                         imp.setPiscofinsCstCredito(rst.getString("piscofins_s"));
                         imp.setPiscofinsCstCredito(rst.getString("piscofins_e"));
@@ -952,8 +953,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setIcmsConsumidorId(rst.getString("icms_dentro_estado"));
                         imp.setIcmsCreditoId(rst.getString("icms_dentro_estado"));
                         imp.setIcmsCreditoForaEstadoId(rst.getString("icms_fora_estado"));
-                        imp.setNcm(rst.getString("ncm"));
-                        imp.setCest(rst.getString("cest"));
                     }
 
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
