@@ -191,7 +191,8 @@ public enum EScriptLojaOrigemSistema {
     WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
     GSOFT(238, 13, "select case when Nome = ''SUPERMERCADO PRIMAVERA II - PALMARES'' then 3 else Codigo end id, nome descricao from MC_Empresa"),
     FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS"),
-    BRDATA(240, 13,"select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito");
+    BRDATA(240, 13,"select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito"),
+    BLUESOFT(241,11,"select ''01'' id, ''SAN - LJ 01'' descricao");
 
 
     private int idSistema;
