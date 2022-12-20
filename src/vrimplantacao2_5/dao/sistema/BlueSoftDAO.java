@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -20,6 +21,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -98,7 +100,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.EMAIL,
-                OpcaoCliente.CELULAR
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.CONTATOS
         ));
     }
 
@@ -359,6 +362,171 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private void gravarContatoFornecedor(FornecedorIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            String sql
+                    = "select \n"
+                    + " pessoa_key fornecedorid,\n"
+                    + " tipo_contato tipocontato,\n"
+                    + " descritivo contato\n"
+                    + "from contatofornecedor\n"
+                    + " where pessoa_key::int = " + imp.getImportId();
+
+            LOG.finer(sql);
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+
+                    if ("Telefone Comercial".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Telefone Comercial",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Telefone Cobrança".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Telefone Cobrança",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.FINANCEIRO,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Telefone Referência".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Telefone Referência",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Telefone Residencial".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Telefone Residencial",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("WhatsApp".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "WhatsApp",
+                                "",
+                                rst.getString("contato"),
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Rádio Nextel".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Rádio Nextel",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Home Page".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Home Page",
+                                "",
+                                "",
+                                TipoContato.COMERCIAL,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Fax Cobrança".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Fax Cobrança",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.FINANCEIRO,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Fax".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Fax",
+                                rst.getString("contato"),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Email de envio NFS-e".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Email de envio NFS-e",
+                                "",
+                                "",
+                                TipoContato.NFE,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Email de envio NF-e".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Email de envio NF-e",
+                                "",
+                                "",
+                                TipoContato.NFE,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Email Particular".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Email Particular",
+                                "",
+                                "",
+                                TipoContato.COMERCIAL,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Email Comercial".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Email Comercial",
+                                "",
+                                "",
+                                TipoContato.COMERCIAL,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Email Cobrança".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Email Cobrança",
+                                "",
+                                "",
+                                TipoContato.FINANCEIRO,
+                                rst.getString("contato"));
+                        System.out.println(c);
+                    }
+                    if ("Celular Particular".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Celular Particular",
+                                "",
+                                rst.getString("contato"),
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                    if ("Celular Empresa".equals(rst.getString("tipocontato"))) {
+                        FornecedorContatoIMP c = imp.addContato(
+                                "Celular Empresa",
+                                "",
+                                rst.getString("contato"),
+                                TipoContato.COMERCIAL,
+                                "");
+                        System.out.println(c);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -406,6 +574,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
                     }
 
+                    gravarContatoFornecedor(imp);
+
                     result.add(imp);
                 }
             }
@@ -444,6 +614,33 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+
+    /*private void gravarContatoCliente(ClienteIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            String sql
+                    = "select \n"
+                    + " pessoa_key clienteid,\n"
+                    + " tipo_contato tipocontato,\n"
+                    + " descritivo contato\n"
+                    + "from contatocliente\n";
+                    //+ " where pessoa_key::int = " + imp.getId();
+
+            LOG.finer(sql);
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+
+                    if ("Telefone Comercial".equals(rst.getString("tipocontato"))) {
+
+                        imp.addTelefone("Telefone Comercial", rst.getString("contato"));  
+                        
+                    }
+
+                }
+            }
+        }
+    }*/
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -497,6 +694,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setTelefone(rs.getString("telefone"));
+
+                    //gravarContatoCliente(imp);
 
                     result.add(imp);
                 }
