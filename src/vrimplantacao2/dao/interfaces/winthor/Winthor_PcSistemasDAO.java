@@ -147,7 +147,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.MARGEM_MINIMA,
-                OpcaoProduto.ATACADO
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.CODIGO_BENEFICIO
         ));
     }
 
@@ -933,7 +934,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("new_cest"));
-                    
+
                     if (tributacaoNcmFigura) {
                         imp.setPiscofinsCstDebito(rst.getInt("piscofinscst"));
                         imp.setIcmsDebitoId(rst.getString("idtributacao"));
@@ -1150,6 +1151,69 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                                     break;
                             }
                         }
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        } else if (opt == OpcaoProduto.CODIGO_BENEFICIO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "WITH teste AS (\n"
+                        + "SELECT PASSO1.CODPROD,\n"
+                        + "       PASSO1.DESCRICAO,\n"
+                        + "       PASSO1.UFDESTINO,\n"
+                        + "       PASSO1.CODFILIALNF,\n"
+                        + "       PASSO1.CODST FIGURA ,\n"
+                        + "       PASSO1.DESCRICAOFIG,\n"
+                        + "CASE WHEN \n"
+                        + "  (SELECT PCEXCECAOCADASTROSFISCAIS.codcadastroexcecao\n"
+                        + "     FROM PCEXCECAOCADASTROSFISCAIS \n"
+                        + "    WHERE PCEXCECAOCADASTROSFISCAIS.codcadastroprinc = PASSO1.P_BENEFICIO\n"
+                        + "      AND PCEXCECAOCADASTROSFISCAIS.TIPO1 = 'FT'\n"
+                        + "      AND PCEXCECAOCADASTROSFISCAIS.VALOR1 = PASSO1.CODST ) IS NOT NULL \n"
+                        + "     THEN (SELECT PCEXCECAOCADASTROSFISCAIS.codcadastroexcecao\n"
+                        + "             FROM PCEXCECAOCADASTROSFISCAIS \n"
+                        + "            WHERE PCEXCECAOCADASTROSFISCAIS.codcadastroprinc = PASSO1.P_BENEFICIO\n"
+                        + "              AND PCEXCECAOCADASTROSFISCAIS.TIPO1 = 'FT'\n"
+                        + "              AND PCEXCECAOCADASTROSFISCAIS.VALOR1 = PASSO1.CODST )\n"
+                        + "   ELSE PASSO1.P_BENEFICIO   \n"
+                        + "   END BENEFICIO_CORRETO\n"
+                        + "FROM\n"
+                        + "(select PCTABTRIB.CODPROD,\n"
+                        + "       PCPRODUT.DESCRICAO, \n"
+                        + "       PCTABTRIB.ufdestino,\n"
+                        + "       PCTABTRIB.CODFILIALNF,\n"
+                        + "       PCTABTRIB.CODST,\n"
+                        + "       PCTRIBUT.mensagem DESCRICAOFIG,\n"
+                        + "       (SELECT PCCODIGOBENEFICIOFISCALVINCULO.codigobeneficio \n"
+                        + "          FROM PCCODIGOBENEFICIOFISCALVINCULO\n"
+                        + "         WHERE PCCODIGOBENEFICIOFISCALVINCULO.codfiscal = PCTRIBUT.CODFISCAL \n"
+                        + "           AND PCCODIGOBENEFICIOFISCALVINCULO.SITTRIBUT = PCTRIBUT.sittribut\n"
+                        + "          ) P_BENEFICIO     \n"
+                        + "  from PCTABTRIB , PCTRIBUT, PCPRODUT\n"
+                        + " where PCTABTRIB.CODST = PCTRIBUT.CODST\n"
+                        + "   --and PCTABTRIB.CODPROD IN (66085, 2309) --(ARROZ,FEIJAO)\n"
+                        + "   and PCTABTRIB.CODPROD = PCPRODUT.CODPROD\n"
+                        + "   and PCTABTRIB.UFDESTINO = 'GO'\n"
+                        + "   and PCTRIBUT.CODFISCAL = 5102 \n"
+                        + "   AND PCTABTRIB.CODFILIALNF = '"+getLojaOrigem()+"')PASSO1)\n"
+                        + "   SELECT \n"
+                        + "    CODPROD,\n"
+                        + "    DESCRICAO,\n"
+                        + "    BENEFICIO_CORRETO\n"
+                        + "   FROM teste\n"
+                        + "   WHERE BENEFICIO_CORRETO IS NOT NULL"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("CODPROD"));
+                        imp.setBeneficio(rst.getString("BENEFICIO_CORRETO"));
 
                         vResult.add(imp);
                     }
