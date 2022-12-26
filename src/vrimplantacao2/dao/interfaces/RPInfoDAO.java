@@ -1660,10 +1660,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	func_nome nome_conveniado,\n"
                     + "case when func_situacao in ('05','06','08') then 1 else 0 end bloqueado\n"
                     + "from\n"
-                    + "	funcionarios"
-            //                    + "where\n"
-            //                    + "	func_unid_codigo = '" + getLojaOrigem() + "'\n"
-            //                    + "order by 1"
+                    + "	funcionarios\n"
+                    + "where\n"
+                    + "	func_unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "order by 1"
             )) {
                 while (rs.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
@@ -1728,7 +1728,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	pendfin ct\n"
                     + "	join funcionarios f on f.func_codigo = ct.pfin_codentidade\n"
-                    //                    + "		and f.func_unid_codigo = ct.pfin_unid_codigo \n"
                     + "where\n"
                     + "	pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
                     + "	and pfin_contabaixa = 0\n"
@@ -2216,9 +2215,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        //next.setSubTotalImpressora(rst.getDouble("valor"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -2229,8 +2228,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql
-                    = /*
-                    "select\n"
+                    = "select\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as id,\n"
                     + "  vdet_cupom||0 as cupom,\n"
                     + "  0 cancelado,\n"
@@ -2242,8 +2240,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  sum(vdet_valordesc) desconto\n"
                     + "from vdadet" + tabelaVenda + "\n"
                     + "where vdet_status in ('N') and vdet_unid_codigo = '" + idLojaCliente + "'\n"
-                    + "group by 1,2,3,4,5,6"
-                     */ "select \n"
+                    + "group by 1,2,3,4,5,6";
+
+//                  VENDAS DO BANCO WRPDV
+            /*"select \n"
                     + " v.tvd_unidade ||'-'||v.tvd_pdv || v.tvd_cupom ||v.tvd_operador id,\n"
                     + " v.tvd_pdv ecf,\n"
                     + " v.tvd_cupom cupom,\n"
@@ -2258,7 +2258,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and split_part(f.tvd_registro,'|',3) is not null\n"
                     + "	and split_part(f.tvd_registro,'|',5) != '7000'\n"
                     + "group by 1,2,3,4,5\n"
-                    + "order by 3, 4, 5";
+                    + "order by 3, 4, 5";*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -2303,12 +2303,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setSequencia(rst.getInt("sequencial"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
-//                      next.setCancelado(rst.getBoolean("cancelado"));
-//                      next.setValorDesconto(rst.getDouble("desconto"));
-//                      next.setUnidadeMedida(rst.getString("unidade"));
-//                      next.setIcmsCst(rst.getInt("csticms"));
-//                      next.setIcmsAliq(rst.getDouble("aliqicms"));
-//                      next.setIcmsReduzido(0);
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setIcmsCst(rst.getInt("csticms"));
+                        next.setIcmsAliq(rst.getDouble("aliqicms"));
+                        next.setIcmsReduzido(0);
                     }
                 }
             } catch (SQLException ex) {
@@ -2319,8 +2319,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql
-                    = /*
-                    "select distinct\n"
+                    = "select distinct\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_sequencial||'.'||vdet_pdv as id,\n"
                     + "  vdet_transacao||'.'||vdet_cupom||'.'||vdet_hora||'.'||vdet_pdv||'0' as idvenda,\n"
                     + "  vdet_cupom as cupom,\n"
@@ -2338,8 +2337,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  vdet_cst csticms\n"
                     + "from vdadet" + tabelaVenda + " vi\n"
                     + "left join produn un on vi.vdet_prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'\n"
-                    + "where vdet_status in ('N', 'D') and vdet_unid_codigo = '" + idLojaCliente + "'"
-                     */ "select distinct\n"
+                    + "where vdet_status in ('N', 'D') and vdet_unid_codigo = '" + idLojaCliente + "'";
+
+//                  VENDAS DO BANCO WRPDV
+            /*"select distinct\n"
                     + "	v.tvd_unidade ||'-'|| v.tvd_pdv || v.tvd_cupom ||v.tvd_operador idvenda,\n"
                     + "	v.tvd_unidade ||'-'|| v.tvd_cupom || '-' || tvd_cpseq::int-1 || '-' || v.tvd_operador || tvd_data_hora  id,\n"
                     + "	tvd_cupom cupom,\n"
@@ -2354,7 +2355,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tvd_unidade = '" + idLojaCliente + "'\n"
                     + "	and tvd_tipo_reg = 'VITN'\n"
                     + " and v.tvd_unidade ||'-'|| v.tvd_cupom || '-' || tvd_cpseq::int-1 || '-' || v.tvd_operador || tvd_data_hora is not null \n"
-                    + "	order by 1,2,3,4";
+                    + "	order by 1,2,3,4"*/
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             System.out.println(sql);
             rst = stm.executeQuery(sql);

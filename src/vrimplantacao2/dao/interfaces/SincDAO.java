@@ -222,31 +222,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-//    @Override
-//    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-//        List<FamiliaProdutoIMP> result = new ArrayList<>();
-//
-//        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-//            try (ResultSet rs = stm.executeQuery(
-//                    "select \n"
-//                    + "	codsimilar,\n"
-//                    + "	descricao\n"
-//                    + "from \n"
-//                    + "	simprod")) {
-//                while (rs.next()) {
-//                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-//                    imp.setImportSistema(getSistema());
-//                    imp.setImportLoja(getLojaOrigem());
-//
-//                    imp.setImportId(rs.getString("codsimilar"));
-//                    imp.setDescricao(rs.getString("descricao"));
-//
-//                    result.add(imp);
-//                }
-//            }
-//        }
-//        return result;
-//    }
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -358,15 +333,10 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        /*imp.setValidade(bal.getValidade() > 1
-                                ? bal.getValidade() : rst.getInt("diasvalidade"));*/
                         imp.setEan(imp.getImportId());
                     }
 
-//                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-//                    imp.setQtdEmbalagemCotacao(rst.getInt("qtde_compra"));
                     imp.setTipoEmbalagem(rst.getString("tipoemb"));
-//                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
@@ -376,19 +346,11 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setCodMercadologico4(rst.getString("merc4"));
-//                    imp.setIdFamiliaProduto(rst.getString("codsimilar"));
-//                    imp.setTipoEmbalagemVolume(rst.getString("tipo_volume"));
-//                    imp.setVolume(rst.getDouble("qtde_volume"));
-//                    imp.setEstoqueMinimo(rst.getDouble("estminimo"));
-//                    imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-//                    imp.setPesoLiquido(rst.getDouble("pesoliq"));
-//                    imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setMargem(rst.getDouble("margem"));
-//                    imp.setDataCadastro(rst.getDate("datainclusao"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
@@ -401,7 +363,6 @@ public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
-//                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
 
                     result.add(imp);
                 }
