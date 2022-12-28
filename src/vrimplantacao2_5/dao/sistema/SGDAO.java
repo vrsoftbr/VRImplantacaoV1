@@ -34,21 +34,21 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
  * @author guilhermegomes
  */
 
-/* OBSERVAÇÃO: Banco de dados do sistema é BDF convertido para POSTGRES, utilizando Linux!
+/* OBSERVAÇÃO: Banco de dados do sistema é DBF convertido para POSTGRES, utilizando Linux!
     
     Arquivos DBF necessários:
-        arqbar
-        cadcli
-        cadfil
-        cadforn
-        cadpro
-        conrec
-        contpag
-        profer
-        profor
-        tabagr
-        tabmun
-        tpiscof
+        arqbar.dbf
+        cadcli.dbf
+        cadfil.dbf
+        cadforn.dbf
+        cadpro.dbf
+        conrec.dbf
+        contpag.dbf
+        profer.dbf
+        profor.dbf
+        tabagr.dbf
+        tabmun.dbf
+        tpiscof.dbf
 */
 
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
