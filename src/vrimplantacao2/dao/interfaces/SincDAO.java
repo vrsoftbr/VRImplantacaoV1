@@ -40,13 +40,16 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Alan
  */
+
+    // ATENÇÃO :  Sistema sem ID de loja, alterar o CNPJ no ENUM EScriptLojaOrigem
+
 public class SincDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "Sinc";
     }
-
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(

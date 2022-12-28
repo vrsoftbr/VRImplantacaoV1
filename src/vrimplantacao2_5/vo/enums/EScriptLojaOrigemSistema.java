@@ -189,7 +189,7 @@ public enum EScriptLojaOrigemSistema {
     HIPER(75, 13, "select id_filial id, razao_social descricao from filial order by id_filial"),
     WINTHOR(236, 9, "select codigo id, concat(concat(CAST(codigo AS varchar(10)),'' - ''),coalesce(fantasia, razaosocial)) descricao FROM pcfilial ORDER BY codigo"),
     WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
-    GSOFT(238, 13, "select case when Nome = ''SUPERMERCADO PRIMAVERA II - PALMARES'' then 3 else Codigo end id, nome descricao from MC_Empresa"),
+    GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa"),
     FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS"),
     BRDATA(240, 13,"select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito");
 
