@@ -5545,10 +5545,11 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSuperControleActionPerformed
 
     private void mnuRelatoriosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRelatoriosActionPerformed
-        Object[] options = {"Relatatórios e Sped", "Sped", "Cancelar"};
+        Object[] options = {"Relatatórios e Sped", "Sped", "Relatórios", "Cancelar"};
         int decisao = JOptionPane.showOptionDialog(null, "Selecionando a primeira opção, serão gerados relatórios fiscais em vr/implantacao/planilhas. \n"
                 + "E também será inserido as alterações de código na tabela de SPED.\n\n"
                 + "A segunda opção apenas insere dados de SPED.\n"
+                + "A terceira opção apenas gera os relatórios fiscais separados por tipo.\n"
                 + "\nÉ preciso ter uma importação concluida para os relatórios serem gerados.\n\n",
                 "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (decisao == 0) {
@@ -5562,6 +5563,12 @@ public final class MenuGUI extends VRMdiFrame {
             try {
                 new ExecutaSpedDAO().executaSped();
                 JOptionPane.showMessageDialog(null, "SPED gerado", "Sped", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } if (decisao == 2) {
+            try {
+                new GeradorArquivosRepository().geraRelaotirosTexto();
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import vrimplantacao2_5.relatorios.utils.Formatador;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -79,7 +80,7 @@ public class GeradorNcm {
         gerarNcmTxt();
     }
 
-    private void gerarNcmTxt() {
+    public void gerarNcmTxt() {
         try {
             File f = new File("/vr/implantacao/planilhas/Ncm.txt");
             PrintWriter printWriter = new PrintWriter(f);
@@ -89,10 +90,10 @@ public class GeradorNcm {
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-            printWriter.println("|    NCM    |   QTD   |");
-            printWriter.println("|-----------|---------|");
-            String espacos = "----------";
-            String espacosQ = "--------";
+            printWriter.println("|       NCM       |      QTD      |");
+            printWriter.println("|-----------------|---------------|");
+            String espacos = "----------------";
+            String espacosQ = "--------------";
             for (NCMFaltandoVO n : ncm) {
                 String ncmDesign = n.getNcm().trim() + espacos.substring(n.getNcm().trim().length()).replace("-", " ");
                 String qtdDesign = n.getQtd().trim() + espacosQ.substring(n.getQtd().trim().length()).replace("-", " ");
@@ -105,6 +106,9 @@ public class GeradorNcm {
             printWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null,"Erro em GeradorNcm\n" 
+                    + "Entre em contato com o setor de migração e reporte esse erro\n\n"
+                    + e, "Relatórios", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

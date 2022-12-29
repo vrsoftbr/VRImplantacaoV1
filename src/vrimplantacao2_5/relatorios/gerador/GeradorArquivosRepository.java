@@ -28,14 +28,14 @@ public class GeradorArquivosRepository {
 
     public void geraPlanilha() throws Exception {
         Arquivo.mkdir(Util.getRoot() + "vr/implantacao/planilhas");
-        
+
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         cest.geraPlanilhaCest(workbook);
         ncm.geraPlanilhaNcm(workbook);
         bal.geraPlanilhaBalanca(workbook);
 
-        try {            
+        try {
             FileOutputStream out = new FileOutputStream(new File("/vr/implantacao/planilhas/relatorios_fiscais.xls"));
             workbook.write(out);
             out.close();
@@ -60,5 +60,38 @@ public class GeradorArquivosRepository {
             System.out.println("Provavel erro na geração de SPED");
             e.printStackTrace();
         }
+    }
+
+    public void geraRelaotirosTexto() throws Exception {
+        Arquivo.mkdir(Util.getRoot() + "vr/implantacao/planilhas");
+
+        Object[] options = {"Cest", "Códigos de balança alterados", "Ncm", "Cancelar"};
+        int menu = 0;
+
+        do {
+
+            int decisao = JOptionPane.showOptionDialog(null, "Selecione um relatório:\n"
+                    + "Para sair da tela, clique em cancelar.\n\n",
+                    "Gerar Relatórios", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            if (decisao == 3 || decisao == -1) {
+                menu = 3;
+            }
+
+            if (decisao == 0) {
+                new GeradorCest().gerarCestTxt();
+                JOptionPane.showMessageDialog(null, "Relatório Cest gerado", "Relatórios", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            if (decisao == 1) {
+                new GeradorBalanca().gerarBalancaTxt();
+                JOptionPane.showMessageDialog(null, "Relatório Cod. Balança gerado", "Relatórios", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            if (decisao == 2) {
+                new GeradorNcm().gerarNcmTxt();
+                JOptionPane.showMessageDialog(null, "Relatório Ncm gerado", "Relatórios", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } while (menu == 0);
     }
 }

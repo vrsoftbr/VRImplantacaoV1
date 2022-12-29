@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import vrimplantacao2_5.relatorios.utils.Formatador;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -79,7 +80,7 @@ public class GeradorCest {
         gerarCestTxt();
     }
 
-    private void gerarCestTxt() {
+    public void gerarCestTxt() {
         try {
             File f = new File("/vr/implantacao/planilhas/Cest.txt");
             PrintWriter printWriter = new PrintWriter(f);
@@ -89,10 +90,10 @@ public class GeradorCest {
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-            printWriter.println("|     Cest    |   QTD   |");
-            printWriter.println("|-------------|---------|");
-            String espacos = "----------";
-            String espacosQ = "--------";
+            printWriter.println("|        Cest       |      QTD      |");
+            printWriter.println("|-------------------|---------------|");
+            String espacos = "----------------";
+            String espacosQ = "--------------";
             for (CestFaltandoVO c : cest) {
                 String cestDesign = c.getCest().trim() + espacos.substring(c.getCest().trim().length()).replace("-", " ");
                 String qtdDesign = c.getQtd().trim() + espacosQ.substring(c.getQtd().trim().length()).replace("-", " ");
@@ -105,6 +106,9 @@ public class GeradorCest {
             printWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null,"Erro em GeradorCest\n" 
+                    + "Entre em contato com o setor de migração e reporte esse erro\n\n"
+                    + e, "Relatórios", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

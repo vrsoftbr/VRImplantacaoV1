@@ -17,10 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -39,6 +39,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
@@ -165,6 +166,27 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         ));
     }
 
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.EMPRESA,
+                OpcaoCliente.SALARIO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.OBSERVACOES2,
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
