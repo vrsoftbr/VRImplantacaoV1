@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import vrimplantacao2.relatorios.utils.Formatador;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -85,7 +86,7 @@ public class GeradorBalanca {
             if(b.getDescricao().length() > 15) {
             cell.setCellValue(b.getDescricao().substring(0, 15));
             } else cell.setCellValue(b.getDescricao());
-            
+
             cell = row.createCell(cellnum++);
             cell.setCellStyle(textStyle);
             cell.setCellValue(b.getEan());
@@ -98,7 +99,7 @@ public class GeradorBalanca {
         gerarBalancaTxt();
     }
 
-    private void gerarBalancaTxt() {
+    public void gerarBalancaTxt() {
         try {
             File f = new File("/vr/implantacao/planilhas/Cod_Bal.txt");
             PrintWriter printWriter = new PrintWriter(f);
@@ -108,12 +109,12 @@ public class GeradorBalanca {
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-            printWriter.println("|  Código Antigo |    Descricao        | Código Antigo  | Código Atual   |");
-            printWriter.println("|----------------|---------------------|----------------|----------------|");
-            String espacos = "----------------";
-            String espacosD = "--------------------";
+            printWriter.println("|    Código Antigo   |         Descricao         |         EAN        |    Código Atual    |");
+            printWriter.println("|--------------------|---------------------------|--------------------|--------------------|");
+            String espacos = "--------------------";
+            String espacosD = "--------------------------";
             for (CodBalAlteradoVO b : bal) {
-                if (b.getDescricao().length() < 15){
+                if (b.getDescricao().length() <= 15){
                     printWriter.print(
                        "|" + b.getId().trim() + espacos.substring(b.getId().trim().length()).replace("-", " ") +
                        "| " + b.getDescricao().trim() + espacosD.substring(b.getDescricao().trim().length()).replace("-", " ") +
@@ -133,6 +134,9 @@ public class GeradorBalanca {
             printWriter.close();
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null,"Erro em GeradorBalanca\n" 
+                    + "Entre em contato com o setor de migração e reporte esse erro\n\n"
+                    + e, "Relatórios", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
