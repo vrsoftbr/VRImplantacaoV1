@@ -169,6 +169,10 @@ public enum EScriptLojaOrigemSistema {
     LCSISTEMAS(222, 8, "select id, fantasia descricao from empresa"),
     INOVA(81, 11, "select empresaid id, empresanomefantasia descricao from empresa"),
     ISERVER(78, 8, "select Codigo id, NomeFantasia descricao from tbl_loja"),
+    SHI(147, 5, "select\n"
+            + "    codigo id,\n"
+            + "    razsoc descricao\n"
+            + "from filial"),
     SIAC(149, 9, "select empresa_id id, fantasia descricao from empresas"),
     NEREUS(224, 11, "select id_emp id, fantasia descricao from cg_emp order by 1"),
     SCORPION(225, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
@@ -181,7 +185,7 @@ public enum EScriptLojaOrigemSistema {
     FOCUS(230, 8, "select id, razao descricao from empresa"),
     MANAGER(231, 5, "select codigo id, fantasia descricao from empresa"),
     SCV(232, 5, "SELECT id, NOME_FANTASIA descricao FROM EMPRESAS;"),
-    SINC(233, 11, "select ncad_cgcocpf_2 id, ncad_fantasi_2 descricao from sincad where ncad_cgcocpf_2 = 44744589000108"),  /*<-- CNPJ do cliente, alterar em novo projeto*/
+    SINC(233, 11, "select ncad_cgcocpf_2 id, ncad_fantasi_2 descricao from sincad where ncad_cgcocpf_2 = 44744589000108"), /*<-- CNPJ do cliente, alterar em novo projeto*/
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
     DX(234, 5, "select  c_codloja id, c_fantaloja descricao from empresa"),
     LIVRE(235, 5, "SELECT CODIGO id, EMPRESA descricao FROM EMPRESA"),
@@ -191,8 +195,7 @@ public enum EScriptLojaOrigemSistema {
     WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
     GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa"),
     FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS"),
-    BRDATA(240, 13,"select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito");
-
+    BRDATA(240, 13, "select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito");
 
     private int idSistema;
     private int idBancoDados;

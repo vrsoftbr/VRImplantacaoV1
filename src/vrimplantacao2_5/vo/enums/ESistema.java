@@ -243,6 +243,7 @@ import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
+import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
@@ -294,6 +295,7 @@ import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.Shi2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
@@ -1258,10 +1260,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     },
-    SHI(147, "SHI", new ShiDAO()) {
+    SHI(147, "SHI", new ShiDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Shi2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     SIAC(149, "SIAC", new SiacDAO()) {
