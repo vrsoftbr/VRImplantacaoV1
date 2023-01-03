@@ -203,6 +203,7 @@ public class ProdutoDAO {
             sql.put("vendacontrolada", vo.isVendaControlada());
             
             sql.put("tiponaturezareceita", 
+                    vo.getPisCofinsNaturezaReceita() == null ? null :
                     vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
                     vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
