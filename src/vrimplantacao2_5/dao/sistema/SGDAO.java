@@ -1,14 +1,20 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -27,6 +33,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
@@ -49,8 +57,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
         tabagr.dbf
         tabmun.dbf
         tpiscof.dbf
-*/
-
+ */
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean digitobalanca = false;
@@ -92,6 +99,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -175,6 +183,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("codigobarras"));
                     imp.setQtdEmbalagem(rst.getInt("embalagem"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+
                     vResult.add(imp);
                 }
             }
@@ -315,6 +324,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
+
                     result.add(imp);
                 }
             }
@@ -588,5 +598,195 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+    private String tabelaVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    public void setTabelaVenda(String tabelaVenda) {
+        this.tabelaVenda = tabelaVenda;
+    }
+
+    public String getTabelaVenda() {
+        return this.tabelaVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new SGDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, getTabelaVenda());
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new SGDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, getTabelaVenda());
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+
+                        next.setId(id);
+                        next.setNumeroCupom(rst.getInt("cupom"));
+                        next.setEcf(rst.getInt("ecf"));
+                        next.setData(rst.getDate("datavenda"));
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+//                        next.setValorDesconto(rst.getDouble("desconto"));
+//                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "	FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL id_venda,\n"
+                    + "	coo cupom,\n"
+                    + "	NUMEROPDV ecf,\n"
+                    + "	v.DATA datavenda,\n"
+                    + "	valor\n"
+                    + "from\n"
+                    + "	cupom v\n"
+                    + "	join lp" + tabelaVenda + " vi on v.coo = vi.ncupom and v.data = vi.data and v.numeropdv = vi.numecr \n"
+                    + "where\n"
+                    + "	FILIAL = " + idLojaCliente + "\n"
+                    + "group by 1,2,3,4,5\n"
+                    + "order by v.data, v.coo";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setId(rst.getString("id_item"));
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setSequencia(rst.getInt("sequencial"));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setDescricaoReduzida(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                    }
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "	FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL id_venda,\n"
+                    //+ "	codfil::varchar || codpro || codbarra || numecr || ncupom || ordem ||horario || vi.data as id_item,\n
+                    + " ordem::varchar || codpro || qtdevend || codbarra || ncupom || horario id_item,\n"
+                    + "	ORDEM sequencial,\n"
+                    + "	CODPRO id_produto,\n"
+                    + "	p.descpro01 produto,\n"
+                    + "	p.UNIDPRO01 unidade,\n"
+                    + "	CODBARRA ean,\n"
+                    + "	QTDEVEND quantidade,\n"
+                    + "	round(PREVEND,2) precovenda,\n"
+                    + "	round(QTDEVEND * PREVEND,2) total\n"
+                    + "from\n"
+                    + "	lp" + tabelaVenda + " vi\n"
+                    + "	join cupom v on v.coo = vi.ncupom and v.numeropdv = vi.numecr and v.filial = vi.codfil\n"
+                    + "	join cadpro p on vi.CODPRO = p.CODPRO01 and vi.codfil = p.codfil01 \n"
+                    + "where\n"
+                    + "	vi.codfil = " + idLojaCliente + " and vi.ncupom != 0\n"
+                    + "order by\n"
+                    + "	v.data, v.coo, vi.ORDEM";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            System.out.println(sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }

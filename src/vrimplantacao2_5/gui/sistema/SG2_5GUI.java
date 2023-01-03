@@ -5,6 +5,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -120,6 +121,16 @@ public class SG2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
+                            case 4:
+                                    if (chkVendas.isSelected()) {
+                                        if (!dtVenda.getText().trim().isEmpty()) {
+                                            sgDAO.setTabelaVenda(dtVenda.getText().trim());
+                                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                                        } else {
+                                            throw new Exception("Preencha os campos para realizar a importação de vendas.");
+                                        }
+                                    }
+                                    break;
                             default: break;
                         }
                     }
@@ -172,6 +183,10 @@ public class SG2_5GUI extends VRInternalFrame {
         pnlEspecial = new javax.swing.JTabbedPane();
         tbProdutosEspecial = new javax.swing.JPanel();
         chekDigitoBalanca = new javax.swing.JCheckBox();
+        tabVendas = new vrframework.bean.panel.VRPanel();
+        lblMesVenda = new vrframework.bean.label.VRLabel();
+        dtVenda = new vrframework.bean.textField.VRTextField();
+        chkVendas = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -181,20 +196,20 @@ public class SG2_5GUI extends VRInternalFrame {
 
         setTitle("SG");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -266,6 +281,46 @@ public class SG2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Especial", pnlEspecial);
 
+        tabVendas.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
+
+        lblMesVenda.setText("Mês/Ano da Venda");
+
+        dtVenda.setEditable(true);
+
+        chkVendas.setText("Pdv Vendas");
+        chkVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
+        tabVendas.setLayout(tabVendasLayout);
+        tabVendasLayout.setHorizontalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabVendasLayout.createSequentialGroup()
+                        .addComponent(lblMesVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dtVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        tabVendasLayout.setVerticalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblMesVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dtVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(158, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Vendas", tabVendas);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -312,9 +367,16 @@ public class SG2_5GUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
+    private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
+
+    }//GEN-LAST:event_chkVendasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JCheckBox chekDigitoBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkVendas;
+    private vrframework.bean.textField.VRTextField dtVenda;
+    private vrframework.bean.label.VRLabel lblMesVenda;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private javax.swing.JTabbedPane pnlEspecial;
@@ -326,6 +388,7 @@ public class SG2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel tabVendas;
     private javax.swing.JPanel tbProdutosEspecial;
     // End of variables declaration//GEN-END:variables
 }
