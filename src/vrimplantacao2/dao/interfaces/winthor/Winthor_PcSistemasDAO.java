@@ -1157,6 +1157,102 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             return vResult;
+        } else if (opt == OpcaoProduto.PRECO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "WITH \n"
+                        + "icms_dentro_estado AS (\n"
+                        + "	SELECT\n"
+                        + "		ic.CODPROD id_produto,\n"
+                        + "		ic.CODST id_tributacao,\n"
+                        + "		PISCOFINS.SITTRIBUT piscofins_s,\n"
+                        + "		piscofins.SITTRIBUTDEV piscofins_e\n"
+                        + "	from pctabpr ic	\n"
+                        + "		LEFT JOIN pctribpiscofins piscofins ON	piscofins.codtribpiscofins = ic.codtribpiscofins\n"
+                        + "	WHERE\n"
+                        + "		ic.NUMREGIAO = "+idRegiaoDentroEstado+"\n"
+                        + "),\n"
+                        + "icms_fora_estado AS (\n"
+                        + "	SELECT\n"
+                        + "		ic.CODPROD id_produto,\n"
+                        + "		ic.CODST id_tributacao\n"
+                        + "	from pctabpr ic\n"
+                        + "	WHERE\n"
+                        + "		ic.NUMREGIAO = "+idRegiaoForaEstado+"\n"
+                        + "),\n"
+                        + "natrec AS (\n"
+                        + "	SELECT\n"
+                        + "		distinct\n"
+                        + "		t.CODPROD id_produto,\n"
+                        + "		REPLACE(t.NCM, '.','') ncm,\n"
+                        + "		t.CODNATREC natrec\n"
+                        + "	from PCTABESCRSPED t\n"
+                        + "	WHERE\n"
+                        + "		NOT (t.CODPROD IS NULL AND t.ncm IS null) and\n"
+                        + "		T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n"
+                        + "		AND (\n"
+                        + "			(T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n"
+                        + "			OR (\n"
+                        + "				T.DATAINIESCR <= current_date\n"
+                        + "				AND T.DATAFINESCR IS NULL\n"
+                        + "			) OR (\n"
+                        + "				(current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR)\n"
+                        + "				AND T.DATAINIESCR IS NOT NULL\n"
+                        + "				AND T.DATAFINESCR IS NOT NULL\n"
+                        + "			)\n"
+                        + "		)\n"
+                        + "),\n"
+                        + "piscofins_icms AS (\n"
+                        + "SELECT\n"
+                        + " pt.CODPROD,\n"
+                        + " pt.CODFILIALNF,\n"
+                        + " pt.UFDESTINO,\n"
+                        + " pt.CODST idtributacao,\n"
+                        + " pt.CODTRIBPISCOFINS,\n"
+                        + " pt.DTULTALTER,\n"
+                        + " pc.DESCRICAOTRIBPISCOFINS,\n"
+                        + " pc.SITTRIBUT piscofinscst\n"
+                        + "FROM PCTABTRIB pt\n"
+                        + "LEFT JOIN PCTRIBPISCOFINS pc ON pc.CODTRIBPISCOFINS = pt.CODTRIBPISCOFINS\n"
+                        + "WHERE pt.UFDESTINO = 'GO'\n"
+                        + "AND pt.CODFILIALNF = '"+getLojaOrigem()+"'\n"
+                        + "ORDER BY pt.DTULTALTER DESC \n"
+                        + ")\n"
+                        + "SELECT\n"
+                        + "	p.codprod id,\n"
+                        + "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda\n"
+                        + "FROM\n"
+                        + "	pcprodut p\n"
+                        + "	JOIN pcfilial emp ON emp.codigo = '"+getLojaOrigem()+"'\n"
+                        + "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n"
+                        + " 	LEFT JOIN PCCESTPRODUTO prodcest ON prodcest.CODPROD = p.CODPROD\n"
+                        + "	LEFT JOIN pccest cest ON cest.CODIGO = prodcest.CODSEQCEST\n"
+                        + "	LEFT JOIN PCEMBALAGEM ean on ean.codprod = p.codprod AND\n"
+                        + "		ean.codfilial = emp.codigo\n"
+                        + "	LEFT JOIN pcest est on est.codprod = p.codprod AND\n"
+                        + "		est.codfilial = emp.codigo \n"
+                        + "	LEFT JOIN pcprodfilial pf on pf.codprod = p.codprod AND\n"
+                        + "		pf.codfilial = emp.codigo\n"
+                        + "	LEFT JOIN icms_dentro_estado ON	icms_dentro_estado.id_produto = p.codprod\n"
+                        + "	LEFT JOIN icms_fora_estado on icms_fora_estado.id_produto = p.codprod\n"
+                        + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod\n"
+                        + "ORDER BY\n"
+                        + "	id,ean.DTULTALTPVENDA"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
         } else if (opt == OpcaoProduto.CODIGO_BENEFICIO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
@@ -1199,7 +1295,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "   and PCTABTRIB.CODPROD = PCPRODUT.CODPROD\n"
                         + "   and PCTABTRIB.UFDESTINO = 'GO'\n"
                         + "   and PCTRIBUT.CODFISCAL = 5102 \n"
-                        + "   AND PCTABTRIB.CODFILIALNF = '"+getLojaOrigem()+"')PASSO1)\n"
+                        + "   AND PCTABTRIB.CODFILIALNF = '" + getLojaOrigem() + "')PASSO1)\n"
                         + "   SELECT \n"
                         + "    CODPROD,\n"
                         + "    DESCRICAO,\n"
