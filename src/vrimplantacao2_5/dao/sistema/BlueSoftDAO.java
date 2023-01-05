@@ -21,6 +21,8 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -28,7 +30,6 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
@@ -76,7 +77,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                OpcaoProduto.NUTRICIONAL
         ));
     }
 
@@ -88,7 +90,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.TIPO_FORNECEDOR));
+                OpcaoFornecedor.TIPO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
 
     @Override
@@ -101,7 +104,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.EMAIL,
                 OpcaoCliente.CELULAR,
-                OpcaoCliente.CONTATOS
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
@@ -171,7 +175,7 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc3ID(rs.getString("merc3"));
                     imp.setMerc3Descricao(rs.getString("desc3"));
                     imp.setMerc4ID(rs.getString("merc4"));
-                    imp.setMerc4Descricao(rs.getString("merc4"));
+                    imp.setMerc4Descricao(rs.getString("desc4"));
 
                     result.add(imp);
                 }
@@ -194,13 +198,14 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.descricao_cupom descricaoreduzida,\n"
                     + " p.descricao_balanca,\n"
                     + " p.embalagem_key embalagem,\n"
-                    + " p.fator_estoque,\n"
-                    + " replace(p.estoque_gerencial,',','.') estoque,\n"
+                    + " replace(e.quantidadeestoque,',','.') estoque,\n"
+                    //+ " replace(p.estoque_gerencial,',','.') estoque,\n"
                     + " case when p.status = 'Inativo' then 0 else 1 end situacao,\n"
                     + " case when p.exporta_balanca = 'Sim' then 1 else 0 end ebalanca,\n"
                     + " p.peso_bruto,\n"
                     + " p.peso_liquido,\n"
-                    + " p.gtin_principal ean,\n"
+                    + " case when p.exporta_balanca = 'Sim' then substring(p.gtin_principal,1,4)\n"
+                    + "  else p.gtin_principal end ean,\n"
                     + " replace(p.preco_venda,',','.') precovenda,\n"
                     + " replace(p.custo_liquido,',','.') custosemimposto,\n"
                     + " replace(p.custo_bruto,',','.') custocomimposto,\n"
@@ -216,7 +221,10 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " (t.cst_saida_pdv||'.'||replace(t.aliquota_saida_pdv,',','.')||'.'||replace(t.reducao_saida_pdv,',','.')||'.S') idtributacao_saida,\n"
                     + " (t.cst_entrada||'.'||replace(t.aliquota_entrada,',','.')||'.'||replace(t.reducao_entrada,',','.')||'.E') idtributacao_entrada\n"
                     + "from produtos p\n"
-                    + "left join tributacao_produto t on t.produto_key = p.produto_key;"
+                    + "left join tributacao_produto t on t.produto_key = p.produto_key\n"
+                    + "left join estoque e on e.codigointerno = p.produto_key\n"
+                    + "where \n"
+                    + " p.produto_key = p.produto_unitario_key;"
             )) {
                 //Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -287,10 +295,22 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    " select \n"
+                    + "  p.produto_key produtoid,\n"
+                    + "  p.gtin_principal ean,\n"
+                    + "  p.embalagem_key embalagem,\n"
+                    + "  p.fator_preco qtde\n"
+                    + " from produtos p\n"
+                    + " where \n"
+                    + " p.produto_key <> p.produto_unitario_key\n"
+                    + " UNION\n"
+                    + " select \n"
                     + " produto_key produtoid,\n"
-                    + " ean\n"
-                    + "from barras;"
+                    + " ean,\n"
+                    + " 'UN' embalagem,\n"
+                    + " '1' qtde\n"
+                    + "from barras\n"
+                    + "where tipo <> 'PLU'"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -321,16 +341,16 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " n.qtde_porcao porcao,\n"
                     + " n.medida_caseira_inteira medidaInteira,\n"
                     + " n.q_calorias calorias,\n"
-                    + " n.q_gorduras_totais gordurastotais,\n"
-                    + " n.q_gorduras_trans gordurastrans,\n"
-                    + " n.q_gorduras_saturadas gordurassaturadas,\n"
-                    + " n.q_carboidratos carboidratos,\n"
-                    + " n.q_proteinas proteinas,\n"
-                    + " n.q_colesterol colesterol,\n"
-                    + " n.q_fibra fibra,\n"
-                    + " n.q_calcio calcio,\n"
-                    + " n.q_ferro ferro,\n"
-                    + " n.q_sodio sodio\n"
+                    + " replace(n.q_gorduras_totais,',','.') gordurastotais,\n"
+                    + " replace(n.q_gorduras_trans,',','.') gordurastrans,\n"
+                    + " replace(n.q_gorduras_saturadas,',','.') gordurassaturadas,\n"
+                    + " replace(n.q_carboidratos,',','.') carboidratos,\n"
+                    + " replace(n.q_proteinas,',','.') proteinas,\n"
+                    + " replace(n.q_colesterol,',','.') colesterol,\n"
+                    + " replace(n.q_fibra,',','.') fibra,\n"
+                    + " replace(n.q_calcio,',','.') calcio,\n"
+                    + " replace(n.q_ferro,',','.') ferro,\n"
+                    + " replace(n.q_sodio,',','.') sodio\n"
                     + "from nutricional n\n"
                     + "join produtos p on p.produto_key = n.produto_key;"
             )) {
@@ -641,7 +661,6 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }*/
-
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -696,12 +715,77 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("telefone"));
 
                     //gravarContatoCliente(imp);
-
                     result.add(imp);
                 }
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " n_duplicata id,\n"
+                    + " sacadodescritivo obs,\n"
+                    + " replace(vencimento,'/','-') vencimento,\n"
+                    + " replace(emissao,'/','-') emissao,\n"
+                    + " replace(valorliquido,',','.') valor,\n"
+                    + " codcliente clienteid,\n"
+                    + " coalesce(ndoc, n_duplicata) numerocupom\n"
+                    + "from contasareceber "
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setIdCliente(rst.getString("clienteid"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " c.duplicata id,\n"
+                    + " c.fatura numerodocumento,\n"
+                    + " c.favorecido obs,\n"
+                    + " replace(c.vencimento,'/','-') vencimento,\n"
+                    + " replace(c.datadeemissao,'/','-') datadeemissao,\n"
+                    + " replace(c.valorliquido,',','.') valor,\n"
+                    + " f.fornecedor_key fornecedorid\n"
+                    + "from contasapagar c\n"
+                    + "join fornecedor f on f.cpf_cnpj = regexp_replace(c.favorecidocpf_cnpj,'[^0-9]','','g')"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("fornecedorid"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("datadeemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
