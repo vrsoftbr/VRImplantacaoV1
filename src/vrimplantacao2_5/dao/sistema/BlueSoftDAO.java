@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
@@ -14,11 +15,13 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -78,7 +81,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
-                OpcaoProduto.NUTRICIONAL
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
@@ -224,16 +228,29 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tributacao_produto t on t.produto_key = p.produto_key\n"
                     + "left join estoque e on e.codigointerno = p.produto_key\n"
                     + "where \n"
-                    + " p.produto_key = p.produto_unitario_key;"
+                    + " p.caixa = 'Não'\n"
+                    + "order by p.embalagem_key;"
             )) {
-                //Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
+
+                    ProdutoBalancaVO balanca = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+
+                    if (balanca != null) {
+                        imp.setEan(String.valueOf(balanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
+                        imp.setValidade(balanca.getValidade());
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    }
+
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -265,22 +282,6 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
-                    imp.seteBalanca(rs.getBoolean("ebalanca"));
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));
-
-                    /*ProdutoBalancaVO balanca = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
-
-                    if (balanca != null) {
-                        imp.setEan(String.valueOf(balanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(balanca.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(balanca.getValidade() > 1
-                                ? balanca.getValidade() : 0);
-                    } else {
-                        imp.setValidade(Utils.stringToInt(rs.getString("validade")));
-                        imp.seteBalanca(rs.getString("e_balanca").trim().equals("S"));
-                        imp.setTipoEmbalagem(rs.getString("tipo_emb"));
-                    }*/
                     result.add(imp);
                 }
             }
@@ -299,10 +300,10 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  p.produto_key produtoid,\n"
                     + "  p.gtin_principal ean,\n"
                     + "  p.embalagem_key embalagem,\n"
-                    + "  p.fator_preco qtde\n"
+                    + "  replace(p.fator_preco,',','.') qtde\n"
                     + " from produtos p\n"
                     + " where \n"
-                    + " p.produto_key <> p.produto_unitario_key\n"
+                    + " p.caixa = 'Sim'\n"
                     + " UNION\n"
                     + " select \n"
                     + " produto_key produtoid,\n"
@@ -319,13 +320,60 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("produtoid"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(1);
+                    imp.setQtdEmbalagem(rs.getInt("qtde"));
 
                     result.add(imp);
                 }
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "with a as (\n"
+                    + "  select \n"
+                    + "  produto_key produtoid,\n"
+                    + "  p.gtin_principal ean,\n"
+                    + "  p.embalagem_key embalagem,\n"
+                    + "  p.fator_estoque qtde\n"
+                    + " from produtos p\n"
+                    + "  where \n"
+                    + "  p.produto_key = p.produto_unitario_key\n"
+                    + "  and\n"
+                    + "  p.caixa = 'Não'\n"
+                    + " )\n"
+                    + " select \n"
+                    + "  p.produto_key produtopai,\n"
+                    + "  p.gtin_principal ean,\n"
+                    + "  p.embalagem_key embalagem,\n"
+                    + "  round(replace(p.fator_estoque,',','.')::numeric) qtde,\n"
+                    + "  a.produtoid produtofilho,\n"
+                    + "  a.ean ean_filho,\n"
+                    + "  a.embalagem emb_filho,\n"
+                    + "  a.qtde qtde_filho\n"
+                    + " from produtos p\n"
+                    + " join a on a.produtoid = p.produto_unitario_key\n"
+                    + " where \n"
+                    + " p.produto_key <> p.produto_unitario_key\n"
+                    + " and\n"
+                    + " p.caixa = 'Não'"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    imp.setId(rst.getString("produtopai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde"));
+                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtde_filho"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -732,12 +780,12 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + " n_duplicata id,\n"
                     + " sacadodescritivo obs,\n"
-                    + " replace(vencimento,'/','-') vencimento,\n"
-                    + " replace(emissao,'/','-') emissao,\n"
+                    + " split_part(vencimento,'/',3)||'-'||split_part(vencimento,'/',2)||'-'||split_part(vencimento,'/',1) vencimento,\n"
+                    + " split_part(emissao,'/',3)||'-'||split_part(emissao,'/',2)||'-'||split_part(emissao,'/',1) emissao,\n"
                     + " replace(valorliquido,',','.') valor,\n"
                     + " codcliente clienteid,\n"
                     + " coalesce(ndoc, n_duplicata) numerocupom\n"
-                    + "from contasareceber "
+                    + "from contasareceber"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -765,8 +813,8 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " c.duplicata id,\n"
                     + " c.fatura numerodocumento,\n"
                     + " c.favorecido obs,\n"
-                    + " replace(c.vencimento,'/','-') vencimento,\n"
-                    + " replace(c.datadeemissao,'/','-') datadeemissao,\n"
+                    + " split_part(c.vencimento,'/',3)||'-'||split_part(c.vencimento,'/',2)||'-'||split_part(c.vencimento,'/',1) vencimento,\n"
+                    + " split_part(c.datadeemissao,'/',3)||'-'||split_part(c.datadeemissao,'/',2)||'-'||split_part(c.datadeemissao,'/',1) datadeemissao,\n"
                     + " replace(c.valorliquido,',','.') valor,\n"
                     + " f.fornecedor_key fornecedorid\n"
                     + "from contasapagar c\n"
