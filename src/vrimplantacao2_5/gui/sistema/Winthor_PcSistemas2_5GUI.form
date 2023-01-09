@@ -295,6 +295,7 @@
                               <Component id="cmbTipoRotativo" min="-2" pref="188" max="-2" attributes="0"/>
                           </Group>
                           <Component id="chkTributacaoNcmFigura" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPrecoUnitario" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="47" max="32767" attributes="0"/>
                   </Group>
@@ -322,7 +323,9 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkTributacaoNcmFigura" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="73" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkPrecoUnitario" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="43" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -393,6 +396,17 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkTributacaoNcmFiguraActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPrecoUnitario">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Pre&#xe7;o unitario"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPrecoUnitarioActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

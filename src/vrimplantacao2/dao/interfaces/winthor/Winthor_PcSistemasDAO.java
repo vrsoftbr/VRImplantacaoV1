@@ -59,6 +59,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     private boolean somenteClienteFidelidade = false;
     private String tipoRotativo = "";
     private boolean tributacaoNcmFigura = false;
+    private boolean precoUnitario = false;
 
     private Date dataVendaInicial;
     private Date dataVendaFinal;
@@ -93,6 +94,10 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
     public void setTributacaoNcmFigura(boolean tributacaoNcmFigura) {
         this.tributacaoNcmFigura = tributacaoNcmFigura;
+    }
+
+    public void setPrecoUnitario(boolean precoUnitario) {
+        this.precoUnitario = precoUnitario;
     }
 
     @Override
@@ -710,8 +715,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     }
                 }
             }
-            try (ResultSet rst = stm.executeQuery(
-                    "WITH \n"
+            String sql = "WITH \n"
                     + "icms_dentro_estado AS (\n"
                     + "	SELECT\n"
                     + "		ic.CODPROD id_produto,\n"
@@ -864,7 +868,180 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "		icms_fora_estado.id_produto = p.codprod\n"
                     + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod\n"
                     + "ORDER BY\n"
-                    + "	id"
+                    + "	id";
+            if (precoUnitario) {
+                sql = "WITH \n"
+                        + "icms_dentro_estado AS (\n"
+                        + "	SELECT\n"
+                        + "		ic.CODPROD id_produto,\n"
+                        + "		ic.CODST id_tributacao,\n"
+                        + "		PISCOFINS.SITTRIBUT piscofins_s,\n"
+                        + "		piscofins.SITTRIBUTDEV piscofins_e\n"
+                        + "	FROM\n"
+                        + "		pctabpr ic	\n"
+                        + "		LEFT JOIN pctribpiscofins piscofins ON\n"
+                        + "			piscofins.codtribpiscofins = ic.codtribpiscofins\n"
+                        + "	WHERE\n"
+                        + "		ic.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
+                        + "),\n"
+                        + "icms_fora_estado AS (\n"
+                        + "	SELECT\n"
+                        + "		ic.CODPROD id_produto,\n"
+                        + "		ic.CODST id_tributacao\n"
+                        + "	FROM\n"
+                        + "		pctabpr ic\n"
+                        + "	WHERE\n"
+                        + "		ic.NUMREGIAO = " + idRegiaoForaEstado + "\n"
+                        + "),\n"
+                        + "natrec AS (\n"
+                        + "	SELECT\n"
+                        + "		distinct\n"
+                        + "		t.CODPROD id_produto,\n"
+                        + "		REPLACE(t.NCM, '.','') ncm,\n"
+                        + "		t.CODNATREC natrec\n"
+                        + "	FROM\n"
+                        + "		PCTABESCRSPED t\n"
+                        + "	WHERE\n"
+                        + "		NOT (t.CODPROD IS NULL AND t.ncm IS null) and\n"
+                        + "		T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n"
+                        + "		AND (\n"
+                        + "			(T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n"
+                        + "			OR (\n"
+                        + "				T.DATAINIESCR <= current_date\n"
+                        + "				AND T.DATAFINESCR IS NULL\n"
+                        + "			) OR (\n"
+                        + "				(current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR)\n"
+                        + "				AND T.DATAINIESCR IS NOT NULL\n"
+                        + "				AND T.DATAFINESCR IS NOT NULL\n"
+                        + "			)\n"
+                        + "		)\n"
+                        + "),\n"
+                        + "piscofins_icms AS (\n"
+                        + "SELECT\n"
+                        + " pt.CODPROD,\n"
+                        + " pt.CODFILIALNF,\n"
+                        + " pt.UFDESTINO,\n"
+                        + " pt.CODST idtributacao,\n"
+                        + " pt.CODTRIBPISCOFINS,\n"
+                        + " pt.DTULTALTER,\n"
+                        + " pc.DESCRICAOTRIBPISCOFINS,\n"
+                        + " pc.SITTRIBUT piscofinscst\n"
+                        + "FROM PCTABTRIB pt\n"
+                        + "LEFT JOIN PCTRIBPISCOFINS pc ON pc.CODTRIBPISCOFINS = pt.CODTRIBPISCOFINS\n"
+                        + "WHERE pt.UFDESTINO = 'GO'\n"
+                        + "AND pt.CODFILIALNF = '" + getLojaOrigem() + "'\n"
+                        + "ORDER BY pt.DTULTALTER DESC \n"
+                        + "),\n"
+                        + "valores AS (\n"
+                        + "	SELECT DISTINCT\n"
+                        + "	 CODPROD id, \n"
+                        + "	 LAST_VALUE(DTULTALTERSRVPRC) OVER (ORDER BY CODPROD) datahora\n"
+                        + "	FROM PCEMBALAGEM \n"
+                        + "	WHERE \n"
+                        + "	CODFILIAL = '"+getLojaOrigem()+"'\n"
+                        + "	AND QTUNIT = 1\n"
+                        + "	AND DTULTALTPVENDA IS NOT NULL\n"
+                        + ")\n"
+                        + "SELECT\n"
+                        + "	p.codprod id,\n"
+                        + "	p.dtcadastro datacadastro, \n"
+                        + "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n"
+                        + "	p.CODAUXILIAR2,\n"
+                        + "	COALESCE(\n"
+                        + "		(CASE\n"
+                        + "			WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1 THEN ean.QTMINIMAATACADO\n"
+                        + "			WHEN ean.QTUNIT >=2 THEN ean.QTUNIT\n"
+                        + "			ELSE 1\n"
+                        + "		END), \n"
+                        + "		1\n"
+                        + "	) as qtdembalagem,\n"
+                        + "	coalesce(ean.qtunit, 1) embalagemunitario,\n"
+                        + "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n"
+                        + "	p.qtunitcx qtdembalagemcompra,\n"
+                        + "	p.unidademaster tipoembalagemcompra,        \n"
+                        + "	p.aceitavendafracao e_balanca,\n"
+                        + "	ean.prazoval validade,\n"
+                        + "	p.descricao descricaocompleta,\n"
+                        //                    + "	p.codepto merc1,\n"
+                        //                    + "	p.codsec merc2,\n"
+                        //                    + "	p.codcategoria merc3,\n"
+                        //                    + "	p.codsubcategoria merc4,\n"
+                        + " p.codepto merc1,\n"
+                        + "	p.codsec merc2,\n"
+                        + "	CASE \n"
+                        + "		WHEN \n"
+                        + "		(CASE WHEN p.codcategoria = 0 THEN NULL ELSE p.codcategoria END) IS NULL THEN p.codsec\n"
+                        + "		ELSE \n"
+                        + "		(CASE WHEN p.codcategoria = 0 THEN NULL ELSE p.codcategoria END) \n"
+                        + "	END merc3,\n"
+                        + "	CASE \n"
+                        + "		WHEN \n"
+                        + "	    (CASE WHEN p.codsubcategoria = 0 THEN NULL ELSE p.codsubcategoria END) IS NULL \n"
+                        + "	    	AND\n"
+                        + "	    (CASE WHEN p.codcategoria = 0 THEN NULL ELSE p.codcategoria END) IS NULL THEN p.codsec\n"
+                        + "	    WHEN \n"
+                        + "	     (CASE WHEN p.codsubcategoria = 0 THEN NULL ELSE p.codsubcategoria END) IS NULL THEN p.codcategoria\n"
+                        + "	    ELSE\n"
+                        + "	     p.codsubcategoria\n"
+                        + "	 END merc4,\n"
+                        + "	CASE WHEN p.codprodprinc != p.codprod then p.codprodprinc else null END id_familiaproduto,\n"
+                        + "	round(coalesce(p.pesobruto, 0),2) pesobruto,\n"
+                        + "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n"
+                        + "	coalesce(est.estmin, 0) estoqueminimo,\n"
+                        + "	coalesce(est.estmax, 0) estoquemaximo,    \n"
+                        + "	coalesce(est.qtestger,0) estoque,\n"
+                        + "	coalesce(ean.margem,0) margem,\n"
+                        + "	coalesce(est.CUSTOULTENTCONT,0),\n"
+                        + " est.CUSTOREAL custosemimposto,\n"
+                        + "	coalesce(est.VLULTPCOMPRA,0),\n"
+                        + " est.CUSTOULTENT custocomimposto,\n"
+                        + "	coalesce(est.custofin,0) customedio,\n"
+                        + "	ean.PVENDA precovenda,\n"
+                        + "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0),\n"
+                        + "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n"
+                        + "	p.nbm ncm,\n"
+                        + "	coalesce(est.codcest, p.codcest) cest,\n"
+                        + " cest.CODCEST new_cest,\n"
+                        + "	icms_dentro_estado.piscofins_s,\n"
+                        + "	icms_dentro_estado.piscofins_e,\n"
+                        + "	(SELECT natrec FROM natrec WHERE (id_produto = p.codprod OR p.nbm LIKE natrec.ncm||'%') AND rownum = 1) piscofins_natrec,\n"
+                        + "	icms_dentro_estado.id_tributacao icms_dentro_estado,\n"
+                        + "	icms_fora_estado.id_tributacao icms_fora_estado,\n"
+                        + "	p.codncmex,\n"
+                        + "	p.codfornec fabricante,\n"
+                        + "	pf.CODFIGURA,\n"
+                        + " pic.idtributacao,\n"
+                        + "	pic.piscofinscst\n"
+                        + "FROM\n"
+                        + "	pcprodut p\n"
+                        + "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n"
+                        + "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n"
+                        + " LEFT JOIN PCCESTPRODUTO prodcest ON prodcest.CODPROD = p.CODPROD\n"
+                        + "	LEFT JOIN pccest cest ON cest.CODIGO = prodcest.CODSEQCEST\n"
+                        + "	LEFT JOIN PCEMBALAGEM ean ON\n"
+                        + "		ean.codprod = p.codprod AND\n"
+                        + "		ean.codfilial = emp.codigo\n"
+                        + "	LEFT JOIN pcest est ON\n"
+                        + "		est.codprod = p.codprod AND\n"
+                        + "		est.codfilial = emp.codigo\n"
+                        + "	LEFT JOIN pcprodfilial pf ON\n"
+                        + "		pf.codprod = p.codprod AND\n"
+                        + "		pf.codfilial = emp.codigo\n"
+                        + "	LEFT JOIN icms_dentro_estado ON\n"
+                        + "		icms_dentro_estado.id_produto = p.codprod\n"
+                        + "	LEFT JOIN icms_fora_estado ON\n"
+                        + "		icms_fora_estado.id_produto = p.codprod\n"
+                        + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod\n"
+                        + " JOIN valores v ON v.id = ean.CODPROD AND v.datahora = ean.DTULTALTERSRVPRC\n"
+                        + " WHERE \n"
+                        //+ "  ean.CODPROD in ('175785','240','176245') \n"
+                        + "	ean.QTUNIT = 1\n"
+                        + "	AND ean.DTULTALTPVENDA IS NOT NULL\n"
+                        + "ORDER BY\n"
+                        + "	id, ean.DTULTALTERSRVPRC";
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    sql
             )) {
                 int cont = 0, cont2 = 0;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -1157,7 +1334,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             return vResult;
-        } else if (opt == OpcaoProduto.PRECO) {
+        } /*else if (opt == OpcaoProduto.PRECO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -1236,9 +1413,9 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "		pf.codfilial = emp.codigo\n"
                         + "	LEFT JOIN icms_dentro_estado ON	icms_dentro_estado.id_produto = p.codprod\n"
                         + "	LEFT JOIN icms_fora_estado on icms_fora_estado.id_produto = p.codprod\n"
-                        + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod\n"
+                        + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod where p.codprod = '176245'\n"
                         + "ORDER BY\n"
-                        + "	id,ean.DTULTALTPVENDA"
+                        + "	id,ean.DTULTALTERSRVPRC"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -1253,7 +1430,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             return vResult;
-        } else if (opt == OpcaoProduto.CODIGO_BENEFICIO) {
+        }*/ else if (opt == OpcaoProduto.CODIGO_BENEFICIO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(

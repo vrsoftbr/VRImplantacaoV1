@@ -200,6 +200,7 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                     dao.setSomenteClienteFidelidade(chkClientePreferenciaSomenteClube.isSelected());
                     dao.setTipoRotativo(((TipoRotativo) cmbTipoRotativo.getModel().getSelectedItem()).descricaocobranca);
                     dao.setTributacaoNcmFigura(chkTributacaoNcmFigura.isSelected());
+                    dao.setPrecoUnitario(chkPrecoUnitario.isSelected());
 
                     Importador importador = new Importador(dao);
 
@@ -297,6 +298,7 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
         lblLojaOrigem3 = new javax.swing.JLabel();
         cmbTipoRotativo = new javax.swing.JComboBox();
         chkTributacaoNcmFigura = new vrframework.bean.checkBox.VRCheckBox();
+        chkPrecoUnitario = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -466,6 +468,14 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
             }
         });
 
+        chkPrecoUnitario.setText("Preço unitario");
+        chkPrecoUnitario.setEnabled(true);
+        chkPrecoUnitario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPrecoUnitarioActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabExtrasLayout = new javax.swing.GroupLayout(tabExtras);
         tabExtras.setLayout(tabExtrasLayout);
         tabExtrasLayout.setHorizontalGroup(
@@ -486,7 +496,8 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                         .addComponent(lblLojaOrigem3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbTipoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkTributacaoNcmFigura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkTributacaoNcmFigura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPrecoUnitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(47, Short.MAX_VALUE))
         );
         tabExtrasLayout.setVerticalGroup(
@@ -508,7 +519,9 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
                     .addComponent(lblLojaOrigem3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkTributacaoNcmFigura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkPrecoUnitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         tabMenu.addTab("Parametros Extras", tabExtras);
@@ -576,10 +589,15 @@ public class Winthor_PcSistemas2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkTributacaoNcmFiguraActionPerformed
 
+    private void chkPrecoUnitarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPrecoUnitarioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkPrecoUnitarioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferenciaSomenteClube;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private vrframework.bean.checkBox.VRCheckBox chkPrecoUnitario;
     private vrframework.bean.checkBox.VRCheckBox chkTributacaoNcmFigura;
     private javax.swing.JComboBox cmbDentroUf;
     private javax.swing.JComboBox cmbForaUf;
