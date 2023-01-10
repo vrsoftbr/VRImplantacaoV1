@@ -41,6 +41,12 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
  */
 public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private boolean inverteAssociado = false;
+
+    public void setInverteAssociado(boolean inverteAssociado) {
+        this.inverteAssociado = inverteAssociado;
+    }
+
     @Override
     public String getSistema() {
         return "BLUESOFT";
@@ -297,7 +303,7 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     " select \n"
-                    + "  p.produto_key produtoid,\n"
+                    + "  p.produto_unitario_key produtoid,\n"
                     + "  p.gtin_principal ean,\n"
                     + "  p.embalagem_key embalagem,\n"
                     + "  replace(p.fator_preco,',','.') qtde\n"
@@ -311,7 +317,15 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " 'UN' embalagem,\n"
                     + " '1' qtde\n"
                     + "from barras\n"
-                    + "where tipo <> 'PLU'"
+                    + "where tipo <> 'PLU'\n"
+                    + " UNION \n"
+                    + "select \n"
+                    + " p.produto_unitario_key produtoid,\n"
+                    + " b.ean,\n"
+                    + " p.embalagem_key embalagem,\n"
+                    + " replace(p.fator_preco,',','.') qtde\n"
+                    + "from produtos p\n"
+                    + " join barras b on b.produto_key = p.produto_key"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -321,6 +335,7 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("produtoid"));
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("qtde"));
+                    imp.setTipoEmbalagem(rs.getString("embalagem"));
 
                     result.add(imp);
                 }
@@ -366,10 +381,21 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rst.getString("produtopai"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde"));
-                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
-                    imp.setQtdEmbalagemItem(rst.getInt("qtde_filho"));
+
+                    if (inverteAssociado) {
+                        imp.setId(rst.getString("produtofilho"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde_filho"));
+                        imp.setProdutoAssociadoId(rst.getString("produtopai"));
+                        imp.setQtdEmbalagemItem(rst.getInt("qtde"));
+                        imp.setAplicaCusto(true);
+                        imp.setAplicaEstoque(false);
+                    } else {
+                        imp.setId(rst.getString("produtopai"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        imp.setProdutoAssociadoId(rst.getString("produtofilho"));
+                        imp.setQtdEmbalagemItem(rst.getInt("qtde_filho"));
+                    }
+
                     result.add(imp);
                 }
             }

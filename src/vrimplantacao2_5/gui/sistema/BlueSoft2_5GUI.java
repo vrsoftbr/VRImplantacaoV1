@@ -94,6 +94,8 @@ public class BlueSoft2_5GUI extends VRInternalFrame {
 
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
+                    
+                    dao.setInverteAssociado(chkInverteAssociado.isSelected());
 
                     Importador importador = new Importador(dao);
 
@@ -173,6 +175,8 @@ public class BlueSoft2_5GUI extends VRInternalFrame {
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        jPanel1 = new javax.swing.JPanel();
+        chkInverteAssociado = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -246,6 +250,33 @@ public class BlueSoft2_5GUI extends VRInternalFrame {
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
+        chkInverteAssociado.setText("Associado invertido");
+        chkInverteAssociado.setEnabled(true);
+        chkInverteAssociado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkInverteAssociadoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkInverteAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(456, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(chkInverteAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(211, Short.MAX_VALUE))
+        );
+
+        tabMenu.addTab("Extras", jPanel1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -269,8 +300,6 @@ public class BlueSoft2_5GUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("BLUESOFT");
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -291,8 +320,14 @@ public class BlueSoft2_5GUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
+    private void chkInverteAssociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkInverteAssociadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkInverteAssociadoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkInverteAssociado;
+    private javax.swing.JPanel jPanel1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
