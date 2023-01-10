@@ -773,7 +773,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + " pc.SITTRIBUT piscofinscst\n"
                     + "FROM PCTABTRIB pt\n"
                     + "LEFT JOIN PCTRIBPISCOFINS pc ON pc.CODTRIBPISCOFINS = pt.CODTRIBPISCOFINS\n"
-                    + "WHERE pt.UFDESTINO = 'GO'\n"
+                    + "WHERE pt.UFDESTINO = 'SP'\n"
                     + "AND pt.CODFILIALNF = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY pt.DTULTALTER DESC \n"
                     + ")"
@@ -1062,9 +1062,10 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.seteBalanca(false);
                     }
 
-//                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
-//                    if (bal != null) {
-                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    //int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    //ProdutoBalancaVO bal = produtosBalanca.get(codigoProduto); --GOIAS
+                    
+                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
                     ProdutoBalancaVO bal = produtosBalanca.get(codigoProduto);
 
                     if (bal != null) {
@@ -1079,7 +1080,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.seteBalanca("S".equals(rst.getString("e_balanca")));
                         imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                         imp.setTipoEmbalagemCotacao(imp.getTipoEmbalagem());
-                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        //imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setQtdEmbalagem(rst.getInt("embalagemunitario"));
                         imp.setValidade(rst.getInt("validade"));
                     }
 
@@ -1109,8 +1111,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("new_cest"));
+                    imp.setNcm(rst.getString("ncm"));                  
+                    imp.setCest(rst.getString("cest"));
 
                     if (tributacaoNcmFigura) {
                         imp.setPiscofinsCstDebito(rst.getInt("piscofinscst"));
@@ -1122,7 +1124,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setIcmsCreditoForaEstadoId(rst.getString("idtributacao"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
                     } else {
-                        imp.setPiscofinsCstCredito(rst.getString("piscofins_s"));
+                        imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
                         imp.setPiscofinsCstCredito(rst.getString("piscofins_e"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
                         imp.setIcmsDebitoId(rst.getString("icms_dentro_estado"));
