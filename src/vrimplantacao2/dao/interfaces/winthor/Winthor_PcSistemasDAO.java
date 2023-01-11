@@ -846,11 +846,14 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	p.codfornec fabricante,\n"
                     + "	pf.CODFIGURA,\n"
                     + " pic.idtributacao,\n"
-                    + "	pic.piscofinscst\n"
+                    + "	pic.piscofinscst,\n"
+                    + " tb.PVENDA1 precovenda2,\n"
+                    + "	tb.PVENDAATAC1 precoatacado\n"
                     + "FROM\n"
                     + "	pcprodut p\n"
                     + "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n"
                     + "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n"
+                    + " LEFT JOIN PCTABPR tb ON tb.CODPROD = p.CODPROD AND tb.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
                     + " LEFT JOIN PCCESTPRODUTO prodcest ON prodcest.CODPROD = p.CODPROD\n"
                     + "	LEFT JOIN pccest cest ON cest.CODIGO = prodcest.CODSEQCEST\n"
                     + "	LEFT JOIN PCEMBALAGEM ean ON\n"
@@ -928,7 +931,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + " pc.SITTRIBUT piscofinscst\n"
                         + "FROM PCTABTRIB pt\n"
                         + "LEFT JOIN PCTRIBPISCOFINS pc ON pc.CODTRIBPISCOFINS = pt.CODTRIBPISCOFINS\n"
-                        + "WHERE pt.UFDESTINO = 'GO'\n"
+                        + "WHERE pt.UFDESTINO = 'SP'\n"
                         + "AND pt.CODFILIALNF = '" + getLojaOrigem() + "'\n"
                         + "ORDER BY pt.DTULTALTER DESC \n"
                         + "),\n"
@@ -938,7 +941,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "	 LAST_VALUE(DTULTALTERSRVPRC) OVER (ORDER BY CODPROD) datahora\n"
                         + "	FROM PCEMBALAGEM \n"
                         + "	WHERE \n"
-                        + "	CODFILIAL = '"+getLojaOrigem()+"'\n"
+                        + "	CODFILIAL = '" + getLojaOrigem() + "'\n"
                         + "	AND QTUNIT = 1\n"
                         + "	AND DTULTALTPVENDA IS NOT NULL\n"
                         + ")\n"
@@ -1010,13 +1013,16 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "	p.codncmex,\n"
                         + "	p.codfornec fabricante,\n"
                         + "	pf.CODFIGURA,\n"
-                        + " pic.idtributacao,\n"
-                        + "	pic.piscofinscst\n"
+                        + "     pic.idtributacao,\n"
+                        + "	pic.piscofinscst,\n"
+                        + "     tb.PVENDA1 precovenda2,\n"
+                        + "	tb.PVENDAATAC1 precoatacado\n"
                         + "FROM\n"
                         + "	pcprodut p\n"
                         + "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n"
                         + "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n"
-                        + " LEFT JOIN PCCESTPRODUTO prodcest ON prodcest.CODPROD = p.CODPROD\n"
+                        + "     LEFT JOIN PCTABPR tb ON tb.CODPROD = p.CODPROD AND tb.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
+                        + "     LEFT JOIN PCCESTPRODUTO prodcest ON prodcest.CODPROD = p.CODPROD\n"
                         + "	LEFT JOIN pccest cest ON cest.CODIGO = prodcest.CODSEQCEST\n"
                         + "	LEFT JOIN PCEMBALAGEM ean ON\n"
                         + "		ean.codprod = p.codprod AND\n"
@@ -1064,7 +1070,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
                     //int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     //ProdutoBalancaVO bal = produtosBalanca.get(codigoProduto); --GOIAS
-                    
                     int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
                     ProdutoBalancaVO bal = produtosBalanca.get(codigoProduto);
 
@@ -1109,9 +1114,11 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoMedioComImposto(rst.getDouble("customedio"));
                     imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    //imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setPrecovenda(rst.getDouble("precoatacado"));
+
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
-                    imp.setNcm(rst.getString("ncm"));                  
+                    imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
                     if (tributacaoNcmFigura) {
@@ -1159,7 +1166,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "SELECT \n"
+                        /*"SELECT \n"
                         + "	p.CODPROD idproduto,\n"
                         + "	p.codauxiliar ean,\n"
                         + "	varejo.pvenda AS precovarejo,\n"
@@ -1201,7 +1208,20 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "	 THEN p.PVENDAATAC \n"
                         + "	-- Preço do atacado por embalagem\n"
                         + "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n"
-                        + "		THEN round((p.PVENDA / p.QTUNIT), 2) END) > 0"
+                        + "		THEN round((p.PVENDA / p.QTUNIT), 2) END) > 0"*/
+                "SELECT \n"
+                        + "       a.CODPROD idproduto,\n"
+                        + "       emb.CODAUXILIAR ean,\n"
+                        + "       a.NUMREGIAO,\n"
+                        + "       a.PVENDA1 precoatacado,\n"
+                        + "       a.PVENDAATAC1 precovarejo,\n"
+                        + "       emb.QTMINIMAATACADO qtdatacado\n"
+                        + "      FROM PCTABPR a\n"
+                        + "      JOIN PCEMBALAGEM emb ON emb.CODPROD = a.CODPROD\n"
+                        + "      WHERE \n"
+                        + "       a.NUMREGIAO = "+idRegiaoForaEstado+"\n"
+                        + "       AND \n"
+                        + "       emb.CODFILIAL = '"+getLojaOrigem()+"'"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -1218,6 +1238,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setQtdEmbalagem(rst.getInt("qtdatacado"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("precovarejo"));
+                        imp.setTipoAtacado(TipoAtacado.QTDE_TOTAL);
 
                         vResult.add(imp);
                     }
@@ -1273,7 +1294,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             return vResult;
-        } else if (opt == OpcaoProduto.TIPO_ATACADO) {
+        } /*else if (opt == OpcaoProduto.TIPO_ATACADO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
