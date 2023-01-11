@@ -2,6 +2,8 @@ package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,7 +27,11 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -33,6 +39,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
@@ -88,7 +95,9 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.NUTRICIONAL,
-                OpcaoProduto.ASSOCIADO
+                OpcaoProduto.ASSOCIADO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
 
@@ -115,7 +124,10 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.EMAIL,
                 OpcaoCliente.CELULAR,
                 OpcaoCliente.CONTATOS,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO
         ));
     }
 
@@ -214,6 +226,15 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " case when p.exporta_balanca = 'Sim' then 1 else 0 end ebalanca,\n"
                     + " p.peso_bruto,\n"
                     + " p.peso_liquido,\n"
+                    + " case when p.produto_key \n"
+                    + " 	 in (select distinct on (preco_equivalente)\n"
+                    + " 				preco_equivalente id\n"
+                    + " 			from produtos  \n"
+                    + " 			where preco_equivalente is not null\n"
+                    + " 				and caixa = 'Não'\n"
+                    + " 				and fator_preco = '1'\n"
+                    + " 				and status  = 'Ativo') then p.produto_key\n"
+                    + " 				else p.preco_equivalente end familiaid,\n"
                     + " case when p.exporta_balanca = 'Sim' then substring(p.gtin_principal,1,4)\n"
                     + "  else p.gtin_principal end ean,\n"
                     + " replace(p.preco_venda,',','.') precovenda,\n"
@@ -260,6 +281,7 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setIdFamiliaProduto(rs.getString("familiaid"));
 
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
@@ -342,6 +364,33 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct on (preco_equivalente)\n"
+                    + " 	preco_equivalente id,\n"
+                    + " 	substring(descricao,1,30) descricao\n"
+                    + " from produtos  \n"
+                    + " where preco_equivalente is not null\n"
+                    + " 	and caixa = 'Não'\n"
+                    + " 	and fator_preco = '1'\n"
+                    + " 	and status  = 'Ativo'"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -627,7 +676,39 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select distinct on (fornecedor_key)\n"
+                    "with teste as (\n"
+                    + "select \n"
+                    + " codigo id,\n"
+                    + " nomerazao razao,\n"
+                    + " nomeabreviado fantasia,\n"
+                    + " cpfcnpj,\n"
+                    + " rua endereco,\n"
+                    + " num numero,\n"
+                    + " '0' complemento,\n"
+                    + " cidade,\n"
+                    + " bairro,\n"
+                    + " uf,\n"
+                    + " '0' cep,\n"
+                    + " '0' codigo_ibge,\n"
+                    + " inscestadual insc,\n"
+                    + " case when status = 'INATIVA' then 0 else 1 end situacao,\n"
+                    + " '0' produtor_rural\n"
+                    + "from fornecedor2\n"
+                    + "where \n"
+                    + " tipopessoa ilike '%fornecedor%'\n"
+                    + " or \n"
+                    + " tipopessoa ilike '%governo%'\n"
+                    + " or\n"
+                    + " tipopessoa is null\n"
+                    + ")\n"
+                    + "select \n"
+                    + " id, razao, fantasia, cpfcnpj, endereco, numero, complemento, cidade, \n"
+                    + " bairro, uf, cep, codigo_ibge, insc, situacao, produtor_rural\n"
+                    + "from teste \n"
+                    + "where \n"
+                    + " id not in (select fornecedor_key from fornecedor)\n"
+                    + " union\n"
+                    + " select distinct on (fornecedor_key)\n"
                     + " fornecedor_key id,\n"
                     + " nome_razao razao,\n"
                     + " nome_fantasia fantasia,\n"
@@ -640,11 +721,10 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " estado_sigla uf,\n"
                     + " cep,\n"
                     + " codigo_ibge,\n"
-                    + " sexo,\n"
                     + " insc,\n"
                     + " case when status = 'Inativo' then 0 else 1 end situacao,\n"
                     + " produtor_rural\n"
-                    + "from fornecedor;"
+                    + "from fornecedor"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -766,7 +846,12 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from cliente c\n"
                     + "left join contatocliente ct on ct.pessoa_key = c.pessoa_key and ct.tipo_contato = 'Celular Particular'\n"
                     + "left join contatocliente ct2 on ct2.pessoa_key = c.pessoa_key and ct2.tipo_contato = 'Email Comercial'\n"
-                    + "left join contatocliente ct3 on ct3.pessoa_key = c.pessoa_key and ct3.tipo_contato = 'Telefone Residencial'"
+                    + "left join contatocliente ct3 on ct3.pessoa_key = c.pessoa_key and ct3.tipo_contato = 'Telefone Residencial'\n"
+                    + "where \n"
+                    + " c.pessoa_key not in (\n"
+                    + "  select codigo\n"
+                    + "	from cliente2\n"
+                    + "   where nomerazao = colativo )"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -811,7 +896,12 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " replace(valorliquido,',','.') valor,\n"
                     + " codcliente clienteid,\n"
                     + " coalesce(ndoc, n_duplicata) numerocupom\n"
-                    + "from contasareceber"
+                    + "from contasareceber\n"
+                    + "where \n"
+                    + " codcliente not in (\n"
+                    + "  select codigo\n"
+                    + "	from cliente2\n"
+                    + "   where nomerazao = colativo )"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -844,7 +934,18 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " replace(c.valorliquido,',','.') valor,\n"
                     + " f.fornecedor_key fornecedorid\n"
                     + "from contasapagar c\n"
-                    + "join fornecedor f on f.cpf_cnpj = regexp_replace(c.favorecidocpf_cnpj,'[^0-9]','','g')"
+                    + "join fornecedor f on f.cpf_cnpj::bigint = regexp_replace(c.favorecidocpf_cnpj,'[^0-9]','','g')::bigint\n"
+                    + "union\n"
+                    + "select \n"
+                    + " c.duplicata id,\n"
+                    + " c.fatura numerodocumento,\n"
+                    + " c.favorecido obs,\n"
+                    + " split_part(c.vencimento,'/',3)||'-'||split_part(c.vencimento,'/',2)||'-'||split_part(c.vencimento,'/',1) vencimento,\n"
+                    + " split_part(c.datadeemissao,'/',3)||'-'||split_part(c.datadeemissao,'/',2)||'-'||split_part(c.datadeemissao,'/',1) datadeemissao,\n"
+                    + " replace(c.valorliquido,',','.') valor,\n"
+                    + " f2.codigo fornecedorid\n"
+                    + "from contasapagar c\n"
+                    + " join fornecedor2 f2 on f2.cpfcnpj::bigint = regexp_replace(c.favorecidocpf_cnpj,'[^0-9]','','g')::bigint"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -856,6 +957,109 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("obs"));
                     imp.setVencimento(rst.getDate("vencimento"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " codigo id ,\n"
+                    + " nomerazao razao,\n"
+                    + " cpfcnpj cnpj,\n"
+                    + " inscestadual inscricaoestadual,\n"
+                    + " rua endereco,\n"
+                    + " num,\n"
+                    + " bairro,\n"
+                    + " uf\n"
+                    + "from fornecedor2 \n"
+                    + "where codigo = '2'"
+            )) {
+                //SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("num"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setUf(rst.getString("uf"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " codigo id,\n"
+                    + " nomerazao razao,\n"
+                    + " cpfcnpj cnpj,\n"
+                    + " '2' empresa\n"
+                    + "from cliente2\n"
+                    + "where nomerazao = colativo "
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setNome(rst.getString("razao"));
+                    imp.setIdEmpresa(rst.getString("empresa"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " n_duplicata id,\n"
+                    + " sacadodescritivo obs,\n"
+                    + " split_part(vencimento,'/',3)||'-'||split_part(vencimento,'/',2)||'-'||split_part(vencimento,'/',1) vencimento,\n"
+                    + " split_part(emissao,'/',3)||'-'||split_part(emissao,'/',2)||'-'||split_part(emissao,'/',1) emissao,\n"
+                    + " replace(valorliquido,',','.') valor,\n"
+                    + " codcliente clienteid,\n"
+                    + " coalesce(ndoc, n_duplicata) numerocupom\n"
+                    + "from contasareceber\n"
+                    + "where \n"
+                    + " codcliente in (\n"
+                    + "  select codigo\n"
+                    + "	from cliente2\n"
+                    + "   where nomerazao = colativo )"
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("clienteid"));
+                    imp.setEcf("1");
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setDataHora(rst.getTimestamp("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
                     result.add(imp);
                 }
             }
