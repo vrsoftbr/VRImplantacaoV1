@@ -90,6 +90,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FABRICANTE,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.ATIVO,
@@ -114,6 +115,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         ));
     }
@@ -208,8 +210,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
                     + "(p.descpro01||''||p.desccomp01) descricaocompleta,\n"
-                    + "	p.descpro01 descricaoreduzida,\n"
-                    + "	p.descabr01 descricaogondola,\n"
+                    + "	p.descpro01 descricaogondola,\n"
+                    + "	p.descabr01 descricaoreduzida,\n"
                     + "	p.datacad01 datacadastro,\n"
                     + "	p.unidpro01 unidade,\n"
                     + "	p.cusreal01 custocomimposto,\n"
@@ -221,6 +223,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.estatu01 estoque,\n"
                     + "	p.estmin01 estoqueminimo,\n"
                     + "	p.estmax01 estoquemaximo,\n"
+                    + " f.codforn02 fabricante,\n"
                     + "	p.pesopro01 pesobruto,\n"
                     + "	p.pesoliq01 pesoliquido,\n"
                     + "	p.alikicm01 icmsaliquota,\n"
@@ -244,13 +247,23 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.codcest01 cest,\n"
                     + "	p.natpisco01 naturezareceita,\n"
                     + " case when sitpro01 = 'I' then 0\n"
-                    + "    else 1 end situacao\n"
+                    + "    else 1 end situacao,\n"
+                    + " case \n"
+                    + "		when medida = 'M' then 'MT'\n"
+                    + "		when medida = 'U' then 'UN'\n"
+                    + "		when medida = 'G' then 'KG'\n"
+                    + "		when medida = 'L' then 'LT'\n"
+                    + " else 'UN'\n"
+                    + "	end tipo_volume,\n"
+                    + "	m.quantidade volume \n"
                     + "from \n"
                     + "	cadpro p \n"
                     + "left join arqbar ean on p.codpro01 = ean.codpro\n"
                     + "left join tpiscof pis on p.codpro01 = pis.codpro and \n"
                     + "	pis.entsai = 'S' and \n"
                     + "	pis.filial = p.codfil01\n"
+                    + "join cadforn f on substring(p.fornec01,1,15) = substring(f.nomeabr02,1,15)\n"
+                    + "left join medpro m on m.filial = p.codfil01 and m.codpro = p.codpro01\n"
                     + "where \n"
                     + "	p.codfil01 = " + getLojaOrigem())) {
                 while (rs.next()) {
@@ -277,6 +290,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setIdFamiliaProduto(rs.getString("familia_id"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
+                    imp.setFornecedorFabricante(rs.getString("fabricante"));
+                    imp.setTipoEmbalagemVolume(rs.getString("tipo_volume"));
+                    imp.setVolume(rs.getDouble("volume"));
 
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotadebito"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
@@ -430,21 +446,25 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "	codforn13 id_fornecedor,\n"
                     + "	codpro13 id_produto,\n"
-                    + "	cadpro.unidpro01 unidade\n"
-                    + "from \n"
-                    + "	profor\n"
-                    + " join cadpro on profor.codpro13 = cadpro.codpro01\n"
-                    + " join cadforn on profor.codforn13 = cadforn.codforn02")) {
+                    + "	p.unidpro01 unidade,\n"
+                    + "	ce.cdfabric codexterno\n"
+                    + "from\n"
+                    + "	profor pf\n"
+                    + "join cadpro p on pf.codpro13 = p.codpro01 and p.codfil01 = " + getLojaOrigem() + "\n"
+                    + "join cadforn f on pf.codforn13 = f.codforn02\n"
+                    + "join arqfab ce on ce.codpro = pf.codpro13 and ce.codforn = pf.codforn13\n"
+                    + "order by codforn13, codpro13")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setIdProduto(rs.getString("id_produto"));
+                    
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setCodigoExterno(rs.getString("codexterno"));
 
                     result.add(imp);
                 }
@@ -663,8 +683,6 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
-//                        next.setValorDesconto(rst.getDouble("desconto"));
-//                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -735,6 +753,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException ex) {
@@ -747,8 +767,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n"
                     + "	FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL id_venda,\n"
-                    //+ "	codfil::varchar || codpro || codbarra || numecr || ncupom || ordem ||horario || vi.data as id_item,\n
-                    + " ordem::varchar || codpro || qtdevend || codbarra || ncupom || horario id_item,\n"
+                    + " FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL || ordem::varchar || codpro || qtdevend || codbarra || ncupom || horario id_item,\n"
                     + "	ORDEM sequencial,\n"
                     + "	CODPRO id_produto,\n"
                     + "	p.descpro01 produto,\n"
@@ -756,13 +775,15 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CODBARRA ean,\n"
                     + "	QTDEVEND quantidade,\n"
                     + "	round(PREVEND,2) precovenda,\n"
-                    + "	round(QTDEVEND * PREVEND,2) total\n"
+                    + "	round(QTDEVEND * PREVEND,2) total,\n"
+                    + " desconto,\n"
+                    + " case when cancelado = '' then 0 else 1 end cancelado\n"
                     + "from\n"
                     + "	lp" + tabelaVenda + " vi\n"
                     + "	join cupom v on v.coo = vi.ncupom and v.numeropdv = vi.numecr and v.filial = vi.codfil\n"
                     + "	join cadpro p on vi.CODPRO = p.CODPRO01 and vi.codfil = p.codfil01 \n"
                     + "where\n"
-                    + "	vi.codfil = " + idLojaCliente + " and vi.ncupom != 0\n"
+                    + "	vi.codfil = " + idLojaCliente + "\n"
                     + "order by\n"
                     + "	v.data, v.coo, vi.ORDEM";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
