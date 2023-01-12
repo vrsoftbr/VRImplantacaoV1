@@ -39,7 +39,6 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
@@ -695,9 +694,14 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " '0' produtor_rural\n"
                     + "from fornecedor2\n"
                     + "where \n"
-                    + " tipopessoa ilike '%fornecedor%'\n"
-                    + " or \n"
-                    + " tipopessoa ilike '%governo%'\n"
+                    + " tipopessoa ilike '%Governo Federal%' or\n"
+                    + " tipopessoa ilike '%Fornecedor%' or\n"
+                    + " tipopessoa ilike '%Loja%' or\n"
+                    + " tipopessoa ilike '%Prestador de Serviço%' or\n"
+                    + " tipopessoa ilike '%Administradora Cartão%' or\n"
+                    + " tipopessoa ilike '%Empresa de Cobrança%' or\n"
+                    + " tipopessoa ilike '%Prefeitura Municipal%' or\n"
+                    + " tipopessoa ilike '%Transportadora%'\n"
                     + " or\n"
                     + " tipopessoa is null\n"
                     + ")\n"
