@@ -772,9 +772,10 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " fornecedor_produto_key id,\n"
                     + " fornecedor_key fornecedorid,\n"
                     + " produto_key produtoid,\n"
-                    + " codigo_referencia referencia,\n"
+                    + " case when codigo_referencia = '' then 'SANZITO'\n"
+                    + "   else codigo_referencia end referencia,\n"
                     + " divisao_key quantidade \n"
-                    + "from produto_fornecedor "
+                    + "from produto_fornecedor"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
