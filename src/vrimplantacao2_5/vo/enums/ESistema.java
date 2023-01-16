@@ -207,6 +207,7 @@ import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
+import vrimplantacao2_5.dao.sistema.AriusWebDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
@@ -248,6 +249,7 @@ import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
+import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -2055,6 +2057,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new BrData2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ARIUSWEB(241, "ARIUSWEB", new AriusWebDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new AriusWeb2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
