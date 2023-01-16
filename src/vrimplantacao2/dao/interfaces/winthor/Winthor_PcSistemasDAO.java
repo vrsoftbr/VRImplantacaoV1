@@ -176,7 +176,10 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CHEQUE));
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -1117,7 +1120,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     //imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setPrecovenda(rst.getDouble("precovarejo"));
-                    
+
                     /*if(rst.getInt("qtdatacado") > 1){
                         
                         if (imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
@@ -1129,7 +1132,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setPrecovenda(rst.getDouble("precovarejo"));
                         imp.setTipoAtacado(TipoAtacado.QTDE_TOTAL);
                     }*/
-
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -1566,13 +1568,25 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	codprod) eans WHERE eans.codfilial = '" + getLojaOrigem() + "'"*/
                     "SELECT \n"
                     + "	 CODPROD,\n"
-                    + "	 CODAUXILIAR ean,\n"
+                    + "	 CAST(CODAUXILIAR AS varchar(100)) ean,\n"
                     + "	 UNIDADE,\n"
-                    + "	 QTUNIT,\n"
-                    + "	 CODFILIAL\n"
+                    + "	 QTUNIT\n"
                     + "	FROM PCEMBALAGEM \n"
                     + "	WHERE \n"
-                    + "	 CODFILIAL = '" + getLojaOrigem() + "'"
+                    + "	 CODFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "UNION\n"
+                    + "SELECT \n"
+                    + "       a.CODPROD codprod,\n"
+                    + "       emb.CODFILIAL||'00000'||a.CODPROD ean,\n"
+                    + "       upper(emb.UNIDADE) unidade,\n"
+                    + "       emb.QTMINIMAATACADO qtunit\n"
+                    + "      FROM PCTABPR a\n"
+                    + "      JOIN PCEMBALAGEM emb ON emb.CODPROD = a.CODPROD\n"
+                    + "      WHERE \n"
+                    + "       a.NUMREGIAO = "+idRegiaoDentroEstado+"\n"
+                    + "       AND emb.QTMINIMAATACADO > 1\n"
+                    + "       AND emb.CODFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "       AND a.PVENDA1 > 0"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -1901,7 +1915,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                                 + (rst.getString("telconjuge") != null ? "\n" + "TEL. CONJUGE: " + rst.getString("telconjuge") : "")
                                 + (rst.getString("telcelent") != null ? "\n" + "CELULAR2: " + rst.getString("telcelent") : "")
                                 + (rst.getString("email") != null ? "\n" + "EMAIL: " + rst.getString("email") : "")
-                                + (rst.getString("emailnfe") != null ? "\n" + "EMAIL NF-E: " + rst.getString("emailnfe") : "")
+                                //+ (rst.getString("emailnfe") != null ? "\n" + "EMAIL NF-E: " + rst.getString("emailnfe") : "")
                                 + (rst.getString("emailcob") != null ? "\n" + "EMAIL COB.: " + rst.getString("emailcob") : "")
                         );
                         imp.setTelefone(rst.getString("telent"));
@@ -1910,7 +1924,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         if (rst.getString("emailnfe") != null) {
                             imp.addContato("1", "NFE", "", "", rst.getString("emailnfe"));
                         }
-                        imp.setEmail(rst.getString("email"));
+                        imp.setEmail(rst.getString("emailnfe"));
                         imp.setCobrancaEndereco(rst.getString("endercob"));
                         imp.setCobrancaNumero(rst.getString("numerocob"));
                         imp.setCobrancaComplemento(rst.getString("complementocob"));
