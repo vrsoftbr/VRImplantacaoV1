@@ -195,7 +195,8 @@ public enum EScriptLojaOrigemSistema {
     WLS(237, 5, "SELECT COD_LOJA id, NOME_FANTASIA || '' - '' || CNPJ descricao FROM INFORMACOES ORDER BY COD_LOJA"),
     GSOFT(238, 13, "select Codigo id, nome descricao from MC_Empresa"),
     FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS"),
-    BRDATA(240, 13, "select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito");
+    BRDATA(240, 13, "select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito"),
+    ARIUSWEB(241, 8, "select nroloja id, razao descricao from controle.pf_loja");
 
     private int idSistema;
     private int idBancoDados;
