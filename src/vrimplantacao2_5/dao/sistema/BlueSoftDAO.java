@@ -254,7 +254,7 @@ public class BlueSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tributacao_produto t on t.produto_key = p.produto_key\n"
                     + "left join estoque e on e.codigointerno = p.produto_key\n"
                     + "where \n"
-                    + " p.caixa = 'Não'\n"
+                    + " p.caixa = 'NÃ£o'\n"
                     + "order by p.embalagem_key;"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
