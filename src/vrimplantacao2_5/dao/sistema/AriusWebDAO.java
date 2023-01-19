@@ -1,30 +1,35 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
-import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 
 /**
  *
@@ -75,11 +80,13 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
             OpcaoProduto.OFERTA,
-            OpcaoProduto.FABRICANTE
+            OpcaoProduto.FABRICANTE,
+            OpcaoProduto.VENDA_PDV,
+            OpcaoProduto.PDV_VENDA
         }));
     }
 
-    @Override
+    /*@Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
                 OpcaoFornecedor.DADOS,
@@ -91,8 +98,7 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
-    }
-
+    }*/
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -134,7 +140,6 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by 1"
             )) {
                 while (rs.next()) {
-//                    String id = rs.getString("cst") + "-" + rs.getString("aliq") + "-" + rs.getString("red");
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
@@ -160,7 +165,7 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	mercador m\n"
                     + "where\n"
-                    + "	nroloja = 1\n"
+                    + "	nroloja = " + getLojaOrigem() + "\n"
                     + "	and codigoint = 0"
             )) {
                 while (rst.next()) {
@@ -197,9 +202,9 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by 1, 3")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -261,26 +266,23 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setEan(imp.getImportId());
                     }
-                    
+
                     imp.setDescricaoCompleta(rs.getString("descricao_completa"));
                     imp.setDescricaoReduzida(rs.getString("desc_reduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
-
                     imp.setTipoEmbalagem(rs.getString("unidade"));
 
                     imp.setCodMercadologico1("merc1");
                     imp.setCodMercadologico2("merc2");
                     imp.setCodMercadologico3("merc3");
-                    
+
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoComImposto(rs.getDouble("precocusto"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
-                    
                     imp.setEstoque(rs.getDouble("estoque"));
 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-//                    imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? 1 : 0);
 
                     imp.setIcmsDebitoId(rs.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
@@ -297,116 +299,6 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
-    /*@Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	FORNEC id_fornecedor,\n"
-                    + "	e.ID id_produto,\n"
-                    + "	pf.CODPLU codigoexterno,\n"
-                    + "	pf.EMB embalagem,\n"
-                    + "	pf.QTEMB qtdembalagem\n"
-                    + "from 	\n"
-                    + "	plu pf \n"
-                    + "join estoque e on pf.codigo = e.CODIGO")) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	codigo,\n"
-                    + "	cliente razao,\n"
-                    + "	fantasia,\n"
-                    + "	cnpj,\n"
-                    + "	insc ie,\n"
-                    + "	endereco,\n"
-                    + "	bairro,\n"
-                    + "	cidade,\n"
-                    + "	cep,\n"
-                    + "	estado,\n"
-                    + "	numero,\n"
-                    + "	codmunicip municipio_ibge,\n"
-                    + "	telefone,\n"
-                    + "	telefone2,\n"
-                    + "	telefone3,\n"
-                    + "	contato,\n"
-                    + "	contato2,\n"
-                    + "	contato3,\n"
-                    + "	prazo,\n"
-                    + "	vendedor,\n"
-                    + "	regime,\n"
-                    + "	tipocontribuinte,\n"
-                    + "	emailxml,\n"
-                    + "	datacad cadastro\n"
-                    + "from \n"
-                    + "	fornec")) {
-                while (rs.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("codigo"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setIe_rg(rs.getString("ie"));
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setUf(rs.getString("estado"));
-                    imp.setIbge_municipio(rs.getInt("municipio_ibge"));
-                    imp.setTel_principal(rs.getString("telefone"));
-
-                    String email = rs.getString("emailxml");
-
-                    if (email != null && !email.trim().isEmpty()) {
-                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, email);
-                    }
-
-                    String telfone3 = rs.getString("telefone3");
-
-                    if (telfone3 != null && !telfone3.trim().isEmpty()) {
-                        imp.addContato("2", "TELEFONE2", telfone3, null, TipoContato.NFE, null);
-                    }
-
-                    String contato = rs.getString("vendedor");
-
-                    if (contato != null && !contato.trim().isEmpty()) {
-                        imp.addContato("3", contato, null, null, TipoContato.NFE, null);
-                    }
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }*/
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -467,30 +359,29 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	id,\n"
-                    + "	codcli idcliente,\n"
-                    + "	cliente,\n"
-                    + "	pedido,\n"
+                    "SELECT\n"
+                    + "	CONCAT( pdv, nrocupom, codconvenio) id,\n"
                     + "	pdv,\n"
-                    + "	duplicata,\n"
+                    + " nrocupom cupom,\n"
+                    + "	codconvenio id_cliente,\n"
                     + "	valor,\n"
-                    + "	dtvencimento,\n"
-                    + "	dtemissao\n"
-                    + "from \n"
-                    + "	dupreceber d\n"
-                    + "where \n"
-                    + "	ValorPago is null")) {
+                    + "	dataproc emissao,\n"
+                    + "	dataVencimento vencimento\n"
+                    + "FROM\n"
+                    + "	convenio c\n"
+                    + "WHERE\n"
+                    + "	nroloja = " + getLojaOrigem() + ""
+            )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setDataEmissao(rs.getDate("dtemissao"));
-                    imp.setDataVencimento(rs.getDate("dtvencimento"));
-                    imp.setValor(rs.getDouble("valor"));
                     imp.setEcf(rs.getString("pdv"));
-                    imp.setNumeroCupom(rs.getString("pedido"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
 
                     result.add(imp);
                 }
@@ -498,5 +389,189 @@ public class AriusWebDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+    
+     public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new AriusWebDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new AriusWebDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+
+                        next.setId(id);
+                        next.setNumeroCupom(rst.getInt("cupom"));
+                        next.setEcf(rst.getInt("ecf"));
+                        next.setData(rst.getDate("datavenda"));
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "	CONCAT(NroCupom,Pdv,NroItens,DataProc,numabertura) id_venda, \n"
+                    + "	NroCupom cupom,\n"
+                    + "	pdv ecf,\n"
+                    + "	HoraFim datavenda,\n"
+                    // + "	SUBSTRING(HoraFim, 12,5) hora, \n"
+                    + "	total valor,\n"
+                    + "	case when FlagFimCupom = 0 then 1 else 0 end cancelado\n"
+                    + "from\n"
+                    + "	cupom \n"
+                    + "where\n"
+                    + "	nroloja = " + idLojaCliente + "\n"
+                    + "	and DataProc BETWEEN '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "	order by 2,3,4";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setId(rst.getString("id_item"));
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setSequencia(rst.getInt("sequencial"));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setDescricaoReduzida(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "	CONCAT(v.NroCupom, v.Pdv, v.NroItens, v.DataProc, v.numabertura) id_venda,\n"
+                    + "	CONCAT(vi.NroCupom,vi.pdv,vi.Item, vi.Codigo, vi.HoraMinSeg) id_item,\n"
+                    + "	Item sequencial,\n"
+                    + "	Codigo id_produto,\n"
+                    + "	p.descricao produto,\n"
+                    + "	p.unidade unidade,\n"
+                    + "	vi.Codigo ean,\n"
+                    + "	Quantidade, \n"
+                    + "	ValorUnitario precovenda,\n"
+                    + "	vi.valor total,\n"
+                    + "	valordesc desconto,\n"
+                    + "	Estornado cancelado\n"
+                    + "from\n"
+                    + "	itens vi\n"
+                    + "	join cupom v on v.nroloja = vi.nroloja and v.NroCupom = vi.NroCupom \n"
+                    + "	join mercador p on p.nroloja = vi.nroloja and p.codigoean = vi.Codigo \n"
+                    + "where\n"
+                    + "	v.nroloja = " + idLojaCliente + "\n"
+                    + "	and v.DataProc BETWEEN '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "order by 1,2,3";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            System.out.println(sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }
