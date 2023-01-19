@@ -21,14 +21,15 @@ import vrimplantacao2_5.gui.login.LoginGUI;
 
 /**
  * Classe principal da aplicação
+ *
  * @author leandro
  */
 public class App {
-    
+
     private static Logger LOG = LoggerFactory.getLogger(App.class);
-    
+
     private static App instance;
-    
+
     private static void startApp(String... args) {
         if (instance != null) {
             instance.encerrar();
@@ -37,39 +38,40 @@ public class App {
         instance = new App();
         instance.inicializar();
     }
-    
+
     public static void main(String[] args) {
         App.startApp(args);
     }
-    
+
     private Properties properties;
-    
-    private App() {}
-    
+
+    private App() {
+    }
+
     public static Properties properties() {
         return instance.properties;
     }
-    
+
     /**
-     * Rotina que encerra todas as atividades da aplicação. Seria como o 
+     * Rotina que encerra todas as atividades da aplicação. Seria como o
      * desligamento do sistema, porém sem encerrar a aplicação.
      */
     private void encerrar() {
         this.properties = null;
     }
-    
-    private void inicializar(String... args) {  
+
+    private void inicializar(String... args) {
         inicializarProperties();
-        tratarParametros(args);        
+        tratarParametros(args);
         inicializarView();
         inicializarSistema();
     }
-    
+
     private void inicializarProperties() {
         try {
             //Tenta obter a localização do arquivo properties.
             properties = Properties.getVrImplantacaoProperties();
-            if (properties == null || !properties.exists()) {                
+            if (properties == null || !properties.exists()) {
                 properties = ConexaoPropertiesEditorGUI.create();
             }
             if (properties == null || !properties.exists()) {
@@ -82,24 +84,22 @@ public class App {
             System.exit(1);
         }
     }
-    
-    
 
     private void tratarParametros(String[] args) {
         Map<String, String> params = new HashMap<>();
-        for (String arg: args) {
+        for (String arg : args) {
             String[] st = arg.split("=");
             if (st.length == 1) {
                 params.put(st[0], "");
             } else if (st.length > 1) {
                 params.put(st[0], st[1]);
             }
-        }        
+        }
         if (params.containsKey("-lite")) {
             Parametros.lite = params.get("-lite");
         }
     }
-    
+
     private void inicializarView() {
         try {
             String OSName = System.getProperty("os.name");
@@ -116,27 +116,27 @@ public class App {
                 }
             } else {
                 Util.setLookAndFeel();
-            }            
+            }
         } catch (Exception e) {
             LOG.error("Erro ao inicializar o LookAndFeel", e);
         }
     }
-    
+
     private void inicializarSistema() {
         try {
 
             SplashScreen.show();
             SplashScreen.setSobre("VR Implantação 2.5", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             SplashScreen.setStatus("Inicializando sistema...");
-            
+
             Global.idLoja = properties.getInt("system.numeroloja");
-            
+
             SplashScreen.setStatus("Abrindo conexão...");
             abrirConexao(properties);
 
             SplashScreen.setStatus("Carregando interface...");
-            SplashScreen.dispose();            
-            
+            SplashScreen.dispose();
+
             callLogin(properties);
 
         } catch (Exception ex) {
@@ -153,22 +153,28 @@ public class App {
         String nomeBanco = oProperties.get("database.nome");
         String usuarioBanco = oProperties.get("database.usuario") == null ? "postgres" : oProperties.get("database.usuario");
         String senhaBanco = oProperties.get("database.senha") == null ? "postgres" : oProperties.get("database.senha");
-        
+
         Conexao.abrirConexao(ipBanco, ipSecBanco, portaBanco, nomeBanco, usuarioBanco, senhaBanco);
     }
 
     private static void callLogin(Properties oProperties) throws Exception {
-        LoginGUI form = new LoginGUI();
+        String unidade = oProperties.get("system.unidade") == null ? null : oProperties.get("system.unidade");
         
-        if (!oProperties.get("system.usuario","").isEmpty()) {
+        LoginGUI form = new LoginGUI();
+
+        if (!oProperties.get("system.usuario", "").isEmpty()) {
             form.setUsuario(oProperties.get("system.usuario").toUpperCase());
         }
-        
-        if (!oProperties.get("system.senha","").isEmpty()) {
+
+        if (!oProperties.get("system.senha", "").isEmpty()) {
             form.setSenha(oProperties.get("system.senha").toUpperCase());
-        }        
-        
+        }
+
+        if (!("".equals(unidade) || unidade == null)) {
+            form.setUnidade(unidade);
+        }
+
         form.setVisible(true);
     }
-    
+
 }

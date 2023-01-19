@@ -2,6 +2,7 @@ package vrimplantacao2_5.gui.login;
 
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import vr.core.collection.Properties;
 import vr.core.parametro.versao.Versao;
 import vr.implantacao.main.App;
@@ -26,21 +27,20 @@ public class LoginGUI extends VRDialog {
     private VRMdiFrame mdiFrame = null;
     private List<DadosConexaoPostgreSQL> vEmpresa = null;
     private AtualizadorController atualizadorController = null;
-        
+    private int unidade = 1;
+
     /* Classes da versão 2.5 */
     UnidadeController unidadeController = new UnidadeController();
     UsuarioController usuarioController = new UsuarioController();
-    
 
     public LoginGUI() throws Exception {
         initComponents();
 
         centralizarForm();
-        
+
         criarEstrutura2_5();
 
         getUnidades();
-
         lblVersao.setText("Versão do banco " + Versao.createFromConnectionInterface(Conexao.getConexao()).getVersao());
 
         this.setModal(true);
@@ -50,21 +50,21 @@ public class LoginGUI extends VRDialog {
         atualizadorController = new AtualizadorController();
         atualizadorController.criarEstrutura2_5();
     }
-    
+
     private void getUnidades() throws Exception {
         cboUnidade.setModel(new DefaultComboBoxModel());
-        
+
         List<UnidadeVO> unidadesVO = unidadeController.getUnidades();
-        
+
         if (unidadesVO == null) {
             return;
         }
-        
+
         unidadesVO.forEach((vo) -> {
             cboUnidade.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
         });
     }
-    
+
     public void autenticar() throws Exception {
         if (cboUnidade.getId() == -1) {
             cboUnidade.requestFocus();
@@ -75,9 +75,9 @@ public class LoginGUI extends VRDialog {
         vo.setLogin(txtUsuario.getText());
         vo.setSenha(txtSenha.getText());
         vo.setIdUnidade(cboUnidade.getId());
-        
+
         List<UsuarioVO> usuarioVO = usuarioController.autenticar(vo);
-        
+
         usuarioVO.stream().map((usuario) -> {
             Global.setIdUsuario(usuario.getId());
             Global.setNomeUsuario(usuario.getNome());
@@ -90,7 +90,7 @@ public class LoginGUI extends VRDialog {
         });
 
         MenuGUI form = new MenuGUI(this);
-        
+
         form.atualizarRodape();
         form.setVisible(true);
         form.checkParametros();
@@ -121,6 +121,18 @@ public class LoginGUI extends VRDialog {
         txtSenha.setText(i_senha);
     }
 
+    public void setUnidade(String unidade) {
+        this.unidade = Integer.parseInt(unidade);
+        cboUnidade.setId(this.unidade);
+        if (cboUnidade.getDescricao() == "") {
+            cboUnidade.setId(1);
+            JOptionPane.showMessageDialog(this, "<html> <b> Campo <u>Unidade</u> do Properties está incorreto. </b></html>"
+                    + "\n\nCertifique-se de que digitou o numero da sua unidade corretamente."
+                    + "\n\n<html> <font color=red><b>Exemplo:</b> </font></html>"
+                    + "\n\n<html>\"system.unidade = <b>1</b>\"</html>. "
+                    + "\n\n O número (1) representa a VR MATRIZ\n\n");
+        }
+    }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 

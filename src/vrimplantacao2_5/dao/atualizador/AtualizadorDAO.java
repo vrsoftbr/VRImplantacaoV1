@@ -315,7 +315,17 @@ public class AtualizadorDAO {
     public void inserirUnidade() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (1, 'VR MATRIZ', 3526902, 35) on conflict (id) do nothing;\n"
-                      + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (12, 'VR MG', 3170206, 31) on conflict (id) do nothing;\n");
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (2, 'VR BAURU', 3506003, 35) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (3, 'VR BELEM', 1501402, 15) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (4, 'VR FLORIANOPOLIS', 4205407, 42) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (5, 'VR FORTALEZA', 2304400, 23) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (6, 'VR GOIANIA', 5208707, 52) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (7, 'VR RECIFE', 2611606, 26) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (8, 'VR RJ', 3304557, 33) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (9, 'VR SALVADOR', 2927408, 29) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (10, 'VR SP', 3550308, 35) on conflict (id) do nothing;\n"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (11, 'VR SP ZL', 3550308, 35) on conflict (id) do nothing;"
+                    + "INSERT INTO implantacao2_5.unidade(id, nome, id_municipio, id_estado) VALUES (12, 'VR MG', 3170206, 31) on conflict (id) do nothing;\n");
         }
     }
 
@@ -325,7 +335,18 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'RODRIGO', 'RODRIGO', 'ZIRDA123', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n");
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'RODRIGO', 'RODRIGO', 'ZIRDA123', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (6, 'IMP-BAURU', 'VRSP-BAU', 'IMPBAU35', " + EUnidade.VR_BAURU.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (7, 'IMP-BELEM', 'VRPA', 'IMP15', " + EUnidade.VR_BELEM.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (8, 'IMP-FLORIANOPOLIS', 'VRSC', 'IMP42', " + EUnidade.VR_FLORIANOPOLIS.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (9, 'IMP-FORTALEZA', 'VRCE', 'IMP23', " + EUnidade.VR_FORTALEZA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (10, 'IMP-GOIANIA', 'VRGO', 'IMP52', " + EUnidade.VR_GOIANIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (11, 'IMP-RECIFE', 'VRPE', 'IMP26', " + EUnidade.VR_RECIFE.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (12, 'IMP-RJ', 'VRRJ', 'IMP33', " + EUnidade.VR_RIO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (13, 'IMP-SALVADOR', 'VRBA', 'IMP29', " + EUnidade.VR_SALVADOR.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (14, 'IMP-SP', 'VRSP', 'IMP35', " + EUnidade.VR_SAO_PAULO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (15, 'IMP-SP_ZL', 'VRSP-ZL', 'IMPZL35', " + EUnidade.VR_SAO_PAULO_ZL.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (16, 'IMP-MG', 'VRMG', 'IMP31', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;");
         }
     }
 
