@@ -179,7 +179,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_CONVENIADO,
-                OpcaoCliente.CONVENIO_TRANSACAO));
+                OpcaoCliente.CONVENIO_TRANSACAO
+        ));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -836,7 +837,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	coalesce(est.custofin,0) customedio,\n"
                     + "	ean.PVENDA,\n"
                     + "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda,\n"
-                    + "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n"
+                    + "	CASE WHEN pf.ativo = 'N' OR pf.FORALINHA = 'S' THEN 0 ELSE 1 END situacaocadastro,\n"
                     + "	p.nbm ncm,\n"
                     + "	coalesce(est.codcest, p.codcest) cest,\n"
                     + " cest.CODCEST new_cest,\n"
@@ -1577,16 +1578,42 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "UNION\n"
                     + "SELECT \n"
                     + "       a.CODPROD codprod,\n"
-                    + "       emb.CODFILIAL||'00000'||a.CODPROD ean,\n"
+                    + "       emb.CODFILIAL || '00000' || a.CODPROD,\n" //||emb.QTMINIMAATACADO ean,\n"
                     + "       upper(emb.UNIDADE) unidade,\n"
                     + "       emb.QTMINIMAATACADO qtunit\n"
                     + "      FROM PCTABPR a\n"
                     + "      JOIN PCEMBALAGEM emb ON emb.CODPROD = a.CODPROD\n"
                     + "      WHERE \n"
-                    + "       a.NUMREGIAO = "+idRegiaoDentroEstado+"\n"
+                    + "       a.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
                     + "       AND emb.QTMINIMAATACADO > 1\n"
                     + "       AND emb.CODFILIAL = '" + getLojaOrigem() + "'\n"
-                    + "       AND a.PVENDA1 > 0"
+                    + "       AND a.PVENDA1 > 0\n"
+            /*+ "UNION   \n"
+                    + "SELECT\n"
+                    + "	pf.CODPROD codprod,\n"
+                    + "	pf.CODFILIAL || '00000' || pf.CODPROD || pf.QTMINIMAATACADO ean,\n"
+                    + "	'UN' unidade,\n"
+                    + "	pf.QTMINIMAATACADO qtunit\n"
+                    + "FROM\n"
+                    + "	PCPRODFILIAL pf\n"
+                    + "JOIN PCTABPR pt ON	pt.CODPROD = pf.CODPROD\n"
+                    + "WHERE\n"
+                    + "	pf.QTMINIMAATACADO > 1\n"
+                    + "	AND pf.CODFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "	AND pt.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
+                    + "	AND pt.PVENDAATAC1 > pt.PVENDA1\n"
+                    + "	AND pt.PVENDAATAC1 IS NOT NULL\n"
+                    + "	AND pf.CODFILIAL || '00000' || pf.CODPROD || pf.QTMINIMAATACADO NOT IN\n"
+                    + "        (\n"
+                    + "	SELECT\n"
+                    + "		emb.CODFILIAL || '00000' || a.CODPROD || emb.QTMINIMAATACADO ean\n"
+                    + "	FROM PCTABPR a\n"
+                    + "	JOIN PCEMBALAGEM emb ON	emb.CODPROD = a.CODPROD\n"
+                    + "	WHERE\n"
+                    + "		a.NUMREGIAO = " + idRegiaoDentroEstado + "\n"
+                    + "		AND emb.QTMINIMAATACADO > 1\n"
+                    + "		AND emb.CODFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "		AND a.PVENDA1 > 0)"*/
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -1771,7 +1798,15 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT m.* from\n"
+                    /*"SELECT m.* from\n"
+                    + "(SELECT codfornec, codprod \n"
+                    + "FROM pcmov GROUP BY codfornec, codprod) m\n"
+                    + "JOIN pcprodut p ON m.codprod = p.codprod\n"
+                    + "JOIN pcfornec f ON m.codfornec = f.codfornec"*/
+                    "SELECT \n"
+                    + "m.*,\n"
+                    + "CAST(regexp_replace(p.EMBALAGEMMASTER,'[^0-9]','') AS int) qtde\n"
+                    + "from\n"
                     + "(SELECT codfornec, codprod \n"
                     + "FROM pcmov GROUP BY codfornec, codprod) m\n"
                     + "JOIN pcprodut p ON m.codprod = p.codprod\n"
@@ -1784,6 +1819,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIdFornecedor(rst.getString("codfornec"));
                     imp.setIdProduto(rst.getString("codprod"));
                     imp.setCodigoExterno(rst.getString("codprod"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde"));
                     result.add(imp);
                 }
             }
@@ -2103,7 +2139,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "    emp.CONV_CODIGO id,\n"
                     + "    emp.CONV_DESCRICAO razao,\n"
                     + "    cli.TIP_CGC_CPF cnpj,\n"
@@ -2136,7 +2172,21 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "    ) cicl on\n"
                     + "        emp.conv_codigo = cicl.conv_codigo\n"
                     + "order by \n"
-                    + "    emp.CONV_CODIGO"
+                    + "    emp.CONV_CODIGO"*/
+                    "SELECT \n"
+                    + "  CODIGO id,\n"
+                    + "  RAZAOSOCIAL razao,\n"
+                    + "  ENDERECO,\n"
+                    + "  CIDADE,\n"
+                    + "  BAIRRO,\n"
+                    + "  NUMERO,\n"
+                    + "  UF,\n"
+                    + "  CEP,\n"
+                    + "  CGC cnpj,\n"
+                    + "  TELEFONE fone1\n"
+                    + " FROM PCFILIAL\n"
+                    + " WHERE \n"
+                    + "  CODIGO = 1"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -2145,19 +2195,19 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setCnpj(rst.getString("cnpj"));
-                    imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
+                    //imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero("0");
+                    imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setTelefone(rst.getString("fone1"));
-                    imp.setDataInicio(format.parse(rst.getString("datainicio")));
+                    /*imp.setDataInicio(format.parse(rst.getString("datainicio")));
                     imp.setDataTermino(format.parse(rst.getString("datatermino")));
                     imp.setDesconto(rst.getDouble("desconto"));
                     imp.setDiaPagamento(rst.getInt("diapagamento"));
                     imp.setDiaInicioRenovacao(rst.getInt("diainiciorenovacao"));
-                    imp.setBloqueado(rst.getBoolean("bloquear"));
+                    imp.setBloqueado(rst.getBoolean("bloquear"));*/
 
                     result.add(imp);
                 }
@@ -2173,7 +2223,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    /*"select \n"
                     + "    cli.cli_codigo||cli.cli_digito id,\n"
                     + "    cli.CLI_CPF_CNPJ cnpj,\n"
                     + "    cli.CLI_NOME razao,\n"
@@ -2196,7 +2246,20 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "where\n"
                     + "    cli.cli_convenio > 0\n"
                     + "order by \n"
-                    + "    cli.cli_codigo"
+                    + "    cli.cli_codigo"*/
+                    "SELECT\n"
+                    + "    c.codcli id,\n"
+                    + "    c.cgcent cnpj,\n"
+                    + "    c.cliente razao,\n"
+                    + "    c.fantasia,    \n"
+                    + "    CASE c.bloqueio WHEN 'S' THEN 1 ELSE 0 END bloqueado,\n"
+                    + "    c.limcred limite_convenio,\n"
+                    + "    '1' idEmpresa\n"
+                    + "FROM \n"
+                    + "    PCCLIENT c\n"
+                    + "WHERE \n"
+                    + " c.CODCOB = 'CONV'\n"
+                    + "ORDER BY c.codcli"
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
@@ -2206,7 +2269,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIdEmpresa(rst.getString("idEmpresa"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setConvenioLimite(rst.getDouble("limite_convenio"));
-                    imp.setConvenioDesconto(rst.getDouble("desconto"));
+                    //imp.setConvenioDesconto(rst.getDouble("desconto"));
                     result.add(imp);
                 }
             }

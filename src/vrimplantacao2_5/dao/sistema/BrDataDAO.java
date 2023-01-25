@@ -88,7 +88,8 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.VOLUME_QTD,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.CODIGO_BENEFICIO
                 }
         ));
     }
@@ -113,7 +114,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PAGAR_FORNECEDOR));
+                OpcaoFornecedor.PRODUTO_FORNECEDOR));
     }
 
     @Override
@@ -135,9 +136,9 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
-                            rst.getString("descricao"), 
-                            rst.getInt("cst"), 
-                            rst.getDouble("aliquota"), 
+                            rst.getString("descricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
                     ));
                 }
@@ -231,15 +232,18 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.C001_PrecoCusto,\n"
                     + " p.C001_PrecoCompra,\n"
                     + " coalesce(p.C001_GTIN,p.C001_GTIN_Tributavel) ean,\n"
-                    + " p.C001_UltimoCustoEntrada,\n"
+                    + " p.C001_UltimoCustoEntrada custo,\n"
                     + " p.C291_SetorBalanca ebalanca,\n"
                     + " e.T030_Quantidade estoque,\n"
                     + " coalesce(e.C052_UnidadeMedida,p.C001_UnidadeMedida) unidade,\n"
+                    + " substring(replace(p.C001_UnidadeAux1,'.',''),1,2) unidadecotacao,\n"
+                    + " case when p.C001_Relacao1 = 0 then 1 else p.C001_Relacao1 end qtdecotacao,\n"
                     + " e.T030_PrecoCompra custosemimposto,\n"
-                    + " e.T030_UltimoCustoEntrada custo,\n"
+                    + " e.T030_UltimoCustoEntrada,\n"
                     + " e.T030_CustoMedio,\n"
                     + " pci.C242_CodigoNaturezaReceita natreceita,\n"
-                    + " pci.C073_Codigo piscofins\n"
+                    + " pci.C073_Codigo piscofins,\n"
+                    + " b.C179_CodigoAjusteIcms cbnef\n"
                     + "from C001_Produto p\n"
                     + "left join T030_ControleEstoque e on e.C001_CodigoProduto = p.C001_Codigo \n"
                     + "	and e.C021_CodigoDeposito  = '" + getLojaOrigem() + "' --getloja\n"
@@ -251,6 +255,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join C003_ProdutoGrupo g on g.C003_Codigo  = p.C003_CodigoGrupo\n"
                     + "left join C191_LinhaProdutos l on l.C191_Codigo  = g.C190_CodigoLinha \n"
                     + "left join C004_ProdutoSubGrupo sb on sb.C004_Codigo = p.C004_CodigoSubGrupo\n"
+                    + "left join C290_GrupoBeneficioTributario b on b.C290_Codigo = p.C290_CodigoGrupoBeneficioTributario\n"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -267,8 +272,8 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
 
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
 
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -284,6 +289,8 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    
+                    imp.setBeneficio(rst.getString("cbnef"));
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -298,9 +305,11 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                         //imp.seteBalanca(rst.getBoolean("ebalanca"));
                         imp.setEan(rst.getString("ean"));
                         imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
                         imp.setValidade(rst.getInt("validade"));
                         imp.setQtdEmbalagem(1);
+
+                        imp.setTipoEmbalagemCotacao(rst.getString("unidadecotacao"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdecotacao"));
                     }
 
                     result.add(imp);
@@ -362,7 +371,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " e.C042_Contato,\n"
                     + " e.C042_Email,\n"
                     + " e.C042_Numero numero,\n"
-                    + " e.C042_Fax fax"
+                    + " e.C042_Fax fax\n"
                     + "from C006_Pessoa f\n"
                     + "left join C042_Endereco e on e.C006_CodigoPessoa = f.C006_Codigo\n"
                     + "left join C043_Municipio m on m.C043_ID = e.C043_IDMunicipio \n"
@@ -405,7 +414,11 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + "  C001_CodigoProduto idproduto,\n"
+                    + "  C006_CodigoFornecedor idfornecedor,\n"
+                    + "  R034_Codigo codigoexterno\n"
+                    + "from R034_RelacionaProdutoCodigoFornecedor"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
