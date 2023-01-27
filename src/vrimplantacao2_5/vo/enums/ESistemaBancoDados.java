@@ -175,6 +175,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_MARKET(103, "MARKET", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_MRS(109, "MRS", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_NCA(112, "NCA", 11, "POSTGRESQL", "", "postgres", "post", 5432),
+    POSTGRESQL_PRIME(243, "PRIME", 11, "POSTGRESQL", "", "postgres", "post", 5432),
     POSTGRESQL_RESULTMAIS(133, "RESULTMAIS", 11, "POSTGRESQL", "rmbancodados", "postgres", "rmpostgres", 5432),
     POSTGRESQL_RMSAUTOMAHELP(128, "RMSAUTOMAHELP", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_RPINFO(130, "RPINFO", 11, "POSTGRESQL", "", "postgres", "s3gr3d0", 5432),

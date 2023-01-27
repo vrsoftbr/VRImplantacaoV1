@@ -11,16 +11,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
@@ -87,7 +92,8 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.RAZAO_SOCIAL,
                 OpcaoFornecedor.NOME_FANTASIA,
-                OpcaoFornecedor.CNPJ_CPF
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
 
@@ -175,30 +181,46 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.UNITARIO embalagem,\n"
                     + " p.NCM,\n"
                     + " p.CEST,\n"
-                    + " p.STATUS situacaocadastro,\n"
+                    + " CASE WHEN p.STATUS = 2 THEN 0 ELSE 1 END situacaocadastro,\n"
                     + " CASE WHEN p.KG = 'F' THEN 0 ELSE 1 END ebalanca,\n"
                     + " p.COD_PIS pis,\n"
                     + " p.COD_COFINS cofins,\n"
                     + " e.ESTOQUE_ATUAL estoque,\n"
-                    + " e.ESTOQUE_MINIMO estoqueminimo\n"
+                    + " e.ESTOQUE_MINIMO estoqueminimo,\n"
+                    + " ean.CODIGO ean\n"
                     + "FROM EST_PRODUTO p\n"
                     + "LEFT JOIN EST_ESTOQUE e ON e.REF_PRODUTO = p.REFERENCIAL\n"
-                   
+                    + "LEFT JOIN EST_CODIGO_EXTRA ean ON ean.REF_PRODUTO = p.REFERENCIAL\n"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
-                    imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setCodMercadologico1(rst.getString("idmerc1"));
                     imp.setCodMercadologico2(rst.getString("idmerc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
-                    //imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+
+                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("embalagem"));
+                        imp.setQtdEmbalagem(1);
+                    }
+
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -237,6 +259,35 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("produtoid"));
                     imp.setEan(rst.getString("ean"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + " REFERENCIAL produtoid,\n"
+                    + " REF_FORNECEDOR fornecedorid,\n"
+                    + " CODIGOFOR \n"
+                    + "FROM EST_PRODUTO \n"
+                    + "WHERE \n"
+                    + " REF_FORNECEDOR IS NOT NULL "
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rst.getString("fornecedorid"));
+                    imp.setIdProduto(rst.getString("produtoid"));
+                    //imp.setCodigoExterno(rst.getString("referencia"));
 
                     result.add(imp);
                 }

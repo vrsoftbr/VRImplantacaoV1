@@ -197,7 +197,8 @@ public enum EScriptLojaOrigemSistema {
     FACIL(239, 5, "select EMPRESAS_ID id, EMPRESA_NOME descricao from EMPRESAS"),
     BRDATA(240, 13, "select  C021_Codigo id, C021_Codigo + ''-'' + C021_Descricao descricao from C021_Deposito"),
     ARIUSWEB(241, 8, "select nroloja id, razao descricao from controle.pf_loja"),
-    DEVSIS(242,5, "SELECT REFERENCIAL id, NOME descricao FROM CON_EMPRESA");
+    DEVSIS(242,5, "SELECT REFERENCIAL id, NOME descricao FROM CON_EMPRESA"),
+    PRIME(243,11, "select empr_codigo as id,  empr_nomereduzido as descricao from empresas order by 1");
 
     private int idSistema;
     private int idBancoDados;
