@@ -29,6 +29,7 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
@@ -162,7 +163,9 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.ICMS_SAIDA_NF,
                 OpcaoProduto.ICMS_CONSUMIDOR,
-                OpcaoProduto.ICMS_LOJA
+                OpcaoProduto.ICMS_LOJA,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.VENDA_PDV
         ));
     }
 
@@ -186,7 +189,7 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -402,9 +405,9 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 )) {
                     while (rst.next()) {
                         FornecedorIMP imp = new FornecedorIMP();
-
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
+
                         imp.setImportId(rst.getString("id"));
                         imp.setRazao(rst.getString("razaoSocial"));
                         imp.setFantasia(rst.getString("nomeFantasia"));
@@ -532,6 +535,44 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     imp.setIdProduto(rst.getString("fkProduto"));
                     imp.setCodigoExterno(rst.getString("sref"));
                     imp.setQtdEmbalagem(rst.getInt("tamEmb"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	id,\n"
+                    + "	fkEntidade id_fornecedor,\n"
+                    + "	nroNF documento,\n"
+                    + "	dtEntrada emissao,\n"
+                    + "	dtVencAtual vencimento,\n"
+                    + "	valorOriginal valor,\n"
+                    + "	referencia observacao\n"
+                    + "from\n"
+                    + "	Financeiro.ContasPagar\n"
+                    + "where\n"
+                    + "	fkLoja = " + getLojaOrigem() +"\n"
+                    + "	and valorPago = 0 \n"
+                    + "order by id "
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(imp.getDataEmissao());
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
 
                     result.add(imp);
                 }

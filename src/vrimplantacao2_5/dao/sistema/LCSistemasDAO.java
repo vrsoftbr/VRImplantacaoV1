@@ -268,8 +268,8 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.preco_custo,\n"
                     + " p.custo_medio,\n"
                     + " p.preco_venda,\n"
-                    + " p.margem_ideal,\n"
-                    + " p.margem_lucro,\n"
+                    + " p.margem_ideal margem,\n"
+                    + " p.margem_lucro margem2,\n"
                     + " p.estoque,\n"
                     + " p.estoque_minimo,\n"
                     + " p.estoque_max,\n"
@@ -316,6 +316,7 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoMedioComImposto(rs.getDouble("custo_medio"));
                     imp.setCustoMedioSemImposto(rs.getDouble("custo_medio"));
 
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("preco_venda"));
 
                     imp.setSituacaoCadastro(rs.getInt("ativo"));

@@ -14,7 +14,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class SuperControle_SuperServer2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.LCSISTEMAS.getNome();
+    private static final String SISTEMA = ESistema.SUPERCONTROLE.getNome();
     private static SuperControle_SuperServer2_5GUI instance;
 
     private final SuperControle_SuperServerDAO dao = new SuperControle_SuperServerDAO();
@@ -59,7 +59,7 @@ public class SuperControle_SuperServer2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.LCSISTEMAS);
+        pnlConn.setSistema(ESistema.SUPERCONTROLE);
         pnlConn.getNomeConexao();
 
         centralizarForm();

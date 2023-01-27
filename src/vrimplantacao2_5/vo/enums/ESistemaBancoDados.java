@@ -124,7 +124,7 @@ public enum ESistemaBancoDados {
     MYSQL_HIPCOM(74, "HIPCOM", 8, "MYSQL", "", "root", "hpc00", 3006),
     MYSQL_IQSISTEMAS(77, "IQSISTEMAS", 8, "MYSQL", "", "", "", 3006),
     MYSQL_ISERVER(78, "ISERVER", 8, "MYSQL", "db_iserver", "root", "750051", 3006),
-    MYSQL_LCSISTEMAS(222, "LCSISTEMAS", 8, "MYSQL", "lc_sistemas", "root", "", 3306),
+    MYSQL_LCSISTEMAS(222, "LCSISTEMAS", 8, "MYSQL", "lc_sistemas", "root", "123456", 3306),
     MYSQL_LINEAR(196, "LINEAR", 8, "MYSQL", "sglinx", "adminlinear", "@2013linear", 3006),
     MYSQL_MOBNEPDV(108, "MOBNEPDV", 8, "MYSQL", "", "", "", 3006),
     MYSQL_OPEN(113, "OPEN", 8, "MYSQL", "", "", "", 3006),
