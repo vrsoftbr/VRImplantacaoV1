@@ -22,10 +22,12 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -62,6 +64,8 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
@@ -148,6 +152,38 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODIGO_DEPARTAMENTO merc1,\n"
+                    + "	DESCRICAO descmerc1\n"
+                    + "FROM\n"
+                    + "	TB_DEPARTAMENTO td\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc2ID(imp.getMerc1ID());
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID(imp.getMerc1ID());
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -220,9 +256,9 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	QUANTIDADE_PORCAIXA qtde_emb_compra,\n"
                     + "	CASE WHEN COD_SETORBALANCA IS NOT NULL THEN 1 ELSE 0 END e_balanca,\n"
                     + "	DIAS_VALIDADE validade,\n"
+                    + " COD_DEPARTAMENTO merc1,\n"
                     + "	p.COD_PRECO_PRODUT_EQUIV familia,\n"
                     + "	PRECO_CUSTO custo,\n"
-//                  + "	PRECO_VENDA precovenda,\n"
                     + " PRECO_VENDATERMINAL precovenda,\n"
                     + "	MARGEM_LUCRO margem,\n"
                     + "	CAST(p.DATA_ALTERACAO AS date) DATA_ALTERACAO,\n"
@@ -267,12 +303,15 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setMargem(rst.getDouble("margem"));
 
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(imp.getCodMercadologico1());
+                    imp.setCodMercadologico3(imp.getCodMercadologico1());
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
@@ -425,6 +464,48 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODIGO_FINANCEIRO_P id,\n"
+                    + "	COD_CLIENTE id_fornecedor,\n"
+                    + "	f.NRO_DOCUMENTO ||'-PARC '||fp.PARCELA documento,\n"
+                    + "	CAST (DATA_EMISSAO AS date) emissao,\n"
+                    + "	CAST (DATA_LANCAMENTO AS date) entrada,\n"
+                    + "	CAST (DATA_VENCIMENTO AS date) vencimento,\n"
+                    + "	VALOR_PARCELA valor,\n"
+                    + "	fp.OBS observacao \n"
+                    + "FROM\n"
+                    + "	TB_FINANCEIRO_P fp\n"
+                    + "	JOIN TB_FINANCEIRO f ON f.CODIGO_FINANCEIRO = fp.COD_FINANCEIRO \n"
+                    + "WHERE\n"
+                    + "	f.LOJA = " + getLojaOrigem() + "\n"
+                    + "	AND fp.COD_CLIENTE IS NOT NULL\n"
+                    + "	AND STATUS = 'A'\n"
+                    + "	AND fp.SITUACAO = 'A'\n"
+                    + "	AND DEBITO_CREDITO = 'D'"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
