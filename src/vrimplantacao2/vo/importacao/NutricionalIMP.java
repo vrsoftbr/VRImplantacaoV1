@@ -42,6 +42,7 @@ public class NutricionalIMP {
     private int idTipoMedida = -1;
     private int medidaInteira = 1;
     private int id_tipomedidadecimal = 0;
+    private int Id_tipounidadeporcao = 5;
     private final List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
     private final Set<String> produtos = new HashSet<>();
     
@@ -321,6 +322,12 @@ public class NutricionalIMP {
     public void setId_tipomedidadecimal(int id_tipomedidadecimal) {
         this.id_tipomedidadecimal = id_tipomedidadecimal;
     }
-    
-    
+
+    public int getId_tipounidadeporcao() {
+        return Id_tipounidadeporcao;
+    }
+
+    public void setId_tipounidadeporcao(int Id_tipounidadeporcao) {
+        this.Id_tipounidadeporcao = Id_tipounidadeporcao;
+    }    
 }

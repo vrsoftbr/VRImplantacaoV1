@@ -216,6 +216,7 @@ public class NutricionalRepository {
         nut.setPercentualsodio(imp.getPercentualSodio());
         nut.setQuantidade(Utils.stringToInt(imp.getPorcao()));
         nut.setId_tipomedidadecimal(imp.getId_tipomedidadecimal());
+        nut.setId_tipounidadeporcao(imp.getId_tipounidadeporcao());
         if (imp.getIdTipoMedida() > 0) {
             nut.setId_tipomedida(imp.getIdTipoMedida());
         }
