@@ -21,6 +21,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -28,14 +30,19 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -124,6 +131,74 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
     }
 
     @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    " select\n"
+                    + "  n.fkProduto id,\n"
+                    + "  p.nomeProduto + ' ' + n.descricaoNutricional descritivo,\n"
+                    + "  1 as id_situacaocadastro,\n"
+                    + "  n.vCalorico caloria,\n"
+                    + "  n.vCarboidratos carboidratos,\n"
+                    + "  n.pCarboidratos carboidrato_inferior,\n"
+                    + "  n.vProteinas proteina,\n"
+                    + "  n.pProteinas proteina_inferior,\n"
+                    + "  n.vGordurasTotais gorduras,\n"
+                    + "  n.vGordurasSaturadas gorduras_saturada,\n"
+                    + "  n.vGordurasTrans gorduras_trans,\n"
+                    + "  n.vColesterol colesterol,\n"
+                    + "  n.vFibraAlimentar fibra_alimentar,\n"
+                    + "  n.pFibraAlimentar fibra_inferior,\n"
+                    + "  n.vCalcio calcio,\n"
+                    + "  n.vFerro ferro,\n"
+                    + "  n.vSodio sodio,\n"
+                    + "  n.porcao porcao,\n"
+                    + "  n.composicao mensagemalergico,\n"
+                    + "  N.medidaCaseira medidad_inteira,\n"
+                    + "  (n.unMedida + 1) tipounidade,\n"
+                    + "  n.unPorcao id_tipounidadeporcao\n"
+                    + "from\n"
+                    + "  CadProduto.Nutricional n\n"
+                    + "left join CadProduto.Produto p on p.id = n.fkProduto\n"
+                    + "order by\n"
+                    + "   descritivo"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setCarboidratoInferior(rst.getBoolean("carboidrato_inferior"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setProteinaInferior(rst.getBoolean("proteina_inferior"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setGorduraSaturada(rst.getDouble("gorduras_saturada"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setFibraInferior(rst.getBoolean("fibra_inferior"));
+                    imp.setGorduraTrans(rst.getDouble("gorduras_trans"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao(rst.getString("porcao"));
+                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+                    imp.setMedidaInteira(rst.getInt("medidad_inteira"));
+                    imp.setId_tipounidadeporcao(rst.getInt("id_tipounidadeporcao"));
+                    imp.setIdTipoMedida(rst.getInt("tipounidade"));
+                    imp.addProduto(rst.getString("id"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
@@ -160,12 +235,12 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 OpcaoProduto.ICMS_ENTRADA,
                 OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                 OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.CUSTO,
                 OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.ICMS_CONSUMIDOR,
-                OpcaoProduto.ICMS_LOJA,
-                OpcaoProduto.PDV_VENDA,
-                OpcaoProduto.VENDA_PDV
+                OpcaoProduto.ICMS_LOJA
         ));
     }
 
@@ -187,7 +262,27 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.COMPLEMENTO,
                 OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.CONDICAO_PAGAMENTO,
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.PRAZO_FORNECEDOR
+        ));
     }
 
     @Override
@@ -405,9 +500,9 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 )) {
                     while (rst.next()) {
                         FornecedorIMP imp = new FornecedorIMP();
+
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
-
                         imp.setImportId(rst.getString("id"));
                         imp.setRazao(rst.getString("razaoSocial"));
                         imp.setFantasia(rst.getString("nomeFantasia"));
@@ -545,44 +640,6 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
     }
 
     @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	id,\n"
-                    + "	fkEntidade id_fornecedor,\n"
-                    + "	nroNF documento,\n"
-                    + "	dtEntrada emissao,\n"
-                    + "	dtVencAtual vencimento,\n"
-                    + "	valorOriginal valor,\n"
-                    + "	referencia observacao\n"
-                    + "from\n"
-                    + "	Financeiro.ContasPagar\n"
-                    + "where\n"
-                    + "	fkLoja = " + getLojaOrigem() +"\n"
-                    + "	and valorPago = 0 \n"
-                    + "order by id "
-            )) {
-                while (rst.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setNumeroDocumento(rst.getString("documento"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataEntrada(imp.getDataEmissao());
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -701,6 +758,263 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
     }
 
     @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    " select \n"
+                    + "c.id,\n"
+                    + "c.cnpj,\n"
+                    + "c.inscricaoMunicipal,\n"
+                    + "c.inscricaoEstadual,\n"
+                    + "c.razaoSocial,\n"
+                    + "c.nomeFantasia,\n"
+                    + "c.dtNascimento,\n"
+                    + "c.dtCadastro,\n"
+                    + "c.ativo,\n"
+                    + "c.obs,\n"
+                    + "ender.logradouro,\n"
+                    + "ender.numero,\n"
+                    + "ender.complemento,\n"
+                    + "ender.bairro,\n"
+                    + "ender.cep,\n"
+                    + "ender.fkMunicipio,\n"
+                    + "ender.fkUF,\n"
+                    + "ender.fkPais,\n"
+                    + "email.endereco as email,\n"
+                    + "crm.vlRotativoTotal as valorlimite,\n"
+                    + "crm.liberadoRotativo as permitecreditorotativo,\n"
+                    + "crm.liberadoCheque as permitecheque,\n"
+                    + "crm.vlSalario,\n"
+                    + "crm.dtAdmissao,\n"
+                    + "crm.empresa,\n"
+                    + "crm.cargo,\n"
+                    + "crm.pai,\n"
+                    + "crm.mae,\n"
+                    + "crm.observacao obs2,\n"
+                    + "crm.cdInternoCli,\n"
+                    + "crm.senha,\n"
+                    + "crm.clienteespecial\n"
+                    + "from Cadastro.Entidade c\n"
+                    + "left join Cadastro.Endereco ender on ender.fkEntidade = c.id \n"
+                    + "and ender.id in (select max(id) id from Cadastro.Endereco group by fkEntidade)\n"
+                    + "left join Cadastro.Email email on email.fkEntidade = c.id\n"
+                    + "and email.id in (select max(id) id from Cadastro.Email group by fkEntidade)\n"
+                    + "left join CRM.Cadastro crm on crm.fkEntidade = c.id\n"
+                    + "where c.isCliente = 1\n"
+                    + "and crm.fkCliente = 1\n"
+                    + "and c.isFuncionario = 1\n"
+                    + "order by c.id"
+            )) {
+                while (rs.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setNome(rs.getString("razaoSocial"));
+                    imp.setIdEmpresa("1");
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setConvenioLimite(rs.getDouble("valorlimite"));
+                    imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
+                    imp.setSituacaoCadastro(rs.getInt("ativo") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	c.id,\n"
+                    + "	c.cnpjLoja cnpj_cpf,\n"
+                    + "	f.inscricaoEstadual inscricao_rg,\n"
+                    + "	c.descricaoLoja descritivo,\n"
+                    + "	f.nomeFantasia fantasia,\n"
+                    + "	1 ativo,\n"
+                    + "	ender.logradouro endereco,\n"
+                    + "	ender.numero numero,\n"
+                    + "	ender.complemento complemento,\n"
+                    + "	ender.bairro bairro,\n"
+                    + "	ender.fkMunicipio cidade,\n"
+                    + "	ender.fkUF estado,\n"
+                    + "	ender.cep cep,\n"
+                    + "	f.dtCadastro datahora_cadastro,\n"
+                    + "	f.obs observacao,\n"
+                    + "	fone.numero telefone1\n"
+                    + "from\n"
+                    + "	MultiLoja.Loja c\n"
+                    + "join Cadastro.Entidade f on\n"
+                    + "	c.fkCliente = f.id\n"
+                    + "left join Cadastro.Endereco ender on\n"
+                    + "	ender.fkEntidade = f.id\n"
+                    + "	and ender.id in (\n"
+                    + "	select\n"
+                    + "		max(id) id\n"
+                    + "	from\n"
+                    + "		Cadastro.Endereco\n"
+                    + "	group by\n"
+                    + "		fkEntidade)\n"
+                    + "join Cadastro.Fone fone on fone.id = f.id\n"
+                    + "order by\n"
+                    + "	c.id"
+            )) {
+                while (rst.next()) {
+
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoEstadual(rst.getString("inscricao_rg"));
+                    imp.setRazao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacoes(rst.getString("observacao"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setDataInicio(rst.getDate("datahora_cadastro"));
+                    imp.setDataTermino(Utils.getDataAtual());
+
+                    result.add(imp);
+
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "r.fkVenda as id,\n"
+                    + "r.fkEntidade as cliente,\n"
+                    + "dtVenda as emissao,\n"
+                    + "dateadd(DAY, 30, r.dtVenda) as vencimento,\n"
+                    + "(r.valorVenda - r.valorPago) as valor,\n"
+                    + "r.valorJuros as juros,\n"
+                    + "r.fkPDV as ecf,\n"
+                    + "v.coo numerocupom\n"
+                    + "from Comercial.VendaPrazo r\n"
+                    + "left join Comercial.Venda v on v.id = r.fkVenda\n"
+                    + "join Cadastro.Entidade e on e.id = r.fkEntidade\n"
+                    + "where coalesce(r.valorPago, 0) < coalesce(r.valorVenda,0)\n"
+                    + "and r.fkCliente = " + getLojaOrigem() + "\n"
+                    + "and e.isFuncionario = 1\n"
+                    + "ORDER BY r.dtVenda desc"
+            )) {
+                while (rst.next()) {
+
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("cliente"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setDataHora(rst.getTimestamp("emissao"));
+                    imp.setValor(rst.getDouble("valor"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select DISTINCT\n"
+                    + "    cp.id,\n"
+                    + "    cp.fkEntidade id_fornecedor,\n"
+                    + "    cp.id numerodocumento,\n"
+                    + "    cp.dtReferencia dataemissao,\n"
+                    + "    cp.dtEntrada dataentrada,\n"
+                    + "    cp.valorAtual valor,\n"
+                    + "    cp.dtVencAtual vencimento,\n"
+                    + "    cp.referencia obs\n"
+                    + "from\n"
+                    + "    Financeiro.ContasPagar cp\n"
+                    + "where\n"
+                    + "    cp.pago = 0"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> Result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ch.fkVenda id,\n"
+                    + "	ch.cnpjCliente cpfCnpj,\n"
+                    + "	ch.nomeCliente nome,\n"
+                    + "	ch.nroCheque numeroCheque,\n"
+                    + "	ch.banco banco,\n"
+                    + "	ch.agencia  agencia,\n"
+                    + "	ch.cc conta,\n"
+                    + "	ch.dtEmissao DATA,\n"
+                    + "	ch.dtBomPara dataDeposito,\n"
+                    + "	ch.valorCheque valor,\n"
+                    + "	ch.fone telefone\n"
+                    + "FROM\n"
+                    + "	ControleBancario.Cheque ch\n"
+                    + "where dtEmissao > '2022-01-12'"
+            )) {
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setDate(rs.getDate("DATA"));
+                    imp.setDataDeposito(rs.getDate("dataDeposito"));
+                    imp.setNumeroCheque(rs.getString("numeroCheque"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setCpf(rs.getString("cpfCnpj"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setTelefone(rs.getString("telefone"));
+
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
+    }
+
+    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -716,8 +1030,10 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "v.coo numerocupom\n"
                     + "from Comercial.VendaPrazo r\n"
                     + "left join Comercial.Venda v on v.id = r.fkVenda\n"
+                    + "join Cadastro.Entidade e on e.id = r.fkEntidade\n"
                     + "where coalesce(r.valorPago, 0) < coalesce(r.valorVenda,0)\n"
                     + "and r.fkCliente = " + getLojaOrigem() + "\n"
+                    + "and e.isFuncionario = 0\n"
                     + "ORDER BY r.dtVenda desc"
             )) {
                 while (rst.next()) {

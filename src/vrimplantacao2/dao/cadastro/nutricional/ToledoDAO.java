@@ -46,7 +46,7 @@ public class ToledoDAO {
             sql.put("percentualferro", vo.getPercentualferro());
             sql.put("percentualsodio", vo.getPercentualsodio());
             sql.put("quantidade", vo.getQuantidade());
-            sql.put("id_tipounidadeporcao", 0);
+            sql.put("id_tipounidadeporcao", vo.getId_tipounidadeporcao());
             sql.put("medidainteira", vo.getMedidainteira());
             sql.put("id_tipomedidadecimal", vo.getId_tipomedidadecimal());
             sql.put("id_tipomedida", vo.getId_tipomedida());
