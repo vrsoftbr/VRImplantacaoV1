@@ -243,6 +243,7 @@ import vrimplantacao2_5.dao.sistema.ManagerDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
+import vrimplantacao2_5.dao.sistema.PallasDAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
@@ -295,6 +296,7 @@ import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
 import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
+import vrimplantacao2_5.gui.sistema.Pallas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Plenus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Prime2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
@@ -2094,6 +2096,17 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Prime2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    PALLAS(244, "PALLAS", new PallasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Pallas2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

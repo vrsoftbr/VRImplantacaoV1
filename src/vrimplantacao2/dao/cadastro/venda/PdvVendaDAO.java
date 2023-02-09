@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
@@ -25,6 +26,8 @@ public class PdvVendaDAO {
     
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm:ss");
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public PdvVendaDAO() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -79,9 +82,15 @@ public class PdvVendaDAO {
             if (vo.getTipoDesconto() != null) {
                 sql.put("id_tipodesconto", vo.getTipoDesconto().getId());
             }
-            /*sql.put("vendaecommercemercafacil", false);
-            sql.put("vendaecommercesitemercado", false);*/
-            //sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
+            
+            if(versao.igualOuMaiorQue(4,1,0)){
+                sql.put("vendaecommercemercafacil", false);
+                sql.put("vendaecommercesitemercado", false);
+                sql.put("vendaecommerceapi", false);
+                sql.put("cupomverde", false);
+                //sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
+            }
+            
             
             LOG.finer(
                     "Incluindo a Venda { "
