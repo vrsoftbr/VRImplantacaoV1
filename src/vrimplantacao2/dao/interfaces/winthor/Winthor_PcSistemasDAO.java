@@ -183,7 +183,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.CONVENIO_TRANSACAO
         ));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -197,7 +197,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.OUTRAS_RECEITAS));
     }
-
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -2011,9 +2010,11 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         + "	cp.DTLANC dataentrada,\n"
                         + "	cp.DTULTALTER datahoraalteracao,\n"
                         + "	cp.DTVENC datavencimento,\n"
-                        + "	cp.VALOR,\n"
+                        + "	cp.VALOR real,\n"
                         + "	cp.VALORDEV,\n"
                         + "	cp.DUPLIC parcela,\n"
+                        + "     cp.DESCONTOFIN desconto,\n"
+                        + "	CASE WHEN cp.DESCONTOFIN > 0 THEN (cp.VALOR - cp.DESCONTOFIN) ELSE cp.VALOR END valor,\n"
                         + "	coalesce(cp.HISTORICO,'') observacoes,\n"
                         + "	coalesce(cp.HISTORICO2,'') observacoes2\n"
                         + "FROM\n"
@@ -2039,7 +2040,9 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 String observacoes
                         = rs.getString("observacoes")
                         + "\n"
-                        + rs.getString("observacoes2");
+                        + rs.getString("observacoes2")
+                        + "\n Valor Original:" + rs.getString("real")
+                        + "\n Desconto: " + rs.getString("desconto");
                 ContaPagarVencimentoIMP parcela = imp.addVencimento(
                         rs.getDate("datavencimento"),
                         rs.getDouble("valor"),
