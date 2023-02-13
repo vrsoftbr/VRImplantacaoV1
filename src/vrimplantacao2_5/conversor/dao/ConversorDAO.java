@@ -101,7 +101,7 @@ public class ConversorDAO {
             for (String dado : dados) {
                 if (contador < dados.size()) {
                     dado = dados.get(contador++);
-                    campos += dado.trim().replace(" ", "_") + " text,\n";
+                   campos += dado.trim().replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
                 }
             }
             System.out.println(sql + campos.substring(0, campos.length() - 2) + "\n);");
@@ -147,7 +147,8 @@ public class ConversorDAO {
 
         for (LinhaArquivo linha : arq) {
             for (int i = 0; i < cabecalho.size(); i++) {
-                sql.put(cabecalho.get(i).replace(" ", "_"), linha.getString(cabecalho.get(i)).replace("\\", ""));
+                String cabecalhoBase = cabecalho.get(i).trim().replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
+                sql.put(cabecalhoBase, linha.getString(cabecalho.get(i)));
             }
             try {
                 stm.execute(sql.getInsert());

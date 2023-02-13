@@ -129,6 +129,7 @@ public enum ESistemaBancoDados {
     MYSQL_LINEAR(196, "LINEAR", 8, "MYSQL", "sglinx", "adminlinear", "@2013linear", 3006),
     MYSQL_MOBNEPDV(108, "MOBNEPDV", 8, "MYSQL", "", "", "", 3006),
     MYSQL_OPEN(113, "OPEN", 8, "MYSQL", "", "", "", 3006),
+    MYSQL_PALLAS(244, "PALLAS", 8, "MYSQL", "", "", "", 3306),
     MYSQL_PLENOKW(118, "PLENOKW", 8, "MYSQL", "", "", "", 3006),
     MYSQL_RCNET(126, "RCNET", 8, "MYSQL", "", "", "", 3006),
     MYSQL_SATECFE(144, "SATECFE", 8, "MYSQL", "", "", "", 3006),

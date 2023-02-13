@@ -20,6 +20,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -182,6 +183,21 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.CONVENIO_TRANSACAO
         ));
     }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.OUTRAS_RECEITAS));
+    }
+
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -1120,7 +1136,8 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCustoMedioComImposto(rst.getDouble("customedio"));
                     imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     //imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setPrecovenda(rst.getDouble("precovarejo"));
+                    //imp.setPrecovenda(rst.getDouble("precovarejo"));
+                    imp.setPrecovenda(rst.getDouble("precoatacado"));
 
                     /*if(rst.getInt("qtdatacado") > 1){
                         

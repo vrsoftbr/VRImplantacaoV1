@@ -7,7 +7,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vr.core.utils.StringUtils;
-import vrimplantacao.classe.ConexaoOracle;
+//import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -68,7 +69,47 @@ class WinthorVendaIterator extends MultiStatementIterator<VendaIMP> {
                 .append("	not v.NUMNOTA is null and\n")
                 .append("	not v.NUMCAIXAFISCAL is null\n")
                 .append("order by\n")
-                .append("	v.NUMTRANSVENDA");        
+                .append("	v.NUMTRANSVENDA");
+                /*.append("UNION\n")
+                .append("select\n")
+                .append("	v.NUMTRANSVENDA id,\n")
+                .append("	v.NUMNOTA numerocupom,\n")
+                .append("	v.caixa ecf,\n")
+                .append("	v.DTSAIDA data,\n")
+                .append("	v.HORAEMISSAO horainicio,\n")
+                .append("	v.HORAEMISSAO horafim,\n")
+                .append("	case\n")
+                .append("		when not v.DTCANCEL is null then 1\n")
+                .append("		else 0\n")
+                .append("	end cancelado,\n")
+                .append("	case v.CODCLI\n")
+                .append("		when 1 then null\n")
+                .append("		else v.CODCLI\n")
+                .append("	end id_cliente,\n")
+                .append("	v.CGC cpf,\n")
+                .append("	v.VLTOTAL subtotalimpressora,\n")
+                .append("	v.VLDESCONTO valordesconto,\n")
+                .append("	v.DTCANCEL datacancelamento,\n")
+                .append("	v.SERIE numeroserie,\n")
+                .append("	v.CLIENTE nomecliente,\n")
+                .append("	v.ENDERECO,\n")
+                .append("	v.CHAVESAT,\n")
+                .append("	v.CHAVENFE,\n")
+                .append("	v.CHAVECTE\n")
+                .append("from\n")
+                .append("	PCNFSAID v\n")
+                .append("where\n")
+                .append("	v.DTSAIDA between '")
+                    .append(ORACLE_DATE_FORMATTER.format(intervalo.dataInicial))
+                    .append("' and '")
+                    .append(ORACLE_DATE_FORMATTER.format(intervalo.dataFinal))
+                .append("' and\n")
+                .append("	v.CODFILIAL = '").append(idLoja).append("' and\n")
+                .append("	 v.CODUSUR = 3 and\n")
+                .append("	 v.NUMNOTA is not null and\n")
+                .append("	 v.NUMCAIXAFISCAL is null\n");*/
+                //.append("order by\n")
+                //.append("	v.NUMTRANSVENDA");        
         LOG.info("Script criado para a criação das vendas", sql);
         return sql.toString();             
     }

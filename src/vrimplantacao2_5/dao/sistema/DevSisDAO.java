@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
@@ -95,6 +96,20 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DADOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.FANTASIA,
+                OpcaoCliente.RAZAO));
     }
 
     @Override
@@ -201,6 +216,7 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("idmerc1"));
                     imp.setCodMercadologico2(rst.getString("idmerc2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
@@ -389,6 +405,8 @@ public class DevSisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("DT_CADASTRO"));
                     imp.setValorLimite(rst.getDouble("VALOR_PERMITIDO"));
                     imp.setEmail(rst.getString("email"));
+                    
+                    imp.setPermiteCreditoRotativo(true);
 
                     result.add(imp);
 

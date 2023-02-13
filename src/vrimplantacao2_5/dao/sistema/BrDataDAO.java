@@ -114,7 +114,8 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR));
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR));
     }
 
     @Override
@@ -509,7 +510,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " C006_CodigoPessoa fornecedorid,\n"
                     + " C008_CodigoFilial,\n"
                     + " C013_CodigoFormaPagamento,\n"
-                    + " T014_NumeroDocumento numerodocumento,\n"
+                    + " cast(substring(T014_NumeroDocumento,1,9) as int) numerodocumento,\n"
                     + " T014_DataLancamento emissao,\n"
                     + " T014_DataVencimento vencimento,\n"
                     + " T014_ValorSaldoOriginal,\n"
