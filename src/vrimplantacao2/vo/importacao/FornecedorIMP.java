@@ -70,7 +70,8 @@ public class FornecedorIMP {
     private boolean permiteNfSemPedido = false;
     
     private TipoIndicadorIE tipoIndicadorIe;
-
+    private String utilizaiva = "0";
+    
     public TipoIndicadorIE getTipoIndicadorIe() {
         return tipoIndicadorIe;
     }
@@ -704,5 +705,12 @@ public class FornecedorIMP {
     public void setIdDivisao(String idDivisao) {
         this.idDivisao = idDivisao;
     }
-    
+
+    public String getUtilizaiva() {
+        return utilizaiva;
+    }
+
+    public void setUtilizaiva(String utilizaiva) {
+        this.utilizaiva = utilizaiva;
+    }    
 }

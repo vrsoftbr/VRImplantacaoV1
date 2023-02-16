@@ -422,6 +422,8 @@
                                           <Component id="chkTipoEmpresa" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkTipoFornecedor" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkUtilizaiva" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -452,6 +454,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTipoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkUtilizaiva" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -523,6 +526,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkTipoFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkUtilizaiva">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="UtilizaIVA"/>
                   </Properties>
                 </Component>
               </SubComponents>

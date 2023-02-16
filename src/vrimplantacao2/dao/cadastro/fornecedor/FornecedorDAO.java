@@ -194,7 +194,7 @@ public class FornecedorDAO {
                                     sql.putNull("datasintegra");// timestamp without time zone,
                                     sql.put("id_tipoempresa", 3);// integer NOT NULL,
                                     sql.put("inscricaosuframa", vo.getInscricaoSuframa());// character varying(9) NOT NULL,
-                                    sql.put("utilizaiva", false);// boolean NOT NULL,
+                                    sql.put("utilizaiva", vo.isUtilizaiva());// boolean NOT NULL,
                                     sql.putNull("id_familiafornecedor");// integer,
                                     sql.putNull("id_tipoinspecao");// integer,
                                     sql.put("numeroinspecao", 0);// integer NOT NULL,
@@ -590,7 +590,7 @@ public class FornecedorDAO {
             sql.putNull("datasintegra");// timestamp without time zone,
             sql.put("id_tipoempresa", 3);// integer NOT NULL,
             sql.put("inscricaosuframa", vo.getInscricaoSuframa());// character varying(9) NOT NULL,
-            sql.put("utilizaiva", false);// boolean NOT NULL,
+            sql.put("utilizaiva", vo.isUtilizaiva());// boolean NOT NULL,
             sql.putNull("id_familiafornecedor");// integer,
             sql.putNull("id_tipoinspecao");// integer,
             sql.put("numeroinspecao", 0);// integer NOT NULL,
@@ -720,6 +720,9 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)) {
                     incluirTipoIndicadorIE(vo, sql);
+                }
+                if (opt.contains(OpcaoFornecedor.UTILIZAIVA)){
+                  sql.put("utilizaiva", vo.isUtilizaiva());  
                 }
                 if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)) {
                     sql.put("datacadastro", vo.getDataCadastro());

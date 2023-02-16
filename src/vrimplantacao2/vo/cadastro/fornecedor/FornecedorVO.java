@@ -55,6 +55,7 @@ public class FornecedorVO {
     private int idBanco;
     private boolean utilizaNfe = false;
     private boolean permiteNfSemPedido = false;
+    private boolean utilizaiva = false;
     
     private TipoIndicadorIE tipoIndicadorIe;
 
@@ -386,5 +387,12 @@ public class FornecedorVO {
     public void setPermiteNfSemPedido(boolean permiteNfSemPedido) {
         this.permiteNfSemPedido = permiteNfSemPedido;
     }
-    
+
+    public boolean isUtilizaiva() {
+        return utilizaiva;
+    }
+
+    public void setUtilizaiva(boolean utilizaiva) {
+        this.utilizaiva = utilizaiva;
+    }    
 }

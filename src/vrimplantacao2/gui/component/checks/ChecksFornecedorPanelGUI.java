@@ -304,6 +304,9 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         if (chkSituacaoCadastro.isSelected()) {
             opcao.add(OpcaoFornecedor.SITUACAO_CADASTRO);
         }
+        if (chkUtilizaiva.isSelected()) {
+            opcao.add(OpcaoFornecedor.UTILIZAIVA);
+        }
         if (chkPrazoFornecedor.isSelected()) {
             opcao.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
         }
@@ -423,6 +426,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoFornecedor = new javax.swing.JCheckBox();
+        chkUtilizaiva = new javax.swing.JCheckBox();
         pnlContato = new vrframework.bean.panel.VRPanel();
         jLabel8 = new javax.swing.JLabel();
         chkTelefone = new vrframework.bean.checkBox.VRCheckBox();
@@ -665,6 +669,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkTipoFornecedor, "Tipo Fornecedor");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkUtilizaiva, "UtilizaIVA");
+
         javax.swing.GroupLayout pnlDadosComplementaresLayout = new javax.swing.GroupLayout(pnlDadosComplementares);
         pnlDadosComplementares.setLayout(pnlDadosComplementaresLayout);
         pnlDadosComplementaresLayout.setHorizontalGroup(
@@ -692,7 +698,9 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                             .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
                                 .addComponent(chkTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkTipoFornecedor)))))
+                                .addComponent(chkTipoFornecedor)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkUtilizaiva)))))
                 .addContainerGap(101, Short.MAX_VALUE))
         );
         pnlDadosComplementaresLayout.setVerticalGroup(
@@ -713,7 +721,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkTipoFornecedor))
+                    .addComponent(chkTipoFornecedor)
+                    .addComponent(chkUtilizaiva))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -935,6 +944,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JCheckBox chkTipoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
+    public javax.swing.JCheckBox chkUtilizaiva;
     public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
