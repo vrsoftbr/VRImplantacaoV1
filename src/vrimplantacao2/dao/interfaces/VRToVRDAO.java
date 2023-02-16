@@ -22,6 +22,7 @@ import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -51,11 +52,13 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -137,7 +140,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.FABRICANTE,
                     OpcaoProduto.NUMERO_PARCELA,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.NUTRICIONAL,
+                    OpcaoProduto.RECEITA
                 }
         ));
     }
@@ -1559,6 +1564,132 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " n.id,\n"
+                    + " n.descricao,\n"
+                    + " n.id_situacaocadastro,\n"
+                    + " n.caloria,\n"
+                    + " n.carboidrato,\n"
+                    + " n.carboidratoInferior,\n"
+                    + " n.proteina,\n"
+                    + " n.proteinaInferior,\n"
+                    + " n.gordura,\n"
+                    + " n.gorduraSaturada,\n"
+                    + " n.gorduraTrans,\n"
+                    + " n.colesterolInferior,\n"
+                    + " n.fibra,\n"
+                    + " n.fibraInferior,\n"
+                    + " n.calcio,\n"
+                    + " n.ferro,\n"
+                    + " n.sodio,\n"
+                    + " n.percentualCaloria,\n"
+                    + " n.percentualCarboidrato,\n"
+                    + " n.percentualProteina,\n"
+                    + " n.percentualGordura,\n"
+                    + " n.percentualGorduraSaturada,\n"
+                    + " n.percentualFibra,\n"
+                    + " n.percentualCalcio,\n"
+                    + " n.percentualFerro,\n"
+                    + " n.percentualSodio,\n"
+                    + " n.id_TipoMedida,\n"
+                    + " n.medidaInteira,\n"
+                    + " n.id_tipomedidadecimal,\n"
+                    + " n.Id_tipounidadeporcao,\n"
+                    + " n.mensagemalergico1||' '||n.mensagemalergico2||' '||n.mensagemalergico3||\n"
+                    + " ' '||n.mensagemalergico4||' '||n.mensagemalergico5 as mensagemalergico,\n"
+                    + " ni.id_produto \n"
+                    + "from nutricionaltoledo n\n"
+                    + "join nutricionaltoledoitem ni on ni.id_nutricionaltoledo = n.id"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setSituacaoCadastro("1".equals(rst.getString("id_situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidrato"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gordura"));
+                    imp.setFibra(rst.getDouble("fibra"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPercentualCaloria(rst.getInt("percentualCaloria"));
+                    imp.setPercentualCarboidrato(rst.getInt("percentualCarboidrato"));
+                    imp.setPercentualProteina(rst.getInt("percentualProteina"));
+                    imp.setPercentualGordura(rst.getInt("percentualGordura"));
+                    imp.setPercentualGorduraSaturada(rst.getInt("percentualGorduraSaturada"));
+                    imp.setPercentualFibra(rst.getInt("percentualFibra"));
+                    imp.setPercentualCalcio(rst.getInt("percentualCalcio"));
+                    imp.setPercentualFerro(rst.getInt("percentualFerro"));
+                    imp.setPercentualSodio(rst.getInt("percentualSodio"));
+                    imp.setIdTipoMedida(rst.getInt("id_TipoMedida"));
+                    imp.setMedidaInteira(rst.getInt("medidaInteira"));
+                    imp.setId_tipomedidadecimal(rst.getInt("id_tipomedidadecimal"));
+                    imp.setId_tipounidadeporcao(rst.getInt("Id_tipounidadeporcao"));
+
+                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+                    imp.addProduto(rst.getString("id"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select \n"
+                    + " r.id,\n"
+                    + " r.descricao,\n"
+                    + " r.id_situacaocadastro,\n"
+                    + " rp.id_produto produtoreceita,\n"
+                    + " rp.rendimento,\n"
+                    + " ri.id_produto receitaitem,\n"
+                    + " ri.qtdembalagemreceita,\n"
+                    + " ri.qtdembalagemproduto,\n"
+                    + " ri.baixaestoque,\n"
+                    + " ri.fatorconversao,\n"
+                    + " ri.embalagem \n"
+                    + "from receita r\n"
+                    + "join receitaproduto rp on rp.id_receita = r.id \n"
+                    + "join receitaitem ri on ri.id_receita = r.id "
+            )) {
+                while (rs.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rs.getString("id"));
+                    imp.setIdproduto(rs.getString("produtoreceita"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setId_situacaocadastro("1".equals(rs.getString("id_situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setRendimento(rs.getDouble("rendimento"));
+                    imp.setQtdembalagemproduto(rs.getInt("qtdembalagemreceita"));
+                    imp.setQtdembalagemreceita(rs.getInt("qtdembalagemproduto"));
+                   
+                    imp.setFator(rs.getDouble("fatorconversao"));
+                    imp.getProdutos().add(rs.getString("receitaitem"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
