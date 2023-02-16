@@ -89,7 +89,8 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.VOLUME_QTD,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.CODIGO_BENEFICIO
+                    OpcaoProduto.CODIGO_BENEFICIO,
+                    OpcaoProduto.PDV_VENDA
                 }
         ));
     }
@@ -290,7 +291,7 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    
+
                     imp.setBeneficio(rst.getString("cbnef"));
 
                     int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
@@ -618,25 +619,22 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id_venda");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setNomeCliente(rst.getString("nome_cliente"));
-                        next.setCpf(rst.getString("cpf_cnpj"));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("emissao"));
-                        String horaInicio = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horatermino");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerodocumento")));
+                        next.setEcf(Utils.stringToInt(rst.getString("pdv")));
+                        next.setData(rst.getDate("dataemissao"));
+                        //String horaInicio = timestampDate.format(rst.getDate("dataemissao") + " 00:00:00");
+                        //String horaTermino = timestampDate.format(rst.getDate("dataemissao") + " 00:00:00");
+                        //next.setHoraInicio(timestamp.parse(horaInicio));
+                        //next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("subtotal"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException  ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -647,29 +645,66 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "";/*"SELECT\n"
-                    + "	v.VndNumeroVenda id_venda,\n"
-                    + "	d.VndDocNumero numerocupom,\n"
-                    + "	VndClienteID id_cliente,\n"
-                    + "	c.PessoaNome nome_cliente,\n"
-                    + "	v.VndNfpCpfCnpj cpf_cnpj,\n"
-                    + "	SUBSTRING(e.EstacaoDescricao, 4, 2) ecf,\n"
-                    + "	v.VndDtEmissao emissao,\n"
-                    + "	CAST (VndDtAbertura as time) horainicio,\n"
-                    + "	CAST (VndDtFechamento as time) horatermino,\n"
-                    + "	CASE\n"
-                    + "	  when v.VndClienteValor = 0\n"
-                    + "   then v.VndConvenioValor\n"
-                    + "	  ELSE v.VndClienteValor\n"
-                    + "	END subtotalimpressora\n"
-                    + "FROM\n"
-                    + "	TB_VENDA v\n"
-                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID\n"
-                    + "LEFT JOIN TB_ESTACAO e on e.EstacaoID = v.VndEstacaoID\n"
-                    + "LEFT JOIN TB_PESSOA_PFPJ c on c.PessoaID = v.VndClienteID\n"
-                    + "WHERE\n"
-                    + " d.VndDocNumero is not NULL \n"
-                    + "	and v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";*/
+                    = "with venda as (\n"
+                    + "select \n"
+                    + " T003_ID id,\n"
+                    + " C008_CodigoFilial id_loja,\n"
+                    + " C013_CodigoFormaPagamento,\n"
+                    + " C015_CodigoOperacao,\n"
+                    + " T003_Transacao,\n"
+                    + " T003_TipoNota,\n"
+                    + " T003_NumeroNota numerodocumento,\n"
+                    + " T003_Status situacao,\n"
+                    + " T003_ValorTotalProdutos valortotal,\n"
+                    + " T003_ValorTotalNota subtotal,\n"
+                    + " cast(SUBSTRING(cast(T003_DataEmissao as varchar(20)),1,19) as date) dataemissao,\n"
+                    + " T003_DataEntrada,\n"
+                    + " replace(P005_CodigoCaixaPDV,'CX-','') pdv,\n"
+                    + " T003_ValorDesconto desconto\n"
+                    + "from T003_NotaFiscal\n"
+                    + "where \n"
+                    + " C008_CodigoFilial = '" + idLojaCliente + "'\n"
+                    + " and \n"
+                    + " C015_CodigoOperacao in ('000047','000048','000051')\n"
+                    + " and \n"
+                    + " C013_CodigoFormaPagamento in ('CRE','CRT','DIN')\n"
+                    + " UNION\n"
+                    + " select --cheques\n"
+                    + "  nf.T003_ID id,\n"
+                    + "  nf.C008_CodigoFilial id_loja,\n"
+                    + "  nf.C013_CodigoFormaPagamento,\n"
+                    + "  nf.C015_CodigoOperacao,\n"
+                    + "  nf.T003_Transacao,\n"
+                    + "  nf.T003_TipoNota,\n"
+                    + "  nf.T003_NumeroNota numerodocumento,\n"
+                    + "  nf.T003_Status situacao,\n"
+                    + "  nf.T003_ValorTotalProdutos valortotal,\n"
+                    + "  nf.T003_ValorTotalNota subtotal,\n"
+                    + "  cast(SUBSTRING(cast(mc.T005_DataVencimento as varchar(20)),1,19) as date) dataemissao,\n"
+                    + "  nf.T003_DataEntrada,\n"
+                    + "  replace(nf.P005_CodigoCaixaPDV,'CX-','') pdv,\n"
+                    + "  nf.T003_ValorDesconto desconto\n"
+                    + " from T005_MovimentacaoCheque mc\n"
+                    + "  join T003_NotaFiscal nf on nf.T003_ID = mc.T003_IDCupom \n"
+                    + " where \n"
+                    + "  mc.T003_IDCupom is not null\n"
+                    + "  and \n"
+                    + "  nf.C008_CodigoFilial = '" + idLojaCliente + "'\n"
+                    + ")\n"
+                    + "select \n"
+                    + " id,\n"
+                    + " id_loja,\n"
+                    + " numerodocumento,\n"
+                    + " situacao,\n"
+                    + " valortotal,\n"
+                    + " desconto,\n"
+                    + " subtotal,\n"
+                    + " dataemissao,\n"
+                    + " pdv \n"
+                    + "from venda\n"
+                    + "where \n"
+                    + " dataemissao BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "';";
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -708,15 +743,14 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
                         next = new VendaItemIMP();
 
-                        next.setVenda(rst.getString("id_venda"));
-                        next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nro_item"));
-                        next.setProduto(rst.getString("produto"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setVenda(rst.getString("idvenda"));
+                        next.setId(rst.getString("id"));
+                        next.setSequencia(rst.getInt("sequecia"));
+                        next.setProduto(rst.getString("produtoid"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setTotalBruto(rst.getDouble("total"));
                     }
                 }
@@ -728,30 +762,69 @@ public class BrDataDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";/*"select\n"
-                    + "	v.VndNumeroVenda id_venda,\n"
-                    + "	vi.DocBaseItemID id_item,\n"
-                    + "	vi.DocBaseItemSequencia nro_item,\n"
-                    + "	vi.DocBaseItemProdID produto,\n"
-                    + "	un.UnSigla unidade,\n"
-                    + "	case\n"
-                    + "	   when p.ProdCodBarras1 is null then p.ProdCodInterno\n"
-                    + "	   else p.ProdCodBarras1\n"
-                    + "	end as codigobarras,\n"
-                    + "	p.ProdDescricao descricao,\n"
-                    + "	vi.DocBaseItemQuantidade quantidade,\n"
-                    + "	vi.DocBaseItemValorUnitario precovenda,\n"
-                    + "	vi.DocBaseItemValorTotal total\n"
-                    + "from\n"
-                    + "	TB_DOCUMENTO_BASE_ITENS vi\n"
-                    + "left join TB_VENDA v on v.VndDocBaseID = vi.DocBaseItemDocBaseID \n"
-                    + "left join TB_PRODUTO p on p.ProdID = vi.DocBaseItemProdID \n"
-                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID \n"
-                    + "left join TB_UNIDADE_MEDIDA un on un.UnID = vi.DocBaseItemUnidadeID \n"
-                    + "WHERE\n"
-                    + " d.VndDocNumero is not NULL \n"
-                    + "	and v.VndDtEmissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "order by 2,1";*/
+                    = "with vendaitem as (\n"
+                    + " select \n"
+                    + "  CONCAT(vi.T003_IDNota, vi.T004_ID) id,\n"
+                    + "  vi.T004_ID sequecia,\n"
+                    + "  vi.T003_IDNota idvenda, \n"
+                    + "  vi.C001_CodigoProduto produtoid,\n"
+                    + "  vi.C052_UnidadeMedida unidade,\n"
+                    + "  vi.T004_NumeroNota numerodocumento,\n"
+                    + "  vi.T004_Quantidade quantidade,\n"
+                    + "  vi.T004_ValorItem valor,\n"
+                    + "  vi.T004_ValorTotalItem,\n"
+                    + "  vi.T004_ValorDesconto desconto,\n"
+                    + "  vi.T004_ValorFinalTotalItem total,\n"
+                    + "  vi.T004_Status cancelado,\n"
+                    + "  cast(SUBSTRING(cast(v.T003_DataEmissao as varchar(20)),1,19) as date) dataemissao\n"
+                    + " from T004_NotaFiscalItem vi\n"
+                    + " join T003_NotaFiscal v on v.T003_ID = vi.T003_IDNota\n"
+                    + " where \n"
+                    + "  v.C008_CodigoFilial = '"+ idLojaCliente +"'\n"
+                    + "  and \n"
+                    + "  v.C015_CodigoOperacao in ('000047','000048','000051')\n"
+                    + "  and \n"
+                    + "  v.C013_CodigoFormaPagamento in ('CRE','CRT','DIN')\n"
+                    + "  UNION\n"
+                    + "  select \n"
+                    + "   CONCAT(vi.T003_IDNota, vi.T004_ID) id,\n"
+                    + "   vi.T004_ID sequecia,\n"
+                    + "   vi.T003_IDNota idvenda, \n"
+                    + "   vi.C001_CodigoProduto produtoid,\n"
+                    + "   vi.C052_UnidadeMedida unidade,\n"
+                    + "   vi.T004_NumeroNota numerodocumento,\n"
+                    + "   vi.T004_Quantidade quantidade,\n"
+                    + "   vi.T004_ValorItem valor,\n"
+                    + "   vi.T004_ValorTotalItem,\n"
+                    + "   vi.T004_ValorDesconto desconto,\n"
+                    + "   vi.T004_ValorFinalTotalItem total,\n"
+                    + "   vi.T004_Status cancelado,\n"
+                    + "   cast(SUBSTRING(cast(mc.T005_DataVencimento as varchar(20)),1,19) as date) dataemissao\n"
+                    + "  from T005_MovimentacaoCheque mc\n"
+                    + "  join T003_NotaFiscal v on v.T003_ID = mc.T003_IDCupom\n"
+                    + "  join T004_NotaFiscalItem vi on vi.T003_IDNota = v.T003_ID \n"
+                    + "   and vi.T004_NumeroNota = v.T003_NumeroNota \n"
+                    + "  where \n"
+                    + "   mc.T003_IDCupom is not null\n"
+                    + "   and \n"
+                    + "   v.C008_CodigoFilial = '"+ idLojaCliente +"'\n"
+                    + ")\n"
+                    + "select \n"
+                    + " id, \n"
+                    + " idvenda,\n"
+                    + " sequecia,\n"
+                    + " produtoid,\n"
+                    + " unidade,\n"
+                    + " numerodocumento,\n"
+                    + " quantidade,\n"
+                    + " valor,\n"
+                    + " desconto,\n"
+                    + " cancelado,\n"
+                    + " total\n"
+                    + "from vendaitem\n"
+                    + "  where \n"
+                    + " dataemissao BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "';";
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
