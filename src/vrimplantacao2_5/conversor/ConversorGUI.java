@@ -336,7 +336,7 @@ public class ConversorGUI extends javax.swing.JFrame {
                     Exceptions.printStackTrace(ex);
                     ProgressBar.dispose();
                     JOptionPane.showMessageDialog(null, "Ops, tivemos um erro ao popular a tabela! \n\n"
-                            + "Confira se o nome digitado da tabela está correto."
+                            + "Confira se o nome digitado da tabela está correto.\n"
                             + "Confira se a planilha corresponde a tabela que foi criada.\n"
                             + "Confira se não há erro na planilha.\n"
                             + "Se o erro persistir, contate o setor de Migração.\n\nErro: " + ex.getMessage());

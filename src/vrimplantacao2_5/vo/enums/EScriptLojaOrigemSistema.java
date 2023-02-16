@@ -201,6 +201,7 @@ public enum EScriptLojaOrigemSistema {
     PRIME(243,11, "select empr_codigo as id,  empr_nomereduzido as descricao from empresas order by 1"),
     GEP(246, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
     PALLAS(244,8, "select cod_cli id, nome_cli descricao from cliente where cod_cli = 1"),
+    ALCANCE(245,8, "SELECT NumComanda id, Titulo descricao FROM ppcx.paramh"),
     SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004");
 
     private int idSistema;
