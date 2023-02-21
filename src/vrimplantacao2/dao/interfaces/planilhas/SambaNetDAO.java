@@ -49,7 +49,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "SambaNet";
+        return "SAMBANET" + " - " + getLojaOrigem();
     }
 
     public void setPlanilhaFamiliaProduto(String planilhaFamilia) {

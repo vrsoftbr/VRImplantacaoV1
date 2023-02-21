@@ -933,6 +933,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNFe = new javax.swing.JMenuItem();
         mnuCodigoBarrasAtacado = new javax.swing.JMenuItem();
         mnuPlanilhaV2 = new javax.swing.JMenuItem();
+        mnuSambanet = new javax.swing.JMenuItem();
         mnuImportarNfce = new javax.swing.JMenuItem();
         mnuEspeciais = new javax.swing.JMenu();
         mnupdvvendaitem = new javax.swing.JMenuItem();
@@ -3458,6 +3459,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuImpSistema.add(mnuPlanilhaV2);
 
+        mnuSambanet.setText("Sambanet");
+        mnuSambanet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSambanetActionPerformed(evt);
+            }
+        });
+        mnuImpSistema.add(mnuSambanet);
+
         mnuImportarNfce.setText("NFC-e");
         mnuImportarNfce.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -5593,6 +5602,10 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem17ActionPerformed
 
+    private void mnuSambanetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSambanetActionPerformed
+        SambaNetGUI.exibir(this);
+    }//GEN-LAST:event_mnuSambanetActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5878,6 +5891,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSaef;
     private javax.swing.JMenuItem mnuSambaNet;
     private javax.swing.JMenuItem mnuSambaNetGetWay;
+    private javax.swing.JMenuItem mnuSambanet;
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuSav;
     private javax.swing.JMenuItem mnuScef;

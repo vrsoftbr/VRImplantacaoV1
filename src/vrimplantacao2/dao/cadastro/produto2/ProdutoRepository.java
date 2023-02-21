@@ -332,7 +332,10 @@ public class ProdutoRepository {
                         .toString());
         
         if (this.provider.isImportarPorPlanilha()) {
-            salvar(produtos);
+            forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
+            if (this.forcarUnificacao) {
+                unificar(produtos);
+            } else salvar(produtos);
         } else {
             ProdutoService produtoService = new ProdutoService();
 

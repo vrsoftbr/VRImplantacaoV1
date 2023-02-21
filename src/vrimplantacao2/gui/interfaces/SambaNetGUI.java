@@ -23,7 +23,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class SambaNetGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "SambaNet";
+    private static final String SISTEMA = "SAMBANET";
     private static final String SERVIDOR_SQL = "Planilha";
     private static SambaNetGUI instance;
 
@@ -159,6 +159,7 @@ public class SambaNetGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
 
                     Importador importador = new Importador(dao);
+                    importador.importarPorPlanilha = true;
                     importador.setLojaOrigem(txtLoja.getText());
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
