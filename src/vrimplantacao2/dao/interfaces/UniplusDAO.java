@@ -386,7 +386,6 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	p.cstpisentrada, \n"
                     + "	p.cstpis, \n"
                     + "	p.idfamilia, \n"
-                    + " p.diasvencimento validade,\n"
                     + " coalesce(prc.percentuallucromargem,prc2.percentuallucromargem) margem_atual,\n"
                     + "	coalesce(prc.customercadoriavendida,prc2.customercadoriavendida) custo_atual,\n"
                     + "	coalesce(prc.custo,prc2.custo) custosemimposto,\n"
@@ -585,7 +584,6 @@ public class UniplusDAO extends InterfaceDAO {
                         + "	p.cstpisentrada, \n"
                         + "	p.cstpis, \n"
                         + "	p.idfamilia, \n"
-                        + " 	p.diasvencimento validade,\n"
                         + " 	prc.percentuallucromargem margem_atual,\n"
                         + " 	prc.customercadoriavendida custo_atual,\n"
                         + " 	prc.custo custosemimposto,\n"
@@ -663,6 +661,7 @@ public class UniplusDAO extends InterfaceDAO {
                     }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setValidade(rs.getInt("validade"));
 
                     if (priorizarPrecoDaTabelaFormacaoPrecoProduto()) {
                         imp.setPrecovenda(rs.getDouble("precovenda1"));
@@ -670,15 +669,18 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setPrecovenda(rs.getDouble("preco_venda"));
                     }
 
-                    imp.setCustoSemImposto(rs.getDouble("custo_sem_imposto"));
-                    imp.setCustoComImposto(rs.getDouble("custo_com_imposto"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    
 
                     if (temProdutoAssociado) {
                         imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                         imp.setCustoComImposto(rs.getDouble("custo_atual"));
                         imp.setPrecovenda(rs.getDouble("preco_atual"));
                         imp.setMargem(rs.getDouble("margem_atual"));
+                    }
+                    else {
+                        imp.setCustoSemImposto(rs.getDouble("custo_sem_imposto"));
+                        imp.setCustoComImposto(rs.getDouble("custo_com_imposto"));
+                        imp.setMargem(rs.getDouble("margem"));
                     }
 
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
