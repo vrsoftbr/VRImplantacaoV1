@@ -322,7 +322,8 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.cade_ctnota as custo,\n"
                     + "    pe.cade_estoque2 as estoque, \n"
                     + "    p.cadp_vincpreco familiaid, \n"
-                    + "    pe.cade_validade validade\n"
+                    + "    pe.cade_validade validade,\n"
+                    + "    p.cadp_codreceita natreceita\n"
                     + "from cadprod p\n"
                     + "left join cadprodemp pe on pe.cade_codigo = p.cadp_codigo\n"
                     + "	and pe.cade_codempresa = '" + getLojaOrigem() + "'\n"
@@ -367,6 +368,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
 
                     imp.setIdFamiliaProduto(rst.getString("familiaid"));
 
