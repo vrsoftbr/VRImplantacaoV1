@@ -36,9 +36,11 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
+import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 
 /**
  *
@@ -94,7 +96,8 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.PDV_VENDA
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.RECEITA
         ));
     }
 
@@ -152,7 +155,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("aliquota"),
                             0,
                             0,
-                            0
+                            rst.getDouble("reducao")
                     ));
                 }
             }
@@ -210,7 +213,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " CODMARCA,\n"
                     + " PRECOCUSTO,\n"
                     + " PRECOVENDA,\n"
-                    + " ESTOQUE,\n"
+                    + " E.ESTOQUE_ATUAL ESTOQUE,\n"
                     + " CASE WHEN USA_BALANCA = 2 THEN 0 ELSE 1 END ebalanca,\n"
                     + " CST,\n"
                     + " replace(CLASSIFICACAO_FISCAL,'.','') ncm,\n"
@@ -225,8 +228,11 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " CODALIQUOTA,\n"
                     + " replace(FISCO_CEST,'.','') cest,\n"
                     + " FISCO_CST_PIS pis,\n"
-                    + " FISCO_CST_COFINS cofins\n"
-                    + " FROM C000025"
+                    + " FISCO_CST_COFINS cofins,\n"
+                    + " CASE WHEN replace(COALESCE(VALIDADE,'0'),'','0') <> '' THEN replace(COALESCE(VALIDADE,'0'),'','0')\n"
+                    + "   ELSE '0' END validade \n"
+                    + " FROM C000025 P \n"
+                    + " LEFT JOIN C000100 E ON P.CODIGO = E.CODPRODUTO "
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -259,15 +265,16 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
-                        imp.setValidade(produtoBalanca.getValidade());
+                        //imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(rst.getBoolean("ebalanca"));
                         imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setQtdEmbalagem(rst.getInt("qtde_embalagem"));
+                        imp.setValidade(rst.getInt("validade"));
                     }
-
+                    imp.setValidade(rst.getInt("validade"));
                     imp.setIcmsDebitoId(rst.getString("id_aliquota"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
@@ -383,19 +390,19 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
-    /*@Override
+
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	COD_PROD produtoid,\n"
-                    + "	COD_FORNEC fornecedorid,\n"
-                    + "	REFERENCIA referencia \n"
-                    + " FROM \n"
-                    + "	PRODUTOS_FORNECEDOR"
+                    "SELECT \n"
+                    + "  CODFORNECEDOR fornecedorid,\n"
+                    + "  CODPRODUTO produtoid,\n"
+                    + "  CODIGO externo \n"
+                    + "FROM \n"
+                    + "FORNECEDOR_CODIGO"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -403,22 +410,31 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("fornecedorid"));
                     imp.setIdProduto(rst.getString("produtoid"));
-                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setCodigoExterno(rst.getString("externo"));
 
                     result.add(imp);
                 }
             }
         }
         return result;
-    }*/
+    }
 
-    /*@Override
+    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + "  CODIGO id,\n"
+                    + "  CODCLIENTE idcliente,\n"
+                    + "  NUMERO_CUPOM cupom,\n"
+                    + "  DATA_EMISSAO dataemissao,\n"
+                    + "  DATA_VENCIMENTO datavencimento,\n"
+                    + "  DOCUMENTO numerodocumento,\n"
+                    + "  VALOR_ORIGINAL valor\n"
+                    + "FROM C000049\n"
+                    + "WHERE SITUACAO = 1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -434,7 +450,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }*/
+    }
 
     /*@Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
@@ -442,7 +458,15 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT  \n"
+                    +   "CODIGO id,\n"
+                    +   "CODFORNECEDOR idforecedor,\n"
+                    +   "NOTAFISCAL numerodocumento,\n"
+                    +   "DATA_EMISSAO dataemissao,\n"
+                    +   "VALOR valor,\n"
+                    +   "DATA_VENCIMENTO dtvencimento\n"
+                    + "FROM C000046\n"
+                    + "WHERE SITUACAO = 1"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -453,7 +477,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setVencimento(rst.getDate("dtvencimento"));
-                    imp.setObservacao(rst.getString("obs"));
+                    //imp.setObservacao(rst.getString("obs"));
 
                     result.add(imp);
                 }
@@ -462,6 +486,37 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }*/
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "  SELECT \n"
+                    + "  CODIGO ID_PRODUTOPAI,\n"
+                    + "  PRODUTO DESCRICAO,\n"
+                    + "  QUANTIDADE QUANTIDADE,\n"
+                    + "  CODPRODUTO ID_PRODUTOFILHO\n"
+                    + "  FROM C000079"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id_produtopai"));
+                    imp.setIdproduto(rst.getString("id_produtopai"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setQtdembalagemreceita(rst.getInt("quantidade"));
+                    imp.setQtdembalagemproduto(1);
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
