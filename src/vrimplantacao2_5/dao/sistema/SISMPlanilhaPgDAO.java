@@ -97,10 +97,9 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO,
-                OpcaoCliente.CONVENIO_EMPRESA,
-                OpcaoCliente.CONVENIO_TRANSACAO,
-                OpcaoCliente.CONVENIO_CONVENIADO));
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.INSCRICAO_ESTADUAL
+        ));
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
@@ -415,12 +414,12 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " codigo,\n"
                     + " nome,\n"
                     + " cnpjcpf,\n"
-                    + " rg,\n"
+                    + " case when rg = '' then ie else rg end rg,\n"
                     + " tel1,\n"
                     + " tel2,\n"
                     + " case when situacao = '5-Bloqueado' then 0\n"
                     + "   else 1 end situacao,\n"
-                    + " limite,\n"
+                    + "  replace(limite,',','.') limite,\n"
                     + " ende,\n"
                     + " bairro,\n"
                     + " cid,\n"
@@ -446,6 +445,8 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
 
                     imp.setBloqueado(rst.getBoolean("situacao"));
                     imp.setAtivo(rst.getBoolean("situacao"));
+                    imp.setLimiteCompra(0);
+                    imp.setValorLimite(rst.getDouble("limite"));
 
                     result.add(imp);
                 }
