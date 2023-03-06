@@ -202,7 +202,8 @@ public enum EScriptLojaOrigemSistema {
     GEP(246, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
     PALLAS(244,8, "select cod_cli id, nome_cli descricao from cliente where cod_cli = 1"),
     ALCANCE(245,8, "SELECT NumComanda id, Titulo descricao FROM ppcx.paramh"),
-    SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004");
+    SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004"),
+    FENIXME(249, 5, "SELECT CODIGOFILIAL id, CODIGOFILIAL|| ''-'' ||NOME AS descricao FROM FILIAL ORDER BY 1");
 
     private int idSistema;
     private int idBancoDados;
