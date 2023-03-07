@@ -223,6 +223,7 @@ import vrimplantacao2_5.dao.sistema.DxDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.FacilDAO;
+import vrimplantacao2_5.dao.sistema.FenixMEDAO;
 import vrimplantacao2_5.dao.sistema.FocusDAO;
 import vrimplantacao2_5.dao.sistema.GEPDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
@@ -274,6 +275,7 @@ import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Facil2_5GUI;
+import vrimplantacao2_5.gui.sistema.FenixME2_5GUI;
 import vrimplantacao2_5.gui.sistema.Focus2_5GUI;
 import vrimplantacao2_5.gui.sistema.GEP2_5GUI;
 import vrimplantacao2_5.gui.sistema.GSoft2_5GUI;
@@ -2147,6 +2149,18 @@ public enum ESistema {
         ) {
             try {
                 return new SoftLog2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    FENIXME(249, "FENIXME", new FenixMEDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new FenixME2_5GUI(frame);
                 } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
