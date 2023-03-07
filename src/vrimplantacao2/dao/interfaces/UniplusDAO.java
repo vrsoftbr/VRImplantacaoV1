@@ -543,7 +543,6 @@ public class UniplusDAO extends InterfaceDAO {
                         + "		order by  prc3.datahora  asc";
 
             }*/
-
             if (temProdutoAssociado) {
                 sql = "select \n"
                         + "	e.id,\n"
@@ -669,15 +668,12 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setPrecovenda(rs.getDouble("preco_venda"));
                     }
 
-                    
-
                     if (temProdutoAssociado) {
                         imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                         imp.setCustoComImposto(rs.getDouble("custo_atual"));
                         imp.setPrecovenda(rs.getDouble("preco_atual"));
                         imp.setMargem(rs.getDouble("margem_atual"));
-                    }
-                    else {
+                    } else {
                         imp.setCustoSemImposto(rs.getDouble("custo_sem_imposto"));
                         imp.setCustoComImposto(rs.getDouble("custo_com_imposto"));
                         imp.setMargem(rs.getDouble("margem"));
@@ -1409,7 +1405,7 @@ public class UniplusDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "	f.id,\n"
                     + "	e.codigo identidade,\n"
                     + "	f.documento,\n"
@@ -1431,7 +1427,54 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
                     + "order by\n"
-                    + "	f.id"
+                    + "	f.id"*/
+                    "with contas as (\n"
+                    + "select\n"
+                    + "	f.id,\n"
+                    + "	e.codigo identidade,\n"
+                    + "	f.documento,\n"
+                    + "	f.emissao,\n"
+                    + "	f.entrada,\n"
+                    + "	f.historico observacao,\n"
+                    + "	doc.descricao tipodocumento,\n"
+                    + "	f.vencimento,\n"
+                    + "	f.valor,\n"
+                    + "	f.saldo\n"
+                    + "from\n"
+                    + "	financeiro f\n"
+                    + "	join entidade e on\n"
+                    + "		f.identidade = e.id\n"
+                    + "	left join tipodocumentofinanceiro doc on\n"
+                    + "		f.idtipodocumentofinanceiro = doc.id\n"
+                    + "where\n"
+                    + "	f.tipo = 'P'\n"
+                    + "	and f.idfilial = "+getLojaOrigem()+"\n"
+                    + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
+                    + "union\n"
+                    + "select\n"
+                    + "	f.id,\n"
+                    + "	e.codigo identidade,\n"
+                    + "	f.documento,\n"
+                    + "	f.emissao,\n"
+                    + "	f.entrada,\n"
+                    + "	f.historico observacao,\n"
+                    + "	doc.descricao tipodocumento,\n"
+                    + "	f.vencimento,\n"
+                    + "	f.valor,\n"
+                    + "	f.saldo\n"
+                    + "from\n"
+                    + "	financeiro f\n"
+                    + "	join entidade e on\n"
+                    + "		f.identidade = e.id\n"
+                    + "	left join tipodocumentofinanceiro doc on\n"
+                    + "		f.idtipodocumentofinanceiro = doc.id\n"
+                    + "	left join financeirolancamento fi on fi.idfinanceiro = f.id \n"
+                    + "where\n"
+                    + "	f.tipo = 'P'\n"
+                    + "	and f.idfilial = "+getLojaOrigem()+"\n"
+                    + "	and fi.idfinanceiro is null\n"
+                    + ")\n"
+                    + "select * from contas"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
