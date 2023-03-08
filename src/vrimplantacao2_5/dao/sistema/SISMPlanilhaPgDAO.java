@@ -26,7 +26,6 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
@@ -83,7 +82,8 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
             OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
             OpcaoProduto.MARGEM,
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-            OpcaoProduto.PDV_VENDA
+            OpcaoProduto.PDV_VENDA,
+            OpcaoProduto.QTD_EMBALAGEM_EAN
         }));
     }
 
@@ -207,6 +207,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " p.descricao,\n"
                     + " p.codbarra,\n"
                     + " p.un,\n"
+                    + " regexp_replace(p.ebv,'[^0-9]','','g') ebv,\n"
                     + " 1 as ativo,\n"
                     + " replace(p.pcusto,',','.') custo,\n"
                     + " replace(p.pvenda,',','.') venda,\n"
@@ -240,6 +241,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " p.descricao,\n"
                     + " p.codbarra,\n"
                     + " p.un,\n"
+                    + " regexp_replace(p.ebv,'[^0-9]','','g') ebv,\n"
                     + " 0 as ativo,\n"
                     + " replace(p.pcusto,',','.') custo,\n"
                     + " replace(p.pvenda,',','.') venda,\n"
@@ -290,7 +292,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                         imp.setTipoEmbalagem(rst.getString("un"));
                         imp.setTipoEmbalagemVolume(rst.getString("un"));
                         imp.setTipoEmbalagemCotacao(rst.getString("un"));
-                        imp.setQtdEmbalagem(1);
+                        imp.setQtdEmbalagem(rst.getInt("ebv"));
                         imp.setVolume(1);
                         imp.setQtdEmbalagemCotacao(1);
                     }
@@ -327,6 +329,43 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + " p.codigo,\n"
+                    + " p.codbarra,\n"
+                    + " p.un,\n"
+                    + " regexp_replace(p.ebv,'[^0-9]','','g') ebv\n"
+                    + "from produtos p\n"
+                    + "left join trib_ativos t on t.codigo = p.codigo\n"
+                    + "union \n"
+                    + "select distinct\n"
+                    + " p.codigo,\n"
+                    + " p.codbarra,\n"
+                    + " p.un,\n"
+                    + " regexp_replace(p.ebv,'[^0-9]','','g') ebv\n"
+                    + "from produtos_inativos p\n"
+                    + "left join trib_inativos t on t.codigo = p.codigo\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setEan(rst.getString("codbarra"));
+                    imp.setTipoEmbalagem(rst.getString("un"));
+                    imp.setQtdEmbalagem(rst.getInt("ebv"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
     }
 
     @Override
