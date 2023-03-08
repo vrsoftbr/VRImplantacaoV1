@@ -1439,7 +1439,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	doc.descricao tipodocumento,\n"
                     + "	f.vencimento,\n"
                     + "	f.valor,\n"
-                    + "	f.saldo\n"
+                    + "	f.saldo,\n"
+                    + " f.parcela\n"
                     + "from\n"
                     + "	financeiro f\n"
                     + "	join entidade e on\n"
@@ -1448,8 +1449,9 @@ public class UniplusDAO extends InterfaceDAO {
                     + "		f.idtipodocumentofinanceiro = doc.id\n"
                     + "where\n"
                     + "	f.tipo = 'P'\n"
-                    + "	and f.idfilial = "+getLojaOrigem()+"\n"
+                    + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
+                    + " and f.status = 'A'\n"
                     + "union\n"
                     + "select\n"
                     + "	f.id,\n"
@@ -1461,7 +1463,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	doc.descricao tipodocumento,\n"
                     + "	f.vencimento,\n"
                     + "	f.valor,\n"
-                    + "	f.saldo\n"
+                    + "	f.saldo,\n"
+                    + " f.parcela\n"
                     + "from\n"
                     + "	financeiro f\n"
                     + "	join entidade e on\n"
@@ -1471,8 +1474,9 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	left join financeirolancamento fi on fi.idfinanceiro = f.id \n"
                     + "where\n"
                     + "	f.tipo = 'P'\n"
-                    + "	and f.idfilial = "+getLojaOrigem()+"\n"
+                    + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and fi.idfinanceiro is null\n"
+                    + " and f.status = 'A'\n"
                     + ")\n"
                     + "select * from contas"
             )) {
@@ -1485,7 +1489,15 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setIdTipoEntradaVR(210);
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
-                    imp.setObservacao(
+
+                    //imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("saldo"), rst.getString("observacao"));
+                    imp.addVencimento(
+                            rst.getDate("vencimento"), 
+                            rst.getDouble("saldo"), 
+                            rst.getString("observacao"), 
+                            rst.getInt("parcela"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    /*imp.setObservacao(
                             new StringBuilder(rst.getString("tipodocumento"))
                                     .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor") : "")
                                     .append(" - ")
@@ -1495,7 +1507,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.addVencimento(
                             rst.getDate("vencimento"),
                             (rst.getDouble("saldo") > 0 ? rst.getDouble("saldo") : rst.getDouble("valor"))
-                    );
+                    );*/
 
                     result.add(imp);
                 }
