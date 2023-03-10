@@ -224,6 +224,7 @@
                               <Component id="chkProdutoNota" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTemProdutoAssociado" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutosNaoAtualizados" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkContasPagarOutrasDespesas" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="377" max="32767" attributes="0"/>
                       </Group>
@@ -244,7 +245,9 @@
                           <Component id="chkTemProdutoAssociado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutosNaoAtualizados" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="93" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkContasPagarOutrasDespesas" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="57" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -278,6 +281,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkProdutosNaoAtualizados">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Atualizar Pre&#xe7;o e Custo de Produtos n&#xe3;o atualizados"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkContasPagarOutrasDespesas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas a Pagar (Outras Despesas)"/>
                   </Properties>
                 </Component>
               </SubComponents>

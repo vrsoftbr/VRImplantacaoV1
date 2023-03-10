@@ -50,6 +50,7 @@ public class UniplusDAO extends InterfaceDAO {
     public boolean usar_arquivoBalanca;
     public boolean temProdutoAssociado;
     public boolean produtosNaoAtualizados;
+    public boolean outrasDespesas = false;
 
     public void setProdutosNaoAtualizados(boolean produtosNaoAtualizados) {
         this.produtosNaoAtualizados = produtosNaoAtualizados;
@@ -153,6 +154,7 @@ public class UniplusDAO extends InterfaceDAO {
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.OUTRAS_RECEITAS,
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.SEXO,
@@ -1403,32 +1405,60 @@ public class UniplusDAO extends InterfaceDAO {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    /*"select\n"
-                    + "	f.id,\n"
-                    + "	e.codigo identidade,\n"
-                    + "	f.documento,\n"
-                    + "	f.emissao,\n"
-                    + "	f.entrada,\n"
-                    + "	f.historico observacao,\n"
-                    + "	doc.descricao tipodocumento,\n"
-                    + "	f.vencimento,\n"
-                    + "	f.valor,\n"
-                    + "	f.saldo\n"
-                    + "from\n"
-                    + "	financeiro f\n"
-                    + "	join entidade e on\n"
-                    + "		f.identidade = e.id\n"
-                    + "	left join tipodocumentofinanceiro doc on\n"
-                    + "		f.idtipodocumentofinanceiro = doc.id\n"
-                    + "where\n"
-                    + "	f.tipo = 'P'\n"
-                    + "	and f.idfilial = " + getLojaOrigem() + "\n"
-                    + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
-                    + "order by\n"
-                    + "	f.id"*/
-                    "with contas as (\n"
+        String sql = "with contas as (\n"
+                + "select\n"
+                + "	f.id,\n"
+                + "	e.codigo identidade,\n"
+                + "	f.documento,\n"
+                + "	f.emissao,\n"
+                + "	f.entrada,\n"
+                + "	f.historico observacao,\n"
+                + "	doc.descricao tipodocumento,\n"
+                + "	f.vencimento,\n"
+                + "	f.valor,\n"
+                + "	f.saldo,\n"
+                + " f.parcela\n"
+                + "from\n"
+                + "	financeiro f\n"
+                + "	join entidade e on\n"
+                + "		f.identidade = e.id\n"
+                + "	left join tipodocumentofinanceiro doc on\n"
+                + "		f.idtipodocumentofinanceiro = doc.id\n"
+                + "where\n"
+                + "	f.tipo = 'P'\n"
+                + "	and f.idfilial = " + getLojaOrigem() + "\n"
+                + "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n"
+                + " and f.status = 'A'\n"
+                + "union\n"
+                + "select\n"
+                + "	f.id,\n"
+                + "	e.codigo identidade,\n"
+                + "	f.documento,\n"
+                + "	f.emissao,\n"
+                + "	f.entrada,\n"
+                + "	f.historico observacao,\n"
+                + "	doc.descricao tipodocumento,\n"
+                + "	f.vencimento,\n"
+                + "	f.valor,\n"
+                + "	f.saldo,\n"
+                + " f.parcela\n"
+                + "from\n"
+                + "	financeiro f\n"
+                + "	join entidade e on\n"
+                + "		f.identidade = e.id\n"
+                + "	left join tipodocumentofinanceiro doc on\n"
+                + "		f.idtipodocumentofinanceiro = doc.id\n"
+                + "	left join financeirolancamento fi on fi.idfinanceiro = f.id \n"
+                + "where\n"
+                + "	f.tipo = 'P'\n"
+                + "	and f.idfilial = " + getLojaOrigem() + "\n"
+                + "	and fi.idfinanceiro is null\n"
+                + " and f.status = 'A'\n"
+                + ")\n"
+                + "select * from contas ";
+
+        if (outrasDespesas) {
+            sql = "with contas as (\n"
                     + "select\n"
                     + "	f.id,\n"
                     + "	e.codigo identidade,\n"
@@ -1478,25 +1508,39 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	and fi.idfinanceiro is null\n"
                     + " and f.status = 'A'\n"
                     + ")\n"
-                    + "select * from contas"
+                    + "select * from contas where identidade in ('5840','5904','6224','6227') order by id";
+        }
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                   sql
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("identidade"));
-                    imp.setNumeroDocumento(rst.getString("documento"));
-                    imp.setIdTipoEntradaVR(210);
+
+                    if (outrasDespesas) {
+                        imp.setIdTipoEntradaVR(99);
+                        imp.setNumeroDocumento(rst.getString("id"));
+                    } else {
+                        imp.setNumeroDocumento(rst.getString("documento"));
+                    }
+
+                    //imp.setIdTipoEntradaVR(210);
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setValor(rst.getDouble("saldo"));
 
                     //imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("saldo"), rst.getString("observacao"));
                     imp.addVencimento(
-                            rst.getDate("vencimento"), 
-                            rst.getDouble("saldo"), 
-                            rst.getString("observacao"), 
+                            rst.getDate("vencimento"),
+                            rst.getDouble("saldo"),
+                            rst.getString("observacao"),
                             rst.getInt("parcela"));
                     imp.setObservacao(rst.getString("observacao"));
+
                     /*imp.setObservacao(
                             new StringBuilder(rst.getString("tipodocumento"))
                                     .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor") : "")
@@ -1508,7 +1552,6 @@ public class UniplusDAO extends InterfaceDAO {
                             rst.getDate("vencimento"),
                             (rst.getDouble("saldo") > 0 ? rst.getDouble("saldo") : rst.getDouble("valor"))
                     );*/
-
                     result.add(imp);
                 }
             }
