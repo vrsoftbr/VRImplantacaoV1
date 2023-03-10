@@ -458,7 +458,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
                     + " tel2,\n"
                     + " case when situacao = '5-Bloqueado' then 0\n"
                     + "   else 1 end situacao,\n"
-                    + "  replace(limite,',','.') limite,\n"
+                    + "  case when replace(limite,',','.') = '' then '0' else replace(limite,',','.') end limite,\n"
                     + " ende,\n"
                     + " bairro,\n"
                     + " cid,\n"
@@ -484,7 +484,7 @@ public class SISMPlanilhaPgDAO extends InterfaceDAO implements MapaTributoProvid
 
                     imp.setBloqueado(rst.getBoolean("situacao"));
                     imp.setAtivo(rst.getBoolean("situacao"));
-                    imp.setLimiteCompra(0);
+                    //imp.setLimiteCompra(0);
                     imp.setValorLimite(rst.getDouble("limite"));
 
                     result.add(imp);
