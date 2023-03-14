@@ -311,6 +311,7 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
                     result.add(imp);
+                    
                 }
             }
         }
