@@ -242,6 +242,7 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.ManagerDAO;
+import vrimplantacao2_5.dao.sistema.Market2_5DAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
@@ -297,6 +298,7 @@ import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MRS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Manager2_5GUI;
+import vrimplantacao2_5.gui.sistema.Market2_5GUI;
 import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
@@ -999,8 +1001,14 @@ public enum ESistema {
     },
     MARKET(103, "MARKET", new MarketDAO()) {
         @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Market2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     MASTER(104, "MASTER", new MasterDAO()) {
