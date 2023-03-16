@@ -18,6 +18,8 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -75,10 +77,12 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE,     
+                OpcaoProduto.FABRICANTE,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO                
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
 
@@ -103,6 +107,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL));
     }
 
@@ -190,24 +195,24 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	dep.cd_depto as merc1,\n" +
-                    "	dep.nm_depto as descmerc1,\n" +
-                    "	sec.cd_depto_secao as merc2,\n" +
-                    "	sec.nm_depto_secao as descmerc2,\n" +
-                    "	coalesce(gru.cd_depto_grupo, 1) as merc3,\n" +
-                    "	coalesce(gru.nm_depto_grupo, sec.nm_depto_secao) as descmerc3\n" +
-                    "from\n" +
-                    "	produto.tb_depto dep\n" +
-                    "left join\n" +
-                    "	produto.tb_depto_secao sec on sec.cd_depto = dep.cd_depto\n" +
-                    "left join\n" +
-                    "	produto.tb_depto_grupo gru on gru.cd_depto_secao = sec.cd_depto_secao\n" +
-                    "order by\n" +
-                    "	dep.cd_depto, sec.cd_depto_secao")) {
+                    "select\n"
+                    + "	dep.cd_depto as merc1,\n"
+                    + "	dep.nm_depto as descmerc1,\n"
+                    + "	sec.cd_depto_secao as merc2,\n"
+                    + "	sec.nm_depto_secao as descmerc2,\n"
+                    + "	coalesce(gru.cd_depto_grupo, 1) as merc3,\n"
+                    + "	coalesce(gru.nm_depto_grupo, sec.nm_depto_secao) as descmerc3\n"
+                    + "from\n"
+                    + "	produto.tb_depto dep\n"
+                    + "left join\n"
+                    + "	produto.tb_depto_secao sec on sec.cd_depto = dep.cd_depto\n"
+                    + "left join\n"
+                    + "	produto.tb_depto_grupo gru on gru.cd_depto_secao = sec.cd_depto_secao\n"
+                    + "order by\n"
+                    + "	dep.cd_depto, sec.cd_depto_secao")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
@@ -218,15 +223,42 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
                     imp.setMerc3ID(rs.getString("merc3"));
                     imp.setMerc3Descricao(rs.getString("descmerc3"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
-    
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cd_produto_semelhante as id,\n"
+                    + "	nm_produto_semelhante as nomeproduto,\n"
+                    + "	dt_inc as dtcadastro\n"
+                    + "from \n"
+                    + "	produto.tb_produto_semelhante \n"
+                    + "order by \n"
+                    + "	nm_produto_semelhante")) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("nomeproduto"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -265,7 +297,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "select  \n"
                     + "	tp.nr_produto id,\n"
                     + "	tp.nm_produto_longo desc_completa,\n"
@@ -277,11 +309,12 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	custo.per_margem_venda margem,\n"
                     + "	est.qt_saldo estoque,\n"
                     + "	tp.cd_depto codmerc1,\n"
+                    + " tp.cd_produto_semelhante as idfamilia,\n"
                     + "	tp.cd_depto_secao codmerc2,\n"
                     + "	tp.cd_depto_grupo codmerc3,\n"
                     + "	tp.tp_embalagem tipo_embalagem,\n"
                     + "	tp.qt_embalagem qtde_emb,\n"
-                    //+ "	coalesce (pb.qt_dias_validade_balanca, '0') validadebalanca,\n"
+                    + "	coalesce (pb.qt_dias_validade_balanca, '0') validadebalanca,\n"
                     + "	case when tp.is_excluido = 'N' then 1 else 0\n"
                     + "	end as ativo,\n"
                     + "	tp.dt_inc data_cadastro,\n"
@@ -300,69 +333,70 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	where \n"
                     + "		f.cd_ncm_figura_mva = tp.cd_ncm_figura_mva limit 1) as cest,\n"
                     + "	trim(custo.ds_icms) as id_icms,\n"
-//                    + "	tp_unidade_medida  tipovolume,\n"
-//                    + "	qt_unidade_medida  volume,\n"
+                    //                    + "	tp_unidade_medida  tipovolume,\n"
+                    //                    + "	qt_unidade_medida  volume,\n"
                     + "	case \n"
                     + "	when tp.tp_venda = 'B' then 1 else 0 end is_balanca \n"
                     + "from\n"
                     + "	produto.tb_produto tp\n"
                     + "join produto.tb_produto_codbarra cd on cd.cd_produto = tp.cd_produto\n"
-                    + "join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja = " +getLojaOrigem() + "\n"
+                    + "join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja = " + getLojaOrigem() + "\n"
                     + "join saldo.vw_saldo_loja est on est.nr_produto = tp.nr_produto and nr_loja = " + getLojaOrigem() + "\n"
                     + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and  pb.cd_loja = " + getLojaOrigem()
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
-                while (rst.next()) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("id"));
-                    
-                    imp.seteBalanca(rst.getBoolean("is_balanca"));
-                    imp.setEan(rst.getString("ean"));
+                    imp.setImportId(rs.getString("id"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+                    imp.seteBalanca(rs.getBoolean("is_balanca"));
+                    imp.setEan(rs.getString("ean"));
+
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
 
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setValidade(bal.getValidade() > 1
-                                ? bal.getValidade() : rst.getInt("validadebalanca"));
+                                ? bal.getValidade() : rs.getInt("validadebalanca"));
                         imp.setEan(String.valueOf(bal.getCodigo()));
                     }
 
-                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
-                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
+                    imp.setDescricaoCompleta(rs.getString("desc_completa"));
+                    imp.setDescricaoReduzida(rs.getString("desc_reduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
 
-                    imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
-//                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
-//                    imp.setVolume(rst.getDouble("volume"));
-//                   imp.setTipoEmbalagemVolume(rst.getString("tipovolume"));
+                    imp.setTipoEmbalagem(rs.getString("tipo_embalagem"));
+//                    imp.setTipoEmbalagemCotacao(rs.getString("emb_compra"));
+                    imp.setQtdEmbalagem(rs.getInt("qtde_emb"));
+//                    imp.setVolume(rs.getDouble("volume"));
+//                   imp.setTipoEmbalagemVolume(rs.getString("tipovolume"));
 
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setPesoBruto(rs.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
 
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
 
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    
-                    imp.setCodMercadologico1(rst.getString("codmerc1"));
-                    imp.setCodMercadologico2(rst.getString("codmerc2"));
-                    imp.setCodMercadologico3(rst.getString("codmerc3"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
 
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCodMercadologico1(rs.getString("codmerc1"));
+                    imp.setCodMercadologico2(rs.getString("codmerc2"));
+                    imp.setCodMercadologico3(rs.getString("codmerc3"));
+
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
 
                     String idIcms;
 
-                    idIcms = rst.getString("id_icms");
+                    idIcms = rs.getString("id_icms");
 
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
@@ -371,8 +405,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
-                    //          imp.setPiscofinsCstCredito(rst.getString("piscofins"));
-                    //          imp.setPiscofinsCstDebito(rst.getString("piscofins"));
+                    //          imp.setPiscofinsCstCredito(rs.getString("piscofins"));
+                    //          imp.setPiscofinsCstDebito(rs.getString("piscofins"));
                     result.add(imp);
                 }
             }
@@ -387,7 +421,37 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	c.cd_base id,\n"
+                    + "	nm_base razao,\n"
+                    + "	case when nm_fantasia is null then nm_base else nm_fantasia end fantasia,\n"
+                    + "	nr_cpf_cnpj cnpj,\n"
+                    + "	ie.ds_documento ie,\n"
+                    + "	e.nm_logradouro endereco,\n"
+                    + "	nr_endereco numero,\n"
+                    + "	ds_complemento complemento,\n"
+                    + "	b.nm_bairro bairro,\n"
+                    + "	m.nm_cidade cidade,\n"
+                    + "	m.cd_uf uf,\n"
+                    + "	nr_cep cep,\n"
+                    + "	c.dt_inc data_cadastro,\n"
+                    + "	ds_email_nfe email,\n"
+                    + "	case when is_ativo = 'S' then 1 else 0	end ativo,\n"
+                    + "	replace (coalesce (t1.sg_ddd,'') || t1.ds_valor,'-', '') as tel_principal,\n"
+                    + "	t1.nm_contato contato1,\n"
+                    + "	replace (coalesce (t1.sg_ddd,'') || t1.ds_valor,'-', '') as fone1,\n"
+                    + "	t2.nm_contato contato2,\n"
+                    + "	replace(replace(coalesce (t2.sg_ddd, '') || t2.ds_valor, '-', ''), '*', '') fone2\n"
+                    + "from\n"
+                    + "	cadastro.tb_base c\n"
+                    + "left join cadastro.tb_logradouro e on e.cd_logradouro = c.cd_logradouro\n"
+                    + "left join cadastro.tb_bairro b on b.cd_bairro = c.cd_bairro\n"
+                    + "left join cadastro.tb_cidade m on m.cd_cidade = c.cd_cidade\n"
+                    + "left join cadastro.tb_base_documento ie on 	ie.cd_base = c.cd_base\n"
+                    + "left join cadastro.tb_base_contato t1 on t1.cd_base = c.cd_base and t1.tp_principal = 'S'\n"
+                    + "left join cadastro.tb_base_contato t2 on t2.cd_base = c.cd_base and t2.tp_principal = 'N'\n"
+                    + "join cadastro.tb_base_tipo tipo on tipo.cd_base = c.cd_base and tipo.cd_base_tipo_flag = 2\n"
+                    + "join cadastro.tb_cliente n on n.cd_base_cliente = c.cd_base and n.cd_loja = " + getLojaOrigem()
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -406,17 +470,33 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone")));
+                    imp.setTel_principal(Utils.acertarTexto(rs.getString("tel_principal")));
 
-                    String email = Utils.acertarTexto(rs.getString("email")).toLowerCase();
-                    if (!"".equals(email)) {
-                        imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL,
-                                (email.length() > 50 ? email.substring(0, 50) : email));
+                    if ((rs.getString("contato1") != null)
+                            && (!rs.getString("contato1").trim().isEmpty())) {
+                        imp.addContato(
+                                rs.getString("contato1"),
+                                rs.getString("fone1"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                rs.getString("email")
+                        );
+                    }
+
+                    if ((rs.getString("contato2") != null)
+                            && (!rs.getString("contato2").trim().isEmpty())) {
+                        imp.addContato(
+                                rs.getString("contato2"),
+                                rs.getString("fone2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
                     }
 
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
                     imp.setAtivo(rs.getBoolean("ativo"));
-                    imp.setObservacao(rs.getString("observacao"));
+//                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -534,6 +614,57 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setValorLimite(rs.getDouble("limite"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	r.cd_receber as id,\n"
+                    + "	r.cd_base_cliente as idcliente,\n"
+                    + "	ba.nr_cpf_cnpj as cnpj,\n"
+                    + "	ba.nm_base as razao,\n"
+                    + "	r.cd_caixa as ecf,\n"
+                    + "	r.nr_titulo,\n"
+                    + "	r.nr_digito,\n"
+                    + "	r.ds_obs,\n"
+                    + "	r.vl_valor,\n"
+                    + "	r.dt_emissao,\n"
+                    + "	r.dt_vcto,\n"
+                    + "	r.nr_coo as coo,\n"
+                    + "	r.nr_serie_ecf as serieecf\n"
+                    + "from \n"
+                    + "	receber.tb_receber r \n"
+                    + "join\n"
+                    + "	cadastro.tb_titulo_tipo rt on rt.cd_titulo_tipo = r.cd_titulo_tipo\n"
+                    + "join\n"
+                    + "	cadastro.tb_base ba on ba.cd_base = r.cd_base_cliente\n"
+                    + "where \n"
+                    + "	dt_ultima_baixa is null and r.cd_loja = " + getLojaOrigem() + "\n "
+                    + "and r.cd_titulo_tipo = 15\n"
+                    + "order by dt_emissao"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setDataEmissao(rs.getDate("dt_emissao"));
+                    imp.setDataVencimento(rs.getDate("dt_vcto"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setObservacao(rs.getString("ds_obs"));
+                    imp.setValor(rs.getDouble("vl_valor"));
 
                     result.add(imp);
                 }
