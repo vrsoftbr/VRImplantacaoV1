@@ -4,6 +4,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.UniplusDAO;
 import vrimplantacao2.dao.interfaces.UniplusDAO.TabelaPreco;
@@ -102,6 +103,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     dao.usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
                     dao.temProdutoAssociado= chkTemProdutoAssociado.isSelected();
                     dao.produtosNaoAtualizados= chkProdutosNaoAtualizados.isSelected();
+                    dao.outrasDespesas = chkContasPagarOutrasDespesas.isSelected();
+                                       
 
                     Importador importador = new Importador(dao);
 
@@ -112,6 +115,10 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedor.setImportador(importador);
                     tabClientes.setImportador(importador);
+                    
+                    if(chkContasPagarOutrasDespesas.isSelected()){
+                        importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
+                    }
 
                     if (tab.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -185,6 +192,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         chkProdutoNota = new javax.swing.JCheckBox();
         chkTemProdutoAssociado = new javax.swing.JCheckBox();
         chkProdutosNaoAtualizados = new javax.swing.JCheckBox();
+        chkContasPagarOutrasDespesas = new javax.swing.JCheckBox();
         tabBalanca = new javax.swing.JPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
@@ -299,6 +307,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         chkProdutosNaoAtualizados.setText("Atualizar Preço e Custo de Produtos não atualizados");
 
+        chkContasPagarOutrasDespesas.setText("Contas a Pagar (Outras Despesas)");
+
         javax.swing.GroupLayout pnlParamLayout = new javax.swing.GroupLayout(pnlParam);
         pnlParam.setLayout(pnlParamLayout);
         pnlParamLayout.setHorizontalGroup(
@@ -311,7 +321,8 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                     .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoNota)
                     .addComponent(chkTemProdutoAssociado)
-                    .addComponent(chkProdutosNaoAtualizados))
+                    .addComponent(chkProdutosNaoAtualizados)
+                    .addComponent(chkContasPagarOutrasDespesas))
                 .addContainerGap(377, Short.MAX_VALUE))
         );
         pnlParamLayout.setVerticalGroup(
@@ -329,7 +340,9 @@ public class Uniplus2_5GUI extends VRInternalFrame {
                 .addComponent(chkTemProdutoAssociado)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutosNaoAtualizados)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkContasPagarOutrasDespesas)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parâmetros Extra", pnlParam);
@@ -410,6 +423,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox chkContasPagarOutrasDespesas;
     private vrframework.bean.checkBox.VRCheckBox chkDUN14Atacado;
     private vrframework.bean.checkBox.VRCheckBox chkNewEan;
     private javax.swing.JCheckBox chkProdutoNota;

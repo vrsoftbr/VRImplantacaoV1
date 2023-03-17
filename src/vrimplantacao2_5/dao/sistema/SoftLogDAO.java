@@ -507,7 +507,8 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportid(rst.getString("id_produtopai"));
                     imp.setIdproduto(rst.getString("id_produtopai"));
                     imp.setDescricao(rst.getString("descricao"));
-                    imp.setQtdembalagemreceita(rst.getInt("quantidade"));
+                    imp.setRendimento(1);
+                    imp.setQtdembalagemreceita("0".equals(rst.getInt("quantidade")) ? 1 : rst.getInt("quantidade"));
                     imp.setQtdembalagemproduto(1);
                     imp.setFator(1);
                     imp.getProdutos().add(rst.getString("id_produtofilho"));
