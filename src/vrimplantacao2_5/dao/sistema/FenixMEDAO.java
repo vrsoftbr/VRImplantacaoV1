@@ -307,8 +307,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("natrec"));
-
+                    
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
@@ -325,6 +324,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstCredito(rst.getString("piscofins"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natrec"));
 
                     result.add(imp);
                 }

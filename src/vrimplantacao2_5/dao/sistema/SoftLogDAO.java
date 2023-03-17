@@ -361,6 +361,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " CPF,\n"
                     + " LIMITE,\n"
                     + " NUMERO,\n"
+                    + " COMPLEMENTO,\n"
                     + " COD_MUNICIPIO_IBGE,\n"
                     + " SITUACAO\n"
                     + "FROM C000007"
@@ -376,6 +377,7 @@ public class SoftLogDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
                     imp.setCnpj(rst.getString("cpf"));
                     imp.setInscricaoestadual(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone1"));
