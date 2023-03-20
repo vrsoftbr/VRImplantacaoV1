@@ -296,6 +296,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	custo.vl_custo custocomimposto,\n"
                     + "	custo.vl_venda precovenda,\n"
                     + "	custo.per_margem_venda margem,\n"
+                    + " custo.qt_minimo est_min,\n"
                     + "	est.qt_saldo estoque,\n"
                     + "	tp.cd_depto codmerc1,\n"
                     + " tp.cd_produto_semelhante as idfamilia,\n"
@@ -378,6 +379,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rs.getString("cest"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
 
+                    imp.setEstoqueMinimo(rs.getDouble("est_min"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setIdFamiliaProduto(rs.getString("idfamilia"));
 
