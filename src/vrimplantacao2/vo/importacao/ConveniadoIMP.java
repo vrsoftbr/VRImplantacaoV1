@@ -15,7 +15,7 @@ public class ConveniadoIMP {
     private boolean bloqueado = false;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private int senha = 0;
-    private String cnpj;
+    private String cnpj; // cpf do cliente
     private String observacao;        
     private Date validadeCartao;
     private Date dataDesbloqueio;
