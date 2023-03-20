@@ -22,6 +22,8 @@ public class Market2_5GUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(dao.getLojaOrigem());
     }
 
     public Market2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -105,7 +107,6 @@ public class Market2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
 
-                   
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:

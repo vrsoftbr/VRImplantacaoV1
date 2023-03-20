@@ -13,11 +13,13 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -90,6 +92,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.RECEITA
         ));
     }
@@ -331,9 +335,9 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	produto.tb_produto tp\n"
                     + "left join produto.tb_produto_codbarra cd on cd.cd_produto = tp.cd_produto\n"
-                    + "left join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja = 1\n"
-                    + "left join saldo.vw_saldo_loja est on est.nr_produto = tp.nr_produto and nr_loja = 1\n"
-                    + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and  pb.cd_loja = 1\n"
+                    + "left join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja =  " + getLojaOrigem() + "\n"
+                    + "left join saldo.vw_saldo_loja est on est.nr_produto = tp.nr_produto and nr_loja = " + getLojaOrigem() + "\n"
+                    + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and pb.cd_loja = " + getLojaOrigem() + "\n"
                     + "where cd.is_padrao = 'S'"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -365,7 +369,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setTipoEmbalagemCotacao(rs.getString("emb_compra"));
                     imp.setQtdEmbalagem(rs.getInt("qtde_emb"));
                     imp.setVolume(rs.getDouble("volume") / 1000);
-                    imp.setTipoEmbalagemVolume(rs.getString("tipovolume"));
+                    imp.setTipoEmbalagemVolume(rs.getString("tipo_unidade_medida"));
 
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
@@ -404,6 +408,47 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "    ass.nr_produto idproduto_item,\n"
+                    + "    ass.nm_produto as descricaoproduto_principal,\n"
+                    + "    ass.qt_embalagem qtdembalagem_item,\n"
+                    + "    pro.nr_produto as idproduto_principal,\n"
+                    + "    pro.nm_produto as descproduto_item,\n"
+                    + "    pro.qt_embalagem as qtdembalagem,\n"
+                    + "    '' percentualpreco,\n"
+                    + "    '' aplicapreco,\n"
+                    + "    '' aplicacusto,\n"
+                    + "    '' aplicaestoque,\n"
+                    + "    '' percentualcustoestoque\n"
+                    + "from \n"
+                    + "    produto.tb_produto pro\n"
+                    + "join\n"
+                    + "    produto.tb_produto ass  on ass.cd_produto = pro.cd_produto_movimento\n"
+                    + "left join\n"
+                    + "    saldo.vw_saldo_loja_un est\n"
+                    + "    on est.nr_produto = pro.nr_produto\n"
+                    + "    and est.nr_loja = " + getLojaOrigem() + "\n"
+                    + "order by \n"
+                    + "    2,5"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    imp.setId(rst.getString("idproduto_principal"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setProdutoAssociadoId(rst.getString("idproduto_item"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_item"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
