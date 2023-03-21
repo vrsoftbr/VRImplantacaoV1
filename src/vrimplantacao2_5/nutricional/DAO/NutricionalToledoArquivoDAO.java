@@ -35,6 +35,7 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
     Properties prop = App.properties();
     private final String ip = prop.get("database.ip");
     private final String banco = prop.get("database.nome");
+    private final int porta = Integer.parseInt(prop.get("database.porta"));
     int tipoScript = 0;
     private String sql = "";
     private String sistemaOrigem = "ARQUIVOS";
@@ -349,7 +350,7 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
     }
 
     public void iniciarConexao() throws Exception {
-        con.abrirConexao(ip, 8745, banco, "postgres", "VrPost@Server");
+        con.abrirConexao(ip, porta, banco, "postgres", "VrPost@Server");
     }
 
     public void finalizarConexao() throws Exception {
