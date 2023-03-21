@@ -142,6 +142,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.NUMERO_PARCELA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.NUTRICIONAL,
+                    OpcaoProduto.VENDA_PDV,
+                    OpcaoProduto.PDV_VENDA,
                     OpcaoProduto.RECEITA
                 }
         ));

@@ -6,6 +6,7 @@ package vrimplantacao2_5.vo.enums;
  */
 public enum EScriptLojaOrigemSistema {
 
+    AVANCE(15, 8, "SELECT distinct id_loja id, fantasia descricao FROM adm_empresas_estab ORDER BY 1"),
     ARIUS(197, 9, "SELECT id ,id || '' - '' || descritivo || '' - '' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5,
             "SELECT l.COD_EMPRESA AS id, "
@@ -203,7 +204,9 @@ public enum EScriptLojaOrigemSistema {
     PALLAS(244,8, "select cod_cli id, nome_cli descricao from cliente where cod_cli = 1"),
     ALCANCE(245,8, "SELECT NumComanda id, Titulo descricao FROM ppcx.paramh"),
     SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004"),
-    FENIXME(249, 5, "SELECT CODIGOFILIAL id, CODIGOFILIAL|| ''-'' ||NOME AS descricao FROM FILIAL ORDER BY 1");
+    MBD(248,5,"SELECT COUNT(*) id, RAZAO_SOCIAL descricao FROM FIRMA f GROUP BY RAZAO_SOCIAL"),
+    FENIXME(249, 5, "SELECT CODIGOFILIAL id, CODIGOFILIAL|| ''-'' ||NOME AS descricao FROM FILIAL ORDER BY 1"),
+    TARGET_G3(250, 13, "select cd_emp id, raz_soc descricao from empresa");
 
     private int idSistema;
     private int idBancoDados;

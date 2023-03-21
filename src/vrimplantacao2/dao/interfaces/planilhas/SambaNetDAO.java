@@ -112,6 +112,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PESAVEL,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.TIPO_PRODUTO,
+            OpcaoProduto.QTD_EMBALAGEM_EAN,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         }));
@@ -393,6 +395,9 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
                         imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
+                        imp.setTipoEmbalagem("UN");
+                        imp.setTipoEmbalagemCotacao("UN");
+                        imp.seteBalanca(false);
                         
                         ProdutoBalancaVO prod = produtosBalanca.get(Utils.stringToInt(imp.getEan()));
                         if (prod != null) {
@@ -400,14 +405,17 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setValidade(prod.getValidade());
                             if ("U".equals(prod.getPesavel())) {
                                 imp.setTipoEmbalagem("UN");
+                                imp.setTipoEmbalagemCotacao("UN");
                             } else {
                                 imp.setTipoEmbalagem("KG");
+                                imp.setTipoEmbalagemCotacao("KG");
                             }
                             imp.setEan(String.valueOf(prod.getCodigo()));
                         } else {
                             imp.seteBalanca(false);
                             imp.setValidade(0);
                             imp.setTipoEmbalagem("UN");
+                            imp.setTipoEmbalagemCotacao("UN");
                         }
                         
                         produtos.put(imp, imp.getImportId(), sheet.getCell(2, i).getContents());
@@ -529,9 +537,10 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                             !val(sh, 4, i).equals("")
                     ) {
                         ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
-                    
+                        if (imp != null){
                         if (!imp.isBalanca()) {
-                            imp.setTipoEmbalagem(val(sh,6,i));
+                            imp.setTipoEmbalagem(val(sh,6,i) == null ? "UN" : val(sh,6,i));
+                            imp.setTipoEmbalagemCotacao(val(sh,6,i) == null ? "UN" : val(sh,6,i));
                         }
                         imp.setDescricaoCompleta(val(sh,4,i));
                         imp.setNcm(val(sh,7,i));
@@ -545,6 +554,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPiscofinsCstDebito(val(sh,16,i));
                         imp.setPiscofinsNaturezaReceita(val(sh,19,i));
                         imp.setCest(val(sh,20,i));
+                    }
                     }
                     
                     ProgressBar.next();
@@ -727,15 +737,15 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(val(sh, 0, i));
                     imp.setRazao(val(sh, 1, i));
                     imp.setFantasia(imp.getRazao());
-                    imp.setCnpj(val(sh, 2, i));
-                    imp.setInscricaoestadual(val(sh, 3, i));
+                    imp.setCnpj(val(sh, 6, i));
+                    imp.setInscricaoestadual(val(sh, 7, i));
 
-                    if (!val(sh, 4, i).equals("")) {
-                        imp.setTelefone(val(sh, 4, i));
+                    if (!val(sh, 8, i).equals("")) {
+                        imp.setTelefone(val(sh, 8, i));
                     }
                     
-                    if (!val(sh, 5, i).equals("")) {
-                        imp.setObservacao2("CONTATO " + val(sh, 5, i));
+                    if (!val(sh, 10, i).equals("")) {
+                        imp.setObservacao2("CONTATO " + val(sh, 10, i));
                     }
 
                     
@@ -749,7 +759,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         String enderecoCompleto = val(sh, 11, i);
                         String ende[] = enderecoCompleto.split(",");
                         
-                        imp.setObservacao2(imp.getObservacao2() + " == " + "ENDERCO " + enderecoCompleto);
+                        imp.setObservacao2(imp.getObservacao2() + " == " + "ENDERECO " + enderecoCompleto);
                                                 
                         for (int j = 0; j < ende.length; j++) {
                             

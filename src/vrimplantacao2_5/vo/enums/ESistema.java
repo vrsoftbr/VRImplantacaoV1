@@ -205,7 +205,6 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
-import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.AriusWebDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
@@ -242,6 +241,7 @@ import vrimplantacao2_5.dao.sistema.VersatilDAO;
 import vrimplantacao2_5.dao.sistema.WBADAO;
 import vrimplantacao2_5.dao.sistema.LogusDAO;
 import vrimplantacao2_5.dao.sistema.ManagerDAO;
+import vrimplantacao2_5.dao.sistema.MbdDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
@@ -251,6 +251,7 @@ import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
+import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
@@ -258,6 +259,7 @@ import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
+import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.BrData2_5GUI;
@@ -297,6 +299,7 @@ import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MRS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Manager2_5GUI;
+import vrimplantacao2_5.gui.sistema.Mbd2_5GUI;
 import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
@@ -319,6 +322,7 @@ import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sygma2_5GUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
+import vrimplantacao2_5.gui.sistema.Target_G32_5GUI;
 import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
@@ -422,7 +426,12 @@ public enum ESistema {
     AVANCE(15, "AVANCE", new AvanceDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Avance2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     AVISTARE(16, "AVISTARE", new AvistareDAO()) {
@@ -2154,6 +2163,18 @@ public enum ESistema {
             }
             return null;
         }
+     },   
+    MBD(248, "MBD", new MbdDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Mbd2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
     },
     FENIXME(249, "FENIXME", new FenixMEDAO()) {
         @Override
@@ -2166,7 +2187,19 @@ public enum ESistema {
             }
             return null;
         }
-    };
+    },
+     TARGET_G3(250, "TARGET-G3", new Target_G3DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Target_G32_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     };
 
     private int id;
     private String nome;

@@ -326,6 +326,7 @@ import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
+import vrimplantacao2_5.nutricional.GUI.NutricionalArqGUI;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2_5.relatorios.relatoriosDAO.ExecutaSpedDAO;
 
@@ -957,6 +958,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
         mnuRelatorios = new javax.swing.JMenuItem();
         jMenuItem17 = new javax.swing.JMenuItem();
+        jMenuItem18 = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -3633,6 +3635,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFerramentas.add(jMenuItem17);
 
+        jMenuItem18.setText("Nutricional Arquivo");
+        jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem18ActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(jMenuItem18);
+
         mnuMenu.add(mnuFerramentas);
 
         mnuPlanilha.setText("Planilha");
@@ -5606,6 +5616,15 @@ public final class MenuGUI extends VRMdiFrame {
         SambaNetGUI.exibir(this);
     }//GEN-LAST:event_mnuSambanetActionPerformed
 
+    private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
+        try {
+            new NutricionalArqGUI().setVisible(true);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_jMenuItem18ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5620,6 +5639,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem17;
+    private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem23;

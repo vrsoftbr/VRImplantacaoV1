@@ -111,6 +111,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_FACIL(239, "FACIL", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_GEP(246, "GEP", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_FENIXME(249, "FENIXME", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
+    FIREBIRD_MBD(248, "MBD", 5, "FIREBIRD", "C:\\MBD\\DB\\ARCOIRIS.FDB", "sysdba", "sysdbambd", 3050),
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "", 9088),
     MYSQL_AVANCE(15, "AVANCE", 8, "MYSQL", "", "root", "infor", 3006),
     MYSQL_CLICK(29, "CLICK", 8, "MYSQL", "", "", "", 3006),
@@ -249,7 +250,8 @@ public enum ESistemaBancoDados {
     SQLSERVER_CMM(216, "CMM", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_ETRADE(220, "ETRADE", 13, "SQLSERVER", "ETrade", "dba", "master1", 1433),
     SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "", "", 1433),
-    SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433);
+    SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433),
+    SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433);
 
     private int idSistema;
     private String nomeSistema;
