@@ -255,7 +255,8 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + " p.id,\n"
-                    + " p.codigo_barras ean,\n"
+//                  + " p.codigo_barras ean,\n"
+                    + " case when p.pode_balanca = 'S' then p.codigo else p.codigo_barras end ean,\n"
                     + " p.nome descricaocompleta,\n"
                     + " p.id_categoria mercid1,\n"
                     + " p.id_subcategoria mercid2,\n"
@@ -295,6 +296,31 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
+                    
+                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+
+                        String balanca = (rs.getString("ebalanca"));
+                        if ("S".equals(balanca)) {
+                            imp.seteBalanca(true);
+                        } else {
+                            imp.seteBalanca(false);
+                        }
+
+                        imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
+                        imp.setValidade(rs.getInt("qtd_diasvalidade"));
+                        imp.setQtdEmbalagem(rs.getInt("qtd_embalagem"));
+                    }
+                    
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -333,29 +359,6 @@ public class LCSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
 
-                    int codigoProduto = Utils.stringToInt(rs.getString("id"), -2);
-                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
-
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-
-                        String balanca = (rs.getString("ebalanca"));
-                        if ("S".equals(balanca)) {
-                            imp.seteBalanca(true);
-                        } else {
-                            imp.seteBalanca(false);
-                        }
-
-                        imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                        imp.setValidade(rs.getInt("qtd_diasvalidade"));
-                        imp.setQtdEmbalagem(rs.getInt("qtd_embalagem"));
-                    }
                     result.add(imp);
                 }
             }
