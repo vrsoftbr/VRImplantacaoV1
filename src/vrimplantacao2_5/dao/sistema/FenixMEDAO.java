@@ -24,6 +24,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -157,6 +158,45 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "WITH familia AS (\n"
+                    + "	SELECT DISTINCT \n"
+                    + "	f.CODIGOREFERENCIA id_familia\n"
+                    + "FROM\n"
+                    + "	PRODUTO f\n"
+                    + "WHERE\n"
+                    + "	f.CODIGOREFERENCIA IS NOT NULL\n"
+                    + "	AND f.CODIGOREFERENCIA != 0)\n"
+                    + "SELECT DISTINCT \n"
+                    + "	f.CODIGOREFERENCIA id_familia,\n"
+                    + "	f.DESCRICAOREDUZIDA familia\n"
+                    + "FROM\n"
+                    + "	PRODUTO f\n"
+                    + "	JOIN familia ON id_familia = f.CODIGOPRODUTO \n"
+                    + "WHERE\n"
+                    + "	f.CODIGOREFERENCIA IS NOT NULL\n"
+                    + "	AND f.CODIGOREFERENCIA != 0\n"
+                    + " ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setImportId(rs.getString("id_familia"));
+                    imp.setDescricao(rs.getString("familia"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -247,6 +287,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	e.PRECOVENDA1 precovenda,\n"
                     + "	e.CUSTO precocusto,\n"
                     + "	m.PORCENTPRECO1 margem,\n"
+                    + " p.CODIGOREFERENCIA id_familia,\n"
                     + "	m1.CODIGODEPARTAMENTO merc1,\n"
                     + "	m1.DESCRICAO desc_merc1,\n"
                     + "	m2.CODIGOSECAO merc2,\n"
@@ -298,6 +339,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(rst.getDouble("margem"));
 
+                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
@@ -307,7 +349,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
@@ -403,7 +445,6 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	PESSOA f\n"
                     + "WHERE\n"
                     + "	PESSOAFORNECEDOR = 'S'\n"
-                    + "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -501,7 +542,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	JOIN PESSOA f ON f.CNPJCPF = cp.CNPJCPF\n"
                     + "WHERE\n"
                     + "	cp.CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
-                    + "	AND VALORBAIXA IS NULL"
+                    + "	AND DATABAIXA IS NULL"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -550,7 +591,6 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	PESSOA c\n"
                     + "WHERE\n"
                     + "	PESSOACLIENTE = 'S'\n"
-                    + "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
