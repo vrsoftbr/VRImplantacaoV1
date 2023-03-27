@@ -329,12 +329,6 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tp.dt_inc data_cadastro,\n"
                     + "	tp.vl_peso_liquido pesoliquido,\n"
                     + "	tp.vl_peso_bruto pesobruto,\n"
-                    + "	(select \n"
-                    + "		f.nr_ncm\n"
-                    + "	from\n"
-                    + "		produto.tb_ncm_figura_vigencia_federal f\n"
-                    + "	where \n"
-                    + "		f.cd_ncm_figura_mva = tp.cd_ncm_figura_mva limit 1) as ncm,\n"
                     + "		(select \n"
                     + "		f.nr_cest\n"
                     + "	from\n"
@@ -345,13 +339,18 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tp_unidade_medida  tipovolume,\n"
                     + "	qt_unidade_medida  volume,\n"
                     + "	case \n"
-                    + "	when tp.tp_venda = 'B' then 1 else 0 end is_balanca \n"
+                    + "	when tp.tp_venda = 'B' then 1 else 0 end is_balanca ,\n"
+                    + "	cst.nr_ncm as ncm,\n"
+                    + "	cst.nr_cst_pis_cofins_entrada as piscof_debito,\n"
+                    + "	cst.nr_cst_pis_cofins_saida as piscof_credito,\n"
+                    + "	cst.nr_natureza_receita_pis_cofins as natureza_receita\n"
                     + "from\n"
                     + "	produto.tb_produto tp\n"
                     + "left join produto.tb_produto_codbarra cd on cd.cd_produto = tp.cd_produto and cd.is_padrao = 'S'\n"
                     + "left join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja =  1\n"
                     + "left join saldo.vw_saldo_loja est on est.nr_produto = tp.nr_produto and nr_loja = 1\n"
-                    + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and pb.cd_loja = " + getLojaOrigem()
+                    + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and pb.cd_loja = 1\n"
+                    + "join  produto.vw_produto_vigencia_loja_federal_padrao cst on cst.nr_produto = tp.nr_produto and cst.cd_loja = " + getLojaOrigem()
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -415,8 +414,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
-                    //          imp.setPiscofinsCstCredito(rs.getString("piscofins"));
-                    //          imp.setPiscofinsCstDebito(rs.getString("piscofins"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscof_credito"));
+                    imp.setPiscofinsCstDebito(rs.getString("piscof_debito"));
                     result.add(imp);
                 }
             }
@@ -1078,7 +1077,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.cd_log_venda as id_venda,\n"
                     + "	v.nr_coo as numerocupom,\n"
                     + "	v.cd_caixa as ecf,\n"
-                    + "	v.dt_cupom as data_cupom,\n"
+                    + "	v.dt_cupom as data,\n"
                     + "	v.hr_cupom as hora,\n"
                     + "	case when tp_status = 'C' then 1 else 0 end cancelado\n"
                     + "from\n"
@@ -1127,7 +1126,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setSequencia(rst.getInt("seq"));
                         next.setProduto(rst.getString("produto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setCodigoBarras(rst.getString("barra"));
+                        next.setCodigoBarras(rst.getString("ean"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
@@ -1151,7 +1150,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	i.nr_item_log_venda as seq,\n"
                     + "	i.cd_produto as produto,\n"
                     + "	case when preco.tp_unidade_medida = 'GR' then 'KG' else 'UN' end unidade,\n"
-                    + "	i.cd_barra,\n"
+                    + "	i.cd_barra ean,\n"
                     + "	i.nm_reduzido as descricao,\n"
                     + "	i.vl_qtd as quantidade,\n"
                     + "	i.vl_unitario as valor,\n"
@@ -1163,7 +1162,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + " JOIN logs.tb_log_venda_item i ON i.cd_log_venda::integer = v.cd_log_venda::integer\n"
                     + " left join  precos.tb_preco preco on preco.cd_produto = i.cd_produto and preco.nr_loja = " + idLojaCliente + "\n"
                     + " where cd_loja  = " + idLojaCliente + "  \n"
-                    + " and v.dt_cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" +  VendaIterator.FORMAT.format(dataTermino)+ "' \n"
+                    + " and v.dt_cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
                     + " ORDER BY 1,3;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
