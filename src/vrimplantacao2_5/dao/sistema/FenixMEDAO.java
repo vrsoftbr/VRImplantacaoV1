@@ -20,10 +20,14 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -101,6 +105,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.TIPO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
@@ -117,7 +122,9 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO
         ));
     }
 
@@ -282,6 +289,9 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	DESCRICAOCOMPLETA desc_completa,\n"
                     + "	DESCRICAOREDUZIDA desc_reduzida,\n"
                     + "	UNIDADEVENDA tipo_embalagem,\n"
+                    + " p.UNIDADECOMPRA emb_cotacao,\n"
+                    + "	p.QTDUNIDADE qtde_cotacao,\n"
+                    + "	p.DIASVALIDADE validade,\n"
                     + "	p.DATAINCLUSAO data_cadastro,\n"
                     + "	p.DATAALTERACAO data_alteracao,\n"
                     + "	e.PRECOVENDA1 precovenda,\n"
@@ -327,12 +337,15 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("ean"));
 
-                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
-                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("desc_completa")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("desc_reduzida")));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("emb_cotacao"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtde_cotacao"));
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setValidade(rst.getInt("validade"));
 
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
@@ -419,28 +432,35 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CASE WHEN codigo is null then CNPJCPF else codigo end id,\n"
+                    + "	CASE WHEN codigo IS NULL THEN CNPJCPF ELSE codigo END id,\n"
                     + "	CNPJCPF,\n"
                     + "	PESSOAINSCRICAO ie_rg,\n"
                     + "	PESSOADESCRICAO razao,\n"
                     + "	PESSOAFANTASIA fantasia,\n"
                     + "	PESSOACADASTRO data_cadastro,\n"
+                    + " CASE TIPOFORNECEDOR\n"
+                    + "     WHEN 'D' THEN 1\n"
+                    + "     WHEN 'I' THEN 2\n"
+                    + "     WHEN 'O' THEN 3\n"
+                    + "     WHEN 'P' THEN 5\n"
+                    + "     ELSE 0\n"
+                    + "	END tipo_fornecedor,\n"
                     + "	ENDERECORUA endereco,\n"
                     + "	ENDERECONUMERO numero,\n"
                     + "	ENDERECOBAIRRO bairro,\n"
-                    + "	ENTREGACIDADE cidade,\n"
+                    + "	ENDERECOCIDADE cidade,\n"
                     + "	ENDERECOESTADO uf,\n"
                     + "	ENDERECOCEP cep,\n"
                     + "	CASE WHEN ATIVO = 'S' THEN 1 ELSE 0 END ativo,\n"
+                    + "	TELCOMERCIAL1 tel_principal,\n"
                     + "	PESSOAREPRESENTANTE contato1,\n"
-                    + "	TELCOMERCIAL1 fone1,\n"
+                    + "	TELCOMERCIAL2 fone1,\n"
                     + "	TELCELULAR celular1,\n"
                     + "	EMAILCOMERCIAL email1,\n"
-                    + "	PESSOAREPRESENTANTE contato2,\n"
-                    + "	TELCOMERCIAL2 fone2,\n"
+                    + "	'FAX' contato2,\n"
                     + "	EMAILPESSOAL email2,\n"
-                    + "	TELFAX fax,\n"
-                    + " PESSOAOBSERVACAO obs\n"
+                    + "	TELFAX fax2,\n"
+                    + "	PESSOAOBSERVACAO obs\n"
                     + "FROM\n"
                     + "	PESSOA f\n"
                     + "WHERE\n"
@@ -460,6 +480,26 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
 
+                    imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("tipo_fornecedor")));
+                    
+                    /*switch (rs.getInt("tipo_fornecedor")) {
+                        case 1:
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            break;
+                        case 2:
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            break;
+                        case 3:
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            break;
+                        case 5:
+                            imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
+                            break;
+                        default:
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            break;
+                    }*/
+
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
@@ -468,6 +508,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rs.getString("cep"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setObservacao(rs.getString("obs"));
+                    imp.setTel_principal(rs.getString("tel_principal"));
 
                     if ((rs.getString("contato1") != null)
                             && (!rs.getString("contato1").trim().isEmpty())) {
@@ -484,7 +525,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rs.getString("contato2").trim().isEmpty())) {
                         imp.addContato(
                                 rs.getString("contato2"),
-                                rs.getString("fone2"),
+                                rs.getString("fax2"),
                                 null,
                                 TipoContato.COMERCIAL,
                                 rs.getString("email2")
@@ -504,7 +545,15 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	CASE WHEN f.codigo is null then f.CNPJCPF else f.codigo end id_fornecedor,\n"
+                    + "	pf.CODIGOPRODUTO id_produto,\n"
+                    + "	CODIGOFORNECEDOR cod_externo,\n"
+                    + "	p.QTDUNIDADE qtdembalagem\n"
+                    + "FROM\n"
+                    + "	FORNECIMENTO pf\n"
+                    + "	JOIN PESSOA f ON f.CNPJCPF = pf.CNPJCPF AND f.PESSOAFORNECEDOR = 'S'\n"
+                    + "	JOIN produto p ON p.CODIGOPRODUTO = pf.CODIGOPRODUTO"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -536,6 +585,8 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cp.DATAINCLUSAO entrada,\n"
                     + "	VENCIMENTO,\n"
                     + "	VALORTITULO valor,\n"
+                    + " DESCONTODE desconto,\n"
+                    + " CASE WHEN DESCONTODE > 0 THEN VALORTITULO - DESCONTODE ELSE VALORTITULO END valor_com_desc,\n"
                     + "	OBSERVACOES observacao\n"
                     + "FROM\n"
                     + "	DESPESAS cp\n"
@@ -552,7 +603,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor_com_desc"), rst.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -626,38 +677,121 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODIGOFILIAL id,\n"
+                    + "	CNPJ,\n"
+                    + "	INSCRICAO ie,\n"
+                    + "	NOME razao,\n"
+                    + "	ENDERECO,\n"
+                    + "	\"NUMERO\",\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + "	ESTADO uf,\n"
+                    + "	CEP,\n"
+                    + "	TELEFONE\n"
+                    + "FROM\n"
+                    + "	FILIAL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
 
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIGOTITULO id,\n"
-                    + "	CASE WHEN p.CODIGO IS NULL THEN p.CNPJCPF ELSE p.CODIGO END id_cliente,\n"
-                    + " p.CNPJCPF,\n"
-                    + "	DOCUMENTO,\n"
-                    + "	DATAEMISSAO emissao,\n"
-                    + "	VENCIMENTO,\n"
-                    + "	VALORTITULO valor,\n"
-                    + "	HISTORICO obs\n"
+                    + "	CNPJCPF id_cliente,\n"
+                    + "	FISICOJURIDICO,\n"
+                    + "	PESSOADESCRICAO nome,\n"
+                    + "	CODIGOFILIAL id_empresa,\n"
+                    + "	CNPJCPF cpf_cnpj,\n"
+                    + "	COALESCE (CLIENTELIMITE,0) limite,\n"
+                    + "	CASE WHEN CODIGOSITUACAO = 0 THEN 1 ELSE 0 END status,\n"
+                    + "	PESSOAOBSERVACAO observacao\n"
                     + "FROM\n"
-                    + "	RECEITAS cr\n"
-                    + "	JOIN PESSOA p ON p.CNPJCPF = cr.CNPJCPF\n"
+                    + "	PESSOA p\n"
                     + "WHERE\n"
-                    + "	cr.CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
-                    + "	AND VALORBAIXA IS NULL"
+                    + "	PESSOACLIENTE = 'S'\n"
+                    + "	AND FISICOJURIDICO = 'F'\n"
+                    + "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "ORDER BY\n"
+                    + "	PESSOADESCRICAO"
             )) {
                 while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rs.getString("id_cliente"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setIdEmpresa(rs.getString("id_empresa"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setConvenioLimite(rs.getDouble("limite"));
+                    imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
+                    imp.setSituacaoCadastro(rs.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setObservacao(rs.getString("observacao"));
 
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroCupom(Utils.formataNumero(rs.getString("documento")));
-                    imp.setIdCliente(rs.getString("id_cliente"));
-                    imp.setCnpjCliente(rs.getString("cnpjcpf"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("obs"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODIGOTITULO id,\n"
+                    + "	ct.CNPJCPF id_conveniado,\n"
+                    + "	DOCUMENTO,\n"
+                    + "	ct.DATAINCLUSAO emissao,\n"
+                    + "	VALORTITULO valor,\n"
+                    + "	OBSERVACOES observacao\n"
+                    + "FROM\n"
+                    + "	RECEITAS ct\n"
+                    + "JOIN PESSOA p ON ct.CNPJCPF = p.CNPJCPF AND ct.CODIGOFILIAL = p.CODIGOFILIAL\n"
+                    + "WHERE\n"
+                    + "	ct.CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "	AND p.PESSOACLIENTE = 'S'\n"
+                    + "	AND FISICOJURIDICO = 'F'\n"
+                    + "	AND ct.CODIGOTIPOOPERACAO IS NULL\n"
+                    + "	AND DATABAIXA IS NULL\n"
+                    + "ORDER BY 2"
+            )) {
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("id_conveniado"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setDataHora(rst.getTimestamp("emissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
 
                     result.add(imp);
                 }

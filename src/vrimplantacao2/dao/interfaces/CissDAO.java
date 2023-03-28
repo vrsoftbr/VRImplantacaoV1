@@ -413,9 +413,9 @@ public class CissDAO extends InterfaceDAO {
                         case "A":
                             imp.setTipoFornecedor(TipoFornecedor.ATACADO);
                             break;
-                        case "S":
+                        /*case "S":
                             imp.setTipoFornecedor(TipoFornecedor.SEMTIPO);
-                            break;
+                            break;*/
                         case "F":
                             imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             break;
