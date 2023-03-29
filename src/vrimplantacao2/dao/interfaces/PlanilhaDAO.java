@@ -1237,7 +1237,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date getData(String format) {
         if (format != null && !"".equals(format.trim())) {
             try {
-                return format == null ? null : formatData.parse(format);
+                //format.replace("/", "-");
+                SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
+               return converteData.parse(converteData.format(ajusteData.parse(format)));//.replace("/", "-"));
+               
             } catch (ParseException ex) {
                 Exceptions.printStackTrace(ex);
             }

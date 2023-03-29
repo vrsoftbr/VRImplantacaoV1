@@ -341,8 +341,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case \n"
                     + "	when tp.tp_venda = 'B' then 1 else 0 end is_balanca ,\n"
                     + "	cst.nr_ncm as ncm,\n"
-                    + "	cst.nr_cst_pis_cofins_entrada as piscof_debito,\n"
-                    + "	cst.nr_cst_pis_cofins_saida as piscof_credito,\n"
+                    + "	cst.nr_cst_pis_cofins_entrada as piscof_credito,\n"
+                    + "	cst.nr_cst_pis_cofins_saida as piscof_debito,\n"
                     + "	cst.nr_natureza_receita_pis_cofins as natureza_receita\n"
                     + "from\n"
                     + "	produto.tb_produto tp\n"
@@ -413,9 +413,11 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(idIcms);
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
-
-                    imp.setPiscofinsCstCredito(rs.getString("piscof_credito"));
+                    
                     imp.setPiscofinsCstDebito(rs.getString("piscof_debito"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscof_credito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("natureza_receita"));
+
                     result.add(imp);
                 }
             }
