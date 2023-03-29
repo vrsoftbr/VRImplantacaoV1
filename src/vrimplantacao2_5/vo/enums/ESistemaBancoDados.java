@@ -178,7 +178,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_JRF(90, "JRF", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_LOGTEC(98, "LOGTEC", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_LYNCIS(101, "LYNCIS", 11, "POSTGRESQL", "", "", "", 5432),
-    POSTGRESQL_MARKET(103, "MARKET", 11, "POSTGRESQL", "", "", "", 5432),
+    POSTGRESQL_MARKET(103, "MARKET", 11, "POSTGRESQL", "viza", "postgres", "hm1722+#()", 5432),
     POSTGRESQL_MRS(109, "MRS", 11, "POSTGRESQL", "", "", "", 5432),
     POSTGRESQL_NCA(112, "NCA", 11, "POSTGRESQL", "", "postgres", "post", 5432),
     POSTGRESQL_PRIME(243, "PRIME", 11, "POSTGRESQL", "", "postgres", "post", 5432),

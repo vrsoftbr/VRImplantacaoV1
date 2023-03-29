@@ -300,6 +300,7 @@ import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
 import vrimplantacao2_5.gui.sistema.MRS2_5GUI;
 import vrimplantacao2_5.gui.sistema.Manager2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mbd2_5GUI;
+import vrimplantacao2_5.gui.sistema.Market2_5GUI;
 import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
@@ -1008,8 +1009,14 @@ public enum ESistema {
     },
     MARKET(103, "MARKET", new MarketDAO()) {
         @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Market2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     MASTER(104, "MASTER", new MasterDAO()) {

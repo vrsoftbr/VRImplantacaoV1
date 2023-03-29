@@ -206,7 +206,8 @@ public enum EScriptLojaOrigemSistema {
     SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004"),
     MBD(248,5,"SELECT COUNT(*) id, RAZAO_SOCIAL descricao FROM FIRMA f GROUP BY RAZAO_SOCIAL"),
     FENIXME(249, 5, "SELECT CODIGOFILIAL id, CODIGOFILIAL|| ''-'' ||NOME AS descricao FROM FILIAL ORDER BY 1"),
-    TARGET_G3(250, 13, "select cd_emp id, raz_soc descricao from empresa");
+    TARGET_G3(250, 13, "select cd_emp id, raz_soc descricao from empresa"),
+    MARKET(103,11,"select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1");
 
     private int idSistema;
     private int idBancoDados;
