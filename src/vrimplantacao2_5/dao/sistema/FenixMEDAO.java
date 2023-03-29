@@ -20,11 +20,13 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -107,7 +109,8 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.TIPO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.OUTRAS_RECEITAS
         ));
     }
 
@@ -119,12 +122,14 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_CONVENIADO,
-                OpcaoCliente.CONVENIO_TRANSACAO
+                OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.OUTRAS_RECEITAS
         ));
     }
 
@@ -223,7 +228,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	JOIN SECAO m2 ON m1.CODIGODEPARTAMENTO = m2.CODIGODEPARTAMENTO\n"
                     + "	JOIN GRUPO m3 ON m3.CODIGOGRUPO = m2.CODIGOSECAO\n"
                     + "	JOIN SUBGRUPO m4 ON m4.CODIGOGRUPO = m3.CODIGOGRUPO\n"
-                    + "ORDER BY 1,3,5,7	"
+                    + "ORDER BY 1,3,5,7"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -294,6 +299,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DIASVALIDADE validade,\n"
                     + "	p.DATAINCLUSAO data_cadastro,\n"
                     + "	p.DATAALTERACAO data_alteracao,\n"
+                  //+ " CASE WHEN e.EMLINHA = 'S' THEN 1 ELSE 0 END ativo,\n"
                     + "	e.PRECOVENDA1 precovenda,\n"
                     + "	e.CUSTO precocusto,\n"
                     + "	m.PORCENTPRECO1 margem,\n"
@@ -481,7 +487,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
 
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("tipo_fornecedor")));
-                    
+
                     /*switch (rs.getInt("tipo_fornecedor")) {
                         case 1:
                             imp.setTipoFornecedor(TipoFornecedor.ATACADO);
@@ -499,7 +505,6 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             break;
                     }*/
-
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
@@ -548,7 +553,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "	CASE WHEN f.codigo is null then f.CNPJCPF else f.codigo end id_fornecedor,\n"
                     + "	pf.CODIGOPRODUTO id_produto,\n"
-                    + "	CODIGOFORNECEDOR cod_externo,\n"
+                    + " COALESCE (CODIGOFORNECEDOR, 'BENGALA') cod_externo,\n"
                     + "	p.QTDUNIDADE qtdembalagem\n"
                     + "FROM\n"
                     + "	FORNECIMENTO pf\n"
@@ -610,6 +615,45 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    // Devoluçao de Fornecedores
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODIGOTITULO id,\n"
+                    + "	CASE WHEN f.codigo IS NULL THEN f.CNPJCPF ELSE codigo END id_fornecedor,\n"
+                    + "	DATAEMISSAO emissao,\n"
+                    + "	VENCIMENTO,\n"
+                    + "	VALORTITULO valor,\n"
+                    + "	HISTORICO observacao\n"
+                    + "FROM\n"
+                    + "	RECEITAS dev\n"
+                    + "	JOIN PESSOA f ON f.CNPJCPF = dev.CNPJCPF AND f.PESSOAFORNECEDOR = 'S'\n"
+                    + "WHERE\n"
+                    + "	dev.CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "	AND dev.CODIGOTIPOOPERACAO = '000048'\n"
+                    + "	AND DATABAIXA IS NULL\n"
+                    + "ORDER BY 1,3"
+            )) {
+                while (rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -865,21 +909,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "SELECT\n"
-                    + "	CODIGO_VENDA id_venda,\n"
-                    + "	COO_ECF_NF numerocupom,\n"
-                    + "	SERIE_ECF ecf,\n"
-                    + "	CAST(DATA_VENDA AS DATE) data,\n"
-                    + "	SUBSTRING(DATA_VENDA FROM 12 FOR 8) hora,\n"
-                    + "	VALOR_LIQUIDO_VENDA total,\n"
-                    + "	CASE WHEN VENDAATIVA = 'N' THEN 1 ELSE 0 END cancelado\n"
-                    + "FROM\n"
-                    + "	TB_VENDA v\n"
-                    + "WHERE\n"
-                    + "	NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + " AND COD_TIPOMOVIMENTO in (5,-5)\n"
-                    + " AND VENDAATIVA = 'S'\n"
-                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
+                    = "";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -938,28 +968,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n"
-                    + "	COD_VENDA id_venda,\n"
-                    + "	CODIGO_VENDAITEM id_item,\n"
-                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
-                    + "	COD_PRODUTO produto,\n"
-                    + "	p.UNIDADE_REFERENCIA unidade,\n"
-                    + "	COD_BARRA codigobarras,\n"
-                    + "	p.DESCRICAO_PDV descricao,\n"
-                    + "	QUANTIDADE,\n"
-                    + "	VALOR_UNITARIO precovenda,\n"
-                    + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
-                    + "	CASE\n"
-                    + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
-                    + "	  END CANCELADO\n"
-                    + "FROM\n"
-                    + "	TB_VENDA_ITEM vi\n"
-                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
-                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
-                    + "WHERE\n"
-                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "	ORDER BY 1,3";
+                    = "";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
