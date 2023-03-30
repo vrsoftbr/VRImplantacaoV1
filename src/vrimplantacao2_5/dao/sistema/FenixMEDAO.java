@@ -299,7 +299,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DIASVALIDADE validade,\n"
                     + "	p.DATAINCLUSAO data_cadastro,\n"
                     + "	p.DATAALTERACAO data_alteracao,\n"
-                  //+ " CASE WHEN e.EMLINHA = 'S' THEN 1 ELSE 0 END ativo,\n"
+                    + " CASE WHEN e.EMLINHA = 'S' THEN 1 ELSE 0 END ativo,\n"
                     + "	e.PRECOVENDA1 precovenda,\n"
                     + "	e.CUSTO precocusto,\n"
                     + "	m.PORCENTPRECO1 margem,\n"
@@ -782,7 +782,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	PESSOACLIENTE = 'S'\n"
                     + "	AND FISICOJURIDICO = 'F'\n"
-                    + "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                  //+ "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY\n"
                     + "	PESSOADESCRICAO"
             )) {
@@ -895,7 +895,8 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("total"));
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -909,7 +910,21 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "";
+                    = "SELECT\n"
+                    + "	NUMEROCUPOMFISCAL||CAIXA||DATACUPOM id_venda,\n"
+                    + "	NUMEROCUPOMFISCAL numerocupom,\n"
+                    + "	CAIXA AS ecf,\n"
+                    + "	DATACUPOM data,\n"
+                    + "	hora AS hora,\n"
+                    + "	CASE WHEN CUPOMCANCELADO = 'S' THEN 1 ELSE 0 END cancelado, \n"
+                    + "	VALORTOTALCUPOM valor\n"
+                    + "FROM\n"
+                    + "	ECF_MOVIMENTO m\n"
+                    + "WHERE\n"
+                    + "	LOJA = '1'\n"   // <--  ALTERAR A LOJA
+                    + "	AND DATACUPOM between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "	AND TIPOREGISTRO = 'PG'\n"
+                    + "GROUP BY 1,2,3,4,5,6,7";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -956,6 +971,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
@@ -968,7 +984,26 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = "SELECT\n"
+                    + "	NUMEROCUPOMFISCAL||CAIXA||DATACUPOM id_venda,\n"
+                    + "	CODIGO id_item,\n"
+                    + "	SEQUENCIA nroitem,\n"
+                    + "	CODIGOPRODUTO produto,\n"
+                    + "	UNIDADEVENDA unidade,\n"
+                    + "	CODIGOBARRAS,\n"
+                    + "	DESCRICAOPRODUTO descricao,\n"
+                    + "	QUANTIDADE,\n"
+                    + "	VALORUNITARIO precovenda,\n"
+                    + "	VALORDESCONTO desconto,\n"
+                    + "	VALORTOTALITEM total,\n"
+                    + "	CASE WHEN ITEMCANCELADO = 'S' THEN 1 ELSE 0 END cancelado\n"
+                    + "FROM\n"
+                    + "	ECF_MOVIMENTO m\n"
+                    + "WHERE\n"
+                    + "	LOJA = '1'\n"
+                    + "	AND TIPOREGISTRO = 'VI'\n"
+                    + "	AND DATACUPOM BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "ORDER BY 1,2,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
