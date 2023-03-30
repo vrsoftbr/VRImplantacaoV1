@@ -36,6 +36,8 @@ public class ConversorDAO {
     ConexaoPostgres con = new ConexaoPostgres();
     Properties prop = App.properties();
     private String ip = prop.get("database.ip");
+    private int porta = Integer.parseInt(prop.get("database.porta"));
+    private String regexp = "([-]|[\\]|[/]|[.]|[,]|[ ])";
 
     public ConversorDAO() {
 
@@ -94,14 +96,14 @@ public class ConversorDAO {
             }
         };
         String campos = "(\n";
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         try (Statement stm = con.getConexao().createStatement()) {
             String sql = "CREATE TABLE IF NOT EXISTS " + getNomeDaTabela() + "\n";
             int contador = 0;
             for (String dado : dados) {
                 if (contador < dados.size()) {
                     dado = dados.get(contador++);
-                   campos += dado.trim().replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
+                   campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
                 }
             }
             System.out.println(sql + campos.substring(0, campos.length() - 2) + "\n);");
@@ -115,7 +117,7 @@ public class ConversorDAO {
             e.printStackTrace();
             throw e;
         }
-        con.close();
+        fecharConexao();
     }
 
     public ArrayList<String> captaCabecalhoTabela() throws Exception {
@@ -137,7 +139,7 @@ public class ConversorDAO {
         };
         SQLBuilder sql = new SQLBuilder();
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         Statement stm = con.getConexao().createStatement();
         ArrayList<String> cabecalho = new ArrayList<>();
         sql.setTableName(getNomeDaTabela());
@@ -147,7 +149,7 @@ public class ConversorDAO {
 
         for (LinhaArquivo linha : arq) {
             for (int i = 0; i < cabecalho.size(); i++) {
-                String cabecalhoBase = cabecalho.get(i).trim().replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
+                String cabecalhoBase = cabecalho.get(i).replaceAll(regexp, "").trim().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
                 sql.put(cabecalhoBase, linha.getString(cabecalho.get(i)));
             }
             try {
@@ -166,11 +168,11 @@ public class ConversorDAO {
             }
         }
 
-        con.close();
+        fecharConexao();
     }
 
     public void criarControleDeDadosConvertidos() throws Exception {
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         try (Statement stm = con.getConexao().createStatement();) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS conversao");
             String sql = "CREATE TABLE IF NOT EXISTS conversao.dados(\n"
@@ -179,18 +181,18 @@ public class ConversorDAO {
                     + "    populada varchar\n"
                     + ");";
             stm.execute(sql);
-            con.close();
+             fecharConexao();
         }
     }
 
     public void insereDeDadosConvertidos(String banco, String tabela) throws Exception {
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         try (Statement stm = con.getConexao().createStatement();) {
             String sql = "insert into	conversao.dados\n"
                     + "(banco,	nome_tabela, populada)\n"
                     + "values ('" + banco + "', '" + tabela + "', 'não')";
             stm.execute(sql);
-            con.close();
+             fecharConexao();
         } catch (PSQLException e) {
             System.out.println("erro em insereDeDadosConvertidos = " + e.getMessage());
             e.printStackTrace();
@@ -198,7 +200,7 @@ public class ConversorDAO {
     }
 
     public void atualizaDeDadosConvertidos(String banco, String tabela) throws Exception {
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         try (Statement stm = con.getConexao().createStatement();) {
             String sql = "UPDATE conversao.dados SET \n"
                     + " populada = 'sim' \n"
@@ -206,7 +208,7 @@ public class ConversorDAO {
                     + "banco = '" + banco + "'\n"
                     + "AND nome_tabela = '" + tabela + "'";
             stm.execute(sql);
-            con.close();
+            fecharConexao();
         } catch (PSQLException e) {
             System.out.println("erro em insereDeDadosConvertidos = " + e.getMessage());
             e.printStackTrace();
@@ -214,7 +216,7 @@ public class ConversorDAO {
     }
 
     public List<ControleDadosConvertidosVO> captaDadosConvertidos(String banco, String tabela) throws Exception {
-        con.abrirConexao(ip, 8746, getNomeBanco(), "postgres", "VrPost@Server");
+        abrirConexao();
         List<ControleDadosConvertidosVO> result = new ArrayList<>();
 
         try (Statement stm = con.getConexao().createStatement()) {
@@ -245,5 +247,13 @@ public class ConversorDAO {
             if (dado.getNomeTabela() == tabela) {
             }
         };
+    }
+    
+    public void abrirConexao() throws Exception {
+        con.abrirConexao(ip, porta, getNomeBanco(), "postgres", "VrPost@Server");
+    }
+
+    public void fecharConexao() throws Exception {
+        con.close();
     }
 }
