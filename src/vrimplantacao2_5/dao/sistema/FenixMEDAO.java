@@ -226,10 +226,10 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	m4.DESCRICAO descmerc4\n"
                     + "FROM\n"
                     + "	DEPARTAMENTO m1\n"
-                    + "	JOIN SECAO m2 ON m1.CODIGODEPARTAMENTO = m2.CODIGODEPARTAMENTO\n"
-                    + "	JOIN GRUPO m3 ON m3.CODIGOGRUPO = m2.CODIGOSECAO\n"
-                    + "	JOIN SUBGRUPO m4 ON m4.CODIGOGRUPO = m3.CODIGOGRUPO\n"
-                    + "ORDER BY 1,3,5,7"
+                    + "	JOIN SECAO m2 ON m2.CODIGODEPARTAMENTO = m1.CODIGODEPARTAMENTO\n"
+                    + "	JOIN GRUPO m3 ON m3.CODIGOSECAO = m2.CODIGOSECAO \n"
+                    + "	JOIN SUBGRUPO m4 ON m4.CODIGOGRUPO = m3.CODIGOGRUPO \n"
+                    + " ORDER BY 1,3,5,7"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -684,7 +684,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ENDERECORUA endereco,\n"
                     + "	ENDERECONUMERO numero,\n"
                     + "	ENDERECOBAIRRO bairro,\n"
-                    + "	ENTREGACIDADE cidade,\n"
+                    + "	ENDERECOCIDADE cidade,\n"
                     + "	ENDERECOESTADO uf,\n"
                     + "	ENDERECOCEP cep,\n"
                     + "	EMAILPESSOAL email,\n"
@@ -790,7 +790,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	PESSOACLIENTE = 'S'\n"
                     + "	AND FISICOJURIDICO = 'F'\n"
-                  //+ "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                    //+ "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY\n"
                     + "	PESSOADESCRICAO"
             )) {
