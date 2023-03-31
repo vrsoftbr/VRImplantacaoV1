@@ -37,7 +37,7 @@ public class ConversorDAO {
     Properties prop = App.properties();
     private String ip = prop.get("database.ip");
     private int porta = Integer.parseInt(prop.get("database.porta"));
-    private String regexp = "([-]|[\\]|[/]|[.]|[,]|[ ])";
+    private String regexp = "([\\W])";
 
     public ConversorDAO() {
 
