@@ -240,14 +240,6 @@ public class ConversorDAO {
         }
         return result;
     }
-
-    public void existeTabelaCriada(String banco, String tabela) throws Exception {
-        List<ControleDadosConvertidosVO> dadosCOnvertidos = captaDadosConvertidos(banco, tabela);
-        for (ControleDadosConvertidosVO dado : dadosCOnvertidos) {
-            if (dado.getNomeTabela() == tabela) {
-            }
-        };
-    }
     
     public void abrirConexao() throws Exception {
         con.abrirConexao(ip, porta, getNomeBanco(), "postgres", "VrPost@Server");

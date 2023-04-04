@@ -226,6 +226,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         btnRestaura = new javax.swing.JButton();
         rdbEditaTxtInfo = new javax.swing.JRadioButton();
+        btnZerar = new javax.swing.JButton();
         painel3EditorImportacao = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
@@ -881,6 +882,14 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             }
         });
 
+        btnZerar.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnZerar, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.btnZerar.text")); // NOI18N
+        btnZerar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnZerarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout painel2PrincipalLayout = new javax.swing.GroupLayout(painel2Principal);
         painel2Principal.setLayout(painel2PrincipalLayout);
         painel2PrincipalLayout.setHorizontalGroup(
@@ -893,7 +902,9 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painel2PrincipalLayout.createSequentialGroup()
                                 .addComponent(btnRestaura)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 180, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnZerar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                                 .addComponent(jButton5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnSalvarTabelaEditada)))
@@ -919,7 +930,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 .addGroup(painel2PrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton5)
                     .addComponent(btnSalvarTabelaEditada)
-                    .addComponent(btnRestaura))
+                    .addComponent(btnRestaura)
+                    .addComponent(btnZerar))
                 .addGap(6, 6, 6))
         );
 
@@ -1086,7 +1098,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             painelTabelaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelTabelaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1168,7 +1180,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 System.out.println(ex.getMessage() + "Erro ao passar valor na coluna8fim");
                 Exceptions.printStackTrace(ex);
             }
-            Coluna8Fim.setEnabled(false);
+            //Coluna8Fim.setEnabled(false);
             restauraCoresSpinners();
             try {
                 setItensMgv(new OperacoesArquivoMgvToledo(
@@ -1227,7 +1239,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfinutri(opcao, getInfNutri());
                 btnSalvarTabelaEditada.setEnabled(true);
-                Coluna16Fim.setEnabled(false);
+                //Coluna16Fim.setEnabled(false);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Provável erro na edição das colunas.\n\n"
                         + ex.getMessage());
@@ -1238,7 +1250,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         } else if (opcao == 3 && validaCompoTxtInfo()) {
             restauraCoresSpinners();
             try {
-                Coluna16Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
+                Coluna16Fim.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
             } catch (Exception ex) {
                 System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
                 Exceptions.printStackTrace(ex);
@@ -1264,7 +1276,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaTxtInfo(opcao, getListaTxtInfo());
                 btnSalvarTabelaEditada.setEnabled(true);
-                Coluna16Fim.setEnabled(false);
+                //Coluna16Fim.setEnabled(false);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Provável erro na edição das colunas.\n\n"
                         + ex.getMessage());
@@ -1614,6 +1626,17 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_rdbEditaTxtInfoActionPerformed
 
+    private void btnZerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZerarActionPerformed
+        int decisao = JOptionPane.showConfirmDialog(this, "Essa ação zera todos os compos, deseja mesmo prosseguir?");
+        if (decisao == 0) {
+            for (Component c : painelEditor.getComponents()) {
+                if (c instanceof JSpinner) {
+                    ((JSpinner) c).setValue(0);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnZerarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1701,6 +1724,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     private javax.swing.JButton btnPopularTxtInfoVisualizador;
     private javax.swing.JButton btnRestaura;
     private javax.swing.JButton btnSalvarTabelaEditada;
+    private javax.swing.JButton btnZerar;
     private javax.swing.JComboBox<String> comboContador;
     private javax.swing.JComboBox<String> comboLojaOrigem;
     private javax.swing.JComboBox<String> comboLojaVr;
@@ -1818,8 +1842,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     }
 
     public void bloquearEdicaoEAcao() {
-        //this.painelDeAbas.setEnabledAt(1, false);
-        //this.painelDeAbas.setEnabledAt(2, false);
+        this.painelDeAbas.setEnabledAt(1, false);
+        this.painelDeAbas.setEnabledAt(2, false);
         painel3EditorImportacao.setVisible(false);
         btnDeletarTabelasVisualizador.setEnabled(false);
         btnRestaura.setEnabled(false);
@@ -1892,10 +1916,11 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         try {
             Coluna8Fim.setValue(new OperacoesArquivoMgvToledo().getLenghtFimLinhaMgv(getArquivo()));
         } catch (Exception ex) {
+            Coluna8Fim.setValue(0);
             System.out.println(ex.getMessage() + "Erro ao passar valor na coluna8fim");
             Exceptions.printStackTrace(ex);
         }
-        Coluna8Fim.setEnabled(false);
+        //Coluna8Fim.setEnabled(false);
         Coluna9Inicio.setValue(0);
         Coluna9Fim.setValue(0);
         Coluna10Inicio.setValue(Coluna9Fim.getValue());
@@ -1966,9 +1991,10 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             Coluna16Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
         } catch (Exception ex) {
             System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
+            Coluna16Fim.setValue(0);
             Exceptions.printStackTrace(ex);
         }
-        Coluna16Fim.setEnabled(false);
+        //Coluna16Fim.setEnabled(false);
     }
 
     private boolean validaCompoMgv() {
@@ -2230,11 +2256,12 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         Coluna15Fim.setValue(834);
         Coluna16Inicio.setValue(Coluna15Fim.getValue());
         try {
-            Coluna16Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
+            Coluna16Fim.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
         } catch (Exception ex) {
+            Coluna16Fim.setValue(0);
             System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
             Exceptions.printStackTrace(ex);
         }
-        Coluna16Fim.setEnabled(false);
+        //Coluna16Fim.setEnabled(false);
     }
 }

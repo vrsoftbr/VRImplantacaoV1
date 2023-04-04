@@ -8,6 +8,7 @@ package vrimplantacao2_5.nutricional.utils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -33,6 +34,7 @@ public class GeradorTabelas {
     }
 
     public void carregarTabelaMgv(int parametro, List<ItensMgvVO> listaItensMgv) {
+        Collections.sort(listaItensMgv);
         if (parametro == 1) {
             Object[] colunasIntensMgv = {"DEPARTAMENTO", "TIPO", "COD_ITEM", "PREÇO", "VALIDADE", "DESCRIÇÃO 1 E 2", "COD_NUTRICIONAL",
                 "BALANÇA", "DEMAIS DADOS"};
@@ -53,6 +55,8 @@ public class GeradorTabelas {
             jTableLerArquivos.getColumnModel().getColumn(5).setPreferredWidth(200);
             jTableLerArquivos.getColumnModel().getColumn(6).setPreferredWidth(100);
             jTableLerArquivos.getColumnModel().getColumn(8).setPreferredWidth(450);
+            jTableLerArquivos.setSelectionForeground(Color.BLUE);
+            jTableLerArquivos.setSelectionBackground(Color.WHITE);
             for (ItensMgvVO vo : listaItensMgv) {
                 modelo.addRow(new Object[]{
                     vo.getDepartamento(), vo.getTipo(), vo.getCodigo(), vo.getPreco(), vo.getValidade(),
@@ -99,6 +103,8 @@ public class GeradorTabelas {
             jTableLerArquivos.getColumnModel().getColumn(3).setPreferredWidth(40);
             jTableLerArquivos.getColumnModel().getColumn(7).setPreferredWidth(100);
             jTableLerArquivos.getColumnModel().getColumn(11).setPreferredWidth(100);
+            jTableLerArquivos.setSelectionForeground(Color.BLUE);
+            jTableLerArquivos.setSelectionBackground(Color.WHITE);
             for (InfnutriVO vo : listaItensInfnutri) {
                 modelo.addRow(new Object[]{
                     vo.getIndicador(), vo.getNutricional(), vo.getReservado(), vo.getQuantidade(), vo.getPorcaoUnGr(), vo.getMedidaCaseiraInteira(),
@@ -146,6 +152,8 @@ public class GeradorTabelas {
             jTableLerArquivos.getColumnModel().getColumn(3).setPreferredWidth(300);
             jTableLerArquivos.getColumnModel().getColumn(4).setPreferredWidth(300);
             jTableLerArquivos.getColumnModel().getColumn(5).setPreferredWidth(300);
+            jTableLerArquivos.setSelectionForeground(Color.BLUE);
+            jTableLerArquivos.setSelectionBackground(Color.WHITE);
             for (TxtInfoVO vo : listaTxtInfo) {
                 modelo.addRow(new Object[]{
                     vo.getCodigo(), vo.getObs(), vo.getLinha1(), vo.getLinha2(), vo.getLinha3(), vo.getLinha4(), vo.getLinha5(),
@@ -191,6 +199,8 @@ public class GeradorTabelas {
             modelo.addRow(linhas);
             jTableLerArquivos.getTableHeader().setBackground(new Color(160, 10, 0));
             jTableLerArquivos.getTableHeader().setForeground(new Color(255, 165, 0));
+            jTableLerArquivos.setSelectionForeground(Color.BLUE);
+            jTableLerArquivos.setSelectionBackground(Color.WHITE);
         }
         jTableLerArquivos.getTableHeader().setOpaque(false);
         ((DefaultTableCellRenderer) jTableLerArquivos.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);

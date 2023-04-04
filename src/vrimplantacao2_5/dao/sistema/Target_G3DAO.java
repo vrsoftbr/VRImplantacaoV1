@@ -7,7 +7,6 @@ package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -20,17 +19,13 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
-import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -131,6 +126,7 @@ public class Target_G3DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.EMPRESA,
                 OpcaoCliente.SALARIO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.BLOQUEADO,
                 OpcaoCliente.OBSERVACOES2,
                 OpcaoCliente.OBSERVACOES,

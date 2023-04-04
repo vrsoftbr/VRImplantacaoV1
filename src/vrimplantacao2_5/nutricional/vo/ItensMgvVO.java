@@ -9,7 +9,8 @@ package vrimplantacao2_5.nutricional.vo;
  *
  * @author Desenvolvimento
  */
-public class ItensMgvVO {
+public class ItensMgvVO implements Comparable<ItensMgvVO> {
+
     private String departamento = "";
     private String tipo = "";
     private int codigo = 0;
@@ -92,5 +93,8 @@ public class ItensMgvVO {
         this.pesavel = pesavel;
     }
 
-    
+    @Override
+    public int compareTo(ItensMgvVO item) {
+        return this.descricao.compareTo(item.getDescricao());
+    }
 }
