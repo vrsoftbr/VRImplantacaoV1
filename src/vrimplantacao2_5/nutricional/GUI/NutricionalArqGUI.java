@@ -904,7 +904,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                                 .addComponent(btnRestaura)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnZerar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                                 .addComponent(jButton5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnSalvarTabelaEditada)))
@@ -1633,6 +1633,39 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 if (c instanceof JSpinner) {
                     ((JSpinner) c).setValue(0);
                 }
+            }
+            switch (opcao) {
+                case 1:
+                    try {
+                        Coluna8Inicio.setValue(new OperacoesArquivoMgvToledo().getLenghtFimLinhaMgv(getArquivo()));
+                        Coluna8Fim.setValue(new OperacoesArquivoMgvToledo().getLenghtFimLinhaMgv(getArquivo()));
+                        Coluna9Fim.setValue(0);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage() + "Erro ao passar valor na coluna8fim");
+                        Exceptions.printStackTrace(ex);
+                    }
+                    break;
+                case 2:
+                    try {
+                        Coluna16Inicio.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
+                        Coluna16Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
+                        Exceptions.printStackTrace(ex);
+                    }
+                    break;
+                case 3:
+                    try {
+                        Coluna16Inicio.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
+                        Coluna16Fim.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
+                        Exceptions.printStackTrace(ex);
+                    }
+                    break;
+                default:
+                    Coluna16Fim.setValue(0);
+                    break;
             }
         }
     }//GEN-LAST:event_btnZerarActionPerformed

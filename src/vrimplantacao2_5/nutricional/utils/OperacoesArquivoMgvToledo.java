@@ -69,21 +69,21 @@ public class OperacoesArquivoMgvToledo {
                 if ("0".equals(vToledo.get(i).substring(2, 3))) {
                     toledo.setDepartamento(vToledo.get(i).substring(mgvColuna1Inicio, mgvColuna1Fim));
                     toledo.setTipo(vToledo.get(i).substring(mgvColuna2Inicio, mgvColuna2Fim));
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim)));
+                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim)));
                     toledo.setPreco(vToledo.get(i).substring(mgvColuna4Inicio, mgvColuna4Fim));
-                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim)));
+                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim)));
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(mgvColuna6Inicio, mgvColuna6Fim).replace("'", "").trim()));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim)));
                     toledo.setDemaisDados(vToledo.get(i).substring(mgvColuna8Inicio, mgvColuna8Fim));
                     toledo.setPesavel("P");
                 } else {
                     toledo.setDepartamento(vToledo.get(i).substring(mgvColuna1Inicio, mgvColuna1Fim));
                     toledo.setTipo(vToledo.get(i).substring(mgvColuna2Inicio, mgvColuna2Fim));
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim)));
+                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna3Inicio, mgvColuna3Fim)));
                     toledo.setPreco(vToledo.get(i).substring(mgvColuna4Inicio, mgvColuna4Fim));
-                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim)));
+                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna5Inicio, mgvColuna5Fim)));
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(mgvColuna6Inicio, mgvColuna6Fim).replace("'", "").trim()));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim).equals("") ? "0" : vToledo.get(i).substring(mgvColuna7Inicio, mgvColuna7Fim)));
                     toledo.setDemaisDados(vToledo.get(i).substring(mgvColuna8Inicio, mgvColuna8Fim));
                     toledo.setPesavel("U");
                 }

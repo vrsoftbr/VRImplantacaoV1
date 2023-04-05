@@ -303,6 +303,30 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select p.CODPROD produtoid, p.DESCRICAO, BARRA ean, p.UNIDADE, p.QTDEMBAL from CDALTERNATIVO a\n"
+                    + "	join CDPRODUTOS p on a.CODBARRA = p.CODBARRA  "
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("produtoid"));
+                    imp.setEan(rst.getString("ean"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {

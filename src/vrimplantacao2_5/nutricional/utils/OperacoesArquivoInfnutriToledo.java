@@ -117,7 +117,7 @@ public class OperacoesArquivoInfnutriToledo {
                 if (!vToledo.get(i).trim().isEmpty()) {
 
                     vo.setIndicador(vToledo.get(i).substring(infColuna1Inicio, infColuna1Fim));
-                    vo.setNutricional(Integer.parseInt(vToledo.get(i).substring(infColuna2Inicio, infColuna2Fim)));
+                    vo.setNutricional(Integer.parseInt(vToledo.get(i).substring(infColuna2Inicio, infColuna2Fim).equals("") ? "0" : vToledo.get(i).substring(infColuna2Inicio, infColuna2Fim)));
                     vo.setReservado(vToledo.get(i).substring(infColuna3Inicio, infColuna3Fim));
                     vo.setQuantidade(vToledo.get(i).substring(infColuna4Inicio, infColuna4Fim));
                     vo.setPorcaoUnGr(vToledo.get(i).substring(infColuna5Inicio, infColuna5Fim));

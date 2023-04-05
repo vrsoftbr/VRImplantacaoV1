@@ -112,7 +112,7 @@ public class OperacoesArquivoTxtInfoToledo {
                 txtInfoColuna16Fim = vToledo.get(i).trim().length();
                 if (!vToledo.get(i).trim().isEmpty()) {
 
-                    vo.setCodigo(Integer.parseInt(vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim)));
+                    vo.setCodigo(Integer.parseInt(vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim).equals("") ? "0" : vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim)));
                     vo.setObs(txtInfoColuna2Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna2Inicio, txtInfoColuna2Fim));
                     vo.setLinha1(txtInfoColuna3Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna3Inicio, txtInfoColuna3Fim));
                     vo.setLinha2(txtInfoColuna4Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna4Inicio, txtInfoColuna4Fim));
@@ -136,7 +136,7 @@ public class OperacoesArquivoTxtInfoToledo {
     
     public int getLenghtFimLinhaTxtInfo(String arquivo) throws Exception {
         List<String> vToledo = util.lerArquivoBalanca(arquivo);
-        for (int i = 0; i <= 1; i++) {
+        for (int i = 0; i <= 0; i++) {
             txtInfoColuna16Fim = vToledo.get(i).trim().length();            
             }
         return txtInfoColuna16Fim;
