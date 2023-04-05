@@ -360,13 +360,13 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("margem"));
 
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
-                    //imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setCodMercadologico4(rst.getString("merc4"));
 
-                    //imp.setSituacaoCadastro(rst.getInt("ativo"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
@@ -779,8 +779,8 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "	CNPJCPF id_cliente,\n"
                     + "	FISICOJURIDICO,\n"
-                    + "	PESSOADESCRICAO || ' LJ-" + getLojaOrigem() + "'nome,\n"
-                    + "	'" + getLojaOrigem() + "' id_empresa,\n"
+                    + "	PESSOADESCRICAO nome,\n"
+                    + "	CODIGOFILIAL id_empresa,\n"
                     + "	CNPJCPF cpf_cnpj,\n"
                     + "	COALESCE (CLIENTELIMITE,0) limite,\n"
                     + "	CASE WHEN CODIGOSITUACAO = 0 THEN 1 ELSE 0 END status,\n"
@@ -790,7 +790,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	PESSOACLIENTE = 'S'\n"
                     + "	AND FISICOJURIDICO = 'F'\n"
-                    //+ "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
+                    + "	AND CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY\n"
                     + "	PESSOADESCRICAO"
             )) {
@@ -826,7 +826,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	OBSERVACOES observacao\n"
                     + "FROM\n"
                     + "	RECEITAS ct\n"
-                    + "JOIN PESSOA p ON ct.CNPJCPF = p.CNPJCPF\n" //AND ct.CODIGOFILIAL = p.CODIGOFILIAL\n"
+                    + "JOIN PESSOA p ON ct.CNPJCPF = p.CNPJCPF AND ct.CODIGOFILIAL = p.CODIGOFILIAL\n"
                     + "WHERE\n"
                     + "	ct.CODIGOFILIAL = '" + getLojaOrigem() + "'\n"
                     + "	AND p.PESSOACLIENTE = 'S'\n"
