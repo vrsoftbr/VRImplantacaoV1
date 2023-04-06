@@ -1,48 +1,33 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
@@ -148,20 +133,23 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select distinct\n"
-                    + "    COALESCE (p.cd_cst_sai_pro,0),\n"
-                    + "    COALESCE (p.vl_aliquota_sai_pro,0),\n"
-                    + "    COALESCE (p.aliquota_reduz_pro,0)\n"
-                    + "from\n"
-                    + "    produto p"
+                    "SELECT\n"
+                    + "	DISTINCT  replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO,0),',','.')  AS id,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS descricao,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS cst,\n"
+                    + "	replace(COALESCE (p.vl_aliquota_sai_pro,0), ',','.') AS aliquota,\n"
+                    + "	replace(COALESCE (p.aliquota_reduz_pro,	0),',','.') AS reducao\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "	ORDER BY 1"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
                             rs.getInt("cst"),
-                            rs.getDouble("aliq"),
-                            rs.getDouble("red"))
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao"))
                     );
                 }
             }
@@ -170,37 +158,30 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	tp.cd_depto as merc1, \n"
-                    + "	td.nm_depto as descmerc1,\n"
-                    + "	tp.cd_depto_secao as merc2,\n"
-                    + "	tds.nm_depto_secao as descmerc2,\n"
-                    + "	tp.cd_depto_grupo as merc3,\n"
-                    + "	tdg.nm_depto_grupo as descmerc3,\n"
-                    + "	tp.cd_depto_subgrupo as merc4 ,\n"
-                    + "	tds2.nm_depto_subgrupo as descmerc4 \n"
-                    + "	from produto.tb_produto tp \n"
-                    + "	left join produto.tb_depto td on td.cd_depto = tp.cd_depto \n"
-                    + "	left join produto.tb_depto_secao tds on tds.cd_depto_secao  = tp.cd_depto_secao \n"
-                    + "	left join produto.tb_depto_grupo tdg on tdg.cd_depto_grupo = tp.cd_depto_grupo \n"
-                    + "	left join produto.tb_depto_subgrupo tds2 on tds2.cd_depto_subgrupo  = tp.cd_depto_subgrupo \n"
-                    + "	order by 1,3,5,7")) {
+                    "select\n"
+                    + "    f.id_fam as id,\n"
+                    + "    f.ds_fam as descricao\n"
+                    + "from\n"
+                    + "    familia f\n"
+                    + "order by\n"
+                    + "    1")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rs.getString("merc1"));
-                    imp.setMerc1Descricao(rs.getString("descmerc1"));
-                    imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("descmerc3"));
+                    imp.setMerc1ID(rs.getString("id"));
+                    imp.setMerc1Descricao(rs.getString("descricao"));
+                    imp.setMerc2ID(rs.getString("1"));
+                    imp.setMerc2Descricao(rs.getString("1"));
+                    imp.setMerc3ID(rs.getString("1"));
+                    imp.setMerc3Descricao(rs.getString("1"));
                     imp.setMerc4ID(rs.getString("merc4"));
                     imp.setMerc4Descricao(rs.getString("descmerc4"));
 
@@ -211,7 +192,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*   
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -277,34 +258,45 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " SELECT\n"
-                    + "	CD_PRO AS id,\n"
+                    "SELECT\n"
+                    + "	RIGHT (CD_PRO,9)AS id,\n"
                     + "	CD_PRO AS ean,\n"
-                    + "	1 AS qtd_embalagem,\n"
                     + "	UN_PRO AS unidade,\n"
                     + "	FL_BALANCA_PRO AS ebalanca,\n"
-                    + "	COALESCE (VAL_BALANCA_PRO,0) AS validade,\n"
-                    + "	coalesce(trim(p.ds_pro), '') || ' ' || coalesce(trim(p.marca_pro), '') || ' ' || coalesce(trim(p.un_pro),'') descricaocompleta,\n"
-                    + "	coalesce(trim(p.ds_pro), '') || ' ' || coalesce(trim(p.un_pro),'') descricaoreduzida,\n"
+                    + "	COALESCE (VAL_BALANCA_PRO,\n"
+                    + "	0) AS validade,\n"
+                    + "	COALESCE(trim(p.ds_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.marca_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
+                    + "	'') descricaocompleta,\n"
+                    + "	COALESCE(trim(p.ds_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
+                    + "	'') descricaoreduzida,\n"
                     + "	CDFAM_PRO AS mercadologico,\n"
                     + "	1 AS mercadologico1,\n"
-                    + "	COALESCE (QT_EST_MIN_PRO,0) AS estoqueminimo,\n"
-                    + "	COALESCE (QT_EST_IDEAL_PRO,0) AS estoquemaximo,\n"
-                    + "	COALESCE (QT_EST_ATUAL_PRO,0) AS estoque,\n"
+                    + "	COALESCE (QT_EST_MIN_PRO,\n"
+                    + "	0) AS estoqueminimo,\n"
+                    + "	COALESCE (QT_EST_IDEAL_PRO,\n"
+                    + "	0) AS estoquemaximo,\n"
+                    + "	COALESCE (QT_EST_ATUAL_PRO,\n"
+                    + "	0) AS estoque,\n"
                     + "	MARKUP_PRO AS margem,\n"
                     + "	VL_COMPRA_PRO AS custocomimposto,\n"
                     + "	VL_COM_BRUTO_PRO AS custosemimposto,\n"
                     + "	VL_VENDA_PRO AS preco,\n"
                     + "	FL_ATIVO_PRO AS ativo,\n"
-                    + "	COALESCE (NCM_PRO,0) AS ncm,\n"
-                    + "	COALESCE (CEST_ST_PRO,0) AS cest,\n"
+                    + "	COALESCE (NCM_PRO,\n"
+                    + "	0) AS ncm,\n"
+                    + "	COALESCE (CEST_ST_PRO,\n"
+                    + "	0) AS cest,\n"
                     + "	CST_PIS_SAI_PRO AS pisconfis_saida,\n"
                     + "	CST_IPI_ENT_PRO AS piscofins_entrada,\n"
                     + "	CST_PIS_ENT_PRO AS piscofins_natrec,\n"
                     + "	IDFOR_PRO AS id_fornecedor,\n"
-                    + "VL_ICMS_ST_UN_PRO AS icms"
+                    + "	replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO, 0), ',', '.') AS id_icms\n"
                     + "FROM\n"
                     + "	PRODUTO p"
+            //SELECT * FROM PRODUTO p WHERE RIGHT (CD_PRO,9) IN select para validar quantidades faltantes devido id ser EAN
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -316,14 +308,13 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setEan(rs.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
-
+//                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
 
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtd_embalagem"));
+                    imp.setQtdEmbalagem(rs.getInt(1));
 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
@@ -340,7 +331,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
 
                     String idIcms;
 
@@ -430,7 +421,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  FL_ATIVO_CLI AS ativo,\n"
                     + "  EMAIL_CLI AS email\n"
                     + "  FROM CLIENTE c \n"
-                    + "  WHERE TIPO_DADOS_CLI = 'F"
+                    + "  WHERE TIPO_DADOS_CLI = 'F'"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -449,28 +440,6 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(Utils.acertarTexto(rs.getString("fone1")));
-
-                    if ((rs.getString("fone1") != null)
-                            && (!rs.getString("fone1").trim().isEmpty())) {
-                        imp.addContato(
-                                rs.getString("fone1"),
-                                rs.getString("fone1"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                rs.getString("email")
-                        );
-                    }
-
-                    if ((rs.getString("fone2") != null)
-                            && (!rs.getString("fone2").trim().isEmpty())) {
-                        imp.addContato(
-                                rs.getString("fone2"),
-                                rs.getString("fone2"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
 
                     imp.setAtivo(rs.getBoolean("ativo"));
 
@@ -581,11 +550,12 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    pf.cdfor_pfor id_fornecedor,\n"
-                    + "    pf.cdpro_produto_pfor id_produto,\n"
-                    + "    pf.cdprofor_pfor codigoexterno\n"
+                    + "    RIGHT (p.CD_PRO,9)AS id_produto,\n"
+                    + "    pf.cdprofor_pfor codigoexterno,\n"
                     + "    1 AS qtd_embalagem\n"
                     + "from\n"
                     + "    produto_fornecedor pf\n"
+                    + "    JOIN PRODUTO p ON p.CD_PRO = pf.CDPRO_PRODUTO_PFOR \n"
                     + "order by\n"
                     + "    1,2"
             )) {
@@ -714,15 +684,12 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("estado"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setTelefone(rs.getString("telefone"));
-                    imp.setCelular(rs.getString("celular"));
+                    imp.setTelefone(rs.getString("contato1"));
+                    imp.setCelular(rs.getString("contato2"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setObservacao(rs.getString("contato1"));
-                    imp.setObservacao(rs.getString("contato2"));
 
-                    imp.setDataNascimento(rs.getDate("data_nasc"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-
+//                    imp.setDataNascimento(rs.getDate("data_nasc"));
+//                    imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
@@ -734,14 +701,24 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	ID_CONVENIO AS id,\n"
+                    + "	CD_CLIENTE AS id_cliente,\n"
+                    + "	c2.CNPJ_CLI AS cnpj,\n"
+                    + "	ct.NR_CUPOM_FISCAL AS coo,\n"
+                    + "	c.DH_INCLUSAO AS dt_emissao,\n"
+                    + "	ct.NM_ESTACAO AS ecf,\n"
+                    + "	c.VL_CONVENIO AS valor\n"
+                    + "FROM\n"
+                    + "	CONVENIO c \n"
+                    + "JOIN CLIENTE c2 ON c2.ID_CLI = c.CD_CLIENTE \n"
+                    + "JOIN conta ct ON ct.ID_CONTA  = c.ID_CONTA "
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

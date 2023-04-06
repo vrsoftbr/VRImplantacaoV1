@@ -10,7 +10,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.Market2_5DAO;
+import vrimplantacao2_5.dao.sistema.Fenix2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Fenix2_5GUI extends VRInternalFrame {
@@ -21,7 +21,7 @@ public class Fenix2_5GUI extends VRInternalFrame {
     private static final String SISTEMA = ESistema.FENIX.getNome();
     private static Fenix2_5GUI instance;
 
-    private final Market2_5DAO dao = new Market2_5DAO();
+    private final Fenix2_5DAO dao = new Fenix2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -111,12 +111,12 @@ public class Fenix2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
                     
-                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
+/*                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
                         dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
                         dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-                    }
+                    }*/
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
