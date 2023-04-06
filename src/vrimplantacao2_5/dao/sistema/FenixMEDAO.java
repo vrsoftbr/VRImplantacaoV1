@@ -301,8 +301,8 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.DATAINCLUSAO data_cadastro,\n"
                     + "	p.DATAALTERACAO data_alteracao,\n"
                     + " CASE WHEN e.EMLINHA = 'S' THEN 1 ELSE 0 END ativo,\n"
-                    + "	e.PRECOVENDA1 precovenda,\n"
-                    + "	e.CUSTO precocusto,\n"
+                    + "	ROUND(e.PRECOVENDA1,2) precovenda,\n"
+                    + "	ROUND(e.CUSTO,2) precocusto,\n"
                     + "	m.PORCENTPRECO1 margem,\n"
                     + " p.CODIGOREFERENCIA id_familia,\n"
                     + "	m1.CODIGODEPARTAMENTO merc1,\n"
@@ -355,7 +355,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rst.getInt("validade"));
 
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(rst.getDouble("margem"));
 
@@ -929,7 +929,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '1'\n" // <--  ALTERAR A LOJA
+                    + "	LOJA = '3'\n" // <--  ALTERAR A LOJA
                     + "	AND DATACUPOM between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "	AND TIPOREGISTRO = 'PG'\n"
                     + "GROUP BY 1,2,3,4,5,6,7";
@@ -1008,7 +1008,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '1'\n"
+                    + "	LOJA = '3'\n"   // <--  ALTERAR A LOJA
                     + "	AND TIPOREGISTRO = 'VI'\n"
                     + "	AND DATACUPOM BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,2,3";
