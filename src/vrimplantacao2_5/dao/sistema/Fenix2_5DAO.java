@@ -1,59 +1,44 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
+import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
  * @author Bruno
  */
-public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
+public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Market";
+        return "Fenix";
     }
 
     @Override
@@ -146,46 +131,25 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	distinct trim(ds_icms) as id,\n"
-                    + "	coalesce (ds_icms, 'NULO') descricao,\n"
-                    + "	case\n"
-                    + "		when ds_icms = 'IS' then '40'\n"
-                    + "		when ds_icms = '07' then '00'\n"
-                    + "		when ds_icms = '12' then '00'\n"
-                    + "		when ds_icms = '17' then '00'\n"
-                    + "		when ds_icms = '25' then '00'\n"
-                    + "		when TRIM(ds_icms) = 'ST' then '60'\n"
-                    + "		when ds_icms = 'NT' then '41'\n"
-                    + "		when ds_icms is null then '40'\n"
-                    + "		else '40'\n"
-                    + "	end as cst,\n"
-                    + "	case ds_icms\n"
-                    + "		when 'IS' then 0\n"
-                    + "		when '07' then 7\n"
-                    + "		when '12' then 12\n"
-                    + "		when '17' then 17\n"
-                    + "		when '25' then 25\n"
-                    + "		when 'ST' then 0\n"
-                    + "		when 'NT' then 0\n"
-                    + "		else 0\n"
-                    + "	end as aliq,\n"
-                    + "		0 as red\n"
-                    + "from\n"
-                    + "	produto.tb_produto_loja tpl\n"
-                    + "where\n"
-                    + "	cd_loja = " + getLojaOrigem() + "\n"
-                    + "order by 1 "
+                    "SELECT\n"
+                    + "	DISTINCT  replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO,0),',','.')  AS id,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS descricao,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS cst,\n"
+                    + "	replace(COALESCE (p.vl_aliquota_sai_pro,0), ',','.') AS aliquota,\n"
+                    + "	replace(COALESCE (p.aliquota_reduz_pro,	0),',','.') AS reducao\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "	ORDER BY 1"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
                             rs.getInt("cst"),
-                            rs.getDouble("aliq"),
-                            rs.getDouble("red"))
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao"))
                     );
                 }
             }
@@ -194,37 +158,30 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	tp.cd_depto as merc1, \n"
-                    + "	td.nm_depto as descmerc1,\n"
-                    + "	tp.cd_depto_secao as merc2,\n"
-                    + "	tds.nm_depto_secao as descmerc2,\n"
-                    + "	tp.cd_depto_grupo as merc3,\n"
-                    + "	tdg.nm_depto_grupo as descmerc3,\n"
-                    + "	tp.cd_depto_subgrupo as merc4 ,\n"
-                    + "	tds2.nm_depto_subgrupo as descmerc4 \n"
-                    + "	from produto.tb_produto tp \n"
-                    + "	left join produto.tb_depto td on td.cd_depto = tp.cd_depto \n"
-                    + "	left join produto.tb_depto_secao tds on tds.cd_depto_secao  = tp.cd_depto_secao \n"
-                    + "	left join produto.tb_depto_grupo tdg on tdg.cd_depto_grupo = tp.cd_depto_grupo \n"
-                    + "	left join produto.tb_depto_subgrupo tds2 on tds2.cd_depto_subgrupo  = tp.cd_depto_subgrupo \n"
-                    + "	order by 1,3,5,7")) {
+                    "select\n"
+                    + "    f.id_fam as id,\n"
+                    + "    f.ds_fam as descricao\n"
+                    + "from\n"
+                    + "    familia f\n"
+                    + "order by\n"
+                    + "    1")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rs.getString("merc1"));
-                    imp.setMerc1Descricao(rs.getString("descmerc1"));
-                    imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("descmerc3"));
+                    imp.setMerc1ID(rs.getString("id"));
+                    imp.setMerc1Descricao(rs.getString("descricao"));
+                    imp.setMerc2ID(rs.getString("1"));
+                    imp.setMerc2Descricao(rs.getString("1"));
+                    imp.setMerc3ID(rs.getString("1"));
+                    imp.setMerc3Descricao(rs.getString("1"));
                     imp.setMerc4ID(rs.getString("merc4"));
                     imp.setMerc4Descricao(rs.getString("descmerc4"));
 
@@ -235,11 +192,12 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + "	cd_produto_semelhante as id,\n"
@@ -262,22 +220,19 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+     */
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	ean.cd_produto id_produto,\n"
-                    + "	ean.cd_codbarra ean,\n"
-                    + "	p.tp_embalagem tipo_emb,\n"
-                    + "	p.qt_embalagem  / p.qt_fracionado qtd_emb \n"
-                    + "from\n"
-                    + "	produto.tb_produto_codbarra ean\n"
-                    + "	join produto.tb_produto p on p.cd_produto = ean.cd_produto\n"
-                    + " where ean.is_padrao = 'S' "
-                    + "order by ean.cd_produto"
+                    "SELECT\n"
+                    + "	CD_PRO AS id_produto,\n"
+                    + "	CD_PRO AS ean,\n"
+                    + "	1 AS qtd_embalagem,\n"
+                    + "	UN_PRO AS tipo_embalagem\n"
+                    + "FROM\n"
+                    + "	PRODUTO p"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -286,8 +241,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(rs.getInt("qtd_emb"));
-                    imp.setTipoEmbalagem(rs.getString("tipo_emb"));
+                    imp.setQtdEmbalagem(rs.getInt("qtd_embalagem"));
+                    imp.setTipoEmbalagem(rs.getString("tipo_embalagem"));
 
                     result.add(imp);
                 }
@@ -301,62 +256,47 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select  \n"
-                    + "	tp.nr_produto id,\n"
-                    + "	tp.nm_produto_longo desc_completa,\n"
-                    + "	tp.nm_reduzido desc_reduzida,\n"
-                    + "	cd.cd_codbarra ean,\n"
-                    + "	custo.vl_custo_faturado custosemimposto,\n"
-                    + "	custo.vl_custo custocomimposto,\n"
-                    + "	custo.vl_venda precovenda,\n"
-                    + "	custo.per_margem_venda margem,\n"
-                    + " custo.qt_minimo est_min,\n"
-                    + "	est.qt_saldo estoque,\n"
-                    + "	tp.cd_depto codmerc1,\n"
-                    + " tp.cd_produto_semelhante as idfamilia,\n"
-                    + "	tp.cd_depto_secao codmerc2,\n"
-                    + "	tp.cd_depto_grupo codmerc3,\n"
-                    + "tp.cd_depto_subgrupo codmerc4,\n"
-                    + "	tp.tp_embalagem tipo_embalagem,\n"
-                    + "	case \n"
-                    + "	when tp.tp_unidade_medida = 'M2' then 'MT'	\n"
-                    + "	when tp.tp_unidade_medida = 'CE' then 'MT'\n"
-                    + "	when tp.tp_unidade_medida = 'GR' then 'KG'\n"
-                    + "	when tp.tp_unidade_medida = 'ML' then 'LT'\n"
-                    + "	else 'UN' end as tipo_unidade_medida,\n"
-                    + "	tp.qt_embalagem qtde_emb,\n"
-                    + "	coalesce (pb.qt_dias_validade_balanca, '0') validadebalanca,\n"
-                    + "	case when custo.is_ativo = 'N' then 0 else 1\n"
-                    + "	end as ativo,\n"
-                    + "	tp.dt_inc data_cadastro,\n"
-                    + "	tp.vl_peso_liquido pesoliquido,\n"
-                    + "	tp.vl_peso_bruto pesobruto,\n"
-                    + "		(select \n"
-                    + "		f.nr_cest\n"
-                    + "	from\n"
-                    + "		produto.tb_ncm_figura_vigencia_federal f\n"
-                    + "	where \n"
-                    + "		f.cd_ncm_figura_mva = tp.cd_ncm_figura_mva limit 1) as cest,\n"
-                    + "	trim(custo.ds_icms) as id_icms,\n"
-                    + "	tp_unidade_medida  tipovolume,\n"
-                    + "	qt_unidade_medida  volume,\n"
-                    + "	case \n"
-                    + "	when tp.tp_venda = 'B' then 1 else 0 end is_balanca ,\n"
-                    + "	case \n"
-                    + "	when custo.is_isolado_lj  = 'S' then 1 else 0 end descontinuado,\n"
-                    + "	cst.nr_ncm as ncm,\n"
-                    + "	cst.nr_cst_pis_cofins_entrada as piscof_credito,\n"
-                    + "	cst.nr_cst_pis_cofins_saida as piscof_debito,\n"
-                    + "	cst.nr_natureza_receita_pis_cofins as natureza_receita\n"
-                    + "from\n"
-                    + "	produto.tb_produto tp\n"
-                    + "left join produto.tb_produto_codbarra cd on cd.cd_produto = tp.cd_produto and cd.is_padrao = 'S'\n"
-                    + "left join produto.tb_produto_loja custo on custo.cd_produto = tp.cd_produto and custo.cd_loja = " + getLojaOrigem() + "\n"
-                    + "left join saldo.vw_saldo_loja est on est.nr_produto = tp.nr_produto and nr_loja = " + getLojaOrigem() + "\n"
-                    + "left join produto.tb_produto_balanca pb on pb.cd_produto = tp.cd_produto  and pb.cd_loja = " + getLojaOrigem() + "\n"
-                    + "join  produto.vw_produto_vigencia_loja_federal_padrao cst on cst.nr_produto = tp.nr_produto and cst.cd_loja = " + getLojaOrigem()
+                    "SELECT\n"
+                    + "	RIGHT (CD_PRO,9)AS id,\n"
+                    + "	CD_PRO AS ean,\n"
+                    + "	UN_PRO AS unidade,\n"
+                    + "	FL_BALANCA_PRO AS ebalanca,\n"
+                    + "	COALESCE (VAL_BALANCA_PRO,\n"
+                    + "	0) AS validade,\n"
+                    + "	COALESCE(trim(p.ds_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.marca_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
+                    + "	'') descricaocompleta,\n"
+                    + "	COALESCE(trim(p.ds_pro),\n"
+                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
+                    + "	'') descricaoreduzida,\n"
+                    + "	CDFAM_PRO AS mercadologico,\n"
+                    + "	1 AS mercadologico1,\n"
+                    + "	COALESCE (QT_EST_MIN_PRO,\n"
+                    + "	0) AS estoqueminimo,\n"
+                    + "	COALESCE (QT_EST_IDEAL_PRO,\n"
+                    + "	0) AS estoquemaximo,\n"
+                    + "	COALESCE (QT_EST_ATUAL_PRO,\n"
+                    + "	0) AS estoque,\n"
+                    + "	MARKUP_PRO AS margem,\n"
+                    + "	VL_COMPRA_PRO AS custocomimposto,\n"
+                    + "	VL_COM_BRUTO_PRO AS custosemimposto,\n"
+                    + "	VL_VENDA_PRO AS preco,\n"
+                    + "	FL_ATIVO_PRO AS ativo,\n"
+                    + "	COALESCE (NCM_PRO,\n"
+                    + "	0) AS ncm,\n"
+                    + "	COALESCE (CEST_ST_PRO,\n"
+                    + "	0) AS cest,\n"
+                    + "	CST_PIS_SAI_PRO AS pisconfis_saida,\n"
+                    + "	CST_IPI_ENT_PRO AS piscofins_entrada,\n"
+                    + "	CST_PIS_ENT_PRO AS piscofins_natrec,\n"
+                    + "	IDFOR_PRO AS id_fornecedor,\n"
+                    + "	replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO, 0), ',', '.') AS id_icms\n"
+                    + "FROM\n"
+                    + "	PRODUTO p"
+            //SELECT * FROM PRODUTO p WHERE RIGHT (CD_PRO,9) IN select para validar quantidades faltantes devido id ser EAN
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -365,52 +305,33 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rs.getString("id"));
-
-                    imp.seteBalanca(rs.getBoolean("is_balanca"));
+                    imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setEan(rs.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
-
-                    if (bal != null) {
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        imp.setValidade(bal.getValidade() > 1
-                                ? bal.getValidade() : rs.getInt("validadebalanca"));
-                        imp.setEan(String.valueOf(bal.getCodigo()));
-                    }
-
-                    imp.setDescricaoCompleta(rs.getString("desc_completa"));
-                    imp.setDescricaoReduzida(rs.getString("desc_reduzida"));
+//                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
 
-                    imp.setTipoEmbalagem(rs.getString("tipo_embalagem"));
-//                    imp.setTipoEmbalagemCotacao(rs.getString("emb_compra"));
-                    imp.setQtdEmbalagem(rs.getInt("qtde_emb"));
-                    imp.setVolume(rs.getDouble("volume") / 1000);
-                    imp.setTipoEmbalagemVolume(rs.getString("tipo_unidade_medida"));
-
-                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt(1));
 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
-                    imp.setDescontinuado(rs.getBoolean("descontinuado"));
 
-                    imp.setEstoqueMinimo(rs.getDouble("est_min"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
 
-                    imp.setCodMercadologico1(rs.getString("codmerc1"));
-                    imp.setCodMercadologico2(rs.getString("codmerc2"));
-                    imp.setCodMercadologico3(rs.getString("codmerc3"));
-                    imp.setCodMercadologico4(rs.getString("codmerc4"));
+                    imp.setCodMercadologico1(rs.getString("mercadologico"));
+                    imp.setCodMercadologico2(rs.getString("mercadologico1"));
+                    imp.setFornecedorFabricante(rs.getString("id_fornecedor"));
 
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
 
                     String idIcms;
 
@@ -423,9 +344,9 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
-                    imp.setPiscofinsCstDebito(rs.getString("piscof_debito"));
-                    imp.setPiscofinsCstCredito(rs.getString("piscof_credito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("natureza_receita"));
+                    imp.setPiscofinsCstDebito(rs.getString("pisconfis_saida"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofins_natrec"));
 
                     result.add(imp);
                 }
@@ -435,10 +356,11 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "    ass.nr_produto idproduto_item,\n"
@@ -475,44 +397,31 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+     */
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	c.cd_base id,\n"
-                    + "	nm_base razao,\n"
-                    + "	case when nm_fantasia is null then nm_base else nm_fantasia end fantasia,\n"
-                    + "	nr_cpf_cnpj cnpj,\n"
-                    + "	ie.ds_documento ie,\n"
-                    + "	e.nm_logradouro endereco,\n"
-                    + "	nr_endereco numero,\n"
-                    + "	ds_complemento complemento,\n"
-                    + "	b.nm_bairro bairro,\n"
-                    + "	m.nm_cidade cidade,\n"
-                    + "	m.cd_uf uf,\n"
-                    + "	nr_cep cep,\n"
-                    + "	c.dt_inc data_cadastro,\n"
-                    + "	ds_email_nfe email,\n"
-                    + "	case when is_ativo = 'S' then 1 else 0	end ativo,\n"
-                    + "	replace (coalesce (t1.sg_ddd,'') || t1.ds_valor,'-', '') as tel_principal,\n"
-                    + "	t1.nm_contato contato1,\n"
-                    + "	replace (coalesce (t1.sg_ddd,'') || t1.ds_valor,'-', '') as fone1,\n"
-                    + "	t2.nm_contato contato2,\n"
-                    + "	replace(replace(coalesce (t2.sg_ddd, '') || t2.ds_valor, '-', ''), '*', '') fone2\n"
-                    + "from\n"
-                    + "	cadastro.tb_base c\n"
-                    + "left join cadastro.tb_logradouro e on e.cd_logradouro = c.cd_logradouro\n"
-                    + "left join cadastro.tb_bairro b on b.cd_bairro = c.cd_bairro\n"
-                    + "left join cadastro.tb_cidade m on m.cd_cidade = c.cd_cidade\n"
-                    + "left join cadastro.tb_base_documento ie on 	ie.cd_base = c.cd_base\n"
-                    + "left join cadastro.tb_base_contato t1 on t1.cd_base = c.cd_base and t1.tp_principal = 'S'\n"
-                    + "left join cadastro.tb_base_contato t2 on t2.cd_base = c.cd_base and t2.tp_principal = 'N'\n"
-                    + "join cadastro.tb_base_tipo tipo on tipo.cd_base = c.cd_base and tipo.cd_base_tipo_flag = 2\n"
-                    + "join cadastro.tb_cliente n on n.cd_base_cliente = c.cd_base and n.cd_loja = " + getLojaOrigem()
+                    "SELECT \n"
+                    + "  ID_CLI AS id,\n"
+                    + "  NM_CLI AS razao,\n"
+                    + "  NM_FANTASIA_CLI AS fantasia,\n"
+                    + "  CNPJ_CLI AS cnpj_for,\n"
+                    + "  IE_CLI AS ie_for,\n"
+                    + "  END_CLI AS endereco,\n"
+                    + "  NUMERO_CLI AS numero,\n"
+                    + "  BAIRRO_CLI AS bairro,\n"
+                    + "  CIDADE_CLI AS cidade,\n"
+                    + "  UF_CLI AS uf,\n"
+                    + "  CEP_CLI AS cep,\n"
+                    + "  FONE1_CLI AS fone1,\n"
+                    + "  FONE2_CLI AS fone2,\n"
+                    + "  FL_ATIVO_CLI AS ativo,\n"
+                    + "  EMAIL_CLI AS email\n"
+                    + "  FROM CLIENTE c \n"
+                    + "  WHERE TIPO_DADOS_CLI = 'F'"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -522,42 +431,17 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setCnpj_cpf(rs.getString("cnpj_for"));
+                    imp.setIe_rg(rs.getString("ie_for"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(Utils.acertarTexto(rs.getString("tel_principal")));
+                    imp.setTel_principal(Utils.acertarTexto(rs.getString("fone1")));
 
-                    if ((rs.getString("contato1") != null)
-                            && (!rs.getString("contato1").trim().isEmpty())) {
-                        imp.addContato(
-                                rs.getString("contato1"),
-                                rs.getString("fone1"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                rs.getString("email")
-                        );
-                    }
-
-                    if ((rs.getString("contato2") != null)
-                            && (!rs.getString("contato2").trim().isEmpty())) {
-                        imp.addContato(
-                                rs.getString("contato2"),
-                                rs.getString("fone2"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-
-                    imp.setDatacadastro(rs.getDate("data_cadastro"));
                     imp.setAtivo(rs.getBoolean("ativo"));
-//                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -567,10 +451,11 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	cd_pagar as id, \n"
@@ -609,7 +494,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	cd_cheque_item as id, \n"
@@ -655,21 +540,24 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
+
+     */
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	pf.cd_base_fornecedor id_fornecedor,\n"
-                    + "	nr_produto id_produto,	\n"
-                    + "	nr_produto_externo codexterno,\n"
-                    + "	tp.qt_embalagem qtde_embalagem\n"
+                    + "    pf.cdfor_pfor id_fornecedor,\n"
+                    + "    RIGHT (p.CD_PRO,9)AS id_produto,\n"
+                    + "    pf.cdprofor_pfor codigoexterno,\n"
+                    + "    1 AS qtd_embalagem\n"
                     + "from\n"
-                    + "	produto.tb_produto tp \n"
-                    + "	join produto.tb_produto_loja_forn pf on pf.cd_produto = tp.cd_produto and pf.cd_loja = " + getLojaOrigem() + "\n"
-                    + "	order by 1,2"
+                    + "    produto_fornecedor pf\n"
+                    + "    JOIN PRODUTO p ON p.CD_PRO = pf.CDPRO_PRODUTO_PFOR \n"
+                    + "order by\n"
+                    + "    1,2"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -678,8 +566,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setCodigoExterno(rs.getString("codexterno"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtde_embalagem"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd_embalagem"));
 
                     result.add(imp);
                 }
@@ -689,11 +577,12 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "with pai as \n"
                     + "(\n"
@@ -750,78 +639,57 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+     */
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	c.cd_base id,\n"
-                    + "	nr_cpf_cnpj cpf_cnpj,\n"
-                    + "	ie.ds_documento rg_ie,\n"
-                    + "	nm_base razao,\n"
-                    + "	case when nm_fantasia is null then nm_base else nm_fantasia end fantasia ,\n"
-                    + "	e.nm_logradouro endereco,\n"
-                    + "	nr_endereco numero,\n"
-                    + "	ds_complemento complemento,\n"
-                    + "	b.nm_bairro bairro,\n"
-                    + "	m.nm_cidade cidade,\n"
-                    + "	m.cd_uf estado,\n"
-                    + "	nr_cep cep,\n"
-                    + "	c.dt_inc data_cadastro,\n"
-                    + "	n.dt_nasc data_nasc,\n"
-                    + "	n.nm_pai nomepai,\n"
-                    + "	n.nm_mae nomemae,\n"
-                    + "	n.vl_limite limite,\n"
-                    + "	ds_email_nfe email,\n"
-                    + "	coalesce (n.tp_sexo, 'M') sexo,\n"
-                    + "	case when is_ativo = 'S' then 1 else 0 end ativo,\n"
-                    + "	t2.tp_principal tipo_tel,\n"
-                    + "	replace (coalesce (t1.sg_ddd, '') || t1.ds_valor, '-','') as telefone,\n"
-                    + "	t1.nm_contato contato1,\n"
-                    + "	replace(replace(coalesce (t2.sg_ddd, '') || t2.ds_valor,'-',''),'*','') celular,\n"
-                    + "	t2.nm_contato contato2\n"
-                    + "from\n"
-                    + "	cadastro.tb_base c\n"
-                    + "	left join cadastro.tb_logradouro e on e.cd_logradouro = c.cd_logradouro \n"
-                    + "	left join cadastro.tb_bairro b on b.cd_bairro = c.cd_bairro \n"
-                    + "	left join cadastro.tb_cidade m on m.cd_cidade = c.cd_cidade \n"
-                    + "	left join cadastro.tb_base_documento ie on ie.cd_base = c.cd_base \n"
-                    + "	left join cadastro.tb_base_contato t1 on t1.cd_base = c.cd_base and t1.tp_principal = 'S'\n"
-                    + "	left join cadastro.tb_base_contato t2 on t2.cd_base = c.cd_base and t2.tp_principal = 'N'\n"
-                    + "	join cadastro.tb_base_tipo tipo on tipo.cd_base  = c.cd_base and tipo.cd_base_tipo_flag = 1\n"
-                    + "	join cadastro.tb_cliente n on n.cd_base_cliente = c.cd_base and n.cd_loja = " + getLojaOrigem() + "\n"
-                    + "	order by 1"
+                    "SELECT\n"
+                    + "	ID_CLI AS id_cliente,\n"
+                    + "	CNPJ_CLI AS cnpj,\n"
+                    + "	IE_CLI AS ie,\n"
+                    + "	NM_CLI AS razao,\n"
+                    + "	COALESCE (NM_FANTASIA_CLI,NM_CLI)AS fantasia,\n"
+                    + "	END_CLI AS endereco,\n"
+                    + "	NUMERO_CLI AS numero,\n"
+                    + "	BAIRRO_CLI AS bairro,\n"
+                    + "	CIDADE_CLI AS cidade,\n"
+                    + " UF_CLI AS estado,\n"
+                    + "	CEP_CLI AS cep,\n"
+                    + "	FONE1_CLI AS contato1,\n"
+                    + "	FONE2_CLI AS contato2,\n"
+                    + "	EMAIL_CLI AS email,\n"
+                    + "	DT_NASC_CLI AS data_nasc,\n"
+                    + "	CASE WHEN FL_ATIVO_CLI = 1 THEN 1 ELSE 0 END ativo,\n"
+                    + "	VL_LIMITE AS limite\n"
+                    + "FROM\n"
+                    + "	CLIENTE c\n"
+                    + "	WHERE TIPO_DADOS_CLI = 	'C'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rs.getString("id"));
-                    imp.setCnpj(rs.getString("cpf_cnpj"));
-                    imp.setInscricaoestadual(rs.getString("rg_ie"));
+                    imp.setId(rs.getString("id_cliente"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("estado"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setTelefone(rs.getString("telefone"));
-                    imp.setCelular(rs.getString("celular"));
+                    imp.setTelefone(rs.getString("contato1"));
+                    imp.setCelular(rs.getString("contato2"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setObservacao(rs.getString("contato1"));
-                    imp.setObservacao(rs.getString("contato2"));
 
-                    imp.setDataNascimento(rs.getDate("data_nasc"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setNomeMae(rs.getString("nomemae"));
-                    imp.setNomePai(rs.getString("nomepai"));
-
+//                    imp.setDataNascimento(rs.getDate("data_nasc"));
+//                    imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
@@ -837,32 +705,20 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	r.cd_receber as id,\n"
-                    + "	r.cd_base_cliente as idcliente,\n"
-                    + "	ba.nr_cpf_cnpj as cnpj,\n"
-                    + "	ba.nm_base as razao,\n"
-                    + "	r.cd_caixa as ecf,\n"
-                    + "	r.nr_titulo,\n"
-                    + "	r.nr_digito,\n"
-                    + "	r.ds_obs,\n"
-                    + "	r.vl_valor,\n"
-                    + "	r.dt_emissao,\n"
-                    + "	r.dt_vcto,\n"
-                    + "	r.nr_coo as coo,\n"
-                    + "	r.nr_serie_ecf as serieecf\n"
-                    + "from \n"
-                    + "	receber.tb_receber r \n"
-                    + "join\n"
-                    + "	cadastro.tb_titulo_tipo rt on rt.cd_titulo_tipo = r.cd_titulo_tipo\n"
-                    + "join\n"
-                    + "	cadastro.tb_base ba on ba.cd_base = r.cd_base_cliente\n"
-                    + "where \n"
-                    + "	dt_ultima_baixa is null and r.cd_loja = " + getLojaOrigem() + "\n "
-                    + "and r.cd_titulo_tipo = 15\n"
-                    + "order by dt_emissao"
+                    "SELECT\n"
+                    + "	ID_CONVENIO AS id,\n"
+                    + "	CD_CLIENTE AS id_cliente,\n"
+                    + "	c2.CNPJ_CLI AS cnpj,\n"
+                    + "	ct.NR_CUPOM_FISCAL AS coo,\n"
+                    + "	c.DH_INCLUSAO AS dt_emissao,\n"
+                    + "	ct.NM_ESTACAO AS ecf,\n"
+                    + "	c.VL_CONVENIO AS valor\n"
+                    + "FROM\n"
+                    + "	CONVENIO c \n"
+                    + "JOIN CLIENTE c2 ON c2.ID_CLI = c.CD_CLIENTE \n"
+                    + "JOIN conta ct ON ct.ID_CONTA  = c.ID_CONTA "
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -887,31 +743,23 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	cd_convenio as id,\n"
-                    + "	b.nr_cpf_cnpj as cnpj, \n"
-                    + "	b.nm_base as razao,\n"
-                    + "	doc.ds_documento as ie,\n"
-                    + "	e.nm_logradouro as endereco,\n"
-                    + "	nr_endereco as numero,\n"
-                    + " ds_complemento as complemento,\n"
-                    + " bairro.nm_bairro as bairro,\n"
-                    + " m.nm_cidade as cidade,\n"
-                    + " m.cd_uf as uf,\n"
-                    + " nr_cep as cep,\n"
-                    + " replace (coalesce (cont.sg_ddd,'') || cont.ds_valor,'-', '') as telefone,\n"
-                    + " ce.ds_obs as observacao\n"
-                    + "from\n"
-                    + "	receber.tb_convenio ce \n"
-                    + "	left join cadastro.tb_cliente c on c.cd_base_cliente = ce.cd_base_cliente and c.cd_loja = " + getLojaOrigem() + "\n"
-                    + "	left join cadastro.tb_base b on b.cd_base = c.cd_base_cliente \n"
-                    + "	left join cadastro.tb_base_documento doc on doc.cd_base = b.cd_base \n"
-                    + "	left join cadastro.tb_bairro bairro on bairro.cd_bairro = b.cd_bairro\n"
-                    + "	left join cadastro.tb_cidade m on m.cd_cidade = c.cd_cidade\n"
-                    + "	left join cadastro.tb_logradouro e on e.cd_logradouro = b.cd_logradouro\n"
-                    + "	left join cadastro.tb_base_contato cont on cont.cd_base_contato = b.cd_base and cont.tp_principal = 'S'"
+                    "SELECT\n"
+                    + "	ID_EMPRESA AS id,\n"
+                    + "	CNPJ AS cnpj,\n"
+                    + "	ie AS ie,\n"
+                    + "	NM_CONTRIBUINTE AS razao,\n"
+                    + "	LOGRADOURO AS endereco,\n"
+                    + "	NUMERO AS numero,\n"
+                    + "	COMPLEMENTO AS complemento,\n"
+                    + "	BAIRRO AS bairro,\n"
+                    + "	MUNICIPIO AS cidade,\n"
+                    + "	uf,\n"
+                    + "	CEP AS cep,\n"
+                    + "	TELEFONE 	\n"
+                    + "FROM\n"
+                    + "	EMPRESA e"
             )) {
                 while (rst.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
@@ -928,7 +776,6 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
-                    imp.setObservacoes(rst.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -940,34 +787,28 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	tc.cd_convenio||'-'||nr_conveniado as id_cliente,\n"
-                    + "	nm_conveniado as nome,\n"
-                    + "	tc.cd_convenio as id_empresa,\n"
-                    + "	tc.vl_limite as limite,\n"
-                    + "	dt_desativacao ,\n"
-                    + " tc.nr_cpf_cnpj as cpf_cnpj, \n "
-                    + "	case when dt_desativacao is null then 1 else 0 	end ativo,\n"
-                    + "	tc.ds_obs as observacao\n"
-                    + "from\n"
-                    + "	receber.tb_conveniado tc\n"
-                    + "	left join receber.tb_convenio ce on ce.cd_convenio = tc.cd_convenio \n"
-                    + "	left join cadastro.tb_cliente c on c.cd_base_cliente = ce.cd_base_cliente and c.cd_loja = " + getLojaOrigem() + "\n"
-                    + "	left join cadastro.tb_base b on b.cd_base = c.cd_base_cliente \n"
-                    + "	left join cadastro.tb_base_documento doc on doc.cd_base = b.cd_base"
+                    "SELECT\n"
+                    + "	CD_CLIENTE AS id_cliente,\n"
+                    + "	cl.NM_CLI AS nome,\n"
+                    + "	1 AS id_empresa,\n"
+                    + "	cl.CNPJ_CLI AS cnpj,\n"
+                    + "	cl.VL_LIMITE AS limite,\n"
+                    + "	cl.FL_ATIVO_CLI AS ativo\n"
+                    + "FROM\n"
+                    + "	CONVENIO cc\n"
+                    + "JOIN cliente cl ON cl.ID_CLI = cc.CD_CLIENTE "
             )) {
                 while (rs.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
                     imp.setId(rs.getString("id_cliente"));
                     imp.setNome(rs.getString("nome"));
                     imp.setIdEmpresa(rs.getString("id_empresa"));
-                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setCnpj(rs.getString("cnpj"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
                     imp.setSituacaoCadastro(rs.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
@@ -979,23 +820,18 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	cd_receber  as id,\n"
-                    + "	tr.cd_convenio||'-'||nr_conveniado as id_conveniado,\n"
-                    + "	nr_titulo as documento,\n"
-                    + "	nr_serie_ecf ecf,\n"
-                    + "	dt_emissao as datamovimento,\n"
-                    + "	dt_inc as data_hora,\n"
-                    + "	vl_valor as valor,\n"
-                    + "	ds_obs as observacao\n"
-                    + "from\n"
-                    + "	receber.tb_receber tr\n"
-                    + "where\n"
-                    + "	cd_loja = " + getLojaOrigem() + "\n"
-                    + "	and nr_conveniado is not null \n"
-                    + "	and dt_ultima_baixa is null"
+                    "SELECT\n"
+                    + "	cc.ID_CONTA AS id,\n"
+                    + "	cc.ID_CONVENIO AS id_conveniado,\n"
+                    + "	c.NM_ESTACAO AS ecf,\n"
+                    + "	c.NR_GERADOR AS documento,\n"
+                    + "	cc.DH_INCLUSAO AS data_hora,\n"
+                    + "	cc.VL_CONVENIO  AS valor\n"
+                    + "FROM\n"
+                    + "	CONVENIO cc\n"
+                    + "	JOIN CONTA c ON c.ID_CONTA = cc.ID_CONTA "
             )) {
                 while (rst.next()) {
                     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
@@ -1014,6 +850,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*  
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -1027,19 +864,19 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new Market2_5DAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new Fenix2_5DAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new Market2_5DAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new Fenix2_5DAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1121,7 +958,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -1197,5 +1034,5 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    }
+    }*/
 }

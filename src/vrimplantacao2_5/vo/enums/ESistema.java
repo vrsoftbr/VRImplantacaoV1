@@ -277,6 +277,7 @@ import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Facil2_5GUI;
+import vrimplantacao2_5.gui.sistema.Fenix2_5GUI;
 import vrimplantacao2_5.gui.sistema.FenixME2_5GUI;
 import vrimplantacao2_5.gui.sistema.Focus2_5GUI;
 import vrimplantacao2_5.gui.sistema.GEP2_5GUI;
@@ -681,7 +682,12 @@ public enum ESistema {
     FENIX(54, "FENIX", new FenixDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try{
+                return new Fenix2_5GUI(frame);
+            }catch (Exception ex){
+                Util.exibirMensagemErro(ex, "");
+            }
+                return null;
         }
     },
     FLASH(55, "FLASH", new FlashDAO()) {

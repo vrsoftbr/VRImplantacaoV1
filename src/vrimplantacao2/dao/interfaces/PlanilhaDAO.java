@@ -104,7 +104,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.ATACADO);
         result.add(OpcaoProduto.PRODUTOS);
         result.add(OpcaoProduto.EAN);
-        result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);        
+        result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);
         result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
         result.add(OpcaoProduto.ASSOCIADO);
 
@@ -215,7 +215,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             String id = linha.getString("id");
             if (id != null && !"".equals(id.trim())) {
                 ProdutoIMP produto = new ProdutoIMP();
-            
+
                 produto.setImportSistema(getSistema());
                 produto.setImportLoja(getLojaOrigem());
                 produto.setImportId(id);
@@ -363,7 +363,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida"));
                     produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida"));
                     produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida"));
-                    
+
                 }
 
                 if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
@@ -375,7 +375,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida"));
                     produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida"));
                 }
-                
+
                 if (linha.existsColumn("icms_cst_consumidor")) {
                     produto.setIcmsCstConsumidor(linha.getInt("icms_cst_consumidor"));
                     produto.setIcmsAliqConsumidor(linha.getDouble("icms_aliq_consumidor"));
@@ -401,7 +401,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
-                
+
                 produto.setManterEAN(linha.getBoolean("manterean"));
 
                 result.add(produto);
@@ -416,24 +416,24 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         if (opt == OpcaoProduto.ATACADO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
-            
+
             Arquivo atacado = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
             ProgressBar.setStatus("Carregando Atacado...");
-            
+
             for (LinhaArquivo linha : atacado) {
                 String id = linha.getString("id");
-                if(id != null && !"".equals(id.trim())) {
+                if (id != null && !"".equals(id.trim())) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(id);
-                    
+
                     imp.setEan(linha.getString("codigobarras"));
                     String ean_planilha = imp.getEan();
                     if ((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
@@ -441,11 +441,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setAtacadoPreco(linha.getDouble("precoatacado"));
                     imp.setPrecovenda(linha.getDouble("precovenda"));
-                    
+
                     vResult.add(imp);
                 }
             }
-            
+
             return vResult;
         }
         return null;
@@ -454,19 +454,19 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         Arquivo ean = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando EANs...");
-        
+
         for (LinhaArquivo linha : ean) {
             String id = linha.getString("id");
-            if(id != null && !"".equals(id.trim())) {
+            if (id != null && !"".equals(id.trim())) {
                 ProdutoIMP imp = new ProdutoIMP();
-                
+
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
                 imp.setImportId(id);
-                
+
                 imp.setEan(linha.getString("codigobarras"));
                 String ean_planilha = imp.getEan();
                 if ((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
@@ -474,11 +474,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
                 imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
                 imp.setTipoEmbalagem(linha.getString("unidade"));
-                
+
                 result.add(imp);
             }
         }
-        
+
         return result;
     }
 
@@ -565,7 +565,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         break;
                     }
                 }
-                
+
                 i = 1;
                 while (true) {
                     String prefixo = "prazo" + i;
@@ -669,17 +669,17 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 String civil = linha.getString("estadoCivil") + "   ";
                 civil = (civil != null ? civil.substring(1, 3) : "NAO");
                 imp.setEstadoCivil(estCivil.get(civil));
-                
+
                 if (linha.getString("dataNascimento") != null && !linha.getString("dataNascimento").trim().isEmpty()
                         && linha.getString("dataNascimento").trim().length() == 10) {
-                    
-                        dataNascimento = linha.getString("dataNascimento").substring(6, 10);
-                        dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(3, 5);
-                        dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(0, 2);
-                    
-                        imp.setDataNascimento(getData(dataNascimento));
+
+                    dataNascimento = linha.getString("dataNascimento").substring(6, 10);
+                    dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(3, 5);
+                    dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(0, 2);
+
+                    imp.setDataNascimento(getData(dataNascimento));
                 }
-                
+
                 imp.setDataNascimento(getData(linha.getString("dataNascimento")));
                 imp.setDataCadastro(getData(linha.getString("dataCadastro")));
                 String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
@@ -810,7 +810,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setObservacao(linha.getString("observacao"));
                 imp.setParcela(linha.getInt("parcela"));
                 imp.setValor(linha.getDouble("valor"));
-                if(linha.existsColumn("datapagamento")) {
+                if (linha.existsColumn("datapagamento")) {
                     if (getData(linha.getString("datapagamento")) != null) {
                         imp.addPagamento(
                                 imp.getId(),
@@ -835,9 +835,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
         List<ContaReceberIMP> result = new ArrayList<>();
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
+
         for (LinhaArquivo linha : arq) {
             ContaReceberIMP imp = new ContaReceberIMP();
 
@@ -848,10 +848,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDataVencimento(linha.getData("datavencimento"));
             imp.setValor(linha.getDouble("valor"));
             imp.setObservacao(linha.getString("observacao"));
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
@@ -1149,7 +1149,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         for (LinhaArquivo linha : produtos) {
             AssociadoIMP imp = new AssociadoIMP();
-            
+
             imp.setId(linha.getString("idproduto_principal"));
             imp.setDescricao(linha.getString("descricaoproduto_principal"));
             imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
@@ -1161,10 +1161,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setAplicaCusto(linha.getBoolean("aplicacusto"));
             imp.setAplicaEstoque(linha.getBoolean("aplicaestoque"));
             imp.setPercentualCusto(linha.getDouble("percentualcustoestoque"));
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
@@ -1237,11 +1237,41 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date getData(String format) {
         if (format != null && !"".equals(format.trim())) {
             try {
-                SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
-                SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
-               return converteData.parse(converteData.format(ajusteData.parse(format)));
-               
+                if (format.contains("/")) {
+
+                    String[] dataAjustada = format.split("/");
+                    String ano = dataAjustada[0];
+                    int anoConvert = Integer.parseInt(ano);
+
+                    if (anoConvert > 1000) {
+                        SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
+                        return ajustarAno.parse(format);
+                    }
+                    
+                    SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
+                    return converteData.parse(converteData.format(ajusteData.parse(format)));
+
+                } else if (format.contains("-")) {
+
+                    String[] dataAjustada = format.split("-");
+                    String ano = dataAjustada[0];
+                    int anoConvert = Integer.parseInt(ano);
+                    
+                    if (anoConvert > 1000) {
+                        
+                        SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
+                        return ajustarAno.parse(format);
+                    }
+                    
+                    SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
+                    return converteData.parse(converteData.format(ajusteData.parse(format.replace("-", "/"))));
+                }
+                return format == null ? null : formatData.parse(format);
+
             } catch (ParseException ex) {
+                System.out.println(ex.getMessage());
                 Exceptions.printStackTrace(ex);
             }
         }
