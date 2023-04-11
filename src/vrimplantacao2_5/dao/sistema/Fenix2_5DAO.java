@@ -133,7 +133,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	DISTINCT  replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO,0),',','.')  AS id,\n"
                     + "	COALESCE (p.cd_cst_sai_pro,	0) AS descricao,\n"
                     + "	COALESCE (p.cd_cst_sai_pro,	0) AS cst,\n"
@@ -141,7 +141,25 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	replace(COALESCE (p.aliquota_reduz_pro,	0),',','.') AS reducao\n"
                     + "FROM\n"
                     + "	PRODUTO p\n"
-                    + "	ORDER BY 1"
+                    + "	ORDER BY 1"*/
+                    "SELECT\n"
+                    + "	DISTINCT  replace(COALESCE (p.cd_cst_sai_pro,0)||COALESCE (p.vl_aliquota_sai_pro,0)||COALESCE (p.aliquota_reduz_pro,0),',','.')  AS id,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS descricao,\n"
+                    + "	COALESCE (p.cd_cst_sai_pro,	0) AS cst,\n"
+                    + "	replace(COALESCE (p.vl_aliquota_sai_pro,0), ',','.') AS aliquota,\n"
+                    + "	replace(COALESCE (p.aliquota_reduz_pro,	0),',','.') AS reducao\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "UNION\n"
+                    + "SELECT\n"
+                    + "	DISTINCT  \n"
+                    + "	'-E'||replace(p.CD_CST_PRO||COALESCE(p.ALIQUOTA_PRO,0)||COALESCE(p.ALIQUOTA_REDUZ_PRO,0),',','.') AS id,\n"
+                    + "	COALESCE (p.CD_CST_PRO,	0) AS descricao,\n"
+                    + "	COALESCE (p.CD_CST_PRO,	0) AS cst,\n"
+                    + "	replace(COALESCE (p.ALIQUOTA_PRO,0), ',','.') AS aliquota,\n"
+                    + "	replace(COALESCE (p.ALIQUOTA_REDUZ_PRO,	0),',','.') AS reducao\n"
+                    + "FROM\n"
+                    + "	PRODUTO p"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -265,35 +283,27 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	FL_BALANCA_PRO AS ebalanca,\n"
                     + "	COALESCE (VAL_BALANCA_PRO,\n"
                     + "	0) AS validade,\n"
-                    + "	COALESCE(trim(p.ds_pro),\n"
-                    + "	'') || ' ' || COALESCE(trim(p.marca_pro),\n"
-                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
-                    + "	'') descricaocompleta,\n"
-                    + "	COALESCE(trim(p.ds_pro),\n"
-                    + "	'') || ' ' || COALESCE(trim(p.un_pro),\n"
-                    + "	'') descricaoreduzida,\n"
+                    + "	1 AS embalagem,\n"
+                    + "	COALESCE(trim(p.ds_pro),'') || ' ' || COALESCE(trim(p.marca_pro),'') || ' ' || COALESCE(trim(p.un_pro),'') descricaocompleta,\n"
+                    + "	COALESCE(trim(p.ds_pro),'') || ' ' || COALESCE(trim(p.un_pro),'') descricaoreduzida,\n"
                     + "	CDFAM_PRO AS mercadologico,\n"
                     + "	1 AS mercadologico1,\n"
-                    + "	COALESCE (QT_EST_MIN_PRO,\n"
-                    + "	0) AS estoqueminimo,\n"
-                    + "	COALESCE (QT_EST_IDEAL_PRO,\n"
-                    + "	0) AS estoquemaximo,\n"
-                    + "	COALESCE (QT_EST_ATUAL_PRO,\n"
-                    + "	0) AS estoque,\n"
+                    + "	COALESCE (QT_EST_MIN_PRO,0) AS estoqueminimo,\n"
+                    + "	COALESCE (QT_EST_IDEAL_PRO,0) AS estoquemaximo,\n"
+                    + "	COALESCE (QT_EST_ATUAL_PRO,0) AS estoque,\n"
                     + "	MARKUP_PRO AS margem,\n"
                     + "	VL_COMPRA_PRO AS custocomimposto,\n"
                     + "	VL_COM_BRUTO_PRO AS custosemimposto,\n"
                     + "	VL_VENDA_PRO AS preco,\n"
                     + "	FL_ATIVO_PRO AS ativo,\n"
-                    + "	COALESCE (NCM_PRO,\n"
-                    + "	0) AS ncm,\n"
-                    + "	COALESCE (CEST_ST_PRO,\n"
-                    + "	0) AS cest,\n"
+                    + "	COALESCE (NCM_PRO,0) AS ncm,\n"
+                    + "	COALESCE (CEST_ST_PRO,0)AS cest,\n"
                     + "	CST_PIS_SAI_PRO AS pisconfis_saida,\n"
-                    + "	CST_IPI_ENT_PRO AS piscofins_entrada,\n"
+                    + "	CST_PIS_ENT_PRO AS piscofins_entrada,\n"
                     + "	CST_PIS_ENT_PRO AS piscofins_natrec,\n"
-                    + "	IDFOR_PRO AS id_fornecedor,\n"
-                    + "	replace(COALESCE (CST_PIS_SAI_PRO || CST_IPI_ENT_PRO || ALIQUOTA_PRO || ALIQUOTA_REDUZ_PRO, 0), ',', '.') AS id_icms\n"
+                    + "	NAT_REC_PIS_PRO AS id_fornecedor,\n"
+                    + "	replace(COALESCE (p.cd_cst_sai_pro,0)||COALESCE (p.vl_aliquota_sai_pro,0)||COALESCE (p.aliquota_reduz_pro,0),',','.') AS id_icms,\n"
+                    + " '-E'||replace(p.CD_CST_PRO||COALESCE(p.ALIQUOTA_PRO,0)||COALESCE(p.ALIQUOTA_REDUZ_PRO,0),',','.') as id_icms_entrada\n"
                     + "FROM\n"
                     + "	PRODUTO p"
             //SELECT * FROM PRODUTO p WHERE RIGHT (CD_PRO,9) IN select para validar quantidades faltantes devido id ser EAN
@@ -308,13 +318,13 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setEan(rs.getString("ean"));
 
-//                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+//                  ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
 
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt(1));
+                    imp.setQtdEmbalagem(1);
 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
@@ -341,8 +351,9 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
                     imp.setIcmsConsumidorId(idIcms);
-                    imp.setIcmsCreditoId(idIcms);
-                    imp.setIcmsCreditoForaEstadoId(idIcms);
+
+                    imp.setIcmsCreditoId(rs.getString("id_icms_entrada"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
 
                     imp.setPiscofinsCstDebito(rs.getString("pisconfis_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
