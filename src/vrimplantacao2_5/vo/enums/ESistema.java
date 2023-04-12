@@ -254,6 +254,7 @@ import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
+import vrimplantacao2_5.dao.sistema.WiseDAO;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
@@ -333,6 +334,7 @@ import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 import vrimplantacao2_5.gui.sistema.WLS2_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Winthor_PcSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Wise2_5GUI;
 
 /**
  *
@@ -2201,6 +2203,18 @@ public enum ESistema {
         ) {
             try {
                 return new Target_G32_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },
+     WISE(251, "WISE", new WiseDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Wise2_5GUI(frame);
                 } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

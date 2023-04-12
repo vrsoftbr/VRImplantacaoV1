@@ -312,9 +312,6 @@ public class Target_G3DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("dataCadastro"));
                     imp.setDataAlteracao(rst.getDate("dataAlteracao"));
                     imp.setEan(rst.getString("ean"));
-                    if (rst.getString("id").equals("6395")) {
-                        System.out.println("inferno");
-                    }
                     if (rst.getString("ean") == null) {
                         imp.setEan("9999999" + rst.getString("id"));
                     } else {
