@@ -176,32 +176,31 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    f.id_fam as id,\n"
-                    + "    f.ds_fam as descricao\n"
-                    + "from\n"
-                    + "    familia f\n"
-                    + "order by\n"
-                    + "    1")) {
+                    "SELECT DISTINCT \n"
+                    + "CDFAM_PRO AS id_merc1,\n"
+                    + "f.DS_FAM AS descricao1,\n"
+                    + "s.ID_SFAM AS id_merc2,\n"
+                    + "s.DS_SFAM AS descricao2\n"
+                    + "FROM produto p\n"
+                    + "JOIN FAMILIA f ON f.id_fam = p.CDFAM_PRO \n"
+                    + "JOIN SUBFAMILIA s ON s.ID_SFAM = p.CDSFAM_PRO ")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rs.getString("id"));
-                    imp.setMerc1Descricao(rs.getString("descricao"));
-                    imp.setMerc2ID(rs.getString("1"));
-                    imp.setMerc2Descricao(rs.getString("1"));
-                    imp.setMerc3ID(rs.getString("1"));
-                    imp.setMerc3Descricao(rs.getString("1"));
-                    imp.setMerc4ID(rs.getString("merc4"));
-                    imp.setMerc4Descricao(rs.getString("descmerc4"));
+                    imp.setMerc1ID(rs.getString("id_merc1"));
+                    imp.setMerc1Descricao(rs.getString("descricao1"));
+                    imp.setMerc2ID(rs.getString("id_merc2"));
+                    imp.setMerc2Descricao(rs.getString("descricao2"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao("1");
+
 
                     result.add(imp);
                 }
@@ -210,7 +209,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    
+    /* 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -284,7 +283,7 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	COALESCE (VAL_BALANCA_PRO,\n"
                     + "	0) AS validade,\n"
                     + "	1 AS embalagem,\n"
-                    + "	COALESCE(trim(p.ds_pro),'') || ' ' || COALESCE(trim(p.marca_pro),'') || ' ' || COALESCE(trim(p.un_pro),'') descricaocompleta,\n"
+                    + "	COALESCE(trim(p.ds_pro),'') || ' ' || COALESCE(trim(p.marca_pro),'') descricaocompleta,\n"
                     + "	COALESCE(trim(p.ds_pro),'') || ' ' || COALESCE(trim(p.un_pro),'') descricaoreduzida,\n"
                     + "	CDFAM_PRO AS mercadologico,\n"
                     + "	1 AS mercadologico1,\n"
@@ -345,8 +344,8 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     String idIcms;
 
-                    idIcms = rs.getString("id_icms");
-
+                    idIcms = rs.getString("id_icms").trim();
+                    System.out.println(rs.getString("id") + " icms saida? -> " + rs.getString("id_icms") + " icms entrada? -> " + rs.getString("id_icms_entrada"));
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);

@@ -17,6 +17,8 @@ public class LojaVO {
     public boolean copiaCusto = false;
     public boolean copiaTecladoLayout = false;
     private boolean copiaMargem = false;
+    private boolean chkTrocaCnpj = false;
+    private String txtCnpj = "";
 
     public int getId() {
         return id;
@@ -141,5 +143,13 @@ public class LojaVO {
     
     public void setCopiaMargem(boolean copiaMargem) {
         this.copiaMargem = copiaMargem;
+    }
+       
+    public String gettxtCnpj() {
+        return txtCnpj;
+    }
+
+    public void settxtCnpj(String txtCnpj) {
+        this.txtCnpj = txtCnpj;
     }
 }

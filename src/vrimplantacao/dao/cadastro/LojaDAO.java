@@ -724,4 +724,6 @@ public class LojaDAO {
         }
         return result;
     }
+    
+    
 }
