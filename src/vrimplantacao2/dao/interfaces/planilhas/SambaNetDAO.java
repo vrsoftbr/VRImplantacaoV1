@@ -339,7 +339,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new IOException("Planilha(s) não encontrada");
         }
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         File file = new File(this.planilhaProdutos);        
@@ -453,6 +453,59 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             
             vincularTributos(produtos);
            
+            return new ArrayList<>(produtos.values());
+        } else {
+            throw new IOException("Planilha(s) não encontrada");
+        }
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        File file = new File(this.planilhaProdutos);        
+        if (file.exists()) {
+
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            settings.setIgnoreBlanks(false);
+
+            Workbook planilha = Workbook.getWorkbook(file, settings);            
+            Sheet sheet = planilha.getSheet(0);
+
+            int linha = 0;
+            
+            
+            MultiMap<String, ProdutoIMP> produtos = new MultiMap<>();
+            Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+            
+            try {
+                ProgressBar.setStatus("Analisando Planilha de Produtos");
+                ProgressBar.setMaximum(sheet.getRows());
+                for (int i = 1; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (
+                            sheet.getCell(0, i) != null &&
+                            Utils.acertarTexto(sheet.getCell(0, i).getContents()).matches("[0-9]+") &&
+                            Utils.acertarTexto(sheet.getCell(1, i).getContents()).matches("[0-9]")
+                    ) {
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(sheet.getCell(0, i).getContents());
+                        imp.setEan(sheet.getCell(2, i).getContents());
+                        System.out.println(imp.getEan());
+                        imp.setTipoEmbalagem("UN");
+                                                                       
+                        produtos.put(imp, imp.getImportId(), sheet.getCell(2, i).getContents());
+                        
+                    }
+                    ProgressBar.next();
+                }
+            } catch (Exception ex) {
+                System.out.println(linha);
+                throw ex;
+            }          
             return new ArrayList<>(produtos.values());
         } else {
             throw new IOException("Planilha(s) não encontrada");
