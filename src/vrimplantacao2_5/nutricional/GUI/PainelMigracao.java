@@ -5,6 +5,8 @@
  */
 package vrimplantacao2_5.nutricional.GUI;
 
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -54,24 +56,24 @@ public class PainelMigracao extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 234, Short.MAX_VALUE))
-                    .addComponent(textScrollPane))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel1)
+                                                .addGap(0, 234, Short.MAX_VALUE))
+                                        .addComponent(textScrollPane))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(textScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(textScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         alteraScript();
         //dao.setSql(txtAreaScript.getText());
@@ -136,6 +138,18 @@ public class PainelMigracao extends javax.swing.JPanel {
     }
 
     public String scriptImportacao() {
-        return textArea.getText();
+ 
+      String haveText = (textArea.getText().contains("update")) ? "vazio" :
+                        (textArea.getText().contains("create")) ? "vazio" :
+                        (textArea.getText().contains("delete")) ? "vazio" :
+                        (textArea.getText().contains("insert")) ? "vazio" :
+                         textArea.getText(); 
+
+       if(haveText.contains("vazio")){
+          textArea.setText(haveText);
+          JOptionPane.showMessageDialog(null, "Você não pode rodar comandos de alteração de dados neste Script", "ERRO!", ERROR_MESSAGE); 
+       }
+
+        return haveText;
     }
 }
