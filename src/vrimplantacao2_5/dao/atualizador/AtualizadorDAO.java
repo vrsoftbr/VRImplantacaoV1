@@ -5,6 +5,7 @@ import java.sql.Statement;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
+import vrimplantacao2_5.dao.cadastro.sistemabancodados.SistemaBancoDadosDAO;
 import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
@@ -16,6 +17,9 @@ import vrimplantacao2_5.vo.enums.EUnidade;
  * @author Desenvolvimento
  */
 public class AtualizadorDAO {
+
+    private SistemaBancoDadosDAO dao = new SistemaBancoDadosDAO();
+    private String validaDados = null;
 
     public boolean verificarBancoDados(EBancoDados eBancoDados) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -233,82 +237,100 @@ public class AtualizadorDAO {
                     + "     CONSTRAINT fk_usuario FOREIGN KEY (id_usuario) REFERENCES implantacao2_5.usuario(id),\n"
                     + "     CONSTRAINT fk_tipooperacao FOREIGN KEY (id_tipooperacao) REFERENCES implantacao2_5.tipooperacao(id),\n"
                     + "     CONSTRAINT fk_loja FOREIGN KEY (id_loja) REFERENCES public.loja(id)\n"
+                    + ");\n"
+                    + "CREATE TABLE IF NOT EXISTS implantacao2_5.dadossistemagenerico (\n"
+                    + "    id_banco text,\n"
+                    + "    banco text,\n"
+                    + "    sistema text,\n"
+                    + "    id_sistema int4,\n"
+                    + "    script_getlojas text\n"
                     + ");"
             );
         }
     }
 
     public void salvarBancoDados(EBancoDados eBancoDados) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(
-                    "INSERT INTO implantacao2_5.bancodados (id, nome) \n"
-                    + "VALUES (\n"
-                    + eBancoDados.getId() + ", \n"
-                    + "'" + eBancoDados.getNome() + "'\n"
-                    + ");");
+        if (validarGenerico()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(
+                        "INSERT INTO implantacao2_5.bancodados (id, nome) \n"
+                        + "VALUES (\n"
+                        + eBancoDados.getId() + ", \n"
+                        + "'" + eBancoDados.getNome() + "'\n"
+                        + ");");
+            }
         }
     }
 
     public void salvarSistema(ESistema eSistema) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute("INSERT INTO implantacao2_5.sistema (id, nome) \n"
-                    + "VALUES (\n"
-                    + eSistema.getId() + ", \n"
-                    + "'" + eSistema.getNome() + "'\n"
-                    + ")");
+        if (validarGenerico()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute("INSERT INTO implantacao2_5.sistema (id, nome) \n"
+                        + "VALUES (\n"
+                        + eSistema.getId() + ", \n"
+                        + "'" + eSistema.getNome() + "'\n"
+                        + ")");
+            }
         }
     }
 
     public void deletarSistemaBancoDados() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.sistemabancodados;");
+        if (validarGenerico()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute("DELETE FROM implantacao2_5.sistemabancodados;");
+            }
         }
     }
 
     public void salvarSistemaBancoDados(ESistemaBancoDados eSistemaBancoDados) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(
-                    "INSERT INTO implantacao2_5.sistemabancodados ("
-                    + "id_sistema, "
-                    + "id_bancodados, "
-                    + "usuario, "
-                    + "senha, "
-                    + "nomeschema, "
-                    + "porta"
-                    + ")\n"
-                    + "VALUES ("
-                    + "(SELECT id FROM implantacao2_5.sistema\n"
-                    + "  WHERE nome = '" + eSistemaBancoDados.getNomeSistema() + "'),\n"
-                    + "(SELECT id FROM implantacao2_5.bancodados\n"
-                    + "  WHERE nome = '" + eSistemaBancoDados.getNomeBancoDados() + "'), "
-                    + "'" + eSistemaBancoDados.getUsuario() + "', "
-                    + "'" + eSistemaBancoDados.getSenha() + "', "
-                    + "'" + eSistemaBancoDados.getNomeSchema() + "', "
-                    + eSistemaBancoDados.getPorta() + ");"
-            );
+        if (validarGenerico()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(
+                        "INSERT INTO implantacao2_5.sistemabancodados ("
+                        + "id_sistema, "
+                        + "id_bancodados, "
+                        + "usuario, "
+                        + "senha, "
+                        + "nomeschema, "
+                        + "porta"
+                        + ")\n"
+                        + "VALUES ("
+                        + "(SELECT id FROM implantacao2_5.sistema\n"
+                        + "  WHERE nome = '" + eSistemaBancoDados.getNomeSistema() + "'),\n"
+                        + "(SELECT id FROM implantacao2_5.bancodados\n"
+                        + "  WHERE nome = '" + eSistemaBancoDados.getNomeBancoDados() + "'), "
+                        + "'" + eSistemaBancoDados.getUsuario() + "', "
+                        + "'" + eSistemaBancoDados.getSenha() + "', "
+                        + "'" + eSistemaBancoDados.getNomeSchema() + "', "
+                        + eSistemaBancoDados.getPorta() + ");"
+                );
+            }
         }
     }
 
     public void deletarScriptGetLojaOrigemSistemas() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute("DELETE FROM implantacao2_5.sistemabancodadosscripts");
+        if (validarGenerico()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute("DELETE FROM implantacao2_5.sistemabancodadosscripts");
+            }
         }
     }
 
     public void salvarScriptGetLojaOrigemSistemas(EScriptLojaOrigemSistema eScriptLojaOrigemSistema) throws Exception {
+        if (validarGenerico()) {
+            String sql = "INSERT INTO implantacao2_5.sistemabancodadosscripts("
+                    + "id_sistema, "
+                    + "id_bancodados, "
+                    + "script_getlojas"
+                    + ")\n"
+                    + "VALUES ("
+                    + eScriptLojaOrigemSistema.getIdSistema() + ", "
+                    + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
+                    + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
 
-        String sql = "INSERT INTO implantacao2_5.sistemabancodadosscripts("
-                + "id_sistema, "
-                + "id_bancodados, "
-                + "script_getlojas"
-                + ")\n"
-                + "VALUES ("
-                + eScriptLojaOrigemSistema.getIdSistema() + ", "
-                + eScriptLojaOrigemSistema.getIdBancoDados() + ", "
-                + "'" + eScriptLojaOrigemSistema.getScriptGetLojaOrigem() + "');";
-
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(sql);
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql);
+            }
         }
     }
 
@@ -382,6 +404,15 @@ public class AtualizadorDAO {
                             + eTipoOperacao.getIdMetodo() + ");");
                 }
             }
+        }
+    }
+
+    public boolean validarGenerico() throws Exception {
+        validaDados = dao.verificaDadosSistemaGenerico();
+        if (validaDados == null || validaDados.toLowerCase().contains("vazio")) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

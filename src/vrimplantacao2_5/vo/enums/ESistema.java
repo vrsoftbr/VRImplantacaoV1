@@ -228,6 +228,7 @@ import vrimplantacao2_5.dao.sistema.GEPDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.dao.sistema.ProviderGenericoDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
 import vrimplantacao2_5.dao.sistema.LCSistemasDAO;
 import vrimplantacao2_5.dao.sistema.MRC6DAO;
@@ -286,6 +287,7 @@ import vrimplantacao2_5.gui.sistema.GSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Generico2_5GUI;
 import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
 import vrimplantacao2_5.gui.sistema.GuiaSistemas2_5GUI;
@@ -2221,6 +2223,18 @@ public enum ESistema {
         ) {
             try {
                 return new Wise2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },
+     GENERICO(252, "GENERICO", new ProviderGenericoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Generico2_5GUI(frame);
                 } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

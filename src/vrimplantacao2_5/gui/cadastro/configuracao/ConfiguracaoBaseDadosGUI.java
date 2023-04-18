@@ -1,8 +1,11 @@
 package vrimplantacao2_5.gui.cadastro.configuracao;
 
+import java.awt.Panel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
@@ -20,10 +23,12 @@ import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.controller.cadastro.configuracao.ConfiguracaoBaseDadosController;
 import vrimplantacao2_5.controller.migracao.MigracaoSistemasController;
+import vrimplantacao2_5.dao.cadastro.sistemabancodados.SistemaBancoDadosDAO;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
+import vrimplantacao2_5.vo.cadastro.ScriptLojaOrigemVO;
 import vrimplantacao2_5.vo.enums.EOpcoesMigracaoSistema;
 
 /**
@@ -45,21 +50,22 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
 
     private MigracaoSistemasController migracaoSistemasController = null;
-    
+
     private int idConexao;
-    
+
     /**
      * Creates new form ConfiguracaoPrincipalGUI
+     *
      * @param menuGUI
      * @throws java.lang.Exception
      */
     public ConfiguracaoBaseDadosGUI(VRMdiFrame menuGUI) throws Exception {
         super(menuGUI);
         initComponents();
-        
+
         this.parentFrame = menuGUI;
         setConfiguracao();
-        
+
         migracaoSistemasController = new MigracaoSistemasController();
     }
     
@@ -118,15 +124,15 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         desabilitarBotao();
     }
-    
-    private void selecionarBancoDados() throws Exception {        
+
+    private void selecionarBancoDados() throws Exception {
         migracaoSistemasController.setIdBancoDados(cboBD.getId());
     }
-    
+
     private void selecionarSistema() throws Exception {
         migracaoSistemasController.setIdSistema(cboSistema.getId());
     }
-    
+
     private void exibiPainelConexao() {
         tabConexao.removeAll();
         desabilitarBotao();
@@ -152,7 +158,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     configuracaoBancoVO.getUsuario(),
                     configuracaoBancoVO.getSenha());
         }
-        
+
         habilitarBotaoSalvar();
     }
 
@@ -213,7 +219,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
 
-    public void consultaConfiguracaoLoja() throws Exception {        
+    public void consultaConfiguracaoLoja() throws Exception {
         List<ConfiguracaoBancoLojaVO> lojas = mapaController.getLojaMapeada();
 
         Object[][] dados = new Object[lojas.size()][7];
@@ -241,19 +247,19 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }
 
     public void atualizarConsultaConfiguracaoLoja(int idConexao) {
-        
+
         try {
             this.idConexao = idConexao;
-            
+
             mapaController.consultaLojaMapeada(idConexao);
-            
+
             this.repaint();
-            
-        } catch (Exception ex ) {
+
+        } catch (Exception ex) {
             Util.exibirMensagemErro(ex, title);
         }
     }
-    
+
     @Override
     public void excluir() {
         try {
@@ -264,7 +270,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
             mapaController.excluirLojaMapeada(mapaController.
                     getLojaMapeada().
-                        get(tblLoja.
+                    get(tblLoja.
                             getLinhaSelecionada()));
 
             mapaController.consultaLojaMapeada(configuracaoBancoVO.getId());
@@ -475,13 +481,13 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_cboSistemaActionPerformed
 
     private void cboBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboBDActionPerformed
-        
+
         try {
             exibiPainelConexao();
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
-        
+
     }//GEN-LAST:event_cboBDActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
@@ -504,15 +510,37 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
 
         exibirSelecaoLoja();
-        
+
     }//GEN-LAST:event_btnProximoActionPerformed
 
     private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
-
+        String nomeBanco = null;
+        String script = null;
         try {
             selecionarBancoDados();
             selecionarSistema();
-            exibirMapaLoja();
+            List<ScriptLojaOrigemVO> dao = new SistemaBancoDadosDAO().getScriptsLojaOrigem();
+            for (ScriptLojaOrigemVO vo : dao) {
+                if (vo.getSistema().equals(cboSistema.getDescricao())) {
+                    nomeBanco = vo.getBanco();
+                    script = vo.getScript();
+                }
+            }
+            if (cboSistema.getId() == 252 && (!nomeBanco.equals(cboBD.getDescricao()) || script.equalsIgnoreCase("VAZIO"))) {
+                Object[] options = {"Fechar"};
+                JOptionPane.showOptionDialog(null,
+                        new SalvarScriptLojaOrigemPanel(),
+                        "Altere Script Loja origem, caso necessite.",
+                        JOptionPane.NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+                exibirMapaLoja();
+            } else {
+                exibirMapaLoja();
+            }
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
         }
@@ -550,7 +578,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             mapaLojaGUI.setMapaLojaController(mapaController);
             mapaLojaGUI.configuracaoBaseDadosGUI = this;
             mapaLojaGUI.setConfiguracaoConexao(configuracaoBancoVO);
-            
+
             mapaLojaGUI.setConfiguracao();
             mapaLojaGUI.setVisible(true);
 
@@ -574,7 +602,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             menuGUI.setDefaultCursor();
         }
     }
-    
+
     public void exibirSelecaoLoja() {
         try {
             if (migracaoGUI == null || !migracaoGUI.isActive()) {
@@ -583,9 +611,9 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
             migracaoGUI.parentFrame = this.parentFrame;
             migracaoGUI.setVisible(true);
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Seleção de Loja");
         }
-    }    
+    }
 }

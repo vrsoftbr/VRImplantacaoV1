@@ -209,7 +209,8 @@ public enum EScriptLojaOrigemSistema {
     FENIXME(249, 5, "SELECT CODIGOFILIAL id, CODIGOFILIAL|| ''-'' ||NOME AS descricao FROM FILIAL ORDER BY 1"),
     TARGET_G3(250, 13, "select cd_emp id, raz_soc descricao from empresa"),
     WISE(251, 5, "SELECT 1 id, FANTASIA descricao FROM NFE_EMPRESAS"),
-    MARKET(103, 11, "select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1");
+    MARKET(103, 11, "select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1"),
+    GENERICO(252, 11, "vazio");
 
     private int idSistema;
     private int idBancoDados;

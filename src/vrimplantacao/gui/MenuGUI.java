@@ -253,7 +253,6 @@ import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VCashGUI;
-import vrimplantacao2.gui.interfaces.VRToVRGUI;
 import vrimplantacao2.gui.interfaces.VarejoFacilGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.ViggoGUI;
@@ -328,6 +327,7 @@ import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.nutricional.GUI.NutricionalArqGUI;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
+import vrimplantacao2_5.relatorios.gerador.GeradorProdutoEstoqueFiscal;
 import vrimplantacao2_5.relatorios.relatoriosDAO.ExecutaSpedDAO;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -336,7 +336,7 @@ public final class MenuGUI extends VRMdiFrame {
     public VRSoftwareGUI formMigracaoVR = null;
     public CgaGUI formImportarCga = null;
     public MilenioGUI formImportarMilenio = null;
-    public JMasterGUI formImportarJMaster = null;    
+    public JMasterGUI formImportarJMaster = null;
     public GetWay_ProfitGUI formImportarGetWay = null;
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
@@ -396,9 +396,9 @@ public final class MenuGUI extends VRMdiFrame {
     public JacsysGUI formImportarJacsys = null;
     public SifatGUI formImportarSifat = null;
     public GerarCodigoBarrasAtacadoGUI formImportarGerarCodigoBarrasAtacado = null;
-    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;    
+    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;
     public NotaSaidaNfceImportacaoArquivoGUI formNotaSaidaNfceImportacaoArquivoGUI = null;
-    public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;    
+    public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;
     public ArquivoPadraoGUI formArquivoPadrao = null;
     public PlanilhaV2GUI formPlanilhaV2 = null;
     public AcertarCodigoInternoGUI formAcertarCodigoInterno = null;
@@ -408,7 +408,7 @@ public final class MenuGUI extends VRMdiFrame {
     public VRBusca txtBusca = null;
 
     private LoginGUI loginFrame = null;
-    
+
     private AtualizadorController atualizadorController = null;
 
     public MenuGUI(LoginGUI i_loginFrame) throws Exception {
@@ -425,7 +425,7 @@ public final class MenuGUI extends VRMdiFrame {
         atualizarRodape();
         configurarBusca();
         atualizarJanela();
-        
+
         if (Global.getIdUnidade() != 1) {
             mnuCadastro2_5.setVisible(false);
         }
@@ -433,7 +433,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     @Override
     public void atualizarRodape() throws Exception {
-        
+
         lblUsuario.setText(Global.getNomeUsuario());
         lblUnidade.setText(Global.getNomeUnidade());
         lblData.setText(new DataProcessamentoDAO().get());
@@ -455,45 +455,45 @@ public final class MenuGUI extends VRMdiFrame {
                 try {
                     if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_CGA.getId()) {
                         jMenuItemCGAActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SHI.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SHI.getId()) {
                         jMenuItemSHIActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SYSPDV_FIREBIRD.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SYSPDV_FIREBIRD.getId()) {
                         jMenuItemSysPDVActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_IDEAL.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_IDEAL.getId()) {
                         jMenuItemIdealActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_MOBILITY.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_MOBILITY.getId()) {
                         jMenuItemMobilityActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GDOOR.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GDOOR.getId()) {
                         jMenuItemGdoorActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_WISASOFT.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_WISASOFT.getId()) {
                         jMenuItemGdoorActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SOFTAEX.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SOFTAEX.getId()) {
                         jMenuItemSoftaExActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_JMASTER.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_JMASTER.getId()) {
                         jMenuItemJMasterActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_MILENIO.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_MILENIO.getId()) {
                         jMenuItemMilenioActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GETWAY.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GETWAY.getId()) {
                         jMenuItemGetWayActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SYSPDV_SQLSERVER.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_SYSPDV_SQLSERVER.getId()) {
                         jMenuItemSysPDVSQLServerActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GUIASISTEMAS.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GUIASISTEMAS.getId()) {
                         jMenuItemGuiaSistemasActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_BOECHATSOFT.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_BOECHATSOFT.getId()) {
                         jMenuItemBoechatSoftActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_RMS.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_RMS.getId()) {
                         jMenuItemRMSActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GCF.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GCF.getId()) {
                         jMenuItemGCFActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_FMSISTEMAS.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_FMSISTEMAS.getId()) {
                         jMenuItemFMSistemasActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_EVEREST.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_EVEREST.getId()) {
                         jMenuItemEverastActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_ORION.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_ORION.getId()) {
                         jMenuItemOrionActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_ULTRASYST.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_ULTRASYST.getId()) {
                         jMenuItemUltraSystActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_CONCRETIZE.getId()) {
+                    } else if (evt.idFormulario == Formulario.IMPORTACAO_CONCRETIZE.getId()) {
                         jMenuItemConcretizeActionPerformed(null);
                     } else if (evt.idFormulario == Formulario.IMPORTACAO_KAIROS.getId()) {
                         jMenuItemKairosActionPerformed(null);
@@ -537,6 +537,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMenu.add(Box.createHorizontalGlue());
         mnuMenu.add(txtBusca);
     }
+
     @Override
     public void atualizarJanela() throws Exception {
         //verifica janela selecionada
@@ -965,6 +966,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAjuda = new javax.swing.JMenu();
         jSeparator4 = new javax.swing.JSeparator();
         mnuAjudaSobre = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem20 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("VR Implantação"); // NOI18N
@@ -1028,7 +1031,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
+                .addComponent(lblUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 752, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel5Layout.setVerticalGroup(
@@ -1055,7 +1058,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel6Layout.setVerticalGroup(
@@ -1082,7 +1085,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(lblUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel3Layout.setVerticalGroup(
@@ -1111,7 +1114,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(
@@ -3673,6 +3676,18 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuMenu.add(mnuAjuda);
 
+        jMenu1.setText("Ferramentas Fiscais");
+
+        jMenuItem20.setText("Relatório Produto Estoque para novo CNPJ");
+        jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem20ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem20);
+
+        mnuMenu.add(jMenu1);
+
         setJMenuBar(mnuMenu);
 
         pack();
@@ -4004,7 +4019,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSoftaExActionPerformed
 
     private void jMenuItemOrionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOrionActionPerformed
-        
+
         OrionGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemOrionActionPerformed
 
@@ -4093,7 +4108,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemEcosInformaticaActionPerformed
 
     private void jMenuItemSuperServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSuperServerActionPerformed
-        
+
         SuperControle_SuperServerGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSuperServerActionPerformed
 
@@ -4106,7 +4121,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemControlWareActionPerformed
 
     private void jMenuItemDestroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDestroActionPerformed
-    
+
         DestroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemDestroActionPerformed
 
@@ -4133,7 +4148,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuNFeActionPerformed
 
     private void jMenuItemTopSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemTopSystemActionPerformed
-     
+
         TopSystemGUI3.exibir(this);
     }//GEN-LAST:event_jMenuItemTopSystemActionPerformed
 
@@ -4230,7 +4245,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSIMSActionPerformed
 
     private void jMenuItemGR7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGR7ActionPerformed
-       
+
         GR7_2GUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGR7ActionPerformed
 
@@ -4592,7 +4607,7 @@ public final class MenuGUI extends VRMdiFrame {
         } finally {
             this.setDefaultCursor();
         }
-        
+
     }//GEN-LAST:event_mnuJacsysActionPerformed
 
     private void mnuCodigoBarrasAtacadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCodigoBarrasAtacadoActionPerformed
@@ -4768,7 +4783,7 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuAutoSystem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoSystem1ActionPerformed
         RMSAutomaHelpGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoSystem1ActionPerformed
-	
+
     private void mnuWebsacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWebsacActionPerformed
         WebSacGUI.exibir(this);
     }//GEN-LAST:event_mnuWebsacActionPerformed
@@ -4888,7 +4903,7 @@ public final class MenuGUI extends VRMdiFrame {
         } finally {
             this.setDefaultCursor();
         }
-        
+
     }//GEN-LAST:event_mnuAcertarIdsProdutosActionPerformed
 
     private void mnuUniplusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUniplusActionPerformed
@@ -5325,9 +5340,9 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuSaefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaefActionPerformed
         SaefGUI.exibir(this);
     }//GEN-LAST:event_mnuSaefActionPerformed
-	
+
     private void mnuMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMasterActionPerformed
-       MasterGUI.exibir(this);
+        MasterGUI.exibir(this);
     }//GEN-LAST:event_mnuMasterActionPerformed
 
     private void mnuSTSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemasActionPerformed
@@ -5405,7 +5420,7 @@ public final class MenuGUI extends VRMdiFrame {
         } finally {
             this.setDefaultCursor();
         }
-        
+
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void mnuGondolaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGondolaActionPerformed
@@ -5429,7 +5444,7 @@ public final class MenuGUI extends VRMdiFrame {
         } finally {
             this.setDefaultCursor();
         }
-        
+
     }//GEN-LAST:event_mnuCorrecaoImpostosDSoftActionPerformed
 
 
@@ -5494,9 +5509,9 @@ public final class MenuGUI extends VRMdiFrame {
         EptusGUI.exibir(this);
     }//GEN-LAST:event_mnuEptusActionPerformed
 
-    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {                                       
+    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {
         NeoGUI.exibir(this);
-    }                                      
+    }
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
@@ -5511,18 +5526,18 @@ public final class MenuGUI extends VRMdiFrame {
         StockGUI.exibir(this);
     }//GEN-LAST:event_mnuStockActionPerformed
 
-    private void mnuPrimeActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void mnuPrimeActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         PrimeGUI.exibir(this);
-    }                                        
+    }
 
-    private void mnuAutoMacActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void mnuAutoMacActionPerformed(java.awt.event.ActionEvent evt) {
         AutoMacGUI.exibir(this);
-    }                                                                                         
+    }
 
-    private void mnuDTComActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void mnuDTComActionPerformed(java.awt.event.ActionEvent evt) {
         DTComPlanilhaGUI.exibir(this);
-    }                                        
+    }
 
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
         // TODO add your handling code here:
@@ -5588,14 +5603,16 @@ public final class MenuGUI extends VRMdiFrame {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        } if (decisao == 1) {
+        }
+        if (decisao == 1) {
             try {
                 new ExecutaSpedDAO().executaSped();
                 JOptionPane.showMessageDialog(null, "SPED gerado", "Sped", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
-        } if (decisao == 2) {
+        }
+        if (decisao == 2) {
             try {
                 new GeradorArquivosRepository().geraRelaotirosTexto();
             } catch (Exception ex) {
@@ -5625,11 +5642,20 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem18ActionPerformed
 
+    private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
+        try {
+            new GeradorProdutoEstoqueFiscal().gerarProdutoEstoqueFiscalTxt();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_jMenuItem20ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
@@ -5642,6 +5668,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem20;
     private javax.swing.JMenuItem jMenuItem23;
     private javax.swing.JMenuItem jMenuItem24;
     private javax.swing.JMenuItem jMenuItem25;
@@ -5989,12 +6016,12 @@ public final class MenuGUI extends VRMdiFrame {
             ParametroGUI.Exibir(this);
         }
     }
- 
+
     public void verificarLite() {
         String param = Parametros.lite;
         if (param != null && !"".equals(param)) {
             mnuMenu.setVisible(false);
-            
+
             if ("lince".equals(param)) {
                 LinceGUI.exibir(this, true);
             }

@@ -252,7 +252,9 @@ public enum ESistemaBancoDados {
     SQLSERVER_ETRADE(220, "ETRADE", 13, "SQLSERVER", "ETrade", "dba", "master1", 1433),
     SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433),
-    SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433);
+    SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433),
+    FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "postgres", "postgres", "VrPost@Server", 8745),
+    POSTGRESQL_GENERICO(252, "GENERICO", 11, "POSTGRESQL", "postgres", "postgres", "VrPost@Server", 8745);
 
     private int idSistema;
     private String nomeSistema;
