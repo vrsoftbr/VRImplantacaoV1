@@ -71,6 +71,7 @@ public class ProdutoVO {
     private int numeroparcela = 0;
     private boolean manterDescricao = false;
     private int idVasilhame;
+    private double percentualPerda = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -477,5 +478,13 @@ public class ProdutoVO {
 
     public void setIdVasilhame(int idVasilhame) {
         this.idVasilhame = idVasilhame;
+    }
+    
+    public double getPercentualPerda() {
+        return percentualPerda;
+    }
+
+    public void setPercentualPerda(double percentualPerda) {
+        this.percentualPerda = percentualPerda;
     }
 }

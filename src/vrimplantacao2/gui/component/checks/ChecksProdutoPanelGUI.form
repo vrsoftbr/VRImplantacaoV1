@@ -1463,6 +1463,8 @@
                                   <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="chkVasilhame" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkPercentualPerda" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
@@ -1506,6 +1508,7 @@
                               <Component id="chkVendaControlada" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkDataCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkVasilhame" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPercentualPerda" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="16" max="32767" attributes="0"/>
                       </Group>
@@ -1615,6 +1618,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVasilhame">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Vasilhame"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPercentualPerda">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Percentual Perda"/>
                   </Properties>
                 </Component>
               </SubComponents>

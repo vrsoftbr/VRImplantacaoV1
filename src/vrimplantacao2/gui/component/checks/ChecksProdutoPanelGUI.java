@@ -231,7 +231,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM)
                 || opt.contains(OpcaoProduto.VOLUME_QTD)
                 || opt.contains(OpcaoProduto.VENDA_CONTROLADA)
-                || opt.contains(OpcaoProduto.VASILHAME)) {
+                || opt.contains(OpcaoProduto.VASILHAME)
+                || opt.contains(OpcaoProduto.PERCENTUAL_PERDA)) {
             chkDescCompleta.setVisible(opt.contains(OpcaoProduto.DESC_COMPLETA));
             chkDescReduzida.setVisible(opt.contains(OpcaoProduto.DESC_REDUZIDA));
             chkDescGondola.setVisible(opt.contains(OpcaoProduto.DESC_GONDOLA));
@@ -250,6 +251,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkVendaControlada.setVisible(opt.contains(OpcaoProduto.VENDA_CONTROLADA));
             chkDataCadastro.setVisible(opt.contains(OpcaoProduto.DATA_CADASTRO));
             chkVasilhame.setVisible(opt.contains(OpcaoProduto.VASILHAME));
+            chkPercentualPerda.setVisible(opt.contains(OpcaoProduto.PERCENTUAL_PERDA));
             tabImportacao.add(pnlImpInfoAdic);
         }
 
@@ -653,6 +655,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVrAtacado.setSelected(false);
         chkPromocao.setSelected(false);
         chkDesmembramento.setSelected(false);
+        chkPercentualPerda.setSelected(false);
     }
 
     /**
@@ -790,6 +793,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVendaControlada = new vrframework.bean.checkBox.VRCheckBox();
         chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkVasilhame = new vrframework.bean.checkBox.VRCheckBox();
+        chkPercentualPerda = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpOutrosDados = new vrframework.bean.panel.VRPanel();
         jLabel9 = new javax.swing.JLabel();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -1624,6 +1628,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkVasilhame, "Vasilhame");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkPercentualPerda, "Percentual Perda");
+
         javax.swing.GroupLayout pnlImpInfoAdicLayout = new javax.swing.GroupLayout(pnlImpInfoAdic);
         pnlImpInfoAdic.setLayout(pnlImpInfoAdicLayout);
         pnlImpInfoAdicLayout.setHorizontalGroup(
@@ -1675,7 +1681,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkVasilhame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkVasilhame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkPercentualPerda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(5, 5, 5))
         );
         pnlImpInfoAdicLayout.setVerticalGroup(
@@ -1710,7 +1718,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlImpInfoAdicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkVasilhame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkVasilhame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPercentualPerda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -1977,6 +1986,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     public vrframework.bean.checkBox.VRCheckBox chkPautaUsarEansMenores;
     public vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    public vrframework.bean.checkBox.VRCheckBox chkPercentualPerda;
     public vrframework.bean.checkBox.VRCheckBox chkPesoBruto;
     public vrframework.bean.checkBox.VRCheckBox chkPesoLiquido;
     public vrframework.bean.checkBox.VRCheckBox chkPfIcmsCredito;
@@ -2429,6 +2439,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkVasilhame.isSelected()) {
                     opcoes.add(OpcaoProduto.VASILHAME);
+                }
+                if(chkPercentualPerda.isSelected()){
+                    opcoes.add(OpcaoProduto.PERCENTUAL_PERDA);
                 }
                 opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {

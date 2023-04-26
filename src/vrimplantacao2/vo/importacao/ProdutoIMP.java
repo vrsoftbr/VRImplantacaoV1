@@ -186,6 +186,8 @@ public class ProdutoIMP {
     @DatabaseField private String codigoAnp = "";
     @DatabaseField private String idVasilhame;
     
+    @DatabaseField private double percentualPerda = 0;
+    
     private int codigoAtual;
     private int operacional = 0;
     
@@ -1135,6 +1137,14 @@ public class ProdutoIMP {
 
     public void setIdVasilhame(String idVasilhame) {
         this.idVasilhame = idVasilhame;
+    }
+    
+    public double getPercentualPerda() {
+        return percentualPerda;
+    }
+    
+    public void setPercentualPerda(double percentualPerda){
+        this.percentualPerda = percentualPerda;
     }
     
     public boolean from(ProdutoBalancaVO bal) {

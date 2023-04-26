@@ -215,14 +215,20 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	CODIGO_PRODUTO id_produto,\n"
                     + "	CODIGO_BARRA ean,\n"
                     + "	UNIDADE_REFERENCIA tipo_embalagem,\n"
                     + "	1 qtdembalagem\n"
                     + "FROM\n"
                     + "	TB_PRODUTOS tp\n"
-                    + "ORDER BY 1"
+                    + "ORDER BY 1"*/
+                    "SELECT \n"
+                    + " COD_PRODUTO id_produto,\n"
+                    + " COD_AUXILIAR ean,\n"
+                    + " CASE WHEN QUANTIDADE > 1 THEN 'CX' ELSE 'UN' END tipo_embalagem,\n"
+                    + " QUANTIDADE qtdembalagem\n"
+                    + "FROM TB_PRODUTO_AUXILIAR"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -259,6 +265,8 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " COD_DEPARTAMENTO merc1,\n"
                     + "	p.COD_PRECO_PRODUT_EQUIV familia,\n"
                     + "	PRECO_CUSTO custo,\n"
+                    + " VR_CUSTOBR custocomimposto,\n"
+                    + "	VR_CUSTOLIQ custosemimposto,\n"
                     + " PRECO_VENDATERMINAL precovenda,\n"
                     + "	MARGEM_LUCRO margem,\n"
                     + "	CAST(p.DATA_ALTERACAO AS date) DATA_ALTERACAO,\n"
@@ -298,8 +306,8 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtde_emb_compra"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setMargem(rst.getDouble("margem"));
 
@@ -323,9 +331,11 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
-                    imp.setIcmsCreditoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
+
+                    imp.setIcmsCreditoId(idIcmsDebito);
+                    imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
@@ -399,7 +409,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	TB_PESSOA p\n"
                     + "WHERE\n"
-                    + "	p.CODIGO_PESSOA IN (SELECT COD_FORNECEDORPESSOA FROM TB_FORNECEDORES)\n"
+                    + "	p.TIPO IN ('A','F') OR p.TIPOPESSOA IN ('J','F')\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -602,6 +612,7 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.LOJA = " + getLojaOrigem() + "\n"
                     + "	AND COD_CLIENTE IS NOT NULL\n"
                     + "	AND fp.SITUACAO = 'A'\n"
+                    + " AND f.SITUACAO = 'A'\n"
                     + "	AND DATA_PAGAMENTO IS NULL\n"
                     + "ORDER BY CODIGO_FINANCEIRO_P, DATA_EMISSAO"
             )) {

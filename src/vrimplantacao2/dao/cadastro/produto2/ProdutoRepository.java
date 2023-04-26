@@ -1680,6 +1680,7 @@ public class ProdutoRepository {
         if (anteriorVasilhame != null && anteriorVasilhame.getCodigoAtual().getId() != 0) {
             vo.setIdVasilhame(anteriorVasilhame.getCodigoAtual().getId());
         }
+        vo.setPercentualPerda(imp.getPercentualPerda());
 
         return vo;
     }

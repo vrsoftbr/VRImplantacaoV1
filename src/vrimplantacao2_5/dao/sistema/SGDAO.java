@@ -46,12 +46,14 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
     
     Arquivos DBF necessários:
         arqbar.dbf
+        arqfab.dbf
         cadcli.dbf
         cadfil.dbf
         cadforn.dbf
         cadpro.dbf
         conrec.dbf
         contpag.dbf
+        medpro.dbf
         profer.dbf
         profor.dbf
         tabagr.dbf
@@ -262,7 +264,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tpiscof pis on p.codpro01 = pis.codpro and \n"
                     + "	pis.entsai = 'S' and \n"
                     + "	pis.filial = p.codfil01\n"
-                    + "join cadforn f on substring(p.fornec01,1,15) = substring(f.nomeabr02,1,15)\n"
+                    + "left join cadforn f on substring(p.fornec01,1,15) = substring(f.nomeabr02,1,15)\n"
                     + "left join medpro m on m.filial = p.codfil01 and m.codpro = p.codpro01\n"
                     + "where \n"
                     + "	p.codfil01 = " + getLojaOrigem())) {
