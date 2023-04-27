@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -26,6 +25,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
@@ -201,6 +201,38 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc3ID("1");
                     imp.setMerc3Descricao("1");
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	RIGHT (CD_PRO,9)AS id_produto,\n"
+                    + "	DT_INI_PROMOCAO_PRO AS dataInicio,\n"
+                    + "	DT_FIM_PROMOCAO_PRO AS dataFim,\n"
+                    + "	VL_VENDA_PRO AS precoNormal,\n"
+                    + "	VL_PROMOCAO_PRO AS precoOferta\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "WHERE\n"
+                    + "	HR_INI_PROMOCAO_PRO IS NOT NULL\n"
+                    + "	AND DT_FIM_PROMOCAO_PRO >= CURRENT_DATE"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(rst.getDate("dataInicio"));
+                    imp.setDataFim(rst.getDate("dataFim"));
+                    imp.setPrecoNormal(rst.getDouble("precoNormal"));
+                    imp.setPrecoOferta(rst.getDouble("precoOferta"));
 
                     result.add(imp);
                 }
@@ -717,23 +749,26 @@ public class Fenix2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	ID_CONVENIO AS id,\n"
-                    + "	CD_CLIENTE AS id_cliente,\n"
-                    + "	c2.CNPJ_CLI AS cnpj,\n"
-                    + "	ct.NR_CUPOM_FISCAL AS coo,\n"
-                    + "	c.DH_INCLUSAO AS dt_emissao,\n"
-                    + "	ct.NM_ESTACAO AS ecf,\n"
-                    + "	c.VL_CONVENIO AS valor\n"
-                    + "FROM\n"
-                    + "	CONVENIO c \n"
-                    + "JOIN CLIENTE c2 ON c2.ID_CLI = c.CD_CLIENTE \n"
-                    + "JOIN conta ct ON ct.ID_CONTA  = c.ID_CONTA "
+                    "SELECT  \n"
+                    + " c.ID_CONVENIO as id ,\n"
+                    + " c.CD_CLIENTE as id_cliente,\n"
+                    + " c.VL_CONVENIO,\n"
+                    + " c.ST_CONVENIO,\n"
+                    + " c.DH_INCLUSAO,\n"
+                    + " p.DT_INICIO,\n"
+                    + " p.DH_VENCIMENTO,\n"
+                    + " p.VL_ORIGINAL_SEM_JUROS \n"
+                    + "FROM CONVENIO c\n"
+                    + "LEFT JOIN PAGAMENTO p ON p.ID_PAGAMENTO = c.ID_PAGAMENTO \n"
+                    + "LEFT JOIN CONVENIO_PAGTO cp ON cp.ID_CONVENIO = c.ID_CONVENIO\n"
+                    + "WHERE c.CD_CLIENTE = 34\n"
+                    + "AND c.ST_CONVENIO = 'R' \n"
+                    + "AND cp.ID_CONVENIO IS NULL"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setNumeroCupom(rs.getString("coo"));
                     imp.setDataEmissao(rs.getDate("dt_emissao"));

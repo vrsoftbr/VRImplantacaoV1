@@ -20,7 +20,7 @@ import vrimplantacao2_5.vo.cadastro.TecladoLayoutVO;
 public class LojaDAO {
 
     private Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-
+    
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         List<LojaVO> result = new ArrayList();
 
@@ -214,7 +214,7 @@ public class LojaDAO {
                 copiarPdvTecladoLayout(i_loja);
                 copiarPdvTecladoLayoutFuncao(i_loja);
             }
-            
+
             /* cópia da tabela pdv.finalizadoraconfiguracao */
             stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
 
@@ -232,9 +232,31 @@ public class LojaDAO {
 
             /* cópia tabela tiposaidanotasaidasequencia */
             stm.execute(copiarTipoSaidaNotaSaidaSequencia(i_loja));
+
+            if (i_loja.isCopiaEcf() == true) {
+
+                stm.execute(copiaEcf(i_loja));
+                stm.execute(copiaPdvAcumuladorLayout(i_loja));
+                stm.execute(copiaPdvFinalizadoraLayout(i_loja));
+                stm.execute(copiaPdvAliquotaLayout(i_loja));
+                stm.execute(copiaAliquotaLayoutRetorno(i_loja));
+                stm.execute(copiaAcumuladorLayoutRetorno(i_loja));
+                stm.execute(copiaFinalizadoraRetorno(i_loja));
+                stm.execute(copiaPdvEcfLayout(i_loja));
+            }
+
+            if (i_loja.isCopiaOperador() == true) {
+                stm.execute(copiarOperador(i_loja));
+            }
+
+            if (i_loja.isCopiaUsuario() == true) {
+                stm.execute(copiaUsuarioPermissao(i_loja));
+            }
+
+            //  stm.execute(copiaEcf(i_loja));
         }
     }
-    
+
     public void atualizarLoja(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
@@ -256,7 +278,7 @@ public class LojaDAO {
             }
         }
     }
-    
+
     private String copiarProdutoComplemento(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO produtocomplemento ("
                 + "id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, dataultimopreco, \n"
@@ -448,22 +470,23 @@ public class LojaDAO {
             return result;
         }
     }
-    
+
     public class ProximoIdTecladoLayoutVO {
+
         public int proximoIdTecladoLayout;
     }
-    
+
     public List<ProximoIdTecladoLayoutVO> proximoIdTecladoLayoutVO = new ArrayList<>();
-    
+
     public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
-        
+
         List<TecladoLayoutVO> tecladoLayoutVO = getTecladoLayout(i_loja);
 
         try (Statement stm = Conexao.createStatement()) {
             for (TecladoLayoutVO vo : tecladoLayoutVO) {
 
                 ProximoIdTecladoLayoutVO i_idTecladoLayoutVO = new ProximoIdTecladoLayoutVO();
-                
+
                 int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
 
                 SQLBuilder sqlTecladoLayout = new SQLBuilder();
@@ -476,7 +499,7 @@ public class LojaDAO {
 
                 i_idTecladoLayoutVO.proximoIdTecladoLayout = proximoIdTecladoLayout;
                 proximoIdTecladoLayoutVO.add(i_idTecladoLayoutVO);
-                
+
                 stm.execute(sqlTecladoLayout.getInsert());
             }
         }
@@ -484,13 +507,13 @@ public class LojaDAO {
 
     public List<TecladoLayoutFuncaoVO> getPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
         List<TecladoLayoutFuncaoVO> result = new ArrayList<>();
-        
+
         List<TecladoLayoutVO> tecladoLayout = getTecladoLayout(i_loja);
-        
+
         try (Statement stm = Conexao.createStatement()) {
-            
+
             for (TecladoLayoutVO tecladoLayoutVO : tecladoLayout) {
-                
+
                 try (ResultSet rst = stm.executeQuery(
                         "SELECT \n"
                         + "     tl.id as idtecladolayout, \n"
@@ -502,7 +525,7 @@ public class LojaDAO {
                         + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
                 )) {
                     while (rst.next()) {
-                        
+
                         for (ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO : proximoIdTecladoLayoutVO) {
 
                             TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
@@ -511,7 +534,7 @@ public class LojaDAO {
                             vo.setIdFuncao(rst.getInt("id_funcao"));
 
                             result.add(vo);
-                        
+
                         }
                     }
                 }
@@ -519,7 +542,7 @@ public class LojaDAO {
         }
         return result;
     }
-        
+
     public void copiarPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
 
         List<TecladoLayoutFuncaoVO> tecladoLayoutFuncao = getPdvTecladoLayoutFuncao(i_loja);
@@ -559,6 +582,103 @@ public class LojaDAO {
 
         sql.put("id_loja", i_loja.getId());
         sql.put("data", Util.formatDataBanco(new DataProcessamentoDAO().get()));
+
+        return sql;
+    }
+
+    private String copiaUsuarioPermissao(LojaVO i_loja) throws Exception {
+        String sql = "insert into permissaoloja (id, id_loja,id_permissao)\n"
+                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja ";
+
+        return sql;
+    }
+
+    private String copiaAcumuladorLayoutRetorno(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.acumuladorlayoutretorno ( id_acumuladorlayout ,id_acumulador , retorno , titulo )\n"
+                + "(select max((id_acumuladorlayout)+1) , id_acumulador , retorno , titulo from pdv.acumuladorlayoutretorno\n"
+                + "group by id_acumulador, retorno, titulo )";
+
+        return sql;
+    }
+
+    private String copiaAliquotaLayoutRetorno(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.aliquotalayoutretorno ( id_aliquotalayout ,id_aliquota , retorno , codigoleitura )\n"
+                + "(select max((id_aliquotalayout)+1) , id_aliquota , retorno , codigoleitura from pdv.aliquotalayoutretorno\n"
+                + "group by id_aliquota, retorno, codigoleitura )";
+
+        return sql;
+    }
+
+    private String copiaFinalizadoraRetorno(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.finalizadoralayoutretorno ( id_finalizadoralayout ,id_finalizadora , retorno , utilizado )\n"
+                + "(select max((id_finalizadoralayout)+1) , id_finalizadora , retorno , utilizado from pdv.finalizadoralayoutretorno\n"
+                + "group by id_finalizadora, retorno, utilizado )";
+
+        return sql;
+    }
+
+    private String copiaPdvAcumuladorLayout(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.acumuladorlayout (id,id_loja,descricao)\n"
+                + "(select max((id)+1)," + i_loja.getId() + ",descricao from pdv.acumuladorlayout where id_loja = " + i_loja.getIdCopiarLoja() + " \n"
+                + "group by id)";
+
+        return sql;
+    }
+
+    private String copiaPdvFinalizadoraLayout(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.finalizadoralayout (id, id_loja, descricao)\n"
+                + "(select max((id)+1)," + i_loja.getId() + ",descricao from pdv.finalizadoralayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                + "group by id)";
+
+        return sql;
+    }
+
+    private String copiaPdvAliquotaLayout(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.aliquotalayout (id, id_loja, descricao)\n"
+                + "select max((id)+1) ," + i_loja.getId() + ", descricao from pdv.aliquotalayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                + "group by id";
+
+        return sql;
+    }
+
+    private String copiaEcf(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.ecf (ID_LOJA,ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,numeroserie,\n"
+                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
+                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
+                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv) \n"
+                + "	select " + i_loja.getId() + " , ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,'999'||length(tipoecf||versaosb)+row_number() over(),\n"
+                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
+                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
+                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv\n"
+                + "	from pdv.ecf \n"
+                + "	where id_loja = " + i_loja.getIdCopiarLoja();
+
+        return sql;
+    }
+
+    private String copiaPdvEcfLayout(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.ecflayout (id, id_ecf,id_tecladolayout,id_finalizadoralayout,id_acumuladorlayout,id_aliquotalayout,regracalculo,arredondamentoabnt)\n"
+                + "select \n"
+                + " nextval('pdv.ecflayout_id_seq') , \n"
+                + " (select id from pdv.ecf where id_loja = " + i_loja.getId() + ") as id_ecf,\n"
+                + " (select id from pdv.tecladolayout where id_loja = " + i_loja.getId() + ") as id_teclado,\n"
+                + " (select id from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ") as id_finalizadora,\n"
+                + " (select id from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ") as id_acumaldor,\n"
+                + " (select id from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ") as id_aliquotalayout,\n"
+                + " regracalculo ,\n"
+                + " arredondamentoabnt \n"
+                + " from pdv.ecflayout ecf  \n"
+                + " join pdv.ecf e on e.id = ecf.id_ecf"
+                + " where e.id_loja = " + i_loja.getIdCopiarLoja();
+
+        return sql;
+
+    }
+
+    private String copiarOperador(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.operador (id_loja ,matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro)\n"
+                + "select " + i_loja.getId() + ",matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro from pdv.operador \n"
+                + "where matricula != 500001 and id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }
@@ -692,38 +812,37 @@ public class LojaDAO {
         }
         return result;
     }
-    
+
     public List<LojaVO> getLojasVRMapeada() throws Exception {
         List<LojaVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	l.id,\n" +
-                    "	l.descricao,\n" +
-                    "	f.nomefantasia,\n" +
-                    "	f.razaosocial\n" +
-                    "from\n" +
-                    "	loja l\n" +
-                    "inner join fornecedor f on\n" +
-                    "	l.id_fornecedor = f.id\n" +
-                    "where\n" +
-                    "	l.id_situacaocadastro = 1 and \n" +
-                    "	l.id not in (select distinct id_lojadestino from implantacao2_5.conexaoloja)\n" +
-                    "order by\n" +
-                    "	l.id")) {
+                    "select\n"
+                    + "	l.id,\n"
+                    + "	l.descricao,\n"
+                    + "	f.nomefantasia,\n"
+                    + "	f.razaosocial\n"
+                    + "from\n"
+                    + "	loja l\n"
+                    + "inner join fornecedor f on\n"
+                    + "	l.id_fornecedor = f.id\n"
+                    + "where\n"
+                    + "	l.id_situacaocadastro = 1 and \n"
+                    + "	l.id not in (select distinct id_lojadestino from implantacao2_5.conexaoloja)\n"
+                    + "order by\n"
+                    + "	l.id")) {
                 while (rs.next()) {
                     LojaVO vo = new LojaVO();
-                    
+
                     vo.setId(rs.getInt("id"));
                     vo.setDescricao(rs.getString("descricao"));
-                    
+
                     result.add(vo);
                 }
             }
         }
         return result;
     }
-    
-    
+
 }
