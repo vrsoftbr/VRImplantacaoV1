@@ -125,7 +125,7 @@ public class ProdutoDAO {
             sql.put("comprimentoembalagem", 0);
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
-            sql.put("perda", 0.0);
+            sql.put("perda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
             if (versao.menorQue(4)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());
@@ -135,7 +135,7 @@ public class ProdutoDAO {
             sql.put("percentualipi", 0.0);
             sql.put("percentualfrete", 0.0);
             sql.put("percentualencargo", 0.0);
-            sql.put("percentualperda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
+            sql.put("percentualperda", 0.0);
             sql.put("percentualsubstituicao", 0.0);
             sql.put("descricaogondola", vo.getDescricaoGondola());
             sql.put("dataalteracao", new Date());
@@ -392,7 +392,8 @@ public class ProdutoDAO {
             sql.put("id_produtovasilhame", vo.getIdVasilhame());
         }
         if(opt.contains(OpcaoProduto.PERCENTUAL_PERDA)){
-            sql.put("percentualperda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
+            sql.put("percentualperda", 0.0);
+            sql.put("perda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
         }
 
         sql.setWhere("id = " + vo.getId());
