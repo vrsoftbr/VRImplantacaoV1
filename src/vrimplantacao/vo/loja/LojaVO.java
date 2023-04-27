@@ -19,6 +19,9 @@ public class LojaVO {
     private boolean copiaMargem = false;
     private boolean chkTrocaCnpj = false;
     private String txtCnpj = "";
+    private boolean copiaEcf = false;
+    private boolean copiaOperador = false;
+    private boolean copiaUsuario = false;
 
     public int getId() {
         return id;
@@ -152,4 +155,49 @@ public class LojaVO {
     public void settxtCnpj(String txtCnpj) {
         this.txtCnpj = txtCnpj;
     }
+
+    /**
+     * @return the copiaEcf
+     */
+    public boolean isCopiaEcf() {
+        return copiaEcf;
+    }
+
+    /**
+     * @param copiaEcf the copiaEcf to set
+     */
+    public void setCopiaEcf(boolean copiaEcf) {
+        this.copiaEcf = copiaEcf;
+    }
+
+    /**
+     * @return the copiaOperador
+     */
+    public boolean isCopiaOperador() {
+        return copiaOperador;
+    }
+
+    /**
+     * @param copiaOperador the copiaOperador to set
+     */
+    public void setCopiaOperador(boolean copiaOperador) {
+        this.copiaOperador = copiaOperador;
+    }
+
+    /**
+     * @return the copiaUsuario
+     */
+    public boolean isCopiaUsuario() {
+        return copiaUsuario;
+    }
+
+    /**
+     * @param copiaUsuario the copiaUsuario to set
+     */
+    public void setCopiaUsuario(boolean copiaUsuario) {
+        this.copiaUsuario = copiaUsuario;
+    }
+    
+    
 }
+
