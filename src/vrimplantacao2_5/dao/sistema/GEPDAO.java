@@ -24,7 +24,6 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -126,15 +125,30 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "tributacao"
+                    "SELECT\n"
+                    + "	CODIGO id,\n"
+                    + "	DESCRICAO,\n"
+                    + "	CST,\n"
+                    + "	TXALIQUOTA aliq,\n"
+                    + "	CASE\n"
+                    + "     WHEN DESCRICAO LIKE '%RED%'\n"
+                    + "     THEN replace(\n"
+                    + "     	 replace(\n"
+                    + "     	 replace(\n"
+                    + "          substring(DESCRICAO FROM 12 FOR 6), 'D', ''), ' ', ''), ',', '.')\n"
+                    + "     ELSE 0\n"
+                    + "	END red\n"
+                    + "FROM\n"
+                    + "	ALIQUOTA\n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
-                            rs.getInt("cst_saida"),
-                            rs.getDouble("aliq_saida"),
-                            rs.getDouble("red_saida"))
+                            rs.getInt("cst"),
+                            rs.getDouble("aliq"),
+                            rs.getDouble("red"))
                     );
                 }
             }
@@ -142,7 +156,7 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -167,36 +181,23 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "familia"
-            )) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-
-                    imp.setImportId(rs.getString("id_familia"));
-                    imp.setDescricao(rs.getString("familia"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
+    }*/
 
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "ean"
+                    "SELECT\n"
+                    + "	ID id_produto,\n"
+                    + "	CODIGO ean,\n"
+                    + " UNIDADE tipo_embalagem,\n"
+                    + "	CASE WHEN QTDEMBALAGEM = 0 THEN 1 ELSE QTDEMBALAGEM END qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PRODUTO\n"
+                    + "WHERE\n"
+                    + "	id NOT IN (999999991, 999999992, 999999993, 999999994, 999999995, 999999996)\n"
+                    + "ORDER BY ID"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -221,7 +222,31 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "produto"
+                    "SELECT\n"
+                    + "	id idproduto,\n"
+                    + "	CODIGO ean,\n"
+                    + "	DESCRICAO desc_completa,\n"
+                    + "	DREDUZIDA desc_reduzida,\n"
+                    + "	UNIDADE tipo_embalagem,\n"
+                    + "	COALESCE (BALANCA, 'N') e_balanca,\n"
+                    + "	VALIDADE,\n"
+                    + "	IDCF ncm,\n"
+                    + "	CEST,\n"
+                    + "	ACODIGO id_icms,\n"
+                    + "	IDCSTCOFINS pis_debito,\n"
+                    + "	IDCSTCOFINSE pis_credito,\n"
+                    + "	STATUS,\n"
+                    + "	COALESCE (e.ESTOQUE, 0) estoque,\n"
+                    + "	ESTOQUEMINIMO,\n"
+                    + "	ESTOQUEMAXIMO,\n"
+                    + "	CUSTO,\n"
+                    + "	MARGEMLUCRO,\n"
+                    + "	PRECO,\n"
+                    + "	DTCADASTRO data_cadastro\n"
+                    + "FROM\n"
+                    + "	PRODUTO p\n"
+                    + "	LEFT JOIN ESTOQUE e ON p.ID = e.PID\n"
+                    + "ORDER BY ID"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -243,9 +268,9 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setMargem(rst.getDouble("margem"));
 
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(imp.getCodMercadologico1());
-                    imp.setCodMercadologico3(imp.getCodMercadologico1());
+                  //imp.setCodMercadologico1(rst.getString("merc1"));
+                  //imp.setCodMercadologico2(imp.getCodMercadologico1());
+                  //imp.setCodMercadologico3(imp.getCodMercadologico1());
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
@@ -255,9 +280,6 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
-
-                    imp.setPesoBruto(rst.getDouble("peso_bruto"));
-                    imp.setPesoLiquido(rst.getDouble("peso_liquido"));
 
                     String idIcmsDebito = rst.getString("id_debito");
 
@@ -308,7 +330,26 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "fornecedor"
+                    "SELECT\n"
+                    + "	CODIGO id,\n"
+                    + "	CPFCNPJ cpf_cnpj,\n"
+                    + "	IE rg_ie,\n"
+                    + "	NOME razao,\n"
+                    + "	APELIDO fantasia,\n"
+                    + "	ENDERECO,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + "	UF,\n"
+                    + "	CEP,\n"
+                    + "	FONE telefone,\n"
+                    + "	EMAIL,\n"
+                    + "	CADASTRO data_cad,\n"
+                    + "	OBSERVACAO obs\n"
+                    + "FROM\n"
+                    + "	ENTIDADE\n"
+                    + "WHERE STF = 'S'\n"
+                    + "ORDER BY CODIGO"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -318,10 +359,9 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
+                    imp.setIe_rg(rs.getString("rg_ie"));
                     imp.setEndereco(rs.getString("endereco"));
-                    imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
@@ -349,7 +389,14 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "produto fornecedor"
+                    "SELECT\n"
+                    + "	pf.FID id_fornecedor,\n"
+                    + "	p.ID id_produto,\n"
+                    + "	1 qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PFORNECEDOR pf\n"
+                    + "	JOIN PRODUTO p ON p.CODIGO = pf.PCODIGO\n"
+                    + "ORDER BY 1,2"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -358,7 +405,7 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setCodigoExterno(rs.getString("cod_externo"));
+                    //imp.setCodigoExterno(rs.getString("cod_externo"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
 
                     result.add(imp);
@@ -399,7 +446,29 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "clientes"
+                    "SELECT\n"
+                    + "	CODIGO id,\n"
+                    + "	CPFCNPJ cpf_cnpj,\n"
+                    + "	IE rg_ie,\n"
+                    + "	NOME razao, \n"
+                    + "	APELIDO fantasia,\n"
+                    + "	ENDERECO,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CIDADE,\n"
+                    + "	UF,\n"
+                    + "	CEP,\n"
+                    + "	FONE telefone,\n"
+                    + "	CELULAR,\n"
+                    + "	EMAIL,\n"
+                    + "	BLOQUEADO,\n"
+                    + "	LIMITECOMPRA limite,\n"
+                    + "	CADASTRO dt_cad,\n"
+                    + "	NASCIMENTO dt_nasc,\n"
+                    + "	OBSERVACAO obs\n"
+                    + "FROM\n"
+                    + "	ENTIDADE\n"
+                    + "WHERE STC = 'S'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -407,11 +476,10 @@ public class GEPDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setInscricaoestadual(rs.getString("rg_ie"));
 
                     imp.setEndereco(rs.getString("endereco"));
-                    imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
