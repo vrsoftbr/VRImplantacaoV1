@@ -200,7 +200,7 @@ public enum EScriptLojaOrigemSistema {
     ARIUSWEB(241, 8, "select nroloja id, razao descricao from controle.pf_loja"),
     DEVSIS(242,5, "SELECT REFERENCIAL id, NOME descricao FROM CON_EMPRESA"),
     PRIME(243,11, "select empr_codigo as id,  empr_nomereduzido as descricao from empresas order by 1"),
-    GEP(246, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
+    GEP(246, 5, "SELECT CODIGO id, NOMEFANTASIA descricao FROM EMPRESA"),
     PALLAS(244,8, "select cod_cli id, nome_cli descricao from cliente where cod_cli = 1"),
     ALCANCE(245,8, "SELECT NumComanda id, Titulo descricao FROM ppcx.paramh"),
     SOFTLOG(247,5,"SELECT CODIGO id, FILIAL descricao FROM C000004"),
