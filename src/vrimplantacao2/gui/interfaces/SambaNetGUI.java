@@ -250,6 +250,9 @@ public class SambaNetGUI extends VRInternalFrame {
                                 if (chkTelefoneFornecedor.isSelected()) {
                                     opt.add(OpcaoFornecedor.TELEFONE);
                                 }
+                                if (chkComplemento.isSelected()) {
+                                    opt.add(OpcaoFornecedor.COMPLEMENTO);
+                                }
 
                                 if (!opt.isEmpty()) {
                                     importador.atualizarFornecedor(opt.toArray(new OpcaoFornecedor[]{}));
@@ -358,6 +361,7 @@ public class SambaNetGUI extends VRInternalFrame {
         chkNumeroFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkEnderecoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkTelefoneFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkComplemento = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
         chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
@@ -567,6 +571,8 @@ public class SambaNetGUI extends VRInternalFrame {
 
         chkTelefoneFornecedor.setText("Telefone");
 
+        chkComplemento.setText("Complemento");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -585,8 +591,10 @@ public class SambaNetGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkNumeroFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(231, Short.MAX_VALUE))
+                        .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkComplemento)))
+                .addContainerGap(520, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -599,7 +607,8 @@ public class SambaNetGUI extends VRInternalFrame {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkNumeroFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEnderecoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkComplemento)))
         );
 
         vRPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes"));
@@ -644,7 +653,7 @@ public class SambaNetGUI extends VRInternalFrame {
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(241, Short.MAX_VALUE))
+                .addContainerGap(239, Short.MAX_VALUE))
         );
 
         tabsProduto.addTab("Fornecedores e Clientes", tabFornecedor);
@@ -756,6 +765,7 @@ public class SambaNetGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar1;
     private vrframework.bean.checkBox.VRCheckBox chkClientesEventuais;
     private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
+    private javax.swing.JCheckBox chkComplemento;
     private vrframework.bean.checkBox.VRCheckBox chkContatoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkEnderecoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;

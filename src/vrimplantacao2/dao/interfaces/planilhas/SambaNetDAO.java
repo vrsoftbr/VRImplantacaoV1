@@ -685,7 +685,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setFantasia(imp.getRazao());
                     }
                     imp.setEndereco(val(sh, 10, i).trim());
-                    imp.setComplemento(val(sh, 12, i));
+                    imp.setComplemento(val(sh, 13, i));
 
                     if (
                         !val(sh, 18, i).equals("") &&

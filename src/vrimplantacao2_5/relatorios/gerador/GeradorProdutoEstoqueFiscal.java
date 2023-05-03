@@ -7,7 +7,6 @@ package vrimplantacao2_5.relatorios.gerador;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;

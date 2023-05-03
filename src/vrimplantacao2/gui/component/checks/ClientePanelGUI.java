@@ -5,6 +5,7 @@
  */
 package vrimplantacao2.gui.component.checks;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import javax.swing.JOptionPane;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
+import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
@@ -32,6 +34,7 @@ public class ClientePanelGUI extends javax.swing.JPanel {
     private String Script = "";
     private Importador importador;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
+    int opcaoScript = 1;
 
     public BaseDeDadosPanel getPnlConn() {
         return pnlConn;
@@ -51,10 +54,13 @@ public class ClientePanelGUI extends javax.swing.JPanel {
 
     public ClientePanelGUI() throws Exception {
         dao = new ClienteGenericoDAO();
+        dao.setTipoScript(opcaoScript);
         initComponents();
-        
+
         txtAreaCliente.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_SQL);
         txtAreaCliente.setCodeFoldingEnabled(true);
+        txtAreaCliente.setText(geraScriptSimplificado());
+        txtAreaCliente.setCaretPosition(0);
     }
 
     private void gravarParametros() throws Exception {
@@ -86,9 +92,13 @@ public class ClientePanelGUI extends javax.swing.JPanel {
         chkForcarUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         jBLimpar = new javax.swing.JButton();
         btnMigrar = new vrframework.bean.button.VRButton();
-        jPanel1 = new javax.swing.JPanel();
         cboSistemaCliente = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        lblScript = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        jBLimpar1 = new javax.swing.JButton();
 
         rTextArea1.setColumns(20);
         rTextArea1.setRows(5);
@@ -122,17 +132,6 @@ public class ClientePanelGUI extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 152, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 28, Short.MAX_VALUE)
-        );
-
         cboSistemaCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SISTEMAS" }));
         cboSistemaCliente.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -140,7 +139,37 @@ public class ClientePanelGUI extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jLabel2.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jButton1.text")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        lblScript.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblScript.setForeground(new java.awt.Color(51, 153, 255));
+        org.openide.awt.Mnemonics.setLocalizedText(lblScript, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.lblScript.text")); // NOI18N
+
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jLabel1.text")); // NOI18N
+
+        jBLimpar1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/atualizar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBLimpar1, org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jBLimpar1.text")); // NOI18N
+        jBLimpar1.setToolTipText(org.openide.util.NbBundle.getMessage(ClientePanelGUI.class, "ClientePanelGUI.jBLimpar1.toolTipText")); // NOI18N
+        jBLimpar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -153,18 +182,26 @@ public class ClientePanelGUI extends javax.swing.JPanel {
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jBLimpar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                                .addComponent(lblScript)
+                                .addGap(38, 38, 38)
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cboSistemaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(cboSistemaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(4, 4, 4)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -175,14 +212,19 @@ public class ClientePanelGUI extends javax.swing.JPanel {
                     .addComponent(cboSistemaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                        .addComponent(lblScript)
+                        .addComponent(jLabel1)))
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBLimpar))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(jButton1)
+                        .addComponent(jButton2)
+                        .addComponent(jBLimpar))
+                    .addComponent(jBLimpar1))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -211,9 +253,11 @@ public class ClientePanelGUI extends javax.swing.JPanel {
                     ProgressBar.dispose();
                     JOptionPane.showMessageDialog(null, "Clientes Preferenciais migrados com Sucesso!");
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     System.out.println(ex.getMessage());
                     ProgressBar.dispose();
-                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                    
+                    Util.exibirMensagemErro(ex, "Erro");
                     Exceptions.printStackTrace(ex);
                 }
                 ProgressBar.dispose();
@@ -241,16 +285,71 @@ public class ClientePanelGUI extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_cboSistemaClienteItemStateChanged
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        opcaoScript = 1;
+        lblScript.setText("Estamos usando script simplificado");
+        dao.setTipoScript(opcaoScript);
+        lblScript.setForeground(new Color(51, 153, 255));
+        txtAreaCliente.setText(geraScriptSimplificado());
+        txtAreaCliente.setCaretPosition(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        opcaoScript = 2;
+        lblScript.setText("Estamos usando script completo");
+        dao.setTipoScript(opcaoScript);
+        lblScript.setForeground(new Color(204, 0, 0));
+        txtAreaCliente.setText(geraScriptCompleto());
+        txtAreaCliente.setCaretPosition(0);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jBLimpar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar1ActionPerformed
+        setScript(validaScript(txtAreaCliente.getText()));
+        System.out.println(getScript());
+        dao.setScript(getScript());
+
+        Set<OpcaoCliente> opcao = getOpcoesDisponiveisCliente();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    gravarParametros();
+                    ProgressBar.show();
+                    importador = new Importador(dao);
+                    importador.setLojaOrigem(getPnlConn().getLojaOrigem());
+                    importador.setLojaVR(getPnlConn().getLojaVR());
+                    importador.setIdConexao(getPnlConn().idConexao);
+                    importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
+                    ProgressBar.dispose();
+                    JOptionPane.showMessageDialog(null, "Clientes Preferenciais migrados com Sucesso!");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.out.println(ex.getMessage());
+                    ProgressBar.dispose();
+                    
+                    Util.exibirMensagemErro(ex, "Erro");
+                    Exceptions.printStackTrace(ex);
+                }
+                ProgressBar.dispose();
+            }
+        };
+        thread.start();
+    }//GEN-LAST:event_jBLimpar1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JComboBox<String> cboSistemaCliente;
     private vrframework.bean.checkBox.VRCheckBox chkForcarUnificacao;
     private javax.swing.JButton jBLimpar;
+    private javax.swing.JButton jBLimpar1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblScript;
     private org.fife.ui.rtextarea.RTextArea rTextArea1;
     private org.fife.ui.rsyntaxtextarea.RSyntaxTextArea txtAreaCliente;
     // End of variables declaration//GEN-END:variables
@@ -292,8 +391,9 @@ public class ClientePanelGUI extends javax.swing.JPanel {
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.CELULAR,
                 OpcaoCliente.EMAIL,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
-}
+    }
 
     private String validaScript(String script) {
         if (script == null || "".equals(script)) {
@@ -308,5 +408,106 @@ public class ClientePanelGUI extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Fovor inserir um script válido!");
         }
         return script;
+    }
+
+    public String geraScriptSimplificado() {
+        String scriptSimplificado = "--Script para conferencia de campos/alias\n"
+                + " select \n"
+                + " -1 id,\n"
+                + " 'NOME LTDA' razao,\n"
+                + " 'NOME' fantasia,\n"
+                + " 'ENDERECO' endereco,\n"
+                + " 'NUMERO' numero,\n"
+                + " 'BAIRRO' bairro,\n"
+                + " '12345678' cep,\n"
+                + " 'CIDADE' municipio,\n"
+                + " 'UF' uf,\n"
+                + " '12345678912' cnpj,\n"
+                + " '123.123.123.123' inscricaoestadual,\n"
+                + " 'DDD||FONE' telefone,\n"
+                + " 'DDD||FONE' telefone2,\n"
+                + " '912345678' celular,\n"
+                + " '' observacao,\n"
+                + " '2022-04-18' datacadastro,\n"
+                + " '2022-04-18' datanascimento,\n"
+                + " 0 id_estadocivil,\n"
+                + " '' complemento,\n"
+                + " 5000 valorlimite,\n"
+                + " 1 id_situacaocadastro\n"
+                + "from sua_tabela";
+        return scriptSimplificado;
+    }
+
+    public String geraScriptCompleto() {
+        String scriptCompleto = "--Script para conferencia de campos/alias\n"
+                + "select \n"
+                + " -1 id,\n"
+                + " '12345678912345' cnpj,\n"
+                + " '123.123.123.123' inscricaoestadual,\n"
+                + " '' orgaoemissor,\n"
+                + " 'EMPRESA LTDA' razao,\n"
+                + " 'EMPRESA' fantasia,\n"
+                + " 1 id_situacaocadastro,\n"
+                + " 'N' bloqueado,\n"
+                + " NULL databloqueio,\n"
+                + " 'RUA' endereco,\n"
+                + " 'NUMERO' numero,\n"
+                + " 'COMPLEMENTO' complemento,\n"
+                + " 'BAIRRO' bairro,\n"
+                + " '1234567' municipioIBGE,\n"
+                + " 'AMERICANA' municipio,\n"
+                + " '12' ufIBGE,\n"
+                + " 'UF' uf,\n"
+                + " '12345678' cep,\n"
+                + "     0 id_estadocivil,\n"
+                + " 'NAO INFORMADO' estadocivil,\n"
+                + " '2022-04-18' datanascimento,\n"
+                + " now() datacadastro,\n"
+                + " 'M' sexo,\n"
+                + " '' empresa,\n"
+                + " '' empresaendereco,\n"
+                + " '' empresanumero,\n"
+                + " '' empresacomplemento,\n"
+                + " '' empresabairro,\n"
+                + " null empresamunicipioibge,\n"
+                + " '' empresamunicipio,\n"
+                + " null empresaufIBGE,\n"
+                + " '' empresauf,\n"
+                + " '' empresacep,\n"
+                + " '' empresatelefone,\n"
+                + " null dataadmissao,\n"
+                + " '' cargo,\n"
+                + " null salario,\n"
+                + " null valorlimite,\n"
+                + " '' nomeconjuge,\n"
+                + " '' nomepai,\n"
+                + " '' nomemae,\n"
+                + " '' observacao,\n"
+                + " '' diavencimento,\n"
+                + " 'S' permitecreditorotativo,\n"
+                + " 'S' permitecheque,\n"
+                + " '1234 4567' telefone,\n"
+                + " '91234 4567' celular,\n"
+                + " 'EMAIL@EMAIL.COM' email,\n"
+                + " '' cobrancaTelefone,\n"
+                + " null prazopagamento,\n"
+                + " '' cobrancaendereco,\n"
+                + " '' cobrancanumero,\n"
+                + " '' cobrancacomplemento,\n"
+                + " '' cobrancabairro,\n"
+                + " null cobrancamunicipioibge,\n"
+                + " '' cobrancamunicipio,\n"
+                + " null cobrancaufibge,\n"
+                + " '' cobrancauf,\n"
+                + " '' cobrancacep,\n"
+                + " 'NENHUM' tipoorgaopublico,\n"
+                + " 0 limitecompra,\n"
+                + " '' inscricaomunicipal,\n"
+                + " 'NAO CONTRIBUINTE' tipoindicadorie,\n"
+                + " '' telefone2,\n"
+                + " '' celular2\n"
+                + "from \n"
+                + "	sua_tabela";
+        return scriptCompleto;
     }
 }

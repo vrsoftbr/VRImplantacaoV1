@@ -322,6 +322,7 @@ import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
+import vrimplantacao2_5.gui.sistema.Sismaster2_5GUI;
 import vrimplantacao2_5.gui.sistema.SoftLog2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
@@ -2235,6 +2236,18 @@ public enum ESistema {
         ) {
             try {
                 return new Generico2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },
+     SISMASTER(253, "SISMASTER", new ProviderGenericoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Sismaster2_5GUI(frame);
                 } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

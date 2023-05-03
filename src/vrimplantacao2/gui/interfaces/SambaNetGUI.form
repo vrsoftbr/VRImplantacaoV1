@@ -395,7 +395,7 @@
                       <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="241" max="32767" attributes="0"/>
+                      <EmptySpace pref="239" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -429,9 +429,11 @@
                                   <Component id="chkNumeroFornecedor" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkTelefoneFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkComplemento" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="231" max="32767" attributes="0"/>
+                          <EmptySpace pref="520" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -448,6 +450,7 @@
                               <Component id="chkNumeroFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEnderecoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTelefoneFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -482,6 +485,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTelefoneFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Telefone"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkComplemento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Complemento"/>
                   </Properties>
                 </Component>
               </SubComponents>

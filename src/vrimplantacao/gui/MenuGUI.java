@@ -412,8 +412,8 @@ public final class MenuGUI extends VRMdiFrame {
     private AtualizadorController atualizadorController = null;
 
     public MenuGUI(LoginGUI i_loginFrame) throws Exception {
-        initComponents();
-
+        initComponents();       
+        
         loginFrame = i_loginFrame;
         setExtendedState(VRMdiFrame.MAXIMIZED_BOTH);
 
@@ -3678,7 +3678,7 @@ public final class MenuGUI extends VRMdiFrame {
 
         jMenu1.setText("Ferramentas Fiscais");
 
-        jMenuItem20.setText("Relatório Produto Estoque para novo CNPJ");
+        jMenuItem20.setText("Particionar Relatórios");
         jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem20ActionPerformed(evt);

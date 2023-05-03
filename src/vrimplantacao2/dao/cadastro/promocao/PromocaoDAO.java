@@ -24,7 +24,9 @@ public class PromocaoDAO {
             sql.setSchema("public");
             sql.put("id", promocao.getId());
             sql.put("id_loja", promocao.getIdLoja());
-            sql.put("descricao", promocao.getDescricao());
+            if (promocao.getDescricao().length() >= 30){
+                sql.put("descricao", promocao.getDescricao().substring(0, 29));
+            }else sql.put("descricao", promocao.getDescricao());
             sql.put("datainicio", promocao.getDataInicio());
             sql.put("datatermino", promocao.getDataTermino());
             sql.put("pontuacao", promocao.getPontuacao());

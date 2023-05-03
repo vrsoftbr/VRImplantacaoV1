@@ -210,7 +210,8 @@ public enum EScriptLojaOrigemSistema {
     TARGET_G3(250, 13, "select cd_emp id, raz_soc descricao from empresa"),
     WISE(251, 5, "SELECT 1 id, FANTASIA descricao FROM NFE_EMPRESAS"),
     MARKET(103, 11, "select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1"),
-    GENERICO(252, 11, "vazio");
+    GENERICO(252, 11, "vazio"),
+    SISMASTER(253, 8, "select codigo id, concat(nomefantasia, '' '', cnpj) as descricao from tabdollar t");
 
     private int idSistema;
     private int idBancoDados;

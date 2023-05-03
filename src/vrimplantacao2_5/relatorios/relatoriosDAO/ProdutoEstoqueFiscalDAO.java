@@ -38,7 +38,8 @@ public class ProdutoEstoqueFiscalDAO {
                     + "where\n"
                     + "	id_situacaocadastro = 1\n"
                     + "	and id_loja = " + loja + "\n"
-                    + "	and estoque > 0")) {
+                    + "	and estoque > 0"
+                    + "order by id_produto")) {
                 while (rs.next()) {
                     ProdutoEstoqueFiscalVO imp = new ProdutoEstoqueFiscalVO();
 
@@ -53,18 +54,18 @@ public class ProdutoEstoqueFiscalDAO {
     }
 
     private int escolherLoja() throws Exception {
-        Map<Integer, String> lista = getTipoCarteiraContaPagar();
+        Map<Integer, String> lista = getLoja();
         JComboBox jcb = new JComboBox();
         jcb.removeAll();
-        for (int i = 1; i < lista.size(); i++) {
-            jcb.addItem(lista.get(i));
+        for (Map.Entry<Integer, String> loja : lista.entrySet()) {
+            jcb.addItem(loja.getKey() + " " + loja.getValue());
         }
         int resposta = JOptionPane.showConfirmDialog(null, jcb, "Selecione a loja de onde quer gerar a lista com produtos para gerar a nota.", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
         String[] selecao = (String.valueOf(jcb.getSelectedItem()).split(" "));
         return resposta != 0 ? -1 : Integer.parseInt(selecao[0]);
     }
 
-    public Map<Integer, String> getTipoCarteiraContaPagar() throws Exception {
+    public Map<Integer, String> getLoja() throws Exception {
         Map<Integer, String> result = new HashMap<Integer, String>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
