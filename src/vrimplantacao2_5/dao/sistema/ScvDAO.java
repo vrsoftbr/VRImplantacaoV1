@@ -29,6 +29,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -219,6 +220,32 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	id id_familia,\n"
+                    + "	DESCRICAO familia\n"
+                    + "FROM\n"
+                    + "	PRODUTO_AGRUP_PRECO"
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setImportId(rs.getString("id_familia"));
+                    imp.setDescricao(rs.getString("familia"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -238,7 +265,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.PRECO_ATACADO,\n"
                     + " p.PRECO_VAREJO_SUGERIDO,\n"
                     + " p.CUSTO_MEDIO precocustomedio,\n"
-                    + " p.PRECO_CUSTO precocusto,\n"
+                    + " pp.PRECO_CUSTO precocusto,\n"
                     + " pp.PRECO_FORNECEDOR custo,\n"
                     + " p.PRECO_COMPRA,\n"
                     + " pp.LUCRO_VAREJO margem,\n"
@@ -248,6 +275,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.CODIGO_INTERNO,\n"
                     + " p.CODIGO_BARRA ean,\n"
                     + " p.BALANCA,\n"
+                    + " id_agrup_prec id_familia,\n"
                     + " p.ID_GRUPO mercid1,\n"
                     + " p.ID_SUBGRUPO mercid2,\n"
                     + " p.ID_SUBGRUPO mercid3,\n"
@@ -256,7 +284,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.ID_FORNECEDOR fabricante,\n"
                     + " p.VALOR_MEDIDA qtde,\n"
                     + " p.CEST,\n"
-                    + " p.NATUREZA_RECEITA_PIS_COFINS naturezareceita,\n"
+                    + " pp.COD_NATUREZA_RECEITA natrec,\n"
                     + " p.ID_ALIQUOTA_CADASTRO,\n"
                     + " p.CST,\n"
                     + " p.REDUCAO_BASE_ICMS,\n"
@@ -264,9 +292,9 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.CST_PIS_COFINS_ENT,\n"
                     + " p.NCM\n"
                     + "FROM PRODUTOS p\n"
-                    + "LEFT JOIN PRODUTOS_PREC_TRIB pp ON p.id = pp.ID_PRODUTO \n"
+                    + "LEFT JOIN PRODUTOS_PREC_TRIB pp ON p.id = pp.ID_PRODUTO AND p.ID_EMPRESA = pp.ID_EMPRESA\n"
                     + "LEFT JOIN UNIDADES_MEDIDA u ON p.ID_UM_ENTRADA = u.ID \n"
-                    + "LEFT JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID AND e.ID_ESTOQUE = 1\n"
+                    + "LEFT JOIN PRODUTOS_ESTOQUE_NORMAL e ON e.ID_PRODUTO = p.ID AND e.ID_ESTOQUE = " + getLojaOrigem() + "\n"
                     + "WHERE \n"
                     + "	pp.ID_EMPRESA = " + getLojaOrigem()
             )) {
@@ -298,6 +326,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
+                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
 
                     imp.setCodMercadologico1(rst.getString("mercid1"));
                     imp.setCodMercadologico2(rst.getString("mercid2"));
@@ -305,7 +334,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
@@ -316,7 +345,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("CST_PIS_COFINS"));
                     imp.setPiscofinsCstCredito(rst.getString("CST_PIS_COFINS_ENT"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natrec"));
 
                     imp.setIcmsDebitoId(rst.getString("ID_ALIQUOTA_CADASTRO"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
@@ -324,6 +353,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+
                     result.add(imp);
                 }
             }
@@ -339,7 +369,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
                     + " ID,\n"
-                    + " ID_PRODUTO,\n"
+                    + " ID_PRODUTO produto,\n"
                     + " CODIGO_BARRA ean\n"
                     + "FROM PRODUTOS_CODIGOSBARRAS "
             )) {
@@ -347,9 +377,11 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
+
+                    imp.setImportId(rst.getString("produto"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(1);
+
                     result.add(imp);
                 }
             }
@@ -451,19 +483,22 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	c.id,\n"
-                    + "	c.NOME ,\n"
-                    + "	CPF ,\n"
+                    + "	c.NOME,\n"
+                    + "	CASE WHEN CPF IS NULL THEN CNPJ ELSE cpf END cpf_cnpj,\n"
+                    + "	CASE WHEN CNPJ IS NOT NULL THEN INSCRICAO_ESTADUAL ELSE RG_NUMERO END rg_ie,\n"
+                    + "	INSCRICAO_MUNICIPAL insc_mun,\n"
                     + "	RESIDENCIA_CLIENTE_ENDERECO as endereco,\n"
                     + "	RESIDENCIA_CLIENTE_NUMERO as numero,\n"
+                    + "	RESIDENCIA_CLIENTE_COMPLEMENTO complemento,\n"
                     + "	RESIDENCIA_CLIENTE_CEP as cep,\n"
                     + "	RESIDENCIA_CLIENTE_BAIRRO as bairro,\n"
-                    + "	RESIDENCIA_CLIENTE_ID_CIDADE ,\n"
+                    + "	RESIDENCIA_CLIENTE_ID_CIDADE mun_ibge,\n"
                     + "	c2.NOME AS cidade,\n"
                     + "	TELEFONE1  AS telefone,\n"
                     + "	TELEFONE2 AS telefone2,\n"
                     + "	EMAIL1 AS email,\n"
-                    + "	DATA_NASCIMENTO AS dt_nascimento,\n"
-                    + "	CELULAR1 AS celular,\n"
+                    + "	DATA_NASCIMENTO AS data_nasc,\n"
+                    + "	TELEFONE2 AS celular,\n"
                     + "	LIMITE_CREDITO AS limite,\n"
                     + "	STATUS AS ativo\n"
                     + "FROM\n"
@@ -474,17 +509,20 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("nome"));
-                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rst.getString("rg_ie"));
+                    imp.setInscricaoMunicipal(rst.getString("insc_mun"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
                     imp.setCep(rst.getString("cep"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
+                    imp.setMunicipioIBGE(rst.getString("mun_ibge"));
                     imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("telefone2"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setDataNascimento(rst.getDate("DATA_NASCIMENTO"));
-
-                    imp.setCelular(rst.getString("celular"));
+                    imp.setDataNascimento(rst.getDate("data_nasc"));
 
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -537,28 +575,32 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " cp.ID,\n"
-                    + " cp.ID_FORNECEDOR,\n"
-                    + " cp.STATUS,\n"
-                    + " cp.DATA_CONTA,\n"
-                    + " cp.DATA_VENCIMENTO,\n"
-                    + " cp.DOCUMENTO,\n"
-                    + " cp.PARCELA,\n"
-                    + " cp.VALOR_NOMINAL,\n"
-                    + " cp.VALOR_ABERTO,\n"
-                    + " cp.ANOTACOES,\n"
-                    + " cp.NUMERO_DOC_FISCAL\n"
-                    + "FROM CONTAS_PAGAR cp\n"
+                    "SELECT\n"
+                    + "	cp.ID,\n"
+                    + "	cp.ID_FORNECEDOR,\n"
+                    + "	cp.STATUS,\n"
+                    + "	cp.DATA_CONTA,\n"
+                    + "	cp.DATA_VENCIMENTO,\n"
+                    + "	cp.DOCUMENTO doc,\n"
+                    + " cast(ID_NF_ENTRADA as varchar(10))||'- PARC '||CAST (PARCELA AS varchar(10)) documento,\n"
+                    + "	cp.PARCELA,\n"
+                    + "	cp.VALOR_NOMINAL,\n"
+                    + "	cp.VALOR_ABERTO,\n"
+                    + "	cp.ANOTACOES,\n"
+                    + "	cp.NUMERO_DOC_FISCAL\n"
+                    + "FROM\n"
+                    + "	CONTAS_PAGAR cp\n"
                     + "LEFT JOIN CONTAS_PAGAR_PAGAMENTOS pa ON pa.ID_CP = cp.ID\n"
-                    + "WHERE \n"
-                    + " pa.ID_CP IS NULL and cp.id_empresa = 1"
+                    + "WHERE\n"
+                    + "	pa.ID_CP IS NULL\n"
+                    + "	AND DATA_VENCIMENTO >= 'now'\n"
+                    + "	AND cp.id_empresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rst.getString("ID"));
                     imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
-                    imp.setNumeroDocumento(rst.getString("DOCUMENTO"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("DATA_CONTA"));
                     imp.setValor(rst.getDouble("VALOR_NOMINAL"));
                     imp.setObservacao(rst.getString("ANOTACOES"));
