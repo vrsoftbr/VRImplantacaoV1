@@ -211,7 +211,8 @@ public enum EScriptLojaOrigemSistema {
     WISE(251, 5, "SELECT 1 id, FANTASIA descricao FROM NFE_EMPRESAS"),
     MARKET(103, 11, "select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1"),
     GENERICO(252, 11, "vazio"),
-    SISMASTER(253, 8, "select codigo id, concat(nomefantasia, '' '', cnpj) as descricao from tabdollar t");
+    SISMASTER(253, 8, "select codigo id, concat(nomefantasia, '' '', cnpj) as descricao from tabdollar t"),
+    ALTERDATAWSHOP(254,11,"select cdempresa id, nrcgc || ''-'' || nmempresa descricao from ishop.empshop order by cdempresa");
 
     private int idSistema;
     private int idBancoDados;

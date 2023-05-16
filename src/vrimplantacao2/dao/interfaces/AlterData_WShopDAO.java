@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vr.core.utils.StringUtils;
-import vrimplantacao.classe.ConexaoPostgres;
+//import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -115,7 +116,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	idgrupo merc1,\n"
                     + "	nmgrupo merc1_desc\n"
                     + "from\n"
-                    + "	wshop.grupo\n"
+                    + "	ishop.grupo\n"
                     + "order by \n"
                     + "	nmgrupo"
             )) {
@@ -140,7 +141,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select cdempresa, nrcgc || '-' || nmempresa razao from wshop.empshop order by cdempresa"
+                    "select cdempresa, nrcgc || '-' || nmempresa razao from ishop.empshop order by cdempresa"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("cdempresa"), rst.getString("razao")));
@@ -162,7 +163,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             for (String key : fam) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select iddetalhe, dsdetalhe from wshop.detalhe where iddetalhe = '" + key + "'"
+                        "select iddetalhe, dsdetalhe from ishop.detalhe where iddetalhe = '" + key + "'"
                 )) {
                     while (rst.next()) {
                         FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -187,13 +188,13 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	iddetalhe,\n"
                     + "	iddetalhe iddetalheequivalente\n"
                     + "from\n"
-                    + "	wshop.prodequivalente\n"
+                    + "	ishop.prodequivalente\n"
                     + "union\n"
                     + "select \n"
                     + "	iddetalhe, \n"
                     + "	iddetalheequivalente \n"
                     + "from \n"
-                    + "	wshop.ProdEquivalente \n"
+                    + "	ishop.ProdEquivalente \n"
                     + "order by \n"
                     + "	1, 2"
             )) {
@@ -233,7 +234,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "with icms_usados as (\n" +
-                    "	select distinct p.idcalculoicms from wshop.produto p where not nullif(trim(idcalculoicms), '') is null\n" +
+                    "	select distinct p.idcalculoicms from ishop.produto p where not nullif(trim(idcalculoicms), '') is null\n" +
                     ")\n" +
                     "select distinct\n" +
                     "	icms.idcalculoicms||'-'||icms.stexp id,\n" +
@@ -243,12 +244,12 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     "	icms.alicms aliq,\n" +
                     "	icms.alreducaobaseicms reducao\n" +
                     "from\n" +
-                    "	wshop.icms_uf icms\n" +
-                    "	join wshop.empshop emp on \n" +
+                    "	ishop.icms_uf icms\n" +
+                    "	join ishop.empshop emp on \n" +
                     "		emp.cdempresa = '" + getLojaOrigem() + "' and\n" +
                     "		iduf = emp.cduf and\n" +
                     "		idufdestino = emp.cduf\n" +
-                    "	join wshop.icms i on\n" +
+                    "	join ishop.icms i on\n" +
                     "		icms.idcalculoicms = i.idcalculoicms\n" +
                     "where\n" +
                     "	icms.idcalculoicms in (select idcalculoicms from icms_usados) and\n" +
@@ -318,26 +319,26 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	dt.cdsittribpisentrada piscofins_entrada,\n"
                     + "	dt.cdsittribpis piscofins_saida,\n"
                     + "	dt.cdnaturezareceita piscofins_naturezareceita,	\n"
-                    + "	p.idcalculoicms||'-'||p.stexp idcalculoicms\n"
+                    + "	case when (p.idcalculoicms||'-'||p.stexp) = '-' then null else (p.idcalculoicms||'-'||p.stexp) end idcalculoicms\n"
                     + "from\n"
-                    + "	wshop.produto p\n"
-                    + "	join wshop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n"
-                    + "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n"
-                    + "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
-                    + "	left join wshop.codigos ean on dt.idproduto = ean.idproduto"
+                    + "	ishop.produto p\n"
+                    + "	join ishop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n"
+                    + "	join ishop.detalhe dt on p.idproduto = dt.idproduto\n"
+                    + "	join ishop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
+                    + "	left join ishop.codigos ean on dt.idproduto = ean.idproduto"
                     + (somenteBalanca ? " and ean.tpcodigo = 'Personalizado' and length(coalesce(ean.dscodigo, ids.dscodigo)) = 6\n" : "\n")
                     /*+ "	left join (\n"
                     + "		select \n"
                     + "			ean.*\n"
                     + "		from\n"
-                    + "			wshop.codigos ean\n"
-                    + "			join wshop.detalhe dt on ean.iddetalhe = dt.iddetalhe and ean.idproduto = dt.idproduto\n"
+                    + "			ishop.codigos ean\n"
+                    + "			join ishop.detalhe dt on ean.iddetalhe = dt.iddetalhe and ean.idproduto = dt.idproduto\n"
                     + "		where\n"
                     + "			(dt.stbalanca and ean.tpcodigo = 'Chamada') or\n"
                     + "			(not dt.stbalanca and ean.tpcodigo != 'Chamada')\n"
                     + "	) ean on dt.iddetalhe = ean.iddetalhe and dt.idproduto = ean.idproduto	\n"*/
-                    + "	left join wshop.unidade un on un.idunidade = p.idunidade\n"
-                    + "	left join wshop.produto_balanca bal on bal.iddetalhe = dt.iddetalhe\n"
+                    + "	left join ishop.unidade un on un.idunidade = p.idunidade\n"
+                    + "	left join ishop.produto_balanca bal on bal.iddetalhe = dt.iddetalhe\n"
                     /*
                     + "	left join (\n"
                     + "		select\n"
@@ -345,14 +346,14 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "			est.cdempresa,\n"
                     + "			est.qtestoque\n"
                     + "		from\n"
-                    + "			wshop.estoque est\n"
+                    + "			ishop.estoque est\n"
                     + "			join (\n"
                     + "				select \n"
                     + "					iddetalhe, \n"
                     + "					cdempresa,\n"
                     + "					max(dtreferencia) dtreferencia \n"
                     + "				from\n"
-                    + "					wshop.estoque\n"
+                    + "					ishop.estoque\n"
                     + "				group by \n"
                     + "					iddetalhe, cdempresa\n"
                     + "			) a on est.iddetalhe = a.iddetalhe and est.dtreferencia = a.dtreferencia\n"
@@ -472,12 +473,12 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	p.nmobservacao,\n"
                     + "	p.sticmssimples simplesnacional\n"
                     + "from\n"
-                    + "	wshop.pessoas p\n"
+                    + "	ishop.pessoas p\n"
                     + "where\n"
                     + "	sttipopessoa = 'F'\n"
                     + " and cdchamada not like 'N5%'\n"
                     + "order by\n"
-                    + "	p.cdchamada::integer;"
+                    + "	p.cdchamada::bigint;"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -526,11 +527,11 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	pf.cdprodutofornecedor codigoexterno,\n"
                     + "	pf.dtultimacompra dataalteracao\n"
                     + "from\n"
-                    + "	wshop.prodfor pf\n"
-                    + "	join wshop.produto p on pf.idproduto = p.idproduto\n"
-                    + "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n"
-                    + "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
-                    + "	join wshop.pessoas f on f.idpessoa = pf.idpessoa\n"
+                    + "	ishop.prodfor pf\n"
+                    + "	join ishop.produto p on pf.idproduto = p.idproduto\n"
+                    + "	join ishop.detalhe dt on p.idproduto = dt.idproduto\n"
+                    + "	join ishop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
+                    + "	join ishop.pessoas f on f.idpessoa = pf.idpessoa\n"
                     + "order by\n"
                     + "	1,2"
             )) {
@@ -583,7 +584,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	email email,\n"
                     + "	nrtelfax fax\n"
                     + "from\n"
-                    + "	wshop.pessoas cli\n"
+                    + "	ishop.pessoas cli\n"
                     + "where\n"
                     + "	sttipopessoa = 'C'\n"
                     + "order by \n"
@@ -638,14 +639,14 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	rec.dtvencimento dataVencimento,\n"
                     + "	cli.nrcgc_cic cnpjCliente\n"
                     + "from\n"
-                    + "	wshop.fluxo rec\n"
+                    + "	ishop.fluxo rec\n"
                     + "join \n"
-                    + "	wshop.pessoas cli on rec.idpessoa = cli.idpessoa\n"
+                    + "	ishop.pessoas cli on rec.idpessoa = cli.idpessoa\n"
                     + "where \n"
                     + "	rec.dtbaixa is null\n"
                     + "and rec.tppessoa = 'C'\n"        
                     + "order by\n"
-                    + "	cdchamada::integer"
+                    + "	cdchamada::bigint"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

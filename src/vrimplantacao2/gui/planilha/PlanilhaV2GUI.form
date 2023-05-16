@@ -207,13 +207,17 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="btnDelFamiliaProduto" max="32767" attributes="0"/>
-                                      <Component id="btnDelMercadologico" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                          <Component id="btnDelFamiliaProduto" max="32767" attributes="0"/>
+                                          <Component id="btnDelMercadologico" max="32767" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                                      <Component id="chkNaoUsaMapaTributacao" min="-2" pref="236" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="btnDelProdutos" alignment="0" min="-2" pref="157" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="184" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -221,12 +225,15 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnDelMercadologico" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="btnDelMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkNaoUsaMapaTributacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDelFamiliaProduto" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDelProdutos" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace pref="286" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -255,6 +262,11 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDelProdutosActionPerformed"/>
                       </Events>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNaoUsaMapaTributacao">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="N&#xe3;o Usar Mapa Tributa&#xe7;&#xe3;o"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>

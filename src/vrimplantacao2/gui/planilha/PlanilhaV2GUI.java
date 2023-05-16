@@ -82,6 +82,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         btnDelMercadologico = new vrframework.bean.button.VRButton();
         btnDelFamiliaProduto = new vrframework.bean.button.VRButton();
         btnDelProdutos = new vrframework.bean.button.VRButton();
+        chkNaoUsaMapaTributacao = new vrframework.bean.checkBox.VRCheckBox();
         tabProdUnifacao = new vrframework.bean.panel.VRPanel();
         chkProdUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         tabMapaTributacao = new vrframework.bean.panel.VRPanel();
@@ -243,6 +244,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkNaoUsaMapaTributacao, "Não Usar Mapa Tributação");
+
         javax.swing.GroupLayout tabProdEspeciaisLayout = new javax.swing.GroupLayout(tabProdEspeciais);
         tabProdEspeciais.setLayout(tabProdEspeciaisLayout);
         tabProdEspeciaisLayout.setHorizontalGroup(
@@ -250,22 +253,27 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addGroup(tabProdEspeciaisLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabProdEspeciaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabProdEspeciaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(btnDelFamiliaProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDelMercadologico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(tabProdEspeciaisLayout.createSequentialGroup()
+                        .addGroup(tabProdEspeciaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnDelFamiliaProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnDelMercadologico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(34, 34, 34)
+                        .addComponent(chkNaoUsaMapaTributacao, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnDelProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
         tabProdEspeciaisLayout.setVerticalGroup(
             tabProdEspeciaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabProdEspeciaisLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnDelMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabProdEspeciaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnDelMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNaoUsaMapaTributacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(286, Short.MAX_VALUE))
         );
 
         tabsProduto.addTab("Especiais", tabProdEspeciais);
@@ -1041,11 +1049,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(txtConvQuote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.PREFERRED_SIZE, 26, Short.MAX_VALUE)
+                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
@@ -1371,6 +1379,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
     private javax.swing.JCheckBox chkLimiteRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkNaoUsaMapaTributacao;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vr.view.components.checkbox.VRCheckBox chkPontuacao;
     private vrframework.bean.checkBox.VRCheckBox chkPorEanHistorico;
@@ -1466,6 +1475,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         tabProdImportacao.setImportador(importador);
                         dao.setFormatoData(txtFormatoData.getText());
                         dao.setFormatoDataCompleta(txtFormatoDataCompleta.getText());
+                        dao.setNaoUsaMapaTributacao(chkNaoUsaMapaTributacao.isSelected());
                         ProgressBar.show();
                         ProgressBar.setCancel(true);
 

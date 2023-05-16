@@ -324,9 +324,9 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	e.QTDMINIMA estmin,\n"
                     + "	e.QTDMAXIMA estmax,\n"
                     + "	e.QTDUNIDADE estoque,\n"
-                    + " p.NUNCAFALTE,\n"
-                    + "	p.PERDARENTABILIDADE,\n"
-                    + " CASE WHEN e.DATAINVENTARIO IS NOT NULL AND e.DATAINVENTARIO >= '2023-01-01' THEN e.QTDUNIDADE\n"
+                    + " p.COTACAO,\n"
+                    + "	p.PERDARENTABILIDADE\n"
+                    + " ,CASE WHEN e.DATAINVENTARIO IS NOT NULL AND e.DATAINVENTARIO >= '2023-01-01' THEN e.QTDUNIDADE\n"
                     + "	   ELSE \n"
                     + "    (SELECT estoquevirtual FROM FENIX_ESTOQUEVIRTUAL(p.CODIGOPRODUTO,'" + getLojaOrigem() + "'))\n"
                     + " END estoqueatual\n"
@@ -399,7 +399,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPercentualPerda(rst.getDouble("PERDARENTABILIDADE"));
 
-                    if (rst.getString("NUNCAFALTE") != null && rst.getString("NUNCAFALTE").contains("S")) {
+                    if (rst.getString("COTACAO") != null && rst.getString("COTACAO").contains("S")) {
                         imp.setSugestaoCotacao(true);
                     } else {
                         imp.setSugestaoCotacao(false);
@@ -946,9 +946,18 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '4'\n" // <--  ALTERAR A LOJA
+                    + "	LOJA = '5'\n" // <--  ALTERAR A LOJA
                     + "	AND DATACUPOM between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "	AND TIPOREGISTRO = 'PG'\n"
+                    /*+ " AND NUMEROCUPOMFISCAL||CAIXA||DATACUPOM NOT IN (SELECT\n"
+                    + "	NUMEROCUPOMFISCAL||CAIXA||DATACUPOM id_venda\n"
+                    + "FROM\n"
+                    + "	ECF_MOVIMENTO\n"
+                    + "WHERE\n"
+                    + "    LOJA = '5'\n"
+                    + "	AND\n"
+                    + "	TIPOREGISTRO = 'PG' AND DATACUPOM between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    + "GROUP BY 1 HAVING count(*) > 1)\n"*/
                     + "GROUP BY 1,2,3,4,5,6,7";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1025,7 +1034,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '4'\n" // <--  ALTERAR A LOJA
+                    + "	LOJA = '5'\n" // <--  ALTERAR A LOJA
                     + "	AND TIPOREGISTRO = 'VI'\n"
                     + "	AND DATACUPOM BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,2,3";

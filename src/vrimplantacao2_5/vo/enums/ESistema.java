@@ -15,6 +15,7 @@ import vrimplantacao2.dao.interfaces.ASoftDAO;
 import vrimplantacao2.dao.interfaces.AccesysDAO;
 import vrimplantacao2.dao.interfaces.AcomDAO;
 import vrimplantacao2.dao.interfaces.AlphaSysDAO;
+import vrimplantacao2.dao.interfaces.AlterData_WShopDAO;
 import vrimplantacao2.dao.interfaces.ApolloDAO;
 import vrimplantacao2.dao.interfaces.ArtSystemDAO;
 import vrimplantacao2.dao.interfaces.AsefeDAO;
@@ -257,6 +258,7 @@ import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
+import vrimplantacao2_5.gui.sistema.AlterData_WShop2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
@@ -2248,6 +2250,18 @@ public enum ESistema {
         ) {
             try {
                 return new Sismaster2_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },
+     ALTERDATAWSHOP(254, "ALTERDATAWSHOP", new AlterData_WShopDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new AlterData_WShop2_5GUI(frame);
                 } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
