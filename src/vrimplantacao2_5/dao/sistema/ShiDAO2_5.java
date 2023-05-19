@@ -37,6 +37,8 @@ import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -81,7 +83,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
- * @author Desenvolvimento
+ * @author Michael
  */
 public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
@@ -129,6 +131,38 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return sistema;
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.VALOR_LIMITE
+        ));
+    }
+    
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.CONTATOS
+        ));
     }
 
     @Override

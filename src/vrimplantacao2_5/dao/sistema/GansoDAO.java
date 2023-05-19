@@ -117,6 +117,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CNPJ,
                 OpcaoCliente.INSCRICAO_ESTADUAL,

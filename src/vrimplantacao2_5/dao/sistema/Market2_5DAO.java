@@ -511,8 +511,8 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join cadastro.tb_base_documento ie on 	ie.cd_base = c.cd_base\n"
                     + "left join cadastro.tb_base_contato t1 on t1.cd_base = c.cd_base and t1.tp_principal = 'S'\n"
                     + "left join cadastro.tb_base_contato t2 on t2.cd_base = c.cd_base and t2.tp_principal = 'N'\n"
-                    + "join cadastro.tb_base_tipo tipo on tipo.cd_base = c.cd_base and tipo.cd_base_tipo_flag = 2\n"
-                    + "join cadastro.tb_cliente n on n.cd_base_cliente = c.cd_base and n.cd_loja = " + getLojaOrigem()
+                    + "join cadastro.tb_base_tipo tipo on tipo.cd_base = c.cd_base and tipo.cd_base_tipo_flag = 2"
+                    //+ "join cadastro.tb_cliente n on n.cd_base_cliente = c.cd_base and n.cd_loja = " + getLojaOrigem()
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();

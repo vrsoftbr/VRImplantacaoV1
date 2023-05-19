@@ -682,20 +682,19 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n"
                     + "	ID as idvenda ,\n"
-                    + "	CASE WHEN NUMERO_DOC_FISCAL IS NULL THEN id \n"
-                    + "		WHEN NUMERO_DOC_FISCAL = 0 THEN id \n"
-                    + "		ELSE NUMERO_DOC_FISCAL END AS numerocupom,\n"
+                    + "	CASE WHEN NFCE_NUMERO_CNF IS NULL THEN id \n"
+                    + "		WHEN NFCE_NUMERO_CNF = 0 THEN id \n"
+                    + "		ELSE NFCE_NUMERO_CNF END AS numerocupom,\n"
                     + "	PDV AS ecf,\n"
                     + "	PAF_DATA_MOVIMENTO AS data_venda,\n"
-                    + "	'00:00:00' AS hora,\n"
+                    + "	HORA_ABERTURA AS hora,\n"
                     + "	TOTAL_BRUTO AS valor ,\n"
                     + "	TOTAL_LIQUIDO ,\n"
                     + "	CASE WHEN CANCELADA = 'N' THEN 0 ELSE 1 END AS cancelado\n"
                     + "FROM\n"
                     + "	VENDA v\n"
-                    + "	WHERE ID_EMPRESA = 1\n"
-                    + " AND PAF_DATA_MOVIMENTO >= '" + strDataInicio + "'\n"
-                    + "	AND PAF_DATA_MOVIMENTO <= '" + strDataTermino + "'\n"
+                    + "	WHERE ID_EMPRESA = " + idLojaCliente + " AND NFCE_STATUS <> 'P' \n"
+                    + " AND PAF_DATA_MOVIMENTO between '" + strDataInicio + "'and '" + strDataTermino + "'\n"
                     + "	ORDER BY 1";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -759,13 +758,13 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	SEQUENCIA ,\n"
                     + "	ID_PRODUTO as idProduto,\n"
                     + "	PAF_UNIDADE_MEDIDA AS unidade,\n"
-                    + "	QUANTIDADE ,\n"
+                    + "	CASE WHEN QUANTIDADE > 9999 THEN 1 ELSE QUANTIDADE END quantidade,\n"
                     + "	VALOR_UNITARIO AS valor\n"
                     + "FROM\n"
                     + "	VENDA_ITENS vi\n"
-                    + "	JOIN venda v ON v.ID = vi.ID_VENDA AND v.ID_EMPRESA = 1\n"
-                    + "WHERE v.PAF_DATA_MOVIMENTO >=  '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"
-                    + "	AND v.PAF_DATA_MOVIMENTO <= '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
+                    + "	JOIN venda v ON v.ID = vi.ID_VENDA AND v.ID_EMPRESA = " + idLojaCliente + "\n"
+                    + "WHERE v.PAF_DATA_MOVIMENTO between '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"
+                    + "	AND '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
                     + "	ORDER BY 1";
 
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
