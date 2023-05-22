@@ -693,7 +693,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CASE WHEN CANCELADA = 'N' THEN 0 ELSE 1 END AS cancelado\n"
                     + "FROM\n"
                     + "	VENDA v\n"
-                    + "	WHERE ID_EMPRESA = " + idLojaCliente + " AND NFCE_STATUS <> 'P' \n"
+                    + "	WHERE ID_EMPRESA = " + idLojaCliente + "\n"
                     + " AND PAF_DATA_MOVIMENTO between '" + strDataInicio + "'and '" + strDataTermino + "'\n"
                     + "	ORDER BY 1";
 
@@ -741,6 +741,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
 
                     }
                 }
@@ -759,7 +760,8 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ID_PRODUTO as idProduto,\n"
                     + "	PAF_UNIDADE_MEDIDA AS unidade,\n"
                     + "	CASE WHEN QUANTIDADE > 9999 THEN 1 ELSE QUANTIDADE END quantidade,\n"
-                    + "	VALOR_UNITARIO AS valor\n"
+                    + "	VALOR_UNITARIO AS valor,\n"
+                    + " CASE WHEN vi.CANCELADO = 'N' THEN 0 ELSE 1 END AS cancelado\n"
                     + "FROM\n"
                     + "	VENDA_ITENS vi\n"
                     + "	JOIN venda v ON v.ID = vi.ID_VENDA AND v.ID_EMPRESA = " + idLojaCliente + "\n"
