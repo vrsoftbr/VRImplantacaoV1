@@ -630,6 +630,7 @@ public class ProdutoRepository {
                     logController.executar(EOperacao.ATUALIZAR_PRECO.getId(),
                             sdf.format(new Date()),
                             provider.getLojaVR());
+                    //logController.gravaLogPreco(produtos);
                 }
 
                 if (optSimples.contains(OpcaoProduto.CUSTO)) {

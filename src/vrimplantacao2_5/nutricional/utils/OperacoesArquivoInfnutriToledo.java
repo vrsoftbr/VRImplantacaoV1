@@ -7,6 +7,7 @@ package vrimplantacao2_5.nutricional.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.nutricional.vo.InfnutriVO;
 
@@ -137,6 +138,7 @@ public class OperacoesArquivoInfnutriToledo {
                 }
             }
         } else {
+            JOptionPane.showMessageDialog(null, "Arquivo tipo MVG5, não há tratamente de edição para esse arquivo. \n\nProcure o desenvolvedor.");
             for (int i = 0; i < vToledo.size(); i++) {
                 InfnutriVO vo = new InfnutriVO();
                 if (!vToledo.get(i).trim().isEmpty()) {

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -1873,38 +1874,66 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        int decisao = JOptionPane.showConfirmDialog(null, "Deseja importar apenas contas em aberto?");
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            
+
             StringBuilder builder = new StringBuilder();
-            
+
             for (Iterator<Integer> iterator = this.TipoDocumentoRotativo.iterator(); iterator.hasNext();) {
                 builder.append(iterator.next());
                 if (iterator.hasNext()) {
                     builder.append(",");
                 }
             }
-            
+            String sqlContasAbertas = "SELECT \n"
+                    + "CODRECEBER AS ID, \n"
+                    + "CLIENTES.CNPJ_CPF, \n"
+                    + "CODRECEBER, NUMTIT, \n"
+                    + "RECEBER.CODCLIE, \n"
+                    + "NOTAECF, \n"
+                    + "DTVENCTO, \n"
+                    + "DTEMISSAO, \n"
+                    + "DTPAGTO, \n"
+                    + "SITUACAO, \n"
+                    + "VALORPAGO, \n"
+                    + "coalesce(VALOR,0) VALOR, \n"
+                    + "coalesce(VALORJUROS,0) VALORJUROS, \n"
+                    + "OBS \n"
+                    + "FROM \n"
+                    + "RECEBER \n"
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE \n"
+                    + "where UPPER(SITUACAO) = 'AB'\n"
+                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") \n"
+                    + "and RECEBER.CODLOJA = " + getLojaOrigem() + "\n"
+                    + "order by DTEMISSAO";
+
+            String sqlContasGerais = "SELECT \n"
+                    + "CODRECEBER AS ID, \n"
+                    + "CLIENTES.CNPJ_CPF, \n"
+                    + "CODRECEBER, NUMTIT, \n"
+                    + "RECEBER.CODCLIE, \n"
+                    + "NOTAECF, \n"
+                    + "DTVENCTO, \n"
+                    + "DTEMISSAO, \n"
+                    + "DTPAGTO, \n"
+                    + "SITUACAO, \n"
+                    + "VALORPAGO, \n"
+                    + "coalesce(VALOR,0) VALOR, \n"
+                    + "coalesce(VALORJUROS,0) VALORJUROS, \n"
+                    + "OBS \n"
+                    + "FROM \n"
+                    + "RECEBER \n"
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE \n"
+                    + "where UPPER(SITUACAO) != 'CA'\n"
+                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") \n"
+                    + "and RECEBER.CODLOJA = " + getLojaOrigem() + "\n"
+                    + "order by DTEMISSAO";
+
+            String sqlEscolhido = decisao == 0 ? sqlContasAbertas : sqlContasGerais;
+
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "CODRECEBER AS ID, "
-                    + "CLIENTES.CNPJ_CPF, "
-                    + "CODRECEBER, NUMTIT, "
-                    + "RECEBER.CODCLIE, "
-                    + "NOTAECF, "
-                    + "DTVENCTO, "
-                    + "DTEMISSAO, "
-                    + "DTPAGTO, "
-                    + "coalesce(VALOR,0) VALOR, "
-                    + "coalesce(VALORJUROS,0) VALORJUROS, "
-                    + "OBS "
-                    + "FROM "
-                    + "RECEBER "
-                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                    + "where UPPER(SITUACAO) = 'AB' "
-                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") "
-                    + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                    + "order by DTEMISSAO"
+                    sqlEscolhido
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1917,11 +1946,14 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     }
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataVencimento(rst.getDate("DTVENCTO"));
-                    imp.setValor(rst.getDouble("VALOR"));
                     imp.setNumeroCupom(rst.getString("NOTAECF"));
                     imp.setObservacao(rst.getString("OBS"));
                     imp.setJuros(rst.getDouble("VALORJUROS"));
+                    imp.setValor(rst.getDouble("VALOR"));
 
+                    if ("BT".equals(rst.getString("SITUACAO").toUpperCase().trim()) || "BP".equals(rst.getString("SITUACAO").toUpperCase().trim())) {
+                        imp.addPagamento(imp.getId(), imp.getValor(), 0, 0, rst.getDate("DTPAGTO"), imp.getObservacao() + " - PAGO");
+                    }
                     vResult.add(imp);
                 }
             }
@@ -2060,10 +2092,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
+        int decisao = JOptionPane.showConfirmDialog(null, "Deseja importar apenas contas em aberto?");
         List<ContaPagarIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
+
+            String sqlAbertas = "SELECT "
                     + "CODPAGAR, "
                     + "CODFORNEC, "
                     + "coalesce(NOTA, '0') NOTA, "
@@ -2079,9 +2112,31 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "FROM PAGAR "
                     + "where CODLOJA = " + getLojaOrigem() + " "
                     + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL AND\n"
-                    + " SITUACAO != 'CA'\n"
-                    + "order by DTEMISSAO"
-            )) {
+                    + " SITUACAO = 'AB'\n"
+                    + "order by DTEMISSAO";
+
+            String sqlTodas = "SELECT \n"
+                    + "CODPAGAR, \n"
+                    + "CODFORNEC, \n"
+                    + "coalesce(NOTA, '0') NOTA, \n"
+                    + "DESD PARCELA, \n"
+                    + "VALOR, \n"
+                    + "DTVENCTO, \n"
+                    + "DTEMISSAO, \n"
+                    + "OBS, \n"
+                    + "OBS2, \n"
+                    + "VALORPAGO, \n"
+                    + "DTPAGTO, \n"
+                    + "DTENTRADA,\n"
+                    + "SITUACAO \n"
+                    + "FROM PAGAR \n"
+                    + "where CODLOJA = " + getLojaOrigem() + "\n"
+                    + "and SITUACAO != 'CA'\n"
+                    + "order by DTEMISSAO";
+
+            String sqlEscolhido = decisao == 0 ? sqlAbertas : sqlTodas;
+            System.out.println(sqlEscolhido);
+            try (ResultSet rst = stm.executeQuery(sqlEscolhido)) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rst.getString("CODPAGAR"));
@@ -2103,9 +2158,19 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setDataHoraAlteracao(rst.getTimestamp("DTENTRADA"));
                     imp.setObservacao((rst.getString("OBS") == null ? "" : rst.getString("OBS")) + " "
                             + (rst.getString("OBS2") == null ? "" : rst.getString("OBS2")));
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
                     String parcela = Utils.formataNumero(rst.getString("PARCELA"));
-                    parc.setNumeroParcela(Integer.valueOf(parcela));
+
+                    if (null == rst.getString("DTPAGTO")) {
+                        ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
+                        parc.setNumeroParcela(Integer.valueOf(parcela));
+
+                    }
+                    if ("BP".equals(rst.getString("SITUACAO").trim()) || "BT".equals(rst.getString("SITUACAO").trim())){
+                        imp.addVencimento(
+                                rst.getDate("DTVENCTO"),
+                                rst.getDouble("VALORPAGO"),
+                                rst.getDate("DTPAGTO")).setObservacao(imp.getObservacao());
+                    }
 
                     vResult.add(imp);
                 }

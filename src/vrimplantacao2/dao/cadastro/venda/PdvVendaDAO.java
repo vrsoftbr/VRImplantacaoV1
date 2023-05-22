@@ -88,7 +88,7 @@ public class PdvVendaDAO {
                 sql.put("vendaecommercesitemercado", false);
                 sql.put("vendaecommerceapi", false);
                 sql.put("cupomverde", false);
-                sql.put("baixaestoque", false);
+                //sql.put("baixaestoque", false);
                 //sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
             }
             

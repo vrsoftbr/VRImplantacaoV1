@@ -27,6 +27,7 @@ public class SelecaoLojaGUI extends VRDialog {
     private List<ConfiguracaoBaseDadosVO> conexoes = null;
     public ConfiguracaoBaseDadosGUI baseDadosGUI = null;
     public static int idConexao = 0;
+    public static int lojaOrigem = 0;
     
     /**
      * Creates new form MigracaoGUI
@@ -83,7 +84,7 @@ public class SelecaoLojaGUI extends VRDialog {
         ConfiguracaoBancoLojaVO configuracaoVO = lojas.get(cboOrigem.getSelectedIndex());
         
         txtLojaVR.setText(configuracaoVO.getIdLojaVR() + " - " + configuracaoVO.getDescricaoVR());
-        
+        lojaOrigem = Integer.parseInt(configuracaoVO.getIdLojaOrigem());
         if (configuracaoVO != null) {
             btnProximo.setEnabled(true);
         }
