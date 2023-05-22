@@ -41,7 +41,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 
 /**
  *
- * @author Importacao
+ * @author Michael
  */
 public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -139,7 +139,8 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.TELEFONE,
                 OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.CNPJ_CPF,
-                OpcaoFornecedor.INSCRICAO_ESTADUAL
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.MUNICIPIO
         ));
     }
 
@@ -153,13 +154,12 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	g.nome desc1,\n"
                     + "	t.grupoproduto merc2,\n"
                     + "	gp.grupo desc2,\n"
-                    + "	t.codsubgrupo merc3,\n"
-                    + "	s.grupo desc3\n"
+                    + "	t.grupoproduto merc3,\n"
+                    + "	gp.grupo desc3\n"
                     + "from\n"
                     + "	tabprodutos t\n"
                     + "left join tabgrandesgrupos g on t.codgrandesgrupos = g.codgrandes\n"
-                    + "left join tabgruposproduto gp on t.grupoproduto = gp.codgrupo\n"
-                    + "left join tabgruposproduto2 s on t.codsubgrupo = s.codgrupo"
+                    + "left join tabgruposproduto gp on t.grupoproduto = gp.codgrupo"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -219,14 +219,14 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.NOMEREDU descricaoReduzida,\n"
                     + "	p.codgrandesgrupos merc1,\n"
                     + "	p.grupoproduto merc2,\n"
-                    + "	p.codsubgrupo merc3,\n"
+                    + "	p.grupoproduto merc3,\n"
                     + "	p.marcas familia,\n"
                     + "	p.PESOT pesoBruto,\n"
                     + "	p.PESOT pesoLiquido,\n"
-                    + "	p.ESTOQUECOM estoque,\n"
+                    + "	p.ESTOQUE estoque,\n"
                     + "	p.VENDAMAX_POR margem,\n"
-                    + "	p.CUSTOCOMPRA custoSemImposto,\n"
-                    + "	p.CUSTO custoComImposto,\n"
+                    + "	p.VALCOMPRA custoSemImposto,\n"
+                    + "	p.CUSTOCOMPRA custoComImposto,\n"
                     + "	p.VENDA precovenda,\n"
                     + "	p.VENDAMIN precoatacado,\n"
                     + "	p.ativo situacaoCadastro,\n"
@@ -280,7 +280,7 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofinsNaturezaReceita"));
                     //imp.setFornecedorFabricante(rst.getString("fornec"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    //imp.setIdFamiliaProduto(rst.getString("familia"));
 
                     int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -555,6 +555,7 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(rs.getString("telefone"));
+                    imp.setUf(rs.getString("estado"));
 
                     if ((rs.getString("celular") != null)
                             && (!"".equals(rs.getString("celular")))) {

@@ -70,7 +70,7 @@ public class PromocaoDAO {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from promocaofinalizadora;");
             stm.execute("delete from promocaoitem;");
-            stm.execute("delete from promoca;");
+            stm.execute("delete from promocao;");
             stm.execute("drop table if exists implantacao.codant_promocao;");
             stm.execute("alter sequence promocaoitem_id_seq restart with 1;");
             stm.execute("alter sequence promocaofinalizadora_id_seq restart with 1;");

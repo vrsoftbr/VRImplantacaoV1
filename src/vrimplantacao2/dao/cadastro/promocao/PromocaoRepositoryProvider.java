@@ -97,10 +97,6 @@ public class PromocaoRepositoryProvider {
         promocaoAnteriorDAO.salvar(anterior);
     }
 
-    void getPromocaoItens() throws Exception {
-        List<PromocaoIMP> promocaoItens = promocaoDAO.getPromocaoItens();
-    }
-
     void gravarPromocaoItens(PromocaoAnteriorVO anterior) throws Exception {
         promocaoDAO.salvarPromocaoItens(anterior);
     }

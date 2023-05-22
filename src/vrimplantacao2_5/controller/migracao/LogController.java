@@ -1,6 +1,5 @@
 package vrimplantacao2_5.controller.migracao;
 
-import java.util.Date;
 import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.service.migracao.LogService;
 import vrimplantacao2_5.vo.cadastro.LogVO;

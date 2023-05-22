@@ -8,6 +8,7 @@ package vrimplantacao2_5.nutricional.GUI;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -98,7 +99,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
 
         initComponents();
         setLocationRelativeTo(null);
-        bloquearEdicaoEAcao();
+        //bloquearEdicaoEAcao();
         inicializaLabelsInvalidos();
         List<String> sistemasOrigem = rep.carregarSistemasComboBox();
         List<String> lojasOrigem = rep.carregarLojasComboBox();
@@ -1396,7 +1397,6 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        JOptionPane.showMessageDialog(this, "Esse script necessita de edição, apenas tem todos os alias do método de importação");
         painelMigracao.setScript(carregaScriptCompleto());
         painelMigracao.alteraScript();
         rep.setTipoScript(1);
@@ -1535,7 +1535,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                bloquearEdicaoEAcao();
+                //bloquearEdicaoEAcao();
                 Exceptions.printStackTrace(ex);
             }
         }
@@ -1569,7 +1569,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                bloquearEdicaoEAcao();
+                //bloquearEdicaoEAcao();
                 System.out.println(ex.getMessage());
                 Exceptions.printStackTrace(ex);
             }
@@ -1589,7 +1589,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                bloquearEdicaoEAcao();
+                //bloquearEdicaoEAcao();
                 Exceptions.printStackTrace(ex);
             }
         }
@@ -1896,22 +1896,11 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     }
 
     private void inicializaLabelsInvalidos() {
-        labelColuna1.setText("Inválido");
-        labelColuna2.setText("Inválido");
-        labelColuna3.setText("Inválido");
-        labelColuna4.setText("Inválido");
-        labelColuna5.setText("Inválido");
-        labelColuna6.setText("Inválido");
-        labelColuna7.setText("Inválido");
-        labelColuna8.setText("Inválido");
-        labelColuna9.setText("Inválido");
-        labelColuna10.setText("Inválido");
-        labelColuna11.setText("Inválido");
-        labelColuna12.setText("Inválido");
-        labelColuna13.setText("Inválido");
-        labelColuna14.setText("Inválido");
-        labelColuna15.setText("Inválido");
-        labelColuna16.setText("Inválido");
+        for (Component c : painelEditor.getComponents()) {
+            if (c instanceof JLabel) {
+                ((JLabel) c).setText("Inválido");
+            }
+        }
     }
 
     private void inicializaLabelsESpinersMgv() {
@@ -2207,7 +2196,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     }
 
     private String carregaScriptCompleto() {
-        String sqlCompleta = "--percentuais são adicionados pela classe automaticamente\n"
+        String sqlCompleta = "--SCRIPT PARA CONHECER ALIAS, NÃO SERVIRÁ PARA MIGRAR DADOS"
+                + "--percentuais são adicionados pela classe automaticamente\n"
                 + "--Caso exista txtinfo com alergenicos, fazer join com implantacao.txtinfo_v6\n"
                 + "select 	\n"
                 + "    i.codigo_nutricional id_nutricional,-- integer NOT NULL,\n"

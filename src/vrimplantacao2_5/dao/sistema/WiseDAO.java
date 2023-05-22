@@ -41,7 +41,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
  *
- * @author Wagner
+ * @author Michael
  */
 public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -142,6 +142,7 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_CONVENIADO,
                 OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -215,7 +216,7 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
-                    + "	p.ORDEM Id,\n"
+                    + "	CAST(p.ORDEM AS int) Id,\n"
                     + "	p.DTCAD dataCadastro,\n"
                     + "	p.ULTALTERA dataAlteracao,\n"
                     + "	p.BARRA ean,\n"
@@ -244,7 +245,8 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	null piscofinsNaturezaReceita,\n"
                     + "	p.CST Cst,\n"
                     + "	p.ALIQ idicmsAliqSaida,\n"
-                    + "	p.REDUCAO_ICMS icmsReducao\n"
+                    + "	p.REDUCAO_ICMS icmsReducao,\n"
+                    + "	cast(p.SUBORDEM as int) familia\n"
                     + "from\n"
                     + "	PRODUTOS p "
             )) {
@@ -278,15 +280,16 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
                     imp.setTipoEmbalagemCotacao(rst.getString("tipoEmbalagemCotacao"));
                     imp.setQtdEmbalagem(rst.getInt("embEan"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdEmbalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("embEan"));
                     imp.setPesoBruto(rst.getDouble("pesoBruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoLiquido"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaoCadastro"));
-                    //imp.setSituacaoCadastro(rst.getInt("situacaoCadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    //imp.setSituacaoCadastro(rst.getInt("situacaoCadastro"));
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaoCadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofinsNaturezaReceita"));
                     //imp.setFornecedorFabricante(rst.getString("fornec"));
 
-                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    int codigoProduto = Utils.stringToInt(String.valueOf(Integer.parseInt(rst.getString("id"))), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
                     if (produtoBalanca != null) {
@@ -296,7 +299,11 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
-                        imp.setEan(rst.getString("ean"));
+                        if ("".equals(rst.getString("ean"))) {
+                            imp.setEan(String.valueOf(codigoProduto));
+                        } else {
+                            imp.setEan(rst.getString("ean"));
+                        }
                         imp.seteBalanca(false);
                         imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
                         imp.setValidade(0);
@@ -322,13 +329,13 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT CODIGO id, DESCRI descricao FROM FAMILIA f"
+                    "SELECT cast(CODIGO as int) id, DESCRI descricao FROM FAMILIA f"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
+                    imp.setImportId(String.valueOf(Integer.parseInt(rst.getString("id"))));
                     imp.setDescricao(rst.getString("descricao"));
                     vResult.add(imp);
                 }
@@ -344,7 +351,7 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	f.CODIGO id,\n"
+                    + "	cast(f.CODIGO as int) id,\n"
                     + "	f.RAZAO  razao,\n"
                     + "	f.ENDE  endereco,\n"
                     + "	f.BAIRRO bairro,\n"
@@ -360,7 +367,8 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.FONE1 fone,\n"
                     + "	f.FONE2 fone2,\n"
                     + "	f.FAX,\n"
-                    + "	f.CELULAR\n"
+                    + "	f.CELULAR,\n"
+                    + "	f.PRAZO \n"
                     + "from\n"
                     + "	FORNECEDORES f"
             )) {
@@ -382,6 +390,16 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setTel_principal(Utils.acertarTexto(rst.getString("fone")));
 
+//                    if (rst.getString("prazo") != null) {
+//                        if (rst.getString("prazo").contains("-")) {
+//                            String[] numerodDias = rst.getString("prazo").split("-");
+//                            for (String dia : numerodDias) {
+//                                imp.setCondicaoPagamento(Integer.parseInt(dia.trim()));
+//                            }
+//                        } else {
+//                            imp.setCondicaoPagamento(rst.getInt("prazo"));
+//                        }
+//                    }
                     String fax = (rst.getString("fax"));
                     if (!"".equals(fax)) {
                         FornecedorContatoIMP cont = imp.getContatos().make("1");
@@ -433,8 +451,8 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "  SELECT\n"
-                    + "	p.ORDEMINT externo,\n"
-                    + "	e.CODFORN||'.0' idfornec ,\n"
+                    + "	CAST(p.ORDEMINT as int) externo,\n"
+                    + "	e.CODFORN idfornec, \n"
                     + "	p.ORDEM idprod\n"
                     + "FROM\n"
                     + "	EQUIV e\n"
@@ -462,7 +480,7 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT ORDEM id, BARRA ean, UNIDADE emb FROM PRODUTOS p"
+                    "SELECT cast(ORDEM as int) id, BARRA ean, UNIDADE emb FROM PRODUTOS p"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -486,22 +504,27 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "  	SELECT distinct\n"
-                    + "	c.CODIGO id,\n"
+                    "SELECT\n"
+                    + "	cast(c.CODIGO as int) id,\n"
                     + "    c.CGC cpfcnpj,\n"
-                    + "    c.RAZAO razao,\n"
+                    + "    CASE\n"
+                    + "    	WHEN c.RAZAO IS NULL\n"
+                    + "    	THEN c.NOME\n"
+                    + "    	ELSE c.RAZAO\n"
+                    + "    END razao,\n"
+                    + "    c.IE ierg,\n"
                     + "    c.NOME fantasia,\n"
                     + "    CASE WHEN c.BLOQ = 'True' THEN 0 ELSE 1 end ativo,\n"
                     + "    c.ENDERECO endereco,\n"
                     + "    c.END_NUM numero,\n"
                     + "    c.BAIRRO bairro,\n"
                     + "    c.CIDADE municipio,\n"
-                    + "    c.UF uf,\n"
+                    + "    'SP' as uf,\n"
                     + "    c.CEP cep,\n"
                     + "    c.DATACADASTRO dataCadastro,\n"
                     + "    c.NASC dtnasc,\n"
                     + "    c.FONE,\n"
-                    + "    c.FONE2 ,\n"
+                    + "    c.FONE2,\n"
                     + "    c.EMAIL email,\n"
                     + "    c.CREDITO limite,\n"
                     + "    c.CELULAR celular\n"
@@ -521,11 +544,12 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setCnpj(rst.getString("cpfcnpj"));
+                    imp.setInscricaoestadual(rst.getString("ierg"));
                     imp.setCelular(Utils.acertarTexto(rst.getString("celular")));
                     imp.setTelefone(Utils.acertarTexto(rst.getString("fone")));
                     imp.setDataCadastro(rst.getDate("dataCadastro"));
                     imp.setValorLimite(rst.getDouble("limite"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
                     imp.setEmail(rst.getString("email"));
 
                     if ((rst.getString("FONE2") != null)
@@ -553,7 +577,7 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "  	SELECT distinct\n"
-                    + "	c.CODIGO id,\n"
+                    + "	cast(c.CODIGO as int) id,\n"
                     + "    c.CGC cpfcnpj,\n"
                     + "    c.IE ie,\n"
                     + "    c.RAZAO razao,\n"
@@ -603,18 +627,22 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ConveniadoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "  	SELECT distinct\n"
-                    + "	c.CODIGO id_cliente,\n"
+                    "SELECT\n"
+                    + "	cast(c.CODIGO as int) id_cliente,\n"
                     + "    c.CGC cpfcnpj,\n"
                     + "    c.IE ie,\n"
-                    + "    c.RAZAO razao,\n"
+                    + "    CASE\n"
+                    + "    	WHEN c.RAZAO IS NULL\n"
+                    + "    	THEN c.NOME\n"
+                    + "    	ELSE c.RAZAO\n"
+                    + "    END razao,\n"
                     + "    c.NOME fantasia,\n"
                     + "    CASE WHEN c.BLOQ = 'True' THEN 0 ELSE 1 end ativo,\n"
                     + "    c.ENDERECO endereco,\n"
                     + "    c.END_NUM numero,\n"
                     + "    c.BAIRRO bairro,\n"
                     + "    c.CIDADE municipio,\n"
-                    + "    c.UF uf,\n"
+                    + "    'SP' uf,\n"
                     + "    c.CEP cep,\n"
                     + "    c.DATACADASTRO dataCadastro,\n"
                     + "    c.NASC dtnasc,\n"
@@ -688,11 +716,11 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rst = stm.executeQuery( /*
                     " SELECT\n"
                     + "	DISTINCT \n"
                     + "	f.CONT id,\n"
-                    + "	c.CODIGO idcliente,\n"
+                    + "	cast(c.CODIGO as int) idcliente,\n"
                     + "	f.DATA  dataemissao,\n"
                     + "	f.VENC datavencimento,\n"
                     + "	f.CUPOM numerodocumento,\n"
@@ -704,6 +732,24 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	FIADO f\n"
                     + "LEFT JOIN CLIENTES c ON\n"
                     + "	f.NOME = c.NOME AND c.CONV NOT IN ('True')\n"
+                    + "WHERE\n"
+                    + "	f.pago != 'S'"
+                     */
+                    " SELECT\n"
+                    + "	DISTINCT \n"
+                    + "	f.CONT id,\n"
+                    + "	cast(c.CODIGO as int) idcliente,\n"
+                    + "	f.DATA  dataemissao,\n"
+                    + "	f.VENC datavencimento,\n"
+                    + "	f.CUPOM numerodocumento,\n"
+                    + "	f.VALOR valororig,\n"
+                    + "	(f.VALOR - COALESCE(f.VLRPAGO, 0)) valor,\n"
+                    + "	COALESCE(f.VLRPAGO, 0) VLRPAGO,\n"
+                    + "	c.CONV \n"
+                    + "FROM\n"
+                    + "	FIADO f\n"
+                    + "LEFT JOIN CLIENTES c ON\n"
+                    + "	f.NOME = c.NOME\n"
                     + "WHERE\n"
                     + "	f.pago != 'S'"
             )) {

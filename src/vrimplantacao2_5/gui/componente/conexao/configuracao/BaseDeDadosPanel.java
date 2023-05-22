@@ -84,15 +84,20 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     private void getLojaMapeada() {
         cboOrigem.setModel(new DefaultComboBoxModel());
-
+        int contador = 0;
+        int indice = 0;
         lojas = controller.getLojaMapeada(cboConexao.getId());
         this.idConexao = cboConexao.getId();
-
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
                     configuracaoLojaVO.getIdLojaOrigem() + " - " + configuracaoLojaVO.getDescricaoLojaOrigem() + " - "
                     + (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
+            if (Integer.parseInt(configuracaoLojaVO.getIdLojaOrigem()) == SelecaoLojaGUI.lojaOrigem) {
+                indice = contador;
+            }
+            contador++;
         }
+        cboOrigem.setSelectedIndex(indice);
     }
 
     private void preencheCampoLojaVR() {
@@ -136,7 +141,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     public void fecharConexao() throws Exception {
         if (conexao != null) {
             lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/parado_12.png")));
-            
+
             conexao.close();
             conexao = null;
         }
