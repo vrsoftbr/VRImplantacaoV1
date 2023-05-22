@@ -143,6 +143,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                     dao.eanAtacado = chkEANAtacado.isSelected();
                     dao.apenasAtivo = chkSomenteAtivo.isSelected();
                     dao.setComplemento(pnlConn.getComplemento());
+                    dao.setPrecoVendaSemOferta(chkPrecoVendaSemOferta.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -293,6 +294,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkPrecoVendaSemOferta = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         try {
@@ -640,6 +642,8 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkSomenteAtivo, "Somente Produto Ativo");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkPrecoVendaSemOferta, "Preço venda (Sem Oferta)");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -647,9 +651,10 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkPrecoVendaSemOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(399, Short.MAX_VALUE))
+                .addContainerGap(381, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -658,7 +663,9 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                 .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkPrecoVendaSemOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(134, Short.MAX_VALUE))
         );
 
         tabs.addTab("Especifico", jPanel1);
@@ -836,6 +843,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkNomeFantasia;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendasCustos;
+    private vrframework.bean.checkBox.VRCheckBox chkPrecoVendaSemOferta;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteAtivo;

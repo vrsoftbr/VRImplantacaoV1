@@ -74,11 +74,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarRotativoBaixados = false;
     public boolean importarConveniosBaixados = false;
+    
+    public boolean precoVendaSemOferta = false;
 
     private String complemento = "";
 
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
+    public void setPrecoVendaSemOferta(boolean precoVendaSemOferta){
+        this.precoVendaSemOferta = precoVendaSemOferta;
     }
 
     @Override
@@ -532,7 +538,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
-                    + "	vend.precovenda,\n"
+                    + ( precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n":"vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
                     + " 	vend.margemmaxima,\n"
@@ -569,6 +575,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		emb.id = p.id_tipoembalagem\n"
                     + "	join produtocomplemento vend on\n"
                     + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
+                    + (precoVendaSemOferta ? 
+                       "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n":"\n")
                     + "	left join cest on\n"
                     + "		cest.id = p.id_cest\n"
                     + "	left join tipopiscofins piscofcred on \n"

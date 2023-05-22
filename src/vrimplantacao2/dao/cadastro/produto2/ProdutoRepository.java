@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1429,6 +1430,11 @@ public class ProdutoRepository {
      */
     public ProdutoComplementoVO converterComplemento(ProdutoIMP imp) throws Exception {
         ProdutoComplementoVO complemento = new ProdutoComplementoVO();
+               
+        Calendar dataAtual = Calendar.getInstance();
+        dataAtual.add(Calendar.DATE, -90);
+        Date noventaDias = dataAtual.getTime();
+        System.out.println(noventaDias);
 
         complemento.setIdLoja(getLojaVR());
         complemento.setEstoqueMinimo(imp.getEstoqueMinimo());
@@ -1449,7 +1455,7 @@ public class ProdutoRepository {
         complemento.setTipoAtacado(imp.getTipoAtacado());
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
-        complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
+        complemento.setDataPrimeiraAlteracao(imp.getDataCadastro() == null ? noventaDias : imp.getDataCadastro());
         complemento.setNormaReposicao(imp.getNormaReposicao());
         complemento.setSetor(imp.getSetor());
         complemento.setPrateleira(imp.getPrateleira());
