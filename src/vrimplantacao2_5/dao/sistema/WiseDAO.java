@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JOptionPane;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -780,18 +779,4 @@ public class WiseDAO extends InterfaceDAO implements MapaTributoProvider {
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
-//    private String removerAcentos(String texto) {
-//        texto = texto != null ? Normalizer.normalize(texto, Normalizer.Form.NFD) : "";
-//        texto = texto != null ? texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") : "";
-//        texto = texto != null ? texto.replaceAll("�", "C") : "";
-//        texto = texto != null ? texto.replaceAll("[^\\p{ASCII}]", "") : "";
-//
-//        return texto;
-//    }
-    private int gerarCodigoAtacado() {
-        Object[] options = {"ean atacado", "ean13", "ean14", "Cancelar"};
-        int decisao = JOptionPane.showOptionDialog(null, "Escolha uma opção de ean",
-                "Gerar eans", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-        return decisao;
-    }
 }

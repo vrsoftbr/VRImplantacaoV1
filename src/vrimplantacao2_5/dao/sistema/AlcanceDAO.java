@@ -463,7 +463,6 @@ public class AlcanceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -558,7 +557,8 @@ public class AlcanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-     */
+    
+    /*
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         if (opt == OpcaoProduto.PRECO || opt == OpcaoProduto.CUSTO || opt == OpcaoProduto.MARGEM || opt == OpcaoProduto.ESTOQUE) {
@@ -655,7 +655,8 @@ public class AlcanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return null;
     }
-
+    */
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
