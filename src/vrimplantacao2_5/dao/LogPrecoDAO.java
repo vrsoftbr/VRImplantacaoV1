@@ -33,7 +33,7 @@ public class LogPrecoDAO {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "CREATE TABLE IF NOT EXISTS implantacao.logatualizapreco (\n"
-                    + "	impid varchar(100) NOT NULL PRIMARY key,\n"
+                    + "	impid varchar(100),\n"
                     + " impsistema varchar(100),\n"
                     + " imploja varchar(6),\n"
                     + "	descricao varchar(250),\n"
