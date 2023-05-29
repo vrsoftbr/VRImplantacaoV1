@@ -126,13 +126,13 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         String sistema = "SHI";
-        if (bancoSfi) {
+        /*if (bancoSfi) {
             sistema = "SHI - SFI";
-        }
+        }*/
 
         return sistema;
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -148,7 +148,7 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.VALOR_LIMITE
         ));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -211,7 +211,8 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.EXCECAO,
                     OpcaoProduto.DESCONTINUADO,
-                    OpcaoProduto.ASSOCIADO
+                    OpcaoProduto.ASSOCIADO,
+                    OpcaoProduto.FABRICANTE
                 }
         ));
     }
@@ -458,7 +459,10 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    "WITH\n"
+                    + "	custo AS (SELECT CODPRO, max(DATA) DATA FROM PRECOCUSTO WHERE FILIAL = " + getLojaOrigem() + " GROUP BY CODPRO),\n"
+                    + "	saldo AS (SELECT CODPRO, max(DATA) data FROM ESTOQUE WHERE FILIAL = " + getLojaOrigem() + " GROUP BY CODPRO)\n"
+                    + "select\n"
                     + "    p.codigo id,\n"
                     + "    p.inclusao datacadastro,\n"
                     + "    coalesce(ean.barras, p.codigo) ean,\n"
@@ -472,12 +476,13 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.fantas descricaoreduzida,\n"
                     + "    p.grupox mercadologico,\n"
                     + "    p.peso,\n"
+                    + "    f2.FANTAS fabricante,\n"
                     + "    pv.estmin,\n"
                     + "    pv.estmax,\n"
                     + "    case p.compra when 'S' then 1 else 0 end descontinuado, \n"
-                    + "    0 as estoque,\n"
+                    + "    e.saldoatu estoque,\n"
                     + "    pv.lucro,\n"
-                    + "    0 custo,\n"
+                    + "    pc.CUSTO custo,\n"
                     + "    pv.preco,\n"
                     + "    case p.inativ when 'S' then 0 else 1 end ativo,\n"
                     + "    ncm.clafis ncm,\n"
@@ -501,8 +506,12 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join clafis ncm on ncm.id = p.idclafis\n"
                     + "    left join icmsprod icm on icm.codpro = p.codigo and icm.estado = f.estado\n"
                     + "    left join tabpiscofins pis on p.idpiscofins = pis.id\n"
-                    + "order by\n"
-                    + "    1"
+                    + "    JOIN FORNECEDOR f2 ON p.FORNEC = f2.CODIGO\n"
+                    + "    LEFT JOIN custo c ON p.CODIGO = c.CODPRO  \n"
+                    + "    LEFT JOIN precocusto pc ON c.codpro = pc.CODPRO AND pc.DATA = c.DATA\n"
+                    + "    LEFT JOIN saldo est ON p.CODIGO = est.CODPRO\n"
+                    + "    LEFT JOIN estoque e ON e.codpro = est.codpro AND est.data = e.DATA\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -520,6 +529,7 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setIdFamiliaProduto(rst.getString("altern"));
                     imp.setDescontinuado(rst.getInt("descontinuado") == 1);
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
                     String[] cods = merc.split("\\.");
@@ -548,6 +558,9 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setMargem(rst.getDouble("lucro"));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("ativo")));
@@ -1045,13 +1058,13 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDatacadastro(rst.getDate("datacadastro"));
                         imp.setObservacao(rst.getString("observacao"));
                         imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
-                        
+
                         if (rst.getBoolean("simples")) {
                             imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
                         } else {
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                         }
-                        
+
                         result.add(imp);
                     }
                 }
@@ -1318,24 +1331,32 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select p.codigo codPro,  p.reffab codExt, p.fornec codFor, "
+                    /*"select p.codigo codPro,  p.reffab codExt, p.fornec codFor, "
                     + "p.embala emb, current_date data\n"
                     + "from produtos p\n"
                     + "union\n"
                     + "select pf.codpro codPro, pf.codfor codExt, pf.fornec codFor, "
                     + "pf.embala emb,  pf.data\n"
-                    + "from codfornec pf"
+                    + "from codfornec pf"*/
+                    "SELECT\n"
+                    + "	FORNEC id_fornecedor,\n"
+                    + "	CODIGO id_produto,\n"
+                    + "	REFFAB cod_externo,\n"
+                    + "	embala qtde_emb\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(rst.getString("codFor"));
-                    imp.setIdProduto(rst.getString("codPro"));
-                    imp.setCodigoExterno(rst.getString("codExt"));
-                    imp.setDataAlteracao(rst.getDate("data"));
-                    imp.setQtdEmbalagem(rst.getDouble("emb"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("cod_externo"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtde_emb"));
+                    //imp.setDataAlteracao(rst.getDate("data"));
 
                     result.add(imp);
                 }
