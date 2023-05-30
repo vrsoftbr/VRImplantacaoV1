@@ -317,6 +317,7 @@ import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.STI32_5GUI;
 import vrimplantacao2_5.gui.sistema.Shi2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
@@ -2240,7 +2241,20 @@ public enum ESistema {
             }
             return null;
         }
+     },
+     STI3(255, "STI3", new ProviderGenericoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new STI32_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
      };
+     
 
     private int id;
     private String nome;
