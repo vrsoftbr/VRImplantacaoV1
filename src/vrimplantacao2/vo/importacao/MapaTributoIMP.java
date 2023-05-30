@@ -29,6 +29,8 @@ public class MapaTributoIMP {
         this.id = id;
         this.descricao = descricao;
     }
+    
+    
 
     public MapaTributoIMP(String id, String descricao, int cst, double aliquota, double reduzido) {
         this(id, descricao);

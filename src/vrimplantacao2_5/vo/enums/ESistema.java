@@ -249,6 +249,7 @@ import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.PallasDAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
+import vrimplantacao2_5.dao.sistema.STI32_5DAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
@@ -319,6 +320,7 @@ import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
+import vrimplantacao2_5.gui.sistema.STI32_5GUI;
 import vrimplantacao2_5.gui.sistema.Shi2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
@@ -2267,7 +2269,19 @@ public enum ESistema {
             }
             return null;
         }
-     };
+     },
+     STI3(255, "STI3", new STI32_5DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new STI32_5GUI(frame);
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     };     
 
     private int id;
     private String nome;

@@ -153,6 +153,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.TELEFONE,
                 OpcaoCliente.CELULAR,
                 OpcaoCliente.EMAIL,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -209,7 +210,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -236,6 +237,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.CODIGO_BARRA ean,\n"
                     + " p.CODIGO_EMPRESA,\n"
                     + " p.CODIGO_FILIAL,\n"
+                    + "F_CUSTO_REPOSICAO,\n"
                     + " CASE WHEN e.PAF_UNIDADE_MEDIDA NOT IN ('UN','KG','CX') THEN 'UN'\n"
                     + "      ELSE e.PAF_UNIDADE_MEDIDA END tipoembalagem,\n"
                     + " CASE WHEN p.BALANCA = 'N' THEN 0\n"
@@ -260,7 +262,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rs.getString("codigo"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricao"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricao")));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
@@ -274,8 +276,8 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoque_minimo"));
 
-                    imp.setCustoSemImposto(rs.getDouble("custo_medio"));
-                    imp.setCustoComImposto(imp.getCustoMedioSemImposto());
+                    imp.setCustoComImposto(rs.getDouble("F_CUSTO_REPOSICAO"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rs.getDouble("preco_venda"));
 
                     imp.setSituacaoCadastro(rs.getInt("status"));
@@ -292,7 +294,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
 
-                    int codigoProduto = Utils.stringToInt(rs.getString("codigo"), -2);
+                    int codigoProduto = Utils.stringToInt(rs.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
                     if (produtoBalanca != null) {
@@ -457,6 +459,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
 
                     imp.setIdFornecedor(rs.getString("fornecedorid"));
+                    
                     imp.setIdProduto(rs.getString("produtoid"));
                     imp.setCodigoExterno(rs.getString("referencia"));
 
@@ -610,6 +613,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setOrgaoemissor(rs.getString("uf"));
 
+                    imp.setValorLimite(rs.getDouble("limite"));
                     imp.setAtivo(rs.getBoolean("status"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
@@ -714,8 +718,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
-    
+
     @Override
     public List<DesmembramentoIMP> getDesmembramentos() throws Exception {
         List<DesmembramentoIMP> result = new ArrayList<>();
@@ -834,7 +837,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM VENDA\n"
                     + "WHERE \n"
                     + " DATA_VENDA BETWEEN '" + strDataInicio + "' and '" + strDataTermino + "'";
-            
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
