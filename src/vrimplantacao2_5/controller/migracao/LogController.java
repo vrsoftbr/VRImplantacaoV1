@@ -3,7 +3,7 @@ package vrimplantacao2_5.controller.migracao;
 import java.util.List;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.classe.Global;
-import vrimplantacao2_5.service.migracao.LogPrecoService;
+import vrimplantacao2_5.service.migracao.LogAtualizacaoService;
 import vrimplantacao2_5.service.migracao.LogService;
 import vrimplantacao2_5.vo.cadastro.LogVO;
 
@@ -14,7 +14,7 @@ import vrimplantacao2_5.vo.cadastro.LogVO;
 public class LogController {
     
     private final LogService service = new LogService();
-    private final LogPrecoService serviceLogPreco = new LogPrecoService();
+    private final LogAtualizacaoService serviceLogAtualizacao = new LogAtualizacaoService();
     
     public void executar(
             int idTipoOperacao, 
@@ -31,7 +31,7 @@ public class LogController {
         service.executar(logVO);
     }
 
-    public void executarLogPreco(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
-        serviceLogPreco.converteLogPreco(organizados, sistema, loja);
+    public void executarLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
+        serviceLogAtualizacao.converteLogAtualizacao(organizados, sistema, loja);
     }
 }

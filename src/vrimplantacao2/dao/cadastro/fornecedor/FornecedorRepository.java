@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
+import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto2.DivisaoDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -35,6 +37,8 @@ import vrimplantacao2_5.vo.enums.EOperacao;
 public class FornecedorRepository {
     
     private static final Logger LOG = Logger.getLogger(FornecedorRepository.class.getName());
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     private FornecedorRepositoryProvider provider;
     private MultiMap<String, Integer> contatos;
@@ -172,6 +176,10 @@ public class FornecedorRepository {
                 provider.next();
             }
             
+            if (versao.igualOuMaiorQue(4, 1, 39)){
+                provider.gravarFornecedorEndereco();
+            }
+                        
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             
             //Executa log de operação
@@ -258,6 +266,10 @@ public class FornecedorRepository {
                     }
                 }
                 provider.next();
+            }
+            
+            if (versao.igualOuMaiorQue(4, 1, 39)){
+                provider.atualizarFornecedorEndereco();
             }
 
             provider.commit();
@@ -386,6 +398,10 @@ public class FornecedorRepository {
                 }
 
                 provider.next();
+            }
+            
+            if (versao.igualOuMaiorQue(4, 1, 39)){
+                provider.gravarFornecedorEndereco();
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

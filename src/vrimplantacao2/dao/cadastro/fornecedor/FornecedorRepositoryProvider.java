@@ -25,6 +25,7 @@ public class FornecedorRepositoryProvider {
     private String lojaOrigem;
     private int lojaVR;
     private FornecedorDAO fornecedorDAO;
+    private FornecedorEnderecoDAO fornecedorEnderecoDAO;
     private ProdutoFornecedorDAO produtoFornecedorDAO;
     private FornecedorAnteriorDAO anterioresDAO;
     private MunicipioDAO municipioDAO;
@@ -40,6 +41,7 @@ public class FornecedorRepositoryProvider {
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
         this.fornecedorDAO = new FornecedorDAO();
+        this.fornecedorEnderecoDAO = new FornecedorEnderecoDAO();
         this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
         this.fornecedorContatoDAO = new FornecedorContatoDAO();
         this.anterioresDAO = new FornecedorAnteriorDAO();
@@ -56,6 +58,7 @@ public class FornecedorRepositoryProvider {
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
         this.fornecedorDAO = new FornecedorDAO();
+        this.fornecedorEnderecoDAO = new FornecedorEnderecoDAO();
         this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
         this.fornecedorContatoDAO = new FornecedorContatoDAO();
         this.anterioresDAO = new FornecedorAnteriorDAO();
@@ -196,5 +199,14 @@ public class FornecedorRepositoryProvider {
 
     public void atualizarContato(FornecedorContatoVO contato, Set<OpcaoFornecedor> opt) throws Exception {
         fornecedorContatoDAO.atualizar(contato, opt);
+    }
+
+    void gravarFornecedorEndereco() {
+        fornecedorEnderecoDAO.gravarFornecedorEndereco(getSistema(), getLojaOrigem());
+    }
+
+    void atualizarFornecedorEndereco() {
+        fornecedorEnderecoDAO.atualizarFornecedorEndereco();
+        fornecedorEnderecoDAO.atualizarFornecedorEndereco();
     }
 }

@@ -171,12 +171,12 @@ public class ProdutoDAO {
             sql.put("pesavel", vo.isPesavel());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
             sql.put("vendacontrolada", vo.isVendaControlada());
-            
-            sql.put("tiponaturezareceita", 
-                    vo.getPisCofinsNaturezaReceita() == null ? null :
-                    vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
-                    vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
-                    vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+
+            sql.put("tiponaturezareceita",
+                    vo.getPisCofinsNaturezaReceita() == null ? null
+                    : vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
 
             sql.put("vendapdv", true);
             sql.put("conferido", false);
@@ -189,8 +189,10 @@ public class ProdutoDAO {
             sql.put("tara", 0.0);
             sql.put("utilizatabelasubstituicaotributaria", false);
             sql.put("id_tipolocaltroca", 0);
-            sql.put("qtddiasminimovalidade", 0);
-            sql.put("utilizavalidadeentrada", false);
+            sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
+            if (vo.getQtdDiasMinimoValidade() > 0 ){
+            sql.put("utilizavalidadeentrada", true);                
+            } else sql.put("utilizavalidadeentrada", false);
             sql.put("impostomedioestadual", 0);
             sql.put("id_tipocompra", 0);
             sql.put("numeroparcela", vo.getNumeroparcela());
@@ -215,14 +217,14 @@ public class ProdutoDAO {
             }
 
             try {
-                stm.execute(sql.getInsert());         
+                stm.execute(sql.getInsert());
             } catch (Exception e) {
                 throw e;
             }
         }
     }
-    
-     public void salvarProdutoPisCofins(ProdutoVO vo) throws Exception {
+
+    public void salvarProdutoPisCofins(ProdutoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produtopiscofins");
@@ -232,18 +234,44 @@ public class ProdutoDAO {
             sql.put("id_piscofinsdebito", vo.getPisCofinsDebito().getId());
             sql.put("id_piscofinscredito", vo.getPisCofinsCredito().getId());
             sql.put("codigonaturezareceita",
-                    vo.getPisCofinsNaturezaReceita() == null ? null :
-                    vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
-                    vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null :
-                    vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+                    vo.getPisCofinsNaturezaReceita() == null ? null
+                    : vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
 
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
+                System.out.println(sql.getInsert());
+                System.out.println("Erro em salvarProdutoPisCofins da classe ProdutoDAO");
                 throw e;
             }
         }
+    }
 
+    public void atualizarProdutoPisCofins(ProdutoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtopiscofins");
+
+            sql.put("id_grupoeconomico", 1);
+            sql.put("id_piscofinsdebito", vo.getPisCofinsDebito().getId());
+            sql.put("id_piscofinscredito", vo.getPisCofinsCredito().getId());
+            sql.put("codigonaturezareceita",
+                    vo.getPisCofinsNaturezaReceita() == null ? null
+                    : vo.getPisCofinsCredito().getId() == 15 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsDebito().getId() == 7 && vo.getPisCofinsNaturezaReceita().getCodigo() == 999 ? null
+                    : vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
+
+            try {
+                sql.setWhere("id_produto = " + vo.getId());
+                stm.execute(sql.getUpdate());
+            } catch (Exception e) {
+                System.out.println(sql.getUpdate());
+                System.out.println("Erro no método atualizarProdutoPisCofins da classe ProdutoDAO");
+                throw e;
+            }
+        }
     }
 
     /**
@@ -314,6 +342,10 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("validade", vo.getValidade());
+            sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
+            if (vo.getQtdDiasMinimoValidade() > 0 ){
+            sql.put("utilizavalidadeentrada", true);                
+            } else sql.put("utilizavalidadeentrada", false);
         }
         if (opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO)) {
             sql.put("id_tipoembalagem", vo.getTipoEmbalagem().getId());
@@ -391,7 +423,7 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.VASILHAME) && vo.getIdVasilhame() != 0) {
             sql.put("id_produtovasilhame", vo.getIdVasilhame());
         }
-        if(opt.contains(OpcaoProduto.PERCENTUAL_PERDA)){
+        if (opt.contains(OpcaoProduto.PERCENTUAL_PERDA)) {
             sql.put("percentualperda", 0.0);
             sql.put("perda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
         }
@@ -492,6 +524,26 @@ public class ProdutoDAO {
             } catch (Exception e) {
                 throw e;
             }
+        }
+    }
+
+    void atualizarProdutoPisCofinsPelaProduto() {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "UPDATE\n"
+                    + "    produtopiscofins c\n"
+                    + "set\n"
+                    + "	id_grupoeconomico = 1,\n"
+                    + "    id_piscofinsdebito = p.id_tipopiscofins,\n"
+                    + "    id_piscofinscredito = p.id_tipopiscofinscredito,\n"
+                    + "    codigonaturezareceita = p.tiponaturezareceita\n"
+                    + "FROM\n"
+                    + "    produto p\n"
+                    + "WHERE c.id_produto = p.id "
+            );
+        } catch (Exception e) {
+            System.out.println("Erro na execução do script de atualizarProdutoPisCofinsPelaProduto na classe ProdutoDAO");
+            e.printStackTrace();
         }
     }
 }

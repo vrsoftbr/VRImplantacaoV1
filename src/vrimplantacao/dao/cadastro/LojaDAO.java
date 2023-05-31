@@ -20,7 +20,7 @@ import vrimplantacao2_5.vo.cadastro.TecladoLayoutVO;
 public class LojaDAO {
 
     private Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-    
+
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         List<LojaVO> result = new ArrayList();
 
@@ -253,6 +253,10 @@ public class LojaDAO {
                 stm.execute(copiaUsuarioPermissao(i_loja));
             }
 
+            if (versao.igualOuMaiorQue(4, 1, 39)) {
+                /* cópia tabela parametroagendarecebimento */
+                stm.execute(copiarParametroAgendaecebimento(i_loja));
+            }
             //  stm.execute(copiaEcf(i_loja));
         }
     }
@@ -469,6 +473,27 @@ public class LojaDAO {
             }
             return result;
         }
+    }
+
+    private String copiarParametroAgendaecebimento(LojaVO i_loja) {
+        String sqlUpdateParametroAgendaRecebimento = " insert\n"
+                + "	into\n"
+                + "	parametroagendarecebimento (dia_semana,\n"
+                + "	horario_inicio,\n"
+                + "	horario_termino,\n"
+                + "	tempo_recebimento,\n"
+                + "	quantidade_docas,\n"
+                + "	id_loja)\n"
+                + "select\n"
+                + "	dia_semana,\n"
+                + "	horario_inicio,\n"
+                + "	horario_termino,\n"
+                + "	tempo_recebimento,\n"
+                + "	quantidade_docas,\n"
+                + "	" + i_loja.getId() + " id_loja\n"
+                + "from\n"
+                + "	parametroagendarecebimento";
+        return sqlUpdateParametroAgendaRecebimento;
     }
 
     public class ProximoIdTecladoLayoutVO {

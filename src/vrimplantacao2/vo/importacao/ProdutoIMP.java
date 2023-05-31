@@ -187,6 +187,7 @@ public class ProdutoIMP {
     @DatabaseField private String idVasilhame;
     
     @DatabaseField private double percentualPerda = 0;
+    @DatabaseField private int qtdDiasMinimoValidade = 0;
     
     private int codigoAtual;
     private int operacional = 0;
@@ -1146,7 +1147,15 @@ public class ProdutoIMP {
     public void setPercentualPerda(double percentualPerda){
         this.percentualPerda = percentualPerda;
     }
-    
+
+    public int getQtdDiasMinimoValidade() {
+        return qtdDiasMinimoValidade;
+    }
+
+    public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
+        this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
+    }
+        
     public boolean from(ProdutoBalancaVO bal) {
         if (bal == null) return false;        
         setEan(String.valueOf(bal.getCodigo()));

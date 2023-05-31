@@ -99,7 +99,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
 
         initComponents();
         setLocationRelativeTo(null);
-        //bloquearEdicaoEAcao();
+        bloquearEdicaoEAcao();
         inicializaLabelsInvalidos();
         List<String> sistemasOrigem = rep.carregarSistemasComboBox();
         List<String> lojasOrigem = rep.carregarLojasComboBox();
@@ -1535,7 +1535,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                //bloquearEdicaoEAcao();
+                bloquearEdicaoEAcao();
                 Exceptions.printStackTrace(ex);
             }
         }
@@ -1569,7 +1569,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                //bloquearEdicaoEAcao();
+                bloquearEdicaoEAcao();
                 System.out.println(ex.getMessage());
                 Exceptions.printStackTrace(ex);
             }
@@ -1589,7 +1589,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             } catch (Exception ex) {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfo(-2);
-                //bloquearEdicaoEAcao();
+                bloquearEdicaoEAcao();
                 Exceptions.printStackTrace(ex);
             }
         }

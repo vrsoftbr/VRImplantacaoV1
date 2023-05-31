@@ -253,6 +253,14 @@ public class ProdutoRepositoryProvider {
     public Map<String, Entry<String, Integer>> getDivisoesAnteriores() throws Exception {
         return divisaoDAO.getAnteriores(getSistema(), getLoja());
     }
+
+    void atualizarProdutoPisCofins(ProdutoVO prod) throws Exception {
+        produtoDAO.atualizarProdutoPisCofins(prod);
+    }
+
+    void atualizarProdutoPisCofinsPelaProduto() {
+        produtoDAO.atualizarProdutoPisCofinsPelaProduto();
+    }
     
     public class Anterior {
         

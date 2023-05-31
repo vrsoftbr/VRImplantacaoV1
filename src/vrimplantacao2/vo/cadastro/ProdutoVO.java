@@ -72,6 +72,7 @@ public class ProdutoVO {
     private boolean manterDescricao = false;
     private int idVasilhame;
     private double percentualPerda = 0;
+    private int qtdDiasMinimoValidade = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -487,4 +488,13 @@ public class ProdutoVO {
     public void setPercentualPerda(double percentualPerda) {
         this.percentualPerda = percentualPerda;
     }
+
+    public int getQtdDiasMinimoValidade() {
+        return qtdDiasMinimoValidade;
+    }
+
+    public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
+        this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
+    }
+    
 }

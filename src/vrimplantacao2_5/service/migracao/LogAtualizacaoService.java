@@ -11,27 +11,27 @@ import java.util.List;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2_5.dao.LogPrecoDAO;
-import vrimplantacao2_5.vo.cadastro.LogPrecoVO;
+import vrimplantacao2_5.dao.LogAtualizacaoDAO;
+import vrimplantacao2_5.vo.cadastro.LogAtualizacaoVO;
 
 /**
  *
  * @author Michael
  */
-public class LogPrecoService {
+public class LogAtualizacaoService {
 
-    private LogPrecoDAO logPrecoDAO;
+    private LogAtualizacaoDAO logAtualizacaoDAO;
 
-    public LogPrecoService() {
-        this.logPrecoDAO = new LogPrecoDAO();
+    public LogAtualizacaoService() {
+        this.logAtualizacaoDAO = new LogAtualizacaoDAO();
     }
 
-    public void converteLogPreco(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
-        List<LogPrecoVO> listaVo = new ArrayList<>();
+    public void converteLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
+        List<LogAtualizacaoVO> listaVo = new ArrayList<>();
         ProgressBar.setStatus("Convertendo id de log: " + organizados.size());
         ProgressBar.setMaximum(organizados.size());
         for (ProdutoIMP organizado : organizados) {
-            LogPrecoVO vo = new LogPrecoVO();
+            LogAtualizacaoVO vo = new LogAtualizacaoVO();
             vo.setImpSistema(sistema);
             vo.setImpLoja(loja);
             vo.setImpId(organizado.getImportId());
@@ -39,11 +39,14 @@ public class LogPrecoService {
             vo.setCoigoatual(new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(organizado.getImportId())));
             vo.setPreco(organizado.getPrecovenda());
             vo.setDataAlteracao(new Date());
+            vo.setEstoque(organizado.getEstoque());
+            vo.setCustoComImposto(organizado.getCustoComImposto());
+            vo.setCustoSemImposto(organizado.getCustoComImposto());
             listaVo.add(vo);
             ProgressBar.next();
         }
-        logPrecoDAO.deletarLogAtualizaPreco(sistema, loja);
-        logPrecoDAO.salvarLogPreco(listaVo);
+        logAtualizacaoDAO.deletarLogAtualizacao(sistema, loja);
+        logAtualizacaoDAO.salvarLogAtualizacao(listaVo);
     }
 
 }

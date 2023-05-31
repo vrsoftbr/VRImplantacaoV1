@@ -12,52 +12,55 @@ import org.postgresql.util.PSQLException;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.vo.cadastro.LogPrecoVO;
+import vrimplantacao2_5.vo.cadastro.LogAtualizacaoVO;
 
 /**
  *
  * @author Michael
  */
-public class LogPrecoDAO {
+public class LogAtualizacaoDAO {
 
-    public LogPrecoDAO() {
+    public LogAtualizacaoDAO() {
         try {
-            criarTabelaLogAtualizaPreco();
+            criarTabelaLogAtualizacao();
         } catch (Exception ex) {
-            System.out.println("Erro no Construtor da classe LogPrecoDAO");
+            System.out.println("Erro no Construtor da classe LogAtualizacaoDAO");
             Exceptions.printStackTrace(ex);
         }
     }
 
-    public void criarTabelaLogAtualizaPreco() throws Exception {
+    public void criarTabelaLogAtualizacao() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "CREATE TABLE IF NOT EXISTS implantacao.logatualizapreco (\n"
+                    "CREATE TABLE IF NOT EXISTS implantacao.log_atualizacao (\n"
                     + "	impid varchar(100),\n"
                     + " impsistema varchar(100),\n"
                     + " imploja varchar(6),\n"
                     + "	descricao varchar(250),\n"
                     + "	codigoatual integer,\n"
                     + "	preco numeric(11,2),\n"
+                    + "	estoque numeric(11,2),\n"
+                    + "	custocomimposto numeric(11,2),\n"
+                    + "	custosemimposto numeric(11,2),\n"
                     + "	dataalteracao timestamp\n"
                     + ")"
             );
         } catch (PSQLException e) {
-            System.out.println("erro ao criar tabela implantacao.logatualizapreco: \n\n" + e.getMessage());
+            System.out.println("erro ao criar tabela implantacao.log_atualizacao: \n\n" + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("erro ao criar tabela implantacao.logatualizapreco: \n\n" + e.getMessage());
+            System.out.println("erro ao criar tabela implantacao.log_atualizacao: \n\n" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void salvarLogPreco(List<LogPrecoVO> logPrecos) throws Exception {
-        ProgressBar.setStatus("Salvando Log preço: " + logPrecos.size());
+    public void salvarLogAtualizacao(List<LogAtualizacaoVO> logPrecos) throws Exception {
+        ProgressBar.setStatus("Salvando Log Atualização: " + logPrecos.size());
         ProgressBar.setMaximum(logPrecos.size());
-        for (LogPrecoVO logPrecoVO : logPrecos) {
+        for (LogAtualizacaoVO logPrecoVO : logPrecos) {
             try (Statement stm = Conexao.createStatement()) {
                 SQLBuilder sql = new SQLBuilder();
-                sql.setTableName("logatualizapreco");
+                sql.setTableName("log_atualizacao");
                 sql.setSchema("implantacao");
                 sql.put("impid", logPrecoVO.getImpId());
                 sql.put("impsistema", logPrecoVO.getImpSistema());
@@ -65,6 +68,9 @@ public class LogPrecoDAO {
                 sql.put("descricao", logPrecoVO.getDescricao());
                 sql.put("codigoatual", logPrecoVO.getCoigoatual());
                 sql.put("preco", logPrecoVO.getPreco());
+                sql.put("estoque", logPrecoVO.getEstoque());
+                sql.put("custocomimposto", logPrecoVO.getCustoComImposto());
+                sql.put("custosemimposto", logPrecoVO.getCustoSemImposto());
                 sql.put("dataalteracao", logPrecoVO.getDataAlteracao());
 
                 try {
@@ -78,9 +84,9 @@ public class LogPrecoDAO {
         }
     }
 
-    public void deletarLogAtualizaPreco(String sistema, String loja) throws Exception {
+    public void deletarLogAtualizacao(String sistema, String loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from implantacao.logatualizapreco "
+            stm.execute("delete from implantacao.log_atualizacao "
                     + "where impsistema = '" + sistema + "' and imploja = '" + loja + "'");
         }
     }

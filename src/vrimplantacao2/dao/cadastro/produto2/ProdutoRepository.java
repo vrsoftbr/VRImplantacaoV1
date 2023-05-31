@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.VRException;
@@ -67,6 +68,7 @@ public class ProdutoRepository {
     private boolean manterDescricao = false;
     public boolean importarSomenteLoja = false;
     private boolean forcarUnificacao = false;
+    private int opcao = -1;
 
     private Map<String, Entry<String, Integer>> divisoes;
 
@@ -131,7 +133,7 @@ public class ProdutoRepository {
             String dataImportacao = sdf.format(new Date());
 
             setNotify("Gravando os produtos...", organizados.size());
-            
+
             for (ProdutoIMP imp : organizados) {
 
                 StringBuilder rep = new StringBuilder();
@@ -169,7 +171,7 @@ public class ProdutoRepository {
                             provider.getLoja(),
                             imp.getImportId()
                     );
-                    
+
                     int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
 
                     //<editor-fold defaultstate="collapsed" desc="Se código anterior é nulo">
@@ -232,33 +234,34 @@ public class ProdutoRepository {
 
                         if (idProdutoExistente > 0 && ean > 999999) {
                             anterior.setObsImportacao("PRODUTO JA CADASTRADO NO VR MASTER");
-                            
+
                             prod.setId(idProdutoExistente);
                             anterior.setCodigoAtual(prod);
-                            
+
                             provider.anterior().salvar(anterior);
-                            
+
                             if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
                                 ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
                                 provider.eanAnterior().salvar(eanAnterior);
                             }
-                            
+
                             continue;
                         }
-                        
+
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
-                        if(versao.igualOuMaiorQue(4,1)){
+
+                        if (versao.igualOuMaiorQue(4, 1)) {
                             provider.salvarProdutoPisCofins(prod);
                         }
-                        
-                        if (prod.getDescricaoCompleta() != null 
+
+                        if (prod.getDescricaoCompleta() != null
                                 && !prod.getDescricaoCompleta().trim().isEmpty()
-                                    && prod.getDescricaoCompleta().length() >= 3
-                                        && ean > 999999) {
-                            
+                                && prod.getDescricaoCompleta().length() >= 3
+                                && ean > 999999) {
+
                             if (!(ean > 99999999999999l)) {
                                 provider.salvarLojaVirtual(prod, ean);
                             }
@@ -267,8 +270,7 @@ public class ProdutoRepository {
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
-                    } 
-                    //</editor-fold>
+                    } //</editor-fold>
                     else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
@@ -325,18 +327,20 @@ public class ProdutoRepository {
     public void salvar2_5(List<ProdutoIMP> produtos) throws Exception {
 
         System.out.println(new StringBuilder().append("CONEXAO: ")
-                            .append(this.provider.getIdConexao())
-                            .append(" IMPLOJA: ")
-                            .append(this.getLoja())
-                            .append(" SISTEMA: ")
-                            .append(getSistema())
-                        .toString());
-        
+                .append(this.provider.getIdConexao())
+                .append(" IMPLOJA: ")
+                .append(this.getLoja())
+                .append(" SISTEMA: ")
+                .append(getSistema())
+                .toString());
+
         if (this.provider.isImportarPorPlanilha()) {
             forcarUnificacao = provider.getOpcoes().contains(OpcaoProduto.FORCAR_UNIFICACAO);
             if (this.forcarUnificacao) {
                 unificar(produtos);
-            } else salvar(produtos);
+            } else {
+                salvar(produtos);
+            }
         } else {
             ProdutoService produtoService = new ProdutoService();
 
@@ -407,6 +411,13 @@ public class ProdutoRepository {
         }
         //</editor-fold>
 
+        if (versao.igualOuMaiorQue(4, 1, 39)) {
+            if (optSimples.contains(OpcaoProduto.PIS_COFINS)) {
+                opcao = JOptionPane.showConfirmDialog(null,
+                        "Deseja atualizar a tabela produtopiscofins com base na produto?", "Escolha a origem", JOptionPane.YES_NO_OPTION);
+            }
+        }
+
         if (!optSimples.isEmpty()) {
 
             provider.setStatus("Produtos - Organizando produtos");
@@ -440,7 +451,7 @@ public class ProdutoRepository {
                     strOpt.append(next.toString()).append(iterator.hasNext() ? ", " : "");
                 }
 
-                if (importarSomenteLoja) { 
+                if (importarSomenteLoja) {
                     provider.setStatus("Filtrando produtos que foram inclusos por unificação ou mapeamento");
                     List<ProdutoIMP> a = new ArrayList<>();
                     for (ProdutoIMP imp : organizados) {
@@ -466,7 +477,7 @@ public class ProdutoRepository {
                 if (optSimples.contains(OpcaoProduto.TROCA)) {
                     provider.complemento().criarEstoqueTrocaAnteriorTemporario();
                 }
-                
+
                 if (optSimples.contains(OpcaoProduto.CEST)) {
                     converterCest(organizados);
                 }
@@ -533,6 +544,11 @@ public class ProdutoRepository {
                         precoAtacadoDesconto.setProduto(prod);
 
                         provider.atualizar(prod, optSimples);
+
+                        if (versao.igualOuMaiorQue(4, 1, 39) && opcao == JOptionPane.NO_OPTION) {
+                            provider.atualizarProdutoPisCofins(prod);
+                        }
+
                         provider.complemento().atualizar(complemento, optSimples);
 
                         if (optSimples.contains(OpcaoProduto.ATACADO)) {
@@ -610,6 +626,10 @@ public class ProdutoRepository {
                     provider.next();
                 }
 
+                if (versao.igualOuMaiorQue(4, 1, 39) && opcao == JOptionPane.YES_OPTION) {
+                    provider.atualizarProdutoPisCofinsPelaProduto();
+                }
+
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
@@ -630,7 +650,6 @@ public class ProdutoRepository {
                     logController.executar(EOperacao.ATUALIZAR_PRECO.getId(),
                             sdf.format(new Date()),
                             provider.getLojaVR());
-                    logController.executarLogPreco(organizados, getSistema(), getLoja());
                 }
 
                 if (optSimples.contains(OpcaoProduto.CUSTO)) {
@@ -645,6 +664,12 @@ public class ProdutoRepository {
                     logController.executar(EOperacao.ATUALIZAR_ICMS.getId(),
                             sdf.format(new Date()),
                             provider.getLojaVR());
+                }
+                
+                if (optSimples.contains(OpcaoProduto.PRECO) || 
+                    optSimples.contains(OpcaoProduto.CUSTO) || 
+                    optSimples.contains(OpcaoProduto.ESTOQUE)) {
+                    logController.executarLogAtualizacao(organizados, getSistema(), getLoja());
                 }
 
                 provider.commit();
@@ -702,12 +727,12 @@ public class ProdutoRepository {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-         
+
             //Executa log de operação
             logController.executar(EOperacao.UNIFICAR_PRODUTO.getId(),
                     sdf.format(new Date()),
                     provider.getLojaVR());
-                        
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -1082,6 +1107,7 @@ public class ProdutoRepository {
                     complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                     provider.salvar(codigoAtual);
+                    provider.salvarProdutoPisCofins(codigoAtual);
                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                     //provider.anterior().salvar(anterior);
                     double estoque = complemento.getEstoque();
@@ -1127,6 +1153,7 @@ public class ProdutoRepository {
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                         provider.salvar(codigoAtual);
+                        provider.salvarProdutoPisCofins(codigoAtual);
 
                         obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE "
                                 + ProdutoRepository.class.getName().toString();
@@ -1431,11 +1458,10 @@ public class ProdutoRepository {
      */
     public ProdutoComplementoVO converterComplemento(ProdutoIMP imp) throws Exception {
         ProdutoComplementoVO complemento = new ProdutoComplementoVO();
-               
+
         Calendar dataAtual = Calendar.getInstance();
         dataAtual.add(Calendar.DATE, -90);
         Date noventaDias = dataAtual.getTime();
-        System.out.println(noventaDias);
 
         complemento.setIdLoja(getLojaVR());
         complemento.setEstoqueMinimo(imp.getEstoqueMinimo());
@@ -1650,6 +1676,8 @@ public class ProdutoRepository {
         vo.setVendaPdv(imp.isVendaPdv());
         vo.setAceitaMultiplicacaoPDV(imp.isAceitaMultiplicacaoPDV());
 
+        vo.setQtdDiasMinimoValidade(imp.getQtdDiasMinimoValidade());
+
         //Importação da divisão de fornecedores
         Entry<String, Integer> divisaoFornecedor = this.divisoes.get(imp.getDivisao());
         if (divisaoFornecedor != null && divisaoFornecedor.getValue() != null) {
@@ -1678,12 +1706,12 @@ public class ProdutoRepository {
         }
 
         vo.setNumeroparcela(imp.getNumeroparcela());
-        
+
         ProdutoAnteriorVO anteriorVasilhame = provider.anterior().get(
-                                provider.getSistema(),
-                                provider.getLoja(),
-                                imp.getIdVasilhame());
-        
+                provider.getSistema(),
+                provider.getLoja(),
+                imp.getIdVasilhame());
+
         if (anteriorVasilhame != null && anteriorVasilhame.getCodigoAtual().getId() != 0) {
             vo.setIdVasilhame(anteriorVasilhame.getCodigoAtual().getId());
         }
@@ -1984,28 +2012,28 @@ public class ProdutoRepository {
             throw e;
         }
     }
-    
+
     public void converterCest(List<ProdutoIMP> produtos) throws Exception {
         setNotify("Inserindo cests...", 0);
-        
+
         provider.anterior().createCestInvalido();
-        
+
         for (ProdutoIMP cest : produtos) {
             ProdutoVO vo = converterIMP(cest, 0, TipoEmbalagem.UN, false);
-            
-            if (vo.getCest() == null && 
-                    cest.getCest() != null && 
-                        !cest.getCest().equals("")) {
-                
+
+            if (vo.getCest() == null
+                    && cest.getCest() != null
+                    && !cest.getCest().equals("")) {
+
                 ProdutoAnteriorVO anterior = new ProdutoAnteriorVO();
-                
+
                 anterior.setCest(cest.getCest());
                 anterior.setImportId(cest.getImportId());
-                
+
                 if (cest.getDescricaoCest() != null && !cest.getDescricaoCest().isEmpty()) {
                     anterior.setDescricao(cest.getDescricaoCest());
                 }
-                
+
                 provider.anterior().salvarCestInvalido(anterior);
             }
         }

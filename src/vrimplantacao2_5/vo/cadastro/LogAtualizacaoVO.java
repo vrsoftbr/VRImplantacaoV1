@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author Michael
  */
-public class LogPrecoVO {
+public class LogAtualizacaoVO {
     
     private String impSistema;
     private String impLoja;
@@ -20,6 +20,9 @@ public class LogPrecoVO {
     private int coigoatual;
     private double preco;
     private Date dataAlteracao;
+    private double estoque;
+    private double custoComImposto;
+    private double custoSemImposto;
 
     public String getImpSistema() {
         return impSistema;
@@ -75,5 +78,29 @@ public class LogPrecoVO {
 
     public void setDataAlteracao(Date dataAlteracao) {
         this.dataAlteracao = dataAlteracao;
+    }
+
+    public double getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(double estoque) {
+        this.estoque = estoque;
+    }
+
+    public double getCustoComImposto() {
+        return custoComImposto;
+    }
+
+    public void setCustoComImposto(double custoComImposto) {
+        this.custoComImposto = custoComImposto;
+    }
+
+    public double getCustoSemImposto() {
+        return custoSemImposto;
+    }
+
+    public void setCustoSemImposto(double custoSemImposto) {
+        this.custoSemImposto = custoSemImposto;
     }
 }
