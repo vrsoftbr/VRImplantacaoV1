@@ -17,6 +17,7 @@ import vrimplantacao2.dao.interfaces.AcomDAO;
 import vrimplantacao2.dao.interfaces.AlphaSysDAO;
 import vrimplantacao2.dao.interfaces.AlterData_WShopDAO;
 import vrimplantacao2.dao.interfaces.ApolloDAO;
+import vrimplantacao2.dao.interfaces.ArgoDAO;
 import vrimplantacao2.dao.interfaces.ArtSystemDAO;
 import vrimplantacao2.dao.interfaces.AsefeDAO;
 import vrimplantacao2.dao.interfaces.AtenasDAO;
@@ -261,6 +262,7 @@ import vrimplantacao2_5.dao.sistema.WiseDAO;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
 import vrimplantacao2_5.gui.sistema.AlterData_WShop2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
+import vrimplantacao2_5.gui.sistema.Argo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -2281,7 +2283,18 @@ public enum ESistema {
             }
             return null;
         }
-     };     
+     },
+     ARGO(257, "ARGO", new ArgoDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Argo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    };     
 
     private int id;
     private String nome;
