@@ -256,6 +256,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433),
     SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433),
+    SQLSERVER_ARGO(257, "ARGO", 13, "SQLSERVER", "argo", "sa", "1BC27CA04E2C2C1204", 1433),
     FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "postgres", "postgres", "VrPost@Server", 8745),
     POSTGRESQL_GENERICO(252, "GENERICO", 11, "POSTGRESQL", "postgres", "postgres", "VrPost@Server", 8745);
 

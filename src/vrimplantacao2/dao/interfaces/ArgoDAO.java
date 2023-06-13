@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -18,9 +18,6 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -87,8 +84,7 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
                 OpcaoFornecedor.TIPO_EMPRESA,
-                OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
 
@@ -104,7 +100,6 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.VALOR_LIMITE));
     }
 
@@ -114,14 +109,14 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	DISTINCT\n"
-                    + "		CONCAT (COALESCE (Trb_ICMS_CST,0),'-',COALESCE (Trb_PICMS,0),'-', COALESCE (Trb_PReducao,0)) id,\n"
-                    + "		CONCAT ('CST: ',COALESCE (Trb_ICMS_CST,0), ' ALIQ: ',COALESCE (Trb_PICMS,0), ' RED: ', COALESCE (Trb_PReducao,0)) descricao,\n"
-                    + "		COALESCE (Trb_ICMS_CST,0) cst_icms,\n"
-                    + "		COALESCE (Trb_PICMS,0) aliq_icms,\n"
-                    + "		COALESCE (Trb_PReducao,0) red_icms\n"
+                    + "	DISTINCT \n"
+                    + "	cst_icms + '-' + cast(aliq_icms as varchar(4)) + '-' + cast(base_red_icms as varchar(2)) as id,\n"
+                    + "	'CST '+cst_icms + ' ALIQ '+cast(aliq_icms as varchar(4)) + ' RED ' + cast(base_red_icms as varchar(2)) as descricao,\n"
+                    + "	cst_icms cst_icms,\n"
+                    + "	aliq_icms,\n"
+                    + "	base_red_icms red_icms\n"
                     + "from\n"
-                    + "	MC_Produtos\n"
+                    + "	PROD_NAT_OP\n"
                     + "order by 1"
             )) {
                 while (rs.next()) {
@@ -144,16 +139,15 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	m1.Codigo merc1,\n"
-                    + "	m1.Nome merc1_descricao,\n"
-                    + "	m2.Codigo merc2,\n"
-                    + "	m2.Nome merc2_descricao,\n"
-                    + "	m2.Codigo merc3,\n"
-                    + "	m2.Nome merc3_descricao\n"
+                    + "	codgru merc1,\n"
+                    + "	desgru descmerc1,\n"
+                    + "	codgru merc2,\n"
+                    + "	desgru descmerc2,\n"
+                    + "	codgru merc3,\n"
+                    + "	desgru descmerc3\n"
                     + "from\n"
-                    + "	MC_Setor m1\n"
-                    + "	join MC_Grupo m2 on m2.CodSetor = m1.Codigo\n"
-                    + "order by 1,3"
+                    + "	GRUPRO\n"
+                    + "order by 1,3,5"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -161,11 +155,11 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
 
                     imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("merc1_descricao"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
                     imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(rst.getString("merc2_descricao"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
                     imp.setMerc3ID(rst.getString("merc3"));
-                    imp.setMerc3Descricao(rst.getString("merc3_descricao"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
 
                     Result.add(imp);
                 }
@@ -180,12 +174,14 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	Codigo id_produto,\n"
-                    + "	CodBarras ean,\n"
-                    + "	1 qtde_emb,\n"
-                    + "	Unidade tipo_emb\n"
+                    + "	CODPRO id_produto,\n"
+                    + "	CODIGOEAN ean,\n"
+                    + "	QTDUNIBASE qtde_emb,\n"
+                    + "	UNISAIDA tipo_emb\n"
                     + "from\n"
-                    + "	MC_Produtos"
+                    + "	PRODUTOS p\n"
+                    + "WHERE\n"
+                    + "	codemp = '" + getLojaOrigem() + "'"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -211,35 +207,35 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	Codigo id,\n"
-                    + "	Produto descricao_comp,\n"
-                    + "	NomeCurto descricao_red,\n"
-                    + "	CodBarras ean,\n"
-                    + "	Setor merc1,\n"
-                    + "	Grupo merc2,\n"
-                    + "	Grupo merc3,\n"
-                    + "	Unidade tipo_emb,\n"
-                    + " case when Prix4 = 'S' then 1 else 0 end pesavel,\n"
-                    + "	data data_cad,\n"
-                    + "	Data_Modificacao data_alt,\n"
-                    + "	Ativo,\n"
-                    + " validade,\n"
-                    + "	EstoqueMinino estmin,\n"
-                    + "	EstoqueMaximo estmax,\n"
-                    + "	EstoqueLoja estoque,\n"
-                    + "	PrecoVenda,\n"
-                    + " ROUND(CONVERT (money, CustoRealUnitario), 2) precocusto,\n"
-                    + "	ROUND(CONVERT (money, MargemLucro), 2) margem,\n"
-                    + "	PesoBruto,\n"
-                    + "	PesoLiquido,\n"
-                    + "	Observacao,\n"
-                    + "	CONCAT (COALESCE (Trb_ICMS_CST,0),'-',COALESCE (Trb_PICMS,0),'-', COALESCE (Trb_PReducao,0)) id_icms,\n"
-                    + "	Trb_PIS_CST pis_cofins,\n"
-                    + "	Trb_NCM ncm,\n"
-                    + "	NCM,\n"
-                    + "	CEST \n"
+                    + "	p.CODPRO id,\n"
+                    + "	p.CODIGOEAN ean,\n"
+                    + "	p.NOMPRO desc_completa,\n"
+                    + "	DESPRO desc_reduzida,\n"
+                    + "	cast (DATA_CREATE as date) data_cad,\n"
+                    + "	cast (DATA_CHANGE as date) data_alt,\n"
+                    + "	UNISAIDA tipo_emb,\n"
+                    + "	QTDUNIBASE qtde_emb,\n"
+                    + "	case when STATUS = 'A' then 1 else 0 end ativo,\n"
+                    + "	vvenda precovenda,\n"
+                    + "	vprecocusto custo,\n"
+                    + "	p2.codcla ncm,\n"
+                    + "	estmin,\n"
+                    + "	estmax,\n"
+                    + "	p.codgru merc1,\n"
+                    + "	p.codgru merc2,\n"
+                    + "	p.codgru merc3,\n"
+                    + "	cst_icms + '-' + cast(aliq_icms as varchar(4)) + '-' + cast(base_red_icms as varchar(2)) as id_icms,\n"
+                    + "	cst_pis pis_debito,\n"
+                    + "	cst_pis_e pis_credito,\n"
+                    + "	cod_nat_rec nat_rec\n"
                     + "from\n"
-                    + "	MC_Produtos"
+                    + "	PRODUTOS p\n"
+                    + "join PRODCPL1 p2 on p.codpro = p2.codpro and p.codemp = p2.codemp\n"
+                    + "join PRODFISCAL pf on p.codpro = pf.codpro and p.codemp = pf.codemp\n"
+                    + "join GETPROTOVENDA pr on p.codpro = pr.codpro and p.codemp = pr.codemp\n"
+                    + "left join PROD_NAT_OP tr on p.codpro = tr.codpro and p.codemp = tr.codemp\n"
+                    + "WHERE\n"
+                    + "	p.codemp = '" + getLojaOrigem() + "'"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -248,8 +244,6 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
-                    imp.seteBalanca(rst.getBoolean("pesavel"));
-
                     imp.setEan(rst.getString("ean"));
 
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
@@ -257,44 +251,41 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        /*imp.setValidade(bal.getValidade() > 1
-                                ? bal.getValidade() : rst.getInt("validade"));*/
                         imp.setEan(String.valueOf(bal.getCodigo()));
                     }
 
-                    imp.setDescricaoCompleta(rst.getString("descricao_comp"));
-                    imp.setDescricaoReduzida(rst.getString("descricao_red"));
+                    imp.setDescricaoCompleta(rst.getString("desc_completa"));
+                    imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-//                  imp.setQtdEmbalagem(rst.getInt("VFD_QTDEMBALAGEM"));
-                    imp.setTipoEmbalagem(rst.getString("tipo_emb"));
                     imp.setDataCadastro(rst.getDate("data_cad"));
                     imp.setDataAlteracao(rst.getDate("data_alt"));
+                    imp.setTipoEmbalagem(rst.getString("tipo_emb"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
 
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
 
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setPrecovenda(rst.getDouble("PrecoVenda"));
-                    imp.setCustoComImposto(rst.getDouble("precocusto"));
-                    imp.setCustoSemImposto(rst.getDouble("precocusto"));
+                    //imp.setMargem(rst.getDouble("margem"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
 
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    //imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
 
                     imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("pis_cofins"));
-                    imp.setPiscofinsCstCredito(rst.getString("pis_cofins"));
+                    //imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
+                    imp.setPiscofinsCstCredito(rst.getString("pis_credito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("nat_rec"));
 
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
 
                     Result.add(imp);
                 }
@@ -309,23 +300,22 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	Codigo id,\n"
-                    + "	Nome razao,\n"
-                    + "	Fantasia,\n"
-                    + "	CPF_CGC,\n"
-                    + "	case when PessoaFJ = 'F' then RG else Insc_Estadual end ie,\n"
-                    + "	Endereco,\n"
-                    + "	Numero,\n"
-                    + "	Bairro,\n"
-                    + "	Cidade,\n"
-                    + "	UF,\n"
-                    + "	CEP,\n"
-                    + "	Ativo,\n"
-                    + "	Fone1,\n"
-                    + "	Fone2,\n"
-                    + "	Obs1 obs\n"
+                    + "	codcli id,\n"
+                    + "	razcli razao,\n"
+                    + "	fancli fantasia,\n"
+                    + "	cgccli cpf_cnpj,\n"
+                    + "	inscli rg_ie,\n"
+                    + "	endcli endereco,\n"
+                    + "	nroende numero,\n"
+                    + "	endecpl complemento,\n"
+                    + "	baicli bairro,\n"
+                    + "	cidcli cidade,\n"
+                    + "	estcli uf,\n"
+                    + "	cepcli cep,\n"
+                    + "	foncli fone,\n"
+                    + "	mailcli email\n"
                     + "from\n"
-                    + "	MC_Fornece mf"
+                    + "	FORNE"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -335,27 +325,27 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj_cpf(rst.getString("CPF_CGC"));
-                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setCnpj_cpf(rst.getString("cpf_cnpj"));
+                    imp.setIe_rg(rst.getString("rg_ie"));
 
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
 
-                    imp.setTel_principal(rst.getString("fone1"));
+                    imp.setTel_principal(rst.getString("fone"));
 
-                    if ((rst.getString("Fone2") != null)
-                            && (!rst.getString("Fone2").trim().isEmpty())) {
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
                         imp.addContato(
-                                "Fone2",
-                                rst.getString("fone2"),
+                                "E-mail",
+                                null,
                                 null,
                                 TipoContato.COMERCIAL,
-                                null
+                                rst.getString("email")
                         );
                     }
 
@@ -367,187 +357,47 @@ public class ArgoDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> Result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	pf.CodFornecedor id_fornecedor,\n"
-                    + "	pf.CodProduto id_produto,\n"
-                    + "	pf.CodProdForn cod_externo,\n"
-                    + "	p.QuantCaixa qtde_embalagem\n"
-                    + "from\n"
-                    + "	MC_ProdForn pf\n"
-                    + "	join MC_Produtos p on p.Codigo = pf.Codigo \n"
-                    + "where\n"
-                    + "	pf.CodFornecedor is not null\n"
-                    + "order by 1,2"
-            )) {
-                while (rst.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rst.getString("id_produto"));
-                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setCodigoExterno(rst.getString("cod_externo"));
-                    imp.setQtdEmbalagem(rst.getDouble("qtde_embalagem"));
-
-                    Result.add(imp);
-                }
-            }
-        }
-        return Result;
-    }
-
-    @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    /*
-                    CASE 
-                        when NumDocto like '%/%'
-                            then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'/','')
-                        when NumDocto like '% - %'
-                            then REPLACE(SUBSTRING(NumDocto, LEN(NumDocto)-1, 2),'-','')
-			else 1
-                    END parcela,
-                     */
-                    "select\n"
-                    + "	Codigo id,\n"
-                    + "	COALESCE(CodFornece, 264) id_fornecedor,\n"
-                    + "	NumDocto documento,\n"
-                    + " 1 as parcela,\n"
-                    + "	Emissao,\n"
-                    + "	Valor,\n"
-                    + "	Vencimento,\n"
-                    + "	DataPagamento pagamento,\n"
-                    + " NumDocto as observacao\n"
-                    + "from\n"
-                    + "	MC_ContasMovimento cp\n"
-                    + "where\n"
-                    + "	Emissao is not NULL"
-            )) {
-                while (rst.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setNumeroDocumento(rst.getString("documento"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataEntrada(imp.getDataEmissao());
-                    imp.setObservacao(rst.getString("observacao"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("Valor"), rst.getDate("pagamento"));
-
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("vencimento"), (rst.getDouble("valor")));
-                    parc.setNumeroParcela(rst.getInt("parcela"));
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	Codigo id,\n"
-                    + "	Nome fantasia,\n"
-                    + "	RazaoSocial,\n"
-                    + "	CPF_CGC,\n"
-                    + "	RG,\n"
-                    + "	DataNascimento data_nasc,\n"
-                    + "	DataCadastro data_cad,\n"
-                    + "	case when Ativo = 'SIM' then 1 else 0 end ativo,\n"
-                    + "	Endereco,\n"
-                    + "	Numero,\n"
-                    + "	Complemento,\n"
-                    + "	Bairro,\n"
-                    + "	Cidade,\n"
-                    + "	uf,\n"
-                    + " CEP,\n"
-                    + "	NomeMae,\n"
-                    + "	NomePai,\n"
-                    + "	Fone,\n"
-                    + "	Celular,\n"
-                    + " EMail,\n"
-                    + "	Contato,\n"
-                    + "	Limite,\n"
-                    + " Obs1\n"
+                    + "	codcli id,\n"
+                    + "	razcli razao,\n"
+                    + "	fancli fantasia,\n"
+                    + "	cgccli cpf_cnpj,\n"
+                    + "	inscli rg_ie,\n"
+                    + "	cast(data_create as date) data_cad,\n"
+                    + "	endcli endereco,\n"
+                    + "	nroende numero,\n"
+                    + "	baicli bairro,\n"
+                    + "	cidcli cidade,\n"
+                    + " estcli uf,\n"
+                    + "	cepcli cep,\n"
+                    + "	foncli fone,\n"
+                    + "	faxcli fax\n"
                     + "from\n"
-                    + "	MC_Clientes"
+                    + "	clientes"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rst.getString("id"));
-                    imp.setRazao(rst.getString("RazaoSocial"));
+                    imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj(rst.getString("CPF_CGC"));
-                    imp.setInscricaoestadual(rst.getString("RG"));
+                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rst.getString("rg_ie"));
                     imp.setDataCadastro(rst.getDate("data_cad"));
-                    imp.setDataNascimento(rst.getDate("data_nasc"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
-                    imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setCep(rst.getString("cep"));
                     imp.setUf(rst.getString("uf"));
 
                     imp.setTelefone(rst.getString("fone"));
-                    imp.setCelular(rst.getString("celular"));
-                    imp.setEmail(rst.getString("email"));
-
-                    imp.setNomeMae(rst.getString("NomeMae"));
-                    imp.setNomePai(rst.getString("NomePai"));
-                    imp.setValorLimite(rst.getDouble("limite"));
-                    imp.setObservacao(rst.getString("Obs1"));
-
-                    Result.add(imp);
-                }
-            }
-        }
-        return Result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> Result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	Codigo id,\n"
-                    + "	CodCliente id_cliente,\n"
-                    + "	NumDocto documento,\n"
-                    + "	Emissao,\n"
-                    + "	valor,\n"
-                    + "	Vencimento,\n"
-                    + "	ItemPosicao parcela,\n"
-                    + "	1 as ecf\n"
-                    + "from\n"
-                    + "	MC_Titulos mt\n"
-                    + "where\n"
-                    + "	Recebimento is null\n"
-                    + "order by Codigo,Emissao"
-            )) {
-                while (rst.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
-                    imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("id_cliente"));
-                    imp.setNumeroCupom(rst.getString("documento"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setEcf(rst.getString("ecf"));
+                    imp.setFax(rst.getString("fax"));
 
                     Result.add(imp);
                 }

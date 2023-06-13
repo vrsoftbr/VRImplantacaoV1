@@ -2286,15 +2286,16 @@ public enum ESistema {
      },
      ARGO(257, "ARGO", new ArgoDAO()) {
         @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
             try {
                 return new Argo2_5GUI(frame);
-            } catch (Exception ex) {
+                } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-    };     
+     };     
 
     private int id;
     private String nome;
