@@ -84,7 +84,7 @@ public class SelecaoLojaGUI extends VRDialog {
         ConfiguracaoBancoLojaVO configuracaoVO = lojas.get(cboOrigem.getSelectedIndex());
         
         txtLojaVR.setText(configuracaoVO.getIdLojaVR() + " - " + configuracaoVO.getDescricaoVR());
-        lojaOrigem = Integer.parseInt(configuracaoVO.getIdLojaOrigem());
+        lojaOrigem = Integer.parseInt(configuracaoVO.getIdLojaOrigem().trim());
         if (configuracaoVO != null) {
             btnProximo.setEnabled(true);
         }

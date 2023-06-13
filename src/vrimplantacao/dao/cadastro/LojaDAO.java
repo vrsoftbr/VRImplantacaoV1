@@ -537,8 +537,8 @@ public class LojaDAO {
 
         try (Statement stm = Conexao.createStatement()) {
 
-            for (TecladoLayoutVO tecladoLayoutVO : tecladoLayout) {
-
+            for (int i = 0; i < tecladoLayout.size(); i++) {
+                TecladoLayoutVO tecladoLayoutVO = tecladoLayout.get(i);
                 try (ResultSet rst = stm.executeQuery(
                         "SELECT \n"
                         + "     tl.id as idtecladolayout, \n"
@@ -549,18 +549,16 @@ public class LojaDAO {
                         + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
                         + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
                 )) {
+                        ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO = proximoIdTecladoLayoutVO.get(i);
                     while (rst.next()) {
 
-                        for (ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO : proximoIdTecladoLayoutVO) {
+                        TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
+                        vo.setIdTecladoLayout(i_proximoIdTecladoLayoutVO.proximoIdTecladoLayout);
+                        vo.setCodigoRetorno(rst.getInt("codigoretorno"));
+                        vo.setIdFuncao(rst.getInt("id_funcao"));
 
-                            TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
-                            vo.setIdTecladoLayout(i_proximoIdTecladoLayoutVO.proximoIdTecladoLayout);
-                            vo.setCodigoRetorno(rst.getInt("codigoretorno"));
-                            vo.setIdFuncao(rst.getInt("id_funcao"));
+                        result.add(vo);
 
-                            result.add(vo);
-
-                        }
                     }
                 }
             }
