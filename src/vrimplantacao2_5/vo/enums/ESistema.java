@@ -207,6 +207,7 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
+import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.AriusWebDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
@@ -260,7 +261,11 @@ import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
+import vrimplantacao2_5.gui.sistema.ASoft2_5GUI;
+import vrimplantacao2_5.gui.sistema.Accesys2_5GUI;
+import vrimplantacao2_5.gui.sistema.Acom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
+import vrimplantacao2_5.gui.sistema.AlphaSys2_5GUI;
 import vrimplantacao2_5.gui.sistema.AlterData_WShop2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Argo2_5GUI;
@@ -354,28 +359,48 @@ import vrimplantacao2_5.gui.sistema.Wise2_5GUI;
  */
 public enum ESistema {
 
-    ASOFT(1, "ASOFT", new ASoftDAO()) {
+    ASOFT(1, "ASOFT", new ASoft2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new ASoft2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ACCESYS(2, "ACCESYS", new AccesysDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Accesys2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ACOM(3, "ACOM", new AcomDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Acom2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ALPHASYS(4, "ALPHASYS", new AlphaSysDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+           try {
+                return new AlphaSys2_5GUI (frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     APOLLO(5, "APOLLO", new ApolloDAO()) {
@@ -510,7 +535,7 @@ public enum ESistema {
     CEFAS(24, "CEFAS", new CefasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-             try {
+            try {
                 return new Cefas_Concretize2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
@@ -695,12 +720,12 @@ public enum ESistema {
     FENIX(54, "FENIX", new FenixDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            try{
+            try {
                 return new Fenix2_5GUI(frame);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
-                return null;
+            return null;
         }
     },
     FLASH(55, "FLASH", new FlashDAO()) {
@@ -840,7 +865,7 @@ public enum ESistema {
         }
     },
     HIPER(75, "HIPER", new HiperDAO()) {
-       @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Hiper2_5GUI(frame);
@@ -1032,7 +1057,7 @@ public enum ESistema {
         ) {
             try {
                 return new Market2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -1569,7 +1594,7 @@ public enum ESistema {
         }
     },
     WEBSAC(188, "WEBSAC", new WebSacDAO()) {
-       @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new WebSac2_5GUI(frame);
@@ -1989,7 +2014,7 @@ public enum ESistema {
             }
             return null;
         }
-    }, 
+    },
     FOCUS(230, "FOCUS", new FocusDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
@@ -2024,7 +2049,7 @@ public enum ESistema {
         }
     },
     SINC(233, "SINC", new SincDAO()) {
-       @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new Sinc2_5GUI(frame);
@@ -2172,7 +2197,7 @@ public enum ESistema {
         ) {
             try {
                 return new GEP2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -2184,19 +2209,19 @@ public enum ESistema {
         ) {
             try {
                 return new SoftLog2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },   
+    },
     MBD(248, "MBD", new MbdDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Mbd2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -2208,99 +2233,97 @@ public enum ESistema {
         ) {
             try {
                 return new FenixME2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
     },
-     TARGET_G3(250, "TARGET-G3", new Target_G3DAO()) {
+    TARGET_G3(250, "TARGET-G3", new Target_G3DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Target_G32_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     WISE(251, "WISE", new WiseDAO()) {
+    },
+    WISE(251, "WISE", new WiseDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Wise2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     GENERICO(252, "GENERICO", new ProviderGenericoDAO()) {
+    },
+    GENERICO(252, "GENERICO", new ProviderGenericoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Generico2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     SISMASTER(253, "SISMASTER", new ProviderGenericoDAO()) {
+    },
+    SISMASTER(253, "SISMASTER", new ProviderGenericoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Sismaster2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     ALTERDATAWSHOP(254, "ALTERDATAWSHOP", new AlterData_WShopDAO()) {
+    },
+    ALTERDATAWSHOP(254, "ALTERDATAWSHOP", new AlterData_WShopDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new AlterData_WShop2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     STI3(255, "STI3", new STI32_5DAO()) {
+    },
+    STI3(255, "STI3", new STI32_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new STI32_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     
-     CENTER_INFORMATICA(256, "CENTER_INFORMATICA", new CenterInformaticaDAO2_5()) {
+    },
+    CENTER_INFORMATICA(256, "CENTER_INFORMATICA", new CenterInformaticaDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new CenterInformatica2_5GUI(frame);
-                } catch (Exception ex) {
-                    Util.exibirMensagemErro(ex, "");
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },       
-     
-     ARGO(257, "ARGO", new ArgoDAO()) {
+    },
+    ARGO(257, "ARGO", new ArgoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -2310,7 +2333,7 @@ public enum ESistema {
             }
             return null;
         }
-    };     
+    };
 
     private int id;
     private String nome;

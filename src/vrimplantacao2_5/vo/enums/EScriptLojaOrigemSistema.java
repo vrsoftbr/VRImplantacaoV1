@@ -215,7 +215,12 @@ public enum EScriptLojaOrigemSistema {
     ALTERDATAWSHOP(254,11,"select cdempresa id, nrcgc || ''-'' || nmempresa descricao from ishop.empshop order by cdempresa"),
     STI3(255, 8, "select codigo as id,razao as descricao from empresas"),
     CENTER_INFORMATICA(256, 5, "SELECT COD_EMP AS id , razao AS descricao FROM CONFIG c"),
-    ARGO(257, 13, "select codemp id, razemp descricao from empresa");
+    ARGO(257, 13, "select codemp id, razemp descricao from empresa"),
+    ASOFT(1,5,null),
+    ACCESYS(2,13,null),
+    ACOM(3,13,"select Fil_cod id,Fil_nome nome from filiais order by id"),
+    ALPHASYS(4,5 , "select cod_empresa, cod_empresa||' - '||razao descricao from empresa order by 1");
+    
 
     private int idSistema;
     private int idBancoDados;
