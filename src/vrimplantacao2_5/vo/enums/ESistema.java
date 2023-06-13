@@ -213,6 +213,7 @@ import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
+import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
@@ -273,6 +274,7 @@ import vrimplantacao2_5.gui.sistema.BrData2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
+import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
@@ -2284,6 +2286,20 @@ public enum ESistema {
             return null;
         }
      },
+     
+     CENTER_INFORMATICA(256, "CENTER_INFORMATICA", new CenterInformaticaDAO2_5()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new CenterInformatica2_5GUI(frame);
+                } catch (Exception ex) {
+                    Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },       
+     
      ARGO(257, "ARGO", new ArgoDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame

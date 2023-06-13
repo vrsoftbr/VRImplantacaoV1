@@ -214,6 +214,7 @@ public enum EScriptLojaOrigemSistema {
     SISMASTER(253, 8, "select codigo id, concat(nomefantasia, '' '', cnpj) as descricao from tabdollar t"),
     ALTERDATAWSHOP(254,11,"select cdempresa id, nrcgc || ''-'' || nmempresa descricao from ishop.empshop order by cdempresa"),
     STI3(255, 8, "select codigo as id,razao as descricao from empresas"),
+    CENTER_INFORMATICA(256, 5, "SELECT COD_EMP AS id , razao AS descricao FROM CONFIG c"),
     ARGO(257, 13, "select codemp id, razemp descricao from empresa");
 
     private int idSistema;
