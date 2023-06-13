@@ -219,8 +219,11 @@ public enum EScriptLojaOrigemSistema {
     ASOFT(1,5,null),
     ACCESYS(2,13,null),
     ACOM(3,13,"select Fil_cod id,Fil_nome nome from filiais order by id"),
-    ALPHASYS(4,5 , "select cod_empresa, cod_empresa||' - '||razao descricao from empresa order by 1");
-    
+    ALPHASYS(4,5 , "select cod_empresa, cod_empresa||' - '||razao descricao from empresa order by 1"),
+    RMS(129, 9, "select loj_codigo||loj_digito as id, loj_codigo||'' - DIGITO ''||loj_digito as descricao from AA2CLOJA order by loj_codigo"),
+    VISUALMIX(186, 13, "select codigo as id,	descricao from dbo.Lojas order by 1"),
+    VIVASISTEMAS(258, 5,"SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
+
 
     private int idSistema;
     private int idBancoDados;

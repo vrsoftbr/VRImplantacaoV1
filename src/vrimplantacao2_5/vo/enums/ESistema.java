@@ -140,7 +140,7 @@ import vrimplantacao2.dao.interfaces.PwsDAO;
 import vrimplantacao2.dao.interfaces.RCNetDAO;
 import vrimplantacao2.dao.interfaces.RKSoftwareDAO;
 import vrimplantacao2.dao.interfaces.RMSAutomaHelpDAO;
-import vrimplantacao2.dao.interfaces.RMSDAO;
+import vrimplantacao2_5.dao.sistema.RMSDAO;
 import vrimplantacao2.dao.interfaces.RPInfoDAO;
 import vrimplantacao2.dao.interfaces.RensoftwareDAO;
 import vrimplantacao2.dao.interfaces.RepleisDAO;
@@ -195,7 +195,7 @@ import vrimplantacao2.dao.interfaces.VRToVRDAO;
 import vrimplantacao2.dao.interfaces.ViaSoftDAO;
 import vrimplantacao2.dao.interfaces.ViggoDAO;
 import vrimplantacao2.dao.interfaces.VisualComercioDAO;
-import vrimplantacao2.dao.interfaces.VisualMixDAO;
+import vrimplantacao2_5.dao.sistema.VisualMixDAO;
 import vrimplantacao2.dao.interfaces.W2ADAO;
 import vrimplantacao2.dao.interfaces.WebSacDAO;
 import vrimplantacao2.dao.interfaces.WeberDAO;
@@ -259,6 +259,7 @@ import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
+import vrimplantacao2_5.dao.sistema.VivaSistemasDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
 import vrimplantacao2_5.gui.sistema.ASoft2_5GUI;
@@ -327,6 +328,7 @@ import vrimplantacao2_5.gui.sistema.Plenus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Prime2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
+import vrimplantacao2_5.gui.sistema.RMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.STI32_5GUI;
@@ -347,6 +349,8 @@ import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.VivaSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.VisualMix2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
 import vrimplantacao2_5.gui.sistema.WLS2_5GUI;
 import vrimplantacao2_5.gui.sistema.WebSac2_5GUI;
@@ -1225,7 +1229,12 @@ public enum ESistema {
     RMS(129, "RMS", new RMSDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new RMS2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     RPINFO(130, "RPINFO", new RPInfoDAO()) {
@@ -1582,9 +1591,14 @@ public enum ESistema {
         }
     },
     VISUALMIX(186, "VISUALMIX", new VisualMixDAO()) {
-        @Override
+         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new VisualMix2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     W2A(187, "W2A", new W2ADAO()) {
@@ -2325,10 +2339,24 @@ public enum ESistema {
     },
     ARGO(257, "ARGO", new ArgoDAO()) {
         @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
             try {
                 return new Argo2_5GUI(frame);
-            } catch (Exception ex) {
+                } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+     },
+     
+     VIVASISTEMAS(258, "VIVASISTEMAS", new VivaSistemasDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new VivaSistemas2_5GUI(frame);
+                } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;

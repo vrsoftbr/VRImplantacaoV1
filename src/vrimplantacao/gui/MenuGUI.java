@@ -313,6 +313,7 @@ import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.atualizador.AtualizadorController;
+import vrimplantacao2_5.conversor.ConversorDbfGUI;
 import vrimplantacao2_5.gui.cadastro.bancodados.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.cadastro.sistema.ConsultaSistemaGUI;
@@ -958,7 +959,9 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem6 = new javax.swing.JMenuItem();
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
         mnuRelatorios = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
         jMenuItem17 = new javax.swing.JMenuItem();
+        jMenuItem21 = new javax.swing.JMenuItem();
         jMenuItem18 = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
@@ -3630,13 +3633,25 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFerramentas.add(mnuRelatorios);
 
+        jMenu2.setText("Conversores");
+
         jMenuItem17.setText("Conversor");
         jMenuItem17.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem17ActionPerformed(evt);
             }
         });
-        mnuFerramentas.add(jMenuItem17);
+        jMenu2.add(jMenuItem17);
+
+        jMenuItem21.setText("Conversor DBF");
+        jMenuItem21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem21ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem21);
+
+        mnuFerramentas.add(jMenu2);
 
         jMenuItem18.setText("Nutricional Arquivo");
         jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
@@ -5650,12 +5665,21 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem20ActionPerformed
 
+    private void jMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem21ActionPerformed
+        try {
+            new ConversorDbfGUI().setVisible(true);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_jMenuItem21ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
@@ -5669,6 +5693,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem20;
+    private javax.swing.JMenuItem jMenuItem21;
     private javax.swing.JMenuItem jMenuItem23;
     private javax.swing.JMenuItem jMenuItem24;
     private javax.swing.JMenuItem jMenuItem25;

@@ -331,7 +331,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("ean"));
 
                     long codigoProduto;
-                    codigoProduto = Long.parseLong(imp.getImportId());
+                    
+                    codigoProduto = Long.parseLong(imp.getImportId().equals("PRICMS") ? "999999" : imp.getImportId());
                     if (codigoProduto <= Integer.MAX_VALUE) {
                         produtoBalanca = produtosBalanca.get((int) codigoProduto);
                     } else {
@@ -364,6 +365,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("PRODUnid"));
 
                     if ((rst.getString("prodai") != null)
                             && (!rst.getString("prodai").trim().isEmpty())) {
