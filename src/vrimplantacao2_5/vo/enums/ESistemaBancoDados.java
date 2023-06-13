@@ -110,6 +110,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_WLS(237, "WLS", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_FACIL(239, "FACIL", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_GEP(246, "GEP", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
+    FIREBIRD_CENTER_INFORMATICA(256, "CENTER_INFORMATICA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_FENIXME(249, "FENIXME", 5, "FIREBIRD", "", "SYSDBA", "23248290FENIX", 3050),
     FIREBIRD_MBD(248, "MBD", 5, "FIREBIRD", "C:\\MBD\\DB\\ARCOIRIS.FDB", "sysdba", "sysdbambd", 3050),
     FIREBIRD_WISE(251, "WISE", 5, "FIREBIRD", "C:\\\\Dados\\\\Rede\\\\SUPERMERCADO.FDB", "sysdba", "masterkey", 3050),
@@ -256,6 +257,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "", "", 1433),
     SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433),
     SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433),
+    SQLSERVER_ARGO(257, "ARGO", 13, "SQLSERVER", "argo", "sa", "1BC27CA04E2C2C1204", 1433),
     FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "postgres", "postgres", "VrPost@Server", 8745),
     POSTGRESQL_GENERICO(252, "GENERICO", 11, "POSTGRESQL", "postgres", "postgres", "VrPost@Server", 8745);
 
