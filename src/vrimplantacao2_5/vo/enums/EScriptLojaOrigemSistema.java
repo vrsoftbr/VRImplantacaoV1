@@ -216,6 +216,8 @@ public enum EScriptLojaOrigemSistema {
     STI3(255, 8, "select codigo as id,razao as descricao from empresas"),
     CENTER_INFORMATICA(256, 5, "SELECT COD_EMP AS id , razao AS descricao FROM CONFIG c"),
     ARGO(257, 13, "select codemp id, razemp descricao from empresa"),
+    RMS(129, 9, "select loj_codigo||loj_digito as id, loj_codigo||'' - DIGITO ''||loj_digito as descricao from AA2CLOJA order by loj_codigo"),
+    VISUALMIX(186, 13, "select codigo as id,	descricao from dbo.Lojas order by 1"),
     VIVASISTEMAS(258, 5,"SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
 
     private int idSistema;

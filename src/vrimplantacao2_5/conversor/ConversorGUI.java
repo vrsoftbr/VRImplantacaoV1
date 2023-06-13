@@ -34,6 +34,11 @@ public class ConversorGUI extends javax.swing.JFrame {
      */
     public ConversorGUI() throws Exception {
         this.dao = new ConversorDAO();
+        try {
+            dao.criarControleDeDadosConvertidos();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
         initComponents();
         setLocationRelativeTo(null);
         panelTabelas.setVisible(false);

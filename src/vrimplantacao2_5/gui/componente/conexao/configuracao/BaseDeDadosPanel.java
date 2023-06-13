@@ -92,7 +92,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(),
                     configuracaoLojaVO.getIdLojaOrigem() + " - " + configuracaoLojaVO.getDescricaoLojaOrigem() + " - "
                     + (configuracaoLojaVO.isLojaMatriz() ? "LOJA MIX PRINCIPAL" : "LOJA NORMAL")));
-            if (Integer.parseInt(configuracaoLojaVO.getIdLojaOrigem()) == SelecaoLojaGUI.lojaOrigem) {
+            if (Integer.parseInt(configuracaoLojaVO.getIdLojaOrigem().trim()) == SelecaoLojaGUI.lojaOrigem) {
                 indice = contador;
             }
             contador++;
