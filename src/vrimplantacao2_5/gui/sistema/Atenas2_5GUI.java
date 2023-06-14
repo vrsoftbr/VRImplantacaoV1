@@ -9,22 +9,22 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
+import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class ASoft2_5GUI extends VRInternalFrame {
+public class Atenas2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ASOFT.getNome();
-    private static ASoft2_5GUI instance;
+    private static final String SISTEMA = ESistema.ATENAS.getNome();
+    private static Atenas2_5GUI instance;
 
-    private final ASoft2_5DAO dao = new ASoft2_5DAO();
+    private final Atenas2_5DAO dao = new Atenas2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public ASoft2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Atenas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -59,7 +59,7 @@ public class ASoft2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ASOFT);
+        pnlConn.setSistema(ESistema.ATENAS);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -149,7 +149,7 @@ public class ASoft2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new ASoft2_5GUI(i_mdiFrame);
+                instance = new Atenas2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

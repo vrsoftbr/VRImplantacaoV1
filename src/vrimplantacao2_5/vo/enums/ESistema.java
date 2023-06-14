@@ -208,6 +208,10 @@ import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
 import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
+import vrimplantacao2_5.dao.sistema.Accesys2_5DAO;
+import vrimplantacao2_5.dao.sistema.Acom2_5DAO;
+import vrimplantacao2_5.dao.sistema.AlphaSys2_5DAO;
+import vrimplantacao2_5.dao.sistema.Apollo2_5DAO;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.AriusWebDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
@@ -268,11 +272,17 @@ import vrimplantacao2_5.gui.sistema.Acom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Alcance2_5GUI;
 import vrimplantacao2_5.gui.sistema.AlphaSys2_5GUI;
 import vrimplantacao2_5.gui.sistema.AlterData_WShop2_5GUI;
+import vrimplantacao2_5.gui.sistema.Apollo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Argo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
+import vrimplantacao2_5.gui.sistema.ArtSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.Asefe2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
+import vrimplantacao2_5.gui.sistema.Atenas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
+import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -374,7 +384,7 @@ public enum ESistema {
             return null;
         }
     },
-    ACCESYS(2, "ACCESYS", new AccesysDAO()) {
+    ACCESYS(2, "ACCESYS", new Accesys2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -385,7 +395,7 @@ public enum ESistema {
             return null;
         }
     },
-    ACOM(3, "ACOM", new AcomDAO()) {
+    ACOM(3, "ACOM", new Acom2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -396,51 +406,81 @@ public enum ESistema {
             return null;
         }
     },
-    ALPHASYS(4, "ALPHASYS", new AlphaSysDAO()) {
+    ALPHASYS(4, "ALPHASYS", new AlphaSys2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-           try {
-                return new AlphaSys2_5GUI (frame);
+            try {
+                return new AlphaSys2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
     },
-    APOLLO(5, "APOLLO", new ApolloDAO()) {
+    APOLLO(5, "APOLLO", new Apollo2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Apollo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ARTSYSTEM(6, "ARTSYSTEM", new ArtSystemDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new ArtSystem2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ASEFE(7, "ASEFE", new AsefeDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Asefe2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ATENAS(8, "ATENAS", new AtenasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Atenas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ATHOS(9, "ATHOS", new AthosDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Athos2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ATMA(10, "ATMA", new AtmaDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Atma2_5GUI (frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     AUTOADM(11, "AUTOADM", new AutoAdmDAO()) {
@@ -1591,7 +1631,7 @@ public enum ESistema {
         }
     },
     VISUALMIX(186, "VISUALMIX", new VisualMixDAO()) {
-         @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new VisualMix2_5GUI(frame);
@@ -2343,20 +2383,19 @@ public enum ESistema {
         ) {
             try {
                 return new Argo2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
-     },
-     
-     VIVASISTEMAS(258, "VIVASISTEMAS", new VivaSistemasDAO()) {
+    },
+    VIVASISTEMAS(258, "VIVASISTEMAS", new VivaSistemasDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new VivaSistemas2_5GUI(frame);
-                } catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
