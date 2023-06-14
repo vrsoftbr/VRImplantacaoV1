@@ -18,7 +18,6 @@ import vrimplantacao2.dao.interfaces.AvanceDAO;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.BaseDAO;
 import vrimplantacao2.dao.interfaces.BrainSoftDAO;
-import vrimplantacao2.dao.interfaces.BrajanGestoresDAO;
 import vrimplantacao2.dao.interfaces.CgaDAO;
 import vrimplantacao2.dao.interfaces.CFSoftSiaECFDAO;
 import vrimplantacao2.dao.interfaces.CPGestorDAO;
@@ -210,6 +209,7 @@ import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
 import vrimplantacao2_5.dao.sistema.Autocom2_5DAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
+import vrimplantacao2_5.dao.sistema.BrajanGestores2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
@@ -283,6 +283,7 @@ import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.BrData2_5GUI;
+import vrimplantacao2_5.gui.sistema.BrajanGestores2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
@@ -552,10 +553,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     },
-    BRAJANGESTORES(19, "BRAJANGESTORES", new BrajanGestoresDAO()) {
+    BRAJANGESTORES(19, "BRAJANGESTORES", new BrajanGestores2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+           try {
+                return new BrajanGestores2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CFSOFTSIAECF(20, "CFSOFTSIAECF", new CFSoftSiaECFDAO()) {
