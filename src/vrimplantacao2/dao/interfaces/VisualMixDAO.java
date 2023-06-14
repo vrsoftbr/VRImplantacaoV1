@@ -9,6 +9,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
@@ -37,9 +40,11 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.LogEstoqueVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.PagarFornecedorDAO;
 import vrimplantacao2.dao.cadastro.financeiro.recebervendaprazo.ReceberVendaPrazaoDAO;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -60,10 +65,15 @@ import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -89,9 +99,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean i_contaAbertaVendaPrazo = false;
     public String dataEmissaoVendaPr;
-    
+
     public String i_arquivo;
-    
+
     public String dataVirada;
 
     @Override
@@ -154,6 +164,31 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.TROCA
                 }
         ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -948,7 +983,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    /*"select \n"
                     + "	c.Codigo as id, \n"
                     + "	c.Nome as razao, \n"
                     + "	c.Apelido as fantasia,\n"
@@ -1001,18 +1036,74 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.FoneEntrega as telefoneentrega,\n"
                     + " c.DataNascimentoConjuge as datanascimentoconjuge\n"
                     + "from dbo.Clientes c\n"
-                    + "left join [DiggerMatriz].[dbo].Empresa e on e.Codigo = c.Empresa\n"
-                    + "left join [DiggerMatriz].[dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
-                    + "where c.IDLoja = " + getLojaOrigem() + "\n"
-                    + "order by 1"
+                    + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
+                    + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
+                     + "where c.IDLoja = " + getLojaOrigem() + "\n"
+                    + "order by 1"*/
+                    "select \n"
+                    + "	cast(cv.Codigo as int) as id, \n"
+                    + "	case when cast(cv.CPF as bigint) = 0 then cv.Codigo \n"
+                    + "		 when cast(cv.CPF as bigint) = 99999999999 then cv.Codigo\n"
+                    + "		 when cast(cv.CPF as bigint) = 9999999999999 then cv.Codigo\n"
+                    + "		 when cast(cv.CPF as bigint) = 11111111111 then cv.Codigo\n"
+                    + "          when cast(cv.CPF as bigint) = 191 then cv.Codigo\n"
+                    + "		else cast(cv.CPF as bigint) end as cnpj,\n"
+                    + "	c.RG inscricaoestadual,\n"
+                    + " coalesce(c.Nome, cv.NOME) as razao, \n"
+                    + "	c.Apelido as fantasia,\n"
+                    + "	cv.REGISTRO as ie_rg,\n"
+                    + "	c.Status ativo,\n"
+                    + "	c.DataNascimento,\n"
+                    + "	c.EstadoCivil,\n"
+                    + "	c.NomeConjuge,\n"
+                    + "	c.Endereco,\n"
+                    + "	c.Numero,\n"
+                    + "	c.Complemento,\n"
+                    + "	c.Bairro,\n"
+                    + "	c.CEP,\n"
+                    + "	c.Cidade as municipio,\n"
+                    + "	c.Estado as uf,\n"
+                    + "	c.Referencia,\n"
+                    + "	c.TipoEndereco,\n"
+                    + "	c.eMail,\n"
+                    + "	c.Empresa,\n"
+                    + "	c.DataAdmissao,\n"
+                    + "	c.CodigoProfissao,\n"
+                    + "	c.TelefoneEmpresa,\n"
+                    + "	e.Descricao as nomeempresa,\n"
+                    + "	e.EnderecoEmpresa,\n"
+                    + "	e.NumeroEmpresa,\n"
+                    + "	e.ComplementoEmpresa,\n"
+                    + "	e.BairroEmpresa,\n"
+                    + "	e.CidadeEmpresa,\n"
+                    + "	e.EstadoEmpresa,\n"
+                    + "	e.CEPEmpresa,\n"
+                    + "	c.RamalEmpresa,\n"
+                    + "	c.DataInclusao as datacadastro,\n"
+                    + "	c.Telefone,\n"
+                    + "	case when len((cv.CREDITOMENSAL + coalesce(c.LimiteCredito, cv.CREDITOMENSAL))) > 10 then 999999\n"
+                    + "	     else (cv.CREDITOMENSAL + c.LimiteCredito) end as valorlimite,\n"
+                    + "	c.LimiteCheques,\n"
+                    + "	c.DescProfissao as cargo,\n"
+                    + " p.Descricao as profissao,\n"
+                    + "	c.Renda as salario,\n"
+                    + " c.DataNascimentoConjuge as datanascimentoconjuge,\n"
+                    + " c.Status,\n"
+                    + " o.Observacao,\n"
+                    + " cv.situacao as bloqueadorotativo\n"
+                    + "from ConvConveniados cv\n"
+                    + "left join Clientes c on c.CPF = cv.CPF\n"
+                    + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
+                    + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
+                    + "left join Observacoes o on o.CodigoCliente = c.Codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj(rst.getString("CPF"));
-                    imp.setInscricaoestadual(rst.getString("RG"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setEndereco(rst.getString("Endereco"));
                     imp.setNumero(rst.getString("Numero"));
                     imp.setComplemento(rst.getString("Complemento"));
@@ -1023,8 +1114,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("Telefone"));
                     imp.setEmail(rst.getString("eMail") == null ? "" : rst.getString("eMail").toLowerCase());
                     imp.setValorLimite(rst.getDouble("valorlimite"));
-                    imp.setPermiteCheque(true);
-                    imp.setPermiteCreditoRotativo(true);
                     imp.setDataNascimento(rst.getDate("DataNascimento"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setNomeConjuge(rst.getString("NomeConjuge"));
@@ -1043,7 +1132,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("profissao"));
                     imp.setSalario(rst.getDouble("salario"));
 
-                    if (rst.getInt("EstadoCivil") == 2) {
+                    /*if (rst.getInt("EstadoCivil") == 2) {
                         imp.setEstadoCivil(TipoEstadoCivil.CASADO);
                     } else {
                         imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
@@ -1056,8 +1145,219 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         default:
                             imp.setSexo(TipoSexo.FEMININO);
                             break;
+                    }*/
+                    if ("12".equals(rst.getString("Status"))) {
+                        imp.setPermiteCheque(false);
+                    } else {
+                        imp.setPermiteCheque(true);
                     }
+                    if("1".equals(rst.getString("bloqueadorotativo"))){
+                        imp.setPermiteCreditoRotativo(false);
+                    }
+                    else{
+                        imp.setPermiteCreditoRotativo(true);
+                    }
+                    
+                    imp.setObservacao(rst.getString("Observacao"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + " Nsu id,\n"
+                    + " cast(CodigoCliente as int) clienteid,\n"
+                    + " Data,\n"
+                    + " Loja,\n"
+                    + " Pdv,\n"
+                    + " Cupom,\n"
+                    + " ValorCompra,\n"
+                    + " DataAlteracao\n"
+                    + "from ConvMovimento \n"
+                    + "where \n"
+                    + "ValorPago = 0\n"
+                    + "and Loja = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("clienteid"));
+                    imp.setEcf(rst.getString("Pdv"));
+                    imp.setNumeroCupom(rst.getString("Cupom"));
+                    imp.setValor(rst.getDouble("ValorCompra"));
+                    imp.setDataEmissao(rst.getDate("Data"));
+                    imp.setDataVencimento(rst.getDate("DataAlteracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " ROW_NUMBER() over(order by ch.Data_da_Compra) id,\n"
+                    + " ch.CodigoCliente,\n"
+                    + " ch.Loja,\n"
+                    + " ch.Data_da_Compra,\n"
+                    + " ch.DataAlteracao,\n"
+                    + " ch.CPF_CGC,\n"
+                    + " ch.Valor,\n"
+                    + " ch.Banco,\n"
+                    + " ch.Agencia,\n"
+                    + " ch.Conta,\n"
+                    + " ch.Cheque,\n"
+                    + " c.Nome\n"
+                    + "from Cheque_Emitido ch\n"
+                    + "left join Clientes c on c.Codigo = ch.CodigoCliente where ch.Loja = " + getLojaOrigem()
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("CPF_CGC"));
+                    imp.setNumeroCheque(rst.getString("Cheque"));
+                    imp.setBanco(rst.getInt("Banco"));
+                    imp.setAgencia(rst.getString("Agencia"));
+                    imp.setConta(rst.getString("Conta"));
+                    imp.setDate(rst.getDate("Data_da_Compra"));
+                    imp.setDataDeposito(rst.getDate("DataAlteracao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNome(rst.getString("Nome"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " CODIGO id,\n"
+                    + " NOME razao,\n"
+                    + " ENDERECO,\n"
+                    + " NUMERO,\n"
+                    + " CIDADE,\n"
+                    + " BAIRRO,\n"
+                    + " ESTADO,\n"
+                    + " CEP,\n"
+                    + " TELEFONE,\n"
+                    + " CNPJ,\n"
+                    + " INSCRESTADUAL,\n"
+                    + " DATAALTERACAO,\n"
+                    + " (GETDATE() + 900) datatermino\n"
+                    + "from ConvEmpresas;"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cnpj"));
+
+                    imp.setInscricaoEstadual(rst.getString("INSCRESTADUAL"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero("0");
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataInicio(rst.getDate("DATAALTERACAO"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " CODIGO id,\n"
+                    + " NOME razao,\n"
+                    + " SITUACAO,\n"
+                    + " LIMITE,\n"
+                    + " REGISTRO,\n"
+                    + " CODEMPRESA idEmpresa,\n"
+                    + " CREDITOMENSAL,\n"
+                    + " CPF cnpj,\n"
+                    + " CODEMPRESA \n"
+                    + "from ConvConveniados"
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setNome(rst.getString("razao"));
+                    imp.setIdEmpresa(rst.getString("idEmpresa"));
+                    imp.setConvenioLimite(rst.getDouble("CREDITOMENSAL"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + " Nsu id,\n"
+                    + " CodigoCliente idCliente,\n"
+                    + " Data,\n"
+                    + " Loja,\n"
+                    + " Pdv,\n"
+                    + " Cupom,\n"
+                    + " ValorCompra,\n"
+                    + " DataAlteracao\n"
+                    + "from ConvMovimento \n"
+                    + "where \n"
+                    + "ValorPago = 0\n"
+                    + "and Loja = " + getLojaOrigem()
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("idCliente"));
+                    imp.setEcf(rst.getString("Pdv"));
+                    imp.setNumeroCupom(rst.getString("Cupom"));
+                    imp.setDataMovimento(rst.getDate("Data"));
+                    imp.setDataHora(new Timestamp(format.parse(rst.getString("Data")).getTime()));
+                    imp.setValor(rst.getDouble("ValorCompra"));
                     result.add(imp);
                 }
             }
@@ -1134,7 +1434,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }*/
-
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
         List<ReceitaBalancaIMP> result = new ArrayList<>();
@@ -1427,7 +1726,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public List<ReceberDevolucaoVO> getDevolucaoFornecedorDuplicados(int idLoja) throws Exception {
         List<ReceberDevolucaoVO> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -1453,7 +1752,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     vo.setDataemissao(rst.getDate("dataemissao"));
                     vo.setDatavencimento(rst.getDate("datavencimento"));
                     vo.setValor(rst.getDouble("valor"));
-                    
+
                     System.out.println("Forn " + vo.getIdFornecedor() + " "
                             + "Nota " + vo.getNumeroNota() + " "
                             + "Emissao " + vo.getDataemissao() + " "
@@ -1478,7 +1777,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public List<PagarFornecedorVO> getPagarFornecedorDuplicado(int idLoja) throws Exception {
         List<PagarFornecedorVO> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -1514,7 +1813,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     public void importarReceberVendaPrazoPartir0108(int idLojaVR) throws Exception {
         List<ReceberVendaPrazoVO> vResult;
         try {
@@ -1742,7 +2041,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
-    
+
     public String dataInicioPdvVenda;
     public String dataTerminoPdvVenda;
 
@@ -2038,7 +2337,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	nfe.DATA = v.DATA and \n"
                     + "	nfe.NUM_PDV = v.NUM_PDV and \n"
                     + "	nfe.NUM_CUPOM = v.NUM_CUPOM and\n"
-                    + "	nfe.LOJA = v.LOJA\n"                    
+                    + "	nfe.LOJA = v.LOJA\n"
                     + "where i.Loja = " + idLojaCliente + "\n"
                     + "and i.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
                     + "and convert(datetime,'" + FORMAT.format(dataTermino) + "', 103) \n"
@@ -2065,7 +2364,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + ", '35200860186376000164590004040501259812811853'\n"
                     + ", '35200860186376000164590004040501259820961214')";
 
-
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -2089,7 +2387,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-    
+
     public List<PdvVendaVO> carregarVendasChaveCfe() throws Exception {
         List<PdvVendaVO> result = new ArrayList<>();
         SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
@@ -2101,7 +2399,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " 	cast(v.NUM_PDV as bigint) as ecf, \n"
                     + " 	cast(v.NUM_CUPOM as bigint) as numerocupom, \n"
                     + "         cast(nfe.NUMERONOTA as bigint) as numeronota, \n"
-                    + "         v.CPFCNPJCLIENTE as cpf_cliente, \n"        
+                    + "         v.CPFCNPJCLIENTE as cpf_cliente, \n"
                     + " 	nfe.CHAVE as chaveCfe\n"
                     + " from dbo.Sint_total_Cupom v \n"
                     + " join dbo.SINT_NFCE nfe on  \n"
@@ -2129,12 +2427,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     public void importarChaveCfe(int idLoja) throws Exception {
         List<PdvVendaVO> result = new ArrayList<>();
         try {
             result = carregarVendasChaveCfe();
-            
+
             if (!result.isEmpty()) {
                 gravarChaveCfe(result, idLoja);
             }
@@ -2142,40 +2440,40 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public void gravarChaveCfe(List<PdvVendaVO> vo, int idLoja) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
         String sql = "";
-        
+
         try {
             Conexao.begin();
-            
+
             ProgressBar.setMaximum(vo.size());
             ProgressBar.setStatus("Acertando Cpf...");
-            
+
             stm = Conexao.createStatement();
-            
+
             for (PdvVendaVO i_vo : vo) {
-                sql = /*"update pdv.venda set "
+                sql
+                        = /*"update pdv.venda set "
                         + "cpf = " + i_vo.getCpf() + " "
                         + "where data = '" + i_vo.getData() + "' "
                         + "and ecf = " + i_vo.getEcf() + " "
                         //+ "and chavecfe != '' "
                         + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
                         + "and id_loja = " + idLoja + ";";
-                        /*+ "\n\n"*/
-                        "update escrita set "
+                        /*+ "\n\n"*/ "update escrita set "
                         + "numeronota = " + i_vo.getNumeronota() + ", "
                         + "cpfadquirente = " + i_vo.getCpf() + " "
                         + "where data = '" + i_vo.getData() + "' "
                         //+ "and ecf = " + i_vo.getEcf() + " "
                         + "and chavecfe != '' "
-                        + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
+                        + "and chavecfe = '" + i_vo.getChaveCfe() + "' "
                         //+ "and especie = 'CFE' "
                         //+ "and modelo = '59' "
                         + "and id_loja = " + idLoja + ";";
-                        
+
                 /*sql = "update escrita set "
                         + "chavecfe = '"+ i_vo.getChaveCfe()+"', "
                         + "especie = 'CFE', "
@@ -2187,21 +2485,20 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and especie = 'ECF' "
                         + "and modelo = '2D' "
                         + "and id_loja = " + idLoja + "; \n";*/
-                
                 stm.execute(sql);
-                
+
                 ProgressBar.next();
             }
-            
+
             stm.close();
             Conexao.commit();
-            
-        } catch (Exception ex) {            
+
+        } catch (Exception ex) {
             Conexao.rollback();
             throw ex;
         }
     }
-    
+
     public List<LogEstoqueVO> getProdutosNotaEntradaLogEstoque(int idLojaVR) throws Exception {
         List<LogEstoqueVO> result = new ArrayList<>();
         int linha, numeronota, idfornecedor;
@@ -2230,17 +2527,17 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     numeronota = Integer.parseInt(cellNF.getContents().trim());
                     idfornecedor = Integer.parseInt(cellForncedor.getContents().trim());
-                    
+
                     System.out.println(
-                                "select "
-                                + "id_produto, "
-                                + "quantidade "
-                                + "from logestoque "
-                                + "where id_loja = " + idLojaVR + " "
-                                + "and datahora::date >= '" + dataVirada + "' "
-                                + "and observacao like '%NOTA: ' ||" + numeronota + "||', FORNECEDOR: '||" + idfornecedor + "||'%' "                    
+                            "select "
+                            + "id_produto, "
+                            + "quantidade "
+                            + "from logestoque "
+                            + "where id_loja = " + idLojaVR + " "
+                            + "and datahora::date >= '" + dataVirada + "' "
+                            + "and observacao like '%NOTA: ' ||" + numeronota + "||', FORNECEDOR: '||" + idfornecedor + "||'%' "
                     );
-                    
+
                     try (Statement stm = Conexao.createStatement()) {
                         try (ResultSet rst = stm.executeQuery(
                                 "select "
@@ -2266,13 +2563,13 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public void importarProdutosNotaEntradaLogEstoque(int idLoja) throws Exception {
         List<LogEstoqueVO> result = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando quantidade das notas de entrada...");
             result = getProdutosNotaEntradaLogEstoque(idLoja);
-            
+
             if (!result.isEmpty()) {
                 gravarProdutosNotaEntrada(result, idLoja);
             }
@@ -2280,27 +2577,27 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public void gravarProdutosNotaEntrada(List<LogEstoqueVO> vo, int idLoja) throws Exception {
-        
+
         Statement stm = null;
         String sql;
-        
+
         try {
             Conexao.begin();
-            
+
             ProgressBar.setStatus("Gravando quantidade dos produtos das notas de entrada...");
             ProgressBar.setMaximum(vo.size());
-            
+
             stm = Conexao.createStatement();
-            
+
             sql = "delete from implantacao.notaentradaitem_quantidade where id_loja = " + idLoja + ";\n"
                     + "delete from implantacao.acertoestoque where id_loja = " + idLoja + ";";
-            
+
             stm.execute(sql);
-            
+
             for (LogEstoqueVO i_vo : vo) {
-                
+
                 sql = "insert into implantacao.notaentradaitem_quantidade("
                         + "id_loja, "
                         + "id_produto, "
@@ -2309,20 +2606,18 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         + idLoja + ", "
                         + i_vo.getId_produto() + ", "
                         + i_vo.getQuantidade() + ");";
-                
+
                 stm.execute(sql);
-                
+
                 ProgressBar.next();
             }
-            
-            sql = "insert into implantacao.acertoestoque(select "+idLoja+", id_produto, coalesce(sum(quantidade), 0) "
-                    + "from implantacao.notaentradaitem_quantidade where id_loja = "+idLoja+" group by id_produto);";
-            
-            
-            
+
+            sql = "insert into implantacao.acertoestoque(select " + idLoja + ", id_produto, coalesce(sum(quantidade), 0) "
+                    + "from implantacao.notaentradaitem_quantidade where id_loja = " + idLoja + " group by id_produto);";
+
             stm.execute(sql);
-            
-            stm.close();            
+
+            stm.close();
             Conexao.commit();
         } catch (Exception ex) {
             Conexao.rollback();

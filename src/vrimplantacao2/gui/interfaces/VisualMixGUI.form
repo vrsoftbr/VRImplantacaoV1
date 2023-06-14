@@ -205,7 +205,13 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkDataNascimentoConjuge" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkCliEmpresa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -232,6 +238,8 @@
                                   <Component id="chkCliDataAdmissaoEmpresa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCliSalarioEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkEnderecoCompleto" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
@@ -239,8 +247,16 @@
                                   <Component id="chkReceberVendaPrazoPartir0108" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkReceberVendaPrazoAnterior0108" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
+                                  <Component id="chkEmpresaConvenio" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                                  <Component id="chkConveniado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                                  <Component id="chkTrasacaoConvenio" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="63" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -274,9 +290,14 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkCliDataAdmissaoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliSalarioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEnderecoCompleto" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPermiteRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -284,7 +305,13 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkReceberVendaPrazoAnterior0108" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="69" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkConveniado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTrasacaoConvenio" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEmpresaConvenio" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -391,6 +418,39 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberVendaPrazoAnterior0108">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Receber Venda Prazo (Vencimento  anterior 01/08)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConveniado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Conveniado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEmpresaConvenio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Empresa Convenio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTrasacaoConvenio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Transa&#xe7;&#xe3;o Conveniado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cheque"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEnderecoCompleto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o Completo"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkEnderecoCompletoActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPermiteRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
                   </Properties>
                 </Component>
               </SubComponents>
