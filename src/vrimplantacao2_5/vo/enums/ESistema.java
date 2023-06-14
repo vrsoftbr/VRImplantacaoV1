@@ -213,6 +213,7 @@ import vrimplantacao2_5.dao.sistema.BrajanGestores2_5DAO;
 import vrimplantacao2_5.dao.sistema.CFSoftSiaECF2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CPlus2_5DAO;
+import vrimplantacao2_5.dao.sistema.CadastraFacil2_5DAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
@@ -290,6 +291,7 @@ import vrimplantacao2_5.gui.sistema.CFSoftSiaECF2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
+import vrimplantacao2_5.gui.sistema.CadastraFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
@@ -601,10 +603,15 @@ public enum ESistema {
             return null;
         }
     },
-    CADASTRAFACIL(23, "CADASTRAFACIL", new CadastraFacilDAO()) {
+    CADASTRAFACIL(23, "CADASTRAFACIL", new CadastraFacil2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new CadastraFacil2_5GUI(frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CEFAS(24, "CEFAS", new CefasDAO()) {

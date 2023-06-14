@@ -234,6 +234,7 @@ public enum EScriptLojaOrigemSistema {
     BRAJAN_GESTORES(19,11,null),
     CFSOFTSIAECF(20,5,null),
     CPLUS(22,5,"SELECT e.codempresa AS id, e.nomeempresa AS descricao from empresa e"),
+    CADASTRA_FACIL(23,5,"select lpad(id_empresa, 4, '0') as id, nome_razao AS descricao FROM empresa"),
     VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
 
     private int idSistema;
