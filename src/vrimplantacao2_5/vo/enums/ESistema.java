@@ -11,18 +11,8 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
 import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Stock_PostgresDAO;
-import vrimplantacao2.dao.interfaces.ASoftDAO;
-import vrimplantacao2.dao.interfaces.AccesysDAO;
-import vrimplantacao2.dao.interfaces.AcomDAO;
-import vrimplantacao2.dao.interfaces.AlphaSysDAO;
 import vrimplantacao2.dao.interfaces.AlterData_WShopDAO;
-import vrimplantacao2.dao.interfaces.ApolloDAO;
 import vrimplantacao2.dao.interfaces.ArgoDAO;
-import vrimplantacao2.dao.interfaces.ArtSystemDAO;
-import vrimplantacao2.dao.interfaces.AsefeDAO;
-import vrimplantacao2.dao.interfaces.AtenasDAO;
-import vrimplantacao2.dao.interfaces.AthosDAO;
-import vrimplantacao2.dao.interfaces.AtmaDAO;
 import vrimplantacao2.dao.interfaces.AutoAdmDAO;
 import vrimplantacao2.dao.interfaces.AutoSystemDAO;
 import vrimplantacao2.dao.interfaces.AutocomDAO;
@@ -158,7 +148,6 @@ import vrimplantacao2.dao.interfaces.SambaNetV2DAO;
 import vrimplantacao2.dao.interfaces.SatecfeDAO;
 import vrimplantacao2.dao.interfaces.SavDAO;
 import vrimplantacao2.dao.interfaces.ScefDAO;
-import vrimplantacao2.dao.interfaces.ShiDAO;
 import vrimplantacao2.dao.interfaces.SiacDAO;
 import vrimplantacao2.dao.interfaces.SifatDAO;
 import vrimplantacao2.dao.interfaces.SigmaDAO;
@@ -214,8 +203,13 @@ import vrimplantacao2_5.dao.sistema.AlphaSys2_5DAO;
 import vrimplantacao2_5.dao.sistema.Apollo2_5DAO;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.AriusWebDAO;
+import vrimplantacao2_5.dao.sistema.ArtSystem2_5DAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
+import vrimplantacao2_5.dao.sistema.Athos2_5DAO;
+import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
+import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
@@ -283,6 +277,7 @@ import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atenas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
+import vrimplantacao2_5.gui.sistema.AutoAdm2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -428,7 +423,7 @@ public enum ESistema {
             return null;
         }
     },
-    ARTSYSTEM(6, "ARTSYSTEM", new ArtSystemDAO()) {
+    ARTSYSTEM(6, "ARTSYSTEM", new ArtSystem2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -439,7 +434,7 @@ public enum ESistema {
             return null;
         }
     },
-    ASEFE(7, "ASEFE", new AsefeDAO()) {
+    ASEFE(7, "ASEFE", new ASoft2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -450,7 +445,7 @@ public enum ESistema {
             return null;
         }
     },
-    ATENAS(8, "ATENAS", new AtenasDAO()) {
+    ATENAS(8, "ATENAS", new Atenas2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -461,7 +456,7 @@ public enum ESistema {
             return null;
         }
     },
-    ATHOS(9, "ATHOS", new AthosDAO()) {
+    ATHOS(9, "ATHOS", new Athos2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -472,7 +467,7 @@ public enum ESistema {
             return null;
         }
     },
-    ATMA(10, "ATMA", new AtmaDAO()) {
+    ATMA(10, "ATMA", new Atma2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
@@ -483,10 +478,15 @@ public enum ESistema {
             return null;
         }
     },
-    AUTOADM(11, "AUTOADM", new AutoAdmDAO()) {
+    AUTOADM(11, "AUTOADM", new AutoAdm2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+           try {
+                return new AutoAdm2_5GUI  (frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystemDAO()) {
