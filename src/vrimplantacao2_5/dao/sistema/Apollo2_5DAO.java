@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatiporecebiveis.FinanceiroProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -65,33 +64,6 @@ public class Apollo2_5DAO extends InterfaceDAO implements FinanceiroProvider, Ma
     @Override
     public String getSistema() {
         return "APOLLO";
-    }
-
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    codempresa,\n"
-                    + "    fantasia\n"
-                    + "FROM \n"
-                    + "    " + getSchema() + "empresas \n"
-                    + "order by \n"
-                    + "    codempresa"
-            )) {
-                while (rst.next()) {
-                    result.add(
-                            new Estabelecimento(
-                                    rst.getString("codempresa"),
-                                    rst.getString("fantasia")
-                            )
-                    );
-                }
-            }
-        }
-
-        return result;
     }
 
     @Override

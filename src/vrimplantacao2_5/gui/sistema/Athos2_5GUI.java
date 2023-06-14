@@ -15,9 +15,6 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Athos2_5GUI extends VRInternalFrame {
     
-    private Connection loja;
-    private Connection venda;
-
     private static final String SISTEMA = ESistema.ATHOS.getNome();
     private static Athos2_5GUI instance;
 

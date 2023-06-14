@@ -2,9 +2,7 @@ package vrimplantacao2_5.dao.sistema;
 
 import java.util.Map;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,7 +22,6 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -39,17 +36,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /*
  *
- * @author Brunos
+ * @author Bruno
  *
  */
 public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     // SISTEMA REFATORADO DA 2.0 E NÃO VALIDADO, FAVOR REVER TODOS OS CAMPOS INCLUSIVE ESCRIPTLOJAORIGEM -- SELECT LOJA.
-    private String lojaCliente;
-
-    public String getLojaCliente() {
-        return this.lojaCliente;
-    }
 
     @Override
     public String getSistema() {
@@ -320,32 +312,6 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
 
-                    imp.setImportId(rs.getString("codigo"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setFantasia(rs.getString("nome"));
-
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("uf"));
-                    imp.setCep(rs.getString("cep"));
-
-                    imp.setDatacadastro(rs.getDate("data_cadastro"));
-                    imp.setTel_principal(rs.getString("telefone"));
-                    imp.setAtivo(rs.getBoolean("status"));
-                    imp.setIe_rg(rs.getString("insc_estadual"));
-
-                    String pessoa = (rs.getString("pessoa"));
-                    if ("F".equals(pessoa)) {
-                        imp.setTipo_inscricao(TipoInscricao.FISICA);
-                        imp.setCnpj_cpf(rs.getString("cpfcnpj"));
-                    } else {
-                        imp.setTipo_inscricao(TipoInscricao.JURIDICA);
-                        imp.setCnpj_cpf(rs.getString("cpfcnpj"));
-                    }
-
                     result.add(imp);
                 }
             }
@@ -419,48 +385,6 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         }
 
         return result;
-    }
-
-    @Override
-    public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> Result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "")){
-                while (rs.next()) {
-                    ChequeIMP imp = new ChequeIMP();
-
-                    imp.setId(rs.getString("codigo"));
-                    imp.setDate(rs.getDate("data_aquisicao"));
-                    imp.setDataDeposito(rs.getDate("data_vendimento"));
-                    imp.setNumeroCheque(rs.getString("numero_cheque"));
-                    imp.setBanco(rs.getInt("banco"));
-                    imp.setAgencia(rs.getString("agencia"));
-                    imp.setConta(rs.getString("codigo_conta"));
-                    imp.setEcf(rs.getString("numero_pdv"));
-
-                    String pessoa = (rs.getString("pessoa"));
-                    if ("F".equals(pessoa)) {
-                        imp.setCpf(rs.getString("cpf"));
-                    }
-
-                    imp.setCpf(rs.getString("cnpj"));
-                    imp.setRg(rs.getString("rg"));
-                    imp.setNome(rs.getString("nome"));
-                    imp.setValor(rs.getDouble("valor"));
-
-                    String contato = (rs.getString("telefone"));
-                    if (!"".equals(contato)) {
-                        imp.setTelefone(rs.getString("celular"));
-                    }
-                    imp.setTelefone(rs.getString("telefone"));
-
-                    Result.add(imp);
-                }
-            }
-        }
-        return Result;
     }
 
     @Override

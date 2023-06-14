@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -49,7 +48,7 @@ public class ArtSystem2_5DAO extends InterfaceDAO implements MapaTributoProvider
 
     @Override
     public String getSistema() {
-        return "ARTSYSTEM";
+        return "ArtSystem";
     }
 
     @Override

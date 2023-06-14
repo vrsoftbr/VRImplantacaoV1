@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -28,13 +28,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Bruno
  * 
- * SISTEMA REFATORADO DA 2.0 PARA 2.5 E NÃO TESTADO FAVOC CONFERIR OS METODOS
+ * SISTEMA REFATORADO DA 2.0 PARA 2.5 E NÃO TESTADO FAVOR CONFERIR OS METODOS
  */
 public class Atenas2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "ATENAS";
+        return "Atenas";
     }
 
     public List<Estabelecimento> getLojasCliente() throws SQLException {

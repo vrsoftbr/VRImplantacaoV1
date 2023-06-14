@@ -1,7 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import java.sql.Connection;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -15,9 +14,6 @@ import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Atma2_5GUI extends VRInternalFrame {
     
-    private Connection loja;
-    private Connection venda;
-
     private static final String SISTEMA = ESistema.ATMA.getNome();
     private static Atma2_5GUI instance;
 

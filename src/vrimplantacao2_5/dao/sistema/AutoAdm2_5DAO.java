@@ -47,7 +47,7 @@ public class AutoAdm2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "AUTOADM";
+        return "AutoADM";
     }
 
     private String getAliquotaForaEstadoKey(String cst, double aliq, double red) throws SQLException {

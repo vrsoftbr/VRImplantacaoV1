@@ -12,18 +12,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -44,11 +40,6 @@ import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 public class Acom2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     // SISTEMA REFATORADO DA 2.0 E NÃO VALIDADO, FAVOR REVER TODOS OS CAMPOS INCLUSIVE ESCRIPTLOJAORIGEM -- SELECT LOJA.
-    private String lojaCliente;
-
-    public String getLojaCliente() {
-        return this.lojaCliente;
-    }
 
     @Override
     public String getSistema() {
@@ -478,58 +469,6 @@ public class Acom2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*   
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("produto"));
-                    imp.setEan(rst.getString("ean"));
-                    if (rst.getString("produto").equals("6395")) {
-                        System.out.println("inferno");
-                    }
-                    if (rst.getString("ean") == null) {
-                        imp.setEan("9999999" + rst.getString("produto"));
-                    } else {
-                        if (rst.getString("ean").equals("9999999999999")) {
-                            System.out.println("13" + " - " + "9999999999999");
-                            imp.setEan(rst.getString("ean").substring(rst.getString("produto").length()) + rst.getString("produto"));
-                        }
-                        if (rst.getString("ean").equals("99999999999999")) {
-                            System.out.println("14" + " - " + "99999999999999");
-                            imp.setEan(rst.getString("ean").substring(rst.getString("produto").length()) + rst.getString("produto"));
-                        }
-                        if (rst.getInt("ativo") == 0) {
-                            System.out.println(rst.getInt("produto") + " - " + "ativo 0");
-                            imp.setEan("9999999" + rst.getString("produto"));
-                        }
-                        if (rst.getString("ean").equals("9999999999999") && rst.getInt("ativo") == 0) {
-                            System.out.println("13" + " - " + "9999999999999");
-                            imp.setEan(rst.getString("ean").substring(rst.getString("produto").length()) + rst.getString("produto"));
-                        }
-                        if (rst.getString("ean").equals("99999999999999") && rst.getInt("ativo") == 0) {
-                            System.out.println("14" + " - " + "99999999999999");
-                            imp.setEan(rst.getString("ean").substring(rst.getString("produto").length()) + rst.getString("produto"));
-                        }
-                    }
-                    imp.setQtdEmbalagem(rst.getInt("qtd"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-     */
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -717,26 +656,6 @@ public class Acom2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-//    private String removerAcentos(String texto) {
-//        texto = texto != null ? Normalizer.normalize(texto, Normalizer.Form.NFD) : "";
-//        texto = texto != null ? texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") : "";
-//        texto = texto != null ? texto.replaceAll("�", "C") : "";
-//        texto = texto != null ? texto.replaceAll("[^\\p{ASCII}]", "") : "";
-//
-//        return texto;
-//    }
     private int gerarCodigoAtacado() {
         Object[] options = {"ean atacado", "ean13", "ean14", "Cancelar"};
         int decisao = JOptionPane.showOptionDialog(null, "Escolha uma opção de ean",
