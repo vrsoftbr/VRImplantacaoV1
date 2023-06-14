@@ -9,15 +9,15 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
+import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class AutoSystem2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.AUTOADM.getNome();
+    private static final String SISTEMA = ESistema.AUTOSYSTEM.getNome();
     private static AutoSystem2_5GUI instance;
 
-    private final AutoAdm2_5DAO dao = new AutoAdm2_5DAO();
+    private final AutoSystem2_5DAO dao = new AutoSystem2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -59,7 +59,7 @@ public class AutoSystem2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.AUTOADM);
+        pnlConn.setSistema(ESistema.AUTOSYSTEM);
         pnlConn.getNomeConexao();
 
         centralizarForm();
