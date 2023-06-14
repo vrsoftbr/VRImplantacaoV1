@@ -232,6 +232,7 @@ public enum EScriptLojaOrigemSistema {
     AUTOSYSTEM(12,11,"SELECT grid, grid || ' - ' || nome_reduzido descricao FROM pessoa WHERE tipo ~~ '%%E%%'::bpchar::text order by 1"),
     AUTOCOM(13,5,"select codigo AS id, nome AS descricao from empresa order by 1"),
     BRAJAN_GESTORES(19,11,null),
+    CFSOFTSIAECF(20,5,null),
     VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
 
     private int idSistema;

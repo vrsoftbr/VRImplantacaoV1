@@ -210,6 +210,7 @@ import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
 import vrimplantacao2_5.dao.sistema.Autocom2_5DAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.BrajanGestores2_5DAO;
+import vrimplantacao2_5.dao.sistema.CFSoftSiaECF2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
@@ -284,6 +285,7 @@ import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.BrData2_5GUI;
 import vrimplantacao2_5.gui.sistema.BrajanGestores2_5GUI;
+import vrimplantacao2_5.gui.sistema.CFSoftSiaECF2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
@@ -564,10 +566,15 @@ public enum ESistema {
             return null;
         }
     },
-    CFSOFTSIAECF(20, "CFSOFTSIAECF", new CFSoftSiaECFDAO()) {
+    CFSOFTSIAECF(20, "CFSOFTSIAECF", new CFSoftSiaECF2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new CFSoftSiaECF2_5GUI (frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CPGESTOR(21, "CPGESTOR", new CPGestorDAO()) {
