@@ -181,7 +181,7 @@ public class Apollo2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("DataByte");
+        setTitle("Apollo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

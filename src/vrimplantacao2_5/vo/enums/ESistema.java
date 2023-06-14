@@ -196,6 +196,7 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
+import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.Accesys2_5DAO;
 import vrimplantacao2_5.dao.sistema.Acom2_5DAO;
@@ -210,6 +211,7 @@ import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
 import vrimplantacao2_5.dao.sistema.Athos2_5DAO;
 import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
+import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
@@ -278,6 +280,7 @@ import vrimplantacao2_5.gui.sistema.Atenas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoAdm2_5GUI;
+import vrimplantacao2_5.gui.sistema.AutoSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -489,10 +492,15 @@ public enum ESistema {
             return null;
         }
     },
-    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystemDAO()) {
+    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystem2_5DAO ()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new AutoSystem2_5GUI (frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     AUTOCOM(13, "AUTOCOM", new AutocomDAO()) {

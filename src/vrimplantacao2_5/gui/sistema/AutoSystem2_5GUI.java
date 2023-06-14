@@ -9,22 +9,22 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
+import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class Atenas2_5GUI extends VRInternalFrame {
+public class AutoSystem2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ATENAS.getNome();
-    private static Atenas2_5GUI instance;
+    private static final String SISTEMA = ESistema.AUTOADM.getNome();
+    private static AutoSystem2_5GUI instance;
 
-    private final Atenas2_5DAO dao = new Atenas2_5DAO();
+    private final AutoAdm2_5DAO dao = new AutoAdm2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public Atenas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public AutoSystem2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -59,7 +59,7 @@ public class Atenas2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ATENAS);
+        pnlConn.setSistema(ESistema.AUTOADM);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -106,10 +106,10 @@ public class Atenas2_5GUI extends VRInternalFrame {
                     tabClientes.setImportador(importador);
 
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
-//                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+  //                      dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
-  //                      dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+    //                    dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                     }
 
                     if (tabMenu.getSelectedIndex() == 0) {
@@ -149,7 +149,7 @@ public class Atenas2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Atenas2_5GUI(i_mdiFrame);
+                instance = new AutoSystem2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -181,7 +181,7 @@ public class Atenas2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Atenas");
+        setTitle("AutoSystem");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

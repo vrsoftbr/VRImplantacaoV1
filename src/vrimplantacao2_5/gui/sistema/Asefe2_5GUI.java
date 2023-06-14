@@ -187,7 +187,7 @@ public class Asefe2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Market");
+        setTitle("Asefe");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

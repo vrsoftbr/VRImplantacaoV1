@@ -229,6 +229,7 @@ public enum EScriptLojaOrigemSistema {
     ATHOS(9, 11, null),
     ATMA(10,13,"select ID_EMP as id,FANTASIA as descricao from dbo.CG_EMP order by ID_EMP"),
     AUTOADM(11,5,"SELECT l.nr_loja as id, p.nm_fantasia as descricao from tb_loja l join tb_pessoa p on p.cd_pessoa = l.cd_pessoa_loja order by l.nr_loja"),
+    AUTOSYSTEM(12,11,"SELECT grid, grid || ' - ' || nome_reduzido descricao FROM pessoa WHERE tipo ~~ '%%E%%'::bpchar::text order by 1"),
     VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
 
     private int idSistema;

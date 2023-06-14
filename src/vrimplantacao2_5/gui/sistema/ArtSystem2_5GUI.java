@@ -181,7 +181,7 @@ public class ArtSystem2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("DataByte");
+        setTitle("ArtSystem");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
