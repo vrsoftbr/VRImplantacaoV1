@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import static vr.core.utils.StringUtils.LOG;
@@ -18,9 +19,10 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -28,7 +30,6 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -126,16 +127,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT \n"
-                    + "	p.COD_TRIBUTACAO||'-'||st.COD_SITUACAOFISCAL id,\n"
-                    + "	t.DESCRICAO,\n"
-                    + "	st.COD_SITUACAOFISCAL cst_saida,\n"
-                    + "	t.ALIQUOTA aliq_saida,\n"
-                    + "	t.REDUCAO_BASE red_saida\n"
-                    + "FROM\n"
-                    + "	TB_PRODUTOS p\n"
-                    + "	JOIN TB_TRIBUTACAO t ON p.COD_TRIBUTACAO = t.CODIGO_TRIBUTACAO \n"
-                    + "	JOIN TB_SITUACAO_FISCAL st ON p.COD_SITUACAOTRIBUTARIA = st.CODIGO_SITUACAOFISCAL"
+                    ""
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -157,12 +149,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO_DEPARTAMENTO merc1,\n"
-                    + "	DESCRICAO descmerc1\n"
-                    + "FROM\n"
-                    + "	TB_DEPARTAMENTO td\n"
-                    + "ORDER BY 1"
+                    ""
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -188,12 +175,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO_PRODUTOPRECOEQUIV id_familia,\n"
-                    + "	DESCRICAO familia\n"
-                    + "FROM\n"
-                    + "	TB_PRODUTO_PRECO_EQUIVALENTE\n"
-                    + "ORDER BY 1"
+                    ""
             )) {
                 while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -215,20 +197,14 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"SELECT\n"
-                    + "	CODIGO_PRODUTO id_produto,\n"
-                    + "	CODIGO_BARRA ean,\n"
-                    + "	UNIDADE_REFERENCIA tipo_embalagem,\n"
-                    + "	1 qtdembalagem\n"
+                    "SELECT\n"
+                    + "	prod_pk id_produto,\n"
+                    + "	prod_codigo_unitario ean,\n"
+                    + "	ean.unid_fator_conversao qtdembalagem,\n"
+                    + "	un.unid_nome_sigla tipo_embalagem\n"
                     + "FROM\n"
-                    + "	TB_PRODUTOS tp\n"
-                    + "ORDER BY 1"*/
-                    "SELECT \n"
-                    + " COD_PRODUTO id_produto,\n"
-                    + " COD_AUXILIAR ean,\n"
-                    + " CASE WHEN QUANTIDADE > 1 THEN 'CX' ELSE 'UN' END tipo_embalagem,\n"
-                    + " QUANTIDADE qtdembalagem\n"
-                    + "FROM TB_PRODUTO_AUXILIAR"
+                    + "	ESTO_PRODUTOS ean\n"
+                    + "	JOIN esto_unidades un ON ean.UNID_PK = un.UNID_PK"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -253,44 +229,9 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO_PRODUTO idproduto,\n"
-                    + "	CODIGO_BARRA ean,\n"
-                    + "	p.DESCRICAO desc_completa,\n"
-                    + "	DESCRICAO_PDV desc_reduzida,\n"
-                    + "	UNIDADE_REFERENCIA tipoembalagem,\n"
-                    + "	QUANTIDADE_PORCAIXA qtde_emb_compra,\n"
-                    + "	CASE WHEN COD_SETORBALANCA IS NOT NULL THEN 1 ELSE 0 END e_balanca,\n"
-                    + "	DIAS_VALIDADE validade,\n"
-                    + " COD_DEPARTAMENTO merc1,\n"
-                    + "	p.COD_PRECO_PRODUT_EQUIV familia,\n"
-                    + "	PRECO_CUSTO custo,\n"
-                    + " VR_CUSTOBR custocomimposto,\n"
-                    + "	VR_CUSTOLIQ custosemimposto,\n"
-                    + " PRECO_VENDATERMINAL precovenda,\n"
-                    + "	MARGEM_LUCRO margem,\n"
-                    + "	CAST(p.DATA_ALTERACAO AS date) DATA_ALTERACAO,\n"
-                    + "	CAST(p.DATA_CADASTRO AS date) DATA_CADASTRO,\n"
-                    + "	CASE WHEN p.SITUACAO = 'A' THEN 1 ELSE 0 END ativo,\n"
-                    + "	NCM,\n"
-                    + "	cest.COD_CEST CEST,\n"
-                    + "	est.SALDO estoque,\n"
-                    + "	ESTOQUE_MINIMO estmin,\n"
-                    + "	ESTOQUE_MAXIMO estmax,\n"
-                    + "	PESO_BRUTO,\n"
-                    + "	PESO_LIQUIDO,\n"
-                    + "	p.COD_TRIBUTACAO||'-'||st.COD_SITUACAOFISCAL id_debito,\n"
-                    + "	CST_PIS_ENT piscof_credito,\n"
-                    + "	CST_PIS_ENT piscof_debito,\n"
-                    + " COD_NAT_REC natrec\n"
-                    + "FROM\n"
-                    + "	TB_PRODUTOS p\n"
-                    + "	LEFT JOIN TB_CEST cest ON p.COD_CEST = cest.ID_CEST\n"
-                    + "	LEFT JOIN TB_PRODUTO_ESTOQUE_LOJA est ON est.COD_PRODUTO = p.CODIGO_PRODUTO \n"
-                    + "	JOIN TB_TRIBUTACAO t ON p.COD_TRIBUTACAO = t.CODIGO_TRIBUTACAO \n"
-                    + "	JOIN TB_SITUACAO_FISCAL st ON p.COD_SITUACAOTRIBUTARIA = st.CODIGO_SITUACAOFISCAL\n"
-                    + "ORDER BY 1"
+                    ""
             )) {
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -299,6 +240,14 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
 
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("desc_completa"));
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
                     imp.setDescricaoGondola(rst.getString("desc_completa"));
@@ -349,68 +298,34 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     }
 
     @Override
-    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	 CODIGO_PRODUTO id_produto,\n"
-                    + "	 DESCRICAO,\n"
-                    + "	 CAST (INICIO_PROMOCAO AS date) data_ini,\n"
-                    + "	 CAST (TERMINO_PROMOCAO AS date) data_fim,\n"
-                    + "	 PRECO_VENDA preconormal,\n"
-                    + "	 PRECO_PROMOCAO precooferta\n"
-                    + "FROM\n"
-                    + "	 TB_PRODUTOS\n"
-                    + "WHERE\n"
-                    + "	 PROMOCAO = 'S'\n"
-                    + "	 AND TERMINO_PROMOCAO >= 'now'"
-            )) {
-                while (rs.next()) {
-                    OfertaIMP imp = new OfertaIMP();
-
-                    imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setDataInicio(rs.getDate("data_ini"));
-                    imp.setDataFim(rs.getDate("data_fim"));
-                    imp.setPrecoNormal(rs.getDouble("preconormal"));
-                    imp.setPrecoOferta(rs.getDouble("precooferta"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIGO_PESSOA id,\n"
-                    + "	RAZAOSOCIAL razao,\n"
-                    + "	NOMEFANTASIA fantasia,\n"
-                    + "	CNPJ,\n"
-                    + "	INSCESTADUAL ie,\n"
-                    + "	ENDERECO,\n"
-                    + "	NRO numero,\n"
-                    + "	COMPLEMENTO,\n"
-                    + "	BAIRRO,\n"
-                    + "	CIDADE,\n"
-                    + " cep,\n"
-                    + "	ESTADO uf,\n"
-                    + "	FONE1 telefone,\n"
-                    + "	EMAIL,\n"
-                    + "	DT_CADASTRO data_cad,\n"
-                    + "	OBS\n"
+                    + "	c.CONT_pk id,\n"
+                    + "	cont_nome_razao razao,\n"
+                    + "	cont_cpf_cnpj cpf_cnpj,\n"
+                    + "	cont_ie rg_ie,\n"
+                    + "	cont_dt_cadastro data_cad,\n"
+                    + "	cont_status_registro ativo,\n"
+                    + "	ende_nome_logradouro endereco,\n"
+                    + "	ende_complemento complemento,\n"
+                    + "	ende_numero numero,\n"
+                    + "	ende_bairro bairro,\n"
+                    + "	ende_municipio cidade,\n"
+                    + "	ende_uf uf,\n"
+                    + "	ende_cep cep,\n"
+                    + "	REPLACE(t.tele_numero_ddd,'0','')||t.tele_numero_telefone telefone,\n"
+                    + "	cont_observacao obs\n"
                     + "FROM\n"
-                    + "	TB_PESSOA p\n"
+                    + "	CDTR_CONTATOS c\n"
+                    + "	LEFT JOIN CDTR_ENDERECOS e ON c.cont_pk = e.cont_pk\n"
+                    + "	LEFT JOIN CDTR_TELEFONES t ON c.cont_pk = t.cont_pk\n"
                     + "WHERE\n"
-                    + "	p.TIPO IN ('A','F') OR p.TIPOPESSOA IN ('J','F')\n"
-                    + "ORDER BY 1"
+                    + "	cont_tipo_contato LIKE '%For%'"
+            //+ "	OR cont_tipo_contato LIKE '%Tran%'"
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -419,24 +334,21 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setFantasia(rs.getString("razao"));
+                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
+                    imp.setIe_rg(rs.getString("rg_ie"));
+
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setDatacadastro(rs.getDate("data_cad"));
-                    imp.setObservacao(rs.getString("obs"));
-                    imp.setTel_principal(Utils.acertarTexto(rs.getString("telefone")));
 
-                    String email = Utils.acertarTexto(rs.getString("email")).toLowerCase();
-                    if (!"".equals(email)) {
-                        imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL,
-                                (email.length() > 50 ? email.substring(0, 50) : email));
-                    }
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setDatacadastro(rs.getDate("data_cad"));
+                    imp.setTel_principal(rs.getString("telefone"));
 
                     result.add(imp);
                 }
@@ -452,12 +364,12 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	COD_FORNECEDOR id_fornecedor,\n"
-                    + "	COD_PRODUTO id_produto,\n"
-                    + "	CODIGO_PRODFORN cod_externo,\n"
-                    + " COALESCE (VOLUME,1) qtdembalagem\n"
+                    + "	cont_pk id_fornecedor,\n"
+                    + "	prod_pk id_produto,\n"
+                    + "	prfo_cod_produto_fornecedor cod_externo,\n"
+                    + "	1 qtde_emb\n"
                     + "FROM\n"
-                    + "	TB_PRODUTO_FORNECEDOR\n"
+                    + "	ESTO_PRODUTOS_FORNECEDOR\n"
                     + "ORDER BY 1,2"
             )) {
                 while (rs.next()) {
@@ -468,7 +380,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setCodigoExterno(rs.getString("cod_externo"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtde_emb"));
 
                     result.add(imp);
                 }
@@ -483,23 +395,18 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIGO_FINANCEIRO_P id,\n"
-                    + "	COD_CLIENTE id_fornecedor,\n"
-                    + "	f.NRO_DOCUMENTO ||'-PARC '||fp.PARCELA documento,\n"
-                    + "	CAST (DATA_EMISSAO AS date) emissao,\n"
-                    + "	CAST (DATA_LANCAMENTO AS date) entrada,\n"
-                    + "	CAST (DATA_VENCIMENTO AS date) vencimento,\n"
-                    + "	VALOR_PARCELA valor,\n"
-                    + "	fp.OBS observacao \n"
+                    + "	paga_pk id,\n"
+                    + "	cont_pk id_fornecedor,\n"
+                    + "	paga_numero_fiscal documento,\n"
+                    + "	paga_dt_emissao emissao,\n"
+                    + "	paga_dt_vencimento vencimento,\n"
+                    + "	paga_vlr_documento valor,\n"
+                    + "	paga_descricao||'-'||paga_numero observacao\n"
                     + "FROM\n"
-                    + "	TB_FINANCEIRO_P fp\n"
-                    + "	JOIN TB_FINANCEIRO f ON f.CODIGO_FINANCEIRO = fp.COD_FINANCEIRO \n"
+                    + "	FNCR_PAGAR cp\n"
                     + "WHERE\n"
-                    + "	f.LOJA = " + getLojaOrigem() + "\n"
-                    + "	AND fp.COD_CLIENTE IS NOT NULL\n"
-                    + "	AND STATUS = 'A'\n"
-                    + "	AND fp.SITUACAO = 'A'\n"
-                    + "	AND DEBITO_CREDITO = 'D'"
+                    + "	empr_pk = " + getLojaOrigem() + "\n"
+                    + "	AND paga_dt_pagamento IS NULL"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -508,7 +415,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setDataEntrada(imp.getDataEmissao());
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
 
                     result.add(imp);
@@ -526,39 +433,35 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODIGO_PESSOA id,\n"
-                    + "	RAZAOSOCIAL razao,\n"
-                    + "	NOMEFANTASIA fantasia,\n"
-                    + "	CNPJ cnpj_cpf,\n"
-                    + "	CASE WHEN rg IS NULL THEN INSCESTADUAL ELSE RG END rg_ie,\n"
-                    + "	ENDERECO,\n"
-                    + "	NRO numero,\n"
-                    + " complemento,\n"
-                    + "	BAIRRO,\n"
-                    + "	cep,\n"
-                    + "	CIDADE,\n"
-                    + "	ESTADO uf,\n"
-                    + "	FONE1 telefone,\n"
-                    + "	celular,\n"
-                    + "	CAST (DATANASCIMENTO AS date) dt_nasc,\n"
-                    + "	EMAIL,\n"
-                    + "	CAST (DT_CADASTRO AS date) dt_cad,\n"
-                    + "	LIMITECONVENIO limite,\n"
-                    + "	CASE WHEN STATUS = 'B' THEN 1 ELSE 0 END bloqueado,\n"
-                    + "	OBS \n"
+                    + "	c.CONT_pk id,\n"
+                    + "	cont_nome_razao razao,\n"
+                    + "	cont_cpf_cnpj cpf_cnpj,\n"
+                    + "	CASE WHEN cont_rg = '' THEN cont_ie END rg_ie,\n"
+                    + "	ende_nome_logradouro endereco,\n"
+                    + "	ende_complemento complemento,\n"
+                    + "	ende_numero numero,\n"
+                    + "	ende_bairro bairro,\n"
+                    + "	ende_municipio cidade,\n"
+                    + "	ende_uf uf,\n"
+                    + "	ende_cep cep,\n"
+                    + "	cont_dt_cadastro data_cad,\n"
+                    + "	cont_status_registro ativo,\n"
+                    + "	REPLACE(t.tele_numero_ddd,'0','')||t.tele_numero_telefone telefone,\n"
+                    + "	cont_observacao obs\n"
                     + "FROM\n"
-                    + "	TB_PESSOA P\n"
+                    + "	CDTR_CONTATOS c\n"
+                    + "	LEFT JOIN CDTR_ENDERECOS e ON c.cont_pk = e.cont_pk\n"
+                    + "	LEFT JOIN CDTR_TELEFONES t ON c.cont_pk = t.cont_pk\n"
                     + "WHERE\n"
-                    + "	p.CODIGO_PESSOA IN (SELECT COD_CLIENTEPESSOA FROM TB_CLIENTES)\n"
-                    + "ORDER BY 1"
+                    + "	cont_tipo_contato LIKE '%Cli%'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setFantasia(rs.getString("razao"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setInscricaoestadual(rs.getString("rg_ie"));
 
                     imp.setEndereco(rs.getString("endereco"));
@@ -569,16 +472,9 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setValorLimite(rs.getDouble("limite"));
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-
-                    imp.setDataNascimento(rs.getDate("dt_nasc"));
-                    imp.setDataCadastro(rs.getDate("dt_cad"));
-
+                    imp.setDataCadastro(rs.getDate("data_cad"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setTelefone(rs.getString("telefone"));
-                    imp.setCelular(rs.getString("celular"));
-                    imp.setEmail(rs.getString("email"));
-
                     imp.setObservacao(rs.getString("obs"));
 
                     result.add(imp);
@@ -594,27 +490,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO_FINANCEIRO_P id,\n"
-                    + "	f.NRO_DOCUMENTO numerocupom,\n"
-                    + "	COD_CLIENTE codcli,\n"
-                    + "	p.CNPJ cpfcnpj,\n"
-                    + "	f.NRO_PDV ecf,\n"
-                    + "	VALOR_PARCELA valor,\n"
-                    + "	CAST (DATA_EMISSAO AS date) emissao,\n"
-                    + "	CAST (DATA_VENCIMENTO AS date) vencimento,\n"
-                    + "	fp.obs\n"
-                    + "FROM\n"
-                    + "	TB_FINANCEIRO_P fp\n"
-                    + "	JOIN TB_FINANCEIRO f ON fp.COD_FINANCEIRO = f.CODIGO_FINANCEIRO\n"
-                    + "	LEFT JOIN TB_PESSOA p ON p.CODIGO_PESSOA = fp.COD_CLIENTE\n"
-                    + "WHERE\n"
-                    + "	f.LOJA = " + getLojaOrigem() + "\n"
-                    + "	AND COD_CLIENTE IS NOT NULL\n"
-                    + "	AND fp.SITUACAO = 'A'\n"
-                    + " AND f.SITUACAO = 'A'\n"
-                    + "	AND DATA_PAGAMENTO IS NULL\n"
-                    + "ORDER BY CODIGO_FINANCEIRO_P, DATA_EMISSAO"
+                    ""
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

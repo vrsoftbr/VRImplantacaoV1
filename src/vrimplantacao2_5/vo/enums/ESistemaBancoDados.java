@@ -114,7 +114,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_FENIXME(249, "FENIXME", 5, "FIREBIRD", "", "SYSDBA", "23248290FENIX", 3050),
     FIREBIRD_MBD(248, "MBD", 5, "FIREBIRD", "C:\\MBD\\DB\\ARCOIRIS.FDB", "sysdba", "sysdbambd", 3050),
     FIREBIRD_WISE(251, "WISE", 5, "FIREBIRD", "C:\\\\Dados\\\\Rede\\\\SUPERMERCADO.FDB", "sysdba", "masterkey", 3050),
-    FIREBIRD_VIVASISTEMAS(258, "VIVASISTEMAS", 5, "FIREBIRD", "localhost", "sysdba", "masterkey", 3050),
+    FIREBIRD_VIVASISTEMAS(258, "VIVASISTEMAS", 5, "FIREBIRD", "C:\\VIVA SOFTWARE\\appdata\\WMDADOS.EMM", "sysdba", "masterkey", 3050),
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "", 9088),
     MYSQL_AVANCE(15, "AVANCE", 8, "MYSQL", "", "root", "infor", 3006),
     MYSQL_CLICK(29, "CLICK", 8, "MYSQL", "", "", "", 3006),
