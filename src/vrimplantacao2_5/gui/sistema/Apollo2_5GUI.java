@@ -9,15 +9,15 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
+import vrimplantacao2_5.dao.sistema.Apollo2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Apollo2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ASOFT.getNome();
+    private static final String SISTEMA = ESistema.APOLLO.getNome();
     private static Apollo2_5GUI instance;
 
-    private final ASoft2_5DAO dao = new ASoft2_5DAO();
+    private final Apollo2_5DAO dao = new Apollo2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -59,7 +59,7 @@ public class Apollo2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ASOFT);
+        pnlConn.setSistema(ESistema.APOLLO);
         pnlConn.getNomeConexao();
 
         centralizarForm();

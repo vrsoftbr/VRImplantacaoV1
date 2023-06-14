@@ -22,6 +22,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatiporecebiveis.FinanceiroProvider;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -31,6 +32,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTipoRecebivelIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
@@ -42,7 +44,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Bruno
  */
-public class Apollo2_5DAO extends InterfaceDAO implements FinanceiroProvider {
+public class Apollo2_5DAO extends InterfaceDAO implements FinanceiroProvider, MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(Apollo2_5DAO.class.getName());
 
@@ -632,6 +634,11 @@ public class Apollo2_5DAO extends InterfaceDAO implements FinanceiroProvider {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {

@@ -1,9 +1,7 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.util.Map;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
@@ -55,7 +53,7 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
     @Override
     public String getSistema() {
-        return "ACOM";
+        return "AlphaSys";
     }
 
     @Override
