@@ -9,7 +9,6 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.Accesys2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
