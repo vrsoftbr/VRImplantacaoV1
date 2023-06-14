@@ -1,7 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import java.sql.Connection;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -10,27 +9,22 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
+import vrimplantacao2_5.dao.sistema.Autocom2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
-public class Atma2_5GUI extends VRInternalFrame {
-    
-    private Connection loja;
-    private Connection venda;
+public class Autocom2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ATMA.getNome();
-    private static Atma2_5GUI instance;
+    private static final String SISTEMA = ESistema.AUTOCOM.getNome();
+    private static Autocom2_5GUI instance;
 
-    private final Atma2_5DAO dao = new Atma2_5DAO();
+    private final Autocom2_5DAO dao = new Autocom2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
-        pnlBalanca.setSistema(SISTEMA);
-        pnlBalanca.setLoja(dao.getLojaOrigem());
     }
 
-    public Atma2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Autocom2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -65,7 +59,7 @@ public class Atma2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ATMA);
+        pnlConn.setSistema(ESistema.AUTOCOM);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -110,12 +104,12 @@ public class Atma2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
+
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
- //                       dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+//                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
-   //                     dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+  //                      dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                     }
 
                     if (tabMenu.getSelectedIndex() == 0) {
@@ -131,7 +125,6 @@ public class Atma2_5GUI extends VRInternalFrame {
                                 break;
                             default:
                                 break;
-
                         }
                     }
 
@@ -156,7 +149,7 @@ public class Atma2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Atma2_5GUI(i_mdiFrame);
+                instance = new Autocom2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -173,6 +166,7 @@ public class Atma2_5GUI extends VRInternalFrame {
 
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -187,7 +181,7 @@ public class Atma2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Atma");
+        setTitle("Autocom");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -217,17 +211,30 @@ public class Atma2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
         pnlMigrar.setLayout(pnlMigrarLayout);
         pnlMigrarLayout.setHorizontalGroup(
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlMigrarLayout.setVerticalGroup(
-            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar)
         );
 
         tabImportacao.addTab("Produtos", tabProdutos);
@@ -297,8 +304,15 @@ public class Atma2_5GUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();        
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;

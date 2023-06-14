@@ -13,9 +13,6 @@ import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Stock_PostgresDAO;
 import vrimplantacao2.dao.interfaces.AlterData_WShopDAO;
 import vrimplantacao2.dao.interfaces.ArgoDAO;
-import vrimplantacao2.dao.interfaces.AutoAdmDAO;
-import vrimplantacao2.dao.interfaces.AutoSystemDAO;
-import vrimplantacao2.dao.interfaces.AutocomDAO;
 import vrimplantacao2.dao.interfaces.AutomaqDAO;
 import vrimplantacao2.dao.interfaces.AvanceDAO;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
@@ -196,7 +193,6 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
-import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.Accesys2_5DAO;
 import vrimplantacao2_5.dao.sistema.Acom2_5DAO;
@@ -212,6 +208,7 @@ import vrimplantacao2_5.dao.sistema.Athos2_5DAO;
 import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
+import vrimplantacao2_5.dao.sistema.Autocom2_5DAO;
 import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
@@ -281,6 +278,7 @@ import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoAdm2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.Autocom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avance2_5GUI;
 import vrimplantacao2_5.gui.sistema.Avistare2_5GUI;
 import vrimplantacao2_5.gui.sistema.BomSoft2_5GUI;
@@ -503,10 +501,15 @@ public enum ESistema {
             return null;
         }
     },
-    AUTOCOM(13, "AUTOCOM", new AutocomDAO()) {
+    AUTOCOM(13, "AUTOCOM", new Autocom2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Autocom2_5GUI  (frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     AUTOMAQ(14, "AUTOMAQ", new AutomaqDAO()) {
