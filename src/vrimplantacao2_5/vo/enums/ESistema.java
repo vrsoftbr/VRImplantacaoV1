@@ -212,6 +212,7 @@ import vrimplantacao2_5.dao.sistema.BrDataDAO;
 import vrimplantacao2_5.dao.sistema.BrajanGestores2_5DAO;
 import vrimplantacao2_5.dao.sistema.CFSoftSiaECF2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
+import vrimplantacao2_5.dao.sistema.CPlus2_5DAO;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
@@ -288,6 +289,7 @@ import vrimplantacao2_5.gui.sistema.BrajanGestores2_5GUI;
 import vrimplantacao2_5.gui.sistema.CFSoftSiaECF2_5GUI;
 import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
+import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
@@ -475,8 +477,8 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new Atma2_5GUI (frame);
-            }catch (Exception ex) {
+                return new Atma2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -485,20 +487,20 @@ public enum ESistema {
     AUTOADM(11, "AUTOADM", new AutoAdm2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-           try {
-                return new AutoAdm2_5GUI  (frame);
-            }catch (Exception ex) {
+            try {
+                return new AutoAdm2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
         }
     },
-    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystem2_5DAO ()) {
+    AUTOSYSTEM(12, "AUTOSYSTEM", new AutoSystem2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new AutoSystem2_5GUI (frame);
-            }catch (Exception ex) {
+                return new AutoSystem2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -508,8 +510,8 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new Autocom2_5GUI  (frame);
-            }catch (Exception ex) {
+                return new Autocom2_5GUI(frame);
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -558,7 +560,7 @@ public enum ESistema {
     BRAJANGESTORES(19, "BRAJANGESTORES", new BrajanGestores2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-           try {
+            try {
                 return new BrajanGestores2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
@@ -570,7 +572,7 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new CFSoftSiaECF2_5GUI (frame);
+                return new CFSoftSiaECF2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
@@ -588,10 +590,15 @@ public enum ESistema {
             return null;
         }
     },
-    CPLUS(22, "CPLUS", new CPlusDAO()) {
+    CPLUS(22, "CPLUS", new CPlus2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new CPlus2_5GUI(frame);
+            }catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CADASTRAFACIL(23, "CADASTRAFACIL", new CadastraFacilDAO()) {
