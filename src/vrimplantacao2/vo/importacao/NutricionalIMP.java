@@ -42,7 +42,7 @@ public class NutricionalIMP {
     private int idTipoMedida = -1;
     private int medidaInteira = 1;
     private int id_tipomedidadecimal = 0;
-    private int Id_tipounidadeporcao = 5;
+    private int Id_tipounidadeporcao = 4;
     private final List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
     private final Set<String> produtos = new HashSet<>();
     

@@ -31,6 +31,7 @@ import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoDAO
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemAnteriorDAO;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -66,6 +67,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -530,10 +532,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.RECEITA
         ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -547,7 +550,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONVENIO_TRANSACAO,
                 OpcaoCliente.CONVENIO_CONVENIADO));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -642,6 +645,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	trib.icms_cst,\n"
                     + "	trib.icms_aliq,\n"
                     + "	trib.icms_red,\n"
+                    + " det.DET_GRAMATURA qtdeVolume,\n"
+                    + "	det.DET_TIPO_GRM qtdeEmbalagemVolume,\n"
                     + "	coalesce(\n"
                     + "	    atac.precoatac,\n"
                     + "	    (case when coalesce(preco.preco, 0) != 0 \n"
@@ -792,7 +797,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setVolume(rst.getDouble("qtdembalagemcotacao"));
+
+                    imp.setVolume(rst.getDouble("qtdeVolume"));
+                    imp.setTipoEmbalagemVolume(rst.getString("qtdeEmbalagemVolume"));
 
                     imp.setVendaPdv("S".equals(rst.getString("git_envia_pdv")));
 
@@ -985,6 +992,61 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFator(1);
                     imp.setFichatecnica("");
                     imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + " NUT_PRODUTO id,\n"
+                    + " p.GIT_DESCRICAO descritivo,\n"
+                    + " NUT_QTDE,\n"
+                    + " NUT_VLR_CALORICO caloria,\n"
+                    + " NUT_CARBOIDRATOS carboidratos,\n"
+                    + " NUT_PROTEINAS proteina,\n"
+                    + " NUT_GORD_TOTAIS gorduras,\n"
+                    + " NUT_GORD_SATURADAS gorduras_saturada,\n"
+                    + " NUT_GORD_TRANS gorduras_trans,\n"
+                    + " NUT_COLESTEROL,\n"
+                    + " NUT_FIBRA fibra_alimentar,\n"
+                    + " NUT_CALCIO calcio,\n"
+                    + " NUT_FERRO ferro,\n"
+                    + " NUT_SODIO sodio,\n"
+                    + " NUT_PORCAO_QTD porcao,\n"
+                    + " NUT_PORCAO_TIPO \n"
+                    + "FROM AA2CNUTR n \n"
+                    + "JOIN AA3CITEM p ON p.GIT_COD_ITEM = n.NUT_PRODUTO"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setGorduraSaturada(rst.getDouble("gorduras_saturada"));
+                    imp.setGorduraTrans(rst.getDouble("gorduras_trans"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao(rst.getString("porcao"));
+                    //imp.getMensagemAlergico().add(rst.getString("mensagemalergico2"));
+
+                    imp.addProduto(rst.getString("id"));
 
                     result.add(imp);
                 }
