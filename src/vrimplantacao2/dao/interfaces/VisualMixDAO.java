@@ -1151,13 +1151,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setPermiteCheque(true);
                     }
-                    if("1".equals(rst.getString("bloqueadorotativo"))){
+                    if ("1".equals(rst.getString("bloqueadorotativo"))) {
                         imp.setPermiteCreditoRotativo(false);
-                    }
-                    else{
+                    } else {
                         imp.setPermiteCreditoRotativo(true);
                     }
-                    
+
                     imp.setObservacao(rst.getString("Observacao"));
 
                     result.add(imp);
@@ -1180,11 +1179,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " Loja,\n"
                     + " Pdv,\n"
                     + " Cupom,\n"
-                    + " ValorCompra,\n"
+                    + " ValorConvenio,\n"
                     + " DataAlteracao\n"
                     + "from ConvMovimento \n"
                     + "where \n"
                     + "ValorPago = 0\n"
+                    + "and Situacao = 301\n"
                     + "and Loja = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
@@ -1193,7 +1193,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("clienteid"));
                     imp.setEcf(rst.getString("Pdv"));
                     imp.setNumeroCupom(rst.getString("Cupom"));
-                    imp.setValor(rst.getDouble("ValorCompra"));
+                    imp.setValor(rst.getDouble("ValorConvenio"));
                     imp.setDataEmissao(rst.getDate("Data"));
                     imp.setDataVencimento(rst.getDate("DataAlteracao"));
                     result.add(imp);
