@@ -173,7 +173,7 @@ public class GansoDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("codigo"),
-                            rs.getString("descricao"),
+                            Utils.acertarTexto(rs.getString("descricao")),
                             0,
                             rs.getDouble("cst"),
                             0));

@@ -178,7 +178,7 @@ public enum EScriptLojaOrigemSistema {
     NEREUS(224, 11, "select id_emp id, fantasia descricao from cg_emp order by 1"),
     SCORPION(225, 5, "SELECT LOJA id, RAZAOSOCIAL descricao FROM TB_EMPRESA"),
     MEGASOFTWARE(226, 5, "SELECT cgc id, FANTASIA descricao FROM EMPRESA"),
-    ORION_POSTGRES(227, 11, "select cgc id, firma descricao from config"),
+    ORION_POSTGRES(227, 11, "select substring(cgc,1,7) id, firma descricao from config"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
     ARAUTO(228, 5, "select id, nomefantasia descricao from empresa"),
     SUPERCONTROLE(229, 13, "select lj.id id, descricaoLoja + '' - '' + f.cnpj as descricao from MultiLoja.Loja lj join Cadastro.Entidade f on lj.fkCliente = f.id order by lj.id"),

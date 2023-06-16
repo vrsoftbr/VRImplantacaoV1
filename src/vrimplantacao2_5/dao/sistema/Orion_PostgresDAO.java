@@ -616,7 +616,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("nome"));
-                    imp.setDataNascimento(rst.getDate("nascimento"));
+ //                   imp.setDataNascimento(rst.getDate("nascimento"));
                     imp.setEmpresa(rst.getString("firma"));
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));

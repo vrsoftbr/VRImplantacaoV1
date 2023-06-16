@@ -246,7 +246,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                         String tabela = file.getName().substring(0, file.getName().lastIndexOf("."));
                         dao.setNomeDaTabela(tabela);
                         ProgressBar.setStatus("Criando tabela: " + tabela + ", por favor aguarde.");
-                        DBFReader reader = new DBFReader(new FileInputStream(file));
+                        DBFReader reader = new DBFReader (new FileInputStream(file));
                         List<String> dadosCabecalho = new ArrayList<>();
                         for (int i = 0; i < reader.getFieldCount(); i++) {
                             dadosCabecalho.add(reader.getField(i).getName());
