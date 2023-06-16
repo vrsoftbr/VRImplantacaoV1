@@ -127,7 +127,34 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	TRCA_PK id,\n"
+                    + "	REPLACE(REPLACE(TRCA_NOME, 'ALIQ. ',''),'REDUZIDA','RED') descricao,\n"
+                    + "	CASE\n"
+                    + "		WHEN TRCA_NOME LIKE '%RED%' THEN 20\n"
+                    + "		WHEN TRCA_NOME LIKE '%ISENT%' THEN 40\n"
+                    + "		WHEN TRCA_NOME LIKE '%RET%' THEN 60\n"
+                    + "		ELSE 00 END cst_saida,\n"
+                    + "	CASE \n"
+                    + "		WHEN TRCA_NOME LIKE '%03,%' THEN '3'\n"
+                    + "		WHEN TRCA_NOME LIKE '%07,%' THEN '7'\n"
+                    + "		WHEN TRCA_NOME LIKE '%09,%' THEN '9'\n"
+                    + "		WHEN TRCA_NOME LIKE '%12,%' THEN '12'\n"
+                    + "		WHEN TRCA_NOME LIKE '%17,%' THEN '17'\n"
+                    + "		WHEN TRCA_NOME LIKE '%19,%' THEN '19'\n"
+                    + "		WHEN TRCA_NOME LIKE '%25,%' THEN '25'\n"
+                    + "		WHEN TRCA_NOME LIKE '%27,%' THEN '27'\n"
+                    + "		ELSE '0'\n"
+                    + "	END aliq_saida,\n"
+                    + "	CASE\n"
+                    + "		WHEN TRCA_NOME = 'ALIQ. 12% REDUZIDA PARA 3%' THEN '58.33'\n"
+                    + "		WHEN TRCA_NOME = 'ALIQ. 12% REDUZIDA PARA 7%' THEN '25'\n"
+                    + "		WHEN TRCA_NOME = 'ALIQ. 17% REDUZIDA PARA 7%' THEN '41.18'\n"
+                    + "		WHEN TRCA_NOME = 'ALIQ. 17% REDUZIDA PARA 9%' THEN '52.94'\n"
+                    + "		WHEN TRCA_NOME = 'ALIQ. 17% REDUZIDA PARA 12%' THEN '70.59'\n"
+                    + "		END red_saida\n"
+                    + "FROM\n"
+                    + "	FISC_TRIBUTACAO_CATEGORIA"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -149,7 +176,19 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT DISTINCT \n"
+                    + "	m1.GENE_PK merc1,\n"
+                    + "	m1.GENE_DESCRICAO descmerc1,\n"
+                    + "	m2.EGRU_PK merc2,\n"
+                    + "	m2.EGRU_DESCRICAO descmerc2,\n"
+                    + "	m3.ESGR_PK merc3,\n"
+                    + "	m3.ESGR_DESCRICAO descmerc3\n"
+                    + "FROM\n"
+                    + "	ESTO_PRODUTOS p\n"
+                    + "	JOIN ESTO_GENERO m1 ON p.GENE_PK = m1.GENE_PK\n"
+                    + "	JOIN ESTO_GRUPO m2 ON m2.egru_pk = p.egru_pk\n"
+                    + "	JOIN ESTO_SUBGRUPO m3 ON m2.EGRU_PK = m3.EGRU_PK\n"
+                    + "ORDER BY 1,3,5"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -158,10 +197,10 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("descmerc1"));
-                    imp.setMerc2ID(imp.getMerc1ID());
-                    imp.setMerc2Descricao(imp.getMerc1Descricao());
-                    imp.setMerc3ID(imp.getMerc1ID());
-                    imp.setMerc3Descricao(imp.getMerc1Descricao());
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
 
                     result.add(imp);
                 }
@@ -175,7 +214,12 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	ESFA_PK id_familia,\n"
+                    + "	ESFA_DESCRICAO familia\n"
+                    + "FROM\n"
+                    + "	ESTO_FAMILIA\n"
+                    + "ORDER BY ESFA_PK"
             )) {
                 while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -229,7 +273,39 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "	PROD_PK id,\n"
+                    + "	p.PROD_CODIGO_PERSONALIZADO codigo,\n"
+                    + "	p.PROD_CODIGO_UNITARIO ean,\n"
+                    + "	CASE WHEN p.PROD_BALANCA = 'Sim' THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	p.PROD_DT_CADASTRO data_cad,\n"
+                    + "	p.PROD_DT_ULT_ALTERACAO data_alt,\n"
+                    + "	PROD_DESCRICAO_COMPLETA desc_completa,\n"
+                    + "	PROD_DESCRICAO_ABREVIADA desc_reduzida,\n"
+                    + "	GENE_PK merc1,\n"
+                    + "	EGRU_PK merc2,\n"
+                    + "	ESGR_PK merc3,\n"
+                    + "	n.ENCM_CODIGO ncm,\n"
+                    + "	p.CEST_PK cest,\n"
+                    + "	prod_status_registro ativo,\n"
+                    + "	UNID_NOME_SIGLA tipo_emb,\n"
+                    + "	unid_fator_conversao qtde_emb,\n"
+                    + "	p.PROD_PESO_BRUTO peso_bruto,\n"
+                    + "	p.PROD_PESO_LIQUIDO peso_liquido,\n"
+                    + "	p.PROD_ESTOQUE_MINIMO est_min,\n"
+                    + "	p.PROD_ESTOQUE_MAXIMO est_max,\n"
+                    + "	p.PROD_ESTOQUE_ATUAL estoque,\n"
+                    + "	p.PROD_VLR_CUSTO_FINAL precocusto,\n"
+                    + "	p.PROD_VLR_VAREJO precovenda,\n"
+                    + "	p.TRCA_PK id_icms,\n"
+                    + "	PROD_CST_PIS pis_cofins,\n"
+                    + "	p.PROD_CODIGO_NATUREZA_PISCOFINS nat_rec\n"
+                    + "FROM\n"
+                    + "	ESTO_PRODUTOS p\n"
+                    + "LEFT JOIN ESTO_NCM n ON\n"
+                    + "	p.ENCM_PK = n.ENCM_PK\n"
+                    + "WHERE\n"
+                    + "	EMPR_PK = " + getLojaOrigem()
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -237,7 +313,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
 
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
@@ -247,36 +323,37 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setEan(String.valueOf(bal.getCodigo()));
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("desc_completa"));
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
-                    imp.setDescricaoGondola(rst.getString("desc_completa"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtde_emb_compra"));
+                    imp.setDescricaoGondola(rst.getString("desc_reduzida"));
+                    imp.setTipoEmbalagem(rst.getString("tipo_emb"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
-                    imp.setIdFamiliaProduto(rst.getString("familia"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+
+                    imp.setCustoComImposto(rst.getDouble("precocusto"));
+                    imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setMargem(rst.getDouble("margem"));
+//                    imp.setMargem(rst.getDouble("margem"));
 
                     imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(imp.getCodMercadologico1());
-                    imp.setCodMercadologico3(imp.getCodMercadologico1());
-                    imp.setDataAlteracao(rst.getDate("data_alteracao"));
-                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setDataCadastro(rst.getDate("data_cad"));
+                    imp.setDataAlteracao(rst.getDate("data_alt"));
+
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
+                    imp.setEstoqueMinimo(rst.getDouble("est_min"));
+                    imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rst.getDouble("estmin"));
-                    imp.setEstoqueMaximo(rst.getDouble("estmax"));
 
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
 
-                    String idIcmsDebito = rst.getString("id_debito");
+                    String idIcmsDebito = rst.getString("id_icms");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
@@ -286,9 +363,9 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIcmsCreditoId(idIcmsDebito);
                     imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
 
-                    imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscof_debito"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("natrec"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_cofins"));
+//                    imp.setPiscofinsCstCredito(rst.getString("piscof_credito"));
+                    imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("nat_rec")));
 
                     result.add(imp);
                 }
@@ -482,217 +559,5 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
             }
         }
         return result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    ""
-            )) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
-                    imp.setIdCliente(rs.getString("codcli"));
-                    imp.setCnpjCliente(rs.getString("cpfcnpj"));
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setObservacao(rs.getString("obs"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VivaSistemasDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VivaSistemasDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
-
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
-
-        private void obterNext() {
-            try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaIMP();
-                        String id = rst.getString("id_venda");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
-                        next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("total"));
-                    }
-                }
-            } catch (SQLException | ParseException ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-
-            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
-            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
-            this.sql
-                    = "SELECT\n"
-                    + "	CODIGO_VENDA id_venda,\n"
-                    + "	COO_ECF_NF numerocupom,\n"
-                    + "	SERIE_ECF ecf,\n"
-                    + "	CAST(DATA_VENDA AS DATE) data,\n"
-                    + "	SUBSTRING(DATA_VENDA FROM 12 FOR 8) hora,\n"
-                    + "	VALOR_LIQUIDO_VENDA total,\n"
-                    + "	CASE WHEN VENDAATIVA = 'N' THEN 1 ELSE 0 END cancelado\n"
-                    + "FROM\n"
-                    + "	TB_VENDA v\n"
-                    + "WHERE\n"
-                    + "	NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + " AND COD_TIPOMOVIMENTO in (5,-5)\n"
-                    + " AND VENDAATIVA = 'S'\n"
-                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaIMP next() {
-            obterNext();
-            VendaIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
-    }
-
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
-        private VendaItemIMP next;
-
-        private void obterNext() {
-            try {
-                if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaItemIMP();
-
-                        next.setVenda(rst.getString("id_venda"));
-                        next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nroitem"));
-                        next.setProduto(rst.getString("produto"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                    }
-                }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                throw new RuntimeException(ex);
-            }
-        }
-
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "SELECT\n"
-                    + "	COD_VENDA id_venda,\n"
-                    + "	CODIGO_VENDAITEM id_item,\n"
-                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
-                    + "	COD_PRODUTO produto,\n"
-                    + "	p.UNIDADE_REFERENCIA unidade,\n"
-                    + "	COD_BARRA codigobarras,\n"
-                    + "	p.DESCRICAO_PDV descricao,\n"
-                    + "	QUANTIDADE,\n"
-                    + "	VALOR_UNITARIO precovenda,\n"
-                    + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
-                    + "	CASE\n"
-                    + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
-                    + "	  END CANCELADO\n"
-                    + "FROM\n"
-                    + "	TB_VENDA_ITEM vi\n"
-                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
-                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
-                    + "WHERE\n"
-                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "	ORDER BY 1,3";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);
-        }
-
-        @Override
-        public boolean hasNext() {
-            obterNext();
-            return next != null;
-        }
-
-        @Override
-        public VendaItemIMP next() {
-            obterNext();
-            VendaItemIMP result = next;
-            next = null;
-            return result;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported.");
-        }
     }
 }
