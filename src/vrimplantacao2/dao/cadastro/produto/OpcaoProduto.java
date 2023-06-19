@@ -462,7 +462,8 @@ public enum OpcaoProduto {
     PDV_VENDA,
     PROMOCAO,
     VASILHAME,
-    PERCENTUAL_PERDA;
+    PERCENTUAL_PERDA,
+    TIPO_COMPRA;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

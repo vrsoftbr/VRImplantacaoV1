@@ -247,6 +247,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                         dao.setNomeDaTabela(tabela);
                         ProgressBar.setStatus("Criando tabela: " + tabela + ", por favor aguarde.");
                         DBFReader reader = new DBFReader(new FileInputStream(file));
+                        reader.setMemoFile(new File("/home/desenvolvimento/Documentos/databases/DBF/Sao Mateus/usados/CLIENTE.FPT"));
                         List<String> dadosCabecalho = new ArrayList<>();
                         for (int i = 0; i < reader.getFieldCount(); i++) {
                             dadosCabecalho.add(reader.getField(i).getName());
@@ -267,12 +268,13 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                         while ((linha = reader.nextRow()) != null) {
                             for (int i = 0; i < dadosCabecalho.size(); i++) {
                                 String cabecalhoBase = dadosCabecalho.get(i).replaceAll(regexp, "").trim().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
-                                sql.put(cabecalhoBase, linha.getString(cabecalhoBase));
+                                sql.put(cabecalhoBase, linha.getString(cabecalhoBase), "UTF-8");
+                                sql.setFormatarSQL(true);
                             }
                             inserts.add(sql);
                             ProgressBar.next();
                         }
-
+                        
                         ProgressBar.setStatus("Salvando dados da tabela: " + tabela + ", por favor aguarde.");
                         ProgressBar.setMaximum(reader.getRecordCount());
 

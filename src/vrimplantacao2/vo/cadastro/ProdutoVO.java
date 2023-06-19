@@ -12,6 +12,7 @@ import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.NormaReposicao;
 import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
+import vrimplantacao2_5.vo.enums.TipoCompra;
 
 public class ProdutoVO {
 
@@ -73,6 +74,7 @@ public class ProdutoVO {
     private int idVasilhame;
     private double percentualPerda = 0;
     private int qtdDiasMinimoValidade = 0;
+    private TipoCompra tipoCompra = TipoCompra.NENHUM;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -236,6 +238,10 @@ public class ProdutoVO {
     public void setNormaReposicao(NormaReposicao normaReposicao) {
         this.normaReposicao = normaReposicao;
     }
+    
+    public void setTipoCompra(TipoCompra tipoCompra) {
+        this.tipoCompra = tipoCompra;
+    }
 
     public String getDescricaoCompleta() {
         return descricaoCompleta;
@@ -323,6 +329,10 @@ public class ProdutoVO {
 
     public NormaReposicao getNormaReposicao() {
         return normaReposicao;
+    }
+    
+    public TipoCompra getTipoCompra() {
+        return tipoCompra;
     }
 
     public int getCodigoAnp() {
