@@ -101,6 +101,9 @@ public enum EScriptLojaOrigemSistema {
     MOBILITY(107, 5, "select id, s_nome_fantasia descricao from configuracoes"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     TOPSYSTEM(176, 8, "SELECT empresa id, Razao_Social descricao FROM cad_filial ORDER BY 1"),
+    TSTI(178,8,"select\n" +
+         "empcod id, concat(empcnpj, '' '', empnom) descricao\n" +
+         "from tsl.tsc008a"),
     DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa"),
     WEBSAQ(188, 11, "select \n"
             + "codestabelec id, \n"

@@ -259,6 +259,7 @@ import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
+import vrimplantacao2_5.dao.sistema.TstiDAO2_5;
 import vrimplantacao2_5.dao.sistema.VivaSistemasDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
@@ -359,6 +360,7 @@ import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Target_G32_5GUI;
 import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
+import vrimplantacao2_5.gui.sistema.Tsti2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
@@ -1610,10 +1612,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     },
-    TSTI(178, "TSTI", new TstiDAO()) {
+    TSTI(178, "TSTI", new TstiDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            try {
+                return new Tsti2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     UNIPLUS(179, "UNIPLUS", new UniplusDAO()) {

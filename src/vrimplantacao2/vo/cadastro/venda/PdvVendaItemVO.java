@@ -11,7 +11,7 @@ import vrimplantacao2.vo.enums.TipoDesconto;
  * @author Leandro
  */
 public class PdvVendaItemVO {
-    
+
     private long id;// serial NOT NULL,
     private PdvVendaVO venda;// id_venda bigint NOT NULL,
     private int id_produto;// integer NOT NULL,
@@ -45,6 +45,7 @@ public class PdvVendaItemVO {
     private int id_tipoOferta = -1;// integer,
     private boolean atacado = false;// boolean,
     private Date data;
+    private double aliquota = 0;
 
     public void setId(long id) {
         this.id = id;
@@ -63,7 +64,7 @@ public class PdvVendaItemVO {
     }
 
     public void setPrecoVenda(double precoVenda) {
-        this.precoVenda = MathUtils.round(precoVenda,2);
+        this.precoVenda = MathUtils.round(precoVenda, 2);
     }
 
     public void setId_aliquota(int id_aliquota) {
@@ -306,5 +307,13 @@ public class PdvVendaItemVO {
     public void setData(Date data) {
         this.data = data;
     }
-    
+
+    public double getAliquota() {
+        return aliquota;
+    }
+
+    public void setAliquota(double aliquota) {
+        this.aliquota = aliquota;
+    } 
+
 }

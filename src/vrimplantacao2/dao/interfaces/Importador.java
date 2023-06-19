@@ -127,6 +127,7 @@ import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
@@ -515,7 +516,7 @@ public class Importador {
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEANemBranco();
     }
-    
+
     /**
      * Importa os ECFs do banquinho pdv Firebird.
      *
@@ -523,7 +524,7 @@ public class Importador {
      */
     public void importarECFPdv() throws Exception {
         List<EcfPdvVO> ecfs = getInterfaceDAO().getECF();
-        EcfRepository rep  = new EcfRepository();
+        EcfRepository rep = new EcfRepository();
         rep.salvarECFPdv(ecfs);
     }
 
@@ -1051,7 +1052,25 @@ public class Importador {
                     getLojaOrigem(),
                     getLojaVR()
             );
-            VendaRepository rep = new VendaRepository(provider);
+//            Object[] options = {"pdv.venda", "public.venda", "Cancelar"};
+//            int decisao = JOptionPane.showOptionDialog(null, "Qual tabela você deseja preencher?\n\n",
+//                    "Importando Vendas...", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+//            if (decisao == 0) {
+//                VendaRepository rep = new VendaRepository(provider);
+//                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+//                rep.eBancoUnificado = eBancoUnificado;
+//                rep.importar(opt);
+//            }
+//            if (decisao == 1) {
+//                PublicVendaRepository rep = new PublicVendaRepository(provider);
+//                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+//                rep.eBancoUnificado = eBancoUnificado;
+//                rep.importar(opt);
+//            }
+//            if (decisao == 2) {
+//                throw new NullPointerException("Nunhuma venda foi importada");
+//            }
+            PublicVendaRepository rep = new PublicVendaRepository(provider);
             rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
             rep.eBancoUnificado = eBancoUnificado;
             rep.importar(opt);

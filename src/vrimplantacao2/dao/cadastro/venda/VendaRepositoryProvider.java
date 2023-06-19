@@ -23,6 +23,8 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
+import vrimplantacao2.vo.cadastro.venda.PublicVendaVO;
+import vrimplantacao2.vo.cadastro.venda.PublicVendaValoresAgrupado;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -42,6 +44,7 @@ public class VendaRepositoryProvider {
     private final int lojaVR;
     private PdvVendaDAO vendaDAO;
     private PdvVendaItemDAO vendaItemDAO;
+    private PublicVendaDAO publicVendaDAO;
     private EcfDAO ecfDAO;
     private ProdutoAnteriorDAO produtoAnteriorDAO;
     private MapaVendaDAO mapaVendaDAO;
@@ -68,6 +71,7 @@ public class VendaRepositoryProvider {
         this.source = new JdbcConnectionSource("jdbc:sqlite:" + Parametros.get().getBancoImplantacao());
         this.vendaImpDao = new VendaImpDao(this.source);
         this.vendaItemImpDao = new VendaItemImpDao(this.source);
+        this.publicVendaDAO = new PublicVendaDAO();
     }
 
     public VendaItemFacade item() {
@@ -246,6 +250,22 @@ public class VendaRepositoryProvider {
 
     public List<VendaItemIMP> getProdutosVendidos() throws SQLException {
         return vendaItemImpDao.getProdutosVendidos();
+    }
+
+    public Long gravarPublicVenda(PublicVendaValoresAgrupado item) throws Exception {
+        return publicVendaDAO.gravarPublicVenda(item);
+    }
+
+    List<PublicVendaValoresAgrupado> carregarVendasExistentesNaBase() throws Exception {
+        return publicVendaDAO.carregaVendasExistentes();
+    }
+
+    public Long atualizarPublicVenda(PublicVendaValoresAgrupado vendasBancoVR) throws Exception {
+        return publicVendaDAO.atualizarpublicVenda(vendasBancoVR);
+    }
+
+    public List<PublicVendaValoresAgrupado> carregarVendasImportadas(List<PublicVendaValoresAgrupado> listaAgrupada) throws Exception {
+        return publicVendaDAO.carregarVendasImportadas(listaAgrupada);
     }
     
     public final class VendaItemFacade {
