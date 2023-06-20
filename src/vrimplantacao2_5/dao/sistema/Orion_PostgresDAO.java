@@ -25,6 +25,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -95,6 +96,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO));
     }
 
@@ -481,6 +483,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCnpj_cpf(rst.getString("cgc"));
                     imp.setIe_rg(rst.getString("inscest"));
                     imp.setEndereco(rst.getString("rua"));
+                    imp.setNumero(rst.getString("casa"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("estado"));
@@ -538,6 +541,39 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codigo as id,\n"
+                    + "codfornece as id_fornecedor,\n"
+                    + "tipopag as documento,\n"
+                    + "dlanca as emissao,\n"
+                    + "vencimento,\n"
+                    + "valorpag as valor,\n"
+                    + "parcela as observacao\n"
+                    + "from pagar p "
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("emissao"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -616,12 +652,13 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("nome"));
- //                   imp.setDataNascimento(rst.getDate("nascimento"));
+                    //                   imp.setDataNascimento(rst.getDate("nascimento"));
                     imp.setEmpresa(rst.getString("firma"));
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setValorLimite(rst.getDouble("compramax"));
                     imp.setNomeMae(rst.getString("mae"));
+                    imp.setNumero(rst.getString("casa"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setEndereco(rst.getString("rua"));
                     imp.setBairro(rst.getString("bairro"));
@@ -807,7 +844,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " case when estado = 'Cancelada' then 1 else 0 end cancelado\n"
                     + "from vendas \n"
                     + "where \n"
-                    + " data between '"+ strDataInicio +"' and '"+ strDataTermino +"'\n"
+                    + " data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + " and numcfe <> ''\n"
                     + " order by 1;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -884,7 +921,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + " and iv.estado != 'Cancelado'\n"
                     + " order by 1";
-                    
+
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
