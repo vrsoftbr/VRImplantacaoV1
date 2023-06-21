@@ -40,7 +40,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
- * @author Alan
+ * @author Alan 
  */
 public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
 
