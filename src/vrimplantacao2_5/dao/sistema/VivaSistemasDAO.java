@@ -117,8 +117,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.CLIENTE_EVENTUAL,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.CLIENTE_EVENTUAL
         ));
     }
 
@@ -134,7 +133,8 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "		WHEN TRCA_NOME LIKE '%RED%' THEN 20\n"
                     + "		WHEN TRCA_NOME LIKE '%ISENT%' THEN 40\n"
                     + "		WHEN TRCA_NOME LIKE '%RET%' THEN 60\n"
-                    + "		ELSE 00 END cst_saida,\n"
+                    + "		ELSE 00\n"
+                    + " END cst_saida,\n"
                     + "	CASE \n"
                     + "		WHEN TRCA_NOME LIKE '%03,%' THEN '3'\n"
                     + "		WHEN TRCA_NOME LIKE '%07,%' THEN '7'\n"
@@ -334,24 +334,22 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-//                    imp.setMargem(rst.getDouble("margem"));
 
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
+                    
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setDataCadastro(rst.getDate("data_cad"));
                     imp.setDataAlteracao(rst.getDate("data_alt"));
-
-                    imp.setSituacaoCadastro(rst.getInt("ativo"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-
                     imp.setEstoqueMinimo(rst.getDouble("est_min"));
                     imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
-
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
+
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
 
                     String idIcmsDebito = rst.getString("id_icms");
 
