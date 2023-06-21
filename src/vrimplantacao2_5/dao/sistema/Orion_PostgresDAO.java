@@ -845,7 +845,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from vendas \n"
                     + "where \n"
                     + " data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-                    + " and numcfe <> ''\n"
+          //          + " and numcfe <> ''\n"
                     + " order by 1;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
