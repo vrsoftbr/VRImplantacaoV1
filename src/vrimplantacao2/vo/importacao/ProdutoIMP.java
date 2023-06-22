@@ -10,6 +10,7 @@ import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2_5.vo.enums.TipoCompra;
 
 @DatabaseTable(tableName = "miglog.produto")
 public class ProdutoIMP {
@@ -188,6 +189,8 @@ public class ProdutoIMP {
     
     @DatabaseField private double percentualPerda = 0;
     @DatabaseField private int qtdDiasMinimoValidade = 0;
+    
+    @DatabaseField private TipoCompra tipoCompra = TipoCompra.NENHUM;
     
     private int codigoAtual;
     private int operacional = 0;
@@ -1154,6 +1157,14 @@ public class ProdutoIMP {
 
     public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
         this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
+    }
+    
+    public TipoCompra getTipoCompra() {
+        return tipoCompra;
+    }
+
+    public void setTipoCompra(TipoCompra tipoCompra) {
+        this.tipoCompra = tipoCompra;
     }
         
     public boolean from(ProdutoBalancaVO bal) {

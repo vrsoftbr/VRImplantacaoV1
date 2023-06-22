@@ -1716,6 +1716,7 @@ public class ProdutoRepository {
             vo.setIdVasilhame(anteriorVasilhame.getCodigoAtual().getId());
         }
         vo.setPercentualPerda(imp.getPercentualPerda());
+        vo.setTipoCompra(imp.getTipoCompra());
 
         return vo;
     }
