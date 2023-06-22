@@ -44,7 +44,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 
 /**
  *
- * @author Desenvolvimento
+ * @author Michael
  */
 public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
@@ -79,6 +79,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.MARGEM,
+                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
@@ -696,6 +697,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
         private String sql;
         private VendaIMP next;
         private Set<String> uk = new HashSet<>();
+        int cont = 1;
 
         private void obterNext() {
             try {
@@ -711,7 +713,10 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        if (cont == 18){
+                            cont = 1;
+                        }
+                        next.setEcf(Utils.stringToInt(rst.getString(cont++)));
                         next.setData(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
@@ -755,7 +760,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     = "select\n"
                     //+ "	concat(seq,cupom,data) id,\n"
                     + "	v.seq id_venda,\n"
-                    + "	cupom numerocupom,\n"
+                    + "	v.seq numerocupom,\n"
                     + "	codcli idcliente,\n"
                     + "	case micro\n"
                     + "		when 'PDV01' then 1\n"
@@ -781,7 +786,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	tslv010 v\n"
                     + "where\n"
                     + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
-                    + "	and exclui != 'S' and v.cupom != '000001'\n"
+                    + "	and exclui != 'S'\n"
                     + "	and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "order by seq,data,horaini";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -871,7 +876,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	join tslv010 v on v.seq = i.cupom\n"
                     + "where\n"
                     + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
-                    + " and v.cupom != '000001'\n"
+                    + "	and i.exclui != 'S'\n"
                     + "	and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by i.cupom,i.seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

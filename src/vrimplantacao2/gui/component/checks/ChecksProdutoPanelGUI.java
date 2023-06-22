@@ -72,6 +72,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public void setImportador(Importador importador) {
         this.importador = importador;
+        this.importador.checarVendasDataAtual = chkVerificarVendadDeHoje.isSelected();
     }
 
     public void setOpcoesDisponiveis(InterfaceDAO dao) {
@@ -819,6 +820,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkUsarEANAnterior = new vrframework.bean.checkBox.VRCheckBox();
+        chkVerificarVendadDeHoje = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -1854,6 +1856,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkUsarEANAnterior, "Usar código EAN anterior para importar as vendas");
         chkUsarEANAnterior.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkVerificarVendadDeHoje, "Verificar vendas de hoje na base VR");
+
         javax.swing.GroupLayout pnlImpPdvVendaLayout = new javax.swing.GroupLayout(pnlImpPdvVenda);
         pnlImpPdvVenda.setLayout(pnlImpPdvVendaLayout);
         pnlImpPdvVendaLayout.setHorizontalGroup(
@@ -1871,11 +1875,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkVerificarVendadDeHoje))
                     .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(422, Short.MAX_VALUE))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
         pnlImpPdvVendaLayout.setVerticalGroup(
             pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1886,7 +1892,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkVerificarVendadDeHoje))
                     .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2033,6 +2040,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkVasilhame;
     public vrframework.bean.checkBox.VRCheckBox chkVendaControlada;
     public vrframework.bean.checkBox.VRCheckBox chkVendaPdv;
+    public javax.swing.JCheckBox chkVerificarVendadDeHoje;
     public vrframework.bean.checkBox.VRCheckBox chkVolumeEmbalagem;
     public vrframework.bean.checkBox.VRCheckBox chkVolumeQtd;
     public vrframework.bean.checkBox.VRCheckBox chkVrAtacado;
@@ -2526,6 +2534,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (chkPdvVendas.isSelected()
                     && edtDtVendaIni.getDate() != null
                     && edtDtVendaFim.getDate() != null) {
+                
+                if (chkVerificarVendadDeHoje.isSelected()){
+                    importador.checarVendasDataAtual = true;
+                }
 
                 if (chkUsarEANAnterior.isSelected()) {
                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);

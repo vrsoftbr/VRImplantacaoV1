@@ -23,7 +23,6 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
-import vrimplantacao2.vo.cadastro.venda.PublicVendaVO;
 import vrimplantacao2.vo.cadastro.venda.PublicVendaValoresAgrupado;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -256,16 +255,20 @@ public class VendaRepositoryProvider {
         return publicVendaDAO.gravarPublicVenda(item);
     }
 
-    List<PublicVendaValoresAgrupado> carregarVendasExistentesNaBase() throws Exception {
-        return publicVendaDAO.carregaVendasExistentes();
+    List<PublicVendaValoresAgrupado> carregarVendasExistentesNaBase(String dataAtual, int lojaVR) throws Exception {
+        return publicVendaDAO.carregaVendasExistentes(dataAtual, lojaVR);
     }
 
     public Long atualizarPublicVenda(PublicVendaValoresAgrupado vendasBancoVR) throws Exception {
         return publicVendaDAO.atualizarpublicVenda(vendasBancoVR);
     }
 
-    public List<PublicVendaValoresAgrupado> carregarVendasImportadas(List<PublicVendaValoresAgrupado> listaAgrupada) throws Exception {
-        return publicVendaDAO.carregarVendasImportadas(listaAgrupada);
+    public List<PublicVendaValoresAgrupado> carregarVendasImportadas(String menorData, String maiorData, int lojaVR) throws Exception {
+        return publicVendaDAO.carregarVendasImportadas(menorData, maiorData, lojaVR);
+    }
+
+    void logarPublicVendaImportadas(Long id) throws Exception {
+        publicVendaDAO.logarPublicVendaImportadas(id);
     }
     
     public final class VendaItemFacade {

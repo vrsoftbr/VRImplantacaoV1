@@ -215,21 +215,23 @@ public class ConversorDbfDAO {
         return result;
     }
 
-    public void popularTabelasDbf(SQLBuilder insert) throws Exception {
+    public void popularTabelasDbf(String insert) throws Exception {
         Statement stm = con.getConexao().createStatement();
         try {
-            stm.execute(insert.getInsert());
+            stm.execute(insert);
         } catch (PSQLException e) {
-            System.out.println(insert.getInsert());
+            System.out.println(insert);
             JOptionPane.showMessageDialog(null, "Erro ao popular tabela: " + getNomeDaTabela() + "\n\nErro: " + e);
             System.out.println("PLSQLexception = " + e.getMessage());
             e.printStackTrace();
+            fecharConexao();
             throw e;
         } catch (Exception e) {
-            System.out.println(insert.getInsert());
+            System.out.println(insert);
             JOptionPane.showMessageDialog(null, "Erro ao popular tabela: " + getNomeDaTabela() + "\n\nErro: " + e);
             System.out.println("exception = " + e.getMessage());
             e.printStackTrace();
+            fecharConexao();
             throw e;
         }
     }

@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -62,11 +63,16 @@ public class PublicVendaRepository {
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
     private int matricula;
+    public boolean checarVendasDataAtual = false;
+    public String dataAtual = DATE_FORMAT.format(new Date());
+    Date menorData = null;
+    Date maiorData = null;
 
     private List<PublicVendaVO> vendas = new ArrayList<>();
 
-    public PublicVendaRepository(VendaRepositoryProvider provider) {
+    public PublicVendaRepository(VendaRepositoryProvider provider, boolean checarVendasDataAtual) {
         this.provider = provider;
+        this.checarVendasDataAtual = checarVendasDataAtual;
     }
 
     public boolean importar(Set<OpcaoVenda> opt) throws Exception {
@@ -379,11 +385,18 @@ public class PublicVendaRepository {
             }
 
             List<PublicVendaValoresAgrupado> listaProdutosExistentesNaBase = new ArrayList<>();
-            try {
-                listaProdutosExistentesNaBase = provider.carregarVendasExistentesNaBase();
-            } catch (Exception e) {
-                System.out.println("Erro ao preencher lista com vendas existentes no banco em PublicVendaRepository linha 386");
-                e.printStackTrace();
+
+            //prepara datas para verificar se já existe vendas importadas iguais no banco vr
+            localizarDatasImportadas(listaAgrupada);
+
+            //Verifica se há vendas no banco na data atual, ou seja, no dia que o vrimplantação está sendo executado.
+            if (checarVendasDataAtual) {
+                try {
+                    listaProdutosExistentesNaBase = provider.carregarVendasExistentesNaBase(dataAtual, provider.getLojaVR());
+                } catch (Exception e) {
+                    System.out.println("Erro ao preencher lista com vendas existentes no banco em PublicVendaRepository linha 386");
+                    e.printStackTrace();
+                }
             }
 
             if (listaProdutosExistentesNaBase.size() > 0) {
@@ -858,11 +871,11 @@ public class PublicVendaRepository {
 
     /*
     Método filtra vendas que já foram importadas e salva as demais em public.vendas
-    */
+     */
     private void salvarPublicVendas(List<PublicVendaValoresAgrupado> listaAgrupada) throws Exception {
 
-        SimpleDateFormat formatar = new SimpleDateFormat("yyyy-MM-dd");
-        List<PublicVendaValoresAgrupado> vendasJaImportadas = provider.carregarVendasImportadas(listaAgrupada);
+        //filtrar por datas selecionadas
+        List<PublicVendaValoresAgrupado> vendasJaImportadas = provider.carregarVendasImportadas(DATE_FORMAT.format(menorData), DATE_FORMAT.format(maiorData), provider.getLojaVR());
         List<PublicVendaValoresAgrupado> listaFinal = new ArrayList(listaAgrupada);
 
         if (vendasJaImportadas.size() > 0) {
@@ -871,7 +884,7 @@ public class PublicVendaRepository {
             for (PublicVendaValoresAgrupado vendaBancoCliente : listaAgrupada) {
                 for (PublicVendaValoresAgrupado vendasBancoVR : vendasJaImportadas) {
                     if ((vendasBancoVR.getId_produto() == vendaBancoCliente.getId_produto())
-                            && (formatar.format(vendasBancoVR.getData()).equals(formatar.format(vendaBancoCliente.getData())))
+                            && (DATE_FORMAT.format(vendasBancoVR.getData()).equals(DATE_FORMAT.format(vendaBancoCliente.getData())))
                             && (vendasBancoVR.getId_loja() == vendaBancoCliente.getId_loja())) {
                         listaFinal.remove(vendaBancoCliente);
                     }
@@ -900,13 +913,14 @@ public class PublicVendaRepository {
                 System.out.println("Erro ao Salvar public venda em PublicVendaRepository na linha 397");
                 System.out.println(e.getMessage());
                 e.printStackTrace();
+                throw e;
             }
             provider.commit();
 
             provider.notificar("Gerando log de vendas", (int) idsSalvos.size());
 
             for (Long id : idsSalvos) {
-                provider.logarVendaImportadas(id);
+                provider.logarPublicVendaImportadas(id);
                 provider.notificar();
             }
         }
@@ -916,19 +930,17 @@ public class PublicVendaRepository {
     /*
     Método compara vendas que já existem no banco e atualiza caso as importadas sejam iguais
     chama método salvar vendas para as demais.
-    */
+     */
     private void atualizarPublicVendas(List<PublicVendaValoresAgrupado> listaCliente, List<PublicVendaValoresAgrupado> listaMaster) throws Exception {
-
-        SimpleDateFormat formatar = new SimpleDateFormat("yyyy-MM-dd");
 
         List<PublicVendaValoresAgrupado> listaAtualizada = new ArrayList(listaCliente);
 
-        provider.notificar("Verificando vendas que existem no banco", listaCliente.size());
+        provider.notificar("Verificando vendas que existem no banco na data de hoje.", listaCliente.size());
 
         for (PublicVendaValoresAgrupado vendaBancoCliente : listaCliente) {
             for (PublicVendaValoresAgrupado vendasBancoVR : listaMaster) {
                 if ((vendasBancoVR.getId_produto() == vendaBancoCliente.getId_produto())
-                        && (formatar.format(vendasBancoVR.getData()).equals(formatar.format(vendaBancoCliente.getData())))
+                        && (DATE_FORMAT.format(vendasBancoVR.getData()).equals(DATE_FORMAT.format(vendaBancoCliente.getData())))
                         && (vendasBancoVR.getId_loja() == vendaBancoCliente.getId_loja())) {
                     vendasBancoVR.somarAtributos(vendaBancoCliente);
                     listaAtualizada.remove(vendaBancoCliente);
@@ -954,7 +966,7 @@ public class PublicVendaRepository {
         provider.notificar("Atualizando log", idsAtualizados.size());
 
         for (Long id : idsAtualizados) {
-            provider.logarVendaImportadas(id);
+            provider.logarPublicVendaImportadas(id);
             provider.notificar();
         }
 
@@ -962,6 +974,22 @@ public class PublicVendaRepository {
 
         if (listaAtualizada.size() > 0) {
             salvarPublicVendas(listaAtualizada);
+        }
+    }
+
+    private void localizarDatasImportadas(List<PublicVendaValoresAgrupado> listaAgrupada) {
+        for (PublicVendaValoresAgrupado objeto : listaAgrupada) {
+            Date dataAtual = objeto.getData();
+
+            // Verifique se é a primeira data ou se é menor do que a menorData atual
+            if (menorData == null || dataAtual.before(menorData)) {
+                menorData = dataAtual;
+            }
+
+            // Verifique se é a primeira data ou se é maior do que a maiorData atual
+            if (maiorData == null || dataAtual.after(maiorData)) {
+                maiorData = dataAtual;
+            }
         }
     }
 

@@ -144,6 +144,7 @@ public class Importador {
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
     public boolean importarPorPlanilha = false;
+    public boolean checarVendasDataAtual = false;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -1052,28 +1053,30 @@ public class Importador {
                     getLojaOrigem(),
                     getLojaVR()
             );
-//            Object[] options = {"pdv.venda", "public.venda", "Cancelar"};
-//            int decisao = JOptionPane.showOptionDialog(null, "Qual tabela você deseja preencher?\n\n",
-//                    "Importando Vendas...", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-//            if (decisao == 0) {
-//                VendaRepository rep = new VendaRepository(provider);
-//                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
-//                rep.eBancoUnificado = eBancoUnificado;
-//                rep.importar(opt);
-//            }
-//            if (decisao == 1) {
-//                PublicVendaRepository rep = new PublicVendaRepository(provider);
-//                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
-//                rep.eBancoUnificado = eBancoUnificado;
-//                rep.importar(opt);
-//            }
-//            if (decisao == 2) {
-//                throw new NullPointerException("Nunhuma venda foi importada");
-//            }
-            PublicVendaRepository rep = new PublicVendaRepository(provider);
-            rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
-            rep.eBancoUnificado = eBancoUnificado;
-            rep.importar(opt);
+            Object[] options = {"pdv.venda", "public.venda", "Cancelar"};
+            int decisao = JOptionPane.showOptionDialog(null, "Qual tabela você deseja preencher?\n\n",
+                    "Importando Vendas...", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (decisao == 0) {
+                VendaRepository rep = new VendaRepository(provider);
+                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+                rep.eBancoUnificado = eBancoUnificado;
+                rep.importar(opt);
+            }
+            if (decisao == 1) {
+                PublicVendaRepository rep = new PublicVendaRepository(provider, 
+                    this.checarVendasDataAtual);
+                rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+                rep.eBancoUnificado = eBancoUnificado;
+                rep.importar(opt);
+            }
+            if (decisao == 2) {
+                throw new NullPointerException("Nunhuma venda foi importada");
+            }
+//            PublicVendaRepository rep = new PublicVendaRepository(provider, 
+//                    this.checarVendasDataAtual);
+//            rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+//            rep.eBancoUnificado = eBancoUnificado;
+//            rep.importar(opt);
         }
     }
 

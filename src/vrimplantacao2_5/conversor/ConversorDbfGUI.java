@@ -7,15 +7,20 @@ package vrimplantacao2_5.conversor;
 
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.postgresql.util.PSQLException;
 import vrframework.classe.ProgressBar;
-import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.conversor.dao.ConversorDbfDAO;
 
 /**
@@ -24,8 +29,12 @@ import vrimplantacao2_5.conversor.dao.ConversorDbfDAO;
  */
 public class ConversorDbfGUI extends javax.swing.JFrame {
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private String regexp = "([\\W])";
+    File[] filesDBF = null;
+    File[] filesMemo = null;
     ConversorDbfDAO dao;
+    boolean haMemoFiles = false;
 
     /**
      * Creates new form ConversorDbfGUI
@@ -39,9 +48,17 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
         }
         initComponents();
         setLocationRelativeTo(null);
-        jFileChooser.setMultiSelectionEnabled(true);
-        jFileChooser.setVisible(false);
+        jFileChooserDBF.setPreferredSize(new Dimension(528, 326));
+        lblLogo.setText("");
+        lblLogo.setSize(800, 800);        
+        setExtendedState(MAXIMIZED_BOTH);
+        jFileChooserDBF.setMultiSelectionEnabled(true);
+        jPanel5.setVisible(true);
+        jFileChooserDBF.setVisible(false);
         labelResultado.setVisible(false);
+        jTxInstrucaoTexto.setEditable(false);
+        jTxInstrucaoTexto.setCaretPosition(0);
+        btnReabriDBF.setVisible(false);
     }
 
     /**
@@ -53,24 +70,34 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jFileChooser = new javax.swing.JFileChooser();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextNomeBanco = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         labelResultado = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        lblTitulo = new javax.swing.JLabel();
+        jButtoncarregarMemo = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTxInstrucaoTexto = new javax.swing.JTextArea();
         jSeparator1 = new javax.swing.JSeparator();
+        jPanel3 = new javax.swing.JPanel();
+        jButtonConverter = new javax.swing.JButton();
+        btnReabriDBF = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        lblLogo = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jFileChooserDBF = new javax.swing.JFileChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jFileChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFileChooserActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jLabel1.text")); // NOI18N
 
         jTextNomeBanco.setText(org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jTextNomeBanco.text")); // NOI18N
+
+        labelResultado.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(labelResultado, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.labelResultado.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -79,7 +106,172 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(labelResultado, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.labelResultado.text")); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(204, 0, 0));
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jLabel2.text")); // NOI18N
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextNomeBanco)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(0, 144, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(labelResultado))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addGap(18, 18, 18)
+                .addComponent(labelResultado, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+
+        lblTitulo.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(204, 0, 0));
+        org.openide.awt.Mnemonics.setLocalizedText(lblTitulo, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.lblTitulo.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButtoncarregarMemo, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jButtoncarregarMemo.text")); // NOI18N
+        jButtoncarregarMemo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtoncarregarMemoActionPerformed(evt);
+            }
+        });
+
+        jTxInstrucaoTexto.setColumns(20);
+        jTxInstrucaoTexto.setRows(5);
+        jTxInstrucaoTexto.setText(org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jTxInstrucaoTexto.text")); // NOI18N
+        jScrollPane1.setViewportView(jTxInstrucaoTexto);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButtoncarregarMemo))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(lblTitulo)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTitulo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtoncarregarMemo)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jButtonConverter.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jButtonConverter, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jButtonConverter.text")); // NOI18N
+        jButtonConverter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonConverterActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(btnReabriDBF, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.btnReabriDBF.text")); // NOI18N
+        btnReabriDBF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReabriDBFActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnReabriDBF)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonConverter, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(50, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonConverter, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnReabriDBF))
+                .addContainerGap())
+        );
+
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrimplantacao2_5/nutricional/utils/logoVr.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblLogo, org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.lblLogo.text")); // NOI18N
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 399, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(ConversorDbfGUI.class, "ConversorDbfGUI.jPanel5.border.title"))); // NOI18N
+
+        jFileChooserDBF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFileChooserDBFActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jFileChooserDBF, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jFileChooserDBF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -88,51 +280,39 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextNomeBanco)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1)
-                        .addGap(14, 14, 14))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelResultado)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator1)
-                            .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextNomeBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelResultado)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jFileChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jFileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooserActionPerformed
-        if (evt.getActionCommand().equals(javax.swing.JFileChooser.CANCEL_SELECTION)) {
-            this.dispose();
-        } else {
-            salvar();
-        }
-    }//GEN-LAST:event_jFileChooserActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (validaNomeBanco()) {
@@ -146,7 +326,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                         ProgressBar.setStatus("Criando o banco, por favor aguarde.");
                         criarBanco();
                         ProgressBar.dispose();
-                        jFileChooser.setVisible(true);
+                        jFileChooserDBF.setVisible(true);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                         ProgressBar.dispose();
@@ -158,6 +338,48 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
         }
         labelResultado.setText("Dados de Conversão do banco: " + jTextNomeBanco.getText());
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jFileChooserDBFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooserDBFActionPerformed
+        if (evt.getActionCommand().equals(javax.swing.JFileChooser.CANCEL_SELECTION)) {
+            this.dispose();
+        } else {
+            carregarArquivosDBF();
+            jFileChooserDBF.setVisible(false);
+            piscarBotao();
+            btnReabriDBF.setVisible(true);
+        }
+    }//GEN-LAST:event_jFileChooserDBFActionPerformed
+
+    private void jButtonConverterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConverterActionPerformed
+        if (filesDBF != null) {
+            salvar();
+        } else {
+            JOptionPane.showMessageDialog(null, "Você esqueceu de selecionar os arquivos DBF", "ops!",  1);
+        };
+    }//GEN-LAST:event_jButtonConverterActionPerformed
+
+    private void jButtoncarregarMemoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtoncarregarMemoActionPerformed
+        JFileChooser jFileChooserMemo = new JFileChooser();
+        jFileChooserMemo.setDialogTitle("Carregar Memo Files");
+        jFileChooserMemo.setPreferredSize(new Dimension(500, 450));
+        jFileChooserMemo.setMultiSelectionEnabled(true);
+        int resultado = jFileChooserMemo.showOpenDialog(this);
+        if (resultado == JFileChooser.CANCEL_OPTION) {
+            jFileChooserMemo.setVisible(false);
+            this.filesMemo = null;
+        } else {
+            this.filesMemo = jFileChooserMemo.getSelectedFiles();
+            haMemoFiles = true;
+            jFileChooserMemo.setVisible(false);
+        }
+    }//GEN-LAST:event_jButtoncarregarMemoActionPerformed
+
+    private void btnReabriDBFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReabriDBFActionPerformed
+        jFileChooserDBF.setVisible(true);        
+        this.filesDBF = null;
+        jFileChooserDBF.setSelectedFiles(filesDBF);
+        btnReabriDBF.setVisible(false);
+    }//GEN-LAST:event_btnReabriDBFActionPerformed
 
     /**
      * @param args the command line arguments
@@ -185,6 +407,9 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ConversorDbfGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -195,12 +420,25 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReabriDBF;
     private javax.swing.JButton jButton1;
-    private javax.swing.JFileChooser jFileChooser;
+    private javax.swing.JButton jButtonConverter;
+    private javax.swing.JButton jButtoncarregarMemo;
+    private javax.swing.JFileChooser jFileChooserDBF;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextNomeBanco;
+    private javax.swing.JTextArea jTxInstrucaoTexto;
     private javax.swing.JLabel labelResultado;
+    private javax.swing.JLabel lblLogo;
+    private javax.swing.JLabel lblTitulo;
     // End of variables declaration//GEN-END:variables
 
     public void criarBanco() {
@@ -241,14 +479,15 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(false);
-                    File[] files = jFileChooser.getSelectedFiles();
-                    for (File file : files) {
+                    for (File file : filesDBF) {
                         String tabela = file.getName().substring(0, file.getName().lastIndexOf("."));
                         dao.setNomeDaTabela(tabela);
                         ProgressBar.setStatus("Criando tabela: " + tabela + ", por favor aguarde.");
-
                         DBFReader reader = new DBFReader(new FileInputStream(file));
-
+                        if (haMemoFiles) {
+                            File memoFile = inserirMemoFileEquivaentNoReader(filesMemo, tabela);
+                            reader.setMemoFile(memoFile);
+                        }
                         List<String> dadosCabecalho = new ArrayList<>();
                         for (int i = 0; i < reader.getFieldCount(); i++) {
                             dadosCabecalho.add(reader.getField(i).getName());
@@ -258,35 +497,42 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
 
                         dao.insereDeDadosConvertidos(jTextNomeBanco.getText(), tabela);
 
-                        List<SQLBuilder> inserts = new ArrayList<>();
+                        List<String> inserts = new ArrayList<>();
 
                         ProgressBar.setStatus("Preparando dados da tabela: " + tabela + ", por favor aguarde.");
                         ProgressBar.setMaximum(reader.getRecordCount());
 
-                        SQLBuilder sql = new SQLBuilder();
-                        sql.setTableName(tabela);
                         DBFRow linha;
+                        String insert = "";
                         while ((linha = reader.nextRow()) != null) {
+                            insert = "insert into " + tabela + " values (";
                             for (int i = 0; i < dadosCabecalho.size(); i++) {
                                 String cabecalhoBase = dadosCabecalho.get(i).replaceAll(regexp, "").trim().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
-                                sql.put(cabecalhoBase, linha.getString(cabecalhoBase), "UTF-8");
-                                sql.setFormatarSQL(true);
+                                //sql.put(cabecalhoBase, linha.getString(cabecalhoBase));
+                                insert += "'";
+                                insert += linha.getObject(cabecalhoBase) instanceof Date ? DATE_FORMAT.format(linha.getObject(cabecalhoBase)) : null == linha.getObject(cabecalhoBase) ? "" : Utils.acertarTexto(linha.getString(cabecalhoBase)).toString();
+                                insert += "' ,";
                             }
-                            inserts.add(sql);
+                            insert = insert.substring(0, insert.length() - 2) + ");";
+                            inserts.add(insert);
+                            insert = "";
                             ProgressBar.next();
                         }
-                        
+                        System.gc();
+
                         ProgressBar.setStatus("Salvando dados da tabela: " + tabela + ", por favor aguarde.");
                         ProgressBar.setMaximum(reader.getRecordCount());
 
                         dao.conferePopularTabelas();
                         dao.abrirConexao();
-                        for (SQLBuilder insert : inserts) {
-                            dao.popularTabelasDbf(insert);
+                        for (String insertFinal : inserts) {
+                            dao.popularTabelasDbf(insertFinal);
                             ProgressBar.next();
                         }
                         dao.fecharConexao();
                         dao.atualizaDeDadosConvertidos(jTextNomeBanco.getText(), tabela);
+                        inserts.clear();
+                        System.gc();
                     }
                     JOptionPane.showMessageDialog(null, "Base " + jTextNomeBanco.getText() + " criada com sucesso! \n");
                     ProgressBar.dispose();
@@ -298,7 +544,62 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                     ProgressBar.dispose();
                 }
             }
+
+            //Filtra memo file de acordo com a tabela
+            private File inserirMemoFileEquivaentNoReader(File[] filesMemo, String tabela) {
+                for (File memo : filesMemo) {
+                    String tabelaMemo = memo.getName().substring(0, memo.getName().lastIndexOf("."));
+                    if (tabelaMemo.toUpperCase().trim().equals(tabela.toUpperCase().trim())) {
+                        return memo;
+                    }
+                }
+                return null;
+            }
         };
         thread.start();
+    }
+
+    private void carregarArquivosDBF() {
+        filesDBF = jFileChooserDBF.getSelectedFiles();
+    }
+
+    private void piscarBotao() {
+        Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Color corOriginal = jButtonConverter.getBackground();
+                        Color corOriginalF = jButtonConverter.getForeground();
+                        Thread.sleep(300);
+                        jButtonConverter.setForeground(new Color(255, 103, 0));
+                        jButtonConverter.setBackground(Color.BLACK);
+                        Thread.sleep(300);
+                        jButtonConverter.setBackground(corOriginal);
+                        jButtonConverter.setForeground(corOriginalF);
+                        Thread.sleep(300);
+                        jButtonConverter.setForeground(new Color(255, 103, 0));
+                        jButtonConverter.setBackground(Color.BLACK);
+                        Thread.sleep(300);
+                        jButtonConverter.setBackground(corOriginal);
+                        jButtonConverter.setForeground(corOriginalF);
+                        Thread.sleep(300);
+                        jButtonConverter.setForeground(new Color(255, 103, 0));
+                        jButtonConverter.setBackground(Color.BLACK);
+                        Thread.sleep(300);
+                        jButtonConverter.setBackground(corOriginal);
+                        jButtonConverter.setForeground(corOriginalF);
+                        Thread.sleep(300);
+                        jButtonConverter.setForeground(new Color(255, 103, 0));
+                        jButtonConverter.setBackground(Color.BLACK);
+                        Thread.sleep(300);
+                        jButtonConverter.setBackground(corOriginal);
+                        jButtonConverter.setForeground(corOriginalF);
+                        
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            };
+            thread.start();
     }
 }

@@ -19,6 +19,16 @@ import vrimplantacao2.vo.cadastro.venda.PublicVendaValoresAgrupado;
  */
 public class PublicVendaDAO {
 
+    public PublicVendaDAO() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "create table if not exists implantacao.publicvendasimportadas(\n" +
+                    "	id_venda integer not null primary key\n" +
+                    ");"
+            );
+        } 
+    }    
+
     public Long gravarPublicVenda(PublicVendaValoresAgrupado item) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
 
@@ -60,15 +70,17 @@ public class PublicVendaDAO {
             } catch (Exception e) {
                 System.out.println("Erro em gravarPublicVenda " + e.getMessage());
                 e.printStackTrace();
+                throw e;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
         return null;
     }
 
-    public List<PublicVendaValoresAgrupado> carregaVendasExistentes() throws Exception {
+    public List<PublicVendaValoresAgrupado> carregaVendasExistentes(String dataAtual, int lojaVR) throws Exception {
         List<PublicVendaValoresAgrupado> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -81,7 +93,9 @@ public class PublicVendaDAO {
                     + "	select\n"
                     + "		*\n"
                     + "	from\n"
-                    + "		implantacao.vendasimportadas)"
+                    + "		implantacao.publicvendasimportadas)\n"
+                    + "and data = '" + dataAtual + "'\n"
+                    + "	and id_loja = " + lojaVR
             )) {
                 while (rs.next()) {
                     PublicVendaValoresAgrupado vo = new PublicVendaValoresAgrupado(
@@ -178,7 +192,7 @@ public class PublicVendaDAO {
         return idAtual;
     }
 
-    List<PublicVendaValoresAgrupado> carregarVendasImportadas(List<PublicVendaValoresAgrupado> listaAgrupada) throws Exception {
+    List<PublicVendaValoresAgrupado> carregarVendasImportadas(String menorData, String maiorData, int lojaVR) throws Exception {
         List<PublicVendaValoresAgrupado> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -191,7 +205,9 @@ public class PublicVendaDAO {
                     + "	select\n"
                     + "		*\n"
                     + "	from\n"
-                    + "		implantacao.vendasimportadas)"
+                    + "		implantacao.publicvendasimportadas)\n"
+                    + "and data between '" + menorData + "' and '" + maiorData+ "'\n"
+                    + "and id_loja = " + lojaVR
             )) {
                 while (rs.next()) {
                     PublicVendaValoresAgrupado vo = new PublicVendaValoresAgrupado(
@@ -220,6 +236,12 @@ public class PublicVendaDAO {
             }
         }
         return result;
+    }
+    
+    public void logarPublicVendaImportadas(long id_venda) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("insert into implantacao.publicvendasimportadas values (" + id_venda + ")");
+        }
     }
 
 }

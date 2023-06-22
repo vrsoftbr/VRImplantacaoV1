@@ -1976,13 +1976,15 @@
                               <Component id="edtDtVendaIni" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="edtDtVendaFim" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="chkVerificarVendadDeHoje" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkUsarEANAnterior" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="422" max="32767" attributes="0"/>
+                      <EmptySpace pref="157" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1996,6 +1998,7 @@
                           <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                               <Component id="edtDtVendaIni" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="edtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkVerificarVendadDeHoje" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -2039,6 +2042,11 @@
                 <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="true" type="code"/>
                 </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="chkVerificarVendadDeHoje">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Verificar vendas de hoje na base VR"/>
               </Properties>
             </Component>
           </SubComponents>
