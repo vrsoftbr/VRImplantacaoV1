@@ -21,12 +21,14 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
@@ -41,6 +43,7 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -1057,6 +1060,74 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataFim(rs.getDate("datatermino"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "p.es1_cod idreceita, \n"
+                    + "p.es1_cod idpai, \n"
+                    + "p.es1_desc descritivo,\n"
+                    + "c.es1_rendimento rendimento,\n"
+                    + "filho.qtd*1000 qtde,\n"
+                    + "filho.filho idfilho\n"
+                    + "from es1 c\n"
+                    + "join es1p p on c.es1_cod = p.es1_cod \n"
+                    + "join  (select es1_cod pai, es1_item filho, es1_quant qtd from es1c where es1_empresa = 1) filho on filho.pai = p.es1_cod \n"
+                    + "where c.es1_empresa =" + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+
+                    imp.setImportid(rst.getString("idreceita"));
+                    imp.setIdproduto(rst.getString("idpai"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita(rst.getInt("qtde"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setFator(1);
+                    imp.setFichatecnica("");
+                    imp.getProdutos().add(rst.getString("idfilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  a.es1_cod id_pai,\n"
+                    + "  a.es1_item id_filho,\n"
+                    + "  a.es1_quant qtde\n"
+                    + " from es1c a\n"
+                    + "where a.es1_empresa = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+
+                    imp.setId(rst.getString("id_pai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde"));
+                    imp.setProdutoAssociadoId(rst.getString("id_filho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtde"));
 
                     result.add(imp);
                 }
