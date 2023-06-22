@@ -40,7 +40,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
- * @author Alan 
+ * @author Alan
  */
 public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -85,6 +85,11 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM
         ));
     }
@@ -257,7 +262,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	e.codsub,\n"
                     + "	e.custobase custosemimposto,\n"
                     + "	e.custobase,\n"
-                    + "	((e.custobase - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto\n"
+                    + "	((e.custobase - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto,\n"
+                    + " replace(e.sittribut,'','0')||'-'||e.icms||'-'||e.reducao id_aliquota\n"
                     + "from\n"
                     + "	estoque e\n"
                     + "left join ligplu l on e.plu = l.plu\n"
@@ -296,7 +302,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPiscofinsCstDebito(rst.getString("piscst"));
                     imp.setPiscofinsCstCredito(rst.getString("cofinscst"));
 
-                    imp.setIcmsCstSaida(rst.getInt("sittribut"));
+                    /*imp.setIcmsCstSaida(rst.getInt("sittribut"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
 
@@ -318,8 +324,17 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
 
                     imp.setIcmsCstEntradaForaEstado(rst.getInt("sittribut"));
                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
-
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));*/
+                    
+                    imp.setIcmsDebitoId(rst.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_aliquota"));
+                    
+                    imp.setIcmsCreditoId(rst.getString("id_aliquota"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliquota"));
+                    imp.setIcmsConsumidorId(rst.getString("id_aliquota"));
+                    
+                    
+                    
                     imp.setDataCadastro(rst.getDate("inclusao"));
 
                     long codigoProduto;
@@ -845,7 +860,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from vendas \n"
                     + "where \n"
                     + " data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-          //          + " and numcfe <> ''\n"
+                    //          + " and numcfe <> ''\n"
                     + " order by 1;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
