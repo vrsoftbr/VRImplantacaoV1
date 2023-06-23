@@ -1072,6 +1072,7 @@ public class Importador {
             if (decisao == 2) {
                 throw new NullPointerException("Nunhuma venda foi importada");
             }
+//            
 //            PublicVendaRepository rep = new PublicVendaRepository(provider, 
 //                    this.checarVendasDataAtual);
 //            rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
