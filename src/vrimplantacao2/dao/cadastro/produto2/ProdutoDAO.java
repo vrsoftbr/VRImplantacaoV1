@@ -194,7 +194,7 @@ public class ProdutoDAO {
             sql.put("utilizavalidadeentrada", true);                
             } else sql.put("utilizavalidadeentrada", false);
             sql.put("impostomedioestadual", 0);
-            sql.put("id_tipocompra", vo.getTipoCompra());
+            sql.put("id_tipocompra", vo.getTipoCompra().getId());
             sql.put("numeroparcela", vo.getNumeroparcela());
             sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
             sql.put("volume", vo.getVolume());
@@ -428,7 +428,7 @@ public class ProdutoDAO {
             sql.put("perda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
         }
         if(opt.contains(OpcaoProduto.TIPO_COMPRA)){
-            sql.put("id_tipocompra", vo.getTipoCompra());
+            sql.put("id_tipocompra", vo.getTipoCompra().getId());
         }
 
         sql.setWhere("id = " + vo.getId());

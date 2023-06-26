@@ -75,6 +75,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2_5.vo.enums.TipoCompra;
 
 /*
  *
@@ -154,6 +155,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    tab_codigo = 3\n"
                     + "order by\n"
                     + "    tab_acesso"*/
+                    //FEITO PARA ATENDER UM CLIENTE - COLORADO
+                    //FORA DO PADRÃO
                     "WITH icms AS (    \n"
                     + "select\n"
                     + "    tab_acesso id,\n"
@@ -507,6 +510,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.TIPO_COMPRA,
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
@@ -533,7 +539,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
-                OpcaoProduto.RECEITA
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.ICMS_CONSUMIDOR
         ));
     }
 
@@ -621,8 +628,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when p.GIT_DAT_SAI_LIN = 0 then 1 else 0 end id_situacaocadastral,\n"
                     + "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n"
                     + "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n"
-                    + "	0 estoqueminimo,\n"
-                    + "	0 estoquemaximo,\n"
+                    + "	(p.GIT_TOT_FALTA/100)*est.GET_ESTQ_TROCA estoqueminimo,\n"
+                    + "	est.GET_ESTQ_TROCA estoquemaximo,\n"
+                    + " p.GIT_SIS_ABAST tipocompra,\n"
                     + "	est.GET_ESTOQUE estoque,\n"
                     + " est.get_qtd_pend_vda pendencia,\n"
                     + "	p.GIT_MRG_LUCRO_1 margem,\n"
@@ -787,6 +795,23 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setEstoque(rst.getDouble("estoque"));
 
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    
+                    String tipoCompra = rst.getString("tipocompra");
+                    if("01".equals(tipoCompra)){
+                        imp.setTipoCompra(TipoCompra.DEPOSITO);
+                    }
+                    if("10".equals(tipoCompra)){
+                        imp.setTipoCompra(TipoCompra.CENTRALIZADO);
+                    }
+                    if("11".equals(tipoCompra)){
+                        imp.setTipoCompra(TipoCompra.CROSSDOCKING);
+                    }
+                    if("20".equals(tipoCompra)){
+                        imp.setTipoCompra(TipoCompra.LOJA);
+                    }
+
                     if (imp.getEstoque() == 0) {
                         imp.setEstoque(rst.getDouble("pendencia") * -1);
                     }
@@ -822,14 +847,41 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.setPautaFiscalId(rst.getString("idpautafiscal"));
                     } else {
-                        imp.setPiscofinsCstDebito(rst.getInt("pis_cofins_debito"));
-                        imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        //FEITO PARA ATENDER UM CLIENTE - COLORADO
+                        //FORA DO PADRÃO
+                        String mercadologico = imp.getCodMercadologico1()
+                                + imp.getCodMercadologico2()
+                                + imp.getCodMercadologico3()
+                                + imp.getCodMercadologico4();
+                        //1811 e 1812 - CERVEJAS
+                        if ("1811".equals(mercadologico) || "1812".equals(mercadologico)) {
+
+                            imp.setPiscofinsCstDebito(6);
+                            imp.setPiscofinsCstCredito(70);
+                            imp.setPiscofinsNaturezaReceita(918);
+
+                        } else if ("1821".equals(mercadologico) || "1822".equals(mercadologico) || "1823".equals(mercadologico)) {
+
+                            imp.setPiscofinsCstDebito(6);
+                            imp.setPiscofinsCstCredito(70);
+                            imp.setPiscofinsNaturezaReceita(918);
+
+                        }//COLONIAS/PERFUMES
+                        else if ("27118".equals(mercadologico)) {
+                            imp.setPiscofinsCstDebito(4);
+                            imp.setPiscofinsCstCredito(70);
+                            imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        } else {
+                            imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                            imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        }
 
                         imp.setIcmsDebitoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
                         imp.setIcmsCreditoId(rst.getString("icms_id"));
                         imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));
+                        imp.setIcmsConsumidorId(rst.getString("icms_id"));
                     }
 
                     result.add(imp);
@@ -1099,7 +1151,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n"
                     + "   left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n"
                     + "WHERE\n"
-                    + "	F.TIP_LOJ_CLI in ('F', 'L')\n"
+                    + "	F.TIP_LOJ_CLI in ('F', 'L', 'D')\n"
                     + "order by\n"
                     + "	id"
             )) {

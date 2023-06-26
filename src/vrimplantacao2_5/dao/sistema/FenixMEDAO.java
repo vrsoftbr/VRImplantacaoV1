@@ -946,7 +946,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '4'\n" // <--  ALTERAR A LOJA
+                    + "	LOJA = '2'\n" // <--  ALTERAR A LOJA
                     + "	AND DATACUPOM between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "	AND TIPOREGISTRO = 'PG'\n"
                     /*+ " AND NUMEROCUPOMFISCAL||CAIXA||DATACUPOM NOT IN (SELECT\n"
@@ -1034,7 +1034,7 @@ public class FenixMEDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ECF_MOVIMENTO m\n"
                     + "WHERE\n"
-                    + "	LOJA = '4'\n" // <--  ALTERAR A LOJA
+                    + "	LOJA = '2'\n" // <--  ALTERAR A LOJA
                     + "	AND TIPOREGISTRO = 'VI'\n"
                     + "	AND DATACUPOM BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,2,3";
