@@ -211,6 +211,8 @@
                                   <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkClientesV2" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkCliEmpresa" min="-2" max="-2" attributes="0"/>
@@ -297,6 +299,7 @@
                               <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPermiteRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClientesV2" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -451,6 +454,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPermiteRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClientesV2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Clientes v2"/>
                   </Properties>
                 </Component>
               </SubComponents>
