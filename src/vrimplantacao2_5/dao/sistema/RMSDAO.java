@@ -797,18 +797,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    
+
                     String tipoCompra = rst.getString("tipocompra");
-                    if("01".equals(tipoCompra)){
-                        imp.setTipoCompra(TipoCompra.DEPOSITO);
-                    }
-                    if("10".equals(tipoCompra)){
+                    if ("1".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.CENTRALIZADO);
                     }
-                    if("11".equals(tipoCompra)){
-                        imp.setTipoCompra(TipoCompra.CROSSDOCKING);
+                    if ("10".equals(tipoCompra)) {
+                        imp.setTipoCompra(TipoCompra.CENTRALIZADO);
                     }
-                    if("20".equals(tipoCompra)){
+                    if ("11".equals(tipoCompra)) {
+                        imp.setTipoCompra(TipoCompra.CENTRALIZADO);
+                    }
+                    if ("20".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.LOJA);
                     }
 
@@ -1248,7 +1248,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT DISTINCT\n"
+                    /*"SELECT DISTINCT\n"
                     + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
                     + "	GIT_COD_ITEM PRODUTO,\n"
                     + "	FORITE_REFERENCIA AS REFERENCIA,\n"
@@ -1270,7 +1270,59 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join AA2CTIPO f on\n"
                     + "        p.git_cod_for = f.tip_codigo\n"
                     + "where\n"
-                    + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'"
+                    + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'"*/
+                    "WITH teste AS (	  \n"
+                    + "SELECT DISTINCT\n"
+                    + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
+                    + "	GIT_COD_ITEM AS PRODUTO,\n"
+                    + "	FORITE_REFERENCIA AS REFERENCIA,\n"
+                    + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO,\n"
+                    + "	CASE WHEN PROD.GIT_ENT_ACM_CUS = 0 THEN PROD.GIT_CUS_ULT_ENT_BRU\n"
+                    + "		ELSE (PROD.GIT_ENT_ACM_CUS / PROD.GIT_ENT_ACM_UN) END custo_compra,\n"
+                    + "		PROD.GIT_ENT_ACM_CUS,\n"
+                    + "		PROD.GIT_ENT_ACM_UN,\n"
+                    + "	PROD.git_cus_ult_ent_bru as custocomimposto,\n"
+                    + " 	PROD.git_cus_ult_ent as custosemimposto\n"
+                    + "FROM \n"
+                    + "	AA1FORIT FORN\n"
+                    + "	join AA3CITEM PROD on\n"
+                    + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
+                    + "where\n"
+                    + "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n"
+                    + "UNION\n"
+                    + "SELECT\n"
+                    + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
+                    + "	p.GIT_COD_ITEM AS PRODUTO,\n"
+                    + "    p.git_referencia  AS REFERENCIA,\n"
+                    + "	p.git_emb_for as fator_conversao,\n"
+                    + "	CASE WHEN p.GIT_ENT_ACM_CUS = 0 THEN p.GIT_CUS_ULT_ENT_BRU\n"
+                    + "		ELSE (p.GIT_ENT_ACM_CUS / p.GIT_ENT_ACM_UN) END custo_compra,\n"
+                    + "		p.GIT_ENT_ACM_CUS,\n"
+                    + "		p.GIT_ENT_ACM_UN,\n"
+                    + "	p.git_cus_ult_ent_bru as custocomimposto,\n"
+                    + " 	p.git_cus_ult_ent as custosemimposto\n"
+                    + "FROM \n"
+                    + "	AA3CITEM p\n"
+                    + "	join AA2CTIPO f on\n"
+                    + "        p.git_cod_for = f.tip_codigo\n"
+                    + "where\n"
+                    + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'\n"
+                    + ")\n"
+                    + "select DISTINCT\n"
+                    + " teste.fornecedor,\n"
+                    + " teste.produto,\n"
+                    + " teste.referencia,\n"
+                    + " teste.FATOR_COVERSAO,\n"
+                    + " a.ENTSAIC_PRC_UN custo_compra\n"
+                    + "from AG1IENSA a\n"
+                    + "JOIN teste ON teste.PRODUTO = a.ESITC_CODIGO\n"
+                    + "WHERE \n"
+                    + "a.ESCHC_DATA = (select \n"
+                    + "			max(ESCHC_DATA3) \n"
+                    + "			from AG1IENSA b\n"
+                    + "			WHERE b.ESITC_CODIGO = a.ESITC_CODIGO\n"
+                    + "			AND ESCHC_AGENDA = 1)\n"
+                    + "			AND ESCHC_AGENDA = 1"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -1280,6 +1332,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("produto"));
                     imp.setQtdEmbalagem(rst.getInt("FATOR_COVERSAO"));
                     imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setCustoTabela(rst.getDouble("custo_compra"));
                     result.add(imp);
                 }
             }
