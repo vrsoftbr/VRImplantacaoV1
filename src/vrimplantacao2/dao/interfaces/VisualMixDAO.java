@@ -103,10 +103,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     public String i_arquivo;
 
     public String dataVirada;
-    
+
     public boolean clientesV2;
-    
-     public void setClientesV2(boolean clientesV2) {
+
+    public void setClientesV2(boolean clientesV2) {
         this.clientesV2 = clientesV2;
     }
 
@@ -1029,6 +1029,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	c.DataInclusao as datacadastro,\n"
                 + "	c.Telefone,\n"
                 + "	case when len((cv.CREDITOMENSAL + coalesce(c.LimiteCredito, cv.CREDITOMENSAL))) > 10 then 999999\n"
+                + "	     when  (cv.CREDITOMENSAL + c.LimiteCredito) is null then  cv.CREDITOMENSAL\n"
                 + "	     else (cv.CREDITOMENSAL + c.LimiteCredito) end as valorlimite,\n"
                 + "	c.LimiteCheques,\n"
                 + "	c.DescProfissao as cargo,\n"
@@ -1042,7 +1043,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "left join Clientes c on c.CPF = cv.CPF\n"
                 + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
                 + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
-                + "left join Observacoes o on o.CodigoCliente = c.Codigo";
+                + "left join Observacoes o on o.CodigoCliente = c.Codigo where c.codigo = 143";
         if (clientesV2) {
             sql = "with cpf_ignorar as (\n"
                     + "select CPF_CGC  from Cheque_Alteracao \n"
@@ -1116,8 +1117,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery( sql
-                    /*"select \n"
+            try (ResultSet rst = stm.executeQuery(sql
+            /*"select \n"
                     + "	c.Codigo as id, \n"
                     + "	c.Nome as razao, \n"
                     + "	c.Apelido as fantasia,\n"
@@ -1233,8 +1234,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setPermiteCreditoRotativo(true);
                     }
-                    
-                    if(clientesV2){
+
+                    if (clientesV2) {
                         imp.setPermiteCheque(false);
                         imp.setPermiteCreditoRotativo(false);
                     }
