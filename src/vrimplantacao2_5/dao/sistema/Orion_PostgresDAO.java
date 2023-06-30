@@ -567,7 +567,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     "select \n"
                     + "codigo as id,\n"
                     + "codfornece as id_fornecedor,\n"
-                    + "tipopag as documento,\n"
+                    + "codcontas as documento,\n"
                     + "dlanca as emissao,\n"
                     + "vencimento,\n"
                     + "valorpag as valor,\n"
@@ -845,8 +845,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "select \n"
-                    + " codigo idvenda,\n"
+                    = "select\n"
+                    + "  codigo || terminal idvenda,\n"
                     + " data,\n"
                     + " terminal ecf,\n"
                     + " horainicio,\n"
@@ -920,8 +920,8 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select \n"
-                    + " iv.codvenda||'.'||iv.item::int itemvendaid,\n"
-                    + " v.codigo vendaid,\n"
+                    + " iv.codvenda||'.'||iv.item::int ||'.'||row_number() over() itemvendaid,\n"
+                    + " v.codigo || v.terminal vendaid,\n"
                     + " iv.item::int sequencia,\n"
                     + " iv.codplu produtoid,\n"
                     + " case when iv.estado = 'Cancelado' then 1 else 0 end cancelado,\n"
@@ -935,6 +935,7 @@ public class Orion_PostgresDAO extends InterfaceDAO implements MapaTributoProvid
                     + " iv.datavenda between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + " and v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + " and iv.estado != 'Cancelado'\n"
+                    + " and iv.codplu in (select plu from estoque)\n"
                     + " order by 1";
 
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
