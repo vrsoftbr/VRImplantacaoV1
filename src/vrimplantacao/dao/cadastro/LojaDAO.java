@@ -259,7 +259,7 @@ public class LojaDAO {
             }
             //  stm.execute(copiaEcf(i_loja));
 
-            /* inserir tabela contabilidade. */
+            /* inserir loja na tabela contabilidade.grupoeconomicoloja. */
             stm.execute(inserirGrupoEconomicoLoja(i_loja));
         }
     }
