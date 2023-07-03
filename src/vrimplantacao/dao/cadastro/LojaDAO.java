@@ -258,6 +258,9 @@ public class LojaDAO {
                 stm.execute(copiarParametroAgendaecebimento(i_loja));
             }
             //  stm.execute(copiaEcf(i_loja));
+
+            /* inserir tabela contabilidade. */
+            stm.execute(inserirGrupoEconomicoLoja(i_loja));
         }
     }
 
@@ -549,7 +552,7 @@ public class LojaDAO {
                         + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
                         + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
                 )) {
-                        ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO = proximoIdTecladoLayoutVO.get(i);
+                    ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO = proximoIdTecladoLayoutVO.get(i);
                     while (rst.next()) {
 
                         TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
@@ -709,6 +712,27 @@ public class LojaDAO {
     private String inserirComprovante(LojaVO i_loja) throws Exception {
         String sql = "insert into comprovante select id, " + i_loja.getId() + " as id_loja, descricao, cabecalho, \n"
                 + "detalhe, rodape from comprovante where id_loja = " + i_loja.getIdCopiarLoja();
+
+        return sql;
+    }
+
+    private String inserirGrupoEconomicoLoja(LojaVO i_loja) throws Exception {
+        String sql = "insert\n"
+                + "	into\n"
+                + "	contabilidade.grupoeconomicoloja\n"
+                + "select\n"
+                + "	(\n"
+                + "	select\n"
+                + "		max(id) + 1\n"
+                + "	from\n"
+                + "		contabilidade.grupoeconomicoloja) as id,\n"
+                + "	id_grupoeconomico,\n"
+                + "	" + i_loja.getId() + ",\n"
+                + "	false\n"
+                + "from\n"
+                + "	contabilidade.grupoeconomicoloja\n"
+                + "where\n"
+                + "	id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }

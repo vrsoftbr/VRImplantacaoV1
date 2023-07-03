@@ -243,7 +243,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("merc1"));
@@ -357,7 +357,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));

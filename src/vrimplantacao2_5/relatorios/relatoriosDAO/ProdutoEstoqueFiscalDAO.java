@@ -25,6 +25,7 @@ public class ProdutoEstoqueFiscalDAO {
     public List<ProdutoEstoqueFiscalVO> getProdutoEstoqueFiscal() throws Exception {
         List<ProdutoEstoqueFiscalVO> result = new ArrayList<>();
         int loja = escolherLoja();
+        int contador = 1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -43,10 +44,11 @@ public class ProdutoEstoqueFiscalDAO {
                 while (rs.next()) {
                     ProdutoEstoqueFiscalVO imp = new ProdutoEstoqueFiscalVO();
 
-                    imp.setId(rs.getInt("id"));
+                    imp.setId(contador);
                     imp.setIdProduto(rs.getInt("id_produto"));
                     imp.setEstoque(rs.getString("estoque"));
                     result.add(imp);
+                    contador++;
                 }
             }
         }
