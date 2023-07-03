@@ -382,9 +382,9 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	join [LOCAL] lc on\n" +
                     "		lc.LOJCOD = lj.LOJCOD and\n" +
                     "		lc.LOCCOD = '" + this.localEstoque + "'\n" +
-                    "	left join PRECO pr on\n" +
-                    (utilizarREFPLU ? "  pr.REFPLU = r.REFPLU and\n" : "  pr.PROCOD = r.PROCOD and\n") +
-                    "		pr.LOJCOD = lj.LOJCOD"
+                    "	left join PRECO pr on pr.REFPLU = r.REFPLU and pr.LOJCOD = lj.LOJCOD"
+                    //(utilizarREFPLU ? "  pr.REFPLU = r.REFPLU and\n" : "  pr.PROCOD = r.PROCOD and\n") +
+                    //"		pr.LOJCOD = lj.LOJCOD"
             )) {
                 while (rs.next()) {
                     ProdutoMilenio p = estoque.get(rs.getString("id_produto"));
