@@ -107,7 +107,8 @@ public class ConversorDbfDAO {
             for (String dado : dados) {
                 if (contador < dados.size()) {
                     dado = dados.get(contador++);
-                    campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
+                    campos += "\"" + dado.replaceAll(regexp, "").trim().replace(",", "").toString() + "\"" + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "") + " text,\n";
+                    //campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
                 }
             }
             System.out.println(sql + campos.substring(0, campos.length() - 2) + "\n);");
