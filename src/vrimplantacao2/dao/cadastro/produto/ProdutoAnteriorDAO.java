@@ -143,32 +143,32 @@ public class ProdutoAnteriorDAO {
             );
         }
     }
-    
+
     public void createTableCestInvalido() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("do $$\n" +
-                        "declare\n" +
-                        "begin\n" +
-                        "	if not exists(\n" +
-                        "			select \n" +
-                        "				table_name \n" +
-                        "			from \n" +
-                        "				information_schema.tables \n" +
-                        "			where \n" +
-                        "				table_schema = 'implantacao' and \n" +
-                        "				table_name = 'codant_cestinvalido') then\n" +
-                        "		CREATE TABLE implantacao.codant_cestinvalido\n" +
-                        "                    (\n" +
-                        "                      impsistema character varying NOT NULL,\n" +
-                        "                      imploja character varying NOT NULL,\n" +
-                        "                      impid character varying NOT NULL,\n" +
-                        "                      descricao varchar,\n" +
-                        "                      cest varchar(15),\n" +
-                        "                      primary key (impsistema, imploja, impid)\n" +
-                        "                );\n" +
-                        "		raise notice 'tabela criada';\n" +
-                        "	end if;\n" +
-                        "end; $$;");
+            stm.execute("do $$\n"
+                    + "declare\n"
+                    + "begin\n"
+                    + "	if not exists(\n"
+                    + "			select \n"
+                    + "				table_name \n"
+                    + "			from \n"
+                    + "				information_schema.tables \n"
+                    + "			where \n"
+                    + "				table_schema = 'implantacao' and \n"
+                    + "				table_name = 'codant_cestinvalido') then\n"
+                    + "		CREATE TABLE implantacao.codant_cestinvalido\n"
+                    + "                    (\n"
+                    + "                      impsistema character varying NOT NULL,\n"
+                    + "                      imploja character varying NOT NULL,\n"
+                    + "                      impid character varying NOT NULL,\n"
+                    + "                      descricao varchar,\n"
+                    + "                      cest varchar(15),\n"
+                    + "                      primary key (impsistema, imploja, impid)\n"
+                    + "                );\n"
+                    + "		raise notice 'tabela criada';\n"
+                    + "	end if;\n"
+                    + "end; $$;");
         }
     }
 
@@ -800,20 +800,20 @@ public class ProdutoAnteriorDAO {
             }
         }
     }
-    
+
     public void salvarCestInvalido(ProdutoAnteriorVO anterior) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setSchema("implantacao");
             sql.setTableName("codant_cestinvalido");
-            
+
             sql.put("impsistema", anterior.getImportSistema());
             sql.put("imploja", anterior.getImportLoja());
             sql.put("impid", anterior.getImportId());
             sql.put("cest", anterior.getCest());
             sql.put("descricao", anterior.getDescricao());
-            
+
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }
@@ -1503,82 +1503,8 @@ public class ProdutoAnteriorDAO {
                 + "	r record;\n"
                 + "begin\n"
                 + "	for r in select * from implantacao_lojas\n"
-                + "	loop\n"
-                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clientepreferencial' and t.table_schema = 'implantacao')) then\n"
-                + "			insert into implantacao.codant_clientepreferencial\n"
-                + "			select\n"
-                + "				r.sistema,\n"
-                + "				r.loja_nova,\n"
-                + "				id,\n"
-                + "				codigoatual,\n"
-                + "				cnpj,\n"
-                + "				ie,\n"
-                + "				nome,\n"
-                + "				false,\n"
-                + "                               id_conexao\n"
-                + "			from\n"
-                + "				implantacao.codant_clientepreferencial\n"
-                + "			where\n"
-                + "				sistema = r.sistema and\n"
-                + "				loja = r.loja_modelo and\n"
-                + "				id in (\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_clientepreferencial\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_modelo\n"
-                + "					except\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_clientepreferencial	\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_nova\n"
-                + "				);\n"
-                + "		end if;\n"
-                + "\n"
-                + "		--Clientes eventuais\n"
-                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_clienteeventual' and t.table_schema = 'implantacao')) then\n"
-                + "			insert into implantacao.codant_clienteeventual\n"
-                + "			select\n"
-                + "				r.sistema,\n"
-                + "				r.loja_nova,\n"
-                + "				id,\n"
-                + "				codigoatual,\n"
-                + "				cnpj,\n"
-                + "				ie,\n"
-                + "				nome,\n"
-                + "				false,\n"
-                + "                               id_conexao\n"
-                + "			from\n"
-                + "				implantacao.codant_clienteeventual\n"
-                + "			where\n"
-                + "				sistema = r.sistema and\n"
-                + "				loja = r.loja_modelo and\n"
-                + "				id in (\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_clienteeventual\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_modelo\n"
-                + "					except\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_clienteeventual	\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_nova\n"
-                + "				);\n"
-                + "		end if;\n"
-                + "\n"
+                + "	loop		\n"
                 + "		--Produtos\n"
-                + "\n"
                 + "		insert into implantacao.codant_produto\n"
                 + "		SELECT \n"
                 + "			impsistema, \n"
@@ -1604,7 +1530,7 @@ public class ProdutoAnteriorDAO {
                 + "			novo,\n"
                 + "                       codigosped,\n"
                 + "                       situacaocadastro,\n"
-                + "                       now(),\n"
+                + "                       dataimportacao,\n"
                 + "                       obsimportacao,\n"
                 + "                       icmscstsaida,\n"
                 + "                       icmsaliqsaida,\n"
@@ -1655,8 +1581,6 @@ public class ProdutoAnteriorDAO {
                 + "					imploja = r.loja_nova\n"
                 + "			)\n"
                 + "		order by impid;\n"
-                + "\n"
-                + "\n"
                 + "		insert into implantacao.codant_ean \n"
                 + "		SELECT \n"
                 + "			ant.importsistema,\n"
@@ -1692,109 +1616,7 @@ public class ProdutoAnteriorDAO {
                 + "		where   \n"
                 + "			ant.importsistema = r.sistema and \n"
                 + "			ant.importloja = r.loja_modelo\n"
-                + "			order by ant.importid;\n"
-                + "\n"
-                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_fornecedor' and t.table_schema = 'implantacao')) then\n"
-                + "			insert into implantacao.codant_fornecedor\n"
-                + "			select\n"
-                + "				importsistema,\n"
-                + "				r.loja_nova,\n"
-                + "				importid,\n"
-                + "				codigoatual,\n"
-                + "				cnpj,\n"
-                + "				razao,\n"
-                + "				fantasia,\n"
-                + "                               id_conexao\n"
-                + "			from \n"
-                + "				implantacao.codant_fornecedor\n"
-                + "			where\n"
-                + "				importsistema = r.sistema and \n"
-                + "				importloja = r.loja_modelo and\n"
-                + "				importid in (\n"
-                + "					select\n"
-                + "						importid\n"
-                + "					from\n"
-                + "						implantacao.codant_fornecedor\n"
-                + "					where\n"
-                + "						importsistema = r.sistema and \n"
-                + "						importloja = r.loja_modelo\n"
-                + "					except\n"
-                + "					select\n"
-                + "						importid\n"
-                + "					from\n"
-                + "						implantacao.codant_fornecedor	\n"
-                + "					where\n"
-                + "						importsistema = r.sistema and \n"
-                + "						importloja = r.loja_nova\n"
-                + "				);\n"
-                + "		end if;\n"
-                + "\n"
-                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_convenioempresa' and t.table_schema = 'implantacao')) then\n"
-                + "			insert into implantacao.codant_convenioempresa\n"
-                + "			select\n"
-                + "				sistema,\n"
-                + "				r.loja_nova loja,\n"
-                + "				id,\n"
-                + "				codigoatual,\n"
-                + "				cnpj,\n"
-                + "				razao\n"
-                + "			from \n"
-                + "				implantacao.codant_convenioempresa a\n"
-                + "			where\n"
-                + "				a.sistema = r.sistema and\n"
-                + "				a.loja = r.loja_modelo and\n"
-                + "				a.id in (\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_convenioempresa\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_modelo\n"
-                + "					except\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_convenioempresa	\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_nova\n"
-                + "				);\n"
-                + "		end if;\n"
-                + "\n"
-                + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'codant_conveniado' and t.table_schema = 'implantacao')) then\n"
-                + "			insert into implantacao.codant_conveniado\n"
-                + "			select\n"
-                + "				sistema,\n"
-                + "				r.loja_nova loja,\n"
-                + "				id,\n"
-                + "				codigoatual,\n"
-                + "				cnpj,\n"
-                + "				razao\n"
-                + "			from \n"
-                + "				implantacao.codant_conveniado a\n"
-                + "			where\n"
-                + "				a.sistema = r.sistema and\n"
-                + "				a.loja = r.loja_modelo and\n"
-                + "				a.id in (\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_conveniado\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_modelo\n"
-                + "					except\n"
-                + "					select\n"
-                + "						id\n"
-                + "					from\n"
-                + "						implantacao.codant_conveniado	\n"
-                + "					where\n"
-                + "						sistema = r.sistema and \n"
-                + "						loja = r.loja_nova\n"
-                + "				);\n"
-                + "		end if;\n"
-                + "\n"
+                + "			order by ant.importid;		\n"
                 + "		if (exists(select table_name from information_schema.tables t where t.table_name = 'mapatributacao' and t.table_schema = 'implantacao')) then\n"
                 + "			insert into implantacao.mapatributacao\n"
                 + "			select\n"
@@ -1806,9 +1628,9 @@ public class ProdutoAnteriorDAO {
                 + "				orig_cst,\n"
                 + "				orig_aliquota,\n"
                 + "				orig_reduzido,\n"
-                + "                               orig_fcp,\n"
-                + "                               orig_desonerado,\n"
-                + "                               orig_porcentagemdesonerado\n"
+                + "                orig_fcp,\n"
+                + "                orig_desonerado,\n"
+                + "                orig_porcentagemdesonerado\n"
                 + "			from \n"
                 + "				implantacao.mapatributacao a\n"
                 + "			where\n"
@@ -1826,15 +1648,15 @@ public class ProdutoAnteriorDAO {
                 + "					select\n"
                 + "						orig_id\n"
                 + "					from\n"
-                + "						implantacao.mapatributacao	\n"
+                + "						implantacao.mapatributacao\n"
                 + "					where\n"
                 + "						sistema = r.sistema and \n"
                 + "						agrupador = r.loja_nova\n"
                 + "				);\n"
                 + "		end if;\n"
-                + "	end loop;     \n"
+                + "	end loop;\n"
                 + "end;\n"
-                + "$$;\n";
+                + "$$;";
 
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(sql);

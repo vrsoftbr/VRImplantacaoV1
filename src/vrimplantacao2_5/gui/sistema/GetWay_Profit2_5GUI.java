@@ -1,5 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,12 +10,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JCheckBox;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.panel.VRPanel;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -36,37 +39,37 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private int vLojaVR = -1;
     private GetWay_ProfitDAO dao = new GetWay_ProfitDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
-    
+
     private Set<Integer> rotativoSelecionado = new HashSet<>();
-    private Set<Integer> chequeSelecionado = new HashSet<>();    
+    private Set<Integer> chequeSelecionado = new HashSet<>();
 
     private TipoDocumentoTableModel rotativoModel = new TipoDocumentoTableModel(new ArrayList<TipoDocumentoRecord>());
     private TipoDocumentoTableModel chequeModel = new TipoDocumentoTableModel(new ArrayList<TipoDocumentoRecord>());
-    
+
     private void carregarTipoDocumento() throws Exception {
         this.rotativoModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
-        
+
         for (TipoDocumentoRecord t : this.rotativoModel.getItens()) {
             t.selected = rotativoSelecionado.contains(t.id);
         }
-        
+
         this.rotativoModel.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
                 TipoDocumentoRecord item = rotativoModel.getItens().get(e.getLastRow());
-                
+
                 if (item.selected) {
                     rotativoSelecionado.add(item.id);
                 } else {
                     rotativoSelecionado.remove(item.id);
                 }
-            }        
+            }
         });
-        
+
         tblRotativo.setModel(this.rotativoModel);
-        
+
         this.chequeModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
-        
+
         for (TipoDocumentoRecord f : this.chequeModel.getItens()) {
             f.selected = chequeSelecionado.contains(f.id);
         }
@@ -81,7 +84,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 }
             }
         });
-        tblCheque.setModel(this.chequeModel);        
+        tblCheque.setModel(this.chequeModel);
     }
 
     private void carregarParametros() throws Exception {
@@ -97,7 +100,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         chkPesquisarKG.setSelected(params.getBool(SISTEMA, "PESQUISAR_KG_DESCRICAO"));
         chkUtilizarEmbalagemCompra.setSelected(params.getBool(SISTEMA, "UTILIZAR_EMBALAGEM_DE_COMPRA"));
         chkCopiarIcmsDebitoNaEntrada.setSelected(params.getBool(SISTEMA, "COPIAR_ICMS_DEBITO"));
-        
+
         String strRotativoSelecionado = params.getWithNull("", SISTEMA, "ROTATIVO_SELECT");
         this.rotativoSelecionado.clear();
         for (String id : strRotativoSelecionado.split("\\|")) {
@@ -111,7 +114,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             if (!"".equals(id)) {
                 this.chequeSelecionado.add(Integer.parseInt(id));
             }
-        }        
+        }
     }
 
     private void gravarParametros() throws Exception {
@@ -127,7 +130,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         params.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), SISTEMA, "COPIAR_ICMS_DEBITO");
 
         pnlConn.atualizarParametros();
-        
+
         {
             StringBuilder builder = new StringBuilder();
             for (Iterator<Integer> iterator = this.rotativoSelecionado.iterator(); iterator.hasNext();) {
@@ -148,12 +151,12 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             }
             params.put(builder.toString(), SISTEMA, "CHEQUE_SELECT");
         }
-        
+
         if (pnlConn != null) {
             params.put(pnlConn.getLojaVR(), SISTEMA, "LOJA_VR");
             vLojaVR = pnlConn.getLojaVR();
         }
-        
+
         params.salvar();
     }
 
@@ -168,10 +171,10 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             carregarTipoDocumento();
             gravarParametros();
         });
-        
+
         pnlConn.setSistema(ESistema.GETWAY);
         pnlConn.getNomeConexao();
-        
+
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -196,7 +199,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
-        
+
         carregarParametros();
 
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
@@ -254,7 +257,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                     dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
                     dao.setTipoDocumentoRotativo(rotativoSelecionado);
                     dao.setTipoDocumentoCheque(chequeSelecionado);
-                    
+
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
@@ -293,7 +296,8 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
                                     break;
                                 default:
                                     break;
-                            }   break;
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -302,7 +306,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
+
                 } catch (Exception ex) {
                     try {
                         connSqlServer.close();
@@ -325,6 +329,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
 
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar11 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new javax.swing.JPanel();
@@ -394,17 +399,30 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar11.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar11.setText("Limpar");
+        jBLimpar11.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar11ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar11)
         );
 
         vRPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -910,6 +928,17 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
+    private void jBLimpar11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar11ActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+        for (Component c : vRPanel10.getComponents()) {
+            if (c instanceof JCheckBox) {
+                ((JCheckBox) c).setSelected(false);
+            }
+        }
+    }//GEN-LAST:event_jBLimpar11ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
@@ -933,6 +962,7 @@ public class GetWay_Profit2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUtilizarEmbalagemCompra;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private javax.swing.JButton jBLimpar11;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

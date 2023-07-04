@@ -1,8 +1,11 @@
 package vrimplantacao2.gui.component.checks;
 
+import java.awt.Component;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.swing.JCheckBox;
+import vrframework.bean.panel.VRPanel;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -113,11 +116,11 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             this.remove(pnlContaPagar);
             pnlContasPagar.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoFornecedor.TIPO_EMPRESA)) {
             chkTipoEmpresa.setVisible(opt.contains(OpcaoFornecedor.TIPO_EMPRESA));
         }
-        
+
         if (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR)) {
             chkTipoFornecedor.setVisible(opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR));
         }
@@ -341,7 +344,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 importador.importarContasPagar(OpcaoContaPagar.NOVOS);
             }
         }
-        
+
         if (chkOutrasDespesas.isSelected()) {
             importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
         }
@@ -351,35 +354,58 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         importar();
     }
 
+    /*
+    Procura por checkbox dentro dos componentes e os seta como false.
+     */
     public void limparFornecedor() {
-        ImportarSemFornecedor.setSelected(false);
-        chkBairro.setSelected(false);
-        chkCep.setSelected(false);
-        chkCnpj.setSelected(false);
-        chkComplemento.setSelected(false);
-        chkCondicaoPagamento.setSelected(false);
-        chkContatoAdicional.setSelected(false);
-        chkDataCadastro.setSelected(false);
-        chkEndereco.setSelected(false);
-        chkFantasia.setSelected(false);
-        chkForcarUnificacao.setSelected(false);
-        chkFornecedor.setSelected(false);
-        chkIE.setSelected(false);
-        chkIM.setSelected(false);
-        chkImportarSomenteAtivos.setSelected(false);
-        chkIndicadorIE.setSelected(false);
-        chkMunicipio.setSelected(false);
-        chkMunicipioIbge.setSelected(false);
-        chkNumero.setSelected(false);
-        chkObservacao.setSelected(false);
-        chkPagarFornecedor.setSelected(false);
-        chkPrazoFornecedor.setSelected(false);
-        chkProdutoFornecedor.setSelected(false);
-        chkRazao.setSelected(false);
-        chkSituacaoCadastro.setSelected(false);
-        chkTelefone.setSelected(false);
-        chkUf.setSelected(false);
-        chkUfIbge.setSelected(false);
+        for (Component p : tabImportacao.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabParametros.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : pnlContaPagar.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : pnlProdForn.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
     }
 
     /**

@@ -180,6 +180,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -250,20 +251,20 @@ public class Uniplus2_5GUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -278,17 +279,30 @@ public class Uniplus2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
         pnlMigrar.setLayout(pnlMigrarLayout);
         pnlMigrarLayout.setHorizontalGroup(
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlMigrarLayout.setVerticalGroup(
-            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar)
         );
 
         tabImportacao.addTab("Produtos", tabProdutos);
@@ -363,7 +377,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
             .addGroup(tabBalancaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(175, Short.MAX_VALUE))
+                .addContainerGap(179, Short.MAX_VALUE))
         );
 
         tab.addTab("Balança", tabBalanca);
@@ -420,6 +434,12 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         dao.setTabelaPreco(TabelaPreco.TABELA_PRECO);
     }//GEN-LAST:event_rbnTabelaPrecoActionPerformed
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedor.limparFornecedor();
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -431,6 +451,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
     private javax.swing.JCheckBox chkTemProdutoAssociado;
     private javax.swing.ButtonGroup grbPriorizarPreco;
+    private javax.swing.JButton jBLimpar;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;
     private vrframework.bean.panel.VRPanel pnlParam;

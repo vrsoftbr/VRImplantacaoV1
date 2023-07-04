@@ -184,6 +184,7 @@ public class Focus2_5GUI extends VRInternalFrame {
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar1 = new javax.swing.JButton();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -245,19 +246,35 @@ public class Focus2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar1.setText("Limpar");
+        jBLimpar1.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlLojaLayout = new javax.swing.GroupLayout(pnlLoja);
         pnlLoja.setLayout(pnlLojaLayout);
         pnlLojaLayout.setHorizontalGroup(
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLojaLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jBLimpar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         pnlLojaLayout.setVerticalGroup(
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLojaLayout.createSequentialGroup()
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLojaLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBLimpar1))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -305,8 +322,15 @@ public class Focus2_5GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
+    private void jBLimpar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar1ActionPerformed
+        tabProdutos.limparProduto();
+        tabCliente.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimpar1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JButton jBLimpar1;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;

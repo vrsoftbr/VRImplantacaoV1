@@ -182,6 +182,7 @@ public class Pallas2_5GUI extends VRInternalFrame {
 
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new javax.swing.JPanel();
@@ -206,20 +207,20 @@ public class Pallas2_5GUI extends VRInternalFrame {
         setTitle("PALLAS");
         setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
                 formInternalFrameClosing(evt);
             }
-            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -239,17 +240,30 @@ public class Pallas2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar)
         );
 
         chkProdTemArquivoBalanca.setText("Tem Arquivo da Balança");
@@ -419,9 +433,16 @@ public class Pallas2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formInternalFrameClosing
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vr.view.components.checkbox.VRCheckBox chkProdTemArquivoBalanca;
+    private javax.swing.JButton jBLimpar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;

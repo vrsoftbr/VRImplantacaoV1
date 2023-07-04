@@ -171,6 +171,7 @@ public class Consinco2_5GUI extends VRInternalFrame {
 
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar4 = new javax.swing.JButton();
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -195,20 +196,20 @@ public class Consinco2_5GUI extends VRInternalFrame {
 
         setTitle("Consinco");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -223,17 +224,30 @@ public class Consinco2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar4.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar4.setText("Limpar");
+        jBLimpar4.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
         pnlMigrar.setLayout(pnlMigrarLayout);
         pnlMigrarLayout.setHorizontalGroup(
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlMigrarLayout.setVerticalGroup(
-            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar4)
         );
 
         tabImportacao.addTab("Produtos", tabProdutos);
@@ -401,12 +415,22 @@ public class Consinco2_5GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
+    private void jBLimpar4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar4ActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimpar4ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkImportarOutrasDespesas;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private javax.swing.JButton jBLimpar1;
+    private javax.swing.JButton jBLimpar2;
+    private javax.swing.JButton jBLimpar3;
+    private javax.swing.JButton jBLimpar4;
     private javax.swing.JLabel jLabel15;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;

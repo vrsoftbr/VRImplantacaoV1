@@ -306,6 +306,7 @@ public class Arius2_5GUI extends VRInternalFrame {
 
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -387,17 +388,30 @@ public class Arius2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
         pnlMigrar.setLayout(pnlMigrarLayout);
         pnlMigrarLayout.setHorizontalGroup(
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlMigrarLayout.setVerticalGroup(
-            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar)
         );
 
         tabImportacao.addTab("Produtos", tabProdutos);
@@ -409,7 +423,7 @@ public class Arius2_5GUI extends VRInternalFrame {
         tabCli.setLayout(tabCliLayout);
         tabCliLayout.setHorizontalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(scpClientes, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -685,7 +699,7 @@ public class Arius2_5GUI extends VRInternalFrame {
                 .addGroup(tabFornecedores2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tabEFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(466, Short.MAX_VALUE))
+                .addContainerGap(336, Short.MAX_VALUE))
         );
         tabFornecedores2Layout.setVerticalGroup(
             tabFornecedores2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -706,19 +720,17 @@ public class Arius2_5GUI extends VRInternalFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 849, Short.MAX_VALUE)
-                    .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 711, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 711, Short.MAX_VALUE)
+                        .addComponent(pnlMigrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -781,6 +793,12 @@ public class Arius2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFamiliaFornecedorActionPerformed
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JCheckBox chkClAdminCard;
@@ -803,6 +821,7 @@ public class Arius2_5GUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbTipoVenda1;
     private org.jdesktop.swingx.JXDatePicker edtDtNotaFim1;
     private org.jdesktop.swingx.JXDatePicker edtDtNotaIni1;
+    private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlMigrar;

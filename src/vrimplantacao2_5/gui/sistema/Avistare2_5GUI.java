@@ -193,6 +193,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new javax.swing.JPanel();
@@ -250,17 +251,30 @@ public class Avistare2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar1.setText("Limpar");
+        jBLimpar1.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jBLimpar1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jBLimpar1)
         );
 
         chkProdTemArquivoBalanca.setText("Tem Arquivo da Balança");
@@ -430,9 +444,16 @@ public class Avistare2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formInternalFrameClosing
 
+    private void jBLimpar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar1ActionPerformed
+        tabProdutos.limparProduto();
+        tabClientes.limparCliente();
+        tabFornecedores.limparFornecedor();
+    }//GEN-LAST:event_jBLimpar1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vr.view.components.checkbox.VRCheckBox chkProdTemArquivoBalanca;
+    private javax.swing.JButton jBLimpar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;

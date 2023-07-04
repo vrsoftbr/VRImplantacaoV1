@@ -1,14 +1,17 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.swing.JCheckBox;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.panel.VRPanel;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.utils.Utils;
@@ -286,6 +289,7 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
         chkPdvVendasCustos = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -513,6 +517,7 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -520,6 +525,7 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
                 .addComponent(chkCvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(chkCvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, Short.MAX_VALUE))
         );
@@ -612,12 +618,24 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBLimpar, "Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -625,7 +643,9 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jBLimpar)
+                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -636,7 +656,7 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 573, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -739,6 +759,37 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        for (Component p : tabImpFornecedor.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+        for (Component p : tabClienteDados.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+        for (Component p : vRPanel1.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_jBLimparActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -767,6 +818,7 @@ public class AlterData_WShop2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private javax.swing.JButton jBLimpar;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.panel.VRPanel tabClienteDados;

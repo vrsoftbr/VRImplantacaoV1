@@ -1,11 +1,16 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.panel.VRPanel;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.classe.ConexaoMySQL;
@@ -41,11 +46,11 @@ public class Hipcom2_5GUI extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.gravarParametros(params, SISTEMA);
         pnlConn.atualizarParametros();
         params.put(chkVendaUtilizaDigito.isSelected(), SISTEMA, "UTILIZA_DIGITO");
-        
+
         params.salvar();
     }
 
@@ -56,9 +61,9 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         initComponents();
 
         this.title = "Importação " + SISTEMA;
-        
+
         tabProdutos.setOpcoesDisponiveis(dao);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
@@ -81,13 +86,13 @@ public class Hipcom2_5GUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
 
         carregarParametros();
-        
+
         rdbVendasV1.setSelected(true);
-        
+
         pnlConn.setSistema(ESistema.HIPCOM);
         pnlConn.getNomeConexao();
 
@@ -110,14 +115,14 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
-        
+
         if (chkCreditoRotativo.isSelected()) {
             if (txtRotDtIni.getDate() == null || txtRotDtFim.getDate() == null) {
                 Util.exibirMensagem("Verifique o intervalo de datas do crédito rotativo", "Atenção");
                 return;
             }
-        }        
-        
+        }
+
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
@@ -127,14 +132,13 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                
+
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
 //                    dao.setVersaoVenda(rdbVendasV1.isSelected() ? 1 : 2);
-                    
                     Importador importador = new Importador(dao);
-                    
+
                     importador.setIdConexao(pnlConn.idConexao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -148,11 +152,11 @@ public class Hipcom2_5GUI extends VRInternalFrame {
 
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
-                        
-                        if(chkReceitaProduto.isSelected()){
+
+                        if (chkReceitaProduto.isSelected()) {
                             importador.importarReceitasProducao();
                         }
-                        
+
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -187,7 +191,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                             if (chkFNomeFantasia.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
                             }
-                            if(chkFComplemento.isSelected()){
+                            if (chkFComplemento.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.COMPLEMENTO);
                             }
 
@@ -195,64 +199,64 @@ public class Hipcom2_5GUI extends VRInternalFrame {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                             }
                         }
-                        
+
                         if (chkOutrasReceitas.isSelected()) {
                             dao.setReceberDataInicial(txtOtRecDtIni.getDate());
                             dao.setReceberDataFinal(txtOtRecDtFim.getDate());
                             importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                         }
-                        
+
                         if (chkContasPagar.isSelected()) {
                             dao.setCpDataInicial(txtDtCPEntrada.getDate());
                             dao.setCpDataFinal(txtDtCPFim.getDate());
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
-                        
+
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
-                        
+
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        
+
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
-                            
+
                             if (chkClienteTipoInscricao.isSelected()) {
                                 opcoes.add(OpcaoCliente.TIPO_INSCRICAO);
                             }
-                            
+
                             if (chkCIE.isSelected()) {
                                 opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                             }
-                            if(chkConvenioEmpresa.isSelected()){
+                            if (chkConvenioEmpresa.isSelected()) {
                                 importador.importarConvenioEmpresa();
                             }
-                            if(chkConveniado.isSelected()){
+                            if (chkConveniado.isSelected()) {
                                 importador.importarConvenioConveniado();
                             }
-                            if(chkTransacaoConvenio.isSelected()){
+                            if (chkTransacaoConvenio.isSelected()) {
                                 importador.importarConvenioTransacao();
                             }
-                            
+
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencialNovo(opcoes.toArray(new OpcaoCliente[]{}));
                             }
                         }
-                
+
                         if (chkCreditoRotativo.isSelected()) {
                             dao.setRotativoDataInicial(txtRotDtIni.getDate());
                             dao.setRotativoDataFinal(txtRotDtFim.getDate());
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             dao.setRotativoDataInicial(txtRotDtIni.getDate());
                             dao.setRotativoDataFinal(txtRotDtFim.getDate());
                             importador.importarCheque();
                         }
-                        
+
                         if (chkVendas.isSelected()) {
                             dao.setDataInicioVenda(txtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(txtDtVendaFim.getDate());
@@ -342,6 +346,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar11 = new javax.swing.JButton();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -726,12 +731,24 @@ public class Hipcom2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar11.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar11.setText("Limpar");
+        jBLimpar11.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimpar11ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlLojaLayout = new javax.swing.GroupLayout(pnlLoja);
         pnlLoja.setLayout(pnlLojaLayout);
         pnlLojaLayout.setHorizontalGroup(
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlLojaLayout.createSequentialGroup()
-                .addContainerGap(518, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBLimpar11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -739,7 +756,9 @@ public class Hipcom2_5GUI extends VRInternalFrame {
             pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlLojaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlLojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jBLimpar11)
+                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -789,11 +808,11 @@ public class Hipcom2_5GUI extends VRInternalFrame {
         if (rdbVendasV2.isSelected()) {
             rdbVendasV1.setSelected(false);
         }
-        
+
     }//GEN-LAST:event_rdbVendasV2tipoVendaSelect
 
     private void rdbVendasV1tipoVendaSelect(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVendasV1tipoVendaSelect
-        
+
         if (rdbVendasV1.isSelected()) {
             rdbVendasV2.setSelected(false);
         }
@@ -810,6 +829,58 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private void chkFornCartaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornCartaoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornCartaoActionPerformed
+
+    private void jBLimpar11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimpar11ActionPerformed
+        tabProdutos.limparProduto();
+        for (Component p : tabClientes.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+        for (Component p : tabFornecedor.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+        for (Component p : tabOutras.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_jBLimpar11ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -844,6 +915,7 @@ public class Hipcom2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTransacaoConvenio;
     private javax.swing.JCheckBox chkVendaUtilizaDigito;
     private javax.swing.JCheckBox chkVendas;
+    private javax.swing.JButton jBLimpar11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;

@@ -1,5 +1,6 @@
 package vrimplantacao2_5.gui.sistema;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,11 +8,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.panel.VRPanel;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -329,6 +333,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
         pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
+        jBLimpar = new javax.swing.JButton();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametrosGerais = new vrframework.bean.panel.VRPanel();
@@ -395,12 +400,24 @@ public class SysPdv2_5GUI extends VRInternalFrame {
             }
         });
 
+        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        jBLimpar.setText("Limpar");
+        jBLimpar.setToolTipText("Limpa todos os itens selecionados");
+        jBLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBLimparActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
         pnlMigrar.setLayout(pnlMigrarLayout);
         pnlMigrarLayout.setHorizontalGroup(
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -408,7 +425,9 @@ public class SysPdv2_5GUI extends VRInternalFrame {
             pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jBLimpar)
+                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -951,6 +970,86 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
+    private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
+        tabProdutos.limparProduto();
+        for (Component p : tabParametrosGerais.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabImpFornecedor.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabClientes.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabVenda.getComponents()) {
+            if (p instanceof JPanel) {
+                for (Component c : ((JPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+    }//GEN-LAST:event_jBLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vr.view.components.radiobutton.VRRadioButton chkBalNormal;
@@ -976,6 +1075,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private javax.swing.JButton jBLimpar;
     private vrframework.bean.panel.VRPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlDadosDataVenda;

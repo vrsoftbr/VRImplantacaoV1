@@ -1,9 +1,13 @@
 package vrimplantacao2.gui.component.checks;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import vrframework.bean.panel.VRPanel;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -148,7 +152,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.OUTRAS_RECEITAS)) {
             chkOutrasReceitas.setVisible(opt.contains(OpcaoCliente.OUTRAS_RECEITAS));
             tabCreditoRotativo.add(pnlCreditoRotativo);
@@ -314,7 +318,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.OUTRAS_RECEITAS)) {
             chkOutrasReceitas.setVisible(opt.contains(OpcaoCliente.OUTRAS_RECEITAS));
             tabCreditoRotativo.add(pnlCreditoRotativo);
@@ -475,7 +479,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkCreditoRotativo.isSelected()) {
             importador.importarCreditoRotativo();
         }
-        
+
         if (chkOutrasReceitas.isSelected()) {
             importador.importarOutrasReceitas();
         }
@@ -501,50 +505,82 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         importar();
     }
 
+    /*
+    Procura por checkbox dentro dos componentes e os seta como false.
+     */
     public void limparCliente() {
-        chkBairro.setSelected(false);
-        chkBloqueado.setSelected(false);
-        chkCargo.setSelected(false);
-        chkCelular.setSelected(false);
-        chkCep.setSelected(false);
-        chkCheque.setSelected(false);
-        chkClienteEventual.setSelected(false);
-        chkClientePreferencial.setSelected(false);
-        chkCnpj.setSelected(false);
-        chkComplemento.setSelected(false);
-        chkContatoAdicional.setSelected(false);
-        chkConveniado.setSelected(false);
-        chkConveniadoEmpresa.setSelected(false);
-        chkConveniadoTransacao.setSelected(false);
-        chkCreditoRotativo.setSelected(false);
-        chkDataAdmissao.setSelected(false);
-        chkDataCadastro.setSelected(false);
-        chkDataNascimento.setSelected(false);
-        chkEmail.setSelected(false);
-        chkEmpresa.setSelected(false);
-        chkEndereco.setSelected(false);
-        chkEstadoCivil.setSelected(false);
-        chkForcarUnificacao.setSelected(false);
-        chkIE.setSelected(false);
-        chkImportarClienteAtivo.setSelected(false);
-        chkMunicipio.setSelected(false);
-        chkMunicipioIbge.setSelected(false);
-        chkNome.setSelected(false);
-        chkNomeConjuge.setSelected(false);
-        chkNomeMae.setSelected(false);
-        chkNomePai.setSelected(false);
-        chkNumero.setSelected(false);
-        chkObservacao.setSelected(false);
-        chkObservacao2.setSelected(false);
-        chkPermiteCheque.setSelected(false);
-        chkPermiteCreditoRotativo.setSelected(false);
-        chkSalario.setSelected(false);
-        chkSexo.setSelected(false);
-        chkSituacaoCadastro.setSelected(false);
-        chkTelefone.setSelected(false);
-        chkUf.setSelected(false);
-        chkUfIbge.setSelected(false);
-        chkValorLimite.setSelected(false);
+        for (Component p : tabImportacao.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabCheque.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabClienteEventual.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabConvenio.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabCreditoRotativo.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+        for (Component p : tabParametros.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
     }
 
     /**
