@@ -19,10 +19,7 @@ import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.BaseDAO;
 import vrimplantacao2.dao.interfaces.BrainSoftDAO;
 import vrimplantacao2.dao.interfaces.CgaDAO;
-import vrimplantacao2.dao.interfaces.CFSoftSiaECFDAO;
 import vrimplantacao2.dao.interfaces.CPGestorDAO;
-import vrimplantacao2.dao.interfaces.CPlusDAO;
-import vrimplantacao2.dao.interfaces.CadastraFacilDAO;
 import vrimplantacao2.dao.interfaces.CefasDAO;
 import vrimplantacao2.dao.interfaces.CerebroDAO;
 import vrimplantacao2.dao.interfaces.CervantesDAO;
@@ -65,7 +62,6 @@ import vrimplantacao2.dao.interfaces.GDoorDAO;
 import vrimplantacao2.dao.interfaces.GR7DAO;
 import vrimplantacao2.dao.interfaces.GSoftDAO;
 import vrimplantacao2.dao.interfaces.GTechDAO;
-import vrimplantacao2.dao.interfaces.GZSistemasDAO;
 import vrimplantacao2.dao.interfaces.GestorPdvDAO;
 import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO;
 import vrimplantacao2.dao.interfaces.GigatronDAO;
@@ -175,7 +171,6 @@ import vrimplantacao2.dao.interfaces.TecnosoftDAO;
 import vrimplantacao2.dao.interfaces.TeleconDAO;
 import vrimplantacao2.dao.interfaces.TiTecnologiaDAO;
 import vrimplantacao2.dao.interfaces.TpaRootacDAO;
-import vrimplantacao2.dao.interfaces.TstiDAO;
 import vrimplantacao2.dao.interfaces.UniplusDAO;
 import vrimplantacao2.dao.interfaces.UpFortiDAO;
 import vrimplantacao2.dao.interfaces.VCashDAO;
@@ -195,7 +190,6 @@ import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.dao.interfaces.winthor.Winthor_PcSistemasDAO;
-import vrimplantacao2.gui.interfaces.SiaCriareMySqlGUI;
 import vrimplantacao2_5.dao.sistema.ASoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.Accesys2_5DAO;
 import vrimplantacao2_5.dao.sistema.Acom2_5DAO;
@@ -234,6 +228,7 @@ import vrimplantacao2_5.dao.sistema.FenixMEDAO;
 import vrimplantacao2_5.dao.sistema.FocusDAO;
 import vrimplantacao2_5.dao.sistema.GEPDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
+import vrimplantacao2_5.dao.sistema.GZSistemas2_5DAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
 import vrimplantacao2_5.dao.sistema.ProviderGenericoDAO;
@@ -316,6 +311,7 @@ import vrimplantacao2_5.gui.sistema.Focus2_5GUI;
 import vrimplantacao2_5.gui.sistema.GEP2_5GUI;
 import vrimplantacao2_5.gui.sistema.GSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
+import vrimplantacao2_5.gui.sistema.GZSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Generico2_5GUI;
@@ -882,10 +878,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    GZSISTEMAS(66, "GZSISTEMAS", new GZSistemasDAO()) {
+    GZSISTEMAS(66, "GZSISTEMAS", new GZSistemas2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new GZSistemas2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     GESTORPDV(67, "GESTORPDV", new GestorPdvDAO()) {

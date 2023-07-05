@@ -54,6 +54,7 @@ public enum EScriptLojaOrigemSistema {
     CADASTRAFACIL(23, 5, "select lpad(id_empresa, 4, ''0'') as id, nome_razao AS descricao FROM empresa"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
     FENIX(54, 5, "select id_empresa as id, nm_fantasia as descricao from empresa order by 1"),
+    GZSISTEMAS(66, 8, "select codigo id, nomfan descricao, cgc from mercodb.lojas order by codigo"),
     GETWAY(68, 13, "select CODLOJA id, descricao from LOJA order by id"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
     HIPCOM(74, 8, "select lojcod as id, concat(lojcod,'' - '', lojfantas) descricao, lojcnpj from hiploj order by 1"),    
