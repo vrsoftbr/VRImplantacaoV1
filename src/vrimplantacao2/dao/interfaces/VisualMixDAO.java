@@ -996,7 +996,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "          when cast(cv.CPF as bigint) = 191 then cv.Codigo\n"
                 + "		else cast(cv.CPF as bigint) end as cnpj,\n"
                 + "	c.RG inscricaoestadual,\n"
-                + " coalesce(c.Nome, cv.NOME) as razao, \n"
+                + "     coalesce(cv.NOME, c.Nome) as razao, \n"
                 + "	c.Apelido as fantasia,\n"
                 + "	cv.REGISTRO as ie_rg,\n"
                 + "	c.Status ativo,\n"
@@ -1028,9 +1028,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	c.RamalEmpresa,\n"
                 + "	c.DataInclusao as datacadastro,\n"
                 + "	c.Telefone,\n"
+                + "     cv.CREDITOMENSAL as valorlimite,\n"
                 + "	case when len((cv.CREDITOMENSAL + coalesce(c.LimiteCredito, cv.CREDITOMENSAL))) > 10 then 999999\n"
                 + "	     when  (cv.CREDITOMENSAL + c.LimiteCredito) is null then  cv.CREDITOMENSAL\n"
-                + "	     else (cv.CREDITOMENSAL + c.LimiteCredito) end as valorlimite,\n"
+                + "	     else (cv.CREDITOMENSAL + c.LimiteCredito) end as valorlimite_2,\n"
                 + "	c.LimiteCheques,\n"
                 + "	c.DescProfissao as cargo,\n"
                 + " p.Descricao as profissao,\n"
@@ -1043,27 +1044,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "left join Clientes c on c.CPF = cv.CPF\n"
                 + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
                 + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
-                + "left join Observacoes o on o.CodigoCliente = c.Codigo where c.codigo = 143";
+                + "left join Observacoes o on o.CodigoCliente = c.Codigo";
         if (clientesV2) {
-            sql = "with cpf_ignorar as (\n"
-                    + "select CPF_CGC  from Cheque_Alteracao \n"
-                    + "union\n"
-                    + "select CPF_CGC from Cheque_Devolvido_Historico\n"
-                    + "union\n"
-                    + "select CPF_CGC from Cheque_Devolvido \n"
-                    + "union\n"
-                    + "select CPF_CGC from Historico_Cheques \n"
-                    + "union\n"
-                    + "select CPF_CGC from Historico_ChequesANT \n"
-                    + "union\n"
-                    + "select CPF_CGC from Cheque_Devolvido_Pagto \n"
-                    + "union\n"
-                    + "select CPF_CGC from Cheque_Emitido \n"
-                    + "union\n"
-                    + "select CPF_CGC from Cheque_Emitido_Liberado\n"
-                    + ")\n"
-                    + "select \n"
-                    + "	cast(c.Codigo as varchar) + '-P' as id, \n"
+            sql = "select \n"
+                    + "case when c.Codigo in (select Codigo from ConvConveniados) then cast(c.Codigo as varchar) + '-P'\n"
+                    + "     else cast(c.Codigo as varchar) end as id, \n"
                     + "	c.Nome as razao, \n"
                     + "	c.Apelido as fantasia,\n"
                     + "	c.RG inscricaoestadual, \n"
@@ -1111,70 +1096,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from dbo.Clientes c\n"
                     + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
                     + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
-                    + "left join Observacoes o on o.CodigoCliente = c.Codigo\n"
-                    + "where c.Status = 15\n"
-                    + "and c.CPF not in (select CPF_CGC from cpf_ignorar)";
+                    + "left join Observacoes o on o.CodigoCliente = c.Codigo\n";
+
         }
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(sql
-            /*"select \n"
-                    + "	c.Codigo as id, \n"
-                    + "	c.Nome as razao, \n"
-                    + "	c.Apelido as fantasia,\n"
-                    + "	c.RG, \n"
-                    + "	cast(c.CPF as bigint) as CPF, \n"
-                    + "	c.IDSexo as sexo,\n"
-                    + "	c.DataNascimento,\n"
-                    + "	c.EstadoCivil,\n"
-                    + "	c.NomeConjuge,\n"
-                    + "	c.DataNascimentoConjuge,\n"
-                    + "	c.Endereco,\n"
-                    + "	c.Numero,\n"
-                    + "	c.Complemento,\n"
-                    + "	c.Bairro,\n"
-                    + "	c.CEP,\n"
-                    + "	c.Cidade as municipio,\n"
-                    + "	c.Estado as uf,\n"
-                    + "	c.Referencia,\n"
-                    + "	c.TipoEndereco,\n"
-                    + "	c.eMail,\n"
-                    + "	c.Empresa,\n"
-                    + "	c.DataAdmissao,\n"
-                    + "	c.CodigoProfissao,\n"
-                    + "	c.TelefoneEmpresa,\n"
-                    + "	e.Descricao as nomeempresa,\n"
-                    + "	e.EnderecoEmpresa,\n"
-                    + "	e.NumeroEmpresa,\n"
-                    + "	e.ComplementoEmpresa,\n"
-                    + "	e.BairroEmpresa,\n"
-                    + "	e.CidadeEmpresa,\n"
-                    + "	e.EstadoEmpresa,\n"
-                    + "	e.CEPEmpresa,"
-                    + "	c.RamalEmpresa,\n"
-                    + "	c.DataInclusao as datacadastro,\n"
-                    + "	c.Telefone,\n"
-                    + "	c.InscEstadual as ie_rg,\n"
-                    + "	c.Status,\n"
-                    + "	c.LimiteCredito as valorlimite,\n"
-                    + "	c.LimiteCheques,\n"
-                    + "	c.DescProfissao as cargo,\n"
-                    + " p.Descricao as profissao\n,"
-                    + "	c.Renda as salario,\n"
-                    + "	c.EnderecoEntrega,\n"
-                    + "	c.NumeroEntrega,\n"
-                    + "	c.ComplEntrega,\n"
-                    + "	c.BairroEntrega,\n"
-                    + "	c.CidadeEntrega as municipioentrega,\n"
-                    + "	c.UFEntrega as ufentrega,\n"
-                    + "	c.CEPEntrega as cepentrega,\n"
-                    + "	c.FoneEntrega as telefoneentrega,\n"
-                    + " c.DataNascimentoConjuge as datanascimentoconjuge\n"
-                    + "from dbo.Clientes c\n"
-                    + "left join [dbo].Empresa e on e.Codigo = c.Empresa\n"
-                    + "left join [dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
-                     + "where c.IDLoja = " + getLojaOrigem() + "\n"
-                    + "order by 1"*/)) {
+            try (ResultSet rst = stm.executeQuery(sql)) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
@@ -1224,10 +1151,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setSexo(TipoSexo.FEMININO);
                             break;
                     }*/
-                    if ("12".equals(rst.getString("Status"))) {
+                    if ("12".equals(rst.getString("Status")) || "15".equals(rst.getString("Status"))) {
                         imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
                     } else {
-                        imp.setPermiteCheque(true);
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(true);
                     }
                     if ("1".equals(rst.getString("bloqueadorotativo"))) {
                         imp.setPermiteCreditoRotativo(false);
@@ -1236,8 +1165,18 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     if (clientesV2) {
-                        imp.setPermiteCheque(false);
-                        imp.setPermiteCreditoRotativo(false);
+                        if ("12".equals(rst.getString("Status")) || "15".equals(rst.getString("Status"))) {
+                            imp.setPermiteCheque(false);
+                            imp.setPermiteCreditoRotativo(false);
+                        } else {
+                            imp.setPermiteCheque(true);
+                            imp.setPermiteCreditoRotativo(false);
+                        }
+                        if ("1".equals(rst.getString("bloqueadorotativo"))) {
+                            imp.setPermiteCreditoRotativo(false);
+                        } else {
+                            imp.setPermiteCreditoRotativo(true);
+                        }
                     }
 
                     imp.setObservacao(rst.getString("Observacao"));
@@ -1267,7 +1206,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from ConvMovimento \n"
                     + "where \n"
                     + "ValorPago = 0\n"
-                    + "and Situacao = 301\n"
+                    + "and Situacao in (301,302)\n"
                     + "and Loja = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
