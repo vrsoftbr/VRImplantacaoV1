@@ -31,6 +31,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -188,6 +189,46 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	f.fn2_num id, \n"
+                    + "	f.cg2_cod idfornecedor,\n"
+                    + "	f.fn2_emis dataemissao,\n"
+                    + "	f.fn2_venc dtvencimento,\n"
+                    + "	f.fn2_valor-fn2_vdesc valor,\n"
+                    + "	f.fn2_doc numeroDocumento,\n"
+                    + "	fn2_hist obs\n"
+                    + "from\n"
+                    + "	fn2 f\n"
+                    + "where\n"
+                    + "	f.fn2_dtbaixa is null\n	"
+                    + " and f.cg6_cod != -1\n"
+                    + "	and f.fn2_empresa = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numeroDocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setVencimento(rst.getDate("dtvencimento"));
+                    imp.setObservacao(rst.getString("obs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
