@@ -64,6 +64,7 @@ public enum EScriptLojaOrigemSistema {
     KCMS(92, 13, "select codloja id, fantasia descricao from empresa"),
     LOGUS(100, 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
     MARKET(103, 11, "select cd_loja id, cd_loja || '' - '' ||nm_loja descricao from cadastro.tb_loja order by 1"),
+    MILENIO(106, 13, "select lojcod id, LOJFAN descricao, LOJCGC, LOJEST from loja order by lojcod"),
     MOBILITY(107, 5, "select id, s_nome_fantasia descricao from configuracoes"),
     MRS(109, 11, "select loja id, nome_fantasia descricao from parametros order by loja"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
