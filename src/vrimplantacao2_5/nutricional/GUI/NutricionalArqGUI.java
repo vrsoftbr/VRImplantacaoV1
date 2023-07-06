@@ -225,6 +225,14 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        lblColumAcuIni = new javax.swing.JLabel();
+        Coluna17Inicio = new javax.swing.JSpinner();
+        jLabel161 = new javax.swing.JLabel();
+        Coluna17Fim = new javax.swing.JSpinner();
+        lblColumAcucarTotIni = new javax.swing.JLabel();
+        Coluna18Inicio = new javax.swing.JSpinner();
+        jLabel171 = new javax.swing.JLabel();
+        Coluna18Fim = new javax.swing.JSpinner();
         btnRestaura = new javax.swing.JButton();
         rdbEditaTxtInfo = new javax.swing.JRadioButton();
         btnZerar = new javax.swing.JButton();
@@ -334,7 +342,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelArquivosLayout.createSequentialGroup()
                                 .addGroup(painelArquivosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(txtInfo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(txtMgv, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                    .addComponent(txtMgv, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 795, Short.MAX_VALUE)
                                     .addComponent(txtInfnutri, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -641,6 +649,26 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel16, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.jLabel16.text_1")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(lblColumAcuIni, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.lblColumAcuIni.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel161, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.jLabel161.text")); // NOI18N
+
+        Coluna17Fim.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                Coluna17FimStateChanged(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblColumAcucarTotIni, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.lblColumAcucarTotIni.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel171, org.openide.util.NbBundle.getMessage(NutricionalArqGUI.class, "NutricionalArqGUI.jLabel171.text")); // NOI18N
+
+        Coluna18Fim.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                Coluna18FimStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout painelEditorLayout = new javax.swing.GroupLayout(painelEditor);
         painelEditor.setLayout(painelEditorLayout);
         painelEditorLayout.setHorizontalGroup(
@@ -775,7 +803,25 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                         .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(Coluna13Fim, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelEditorLayout.createSequentialGroup()
+                        .addComponent(lblColumAcuIni)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Coluna17Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel161)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Coluna17Fim, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(painelEditorLayout.createSequentialGroup()
+                        .addComponent(lblColumAcucarTotIni)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Coluna18Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel171)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Coluna18Fim, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         painelEditorLayout.setVerticalGroup(
             painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -783,17 +829,29 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(painelEditorLayout.createSequentialGroup()
-                        .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelColuna13)
-                            .addComponent(Coluna13Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Coluna13Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel13))
+                        .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblColumAcuIni)
+                                .addComponent(Coluna17Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Coluna17Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel161))
+                            .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelColuna13)
+                                .addComponent(Coluna13Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Coluna13Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel13)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelColuna14)
-                            .addComponent(Coluna14Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(Coluna14Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel14))
+                        .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblColumAcucarTotIni)
+                                .addComponent(Coluna18Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Coluna18Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel171))
+                            .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelColuna14)
+                                .addComponent(Coluna14Inicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(Coluna14Fim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel14)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(painelEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(labelColuna15)
@@ -863,7 +921,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                                 .addComponent(jLabel8)
                                 .addComponent(jLabel12))
                             .addComponent(jLabel4))))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(painelEditor);
@@ -905,7 +963,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                                 .addComponent(btnRestaura)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnZerar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnSalvarTabelaEditada)))
@@ -925,9 +983,9 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                     .addComponent(rdbEditaMgv)
                     .addComponent(rdbEditaInfinutri)
                     .addComponent(rdbEditaTxtInfo))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2)
+                .addGap(18, 18, 18)
                 .addGroup(painel2PrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton5)
                     .addComponent(btnSalvarTabelaEditada)
@@ -1099,7 +1157,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             painelTabelaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelTabelaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1236,7 +1294,10 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                         (int) Coluna13Inicio.getValue(), (int) Coluna13Fim.getValue(),
                         (int) Coluna14Inicio.getValue(), (int) Coluna14Fim.getValue(),
                         (int) Coluna15Inicio.getValue(), (int) Coluna15Fim.getValue(),
-                        (int) Coluna16Inicio.getValue(), (int) Coluna16Fim.getValue()).getNutricionalToledoInfnutri(getArquivoInf()));
+                        (int) Coluna16Inicio.getValue(), (int) Coluna16Fim.getValue(),
+                        (int) Coluna17Inicio.getValue(), (int) Coluna17Fim.getValue(),
+                        (int) Coluna18Inicio.getValue(), (int) Coluna18Fim.getValue()).getNutricionalToledoInfnutri(getArquivoInf())
+                );
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaInfinutri(opcao, getInfNutri());
                 btnSalvarTabelaEditada.setEnabled(true);
@@ -1248,7 +1309,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 System.out.println(ex.getMessage());
                 Exceptions.printStackTrace(ex);
             }
-        } else if (opcao == 3 && validaCompoTxtInfo()) {
+        } else if (opcao == 3 && validaCampoTxtInfo()) {
             restauraCoresSpinners();
             try {
                 Coluna16Fim.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
@@ -1277,7 +1338,6 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 jTableLerArquivos = limparTabela();
                 new GeradorTabelas(jTableLerArquivos).carregarTabelaTxtInfo(opcao, getListaTxtInfo());
                 btnSalvarTabelaEditada.setEnabled(true);
-                //Coluna16Fim.setEnabled(false);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Provável erro na edição das colunas.\n\n"
                         + ex.getMessage());
@@ -1579,7 +1639,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
 
     private void btnICarregarArq3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnICarregarArq3ActionPerformed
         setArquivoTxtInfo(txtInfo.getArquivo());
-        if (validaCompoTxtInfo()) {
+        if (validaCampoTxtInfo()) {
             opcao = 3;
             try {
                 setListaTxtInfo(new OperacoesArquivoTxtInfoToledo().getAlergenicosToledoTxtInfo(getArquivoTxtInfo()));
@@ -1670,6 +1730,14 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnZerarActionPerformed
 
+    private void Coluna18FimStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_Coluna18FimStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Coluna18FimStateChanged
+
+    private void Coluna17FimStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_Coluna17FimStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Coluna17FimStateChanged
+
     /**
      * @param args the command line arguments
      */
@@ -1730,6 +1798,10 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     private javax.swing.JSpinner Coluna15Inicio;
     private javax.swing.JSpinner Coluna16Fim;
     private javax.swing.JSpinner Coluna16Inicio;
+    private javax.swing.JSpinner Coluna17Fim;
+    private javax.swing.JSpinner Coluna17Inicio;
+    private javax.swing.JSpinner Coluna18Fim;
+    private javax.swing.JSpinner Coluna18Inicio;
     private javax.swing.JSpinner Coluna1Fim;
     private javax.swing.JSpinner Coluna1Inicio;
     private javax.swing.JSpinner Coluna2Fim;
@@ -1777,7 +1849,9 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel161;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel171;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -1814,6 +1888,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
     private javax.swing.JLabel labelColuna7;
     private javax.swing.JLabel labelColuna8;
     private javax.swing.JLabel labelColuna9;
+    private javax.swing.JLabel lblColumAcuIni;
+    private javax.swing.JLabel lblColumAcucarTotIni;
     private javax.swing.JPanel painel1CarregadorArquivo;
     private javax.swing.JPanel painel2EditorArquivo;
     private javax.swing.JPanel painel2Principal;
@@ -1872,6 +1948,16 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         Coluna14Inicio.setEnabled(true);
         Coluna15Inicio.setEnabled(true);
         Coluna16Inicio.setEnabled(true);
+        Coluna17Inicio.setVisible(false);
+        Coluna17Fim.setVisible(false);
+        Coluna18Inicio.setVisible(false);
+        Coluna18Fim.setVisible(false);
+        if (Coluna17Inicio != null) {
+            Coluna17Inicio.setVisible(true);
+            Coluna17Fim.setVisible(true);
+            Coluna18Inicio.setVisible(true);
+            Coluna18Fim.setVisible(true);
+        }
     }
 
     public void bloquearEdicaoEAcao() {
@@ -1903,7 +1989,77 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         }
     }
 
+    private void ajustaLabelEntreSpinner() {
+        jLabel1.setText(Integer.parseInt(Coluna1Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel2.setText(Integer.parseInt(Coluna2Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel3.setText(Integer.parseInt(Coluna3Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel4.setText(Integer.parseInt(Coluna4Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel5.setText(Integer.parseInt(Coluna5Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel6.setText(Integer.parseInt(Coluna6Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel7.setText(Integer.parseInt(Coluna7Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel8.setText(Integer.parseInt(Coluna8Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel9.setText(Integer.parseInt(Coluna9Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel10.setText(Integer.parseInt(Coluna10Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel11.setText(Integer.parseInt(Coluna11Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel12.setText(Integer.parseInt(Coluna12Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel13.setText(Integer.parseInt(Coluna13Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel14.setText(Integer.parseInt(Coluna14Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel15.setText(Integer.parseInt(Coluna15Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel16.setText(Integer.parseInt(Coluna16Inicio.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel161.setText(Integer.parseInt(Coluna17Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+        jLabel171.setText(Integer.parseInt(Coluna18Fim.getValue().toString()) > 0 ? "até" : "Inválido");
+
+    }
+    
+    
+
+    private void bloqueiaLabelsESpinersMGV() {
+        //  Coluna9Inicio.setEnabled(false);
+        //  Coluna9Fim.setEnabled(false);
+        
+        
+        Coluna1Inicio.setEnabled(Integer.parseInt(Coluna1Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna1Fim.setEnabled(Integer.parseInt(Coluna1Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna2Inicio.setEnabled(Integer.parseInt(Coluna2Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna2Fim.setEnabled(Integer.parseInt(Coluna2Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna3Inicio.setEnabled(Integer.parseInt(Coluna3Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna3Fim.setEnabled(Integer.parseInt(Coluna3Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna4Inicio.setEnabled(Integer.parseInt(Coluna4Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna4Fim.setEnabled(Integer.parseInt(Coluna4Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna5Inicio.setEnabled(Integer.parseInt(Coluna5Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna5Fim.setEnabled(Integer.parseInt(Coluna5Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna6Inicio.setEnabled(Integer.parseInt(Coluna6Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna6Fim.setEnabled(Integer.parseInt(Coluna6Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna7Inicio.setEnabled(Integer.parseInt(Coluna7Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna7Fim.setEnabled(Integer.parseInt(Coluna7Fim.getValue().toString()) <=0 ? false : true);
+        Coluna8Inicio.setEnabled(Integer.parseInt(Coluna8Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna8Fim.setEnabled(Integer.parseInt(Coluna8Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna9Inicio.setEnabled(Integer.parseInt(Coluna9Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna9Fim.setEnabled(Integer.parseInt(Coluna9Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna10Inicio.setEnabled(Integer.parseInt(Coluna10Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna10Fim.setEnabled(Integer.parseInt(Coluna10Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna11Inicio.setEnabled(Integer.parseInt(Coluna11Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna11Fim.setEnabled(Integer.parseInt(Coluna11Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna12Inicio.setEnabled(Integer.parseInt(Coluna12Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna12Fim.setEnabled(Integer.parseInt(Coluna12Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna13Inicio.setEnabled(Integer.parseInt(Coluna13Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna13Fim.setEnabled(Integer.parseInt(Coluna13Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna14Inicio.setEnabled(Integer.parseInt(Coluna14Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna14Fim.setEnabled(Integer.parseInt(Coluna14Fim.getValue().toString()) <=0 ? false : true);
+        Coluna15Inicio.setEnabled(Integer.parseInt(Coluna15Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna15Fim.setEnabled(Integer.parseInt(Coluna15Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna16Inicio.setEnabled(Integer.parseInt(Coluna16Inicio.getValue().toString()) <= 0 ? false : true);
+        Coluna16Fim.setEnabled(Integer.parseInt(Coluna16Inicio.getValue().toString()) <= 0 ? false : true);
+        Coluna17Inicio.setEnabled(Integer.parseInt(Coluna17Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna17Fim.setEnabled(Integer.parseInt(Coluna17Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna18Inicio.setEnabled(Integer.parseInt(Coluna18Fim.getValue().toString()) <= 0 ? false : true);
+        Coluna18Fim.setEnabled(Integer.parseInt(Coluna18Fim.getValue().toString()) <= 0 ? false : true);
+
+    }
+
     private void inicializaLabelsESpinersMgv() {
+
+        //LABELS DA COLUNA
         labelColuna1.setText("Coluna 01 de:");
         labelColuna2.setText("Coluna 02 de:");
         labelColuna3.setText("Coluna 03 de:");
@@ -1912,14 +2068,18 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         labelColuna6.setText("Coluna 06 de:");
         labelColuna7.setText("Coluna 07 de:");
         labelColuna8.setText("Coluna 08 de:");
-        labelColuna9.setText("Inválido");
-        labelColuna10.setText("Inválido");
-        labelColuna11.setText("Inválido");
-        labelColuna12.setText("Inválido");
-        labelColuna13.setText("Inválido");
-        labelColuna14.setText("Inválido");
-        labelColuna15.setText("Inválido");
-        labelColuna16.setText("Inválido");
+        labelColuna9.setText("Coluna 09 de:");
+        labelColuna10.setText("Coluna 10 de:");
+        labelColuna11.setText("Coluna 11 de:");
+        labelColuna12.setText("Coluna 12 de:");
+        labelColuna13.setText("Coluna 13 de:");
+        labelColuna14.setText("Coluna 14 de:");
+        labelColuna15.setText("Coluna 15 de:");
+        labelColuna16.setText("Coluna 16 de:");
+        lblColumAcuIni.setText("Coluna 17 de:");
+        lblColumAcucarTotIni.setText("Coluna 18 de:");
+
+        //labels meio
         Coluna1Inicio.setValue(0);
         Coluna1Fim.setValue(2);
         Coluna2Inicio.setValue(Coluna1Fim.getValue());
@@ -1942,7 +2102,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             System.out.println(ex.getMessage() + "Erro ao passar valor na coluna8fim");
             Exceptions.printStackTrace(ex);
         }
-        //Coluna8Fim.setEnabled(false);
+
         Coluna9Inicio.setValue(0);
         Coluna9Fim.setValue(0);
         Coluna10Inicio.setValue(Coluna9Fim.getValue());
@@ -1959,9 +2119,18 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         Coluna15Fim.setValue(0);
         Coluna16Inicio.setValue(Coluna15Fim.getValue());
         Coluna16Fim.setValue(0);
+        Coluna17Inicio.setValue(Coluna16Fim.getValue());
+        Coluna17Fim.setValue(0);
+        Coluna18Inicio.setValue(Coluna17Fim.getValue());
+        Coluna18Fim.setValue(0);
+
+        bloqueiaLabelsESpinersMGV();
+        ajustaLabelEntreSpinner();
+
     }
 
     private void inicializaLabelsESpinersInfinutri() {
+        //trate os até aqui
         labelColuna1.setText("Coluna 01 de:");
         labelColuna2.setText("Coluna 02 de:");
         labelColuna3.setText("Coluna 03 de:");
@@ -1978,6 +2147,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         labelColuna14.setText("Coluna 14 de:");
         labelColuna15.setText("Coluna 15 de:");
         labelColuna16.setText("Coluna 16 de:");
+        lblColumAcuIni.setText(" Coluna 17 de:");
+        lblColumAcucarTotIni.setText(" Coluna 18 de: ");
         Coluna1Inicio.setValue(0);
         Coluna1Fim.setValue(1);
         Coluna2Inicio.setValue(Coluna1Fim.getValue());
@@ -2009,14 +2180,21 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         Coluna15Inicio.setValue(Coluna14Fim.getValue());
         Coluna15Fim.setValue(40);
         Coluna16Inicio.setValue(Coluna15Fim.getValue());
+        Coluna16Fim.setValue(43);
+        Coluna17Inicio.setValue(67);
+        Coluna17Fim.setValue(70);
+        Coluna18Inicio.setValue(Coluna17Fim.getValue());
+        Coluna18Fim.setValue(73);
+
         try {
-            Coluna16Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
+            Coluna18Fim.setValue(new OperacoesArquivoInfnutriToledo().getLenghtFimLinhaInf(getArquivoInf()));
         } catch (Exception ex) {
-            System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
-            Coluna16Fim.setValue(0);
+            System.out.println(ex.getMessage());
+            Coluna16Fim.setValue(43);
             Exceptions.printStackTrace(ex);
         }
-        //Coluna16Fim.setEnabled(false);
+        bloqueiaLabelsESpinersMGV();
+        ajustaLabelEntreSpinner();
     }
 
     private boolean validaCompoMgv() {
@@ -2043,7 +2221,7 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         return true;
     }
 
-    private boolean validaCompoTxtInfo() {
+    private boolean validaCampoTxtInfo() {
         if (getArquivoTxtInfo() == null || "".equals(getArquivoTxtInfo())) {
             JOptionPane.showMessageDialog(this, "Precisa selecionar e carregar o arquivo TxtInfo");
             return false;
@@ -2129,6 +2307,14 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             JTextField field = ((JSpinner.NumberEditor) Coluna16Inicio.getEditor()).getTextField();
             field.setBackground(new Color(255, 198, 115));
         }
+        if ((int) Coluna17Inicio.getValue() > (int) Coluna17Fim.getValue()) {
+            JTextField field = ((JSpinner.NumberEditor) Coluna17Inicio.getEditor()).getTextField();
+            field.setBackground(new Color(255, 198, 115));
+        }
+        if ((int) Coluna18Inicio.getValue() > (int) Coluna18Fim.getValue()) {
+            JTextField field = ((JSpinner.NumberEditor) Coluna18Inicio.getEditor()).getTextField();
+            field.setBackground(new Color(255, 198, 115));
+        }
     }
 
     private void restruturaPainel(PainelMigracao painelMigracao) {
@@ -2188,6 +2374,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 + "	i.pt_int_med_caseira medidainteira,\n"
                 + "	i.fracao_dec_med_caseira id_tipomedidadecimal,\n"
                 + "	i.med_caseira_utilizada_xic id_tipomedida,\n"
+                + "     i.acucares,\n"
+                + "     i.acucares_total,\n"
                 + "	'' alergenicos \n"
                 + "from implantacao.itens_mgv6 m \n"
                 + "join implantacao.infnutri_v6 i on m.codigo_nutricional = i.codigo_nutricional\n"
@@ -2224,7 +2412,9 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 + "    i.pt_int_med_caseira medidaInteira,\n"
                 + "    i.fracao_dec_med_caseira id_tipomedidadecimal,\n"
                 + "    i.med_caseira_utilizada_xic Id_tipounidadeporcao,\n"
-                + "	'' alergenicos\n"
+                + "    i.acucares,\n"
+                + "    i.acucares_total,\n"
+                + "    '' alergenicos\n"
                 + "from implantacao.itens_mgv6 m \n"
                 + "join implantacao.infnutri_v6 i on m.codigo_nutricional = i.codigo_nutricional";
         return sqlCompleta;
@@ -2278,6 +2468,11 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
         Coluna15Inicio.setValue(Coluna14Fim.getValue());
         Coluna15Fim.setValue(834);
         Coluna16Inicio.setValue(Coluna15Fim.getValue());
+        Coluna16Fim.setValue(0);
+        Coluna17Inicio.setValue(Coluna16Fim.getValue());
+        Coluna17Fim.setValue(0);
+        Coluna18Inicio.setValue(Coluna17Fim.getValue());
+        Coluna18Fim.setValue(0);
         try {
             Coluna16Fim.setValue(new OperacoesArquivoTxtInfoToledo().getLenghtFimLinhaTxtInfo(getArquivoTxtInfo()));
         } catch (Exception ex) {
@@ -2285,6 +2480,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
             System.out.println(ex.getMessage() + "Erro ao passar valor na coluna16fim");
             Exceptions.printStackTrace(ex);
         }
+        bloqueiaLabelsESpinersMGV();
+        ajustaLabelEntreSpinner();
         //Coluna16Fim.setEnabled(false);
     }
 }
