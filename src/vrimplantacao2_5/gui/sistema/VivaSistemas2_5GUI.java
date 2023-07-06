@@ -175,7 +175,7 @@ public class VivaSistemas2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Scorpion");
+        setTitle("VivaSistemas");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

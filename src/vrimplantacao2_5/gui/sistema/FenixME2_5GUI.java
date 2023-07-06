@@ -182,7 +182,7 @@ public class FenixME2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Scorpion");
+        setTitle("FenixME");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

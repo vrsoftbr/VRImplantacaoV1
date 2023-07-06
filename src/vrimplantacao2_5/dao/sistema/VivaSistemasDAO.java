@@ -1,30 +1,30 @@
 package vrimplantacao2_5.dao.sistema;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
-import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 
 /**
  *
@@ -40,74 +40,73 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
-                OpcaoProduto.QTD_EMBALAGEM_EAN,
-                OpcaoProduto.PRODUTOS,
-                OpcaoProduto.EAN,
-                OpcaoProduto.EAN_EM_BRANCO,
-                OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                OpcaoProduto.PESAVEL,
-                OpcaoProduto.VALIDADE,
-                OpcaoProduto.DESC_COMPLETA,
-                OpcaoProduto.DESC_REDUZIDA,
-                OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.ATIVO,
-                OpcaoProduto.PESO_BRUTO,
-                OpcaoProduto.PESO_LIQUIDO,
-                OpcaoProduto.ESTOQUE,
-                OpcaoProduto.TROCA,
-                OpcaoProduto.MARGEM,
-                OpcaoProduto.VENDA_PDV,
-                OpcaoProduto.PDV_VENDA,
-                OpcaoProduto.PRECO,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.CEST,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
-                OpcaoProduto.NCM,
-                OpcaoProduto.CEST,
-                OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESCONTINUADO,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
-                OpcaoProduto.OFERTA,
-                OpcaoProduto.DESCONTINUADO,
-                OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.VOLUME_QTD
         ));
     }
 
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
-                OpcaoFornecedor.ENDERECO,
-                OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
-                OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA
         ));
     }
 
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
-                OpcaoCliente.DADOS,
-                OpcaoCliente.ENDERECO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.DADOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.ENDERECO,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.CLIENTE_EVENTUAL
+                OpcaoCliente.VENCIMENTO_ROTATIVO                
         ));
     }
 
@@ -163,7 +162,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT DISTINCT \n"
@@ -260,7 +258,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
@@ -365,7 +362,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
@@ -425,7 +421,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
@@ -494,7 +489,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
