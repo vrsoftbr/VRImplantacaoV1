@@ -10,7 +10,7 @@ package vrimplantacao2_5.nutricional.vo;
  * @author Desenvolvimento
  */
 public class InfnutriVO {
-    
+
     private String Indicador = "N";
     private String reservado = "";
     private int nutricional = 0;
@@ -27,6 +27,8 @@ public class InfnutriVO {
     private String gordurasTrans = "";
     private String fibra = "";
     private String sodio = "";
+    private String acucares = "";
+    private String acucaresTotais = "";
 
     public String getIndicador() {
         return Indicador;
@@ -154,6 +156,22 @@ public class InfnutriVO {
 
     public void setSodio(String sodio) {
         this.sodio = sodio;
-    }  
-    
+    }
+
+    public String getAcucares() {
+        return acucares;
+    }
+
+    public void setAcucares(String acucares) {
+        this.acucares = acucares;
+    }
+
+    public String getAcucaresTotais() {
+        return acucaresTotais;
+    }
+
+    public void setAcucaresTotais(String acucaresTotais) {
+        this.acucaresTotais = acucaresTotais;
+    }
+
 }

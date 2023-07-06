@@ -30,7 +30,7 @@ import vrimplantacao2_5.nutricional.vo.TxtInfoVO;
  */
 @SuppressWarnings("static-access")
 public class NutricionalToledoArquivoDAO extends InterfaceDAO {
-
+    
     ConexaoPostgres con = new ConexaoPostgres();
     Properties prop = App.properties();
     private final String ip = prop.get("database.ip");
@@ -230,7 +230,9 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                     + "	gorduras_saturadas varchar(10),\n"
                     + "	gorduras_trans varchar(10),\n"
                     + "	fibra_alimentar varchar(10),\n"
-                    + "	sodio varchar(10)\n"
+                    + "	sodio varchar(10),\n"
+                    + " acucares varchar(10),\n"
+                    + " acucares_total varchar(10)\n"
                     + ")";
             stm.execute(
                     tabelaInfnutri
@@ -272,6 +274,8 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
             sql.put("gorduras_trans", vo.getGordurasTrans());
             sql.put("fibra_alimentar", vo.getFibra());
             sql.put("sodio", vo.getSodio());
+            sql.put("acucares",vo.getAcucares());
+            sql.put("acucares_total", vo.getAcucaresTotais());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {

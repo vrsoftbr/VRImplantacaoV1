@@ -140,7 +140,7 @@
                                           <Group type="102" alignment="1" attributes="0">
                                               <Group type="103" groupAlignment="1" attributes="0">
                                                   <Component id="txtInfo" alignment="0" max="32767" attributes="0"/>
-                                                  <Component id="txtMgv" alignment="0" pref="366" max="32767" attributes="0"/>
+                                                  <Component id="txtMgv" alignment="0" pref="795" max="32767" attributes="0"/>
                                                   <Component id="txtInfnutri" alignment="0" max="32767" attributes="0"/>
                                                   <Component id="jLabel17" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
@@ -452,7 +452,7 @@
                                               <Component id="btnRestaura" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="btnZerar" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace pref="68" max="32767" attributes="0"/>
+                                              <EmptySpace max="32767" attributes="0"/>
                                               <Component id="jButton5" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="btnSalvarTabelaEditada" min="-2" max="-2" attributes="0"/>
@@ -480,9 +480,9 @@
                                   <Component id="rdbEditaInfinutri" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="rdbEditaTxtInfo" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" pref="156" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jScrollPane2" max="32767" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jButton5" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="btnSalvarTabelaEditada" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -703,7 +703,28 @@
                                               <Component id="Coluna13Fim" min="-2" pref="55" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <Component id="lblColumAcuIni" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="Coluna17Inicio" min="-2" pref="55" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="jLabel161" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="Coluna17Fim" min="-2" pref="55" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" attributes="0">
+                                              <Component id="lblColumAcucarTotIni" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="Coluna18Inicio" min="-2" pref="55" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="jLabel171" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="Coluna18Fim" min="-2" pref="55" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace pref="27" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -713,18 +734,34 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="1" attributes="0">
                                           <Group type="102" attributes="0">
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="labelColuna13" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="Coluna13Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="Coluna13Fim" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="jLabel13" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                                      <Component id="lblColumAcuIni" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna17Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna17Fim" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel161" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <Group type="103" groupAlignment="3" attributes="0">
+                                                      <Component id="labelColuna13" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna13Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna13Fim" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel13" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
                                               </Group>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="labelColuna14" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="Coluna14Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="Coluna14Fim" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                                      <Component id="lblColumAcucarTotIni" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna18Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna18Fim" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel171" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <Group type="103" groupAlignment="3" attributes="0">
+                                                      <Component id="labelColuna14" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna14Inicio" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="Coluna14Fim" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
                                               </Group>
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="3" attributes="0">
@@ -805,7 +842,7 @@
                                               </Group>
                                           </Group>
                                       </Group>
-                                      <EmptySpace pref="16" max="32767" attributes="0"/>
+                                      <EmptySpace pref="25" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                             </DimensionLayout>
@@ -1190,6 +1227,48 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JLabel" name="lblColumAcuIni">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                                  <ResourceString bundle="vrimplantacao2_5/nutricional/GUI/Bundle.properties" key="NutricionalArqGUI.lblColumAcuIni.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JSpinner" name="Coluna17Inicio">
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel161">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                                  <ResourceString bundle="vrimplantacao2_5/nutricional/GUI/Bundle.properties" key="NutricionalArqGUI.jLabel161.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JSpinner" name="Coluna17Fim">
+                              <Events>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="Coluna17FimStateChanged"/>
+                              </Events>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="lblColumAcucarTotIni">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                                  <ResourceString bundle="vrimplantacao2_5/nutricional/GUI/Bundle.properties" key="NutricionalArqGUI.lblColumAcucarTotIni.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JSpinner" name="Coluna18Inicio">
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel171">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                                  <ResourceString bundle="vrimplantacao2_5/nutricional/GUI/Bundle.properties" key="NutricionalArqGUI.jLabel171.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JSpinner" name="Coluna18Fim">
+                              <Events>
+                                <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="Coluna18FimStateChanged"/>
+                              </Events>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>
@@ -1458,7 +1537,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="346" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="340" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>

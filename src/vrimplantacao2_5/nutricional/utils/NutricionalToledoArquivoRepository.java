@@ -122,6 +122,7 @@ public class NutricionalToledoArquivoRepository {
                     ProgressBar.setStatus("Deletando ItensMgv e Infnutri.");
                     dao.deletarTabelaMgv(lojaOrigem, sistema);
                     dao.deletarTabelaInfnutri(lojaOrigem, sistema);
+                    dao.deletarTabelaTxtinfo(lojaOrigem, sistema);
                     ProgressBar.dispose();
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());

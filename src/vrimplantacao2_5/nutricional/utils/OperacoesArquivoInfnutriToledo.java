@@ -5,6 +5,7 @@
  */
 package vrimplantacao2_5.nutricional.utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -49,27 +50,34 @@ public class OperacoesArquivoInfnutriToledo {
     private int infColuna15Inicio = 37;
     private int infColuna15Fim = 40;
     private int infColuna16Inicio = 40;
-    private int infColuna16Fim;
+    private int infColuna16Fim = 43;
+    private int infColunaAcucarInicio = 67;
+    private int infColunaAcucarFim = 70;
+    private int infColunaAcucarTotalInicio = 70;
+    private int intColunaAcucarTotalFim = 73;
 
     public OperacoesArquivoInfnutriToledo() {
     }
 
-    public OperacoesArquivoInfnutriToledo(int infColuna1Inicio, int infColuna1Fim, 
-            int infColuna2Inicio, int infColuna2Fim, 
-            int infColuna3Inicio, int infColuna3Fim, 
+    public OperacoesArquivoInfnutriToledo(int infColuna1Inicio, int infColuna1Fim,
+            int infColuna2Inicio, int infColuna2Fim,
+            int infColuna3Inicio, int infColuna3Fim,
             int infColuna4Inicio, int infColuna4Fim,
-            int infColuna5Inicio, int infColuna5Fim, 
-            int infColuna6Inicio, int infColuna6Fim, 
-            int infColuna7Inicio, int infColuna7Fim, 
-            int infColuna8Inicio, int infColuna8Fim, 
-            int infColuna9Inicio, int infColuna9Fim, 
-            int infColuna10Inicio, int infColuna10Fim, 
-            int infColuna11Inicio, int infColuna11Fim, 
-            int infColuna12Inicio, int infColuna12Fim, 
-            int infColuna13Inicio, int infColuna13Fim, 
-            int infColuna14Inicio, int infColuna14Fim, 
-            int infColuna15Inicio, int infColuna15Fim, 
-            int infColuna16Inicio, int infColuna16Fim) {
+            int infColuna5Inicio, int infColuna5Fim,
+            int infColuna6Inicio, int infColuna6Fim,
+            int infColuna7Inicio, int infColuna7Fim,
+            int infColuna8Inicio, int infColuna8Fim,
+            int infColuna9Inicio, int infColuna9Fim,
+            int infColuna10Inicio, int infColuna10Fim,
+            int infColuna11Inicio, int infColuna11Fim,
+            int infColuna12Inicio, int infColuna12Fim,
+            int infColuna13Inicio, int infColuna13Fim,
+            int infColuna14Inicio, int infColuna14Fim,
+            int infColuna15Inicio, int infColuna15Fim,
+            int infColuna16Inicio, int infColuna16Fim,
+            int infColunaAcucarInicio, int infColunaAcucarFim,
+            int infColunaAcucarTotalInicio, int intColunaAcucarTotalFim
+    ) {
         infColuna1Inicio = 0;
         this.infColuna1Inicio = infColuna1Inicio;
         this.infColuna1Fim = infColuna1Fim;
@@ -103,6 +111,10 @@ public class OperacoesArquivoInfnutriToledo {
         this.infColuna15Fim = infColuna15Fim;
         this.infColuna16Inicio = infColuna16Inicio;
         this.infColuna16Fim = infColuna16Fim;
+        this.infColunaAcucarInicio = infColunaAcucarInicio;
+        this.infColunaAcucarFim = infColunaAcucarFim;
+        this.infColunaAcucarTotalInicio = infColunaAcucarTotalInicio;
+        this.intColunaAcucarTotalFim = intColunaAcucarTotalFim;
     }
 
     public List<InfnutriVO> getNutricionalToledoInfnutri(String arquivo) throws Exception {
@@ -110,11 +122,22 @@ public class OperacoesArquivoInfnutriToledo {
         List<String> vToledo = util.lerArquivoBalanca(arquivo);
 
         boolean isLayoutMgv6 = !vToledo.isEmpty() && vToledo.get(0).startsWith("N");
+        boolean isLayoutMgv7 = !vToledo.isEmpty() && vToledo.get(0).contains("|");
 
         if (isLayoutMgv6) {
             for (int i = 0; i < vToledo.size(); i++) {
                 InfnutriVO vo = new InfnutriVO();
-                infColuna16Fim = vToledo.get(i).trim().length();
+
+                // O Arquivo só vale para o MGV 7 acima pois tratam os açucares
+                // cabeçalho de leitura do MGV 7 posterior
+                //https://help.toledobrasil.com/mgv7/v7_0_/HTML_PAGES/arquivos_de_cadastro.html
+                
+                if (isLayoutMgv7) {
+                    vo.setAcucares(String.valueOf(Utils.stringToDouble(vToledo.get(i).substring(infColunaAcucarInicio, infColunaAcucarFim)) / 10));
+                    vo.setAcucaresTotais(String.valueOf(Utils.stringToDouble(vToledo.get(i).substring(infColunaAcucarTotalInicio, intColunaAcucarTotalFim)) / 10));
+                } else {
+                    infColuna16Fim = vToledo.get(i).trim().length();
+                }
                 if (!vToledo.get(i).trim().isEmpty()) {
 
                     vo.setIndicador(vToledo.get(i).substring(infColuna1Inicio, infColuna1Fim));
@@ -166,11 +189,18 @@ public class OperacoesArquivoInfnutriToledo {
         }
         return result;
     }
+
     public int getLenghtFimLinhaInf(String arquivo) throws Exception {
         List<String> vToledo = util.lerArquivoBalanca(arquivo);
-        for (int i = 0; i <= 1; i++) {
-            infColuna16Fim = vToledo.get(i).trim().length();            
+        if (!vToledo.isEmpty() && vToledo.get(0).contains("|")) {
+            for (int i = 0; i <= 1; i++) {
+                intColunaAcucarTotalFim = vToledo.get(i).trim().length();
             }
+        } else {
+            for (int i = 0; i <= 1; i++) {
+                infColuna16Fim = vToledo.get(i).trim().length();
+            }
+        }
         return infColuna16Fim;
     }
 }

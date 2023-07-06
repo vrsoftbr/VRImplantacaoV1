@@ -87,6 +87,9 @@ public class GeradorTabelas {
         if (parametro == 2) {
             Object[] colunasIntensMgv = {"INDICADOR", "C. NUTRICIONAL", "RESERVADO", "QTD",
                 "PORÇAO G OU UN", "M. CAS. INTEIRA", "M. CAS. FRAC.", "M. CAS. XICARAS E FATIAS", "CALORIAS",
+                "CARBOIDRATO", "PROTEINAS", "GORDURAS TOTAIS", "G. SATURADAS", "G. TRANS", "FIBRA", "SÓDIO","AÇÚCARES", "AÇÚCARES TOTAIS"};
+            Object[] colunasIntensMgvSemAcucares = {"INDICADOR", "C. NUTRICIONAL", "RESERVADO", "QTD",
+                "PORÇAO G OU UN", "M. CAS. INTEIRA", "M. CAS. FRAC.", "M. CAS. XICARAS E FATIAS", "CALORIAS",
                 "CARBOIDRATO", "PROTEINAS", "GORDURAS TOTAIS", "G. SATURADAS", "G. TRANS", "FIBRA", "SÓDIO"};
             //INVERTIDA SEQUENCIA, EXTRA E IMAGEM VEM ANTES DO NUTRICIONAL.
             DefaultTableModel modelo = (DefaultTableModel) jTableLerArquivos.getModel();
@@ -103,14 +106,21 @@ public class GeradorTabelas {
             jTableLerArquivos.getColumnModel().getColumn(3).setPreferredWidth(40);
             jTableLerArquivos.getColumnModel().getColumn(7).setPreferredWidth(100);
             jTableLerArquivos.getColumnModel().getColumn(11).setPreferredWidth(100);
+            jTableLerArquivos.getColumnModel().getColumn(14).setPreferredWidth(100);
+            jTableLerArquivos.getColumnModel().getColumn(17).setPreferredWidth(100);
             jTableLerArquivos.setSelectionForeground(Color.BLUE);
             jTableLerArquivos.setSelectionBackground(Color.WHITE);
             for (InfnutriVO vo : listaItensInfnutri) {
                 modelo.addRow(new Object[]{
                     vo.getIndicador(), vo.getNutricional(), vo.getReservado(), vo.getQuantidade(), vo.getPorcaoUnGr(), vo.getMedidaCaseiraInteira(),
                     vo.getMedidaCaseiraDecimalFracionado(), vo.getMedidaCaseiraXicaraFatia(), vo.getCalorias(), vo.getCarboidratos(),
-                    vo.getProteinas(), vo.getGordurasTotais(), vo.getGordurasSaturadas(), vo.getGordurasTrans(), vo.getFibra(), vo.getSodio()
+                    vo.getProteinas(), vo.getGordurasTotais(), vo.getGordurasSaturadas(), vo.getGordurasTrans(), vo.getFibra(), vo.getSodio(),vo.getAcucares(),vo.getAcucaresTotais()
                 });
+                
+                if(vo.getAcucares().equals("")){
+                    modelo.setColumnIdentifiers(colunasIntensMgvSemAcucares);
+                }
+        
             }
             jTableLerArquivos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
                 public Component getTableCellRendererComponent(JTable table, Object value,
