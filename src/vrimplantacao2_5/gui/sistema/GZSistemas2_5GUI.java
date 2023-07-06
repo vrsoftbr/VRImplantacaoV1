@@ -101,6 +101,7 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
+                    dao.utilizaPrecoTerminal = chkPrecoTerminal.isSelected();
 
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
@@ -176,6 +177,8 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        chkPrecoTerminal = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -183,7 +186,7 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Scorpion");
+        setTitle("GZSistemas");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -259,6 +262,27 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        chkPrecoTerminal.setText("Utiliza preço campo terminal");
+
+        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPrecoTerminal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(424, Short.MAX_VALUE))
+        );
+        vRPanel2Layout.setVerticalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPrecoTerminal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(195, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Parâmetro Específico", vRPanel2);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -313,6 +337,7 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkPrecoTerminal;
     private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
@@ -324,5 +349,6 @@ public class GZSistemas2_5GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 }

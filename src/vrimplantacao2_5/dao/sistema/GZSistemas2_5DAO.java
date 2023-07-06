@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.dao.sistema;
 
 import vrimplantacao2.dao.interfaces.*;
@@ -22,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -99,7 +93,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -128,9 +121,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-
         ProdutoParaFamiliaHelper helper = new ProdutoParaFamiliaHelper(result);
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
@@ -144,7 +135,8 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     + "  eq.codigo"
             )) {
                 while (rst.next()) {
-                    helper.gerarFamilia(rst.getString("codigo"), rst.getString("descricao"));
+                    helper.gerarFamilia(rst.getString("codigo"),
+                                        rst.getString("descricao"));
                 }
             }
         }
@@ -154,7 +146,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -174,12 +165,14 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("merc1_desc"));
                     imp.setMerc2ID(rst.getString("merc2"));
                     imp.setMerc2Descricao(rst.getString("merc2_desc"));
                     imp.setMerc3ID("1");
                     imp.setMerc3Descricao(rst.getString("merc2_desc"));
+                    
                     result.add(imp);
                 }
             }
@@ -190,7 +183,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -239,6 +231,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("cdprod"));
                     imp.setEan(rst.getString("codbarra"));
                     imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
@@ -291,6 +284,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
                     imp.setIcmsDebitoId(rst.getString("codtrib"));
                     imp.setIcmsCreditoId(rst.getString("codtrib"));
+                    
                     result.add(imp);
                 }
             }
@@ -301,7 +295,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
         if (opt == OpcaoProduto.FAMILIA) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -317,6 +310,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("cdprod"));
                         imp.setIdFamiliaProduto(rst.getString("codigo"));
+                        
                         result.add(imp);
                     }
                 }
@@ -340,6 +334,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("cdprod"));
                         imp.setIcmsDebitoId(rst.getString("tributa"));
+                        
                         result.add(imp);
                     }
                 }
@@ -372,6 +367,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                         
                         imp.setImportId(rst.getString("cdprod"));
                         imp.setIcmsCreditoId(rst.getString("tributa"));
+                        
                         result.add(imp);
                     }
                 }
@@ -396,6 +392,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                         
                         imp.setImportId(rst.getString("cdprod"));
                         imp.setIcmsDebitoId(rst.getString("tributa"));
+                        
                         result.add(imp);
                     }
                 }
@@ -420,6 +417,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                         
                         imp.setImportId(rst.getString("cdprod"));
                         imp.setIcmsCreditoId(rst.getString("tributa"));
+                        
                         result.add(imp);
                     }
                 }
@@ -548,6 +546,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                                 rst.getString("endwww").toLowerCase()
                         );
                     }
+                    
                     result.add(imp);
                 }
             }
@@ -573,10 +572,12 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setIdProduto(rst.getString("cdprod"));
                     imp.setIdFornecedor(rst.getString("cdfornec"));
                     imp.setCodigoExterno(rst.getString("codigo"));
                     imp.setQtdEmbalagem(rst.getInt("porcaixa"));
+                    
                     result.add(imp);
                 }
             }
@@ -587,7 +588,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -686,6 +686,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                                 null
                         );
                     }
+                    
                     result.add(imp);
                 }
             }
@@ -696,7 +697,6 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -722,6 +722,7 @@ public class GZSistemas2_5DAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencto"));
                     imp.setObservacao(rst.getString("obs"));
+                    
                     result.add(imp);
                 }
             }
