@@ -68,6 +68,7 @@ public enum EScriptLojaOrigemSistema {
     MOBILITY(107, 5, "select id, s_nome_fantasia descricao from configuracoes"),
     MRS(109, 11, "select loja id, nome_fantasia descricao from parametros order by loja"),
     PLENUS(119, 5, "select id_empresa id, nome_fantasia descricao from empresa"),
+    MODELO(122, 5, "select id, descricao from empresa"),
     RMS(129, 9, "select loj_codigo||loj_digito as id, loj_codigo||'' - DIGITO ''||loj_digito as descricao from AA2CLOJA order by loj_codigo"),
     RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1"),
     SHI(147, 5, "select codigo id, razsoc descricao from filial"),
