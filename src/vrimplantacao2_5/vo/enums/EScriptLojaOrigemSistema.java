@@ -238,7 +238,8 @@ public enum EScriptLojaOrigemSistema {
     CFSOFTSIAECF(20, 5, null),
     CPLUS(22, 5, "SELECT e.codempresa AS id, e.nomeempresa AS descricao from empresa e"),
     CADASTRAFACIL(23, 5, "select lpad(id_empresa, 4, ''0'') as id, nome_razao AS descricao FROM empresa"),
-    VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
+    VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA"),
+    RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e ");
 
     private int idSistema;
     private int idBancoDados;
