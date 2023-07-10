@@ -141,7 +141,8 @@ public enum EScriptLojaOrigemSistema {
     STI3(255, 8, "select codigo as id,razao as descricao from empresas"),
     CENTER_INFORMATICA(256, 5, "SELECT COD_EMP AS id , razao AS descricao FROM CONFIG c"),
     ARGO(257, 13, "select codemp id, razemp descricao from empresa"),
-    VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA");
+    VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA"),
+    RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e ");
 
     private int idSistema;
     private int idBancoDados;

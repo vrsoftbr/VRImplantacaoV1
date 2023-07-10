@@ -119,6 +119,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "postgres", "postgres", "VrPost@Server", 8745),
     FIREBIRD_CENTER_INFORMATICA(256, "CENTER_INFORMATICA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_VIVASISTEMAS(258, "VIVASISTEMAS", 5, "FIREBIRD", "C:\\VIVA SOFTWARE\\appdata\\WMDADOS.EMM", "sysdba", "masterkey", 3050),
+    FIREBIRD_RESULTHBUSINESS(259, "RESULTHBUSINESS", 5, "FIREBIRD", "", "sysdba", "masterkey", 3050),
 //INFORMIX
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "", 9088),
 //MYSQL
