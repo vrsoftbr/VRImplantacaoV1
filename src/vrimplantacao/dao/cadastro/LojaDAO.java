@@ -1,25 +1,36 @@
 package vrimplantacao.dao.cadastro;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrimplantacao.dao.CodigoInternoDAO;
-import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.vo.cadastro.TecladoLayoutFuncaoVO;
-import vrimplantacao2_5.vo.cadastro.TecladoLayoutVO;
+import vrimplantacao2_5.dao.cadastro.pdv.PdvBalancaLayoutDAO;
+import vrimplantacao2_5.dao.cadastro.pdv.PdvCartaoLayoutDAO;
+import vrimplantacao2_5.dao.cadastro.pdv.PdvParametroValorDAO;
+import vrimplantacao2_5.dao.teclado.TecladoLayoutDAO;
+import vrimplantacao2_5.dao.utils.LojaGeradorScripts;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class LojaDAO {
 
     private Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
+    private LojaGeradorScripts script = new LojaGeradorScripts(versao);
+    private PdvParametroValorDAO pdvParametroValorDAO = new PdvParametroValorDAO();
+    private PdvCartaoLayoutDAO pdvCartaoLayoutDAO = new PdvCartaoLayoutDAO();
+    private PdvBalancaLayoutDAO pdvBalancaLayoutDAO = new PdvBalancaLayoutDAO();
+    private TecladoLayoutDAO tecladoLayoutDAO = new TecladoLayoutDAO();
+    private SQLBuilder scriptSQLBuilder = null;
+    private EcfDAO ecfDAO = new EcfDAO();
 
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         List<LojaVO> result = new ArrayList();
@@ -154,117 +165,170 @@ public class LojaDAO {
         }
     }
 
-    private SQLBuilder criarLoja(LojaVO i_loja) throws Exception {
-        SQLBuilder sql = new SQLBuilder();
-        sql.setSchema("public");
-        sql.setTableName("loja");
-
-        sql.put("id", i_loja.getId());
-        sql.put("descricao", i_loja.getDescricao());
-        sql.put("id_fornecedor", i_loja.getIdFornecedor());
-        sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
-        sql.put("nomeservidor", i_loja.getNomeServidor());
-        sql.put("servidorcentral", i_loja.isServidorCentral());
-        sql.put("id_regiao", i_loja.getIdRegiao());
-        sql.put("geraconcentrador", i_loja.isGeraConcentrador());
-
-        return sql;
-    }
-
     public void salvar(LojaVO i_loja) throws Exception {
-
         try (Statement stm = Conexao.createStatement()) {
 
-            /* criar loja */
-            stm.execute(criarLoja(i_loja).getInsert());
+            //("Criando Loja.");
+            stm.execute(script.criarLoja(i_loja).getInsert());
+            ProgressBar.setStatus("salvando loja... 3%");
 
-            /* cópia da tabela produtocomplemento */
-            stm.execute(copiarProdutoComplemento(i_loja));
+            //("Copiando produtocomplemento.");
+            stm.execute(script.copiarProdutoComplemento(i_loja));
+            ProgressBar.setStatus("salvando loja... 9%");
 
-            /* cópia da tabela fornecedorprazo */
-            stm.execute(copiarFornecedorPrazo(i_loja));
+            //("Copiando fornecedorprazo.");
+            stm.execute(script.copiarFornecedorPrazo(i_loja));
+            ProgressBar.setStatus("salvando loja... 10%");
 
-            /* cópia da tabela fornecedorprazopedido */
-            stm.execute(copiarFornecedorPrazoPedido(i_loja));
+            //("Copiando fornecedorprazopedido.");
+            stm.execute(script.copiarFornecedorPrazoPedido(i_loja));
+            ProgressBar.setStatus("salvando loja... 11%");
 
-            /*cópia da tabela parametrovalor */
-            stm.execute(copiarParametroValor(i_loja));
+            //("Copiando parametrovalor.");
+            stm.execute(script.copiarParametroValor(i_loja));
+            ProgressBar.setStatus("salvando loja... 15%");
 
-            /*cópia da tabela pdv.funcaoniveloperador */
-            stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
+            //("Copiando pdv.funcaoniveloperador.");
+            stm.execute(script.copiarPdvFuncaoNivelOperador(i_loja));
+            ProgressBar.setStatus("salvando loja... 18%");
 
-            /* cópia da tabela pdv.parametrovalor */
-            stm.execute(copiarPdvParametroValor(i_loja));
+            //("Copiando pdv.parametrovalor.");
+            stm.execute(script.copiarPdvParametroValor(i_loja));
+            ProgressBar.setStatus("salvando loja... 21%");
 
-            /* update campo valor na tabela pdv.parametrovalor */
-            atualizarValorPdvParametroValor(i_loja);
+            //("Copiando pdv.parametrovalor.");
+            pdvParametroValorDAO.atualizarValorPdvParametroValor(i_loja);
+            ProgressBar.setStatus("salvando loja... 24%");
 
-            /* cópia da tabela pdv.cartaolayout */
-            if (copiarPdvCartaoLayout(i_loja) != null && !copiarPdvCartaoLayout(i_loja).isEmpty()) {
-                stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
+            scriptSQLBuilder = pdvCartaoLayoutDAO.copiarPdvCartaoLayout(i_loja);
+            if (scriptSQLBuilder != null && !scriptSQLBuilder.isEmpty()) {
+                //("Copiando pdv.cartaolayout.");
+                stm.execute(scriptSQLBuilder.getInsert());
             }
+            ProgressBar.setStatus("salvando loja... 27%");
 
-            /* cópia da tabela pdv.balancaetiquetalayout */
-            if (copiarPdvBalancaEtiquetaLayout(i_loja) != null && !copiarPdvBalancaEtiquetaLayout(i_loja).isEmpty()) {
-                stm.execute(copiarPdvBalancaEtiquetaLayout(i_loja).getInsert());
+            List<SQLBuilder> listaDeInserts = new ArrayList<>();
+            listaDeInserts = pdvBalancaLayoutDAO.carregarPdvBalancaEtiquetaLayout(i_loja);
+            //("Copiando pdv.balancaetiquetalayout.");
+            if (listaDeInserts != null && !listaDeInserts.isEmpty()) {
+
+                for (SQLBuilder listaDeInsert : listaDeInserts) {
+                    stm.execute(listaDeInsert.getInsert());
+                }
+
             }
+            listaDeInserts.clear();
+            ProgressBar.setStatus("salvando loja... 35%");
 
-            /* cópia tabela pdv.tecladolayout  e pdv.tecladolayoutfuncao */
             if (i_loja.isCopiaTecladoLayout()) {
-                copiarPdvTecladoLayout(i_loja);
-                copiarPdvTecladoLayoutFuncao(i_loja);
+                //("Copiando pdv.tecladolayout.");
+                tecladoLayoutDAO.copiarPdvTecladoLayout(i_loja);
+                tecladoLayoutDAO.copiarPdvTecladoLayoutFuncao(i_loja);
             }
+            ProgressBar.setStatus("salvando loja... 40%");
 
-            /* cópia da tabela pdv.finalizadoraconfiguracao */
-            stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
+            //("Copiando pdv.finalizadoraconfiguracao.");
+            stm.execute(script.copiarPdvFinalizadoraConfiguracao(i_loja));
 
-            /* inserir tabela dataprocessamento */
-            stm.execute(inserirDataProcessamento(i_loja).getInsert());
+            //("Copiando dataprocessamento.");
+            stm.execute(script.inserirDataProcessamento(i_loja).getInsert());
 
-            /* inserir tabela comprovante */
-            stm.execute(inserirComprovante(i_loja));
+            //("Copiando comprovante.");
+            stm.execute(script.inserirComprovante(i_loja));
 
-            /* cópia da tabela pdv.operador */
-            stm.execute(copiarPdvOperador(i_loja));
+            //("Copiando pdv.operador.");
+            stm.execute(script.copiarPdvOperador(i_loja));
+            ProgressBar.setStatus("salvando loja... 50%");
 
-            /* inserir tabela notasaidasequencia */
-            stm.execute(inserirNotaSaidaSequencia(i_loja).getInsert());
+            //("Copiando notasaidasequencia.");
+            stm.execute(script.inserirNotaSaidaSequencia(i_loja).getInsert());
 
-            /* cópia tabela tiposaidanotasaidasequencia */
-            stm.execute(copiarTipoSaidaNotaSaidaSequencia(i_loja));
+            //("Copiando tiposaidanotasaidasequencia.");
+            stm.execute(script.copiarTipoSaidaNotaSaidaSequencia(i_loja));
+            ProgressBar.setStatus("salvando loja... 60%");
 
             if (i_loja.isCopiaEcf() == true) {
+                //("Copiando ECF.");
+                try {
+                    stm.execute(script.copiaEcf(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar ECF, certifique-se de que tenha ecf's na base.");
+                }
+                try {
+                    stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
+                }
+                try {
+                    stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
+                }
+                try {
+                    stm.execute(script.copiaPdvAliquotaLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+                }
+                try {
+                    stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+                }
+                try {
+                    stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
+                }
 
-                stm.execute(copiaEcf(i_loja));
-                stm.execute(copiaPdvAcumuladorLayout(i_loja));
-                stm.execute(copiaPdvFinalizadoraLayout(i_loja));
-                stm.execute(copiaPdvAliquotaLayout(i_loja));
-                stm.execute(copiaAliquotaLayoutRetorno(i_loja));
-                stm.execute(copiaAcumuladorLayoutRetorno(i_loja));
-                stm.execute(copiaFinalizadoraRetorno(i_loja));
-                stm.execute(copiaPdvEcfLayout(i_loja));
+                List<String> listaDeInsertsEcf = new ArrayList<>();
+                listaDeInsertsEcf = ecfDAO.carregarCopiaEcfLayout(i_loja);
+                if (listaDeInsertsEcf.isEmpty()){
+                    throw new Exception("Não foi econtrado valores para cópia de ecf Layout, confira se está copiando de uma loja válida.");
+                }
+                for (String string : listaDeInsertsEcf) {
+                    stm.execute(string);
+                }
+
             }
+            ProgressBar.setStatus("salvando loja... 80%");
 
             if (i_loja.isCopiaOperador() == true) {
-                stm.execute(copiarOperador(i_loja));
+                //("Copiando Operador.");
+                stm.execute(script.copiarOperador(i_loja));
             }
 
             if (i_loja.isCopiaUsuario() == true) {
-                stm.execute(copiaUsuarioPermissao(i_loja));
+                //("Copiando Usuario.");
+                stm.execute(script.copiaUsuarioPermissao(i_loja));
             }
+            ProgressBar.setStatus("salvando loja... 90%");
 
             if (versao.igualOuMaiorQue(4, 1, 39)) {
-                /* cópia tabela parametroagendarecebimento */
-                stm.execute(copiarParametroAgendaecebimento(i_loja));
+                //("Copiando parametroagendarecebimento.");
+                stm.execute(script.copiarParametroAgendaecebimento(i_loja));
             }
             //  stm.execute(copiaEcf(i_loja));
 
             /* inserir loja na tabela contabilidade.grupoeconomicoloja. */
-            stm.execute(inserirGrupoEconomicoLoja(i_loja));
+            //("Adicionando loja no grupoeconomico.");
+            stm.execute(script.inserirGrupoEconomicoLoja(i_loja));
+            ProgressBar.setStatus("salvando loja... 100%");
+
+        } catch (Exception ex) {
+            System.out.println("\nErro iniciado em LojaDAO no método Salvar\n" + ex.getMessage() + "\n");
+            ex.printStackTrace();
+            throw ex;
         }
     }
 
     public void atualizarLoja(LojaVO i_loja) throws Exception {
+        ProgressBar.setStatus("Atualizando Loja...");
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
         sql.setTableName("loja");
@@ -282,503 +346,12 @@ public class LojaDAO {
         if (!sql.isEmpty()) {
             try (Statement stmUpdate = Conexao.createStatement()) {
                 stmUpdate.execute(sql.getUpdate());
+            } catch (Exception ex) {
+                System.out.println("Erro iniciado em LojaDAO no método Atualizar\n" + ex.getMessage());
+                ex.printStackTrace();
+                throw ex;
             }
         }
-    }
-
-    private String copiarProdutoComplemento(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO produtocomplemento ("
-                + "id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, dataultimopreco, \n"
-                + "dataultimaentrada, custosemimposto, custocomimposto, custosemimpostoanterior, custocomimpostoanterior, precovenda, precovendaanterior, \n"
-                + "precodiaseguinte, estoque, troca, emiteetiqueta, custosemperdasemimposto, custosemperdasemimpostoanterior, customediocomimposto, \n"
-                + "customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado, \n"
-                + "quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao, id_tipocalculoddv \n";
-
-        if (versao.igualOuMaiorQue(3, 17, 10)) {
-            sql = sql + ", id_tipoproduto, fabricacaopropria ";
-        }
-        if (versao.igualOuMaiorQue(3, 21)) {
-            sql = sql + ", dataprimeiraentrada ";
-        }
-        if (versao.igualOuMaiorQue(4)) {
-            sql = sql + ", margem, margemminima, margemmaxima ";
-        }
-
-        sql = sql + ")";
-
-        sql = sql + " (SELECT id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, null, null, " + (i_loja.isCopiaCusto() ? "custosemimposto" : "0") + ","
-                + " " + (i_loja.isCopiaCusto() ? "custocomimposto" : "0") + ", 0, 0, " + (i_loja.isCopiaPrecoVenda() ? "precovenda" : "0") + ","
-                + "  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,"
-                + " null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,"
-                + " valoricmssubstituicao, null, cestabasica, 0, 3";
-
-        if (versao.igualOuMaiorQue(3, 17, 10)) {
-            sql = sql + ", 0, false";
-        }
-        if (versao.igualOuMaiorQue(3, 21)) {
-            sql = sql + ", dataprimeiraentrada ";
-        }
-        if (versao.igualOuMaiorQue(4)) {
-            sql = sql + (i_loja.isCopiaMargem() ? ", margem" : ", 0");
-            sql = sql + (i_loja.isCopiaMargem() ? ", margemminima" : ", 0");
-            sql = sql + (i_loja.isCopiaMargem() ? ", margemmaxima" : ", 0");
-        }
-
-        sql = sql + " from produtocomplemento where id_loja = " + i_loja.getIdCopiarLoja() + ")";
-
-        return sql;
-    }
-
-    private String copiarFornecedorPrazo(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO fornecedorprazo("
-                + "id_fornecedor, id_loja, id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca)"
-                + "(SELECT id_fornecedor, " + i_loja.getId() + ", id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca \n"
-                + "FROM fornecedorprazo WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
-
-        return sql;
-    }
-
-    private String copiarFornecedorPrazoPedido(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO fornecedorprazopedido(id_fornecedor, id_loja, \n"
-                + "diasentregapedido,diasatualizapedidoparcial) \n"
-                + "(SELECT id_fornecedor, " + i_loja.getId() + ", diasentregapedido,diasatualizapedidoparcial \n"
-                + "FROM fornecedorprazopedido WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
-
-        return sql;
-    }
-
-    private String copiarParametroValor(LojaVO i_loja) throws Exception {
-        String sql = "insert into parametrovalor (\n"
-                + "	id_loja,\n"
-                + "	id_parametro,\n"
-                + "	valor\n"
-                + ") \n"
-                + "select\n"
-                + "	" + i_loja.getId() + ",\n"
-                + "	id_parametro,\n"
-                + "	valor\n"
-                + "from\n"
-                + "	parametrovalor\n"
-                + "where\n"
-                + "	id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                + "	and id_parametro not in (456, 485, 486)";
-
-        return sql;
-    }
-
-    private String copiarPdvFuncaoNivelOperador(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO pdv.funcaoniveloperador (id_loja, id_funcao, id_tiponiveloperador)\n"
-                + "(SELECT " + i_loja.getId() + ", id_funcao, id_tiponiveloperador FROM pdv.funcaoniveloperador WHERE id_loja = " + i_loja.getIdCopiarLoja() + ")";
-
-        return sql;
-    }
-
-    private String copiarPdvParametroValor(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO pdv.parametrovalor (id_loja,id_parametro,valor)\n"
-                + "(SELECT " + i_loja.getId() + ",id_parametro,valor FROM pdv.parametrovalor WHERE id_loja = " + i_loja.getIdCopiarLoja() + ""
-                + "AND id_parametro not in (67, 97))";
-
-        return sql;
-    }
-
-    private void atualizarValorPdvParametroValor(LojaVO i_loja) throws Exception {
-        SQLBuilder sql = new SQLBuilder();
-        sql.setSchema("pdv");
-        sql.setTableName("parametrovalor");
-
-        sql.put("valor", i_loja.getId());
-
-        sql.setWhere("id_loja = " + i_loja.getId() + " and id_parametro = 99");
-
-        if (!sql.isEmpty()) {
-            try (Statement stmUpdate = Conexao.createStatement()) {
-                stmUpdate.execute(sql.getUpdate());
-            }
-        }
-    }
-
-    private SQLBuilder copiarPdvCartaoLayout(LojaVO i_loja) throws Exception {
-        String sql = "SELECT * FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
-        SQLBuilder sqlInsert = null;
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    sql
-            )) {
-                while (rst.next()) {
-                    int proximoId = new CodigoInternoDAO().get("pdv.cartaolayout");
-
-                    sqlInsert = new SQLBuilder();
-                    sqlInsert.setSchema("pdv");
-                    sqlInsert.setTableName("cartaolayout");
-
-                    sqlInsert.put("id", proximoId);
-                    sqlInsert.put("id_loja", i_loja.getId());
-                    sqlInsert.put("id_tipocartao", rst.getInt("id_tipocartao"));
-                    sqlInsert.put("posicao", rst.getInt("posicao"));
-                    sqlInsert.put("tamanho", rst.getInt("tamanho"));
-                    sqlInsert.put("id_tipocartaocampo", rst.getInt("id_tipocartaocampo"));
-                }
-            }
-        }
-
-        return sqlInsert;
-    }
-
-    private SQLBuilder copiarPdvBalancaEtiquetaLayout(LojaVO i_loja) throws Exception {
-        String sql = "SELECT * FROM pdv.balancaetiquetalayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
-        SQLBuilder sqlInsert = null;
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    sql
-            )) {
-                while (rst.next()) {
-                    sqlInsert = new SQLBuilder();
-                    int proximoId = new CodigoInternoDAO().get("pdv.balancaetiquetalayout");
-
-                    sqlInsert.setSchema("pdv");
-                    sqlInsert.setTableName("balancaetiquetalayout");
-
-                    sqlInsert.put("id", proximoId);
-                    sqlInsert.put("id_loja", i_loja.getId());
-                    sqlInsert.put("id_tipobalancaetiqueta", rst.getInt("id_tipobalancaetiqueta"));
-                    sqlInsert.put("id_tipobalancoetiquetacampo", rst.getInt("id_tipobalancoetiquetacampo"));
-                    sqlInsert.put("iniciopeso", rst.getInt("iniciopeso"));
-                    sqlInsert.put("tamanhopeso", rst.getInt("tamanhopeso"));
-                    sqlInsert.put("iniciopreco", rst.getInt("iniciopreco"));
-                    sqlInsert.put("tamanhopreco", rst.getInt("tamanhopreco"));
-                }
-            }
-        }
-
-        return sqlInsert;
-    }
-
-    public List<TecladoLayoutVO> getTecladoLayout(LojaVO i_loja) throws Exception {
-        List<TecladoLayoutVO> result = new ArrayList<>();
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "     id, \n"
-                    + "     id_loja, \n"
-                    + "     descricao \n"
-                    + "FROM pdv.tecladolayout \n"
-                    + "WHERE id_loja = " + i_loja.getIdCopiarLoja()
-            )) {
-                while (rst.next()) {
-                    TecladoLayoutVO vo = new TecladoLayoutVO();
-                    vo.setIdTecladoLayoutCopiado(rst.getInt("id"));
-                    vo.setDescricao(rst.getString("descricao"));
-                    result.add(vo);
-                }
-            }
-            return result;
-        }
-    }
-
-    private String copiarParametroAgendaecebimento(LojaVO i_loja) {
-        String sqlUpdateParametroAgendaRecebimento = " insert\n"
-                + "	into\n"
-                + "	parametroagendarecebimento (dia_semana,\n"
-                + "	horario_inicio,\n"
-                + "	horario_termino,\n"
-                + "	tempo_recebimento,\n"
-                + "	quantidade_docas,\n"
-                + "	id_loja)\n"
-                + "select\n"
-                + "	dia_semana,\n"
-                + "	horario_inicio,\n"
-                + "	horario_termino,\n"
-                + "	tempo_recebimento,\n"
-                + "	quantidade_docas,\n"
-                + "	" + i_loja.getId() + " id_loja\n"
-                + "from\n"
-                + "	parametroagendarecebimento";
-        return sqlUpdateParametroAgendaRecebimento;
-    }
-
-    public class ProximoIdTecladoLayoutVO {
-
-        public int proximoIdTecladoLayout;
-    }
-
-    public List<ProximoIdTecladoLayoutVO> proximoIdTecladoLayoutVO = new ArrayList<>();
-
-    public void copiarPdvTecladoLayout(LojaVO i_loja) throws Exception {
-
-        List<TecladoLayoutVO> tecladoLayoutVO = getTecladoLayout(i_loja);
-
-        try (Statement stm = Conexao.createStatement()) {
-            for (TecladoLayoutVO vo : tecladoLayoutVO) {
-
-                ProximoIdTecladoLayoutVO i_idTecladoLayoutVO = new ProximoIdTecladoLayoutVO();
-
-                int proximoIdTecladoLayout = new CodigoInternoDAO().get("pdv.tecladolayout");
-
-                SQLBuilder sqlTecladoLayout = new SQLBuilder();
-                sqlTecladoLayout.setSchema("pdv");
-                sqlTecladoLayout.setTableName("tecladolayout");
-
-                sqlTecladoLayout.put("id", proximoIdTecladoLayout);
-                sqlTecladoLayout.put("id_loja", i_loja.getId());
-                sqlTecladoLayout.put("descricao", vo.getDescricao());
-
-                i_idTecladoLayoutVO.proximoIdTecladoLayout = proximoIdTecladoLayout;
-                proximoIdTecladoLayoutVO.add(i_idTecladoLayoutVO);
-
-                stm.execute(sqlTecladoLayout.getInsert());
-            }
-        }
-    }
-
-    public List<TecladoLayoutFuncaoVO> getPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
-        List<TecladoLayoutFuncaoVO> result = new ArrayList<>();
-
-        List<TecladoLayoutVO> tecladoLayout = getTecladoLayout(i_loja);
-
-        try (Statement stm = Conexao.createStatement()) {
-
-            for (int i = 0; i < tecladoLayout.size(); i++) {
-                TecladoLayoutVO tecladoLayoutVO = tecladoLayout.get(i);
-                try (ResultSet rst = stm.executeQuery(
-                        "SELECT \n"
-                        + "     tl.id as idtecladolayout, \n"
-                        + "     tlf.codigoretorno, \n"
-                        + "     tlf.id_funcao \n"
-                        + "FROM pdv.tecladolayoutfuncao AS tlf \n"
-                        + "INNER JOIN pdv.tecladolayout AS tl ON tl.id = tlf.id_tecladolayout \n"
-                        + "WHERE tl.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                        + "AND tl.id = " + tecladoLayoutVO.getIdTecladoLayoutCopiado()
-                )) {
-                    ProximoIdTecladoLayoutVO i_proximoIdTecladoLayoutVO = proximoIdTecladoLayoutVO.get(i);
-                    while (rst.next()) {
-
-                        TecladoLayoutFuncaoVO vo = new TecladoLayoutFuncaoVO();
-                        vo.setIdTecladoLayout(i_proximoIdTecladoLayoutVO.proximoIdTecladoLayout);
-                        vo.setCodigoRetorno(rst.getInt("codigoretorno"));
-                        vo.setIdFuncao(rst.getInt("id_funcao"));
-
-                        result.add(vo);
-
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public void copiarPdvTecladoLayoutFuncao(LojaVO i_loja) throws Exception {
-
-        List<TecladoLayoutFuncaoVO> tecladoLayoutFuncao = getPdvTecladoLayoutFuncao(i_loja);
-
-        try (Statement stm = Conexao.createStatement()) {
-            for (TecladoLayoutFuncaoVO vo : tecladoLayoutFuncao) {
-                int proximoIdLayoutFuncao = new CodigoInternoDAO().get("pdv.tecladolayoutfuncao");
-
-                SQLBuilder sqlTecladoLayoutFuncao = new SQLBuilder();
-                sqlTecladoLayoutFuncao.setSchema("pdv");
-                sqlTecladoLayoutFuncao.setTableName("tecladolayoutfuncao");
-
-                sqlTecladoLayoutFuncao.put("id", proximoIdLayoutFuncao);
-                sqlTecladoLayoutFuncao.put("id_tecladolayout", vo.getIdTecladoLayout());
-                sqlTecladoLayoutFuncao.put("codigoretorno", vo.getCodigoRetorno());
-                sqlTecladoLayoutFuncao.put("id_funcao", vo.getIdFuncao());
-
-                stm.execute(sqlTecladoLayoutFuncao.getInsert());
-            }
-        }
-    }
-
-    private String copiarPdvFinalizadoraConfiguracao(LojaVO i_loja) throws Exception {
-        String sql = "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento, \n"
-                + "aceitarecebimento,utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado)\n"
-                + "(SELECT " + i_loja.getId() + ",id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento,aceitarecebimento, \n"
-                + "utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado \n"
-                + "FROM pdv.finalizadoraconfiguracao WHERE id_loja = " + i_loja.getIdCopiarLoja() + ")";
-
-        return sql;
-    }
-
-    private SQLBuilder inserirDataProcessamento(LojaVO i_loja) throws Exception {
-        SQLBuilder sql = new SQLBuilder();
-        sql.setSchema("public");
-        sql.setTableName("dataprocessamento");
-
-        sql.put("id_loja", i_loja.getId());
-        sql.put("data", Util.formatDataBanco(new DataProcessamentoDAO().get()));
-
-        return sql;
-    }
-
-    private String copiaUsuarioPermissao(LojaVO i_loja) throws Exception {
-        String sql = "insert into permissaoloja (id, id_loja,id_permissao)\n"
-                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja ";
-
-        return sql;
-    }
-
-    private String copiaAcumuladorLayoutRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.acumuladorlayoutretorno ( id_acumuladorlayout ,id_acumulador , retorno , titulo )\n"
-                + "(select max((id_acumuladorlayout)+1) , id_acumulador , retorno , titulo from pdv.acumuladorlayoutretorno\n"
-                + "group by id_acumulador, retorno, titulo )";
-
-        return sql;
-    }
-
-    private String copiaAliquotaLayoutRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.aliquotalayoutretorno ( id_aliquotalayout ,id_aliquota , retorno , codigoleitura )\n"
-                + "(select max((id_aliquotalayout)+1) , id_aliquota , retorno , codigoleitura from pdv.aliquotalayoutretorno\n"
-                + "group by id_aliquota, retorno, codigoleitura )";
-
-        return sql;
-    }
-
-    private String copiaFinalizadoraRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.finalizadoralayoutretorno ( id_finalizadoralayout ,id_finalizadora , retorno , utilizado )\n"
-                + "(select max((id_finalizadoralayout)+1) , id_finalizadora , retorno , utilizado from pdv.finalizadoralayoutretorno\n"
-                + "group by id_finalizadora, retorno, utilizado )";
-
-        return sql;
-    }
-
-    private String copiaPdvAcumuladorLayout(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.acumuladorlayout (id,id_loja,descricao)\n"
-                + "(select max((id)+1)," + i_loja.getId() + ",descricao from pdv.acumuladorlayout where id_loja = " + i_loja.getIdCopiarLoja() + " \n"
-                + "group by id)";
-
-        return sql;
-    }
-
-    private String copiaPdvFinalizadoraLayout(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.finalizadoralayout (id, id_loja, descricao)\n"
-                + "(select max((id)+1)," + i_loja.getId() + ",descricao from pdv.finalizadoralayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                + "group by id)";
-
-        return sql;
-    }
-
-    private String copiaPdvAliquotaLayout(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.aliquotalayout (id, id_loja, descricao)\n"
-                + "select max((id)+1) ," + i_loja.getId() + ", descricao from pdv.aliquotalayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                + "group by id";
-
-        return sql;
-    }
-
-    private String copiaEcf(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.ecf (ID_LOJA,ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,numeroserie,\n"
-                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
-                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
-                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv) \n"
-                + "	select " + i_loja.getId() + " , ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,'999'||length(tipoecf||versaosb)+row_number() over(),\n"
-                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
-                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
-                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv\n"
-                + "	from pdv.ecf \n"
-                + "	where id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-    }
-
-    private String copiaPdvEcfLayout(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.ecflayout (id, id_ecf,id_tecladolayout,id_finalizadoralayout,id_acumuladorlayout,id_aliquotalayout,regracalculo,arredondamentoabnt)\n"
-                + "select \n"
-                + " nextval('pdv.ecflayout_id_seq') , \n"
-                + " (select id from pdv.ecf where id_loja = " + i_loja.getId() + ") as id_ecf,\n"
-                + " (select id from pdv.tecladolayout where id_loja = " + i_loja.getId() + ") as id_teclado,\n"
-                + " (select id from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ") as id_finalizadora,\n"
-                + " (select id from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ") as id_acumaldor,\n"
-                + " (select id from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ") as id_aliquotalayout,\n"
-                + " regracalculo ,\n"
-                + " arredondamentoabnt \n"
-                + " from pdv.ecflayout ecf  \n"
-                + " join pdv.ecf e on e.id = ecf.id_ecf"
-                + " where e.id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-
-    }
-
-    private String copiarOperador(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.operador (id_loja ,matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro)\n"
-                + "select " + i_loja.getId() + ",matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro from pdv.operador \n"
-                + "where matricula != 500001 and id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-    }
-
-    private String inserirComprovante(LojaVO i_loja) throws Exception {
-        String sql = "insert into comprovante select id, " + i_loja.getId() + " as id_loja, descricao, cabecalho, \n"
-                + "detalhe, rodape from comprovante where id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-    }
-
-    private String inserirGrupoEconomicoLoja(LojaVO i_loja) throws Exception {
-        String sql = "insert\n"
-                + "	into\n"
-                + "	contabilidade.grupoeconomicoloja\n"
-                + "select\n"
-                + "	(\n"
-                + "	select\n"
-                + "		max(id) + 1\n"
-                + "	from\n"
-                + "		contabilidade.grupoeconomicoloja) as id,\n"
-                + "	id_grupoeconomico,\n"
-                + "	" + i_loja.getId() + ",\n"
-                + "	false\n"
-                + "from\n"
-                + "	contabilidade.grupoeconomicoloja\n"
-                + "where\n"
-                + "	id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-    }
-
-    private String copiarPdvOperador(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.operador (id_loja, matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro) \n"
-                + "select " + i_loja.getId() + ", matricula, nome, senha, codigo, id_tiponiveloperador, id_situacaocadastro \n"
-                + "from pdv.operador \n"
-                + "where id_loja = " + i_loja.getIdCopiarLoja() + " "
-                + "and matricula = 500001";
-
-        return sql;
-    }
-
-    private SQLBuilder inserirNotaSaidaSequencia(LojaVO i_loja) throws Exception {
-        SQLBuilder sql = new SQLBuilder();
-        sql.setSchema("public");
-        sql.setTableName("notasaidasequencia");
-
-        sql.put("id_loja", i_loja.getId());
-        sql.put("numerocontrole", 1);
-        sql.put("serie", 1);
-
-        return sql;
-    }
-
-    private String copiarTipoSaidaNotaSaidaSequencia(LojaVO i_loja) throws Exception {
-        String sql = "insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n"
-                + "select\n"
-                + i_loja.getId() + ", \n"
-                + "	t.id_tiposaida, \n"
-                + "	(select id from notasaidasequencia where id_loja = " + i_loja.getId() + ") id  \n"
-                + "from  \n"
-                + "	tiposaidanotasaidasequencia t\n"
-                + "where  \n"
-                + "   t.id_notasaidasequencia in "
-                + " (select\n"
-                + " min(n.id)\n"
-                + " from\n"
-                + " notasaidasequencia n\n"
-                + " join\n"
-                + " loja l on l.id = n.id_loja\n"
-                + " where\n"
-                + " l.id_situacaocadastro = 1)";
-
-        return sql;
     }
 
     public boolean isLoja(int i_idLoja) throws Exception {
@@ -892,4 +465,366 @@ public class LojaDAO {
         return result;
     }
 
+    public void deletarLoja(LojaVO i_loja) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("do $$\n"
+                    + "begin\n"
+                    + "delete from implantacao2_5.operacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebercheque where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.usuario where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.escrita where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.mdfeemissao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.verbaselloutloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.estoquecongelado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.certificadodigitalloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.balancoestoque where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.transferenciainterna where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebercaixa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.consistenciaecf where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatovendatotal where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mastermaq.parametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from ficha.setor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from encerramento.logencerramento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.lancamentolacs where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.vendapromocaopontuacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from confere.configuracaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from confere.filaexportacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendatef where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from confere.vendaconfere where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from centralrede.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.escritaoutrosvalores where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from ativo.bem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebervendaprazo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from arcos.sugestaopreco where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.promocao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.ofertarelampago where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.produtocomplemento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.parametrovalor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from paf.estoque where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from van.lojaoperadora where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from supersoft.configuracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from sped.configuracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from sped.configuracaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from sef.configuracaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.workflowdivergenciamensagem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.workflowusuarioloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendaecommerce where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendaatacado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendasinteticaprevisao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendasintetica where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendakit where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendacupommedio where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.veiculo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vasilhame where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.veiculodespesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendamediadata where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.usuarioloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.trocanegociacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.tipoworkflowloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.transformado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.tiposaidanotasaidasequencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.tipoentradatipocentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.tarefa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.tabelaproduto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.setorbalancatoledo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.setorbalancafilizola where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.simplesoutrosvalores where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.rupturacoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaoseparacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaoconferencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaocoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaoseparacaocoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaoconferenciacoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reposicaolojacentralizado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.reservaveiculo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receitaloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receitaoutras where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebivelconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebimento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebervendaprazoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebercreditorotativoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberdevolucaoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberdevolucao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberconveniadoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberchequeitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberconveniado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebercontratoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.produtolojavirtualitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.rebaixacusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.programacaoprecoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberbonificacaoverba where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberbonificacaocontrato where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberbonificacaodevolucao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.produtoautomacaodescontolote where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.produtoautomacaodescontooferta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pricinganalisefiltroloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.producaoordem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.previsaodespesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.producao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pesquisasatisfacaorespostas where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pesquisalistagem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.portariacat where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.piscofinsoutrosvalores where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.precotacaofornecedorcoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.precotacaofornecedoritem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.planoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.prepedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidonegociacaotroca where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.permissaoloja where id_loja = 1;\n"
+                    + "delete from public.pedidoinformacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pesquisa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidolimitesemanafornecedoritem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidolimitesemanacomprador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.peps where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidolimitesemanamercadologicoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidocoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidoconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidocrossdocking where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pedidodespesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pagaroutrasdespesas where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pagaroutrasdespesascentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pagaradiantamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.ofertalote where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.outrosvalorespiscofins where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaservico where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pagarfechamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notasaidaconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notasaidacoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notasaidasequencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentradavalefornecedor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentradanfe where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentradacoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentradanfependencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notadespesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.nfcesequencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentradacentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notadespesacentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.midia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.mudancatributacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.recebercreditorotativo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.lucrodiariocliente where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.maparesumosequencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logtroca where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.lojareposicao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logtransacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.maparesumoconfiguracaoaliquota where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logtransacaopedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.maparesumo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.mensagemgrupo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.maparesumoconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.mensagem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logpedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logcestabasica where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logcusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logpreco where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.listagem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.logestoque where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.grupoprecoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.grupopreco where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.inventario where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.inventarioterceiro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.guiaentrega where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.inventarioicmsst where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.geracaoretencaotributoitemnotasaida where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.fornecedorprazopedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.fornecedorsaldo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.fornecedorprazo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.geracaoretencaotributoitemnotadespesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.estoqueterceiro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.feriado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.formulariohorario where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.formularioloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.escritasaldo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.estoque where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.estornooutrosvalores where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.escritafechamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.escritacentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.divergenciasworkflowpedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.divergenciasworkflowentrada where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.droprevisaotipoentrada where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.droprevisaovenda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.diasestoqueprojecao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.vendamedia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.dianaoutil where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.doacaoentidade where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.descontocondicionalitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.divergenciasworkflowcotacaocliente where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.diefconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.dmaconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.oferta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.ddvmercadologico where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.cotacaoclienteinformacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.deliverycoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.cotacaocliente where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.conveniadotransacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.delivery where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.cotacaoclientecoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contratoexcecaoacordo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contratoacordoexcecaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contratolancamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contratofornecedorexcecaoacordo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contabilidade where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contabilidadelancamentocentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.conveniado where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.conveniado_ant where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.controlepoliciacivilconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.contabilidadeanterior where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.concentrador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.configuracaologotipoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.conciliacaobancariacentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.configuracaodaicms where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.comprovante where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.clientepreferencialdiasbloqueioparametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.clientepreferencialpromocaovenda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.caixasaldo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.centralizacaoicmslojaparametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.caixa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.balancoprelancamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.balancoestoqueanterior where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.balanco where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.caixasaldoempresa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.centrocustoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.bancoconta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberverba where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberoutrasreceitasitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.perda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.pagarfornecedor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.verba where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberverbaitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.quebra where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notasaida where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.receberoutrasreceitas where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.consumo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.parametrovalor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.notaentrada where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.administracaoprecodivergencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.administracaoprecolojavirtual where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.administracaoprecoconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.dataprocessamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.analisecentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.administracaopreco where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.agendafornecedorloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.agenda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.administracaoprecolote where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.produtoautomacaodesconto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.agendamentorecebimento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from public.abastecimento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendapromocaopontuacaoitem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendapromocaopontuacaobaixaproduto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendapromocaopontuacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendaoperador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendaoperadorrecebiveltmp where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendaoperadorauditoria where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.valepresente where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.valegasproduto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.vendakit where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.trocacupom where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.valegas where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.tecladolayoutfuncao where id_tecladolayout = " + i_loja.getId() + "; \n"
+                    + "delete from pdv.tecladolayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.pos where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.retirada where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.maparesumo where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.logtransacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.ficha where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.funcaoniveloperador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.finalizadoraconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.ecf where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.documento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.devolucaocupom where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.operador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.descontooperador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.agendatema where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.creditorotativoparcela where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.consistencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.contravale where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.concentrador where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from paf.envioreducaoz where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.cartaolayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.balancaetiquetalayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from pdv.comprovantenaofiscal where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from paf.envioestoquemensal where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatoencerramentodiario where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatoprecotacaofornecedor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatopedidoatendido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatovendaparcial where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from mensagem.contatodivergenciapedido where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from implantacao.codigobarrasanterior where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from implantacao.codigoanteriorforn where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from implantacao.codigoanteriorcli where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from implantacao.codigoanterior where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadornfce.vendaprocessada where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadordmcard.exportacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadorarcos.filadiferenca where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadorarcos.filaexportacao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from fortes.parametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadorarcos.precificacaotemp where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from gerenciadorarcos.ofertatemp where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from food.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from fiscal.processosjudiciais where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from fiscal.escritaprodutocomplementost where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from ficha.impressora where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from fgf.configuracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from encerramento.configuracaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from folhamatic.parametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from ficha.mesa where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from encerramento.dataestornoconsistencia where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from emissoretiqueta.impressora where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from emissoretiqueta.produtocoletor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from emissoretiqueta.configuracaoetiqueta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from dominio.parametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from crescevendas.log where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from crescevendas.vendacrescevendas where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contmatic.parametro where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from emissoretiqueta.logproduto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.lancamentolalurpartea where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.planocontasaldoinicial where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.grupoeconomicoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.dresaldoinicial where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.agendamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from contabilidade.agendamentoitemcentrocusto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.voucher where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from consultapreco.exportacaoproduto where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.produtopontuacaoexclusaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.produtopontuacaoloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.vendapromocaopontuacaoexclusao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.produtobloqueiocancelamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.produtobloqueio where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.ofertadataprocessamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.produtopontuacaoimagemloja where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.dataencerramentodiario where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.folhetooferta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.folhetoofertacancelamento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.lojaconfiguracao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.log where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from connect.lembrete where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from confere.controleconsulta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from confere.configuracaotef where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from comissao.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from centralrede.parametrovalor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from centralcompra.vendagestao where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from comissao.vendedor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from centralcompra.notasaida where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from ativo.baixabem where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from atacarejo.produtocomplemento where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from atacarejo.parametrovalor where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from atacarejo.venda where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from arcos.sugestaooferta where id_loja = " + i_loja.getId() + ";\n"
+                    + "delete from loja where id = " + i_loja.getId() + ";\n"
+                    + "end;\n"
+                    + "$$ language plpgsql");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Erro iniciado em LojaDAO no método Salvar\n"
+                    + "Consequentemente o erro seguiu para o método de deletar.\n"
+                    + "Entre em contato com o setor de Migração.");
+        }
+    }
 }

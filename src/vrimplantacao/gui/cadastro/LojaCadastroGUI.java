@@ -1,7 +1,9 @@
 package vrimplantacao.gui.cadastro;
 
+import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.vo.loja.LojaVO;
@@ -25,15 +27,13 @@ public class LojaCadastroGUI extends VRInternalFrame {
 
         cboRegiao.setTabela("regiao");
         cboRegiao.carregar();
-        
+
         trocaPanel.setVisible(false);
         trocaPanel.setEnabled(false);
         chkCopiaMargem.setEnabled(false);
         chkCopiaEcf.setEnabled(false);
         chkCopiaPermissao.setEnabled(false);
         chkCopiaOperador.setEnabled(false);
-        
-        
 
     }
 
@@ -111,15 +111,18 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.setCopiaEcf(chkCopiaEcf.isSelected());
         oLoja.setCopiaOperador(chkCopiaOperador.isSelected());
         oLoja.setCopiaUsuario(chkCopiaPermissao.isSelected());
-        
 
-        new LojaController().salvar(oLoja);
+        try {
+            new LojaController().salvar(oLoja);
+        } catch (Exception e) {
+            throw e;
+        }
 
         parentFrame.vLoja.add(oLoja);
         cboCopiarLoja.carregar();
 
         habilitarTela();
-        Util.exibirMensagem(Util.MSG_SALVO_SUCESSO, getTitle());
+        //Util.exibirMensagem(Util.MSG_SALVO_SUCESSO, getTitle());
     }
 
     private int getNextId() throws Exception {
@@ -578,14 +581,42 @@ public class LojaCadastroGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnSairActionPerformed
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            this.setWaitCursor();
-            salvar();
-
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        ProgressBar.show();
+                        ProgressBar.setCancel(false);
+                        ProgressBar.setStatus("Por favor aguarde.");
+                        salvar();
+                        ProgressBar.dispose();
+                        Util.exibirMensagem("Loja salva com sucesso!", "Cadastro Loja");
+                        //refresh nas lojas
+                        parentFrame.consultar();
+                    } catch (Exception ex) {
+                        ProgressBar.dispose();
+                        try {
+                            sair();
+                            parentFrame.consultar();
+                        } catch (Exception ex1) {
+                            Exceptions.printStackTrace(ex1);
+                        }
+                        System.out.println(ex.getMessage());
+                        Exceptions.printStackTrace(ex);
+                        Util.exibirMensagemErro(ex, getTitle());
+                    }
+                }
+            };
+            thread.start();
         } catch (Exception ex) {
+            try {
+                parentFrame.consultar();
+                sair();
+            } catch (Exception ex1) {
+                Exceptions.printStackTrace(ex1);
+            }
             Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
+            dispose();
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
     private void btnTbIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTbIncluirActionPerformed
@@ -645,20 +676,21 @@ public class LojaCadastroGUI extends VRInternalFrame {
             chkCopiaMargem.setEnabled(true);
         } else {
             chkCopiaMargem.setSelected(false);
-            chkCopiaMargem.setEnabled(false);            
+            chkCopiaMargem.setEnabled(false);
         }
     }//GEN-LAST:event_chkVersao4ActionPerformed
 
     private void chkTrocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkTrocaActionPerformed
         // TODO add your handling code here:
-        if(chkTroca.isSelected()){
-            
+        if (chkTroca.isSelected()) {
+
             trocaPanel.setVisible(true);
             chkCopiaEcf.setEnabled(true);
             chkCopiaPermissao.setEnabled(true);
             chkCopiaOperador.setEnabled(true);
-        } else
+        } else {
             trocaPanel.setVisible(false);
+        }
     }//GEN-LAST:event_chkTrocaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

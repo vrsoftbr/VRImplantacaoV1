@@ -15,52 +15,57 @@ public class LojaService {
 
     private final ConexaoProvider provider;
     private final LojaDAO lojaDAO;
-    
+
     public LojaService() {
         this.lojaDAO = new LojaDAO();
         this.provider = new ConexaoProvider();
     }
-    
+
     public LojaService(LojaDAO lojaDAO,
-                       ConexaoProvider provider) {
-        
+            ConexaoProvider provider) {
+
         this.lojaDAO = lojaDAO;
         this.provider = provider;
     }
-    
+
     public void salvar(LojaVO vo) throws Exception {
-        
+
         try {
             provider.begin();
-            
+
             if (isLojaExiste(vo)) {
                 lojaDAO.atualizarLoja(vo);
             } else {
                 lojaDAO.salvar(vo);
             }
-            
             provider.commit();
-            
+
         } catch (Exception ex) {
-            ex.printStackTrace();
-            Util.exibirMensagemErro(ex, getTitle());
+            //ex.printStackTrace();
+            //Util.exibirMensagemErro(ex, getTitle());
             provider.rollback();
+            throw ex;
         }
+
     }
-    
+
     private boolean isLojaExiste(LojaVO vo) throws Exception {
         return lojaDAO.isLojaExiste(vo);
     }
-    
+
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         return lojaDAO.consultar(i_filtro);
     }
-    
+
     public LojaVO carregar(int i_id) throws Exception {
         return lojaDAO.carregar(i_id);
     }
-    
+
     private String getTitle() {
         return "Cadastro Loja";
+    }
+
+    public void deletarLoja(LojaVO oLoja) throws Exception {
+        lojaDAO.deletarLoja(oLoja);
     }
 }

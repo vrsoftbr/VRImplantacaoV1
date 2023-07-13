@@ -2,11 +2,12 @@ package vrimplantacao.dao.cadastro;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import vr.core.parametro.versao.Versao;
 import vrimplantacao.classe.Global;
 import vrframework.classe.Conexao;
+import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.pdv.ecf.EcfPdvVO;
 import vrimplantacao2.dao.cadastro.venda.EcfVO;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -15,7 +16,7 @@ import vrimplantacao2.utils.sql.SQLUtils;
 public class EcfDAO {
 
     private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-    
+
     public int get(String i_numeroSerie) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
@@ -37,7 +38,7 @@ public class EcfDAO {
             return -1;
         }
     }
-    
+
     public int get(String i_numeroSerie, int idLojaVR) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
@@ -59,31 +60,31 @@ public class EcfDAO {
             return -1;
         }
     }
-    
+
     public EcfVO getEcf(String numeroSerie, int idLojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	ecf.id,\n" +
-                    "	ecf.id_loja,\n" +
-                    "	ecf.id_tipomarca,\n" +
-                    "	marca.descricao marca,\n" +
-                    "	ecf.id_tipomodelo,\n" +
-                    "	modelo.descricao modelo,\n" +
-                    "	ecf.ecf,\n" +
-                    "	ecf.descricao,\n" +
-                    "	ecf.numeroserie\n" +
-                    "from\n" +
-                    "	pdv.ecf ecf\n" +
-                    "	join pdv.tipomarca marca on ecf.id_tipomarca = marca.id\n" +
-                    "	join pdv.tipomodelo modelo on ecf.id_tipomodelo = modelo.id\n" +
-                    "where\n" +
-                    "	rtrim(ecf.numeroserie) = " + SQLUtils.stringSQL(numeroSerie) + " and\n" +
-                    "	ecf.id_loja = " + idLojaVR
+                    "select\n"
+                    + "	ecf.id,\n"
+                    + "	ecf.id_loja,\n"
+                    + "	ecf.id_tipomarca,\n"
+                    + "	marca.descricao marca,\n"
+                    + "	ecf.id_tipomodelo,\n"
+                    + "	modelo.descricao modelo,\n"
+                    + "	ecf.ecf,\n"
+                    + "	ecf.descricao,\n"
+                    + "	ecf.numeroserie\n"
+                    + "from\n"
+                    + "	pdv.ecf ecf\n"
+                    + "	join pdv.tipomarca marca on ecf.id_tipomarca = marca.id\n"
+                    + "	join pdv.tipomodelo modelo on ecf.id_tipomodelo = modelo.id\n"
+                    + "where\n"
+                    + "	rtrim(ecf.numeroserie) = " + SQLUtils.stringSQL(numeroSerie) + " and\n"
+                    + "	ecf.id_loja = " + idLojaVR
             )) {
                 if (rst.next()) {
                     EcfVO ecf = new EcfVO();
-                    
+
                     ecf.setId(rst.getInt("id"));
                     ecf.setIdLoja(rst.getInt("id_loja"));
                     ecf.setIdTipoMarca(rst.getInt("id_tipomarca"));
@@ -93,7 +94,7 @@ public class EcfDAO {
                     ecf.setEcf(rst.getInt("ecf"));
                     ecf.setDescricao(rst.getString("descricao"));
                     ecf.setNumeroSerie(rst.getString("numeroserie"));
-                    
+
                     return ecf;
                 }
             }
@@ -150,5 +151,64 @@ public class EcfDAO {
                 }
             }
         }
+    }
+
+    public List<String> carregarCopiaEcfLayout(LojaVO i_loja) throws Exception {
+        String sql = "with dadosLayout as (select l.regracalculo, l.arredondamentoabnt, e.id from pdv.ecflayout l join pdv.ecf e on l.id_ecf = e.id where e.id_loja = " + i_loja.getIdCopiarLoja() + ")\n"
+                + "select \n"
+                + " distinct e2.id id_ecf,\n"
+                + " (select id from pdv.tecladolayout where id_loja = " + i_loja.getId() + ") as id_teclado,\n"
+                + " (select id from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ") as id_finalizadora,\n"
+                + " (select id from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ") as id_acumaldor,\n"
+                + " (select id from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ") as id_aliquotalayout,\n"
+                + " lay.regracalculo ,\n"
+                + " lay.arredondamentoabnt \n"
+                + " from pdv.ecf ecf \n"
+                + " join dadosLayout lay on ecf.id_loja = " + i_loja.getIdCopiarLoja() + " and ecf.id = lay.id\n"
+                + " cross join pdv.ecf e2 where e2.id_loja = " + i_loja.getId();
+        String sqlInsert = null;
+        List<String> listaDeInserts = new ArrayList<>();
+
+        int proximoId = captaUltimoIdEcf() + 1;
+
+        if (proximoId == -1) {
+            System.out.println("Erro em PdvBalancaLayoutDAO, provávelmente não há dados na tabela pdv.balancaetiquetalayout.");
+            throw new Exception("Erro ao Copiar pdv.balancaetiquetalayout, provávelmente não há dados na tabela");
+        }
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    sqlInsert = "insert into pdv.ecflayout (id, id_ecf,id_tecladolayout,id_finalizadoralayout,id_acumuladorlayout,id_aliquotalayout,regracalculo,arredondamentoabnt) values ("
+                            + proximoId++ + ", "
+                            + rst.getInt("id_ecf") + ", "
+                            + rst.getInt("id_teclado") + ", "
+                            + rst.getInt("id_finalizadora") + ", "
+                            + rst.getInt("id_acumaldor") + ", "
+                            + rst.getInt("id_aliquotalayout") + ", '"
+                            + rst.getString("regracalculo") + "', "
+                            + rst.getBoolean("arredondamentoabnt") + ");";
+                    listaDeInserts.add(sqlInsert);
+                    sqlInsert = null;
+                }
+            }
+        }
+        return listaDeInserts;
+    }
+
+    private int captaUltimoIdEcf() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  max(id) id\n"
+                    + "	from pdv.ecflayout "
+            )) {
+                while (rst.next()) {
+                    return rst.getInt("id");
+                }
+            }
+        }
+        return -2;
     }
 }

@@ -24,4 +24,8 @@ public class LojaController {
     public LojaVO carregar(int i_id) throws Exception {
         return lojaService.carregar(i_id);
     }
+
+    public void deletarLoja(LojaVO oLoja) throws Exception {
+        lojaService.deletarLoja(oLoja);
+    }
 }
