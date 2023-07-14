@@ -555,7 +555,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_TRANSACAO,
-                OpcaoCliente.CONVENIO_CONVENIADO));
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CLIENTE_EVENTUAL));
     }
 
     @Override
@@ -629,7 +630,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n"
                     + "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n"
                     + "	(p.GIT_TOT_FALTA/100)*est.GET_ESTQ_TROCA estoqueminimo,\n"
-                    + "	est.GET_ESTQ_TROCA estoquemaximo,\n"
+                    + "	round(((est.GET_TOT_FALTA/10000) * est.GET_ESTQ_TROCA) * 1.7) estoquemaximo,\n"
                     + " p.GIT_SIS_ABAST tipocompra,\n"
                     + "	est.GET_ESTOQUE estoque,\n"
                     + " est.get_qtd_pend_vda pendencia,\n"
@@ -689,7 +690,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	    bal.BALCOL_FILIAL = loja.loj_codigo || loja.loj_digito\n"
                     + "left join AA1DITEM det on\n"
                     + "	    p.GIT_COD_ITEM = det.DET_COD_ITEM\n"
-                    + "join AA2CESTQ est on\n"
+                    + "left join AA2CESTQ est on\n"
                     + "	    est.GET_COD_PRODUTO = p.GIT_COD_ITEM || p.GIT_DIGITO and\n"
                     + "	    est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n"
                     + "left join (\n"
@@ -796,7 +797,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
 
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMinimo(0);
 
                     String tipoCompra = rst.getString("tipocompra");
                     if ("1".equals(tipoCompra)) {
@@ -1347,7 +1348,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	F.TIP_CODIGO||F.TIP_DIGITO id,\n"
                     + "	F.TIP_RAZAO_SOCIAL razao,\n"
                     + "	F.TIP_NOME_FANTASIA fantasia,\n"
@@ -1375,31 +1376,42 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	F.TIP_LOJ_CLI = 'C'\n"
                     + "order by\n"
-                    + "    id"
+                    + "    id"*/
+                    "SELECT \n"
+                    + "     CLV_CGC_CPF id,\n"
+                    + "     CLV_CGC_CPF cnpj,\n"
+                    + "     CLV_RAZAO_SOCIAL razao,\n"
+                    + "     CLV_ENDERECO endereco,\n"
+                    + "     CLV_BAIRRO bairro,\n"
+                    + "     CLV_CIDADE cidade,\n"
+                    + "     CLV_ESTADO uf,\n"
+                    + "     CLV_CEP cep,\n"
+                    + "     CLV_INSC_ESTADUAL ie\n"
+                    + "    FROM AA1CCVAR"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setFantasia(rst.getString("razao"));
                     imp.setCnpj(rst.getString("cnpj"));
-                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
-                    imp.setInscricaoMunicipal(rst.getString("insc_municipal"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    //imp.setInscricaoMunicipal(rst.getString("insc_municipal"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setDataCadastro(format.parse(rst.getString("datacadastro")));
-                    imp.setTelefone(rst.getString("fone1"));
-                    if (Utils.stringToLong(rst.getString("fone2")) > 0) {
-                        imp.addContato("1", "FONE 2", Utils.stringLong(rst.getString("fone2")), "", "");
-                    }
-                    if (Utils.stringToLong(rst.getString("fax")) > 0) {
-                        imp.addContato("2", "FAX", Utils.stringLong(rst.getString("fax")), "", "");
-                    }
-                    imp.setPrazoPagamento(rst.getInt("prazoPagamento"));
+                    //imp.setDataCadastro(format.parse(rst.getString("datacadastro")));
+                    //imp.setTelefone(rst.getString("fone1"));
+//                    if (Utils.stringToLong(rst.getString("fone2")) > 0) {
+//                        imp.addContato("1", "FONE 2", Utils.stringLong(rst.getString("fone2")), "", "");
+//                    }
+//                    if (Utils.stringToLong(rst.getString("fax")) > 0) {
+//                        imp.addContato("2", "FAX", Utils.stringLong(rst.getString("fax")), "", "");
+//                    }
+//                    imp.setPrazoPagamento(rst.getInt("prazoPagamento"));
 
                     result.add(imp);
                 }
@@ -2663,9 +2675,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             next.setHoraInicio(timestamp.parse(horaInicio));
                             next.setHoraTermino(timestamp.parse(horaTermino));
                             next.setCancelado("C".equals(rst.getString("situacao").trim()));
-                            next.setSubTotalImpressora(rst.getDouble("vltotal"));
+                            //next.setSubTotalImpressora(rst.getDouble("vltotal"));
                             next.setCpf(rst.getString("cnpj"));
-                            next.setValorDesconto(rst.getDouble("vldesconto"));
+                            //next.setValorDesconto(rst.getDouble("vldesconto"));
                             next.setNumeroSerie(rst.getString("seriecf"));
                             next.setModeloImpressora(rst.getString("modeloecf"));
                             next.setNomeCliente(rst.getString("razaosocial"));
@@ -2932,7 +2944,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             next.setDescricaoReduzida(rst.getString("descricaoproduto"));
                             next.setPrecoVenda(rst.getDouble("precovenda"));
                             next.setQuantidade(rst.getDouble("qtd"));
-                            next.setTotalBruto(rst.getDouble("valortotal"));
+                            //next.setTotalBruto(rst.getDouble("valortotal"));
                             next.setValorDesconto(rst.getDouble("desconto"));
                             next.setValorAcrescimo(rst.getDouble("acrescimo"));
                             next.setCancelado(false);

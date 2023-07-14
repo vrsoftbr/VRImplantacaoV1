@@ -7,6 +7,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.radioButton.VRRadioButton;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -108,12 +109,30 @@ public class RMS2_5GUI extends VRInternalFrame {
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
                     
-                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
-                        //dao.setVendaDataIni(tabProdutos.edtDtVendaIni.getDate());
-                    }
-                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
-                        //dao.setVendaDataFim(tabProdutos.edtDtVendaFim.getDate());
-                    }
+                    if(chkVendas.isSelected()) {
+                            dao.setDataInicioVenda(edtVendaDtIni.getDate());
+                            dao.setDataTerminoVenda(edtVendaDtFim.getDate());
+                            
+                            if (rdbVendasV1.isSelected()) {
+                                dao.setVersaoDaVenda(1);
+                            } else if (rdbVendasV2.isSelected()) {
+                                dao.setVersaoDaVenda(2);
+                            } else if (rdbVendasV3.isSelected()) {
+                                dao.setVersaoDaVenda(3);
+                            }
+                            
+                            importador.eBancoUnificado = chkBancoUnificado.isSelected();
+                            
+                            /*if (rdbVendasV1.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(1);
+                            } else if (rdbVendasV2.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(2);                                
+                            } else if (rdbVendasV3.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(3);                                
+                            }*/                            
+                            RMSDAO.tabela_venda = dtVenda.getText();
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                        }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -481,8 +500,12 @@ public class RMS2_5GUI extends VRInternalFrame {
     }//GEN-LAST:event_jBLimparActionPerformed
 
     private void chkHistoricoVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkHistoricoVendasActionPerformed
-        if (edtVendaDtIni.getDate() == null) {edtVendaDtIni.setDate(new Date());}
-        if (edtVendaDtFim.getDate() == null) {edtVendaDtFim.setDate(new Date());}
+        if (edtVendaDtIni.getDate() == null) {
+            edtVendaDtIni.setDate(new Date());
+        }
+        if (edtVendaDtFim.getDate() == null) {
+            edtVendaDtFim.setDate(new Date());
+        }
     }//GEN-LAST:event_chkHistoricoVendasActionPerformed
 
     private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
@@ -494,54 +517,48 @@ public class RMS2_5GUI extends VRInternalFrame {
     private void rdbVendasV1tipoVendaSelect(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVendasV1tipoVendaSelect
         VRRadioButton btn = (VRRadioButton) evt.getSource();
         dtVenda.setEnabled(
-            chkVendas.isSelected() && (
-                btn.equals(rdbVendasV2) ||
-                btn.equals(rdbVendasV3)
-            )
+                chkVendas.isSelected() && (btn.equals(rdbVendasV2)
+                || btn.equals(rdbVendasV3))
         );
         edtVendaDtIni.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
         edtVendaDtFim.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
     }//GEN-LAST:event_rdbVendasV1tipoVendaSelect
 
     private void rdbVendasV2tipoVendaSelect(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVendasV2tipoVendaSelect
         VRRadioButton btn = (VRRadioButton) evt.getSource();
         dtVenda.setEnabled(
-            chkVendas.isSelected() && (
-                btn.equals(rdbVendasV2) ||
-                btn.equals(rdbVendasV3)
-            )
+                chkVendas.isSelected() && (btn.equals(rdbVendasV2)
+                || btn.equals(rdbVendasV3))
         );
         edtVendaDtIni.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
         edtVendaDtFim.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
     }//GEN-LAST:event_rdbVendasV2tipoVendaSelect
 
     private void rdbVendasV3tipoVendaSelect(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVendasV3tipoVendaSelect
         VRRadioButton btn = (VRRadioButton) evt.getSource();
         dtVenda.setEnabled(
-            chkVendas.isSelected() && (
-                btn.equals(rdbVendasV2) ||
-                btn.equals(rdbVendasV3)
-            )
+                chkVendas.isSelected() && (btn.equals(rdbVendasV2)
+                || btn.equals(rdbVendasV3))
         );
         edtVendaDtIni.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
         edtVendaDtFim.setEnabled(
-            chkVendas.isSelected() &&
-            btn.equals(rdbVendasV1)
+                chkVendas.isSelected()
+                && btn.equals(rdbVendasV1)
         );
     }//GEN-LAST:event_rdbVendasV3tipoVendaSelect
 

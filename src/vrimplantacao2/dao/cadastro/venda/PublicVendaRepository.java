@@ -304,7 +304,9 @@ public class PublicVendaRepository {
                              * Cria lista da public venda com produtos vendidos.
                              */
                             for (PdvVendaItemVO item : venda.getItens()) {
-                                vendas.add(criaListaPublicVenda(item));
+                                if (!item.isCancelado()) {
+                                    vendas.add(criaListaPublicVenda(item));
+                                }
                             }
                         }
 

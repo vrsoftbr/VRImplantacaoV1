@@ -80,11 +80,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
     private SimpleDateFormat formatDataCompleta = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
     private boolean naoUsaMapaTributacao = false;
-    
-    public void setNaoUsaMapaTributacao(boolean naoUsaMapaTributacao){
+
+    public void setNaoUsaMapaTributacao(boolean naoUsaMapaTributacao) {
         this.naoUsaMapaTributacao = naoUsaMapaTributacao;
     }
-            
+
     public void setFormatoData(String format) {
         this.formatData = new SimpleDateFormat(format);
     }
@@ -324,65 +324,63 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPiscofinsCstCredito(linha.getString("piscofins_cst_credito"));
                 produto.setPiscofinsCstDebito(linha.getString("piscofins_cst_debito"));
                 produto.setPiscofinsNaturezaReceita(linha.getString("piscofins_natureza_receita"));
-                
+
                 //produto.setIcmsCst(linha.getInt("icms_cst"));
                 //produto.setIcmsAliq(linha.getDouble("icms_aliquota"));
                 //produto.setIcmsReducao(linha.getDouble("icms_reduzido"));
-                
-                if(naoUsaMapaTributacao){
-                     //ICMS ENTRADA
-                        if (linha.existsColumn("icms_cst_entrada")) {
-                            produto.setIcmsCstEntrada(linha.getInt("icms_cst_entrada"));
-                            produto.setIcmsAliqEntrada(linha.getDouble("icms_aliquota_entrada"));
-                            produto.setIcmsReducaoEntrada(linha.getDouble("icms_reduzido_entrada"));
-                        }
+                if (naoUsaMapaTributacao) {
+                    //ICMS ENTRADA
+                    if (linha.existsColumn("icms_cst_entrada")) {
+                        produto.setIcmsCstEntrada(linha.getInt("icms_cst_entrada"));
+                        produto.setIcmsAliqEntrada(linha.getDouble("icms_aliquota_entrada"));
+                        produto.setIcmsReducaoEntrada(linha.getDouble("icms_reduzido_entrada"));
+                    }
 
-                        if (linha.existsColumn("icms_cst_entrada_foraestado")) {
-                            produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
-                            produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
-                            produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
-                        } else {
-                            produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada"));
-                            produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada"));
-                            produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada"));
-                        }
-                        
-                        //ICMS SAIDA
-                        if (linha.existsColumn("icms_cst_saida")) {
-                            produto.setIcmsCstSaida(linha.getInt("icms_cst_saida"));
-                            produto.setIcmsAliqSaida(linha.getDouble("icms_aliquota_saida"));
-                            produto.setIcmsReducaoSaida(linha.getDouble("icms_reduzido_saida"));
-                        }
+                    if (linha.existsColumn("icms_cst_entrada_foraestado")) {
+                        produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
+                        produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
+                        produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
+                    } else {
+                        produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada"));
+                        produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada"));
+                        produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada"));
+                    }
 
-                        if (linha.existsColumn("icms_cst_saida_foraestado")) {
-                            produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
-                            produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
-                            produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
-                        } else {
-                            produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida"));
-                            produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida"));
-                            produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida"));
+                    //ICMS SAIDA
+                    if (linha.existsColumn("icms_cst_saida")) {
+                        produto.setIcmsCstSaida(linha.getInt("icms_cst_saida"));
+                        produto.setIcmsAliqSaida(linha.getDouble("icms_aliquota_saida"));
+                        produto.setIcmsReducaoSaida(linha.getDouble("icms_reduzido_saida"));
+                    }
 
-                        }
+                    if (linha.existsColumn("icms_cst_saida_foraestado")) {
+                        produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
+                        produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
+                        produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
+                    } else {
+                        produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida"));
+                        produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida"));
+                        produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida"));
 
-                        if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
-                            produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
-                            produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
-                            produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
-                        } else {
-                            produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida"));
-                            produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida"));
-                            produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida"));
-                        }
+                    }
 
-                        if (linha.existsColumn("icms_cst_consumidor")) {
-                            produto.setIcmsCstConsumidor(linha.getInt("icms_cst_consumidor"));
-                            produto.setIcmsAliqConsumidor(linha.getDouble("icms_aliq_consumidor"));
-                            produto.setIcmsReducaoConsumidor(linha.getDouble("icms_reduzido_consumidor"));
-                        }
-                        
-                        
-                }else{
+                    if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
+                        produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
+                        produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
+                        produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
+                    } else {
+                        produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida"));
+                        produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida"));
+                        produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida"));
+                    }
+
+                    if (linha.existsColumn("icms_cst_consumidor")) {
+                        produto.setIcmsCstConsumidor(linha.getInt("icms_cst_consumidor"));
+                        produto.setIcmsAliqConsumidor(linha.getDouble("icms_aliq_consumidor"));
+                        produto.setIcmsReducaoConsumidor(linha.getDouble("icms_reduzido_consumidor"));
+                    }
+
+                } else {
                     //ICMS ENTRADA
                     if (linha.existsColumn("icms_credito_id")) {
                         produto.setIcmsCreditoId(linha.getString("icms_credito_id"));
@@ -408,7 +406,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     //ID PAUTA FISCAL                
                     produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
                 }
-                
+
                 produto.setBeneficio("cbeneficio");
                 produto.setCodigoGIA("cbeneficio");
                 produto.setSugestaoCotacao(linha.getBoolean("sugestaocotacao"));
@@ -707,9 +705,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setObservacao(linha.getString("observacao"));
                 imp.setObservacao2(linha.getString("observacao2"));
                 imp.setDiaVencimento(linha.getInt("diaVencimento"));
-                if (linha.getString("permiteCreditoRotativo") == null || linha.getString("permiteCreditoRotativo").isEmpty()){
+                if (linha.getString("permiteCreditoRotativo") == null || linha.getString("permiteCreditoRotativo").isEmpty()) {
                     imp.setPermiteCreditoRotativo(true);
-                }else imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
+                } else {
+                    imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
+                }
                 imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
                 imp.setSenha(linha.getInt("senha"));
                 imp.setTelefone(linha.getString("telefone"));
@@ -1038,7 +1038,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setId(ln.getString("id"));
             imp.setNumeroCupom(ln.getInt("numerocupom"));
             imp.setEcf(ln.getInt("ecf"));
-            imp.setData(getData(ln.getString("data")));
+            imp.setData(ln.getData("data"));
             imp.setIdClientePreferencial(ln.getString("clientepreferencial"));
             imp.setHoraInicio(ln.getTime("horainicio"));
             imp.setHoraTermino(ln.getTime("horatermino"));
@@ -1250,7 +1250,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
                         return ajustarAno.parse(format);
                     }
-                    
+
                     SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
                     SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
                     return converteData.parse(converteData.format(ajusteData.parse(format)));
@@ -1260,13 +1260,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     String[] dataAjustada = format.split("-");
                     String ano = dataAjustada[0];
                     int anoConvert = Integer.parseInt(ano);
-                    
+
                     if (anoConvert > 1000) {
-                        
+
                         SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
                         return ajustarAno.parse(format);
                     }
-                    
+
                     SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
                     SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
                     return converteData.parse(converteData.format(ajusteData.parse(format.replace("-", "/"))));
