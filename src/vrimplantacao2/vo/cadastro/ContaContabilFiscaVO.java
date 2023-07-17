@@ -3,7 +3,7 @@ package vrimplantacao2.vo.cadastro;
 import java.util.Date;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
-public class ContaContabilVO {
+public class ContaContabilFiscaVO {
 
     private Integer id;
     private String descricao;
@@ -15,9 +15,26 @@ public class ContaContabilVO {
     private Integer nivel;
     private SituacaoCadastro id_situacaoCadastro;
     private String contaReduzida;
+    private boolean resultado;
     private Date data;
     private boolean dmpl;
     private boolean contaCompensacao;
+    private String notaExplicativa;
+
+    /**
+     * @return the id_situacaoCadastro
+     */
+    public SituacaoCadastro getId_situacaoCadastro() {
+        return id_situacaoCadastro;
+    }
+
+    /**
+     * @param id_situacaoCadastro the id_situacaoCadastro to set
+     */
+    public void setId_situacaoCadastro(SituacaoCadastro id_situacaoCadastro) {
+        this.id_situacaoCadastro = id_situacaoCadastro;
+    }
+
     /**
      * @return the id
      */
@@ -187,17 +204,31 @@ public class ContaContabilVO {
     }
 
     /**
-     * @return the id_situacaoCadastro
+     * @return the resultado
      */
-    public SituacaoCadastro getId_situacaoCadastro() {
-        return id_situacaoCadastro;
+    public boolean isResultado() {
+        return resultado;
     }
 
     /**
-     * @param id_situacaoCadastro the id_situacaoCadastro to set
+     * @param resultado the resultado to set
      */
-    public void setId_situacaoCadastro(SituacaoCadastro id_situacaoCadastro) {
-        this.id_situacaoCadastro = id_situacaoCadastro;
+    public void setResultado(boolean resultado) {
+        this.resultado = resultado;
     }
-    
+
+    /**
+     * @return the notaExplicativa
+     */
+    public String getNotaExplicativa() {
+        return notaExplicativa;
+    }
+
+    /**
+     * @param notaExplicativa the notaExplicativa to set
+     */
+    public void setNotaExplicativa(String notaExplicativa) {
+        this.notaExplicativa = notaExplicativa;
+    }
+
 }

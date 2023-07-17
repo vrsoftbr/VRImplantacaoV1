@@ -5,9 +5,9 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 /**
  *
- * @author Implantacao
+ * @author Bruno
  */
-public class ContaContabilIMP {
+public class ContaContabilFiscalIMP {
 
     private String importSistema;
     private String importLoja;
@@ -22,9 +22,11 @@ public class ContaContabilIMP {
     private Integer nivel;
     private SituacaoCadastro id_situacaoCadastro;
     private String contaReduzida;
+    private boolean resultado;
     private Date data;
     private boolean dmpl;
     private boolean contaCompensacao;
+    private String notaExplicativa;
 
     /**
      * @return the importSistema
@@ -236,4 +238,32 @@ public class ContaContabilIMP {
         this.id_situacaoCadastro = id_situacaoCadastro;
     }
 
+    /**
+     * @return the resultado
+     */
+    public boolean isResultado() {
+        return resultado;
+    }
+
+    /**
+     * @param resultado the resultado to set
+     */
+    public void setResultado(boolean resultado) {
+        this.resultado = resultado;
+    }
+
+    /**
+     * @return the notaExplicativa
+     */
+    public String getNotaExplicativa() {
+        return notaExplicativa;
+    }
+
+    /**
+     * @param notaExplicativa the notaExplicativa to set
+     */
+    public void setNotaExplicativa(String notaExplicativa) {
+        this.notaExplicativa = notaExplicativa;
+    }
+    
 }

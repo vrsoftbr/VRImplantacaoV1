@@ -42,6 +42,7 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.AutorizadoraIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaContabilFiscalIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
@@ -1243,6 +1244,53 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 
             }
             
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ContaContabilFiscalIMP> getContaContabilFiscal() throws Exception {
+        List<ContaContabilFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select id,\n"
+                        + "descricao ,\n"
+                        + "conta1 ,\n"
+                        + "conta2 ,\n"
+                        + "conta3 ,\n"
+                        + "conta4 ,\n"
+                        + "conta5 ,\n"
+                        + "nivel,\n"
+                        + "id_situacaocadastro ,\n"
+                        + "contareduzida ,\n"
+                        + "resultado ,\n"
+                        + "\"data\" ,\n"
+                        + "dmpl ,\n"
+                        + "contacompensacao ,\n"
+                        + "notaexplicativa \n"
+                        + "from contacontabilfiscal")) {
+            while (rs.next()) {
+                ContaContabilFiscalIMP imp = new ContaContabilFiscalIMP();
+                
+                imp.setId(rs.getInt("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setConta1(rs.getInt("conta1"));
+                imp.setConta2(rs.getInt("conta2"));
+                imp.setConta3(rs.getInt("conta3"));
+                imp.setConta4(rs.getInt("conta4"));
+                imp.setConta5(rs.getInt("conta5"));
+                imp.setNivel(rs.getInt("nivel"));
+                imp.setId_situacaoCadastro(SituacaoCadastro.ATIVO);
+                imp.setContaReduzida(rs.getString("contareduzida"));
+                imp.setResultado(rs.getBoolean("resultado"));
+                imp.setData(rs.getDate("data"));
+                imp.setDmpl(rs.getBoolean("dmpl"));
+                imp.setContaCompensacao(rs.getBoolean("contacompensacao"));
+                imp.setNotaExplicativa(rs.getString("notaexplicativa"));
+                
+                result.add(imp);
+            }
         }
         return result;
     }

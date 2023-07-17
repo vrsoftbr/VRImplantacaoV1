@@ -1,26 +1,25 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.AutorizadoraVO;
+import vrimplantacao2.vo.cadastro.ContaContabilFiscaVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
- * @author Implantacao
+ * @author Bruno
  */
-public class ContaContabilDAO {
+public class ContaContabilFiscalDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(ContaContabilDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(ContaContabilFiscalDAO.class.getName());
 
-    public void salvar(AutorizadoraVO vo) throws Exception {
+    public void salvar(ContaContabilFiscaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
@@ -29,60 +28,26 @@ public class ContaContabilDAO {
 
             sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
-            sql.put("utilizado", vo.isUtilizado());
-
+            sql.put("conta1", vo.getConta1());
+            sql.put("conta2", vo.getConta2());
+            sql.put("conta3", vo.getConta3());
+            sql.put("conta4",vo.getConta4());
+            sql.put("conta5", vo.getConta5());
+            sql.put("nivel", vo.getNivel());
+            sql.put("id_situacaocadastro",vo.getId_situacaoCadastro().getId());
+            sql.put("contareduzida", vo.getContaReduzida());
+            sql.put("resultado", vo.isResultado());
+            sql.put("data", vo.getData());
+            sql.put("dmpl",vo.isDmpl());
+            sql.put("contacompensacao", vo.isContaCompensacao());
+            sql.put("notaexplicativa", vo.getNotaExplicativa());
+            
             stm.execute(sql.getInsert());
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public Integer idValidos() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT id from \n"
-                    + "(SELECT id FROM generate_series(1, 9999)\n"
-                    + "AS s(id) EXCEPT SELECT id FROM pdv.autorizadora WHERE id <= 9999) AS codigointerno ORDER BY id "
-            )) {
-                while (rst.next()) {
-
-                    return rst.getInt("id");
-                }
-            }
-        }
-        return null;
-    }
-
-    public Integer ultimoId() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "max (id) + 1 as id \n"
-                    + "from pdv.autorizadora   "
-            )) {
-                while (rst.next()) {
-
-                    return rst.getInt("id") + 1;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Integer carregarAutorizadoras() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT * FROM"
-                    + "pdv.autorizadoras"
-            )) {
-                while (rst.next()) {
-
-                    return rst.getInt("id") + 1;
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * @return the idLojaVR
