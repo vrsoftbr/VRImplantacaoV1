@@ -435,7 +435,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(rs.getString("idicmsentrada"));
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
-                    imp.setMargem(rs.getDouble("margemvarejo"));
+                    imp.setMargem(rs.getDouble("margempadrao"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedioComImposto(rs.getDouble("customedio"));
                     imp.setCustoMedioSemImposto(rs.getDouble("customedio"));
