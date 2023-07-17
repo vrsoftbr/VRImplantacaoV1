@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.dao.cadastro.EcfDAO;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaRepository;
 import vrimplantacao.dao.cadastro.NutricionalToledoRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
@@ -37,10 +36,16 @@ import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepository;
 import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepository;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepositoryProvider;
+import vrimplantacao2.dao.cadastro.desmembramento.AutorizadoraRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.desmembramento.TipoRecebivelRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.TipoTefRepository;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroRepository;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.AutorizadoraRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.TipoRecebivelRepositoryProvider;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.TipoTefRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoProvider;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoRepository;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.OpcaoCreditoRotativo;
@@ -55,7 +60,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
-import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepository;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
@@ -128,8 +132,11 @@ import vrimplantacao2_5.controller.interfaces.InterfaceController;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
+import vrimplantacao2.vo.importacao.AutorizadoraIMP;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
+import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
+import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {
@@ -516,6 +523,30 @@ public class Importador {
         dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEANemBranco();
+    }
+
+    public void importarTipoRecebivel() throws Exception {
+        ProgressBar.setStatus("Carregando Dados...");
+        
+        List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
+        TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
+        
+        List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
+        TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
+        
+        List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
+        AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
+        
+        
+        AutorizadoraRepository auto = new AutorizadoraRepository(aut);
+        auto.importarAutorizadora(autorizadora);
+                
+        TipoTefRepository repository = new TipoTefRepository(prov);
+        repository.importarTipoTef(tef);
+        
+        TipoRecebivelRepository rep = new TipoRecebivelRepository(provider);
+        rep.importarRecebivel(recebivel);
+
     }
 
     /**
@@ -1063,8 +1094,8 @@ public class Importador {
                 rep.importar(opt);
             }
             if (decisao == 1) {
-                PublicVendaRepository rep = new PublicVendaRepository(provider, 
-                    this.checarVendasDataAtual);
+                PublicVendaRepository rep = new PublicVendaRepository(provider,
+                        this.checarVendasDataAtual);
                 rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
                 rep.eBancoUnificado = eBancoUnificado;
                 rep.importar(opt);

@@ -39,6 +39,7 @@ import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.AutorizadoraIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -59,6 +60,8 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
+import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -67,26 +70,26 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  * @author Importacao
  */
 public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
-
+    
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
     public boolean apenasAtivo = false;
-
+    
     public boolean importarRotativoBaixados = false;
     public boolean importarConveniosBaixados = false;
     
     public boolean precoVendaSemOferta = false;
-
+    
     private String complemento = "";
-
+    
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
     
-    public void setPrecoVendaSemOferta(boolean precoVendaSemOferta){
+    public void setPrecoVendaSemOferta(boolean precoVendaSemOferta) {
         this.precoVendaSemOferta = precoVendaSemOferta;
     }
-
+    
     @Override
     public String getSistema() {
         if ("".equals(complemento)) {
@@ -94,7 +97,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return "VR MASTER - " + complemento;
     }
-
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -154,11 +157,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
         ));
     }
-
+    
     @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -181,7 +184,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join produto p2 on a2.id_produto = p2.id")) {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-
+                    
                     imp.setId(rs.getString("idproduto"));
                     imp.setDescricao(rs.getString("descricaoassociado"));
                     imp.setDescricaoProdutoAssociado(rs.getString("descricaoassociadoitem"));
@@ -193,17 +196,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAplicaCusto(rs.getBoolean("aplicacusto"));
                     imp.setAplicaEstoque(rs.getBoolean("aplicaestoque"));
                     imp.setAplicaPreco(rs.getBoolean("aplicapreco"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -223,10 +226,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     public List<Estabelecimento> getLojasVR() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres2.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -246,11 +249,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "with aliquotasusadas as (\n"
@@ -300,11 +303,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -317,24 +320,24 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	1")) {
                 while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setDescricao(rs.getString("descricao"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -356,7 +359,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	1,3,5,7,9")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("cod_mercadologico1"));
@@ -369,14 +372,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc4Descricao(rs.getString("mercadologico4"));
                     imp.setMerc5ID(rs.getString("cod_mercadologico5"));
                     imp.setMerc5Descricao(rs.getString("mercadologico5"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -402,19 +405,19 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
                     while (rs.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
-
+                        
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rs.getString("id_produto"));
                         imp.setEan(rs.getString("codigobarras"));
-
+                        
                         if (imp.getEan().length() < 7) {
                             imp.setEan("99999" + imp.getEan());
                         }
-
+                        
                         imp.setTipoEmbalagem(rs.getString("unidade"));
                         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-
+                        
                         result.add(imp);
                     }
                 }
@@ -433,23 +436,23 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
                     while (rs.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
-
+                        
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rs.getString("id_produto"));
                         imp.setEan(rs.getString("codigobarras"));
                         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                         imp.setTipoEmbalagem(rs.getString("unidade"));
-
+                        
                         result.add(imp);
                     }
                 }
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         if (opt == OpcaoProduto.ATACADO) {
@@ -477,36 +480,36 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
-
+                        
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_produto"));
                         imp.setEan(rst.getString("codigobarras"));
-
+                        
                         if (imp.getEan().length() < 7) {
                             imp.setEan("99999" + imp.getEan());
                         }
-
+                        
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPorcentagem(rst.getDouble("desconto"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
-
+                        
                         vResult.add(imp);
                     }
                 }
             }
             return vResult;
         }
-
+        
         return null;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
+        
         Versao versao = Versao.createFromConnectionInterface(ConexaoPostgres.getConexao());
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "with \n"
@@ -538,7 +541,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
-                    + ( precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n":"vend.precovenda,\n")
+                    + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
                     + " 	vend.margemmaxima,\n"
@@ -575,8 +578,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		emb.id = p.id_tipoembalagem\n"
                     + "	join produtocomplemento vend on\n"
                     + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
-                    + (precoVendaSemOferta ? 
-                       "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n":"\n")
+                    + (precoVendaSemOferta
+                            ? "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n" : "\n")
                     + "	left join cest on\n"
                     + "		cest.id = p.id_cest\n"
                     + "	left join tipopiscofins piscofcred on \n"
@@ -599,7 +602,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-
+                    
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
@@ -653,18 +656,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
                     imp.setFornecedorFabricante(rs.getString("id_fornecedorfabricante"));
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -711,7 +714,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	id")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -745,21 +748,21 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtd_minima_pedido(rs.getInt("qtd_minima_pedido"));
                     imp.setValor_minimo_pedido(rs.getDouble("valor_minimo_pedido"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-
+                    
                     getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -799,7 +802,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pf.id")) {
                 while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-
+                    
                     imp.setId(rs.getString("id"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setIva(rs.getDouble("iva"));
@@ -810,18 +813,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAliquotaDebito(rs.getInt("debito_cst"), rs.getDouble("debito_aliquota"), rs.getDouble("debito_reduzido"));
                     imp.setAliquotaCreditoForaEstado(rs.getInt("credito_foraest_cst"), rs.getDouble("credito_foraest_aliquota"), rs.getDouble("debito_foraest_reduzido"));
                     imp.setAliquotaDebitoForaEstado(rs.getInt("debito_foraest_cst"), rs.getDouble("debito_foraest_aliquota"), rs.getDouble("credito_foraest_reduzido"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -839,7 +842,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	codigoexterno")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
@@ -848,14 +851,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     private void getContatoFornecedor(FornecedorIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -872,7 +875,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where 	\n"
                     + "	fc.id_fornecedor = " + imp.getImportId())) {
                 while (rs.next()) {
-
+                    
                     int id = rs.getInt("tipo");
                     imp.addContato(rs.getString("id"),
                             rs.getString("nome"),
@@ -886,7 +889,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }
-
+    
     private void getDivisaoFornecedor(FornecedorIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -907,11 +910,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }
-
+    
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -994,7 +997,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.id")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-
+                    
                     imp.setId(rs.getString("id"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
@@ -1049,16 +1052,16 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaCep(rs.getString("cobrancacep"));
                     imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
-
+                    
                     getContatoCliente(imp);
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     private void getContatoCliente(ClienteIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -1079,11 +1082,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }
-
+    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             Map<String, List<CreditoRotativoItemIMP>> pagamentos = new HashMap<>();
             try (ResultSet rs = stm.executeQuery(
@@ -1109,15 +1112,15 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ci.id"
             )) {
                 while (rs.next()) {
-
+                    
                     List<CreditoRotativoItemIMP> list = pagamentos.get(rs.getString("id_recebercreditorotativo"));
                     if (list == null) {
                         list = new ArrayList<>();
                         pagamentos.put(rs.getString("id_recebercreditorotativo"), list);
                     }
-
+                    
                     CreditoRotativoItemIMP i = new CreditoRotativoItemIMP();
-
+                    
                     i.setId(rs.getString("id"));
                     i.setDataPagamento(rs.getDate("databaixa"));
                     i.setDesconto(rs.getDouble("valordesconto"));
@@ -1128,7 +1131,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     i.setAgencia(rs.getString("agencia"));
                     i.setConta(rs.getString("conta"));
                     i.setId_tiporecebimento(rs.getInt("id_tiporecebimento"));
-
+                    
                     list.add(i);
                 }
             }
@@ -1157,7 +1160,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.id")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
+                    
                     imp.setId(rs.getString("id"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
@@ -1170,7 +1173,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
-
+                    
                     List<CreditoRotativoItemIMP> pags = pagamentos.get(imp.getId());
                     if (pags != null) {
                         for (CreditoRotativoItemIMP pg : pags) {
@@ -1178,18 +1181,136 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.getPagamentos().add(pg);
                         }
                     }
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
+    @Override
+    public List<TipoRecebivelIMP> getRecebivel() throws Exception {
+        List<TipoRecebivelIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id,\n"
+                        + "	descricao,\n"
+                        + "	percentual,\n"
+                        + "	id_tipotef ,\n"
+                        + "	id_tipoticket ,\n"
+                        + "	gerarecebimento ,\n"
+                        + "	id_contacontabilfiscaldebito ,\n"
+                        + "	id_contacontabilfiscalcredito ,\n"
+                        + "	id_historicopadrao ,\n"
+                        + "	id_situacaocadastro,\n"
+                        + "	id_tipovistaprazo ,\n"
+                        + "	id_tipocartaotef ,\n"
+                        + "	id_tipotef ,\n"
+                        + "	id_fornecedor ,\n"
+                        + "	tef,\n"
+                        + "	id_tiporecebimento ,\n"
+                        + "	contabiliza ,\n"
+                        + "	id_contacontabilfinanceiro \n"
+                        + "from\n"
+                        + "	tiporecebivel t\n"
+                        + "order by 1")) {
+            while (rs.next()) {
+                TipoRecebivelIMP imp = new TipoRecebivelIMP();
+                
+                imp.setId(rs.getInt("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setPercentual(rs.getInt("percentual"));
+                imp.setId_tipoTef(rs.getInt("id_tipotef"));
+                imp.setId_tipotiket(rs.getInt("id_tipoticket"));
+                imp.setGeraRecebimento(rs.getBoolean("gerarecebimento"));
+                imp.setId_ContaContabilFiscalDebito(rs.getInt("id_contacontabilfiscaldebito"));
+                imp.setId_ContaContabilFiscalCredito(rs.getInt("id_contacontabilfiscalcredito"));
+                imp.setId_HistoricoPadrao(rs.getInt("id_historicopadrao"));
+                imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
+                imp.setId_TipoVistaPrazo(rs.getInt("id_tipovistaprazo"));
+                imp.setId_TipoCartaoTef(rs.getInt("id_tipocartaotef"));
+                imp.setId_tipoTef(rs.getInt("id_tipotef"));
+                imp.setId_Fornecedor(rs.getInt("id_fornecedor"));
+                imp.setTef(rs.getBoolean("tef"));
+                imp.setId_TipoRecebimento(rs.getInt("id_tiporecebimento"));
+                imp.setContabiliza(rs.getBoolean("contabiliza"));
+                imp.setId_contaContabilFinanceiro(rs.getInt("id_contacontabilfinanceiro"));
+                
+                result.add(imp);
+                
+            }
+            
+        }
+        return result;
+    }
+    
+    @Override
+    public List<TipoTefIMP> getTipoTef() throws Exception {
+        List<TipoTefIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id,\n"
+                        + "	descricao,\n"
+                        + "	tipocomunicacao ,\n"
+                        + "	bandeira,\n"
+                        + "	imprimecupom ,\n"
+                        + "	id_situacaocadastro ,\n"
+                        + "	numeroparcela ,\n"
+                        + "	id_autorizadora \n"
+                        + "from\n"
+                        + "	pdv.tipotef")) {
+            while (rs.next()) {
+                TipoTefIMP imp = new TipoTefIMP();
+                
+                imp.setId(rs.getInt("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setTipocomunicao(rs.getInt("tipocomunicacao"));
+                imp.setBandeira(rs.getString("bandeira"));
+                imp.setImprimeCupom(rs.getBoolean("imprimecupom"));
+                imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
+                imp.setNumeroParcela(rs.getInt("numeroparcela"));
+                imp.setId_autorizadora(rs.getInt("id_autorizadora"));
+                
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<AutorizadoraIMP> getAutorizadora() throws Exception {
+        List<AutorizadoraIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "id,\n"
+                        + "descricao,\n"
+                        + "utilizado\n"
+                        + "from\n"
+                        + "	pdv.autorizadora")) {
+            while (rs.next()) {
+                AutorizadoraIMP imp = new AutorizadoraIMP();
+                
+                imp.setId(rs.getInt("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setUtilizado(rs.getBoolean("utilizado"));
+                
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-
+        
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
@@ -1227,7 +1348,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
             while (rs.next()) {
                 ChequeIMP imp = new ChequeIMP();
-
+                
                 imp.setId(rs.getString("id"));
                 imp.setCpf(rs.getString("cpf"));
                 imp.setNumeroCheque(rs.getString("numerocheque"));
@@ -1251,18 +1372,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 //imp.setIdLocalCobranca(rs.getInt("id_tipolocalcobranca"));
                 imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
                 imp.setVistaPrazo(TipoVistaPrazo.getById(rs.getInt("id_tipovistaprazo")));
-
+                
                 result.add(imp);
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-
+        
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
@@ -1296,7 +1417,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
             while (rs.next()) {
                 ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-
+                
                 imp.setId(rs.getString("id"));
                 imp.setRazao(rs.getString("razaosocial"));
                 imp.setCnpj(rs.getString("cnpj"));
@@ -1319,18 +1440,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDiaInicioRenovacao(rs.getInt("diainiciorenovacao"));
                 imp.setDiaFimRenovacao(rs.getInt("diaterminorenovacao"));
                 imp.setObservacoes(rs.getString("observacao"));
-
+                
                 result.add(imp);
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
-
+        
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
@@ -1355,7 +1476,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
             while (rs.next()) {
                 ConveniadoIMP imp = new ConveniadoIMP();
-
+                
                 imp.setId(rs.getString("id"));
                 imp.setNome(rs.getString("nome"));
                 imp.setIdEmpresa(rs.getString("id_empresa"));
@@ -1369,18 +1490,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
                 imp.setDataBloqueio(rs.getDate("databloqueio"));
                 imp.setLojaCadastro(rs.getInt("id_loja"));
-
+                
                 result.add(imp);
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-
+        
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
@@ -1405,7 +1526,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
             while (rs.next()) {
                 ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-
+                
                 imp.setId(rs.getString("id"));
                 imp.setIdConveniado(rs.getString("id_conveniado"));
                 imp.setEcf(rs.getString("ecf"));
@@ -1416,18 +1537,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDataMovimento(rs.getDate("datamovimento"));
                 imp.setFinalizado(rs.getBoolean("finalizado"));
                 imp.setObservacao(rs.getString("observacao"));
-
+                
                 result.add(imp);
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -1449,7 +1570,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.id_loja = " + getLojaOrigem())) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-
+                    
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
@@ -1459,14 +1580,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setValor(rs.getDouble("valor"));
 
                     incluirVencimentos(imp);
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     private void incluirVencimentos(ContaPagarIMP imp) throws Exception {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -1514,11 +1635,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }
-
+    
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -1530,25 +1651,25 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	datatermino >= now()")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-
+                    
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datatermino"));
                     imp.setSituacaoOferta(rs.getInt("id_situacaooferta") == 1 ? SituacaoOferta.ATIVO : SituacaoOferta.CANCELADO);
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<OperadorIMP> getOperadores() throws Exception {
         List<OperadorIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -1559,7 +1680,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	id_loja = " + getLojaOrigem())) {
                 while (rs.next()) {
                     OperadorIMP imp = new OperadorIMP();
-
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setId(rs.getString("id"));
@@ -1569,18 +1690,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSenha(rs.getString("senha"));
                     imp.setId_tiponiveloperador(rs.getString("id_tiponiveloperador"));
                     imp.setId_situacadastro(rs.getString("id_situacaocadastro"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
         List<NutricionalIMP> result = new ArrayList<>();
-
+        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -1646,21 +1767,21 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMedidaInteira(rst.getInt("medidaInteira"));
                     imp.setId_tipomedidadecimal(rst.getInt("id_tipomedidadecimal"));
                     imp.setId_tipounidadeporcao(rst.getInt("Id_tipounidadeporcao"));
-
+                    
                     imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
                     imp.addProduto(rst.getString("id"));
                     result.add(imp);
                 }
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
-
+        
         try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                     "select \n"
@@ -1681,7 +1802,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
-
+                    
                     imp.setImportsistema(getSistema());
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportid(rs.getString("id"));
@@ -1691,49 +1812,49 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRendimento(rs.getDouble("rendimento"));
                     imp.setQtdembalagemproduto(rs.getInt("qtdembalagemreceita"));
                     imp.setQtdembalagemreceita(rs.getInt("qtdembalagemproduto"));
-                   
+                    
                     imp.setFator(rs.getDouble("fatorconversao"));
                     imp.getProdutos().add(rs.getString("receitaitem"));
-
+                    
                     result.add(imp);
                 }
             }
         }
-
+        
         return result;
     }
-
+    
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
-
+    
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
-
+    
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
-
+    
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VRToVRDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-
+    
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VRToVRDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-
+    
     private static class VendaIterator implements Iterator<VendaIMP> {
-
+        
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
+        
         private Statement stm = ConexaoPostgres.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
         private Set<String> uk = new HashSet<>();
-
+        
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
@@ -1762,7 +1883,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEnderecoCliente(rst.getString("enderecocliente"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCanceladoEmVenda(rst.getBoolean("canceladoemvenda"));
-
+                        
                         int tipoCancelamento = rst.getInt("tipocancelamento");
                         TipoCancelamento tc = null;
                         if (tipoCancelamento != 0) {
@@ -1793,7 +1914,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                                     break;
                             }
                         }
-
+                        
                         next.setTipoCancelamento(tc);
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modeloimpressora"));
@@ -1806,7 +1927,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 throw new RuntimeException(ex);
             }
         }
-
+        
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
@@ -1844,13 +1965,13 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
-
+        
         @Override
         public boolean hasNext() {
             obterNext();
             return next != null;
         }
-
+        
         @Override
         public VendaIMP next() {
             obterNext();
@@ -1858,26 +1979,26 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             next = null;
             return result;
         }
-
+        
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-
+    
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
-
+        
         private Statement stm = ConexaoPostgres.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-
+        
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-
+                        
                         next.setId(rst.getString("id"));
                         next.setVenda(rst.getString("cod_venda"));
                         next.setProduto(rst.getString("cod_produto"));
@@ -1903,7 +2024,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 throw new RuntimeException(ex);
             }
         }
-
+        
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
@@ -1946,13 +2067,13 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
-
+        
         @Override
         public boolean hasNext() {
             obterNext();
             return next != null;
         }
-
+        
         @Override
         public VendaItemIMP next() {
             obterNext();
@@ -1960,13 +2081,13 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             next = null;
             return result;
         }
-
+        
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-
+    
     public void deletaLogEstoque(Date data, int idLoja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data)

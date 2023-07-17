@@ -104,13 +104,14 @@
                               <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="203" max="32767" attributes="0"/>
+                          <EmptySpace pref="244" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoRecebível" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="57" max="-2" attributes="0"/>
                       </Group>
@@ -146,9 +147,11 @@
                                   <Component id="chkFPrazo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkTipoRecebível" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="60" max="32767" attributes="0"/>
+                          <EmptySpace pref="24" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -238,6 +241,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Contas a pagar em aberto"/>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoReceb&#xed;vel">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Receb&#xed;vel"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkTipoReceb&#xed;velActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
