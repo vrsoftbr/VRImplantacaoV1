@@ -28,7 +28,7 @@ public class AutorizadoraRepository {
 
         provider.begin();
         try {
-            provider.setStatus("Carregando Tipo Tef existentes...", autorizadoras.size());
+            provider.setStatus("Carregando Autorizadoras existentes...", autorizadoras.size());
             LOG.info("Iniciando gravação dos recebiveís");
 
             for (AutorizadoraIMP imp : autorizadoras) {

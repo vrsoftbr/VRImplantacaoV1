@@ -4,50 +4,38 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.ContaContabilFiscaVO;
+import vrimplantacao2.vo.cadastro.ContaContabilFinanceiroVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class ContaContabilFiscalDAO {
+public class ContaContabilFinanceiroDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(ContaContabilFiscalDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(ContaContabilFinanceiroDAO.class.getName());
 
-    public void salvar(ContaContabilFiscaVO vo) throws Exception {
+    public void salvar(ContaContabilFinanceiroVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setSchema("public");
-            sql.setTableName("contacontabilfiscal");
+            sql.setTableName("contacontabilfinanceiro");
 
             sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
-            sql.put("conta1", vo.getConta1());
-            sql.put("conta2", vo.getConta2());
-            sql.put("conta3", vo.getConta3());
-            sql.put("conta4",vo.getConta4());
-            sql.put("conta5", vo.getConta5());
-            sql.put("nivel", vo.getNivel());
-            sql.put("id_situacaocadastro",vo.getId_situacaoCadastro().getId());
-            sql.put("contareduzida", vo.getContaReduzida());
-            sql.put("resultado", vo.isResultado());
-            sql.put("data", vo.getData());
-            sql.put("dmpl",vo.isDmpl());
-            sql.put("contacompensacao", vo.isContaCompensacao());
-            sql.put("notaexplicativa", vo.getNotaExplicativa());
-            
+            sql.put("id_situacaocadastro", vo.getId_situacaoCadastro().getId());
+            sql.put("id_contacontabilfiscal",vo.getId_contaContabilFiscal());
+
             stm.execute(sql.getInsert());
         } catch (Exception e) {
             throw e;
         }
     }
-
 
     /**
      * @return the idLojaVR

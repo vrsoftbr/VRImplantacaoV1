@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.ContaContabilFiscalRepositoryProvider;
 import vrimplantacao2.vo.cadastro.ContaContabilFiscaVO;
-import vrimplantacao2.vo.cadastro.TipoTefVO;
 import vrimplantacao2.vo.importacao.ContaContabilFiscalIMP;
-import vrimplantacao2.vo.importacao.TipoTefIMP;
 
 public class ContaContabilFiscalRepository {
     
@@ -22,6 +20,7 @@ public class ContaContabilFiscalRepository {
         ContaContabilFiscaVO vo = new ContaContabilFiscaVO();
         
         vo.setId(imp.getId());
+        vo.setDescricao(imp.getDescricao());
         vo.setConta1(imp.getConta1());
         vo.setConta2(imp.getConta2());
         vo.setConta3(imp.getConta3());
@@ -40,7 +39,7 @@ public class ContaContabilFiscalRepository {
         
     }
     
-    public void importarTipoTef(List<ContaContabilFiscalIMP> contaContabil) throws Exception {
+    public void importarContaContabilFiscal(List<ContaContabilFiscalIMP> contaContabil) throws Exception {
         
         provider.begin();
         try {
