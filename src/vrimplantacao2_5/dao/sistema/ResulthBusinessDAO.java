@@ -236,7 +236,8 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.CODPROD AS id,\n"
-                    + "	p.REFERENCIA AS ean,\n"
+                    + "	CASE \n"
+                    + "	WHEN char_LENGTH(p.REFERENCIA) <=7 THEN substring(p.REFERENCIA FROM 2 FOR 7) ELSE p.REFERENCIA END  AS ean,\n"
                     + "	p.DESCRICAO AS descricao,\n"
                     + "	p.UNIDADEENT AS tipo_emb,\n"
                     + "	p.preco AS precovenda,\n"
@@ -262,7 +263,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	PRODUTO p\n"
                     + "	JOIN COMPPROD c ON c.CODPROD = p.CODPROD \n"
                     + "	JOIN CLASFISC fisc ON fisc.CODCLASFIS = p.CODCLASFIS \n"
-                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD  "
+                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD" 
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
