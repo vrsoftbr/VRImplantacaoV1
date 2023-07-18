@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
-import javax.xml.bind.DatatypeConverter;
+//import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
 
 import java.util.logging.Level;
