@@ -105,6 +105,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.TIPO_INSCRICAO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
@@ -263,7 +264,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	PRODUTO p\n"
                     + "	JOIN COMPPROD c ON c.CODPROD = p.CODPROD \n"
                     + "	JOIN CLASFISC fisc ON fisc.CODCLASFIS = p.CODCLASFIS \n"
-                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD" 
+                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -443,30 +444,33 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODCLIENTE AS id, \n"
-                    + "	NOME AS razao,\n"
-                    + "	NOMEFANTASIA AS fantasia,\n"
-                    + "	CGCCPF AS cpf,\n"
-                    + "	INSCEST AS rg_ie,\n"
-                    + "	ENDERECO AS endereco,\n"
-                    + "	NUMERO AS numero,\n"
-                    + "	c.COMPLEMENTO AS complemento,\n"
-                    + "	BAIRRO AS bairro,\n"
-                    + "	c2.CIDADE AS cidade,\n"
-                    + "	c2.ESTADO AS uf,\n"
-                    + "	CEP AS cep,\n"
-                    + "	DT_CADASTRO AS data_cad,\n"
-                    + "	CASE \n"
-                    + "	WHEN ativo = 'S' THEN 1\n"
-                    + "	ELSE 0\n"
-                    + "	END ativo,\n"
-                    + "	fone AS telefone,\n"
-                    + "	OBSERVACAO AS obs,\n"
-                    + "	EMAIL AS email,\n"
-                    + "	PESSOA_FJ AS tipopessoa\n"
+                    + "    CODCLIENTE AS id, \n"
+                    + "    NOME AS razao,\n"
+                    + "    NOMEFANTASIA AS fantasia,\n"
+                    + "    CGCCPF AS cpf,\n"
+                    + "    INSCEST AS rg_ie,\n"
+                    + "    ENDERECO AS endereco,\n"
+                    + "    NUMERO AS numero,\n"
+                    + "    c.COMPLEMENTO AS complemento,\n"
+                    + "    BAIRRO AS bairro,\n"
+                    + "    c2.CIDADE AS cidade,\n"
+                    + "    c2.ESTADO AS uf,\n"
+                    + "    CEP AS cep,\n"
+                    + "    DT_CADASTRO AS data_cad,\n"
+                    + "    CASE \n"
+                    + "    WHEN ativo = 'S' THEN 1\n"
+                    + "    ELSE 0\n"
+                    + "    END ativo,\n"
+                    + "    fone AS telefone,\n"
+                    + "    OBSERVACAO AS obs,\n"
+                    + "    EMAIL AS email,\n"
+                    + "    CASE\n"
+                    + "    WHEN PESSOA_FJ = 'F' THEN 1 \n"
+                    + "    ELSE 0\n"
+                    + "    END AS tipoinscricao\n"
                     + "FROM\n"
-                    + "	CLIENTE c  \n"
-                    + "	JOIN CIDADES c2 ON c2.CODCIDADE = c.CODCIDADE "
+                    + "    CLIENTE c  \n"
+                    + "    JOIN CIDADES c2 ON c2.CODCIDADE = c.CODCIDADE"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -490,7 +494,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setObservacao(rs.getString("obs"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setTipoInscricao(rs.getString("tipopessoa").equals("J") ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+                    imp.setTipoInscricao(rs.getString("tipopessoa").toUpperCase().trim().equals("J") ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
 
                     result.add(imp);
                 }
