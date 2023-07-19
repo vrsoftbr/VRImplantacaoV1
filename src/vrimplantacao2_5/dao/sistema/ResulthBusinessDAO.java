@@ -16,6 +16,8 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -234,11 +236,12 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	p.CODPROD AS id,\n"
-                    + "	p.REFERENCIA AS ean,\n"
+                    + "	CASE \n"
+                    + "	WHEN char_LENGTH(p.REFERENCIA) <=7 THEN substring(p.REFERENCIA FROM 2 FOR 7) ELSE p.REFERENCIA END  AS ean,\n"
                     + "	p.DESCRICAO AS descricao,\n"
                     + "	p.UNIDADEENT AS tipo_emb,\n"
-                    + "	p.PR_ULT_ENT1 AS precocusto,\n"
                     + "	p.preco AS precovenda,\n"
+                    + "	c.PRECOCUSTO AS precocusto,\n"
                     + "	p.CODGRUPO AS merc1,\n"
                     + "	p.CODSUBGRUPO AS merc2,\n"
                     + "	CASE\n"
@@ -260,7 +263,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	PRODUTO p\n"
                     + "	JOIN COMPPROD c ON c.CODPROD = p.CODPROD \n"
                     + "	JOIN CLASFISC fisc ON fisc.CODCLASFIS = p.CODCLASFIS \n"
-                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD "
+                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD" 
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -458,7 +461,9 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	ELSE 0\n"
                     + "	END ativo,\n"
                     + "	fone AS telefone,\n"
-                    + "	OBSERVACAO AS obs\n"
+                    + "	OBSERVACAO AS obs,\n"
+                    + "	EMAIL AS email,\n"
+                    + "	PESSOA_FJ AS tipopessoa\n"
                     + "FROM\n"
                     + "	CLIENTE c  \n"
                     + "	JOIN CIDADES c2 ON c2.CODCIDADE = c.CODCIDADE "
@@ -484,6 +489,8 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setObservacao(rs.getString("obs"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setTipoInscricao(rs.getString("tipopessoa").equals("J") ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
 
                     result.add(imp);
                 }
@@ -498,22 +505,20 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "      SELECT\n"
-                    + "	m.NUMORD AS id,\n"
-                    + "	m.CODDOCTO AS cupom,\n"
-                    + "	m.CODCLIENTE AS codcli,\n"
+                    "SELECT\n"
+                    + "	d.NUMORD AS id,\n"
+                    + "	d.NUMDOCORIG AS cupom,\n"
+                    + "	d.CODCLIENTE AS codcli,	\n"
                     + "	c.CGCCPF AS cpf,\n"
-                    + "	m.CODOPER AS ecf,\n"
-                    + "	m.VALORMOV AS valor,\n"
-                    + "	m.DT_MOVIMENTO AS emissao,\n"
-                    + "	m.DT_VENCIMENTO AS vencimento,\n"
-                    + "	m.OBSERVACAO AS obs\n"
+                    + "	1 AS ecf,\n"
+                    + "	d.VALORDOCTO AS valor,\n"
+                    + "	d.DT_EMISSAO AS emissao,\n"
+                    + "	d.DT_VENCIMENTO AS vencimento,\n"
+                    + "	d.OBSERVACAO AS obs\n"
                     + "FROM\n"
-                    + "	MOVIREC m\n"
-                    + "JOIN CLIENTE c ON\n"
-                    + "	c.CODCLIENTE = m.CODCLIENTE\n"
-                    + "WHERE\n"
-                    + "	CONTACXA IS NULL "
+                    + "	docurec d\n"
+                    + "JOIN cliente c ON d.CODCLIENTE = c.CODCLIENTE \n"
+                    + "WHERE VALORPAGO = 0 "
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

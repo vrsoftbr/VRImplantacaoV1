@@ -79,6 +79,7 @@ public enum EScriptLojaOrigemSistema {
     VRMASTER(182, 11, "select l.id, l.descricao from loja l join fornecedor f on l.id_fornecedor = f.id where l.id_situacaocadastro = 1 order by l.id"),
     VISUALMIX(186, 13, "select codigo as id,	descricao from dbo.Lojas order by 1"),
     WEBSAQ(188, 11, "select codestabelec id, razaosocial descricao from estabelecimento order by codestabelec"),
+    ECO_CENTAURO(193,5,"SELECT codigo AS id, NOMEFANTASIA AS descricao FROM TGEREMPRESA t"),
     LINEAR(196, 8, "SELECT emp_codigo AS id, concat(emp_codigo, '' - '', emp_fantasia) AS descricao FROM empresa ORDER BY 1"),
     ARIUS(197, 9, "SELECT id ,id || '' - '' || descritivo || '' - '' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5, "SELECT l.COD_EMPRESA AS id, (l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao FROM EMITENTE l ORDER BY 1"),
@@ -143,6 +144,8 @@ public enum EScriptLojaOrigemSistema {
     ARGO(257, 13, "select codemp id, razemp descricao from empresa"),
     VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA"),
     RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e ");
+    
+    
 
     private int idSistema;
     private int idBancoDados;

@@ -222,6 +222,7 @@ import vrimplantacao2_5.dao.sistema.DevSisDAO;
 import vrimplantacao2_5.dao.sistema.DuplaFace_LivreDAO;
 import vrimplantacao2_5.dao.sistema.DxDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
+import vrimplantacao2_5.dao.sistema.EcoCentauro2_5DAO;
 import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.FacilDAO;
 import vrimplantacao2_5.dao.sistema.FenixMEDAO;
@@ -305,6 +306,7 @@ import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DuplaFace_Livre2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.EcoCentauro2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Facil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Fenix2_5GUI;
@@ -1764,6 +1766,17 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+    },
+    ECO_CENTAURO(193, "ECO_CENTAURO", new EcoCentauro2_5DAO ()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new EcoCentauro2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     ZOOMBOX(194, "ZOOMBOX", new ZoomboxDAO()) {
