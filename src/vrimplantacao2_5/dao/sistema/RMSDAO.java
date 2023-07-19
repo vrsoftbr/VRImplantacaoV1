@@ -796,9 +796,6 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setEstoque(rst.getDouble("estoque"));
 
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoqueMinimo(0);
-
                     String tipoCompra = rst.getString("tipocompra");
                     if ("1".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.CENTRALIZADO);
@@ -811,6 +808,14 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     if ("20".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.LOJA);
+                    }
+                    if("1".equals(tipoCompra)){
+                        imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                        imp.setEstoqueMinimo(1);
+                    }
+                    else{
+                        imp.setEstoqueMaximo(0);
+                        imp.setEstoqueMinimo(1);
                     }
 
                     if (imp.getEstoque() == 0) {
