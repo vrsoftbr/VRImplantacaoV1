@@ -36,15 +36,14 @@ import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepository;
 import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepository;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepositoryProvider;
-import vrimplantacao2.dao.cadastro.desmembramento.AutorizadoraRepository;
-import vrimplantacao2.dao.cadastro.desmembramento.ContaContabilFiscalRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepositoryProvider;
-import vrimplantacao2.dao.cadastro.desmembramento.TipoRecebivelRepository;
-import vrimplantacao2.dao.cadastro.desmembramento.TipoTefRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.HistoricoPadraoRepository;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroRepository;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.AutorizadoraRepositoryProvider;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.ContaContabilFinanceirolRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.ContaContabilFiscalRepositoryProvider;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.HistoricoPadraoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.TipoRecebivelRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.TipoTefRepositoryProvider;
@@ -135,12 +134,20 @@ import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.AutorizadoraIMP;
+import vrimplantacao2.vo.importacao.ContaContabilFinanceiroIMP;
 import vrimplantacao2.vo.importacao.ContaContabilFiscalIMP;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
+import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
+import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.Provider.CfopEntradaRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Provider.TipoEntradaRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Repository.CfopEntradaRepository;
+import vrimplantacao2_5.tipoRecebivel.Repository.TipoEntradaRepository;
 
 public class Importador {
 
@@ -530,21 +537,47 @@ public class Importador {
 
     public void importarTipoRecebivel() throws Exception {
         ProgressBar.setStatus("Carregando Dados...");
-        
+
+        // Instanciação das listas
+        List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
+        CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //Tipo Entrada  public.tipoentrada
+        List<TipoEntradaIMP> entrada = getInterfaceDAO().getTipoEntrada();
+        TipoEntradaRepositoryProvider entradaP = new TipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        //Historico Padrão public.historicopadrao
+        List<HistoricoPadraoIMP> historico = getInterfaceDAO().getHistorico();
+        HistoricoPadraoRepositoryProvider rephis = new HistoricoPadraoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        //Conta Contabil Financeiro
+        List<ContaContabilFinanceiroIMP> financeiro = getInterfaceDAO().getContaContabilFinanceiro();
+        ContaContabilFinanceirolRepositoryProvider financeiroprovi = new ContaContabilFinanceirolRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        //Conta Contabil Fiscal
         List<ContaContabilFiscalIMP> conta = getInterfaceDAO().getContaContabilFiscal();
         ContaContabilFiscalRepositoryProvider provi = new ContaContabilFiscalRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+        //pdv.tipotef
         List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
-        TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
-        
+        TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+        //public.tiporecebivel
         List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
-        TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
-        
+        TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+        //pdv.autorizadora
         List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
-        AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(),getLojaOrigem(),getLojaVR());
-                
-        ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
+        AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+
+        HistoricoPadraoRepository hispad = new HistoricoPadraoRepository(rephis);
+        hispad.importarHistoricoPadrao(historico);
+
+        TipoEntradaRepository entrarep = new TipoEntradaRepository(entradaP);
+        entrarep.importarTipoEntrada(entrada);
+
+        CfopEntradaRepository cfop = new CfopEntradaRepository(cfopRe);
+        cfop.importarCfopEntrada(cfopE);
+
+        /*  ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
         cont.importarContaContabilFiscal(conta);
+        
+        ContaContabilFinanceiroRepository fina = new ContaContabilFinanceiroRepository(financeiroprovi);
+        fina.importarContaContabilFiscal(financeiro);
         
         AutorizadoraRepository auto = new AutorizadoraRepository(aut);
         auto.importarAutorizadora(autorizadora);
@@ -554,7 +587,7 @@ public class Importador {
         
         TipoRecebivelRepository rep = new TipoRecebivelRepository(provider);
         rep.importarRecebivel(recebivel);
-
+         */
     }
 
     /**

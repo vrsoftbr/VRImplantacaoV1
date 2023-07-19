@@ -43,7 +43,7 @@ public class ContaContabilFiscalRepository {
         
         provider.begin();
         try {
-            provider.setStatus("Carregando Tipo Tef existentes...", contaContabil.size());
+            provider.setStatus("Carregando conta contabil Fiscal existentes...", contaContabil.size());
             LOG.info("Iniciando gravação dos recebiveís");
             
             for (ContaContabilFiscalIMP imp : contaContabil) {

@@ -4,37 +4,32 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.ContaContabilFinanceiroVO;
+import vrimplantacao2.vo.cadastro.HistoricoPadraoVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class ContaContabilFinanceiroDAO {
+public class HistoricoPadraoDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(ContaContabilFinanceiroDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(HistoricoPadraoDAO.class.getName());
 
-    public void salvar(ContaContabilFinanceiroVO vo) throws Exception {
+    public void salvar(HistoricoPadraoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setSchema("public");
-            sql.setTableName("contacontabilfinanceiro");
+            sql.setTableName("historicopadrao");
 
             sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
             sql.put("id_situacaocadastro", vo.getId_situacaoCadastro().getId());
-            sql.put("id_contacontabilfiscal", vo.getId_contaContabilFiscal());
-            sql.put("transferencia", vo.isTransferencia());
-            sql.put("id_historicopadrao", vo.getId_historicoPadrao());
-            sql.put("contabiliza", vo.isContabiliza());
-            sql.put("id_tipocentrocusto", vo.getId_tipoCentroCusto() == 0 ? null : vo.getId_tipoCentroCusto());
-
+            
             stm.execute(sql.getInsert());
         } catch (Exception e) {
             throw e;

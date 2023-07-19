@@ -62,6 +62,10 @@ import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2.vo.importacao.ContaContabilFinanceiroIMP;
+import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
 
 /**
  * Classe padrão para cria interfaces de importação.
@@ -712,19 +716,43 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
 
+    // TIPO TEF
     public List<TipoTefIMP> getTipoTef() throws Exception {
         return new ArrayList<>();
     }
 
+    // TIPO RECEBÍVEIS
     public List<TipoRecebivelIMP> getRecebivel() throws Exception {
         return new ArrayList<>();
     }
 
+    // PDV.AUTORIZADORA
     public List<AutorizadoraIMP> getAutorizadora() throws Exception {
         return new ArrayList<>();
     }
-    
-     public List<ContaContabilFiscalIMP> getContaContabilFiscal() throws Exception {
+
+    //CONTA CONTABIL FISCAL
+    public List<ContaContabilFiscalIMP> getContaContabilFiscal() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //CONTA CONTABIL FINANCEIRO
+    public List<ContaContabilFinanceiroIMP> getContaContabilFinanceiro() throws Exception {
+        return new ArrayList<>();
+    }
+
+    // HISTORICO PADRAO
+    public List<HistoricoPadraoIMP> getHistorico() throws Exception {
+        return new ArrayList<>();
+    }
+
+    // TIPO ENTRADA
+    public List<TipoEntradaIMP> getTipoEntrada() throws Exception {
+        return new ArrayList<>();
+    }
+
+    // CFOP ENTRADA
+    public List<CfopEntradaIMP> getCfopEntrada() throws Exception {
         return new ArrayList<>();
     }
 
