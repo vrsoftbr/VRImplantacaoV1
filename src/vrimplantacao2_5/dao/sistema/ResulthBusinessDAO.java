@@ -107,8 +107,8 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.TIPO_INSCRICAO,
                 OpcaoCliente.DATA_NASCIMENTO,
-                OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CLIENTE_EVENTUAL
@@ -467,7 +467,8 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	OBSERVACAO \n"
                     + "FROM\n"
                     + "	CLIENTE c\n"
-                    + "	JOIN CIDADES c2 ON c.CODCIDADE = c2.CODCIDADE"
+                    + "	JOIN CIDADES c2 ON c.CODCIDADE = c2.CODCIDADE \n"
+                    //        + "WHERE CODCLIENTE = '00000016'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
