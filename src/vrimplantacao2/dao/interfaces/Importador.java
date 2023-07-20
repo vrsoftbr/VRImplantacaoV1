@@ -143,13 +143,22 @@ import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.CfopSaidaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaContabilidadeIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaNotaFiscalSequenciaIMP;
 import vrimplantacao2_5.tipoRecebivel.Provider.CfopEntradaRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Provider.CfopSaidaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.Provider.TipoEntradaRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaContabilidadeRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaNotaSaidaSequenciaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.Repository.CfopEntradaRepository;
+import vrimplantacao2_5.tipoRecebivel.Repository.CfopSaidaRepository;
 import vrimplantacao2_5.tipoRecebivel.Repository.TipoEntradaRepository;
+import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaContabilidadeRepository;
+import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaNotaSaidaSequenciaRepository;
 import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaRepository;
 
 public class Importador {
@@ -543,35 +552,57 @@ public class Importador {
 
         // Instanciação das listas
         
+        //public.tiposaidacontabilidade
+        List<TipoSaidaContabilidadeIMP> tipoSaidaConta = getInterfaceDAO().getSaidaContabil();
+        TipoSaidaContabilidadeRepositoryProvider saidaContabil = new TipoSaidaContabilidadeRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
+        // public.tiposaidanotasaidasequencia
+        List<TipoSaidaNotaFiscalSequenciaIMP>seqSaida = getInterfaceDAO().getSequenceSaida();
+        TipoSaidaNotaSaidaSequenciaRepositoryProvider seqrep = new TipoSaidaNotaSaidaSequenciaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
+        // CFOP SAIDA  public.cfoptiposaida
+        List<CfopSaidaIMP>cfopSaida = getInterfaceDAO().getCfopSaida();
+        CfopSaidaRepositoryProvider cforef = new CfopSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
+        //  TIPO SAIDA public.tiposaida
         List<TipoSaidaIMP> saida = getInterfaceDAO().getTipoSaida();
         TipoSaidaRepositoryProvider saidarep = new TipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
         
-        // CFOP ENTRADA
+        // CFOP ENTRADA public.tipoentrada
         List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
         CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
 
         //Tipo Entrada  public.tipoentrada
         List<TipoEntradaIMP> entrada = getInterfaceDAO().getTipoEntrada();
         TipoEntradaRepositoryProvider entradaP = new TipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
         //Historico Padrão public.historicopadrao
         List<HistoricoPadraoIMP> historico = getInterfaceDAO().getHistorico();
         HistoricoPadraoRepositoryProvider rephis = new HistoricoPadraoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
         //Conta Contabil Financeiro
         List<ContaContabilFinanceiroIMP> financeiro = getInterfaceDAO().getContaContabilFinanceiro();
         ContaContabilFinanceirolRepositoryProvider financeiroprovi = new ContaContabilFinanceirolRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
         //Conta Contabil Fiscal
         List<ContaContabilFiscalIMP> conta = getInterfaceDAO().getContaContabilFiscal();
         ContaContabilFiscalRepositoryProvider provi = new ContaContabilFiscalRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
         //pdv.tipotef
         List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
         TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+        
         //public.tiporecebivel
         List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
         TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+        
         //pdv.autorizadora
         List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
         AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
 
+        
+        
+        
         HistoricoPadraoRepository hispad = new HistoricoPadraoRepository(rephis);
         hispad.importarHistoricoPadrao(historico);
 
@@ -583,6 +614,15 @@ public class Importador {
         
         TipoSaidaRepository saidar = new TipoSaidaRepository(saidarep);
         saidar.importarTipoSaida(saida);
+        
+        CfopSaidaRepository cfopSaidaRep = new CfopSaidaRepository(cforef);
+        cfopSaidaRep.importarCfopSaida(cfopSaida);
+        
+        TipoSaidaNotaSaidaSequenciaRepository seqRep = new TipoSaidaNotaSaidaSequenciaRepository(seqrep);
+        seqRep.importarSequenceTipoSaida(seqSaida);
+        
+        TipoSaidaContabilidadeRepository saiRep = new TipoSaidaContabilidadeRepository(saidaContabil);
+        saiRep.importarTipoSaidaContabil(tipoSaidaConta);
 
         /*  ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
         cont.importarContaContabilFiscal(conta);

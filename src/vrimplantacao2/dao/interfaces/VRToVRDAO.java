@@ -68,8 +68,11 @@ import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.CfopSaidaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaContabilidadeIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaNotaFiscalSequenciaIMP;
 
 /**
  *
@@ -1601,7 +1604,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setConverterTodasAliquotas(rs.getBoolean("convertertodasaliquotas"));
                 imp.setId_tipoSaida(rs.getInt("id_tiposaida"));
                 imp.setGeraExportacao(rs.getBoolean("geraexportacao"));
-                imp.setId_produto(rs.getInt("id_produto") == 0 ? null :rs.getInt("id_produto"));
+                imp.setId_produto(rs.getInt("id_produto") == 0 ? null : rs.getInt("id_produto"));
                 imp.setUtilizaTributoCadastroDebito(rs.getBoolean("utilizatributoscadastrodebito"));
                 imp.setConverterAliquota(rs.getBoolean("converteraliquota"));
                 imp.setPlanoConta1(rs.getInt("planoconta1"));
@@ -1632,6 +1635,90 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setId(rs.getInt("id"));
                 imp.setCfop(rs.getInt("cfop"));
                 imp.setId_tipoEntrada(rs.getInt("id_tipoentrada"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CfopSaidaIMP> getCfopSaida() throws Exception {
+        List<CfopSaidaIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "id,\n"
+                        + "cfop,\n"
+                        + "id_tiposaida\n"
+                        + "from\n"
+                        + "	cfoptiposaida")) {
+            while (rs.next()) {
+                CfopSaidaIMP imp = new CfopSaidaIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setCfop(rs.getInt("cfop"));
+                imp.setId_tipoSaida(rs.getInt("id_tiposaida"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<TipoSaidaNotaFiscalSequenciaIMP> getSequenceSaida() throws Exception {
+        List<TipoSaidaNotaFiscalSequenciaIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id,\n"
+                        + "	id_loja ,\n"
+                        + "	id_tiposaida ,\n"
+                        + "	id_notasaidasequencia \n"
+                        + "from\n"
+                        + "	tiposaidanotasaidasequencia"
+                        + "where id_loja = " + getLojaOrigem())) {
+            while (rs.next()) {
+                TipoSaidaNotaFiscalSequenciaIMP imp = new TipoSaidaNotaFiscalSequenciaIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_loja(rs.getInt("id_loja"));
+                imp.setId_tipoSaida(rs.getInt("id_tiposaida"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<TipoSaidaContabilidadeIMP> getSaidaContabil() throws Exception {
+        List<TipoSaidaContabilidadeIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id ,\n"
+                        + "	id_tiposaida ,\n"
+                        + "	id_tipovalorcontabilidade ,\n"
+                        + "	id_contacontabilcredito ,\n"
+                        + "	id_contacontabildebito ,\n"
+                        + "	id_historicopadrao \n"
+                        + "from\n"
+                        + "	tiposaidacontabilidade"
+                )) {
+            while (rs.next()) {
+                TipoSaidaContabilidadeIMP imp = new TipoSaidaContabilidadeIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_tipoSaida(rs.getInt("id_tiposaida"));
+                imp.setId_tipoValorContabilidade(rs.getInt("id_tipovalorcontabilidade"));
+                imp.setId_contaContabilCredito(rs.getInt("id_contacontabilcredito"));
+                imp.setId_contaContabilDebito(rs.getInt("id_contacontabildebito"));
+                imp.setId_historicoPadrao(rs.getInt("id_historicopadrao"));
 
                 result.add(imp);
             }

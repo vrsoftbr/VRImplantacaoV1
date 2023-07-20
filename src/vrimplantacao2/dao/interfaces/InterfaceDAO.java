@@ -65,8 +65,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2.vo.importacao.ContaContabilFinanceiroIMP;
 import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.CfopSaidaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.EntradaSaidaTipoSaidaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaContabilidadeIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaNotaFiscalSequenciaIMP;
 
 /**
  * Classe padrão para cria interfaces de importação.
@@ -756,9 +760,29 @@ public abstract class InterfaceDAO {
     public List<CfopEntradaIMP> getCfopEntrada() throws Exception {
         return new ArrayList<>();
     }
-    
+
     // TIPO SAIDA
     public List<TipoSaidaIMP> getTipoSaida() throws Exception {
+        return new ArrayList<>();
+    }
+
+    // CFOP SAIDA
+    public List<CfopSaidaIMP> getCfopSaida() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Tipo Saida Nota Fiscal Sequencia
+    public List<TipoSaidaNotaFiscalSequenciaIMP> getSequenceSaida() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Tipo Saida Nota Fiscal Sequencia
+    public List<TipoSaidaContabilidadeIMP> getSaidaContabil() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Entrada Saida Tipo Saida
+    public List<EntradaSaidaTipoSaidaIMP> getEntradaSaida() throws Exception {
         return new ArrayList<>();
     }
 
