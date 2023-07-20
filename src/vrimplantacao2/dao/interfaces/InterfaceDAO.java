@@ -66,6 +66,7 @@ import vrimplantacao2.vo.importacao.ContaContabilFinanceiroIMP;
 import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
 
 /**
  * Classe padrão para cria interfaces de importação.
@@ -753,6 +754,11 @@ public abstract class InterfaceDAO {
 
     // CFOP ENTRADA
     public List<CfopEntradaIMP> getCfopEntrada() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    // TIPO SAIDA
+    public List<TipoSaidaIMP> getTipoSaida() throws Exception {
         return new ArrayList<>();
     }
 

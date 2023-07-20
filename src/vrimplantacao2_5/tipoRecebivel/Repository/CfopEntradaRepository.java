@@ -3,10 +3,8 @@ package vrimplantacao2_5.tipoRecebivel.Repository;
 import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
 import vrimplantacao2_5.tipoRecebivel.Provider.CfopEntradaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.VO.CfopEntradaVO;
-import vrimplantacao2_5.tipoRecebivel.VO.TipoEntradaVO;
 
 public class CfopEntradaRepository {
     

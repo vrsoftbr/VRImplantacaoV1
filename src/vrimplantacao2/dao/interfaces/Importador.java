@@ -144,10 +144,13 @@ import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
 import vrimplantacao2_5.tipoRecebivel.Provider.CfopEntradaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.Provider.TipoEntradaRepositoryProvider;
+import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaRepositoryProvider;
 import vrimplantacao2_5.tipoRecebivel.Repository.CfopEntradaRepository;
 import vrimplantacao2_5.tipoRecebivel.Repository.TipoEntradaRepository;
+import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaRepository;
 
 public class Importador {
 
@@ -539,6 +542,11 @@ public class Importador {
         ProgressBar.setStatus("Carregando Dados...");
 
         // Instanciação das listas
+        
+        List<TipoSaidaIMP> saida = getInterfaceDAO().getTipoSaida();
+        TipoSaidaRepositoryProvider saidarep = new TipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
+        // CFOP ENTRADA
         List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
         CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
 
@@ -572,6 +580,9 @@ public class Importador {
 
         CfopEntradaRepository cfop = new CfopEntradaRepository(cfopRe);
         cfop.importarCfopEntrada(cfopE);
+        
+        TipoSaidaRepository saidar = new TipoSaidaRepository(saidarep);
+        saidar.importarTipoSaida(saida);
 
         /*  ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
         cont.importarContaContabilFiscal(conta);

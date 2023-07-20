@@ -69,6 +69,7 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
 import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
 
 /**
  *
@@ -1488,6 +1489,125 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDescricao(rs.getString("descricao"));
                 imp.setUtilizado(rs.getBoolean("utilizado"));
 
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<TipoSaidaIMP> getTipoSaida() throws Exception {
+        List<TipoSaidaIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select id ,\n"
+                        + "	descricao ,\n"
+                        + "	baixaestoque ,\n"
+                        + "	geradevolucao ,\n"
+                        + "	especie ,\n"
+                        + "	transportadorproprio ,\n"
+                        + "	destinatariocliente ,\n"
+                        + "	substituicao ,\n"
+                        + "	foraestado ,\n"
+                        + "	consultapedido ,\n"
+                        + "	imprimeboleto,\n"
+                        + "	atualizaescrita ,\n"
+                        + "	utilizaicmscredito ,\n"
+                        + "	naocreditaicms,\n"
+                        + "	desabilitavalor ,\n"
+                        + "	adicionavenda,\n"
+                        + "	gerareceber,\n"
+                        + "	utilizaprecovenda ,\n"
+                        + "	notaprodutor ,\n"
+                        + "	transferencia,\n"
+                        + "	id_tipoentrada ,\n"
+                        + "	tipo ,\n"
+                        + "	calculaiva ,\n"
+                        + "	utilizaicmsentrada ,\n"
+                        + "	id_contacontabilfiscalcredito ,\n"
+                        + "	id_contacontabilfiscaldebito ,\n"
+                        + "	id_historicopadrao,\n"
+                        + "	entraestoque,\n"
+                        + "	vendaindustria,\n"
+                        + "	id_notasaidamensagem ,\n"
+                        + "	id_situacaocadastro ,\n"
+                        + "	geracontrato ,\n"
+                        + "	contabilidadepadrao ,\n"
+                        + "	contabiliza,\n"
+                        + "	atualizatroca ,\n"
+                        + "	creditapiscofins,\n"
+                        + "	consumidorfinal ,\n"
+                        + "	id_tipopiscofins,\n"
+                        + "	id_aliquota ,\n"
+                        + "	fabricacaopropria,\n"
+                        + "	utilizaprecocusto,\n"
+                        + "	convertertodasaliquotas ,\n"
+                        + "	id_tiposaida ,\n"
+                        + "	geraexportacao ,\n"
+                        + "	id_produto,\n"
+                        + "	utilizatributoscadastrodebito,\n"
+                        + "	converteraliquota ,\n"
+                        + "	planoconta1 ,\n"
+                        + "	planoconta2 ,\n"
+                        + "	notamei ,\n"
+                        + "	utilizacustomedio \n"
+                        + "	from \n"
+                        + "	tiposaida")) {
+            while (rs.next()) {
+                TipoSaidaIMP imp = new TipoSaidaIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setBaixaEstoque(rs.getBoolean("baixaestoque"));
+                imp.setGeraDevolucao(rs.getBoolean("geradevolucao"));
+                imp.setEspecie(rs.getString("especie"));
+                imp.setTransportadorProprio(rs.getBoolean("transportadorproprio"));
+                imp.setDestinatarioCliente(rs.getBoolean("destinatariocliente"));
+                imp.setSubsituicao(rs.getBoolean("subistituicao"));
+                imp.setForaEstado(rs.getBoolean("foraestado"));
+                imp.setConsultaPedido(rs.getBoolean("consultapedido"));
+                imp.setImprimeBoleto(rs.getBoolean("imprimeboleto"));
+                imp.setAtualizaEscrita(rs.getBoolean("atualizaescrita"));
+                imp.setUtilizaIcmsCredito(rs.getBoolean("utilizaicmscredito"));
+                imp.setNaoCreditaIcms(rs.getBoolean("naocreditaicms"));
+                imp.setDesabilitaValor(rs.getBoolean("desabilitavalor"));
+                imp.setAdicionaVenda(rs.getBoolean("adicionavenda"));
+                imp.setGeraReceber(rs.getBoolean("gerareceber"));
+                imp.setUtilizaPrecoVenda(rs.getBoolean("utilizaprecovenda"));
+                imp.setNotaProdutor(rs.getBoolean("notaprodutor"));
+                imp.setTransferencia(rs.getBoolean("transferencia"));
+                imp.setId_tipoEntrada(rs.getInt("id_tipoentrada"));
+                imp.setTipo(rs.getString("tipo"));
+                imp.setCalculaIva(rs.getBoolean("calculaiva"));
+                imp.setUtilizaIcmsEntrada(rs.getBoolean("utilizaiva"));
+                imp.setUtilizaIcmsEntrada(rs.getBoolean("utilizaicmsentrada"));
+                imp.setId_contaContabilFiscalCredito(rs.getInt("id_contacontabilfiscalcredito"));
+                imp.setId_contaContabilFiscalDebito(rs.getInt("id_contacontabilfiscaldebito"));
+                imp.setId_historicoPadrao(rs.getInt("id_historicopadrao"));
+                imp.setEntraEstoque(rs.getBoolean("entraestoque"));
+                imp.setVendaIndustria(rs.getBoolean("vendaindustria"));
+                imp.setId_notaSaidaMensagem(rs.getInt("id_notasaidamensagem"));
+                imp.setGeraContrato(rs.getBoolean("geracontrato"));
+                imp.setContabilidadePadrao(rs.getBoolean("contabilidadepadrao"));
+                imp.setContabiliza(rs.getBoolean("contabiliza"));
+                imp.setAtualizaTroca(rs.getBoolean("atualizatroca"));
+                imp.setCreditaPisCofins(rs.getBoolean("creditapiscofins"));
+                imp.setConsumidorFinal(rs.getBoolean("consumidorfinal"));
+                imp.setId_tipoPisCofins(rs.getInt("id_tipopiscofins"));
+                imp.setId_aliquota(rs.getInt("id_aliquota"));
+                imp.setFabricacaoPropria(rs.getBoolean("fabricacaopropria"));
+                imp.setUtilizaPrecoCusto(rs.getBoolean("utilizaprecocusto"));
+                imp.setConverterTodasAliquotas(rs.getBoolean("convertertodasaliquotas"));
+                imp.setId_tipoSaida(rs.getInt("id_tiposaida"));
+                imp.setGeraExportacao(rs.getBoolean("geraexportacao"));
+                imp.setId_produto(rs.getInt("id_produto") == 0 ? null :rs.getInt("id_produto"));
+                imp.setUtilizaTributoCadastroDebito(rs.getBoolean("utilizatributoscadastrodebito"));
+                imp.setConverterAliquota(rs.getBoolean("converteraliquota"));
+                imp.setPlanoConta1(rs.getInt("planoconta1"));
+                imp.setPlanoConta2(rs.getInt("planoconta2"));
+                imp.setNotaMei(rs.getBoolean("notamei"));
+                imp.setUtilizaCustoMedio(rs.getBoolean("utilizacustomedio"));
                 result.add(imp);
             }
         }
