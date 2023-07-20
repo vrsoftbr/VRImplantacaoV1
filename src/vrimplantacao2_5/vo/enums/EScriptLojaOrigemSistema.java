@@ -73,6 +73,7 @@ public enum EScriptLojaOrigemSistema {
     RPINFO(130, 11, "select unid_codigo id, unid_reduzido descricao from unidades order by 1"),
     SHI(147, 5, "select codigo id, razsoc descricao from filial"),
     SIAC(149, 9, "select empresa_id id, fantasia descricao from empresas"),
+    SISMOURA(154, 13, "select Codigo id, (Fantasia + '' - '' + CNPJ) descricao from Empresa order by Codigo"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     TOPSYSTEM(176, 8, "SELECT empresa id, Razao_Social descricao FROM cad_filial ORDER BY 1"),
     TSTI(178,8,"select empcod id, concat(empcnpj, '' '', empnom) descricao from tsl.tsc008a"),
