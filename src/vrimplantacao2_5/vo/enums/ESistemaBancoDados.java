@@ -61,6 +61,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_MOBILITY(107, "MOBILITY", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_ORIONTECH(115, "ORIONTECH", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_PLENUS(119, "PLENUS", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
+    FIREBIRD_MODELO(122, "MODELO", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050),
     FIREBIRD_PWGESTOR(124, "PWGESTOR", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_PWS(125, "PWS", 5, "FIREBIRD", "", "", "", 3050),
     FIREBIRD_RKSOFTWARE(127, "RKSOFTWARE", 5, "FIREBIRD", "", "SYSDBA", "Office25", 3050),

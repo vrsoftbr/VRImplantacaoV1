@@ -39,6 +39,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Utilizar REFPLU"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkUtilizarRefPluActionPerformed"/>
+          </Events>
         </Component>
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
           <Properties>

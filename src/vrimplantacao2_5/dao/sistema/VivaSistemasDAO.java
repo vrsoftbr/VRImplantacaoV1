@@ -28,7 +28,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 
 /**
  *
- * @author Alan
+ * @author Alan 
  */
 public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
