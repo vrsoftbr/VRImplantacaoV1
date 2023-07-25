@@ -64,13 +64,27 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2.vo.importacao.ContaContabilFinanceiroIMP;
 import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.CfopSaidaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.EntradaSaidaTipoSaidaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaContabilidadeIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaNotaFiscalSequenciaIMP;
+import vrimplantacao2_5.Financeiro.IMP.AtivoImobilizadoIMP;
+import vrimplantacao2_5.Financeiro.IMP.CaixaDiferencaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CaixaVendaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeAbatimentoIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.GrupoAtivoIMP;
+import vrimplantacao2_5.Financeiro.IMP.MapaResumoIMP;
+import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
+import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaContabilidadeIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaNotaFiscalSequenciaIMP;
 
 /**
  * Classe padrão para cria interfaces de importação.
@@ -731,6 +745,11 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
 
+    // TIPO RECEBIVEL FINALIZADORA
+    public List<TipoRecebivelFinalizadoraIMP> getTipoRecebivelFinalizadora() throws Exception {
+        return new ArrayList<>();
+    }
+
     // PDV.AUTORIZADORA
     public List<AutorizadoraIMP> getAutorizadora() throws Exception {
         return new ArrayList<>();
@@ -783,6 +802,71 @@ public abstract class InterfaceDAO {
 
     //Entrada Saida Tipo Saida
     public List<EntradaSaidaTipoSaidaIMP> getEntradaSaida() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Entrada Saida Tipo Entrada
+    public List<EntradaSaidaTipoEntradaIMP> getEntradaSaidaTipoEntrada() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Configuracao Recebivel
+    public List<RecebivelConfiguracaoIMP> getConfiguracaoRecebivel() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Tipo Plano Conta
+    public List<TipoPlanoContaIMP> getTipoPlanoConta() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Configuracao Recebivel Tabela
+    public List<RecebivelConfiguracaoTabelaIMP> getConfiguracaoRecebivelTabela() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Grupo Ativo
+    public List<GrupoAtivoIMP> getGrupoAtivo() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Caixa Diferenca
+    public List<CaixaDiferencaIMP> getCaixaDiferenca() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Tipo Entrada
+    public List<ContabilidadeTipoEntradaIMP> getTipoEntradaContabil() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Tipo Saida
+    public List<ContabilidadeTipoSaidaIMP> getTipoSaidaContabil() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Abatimento
+    public List<ContabilidadeAbatimentoIMP> getAbatimento() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Ativo Imobilizado
+    public List<AtivoImobilizadoIMP> getAtivo() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Mapa Resumo
+    public List<MapaResumoIMP> getMapa() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //Contabilidade Caixa Venda
+    public List<CaixaVendaIMP> getCaixa() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    //Contabilidade Caixa Venda
+    public List<CfopIMP> getCfop() throws Exception {
         return new ArrayList<>();
     }
 

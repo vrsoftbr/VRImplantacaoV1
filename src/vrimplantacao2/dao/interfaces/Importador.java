@@ -36,9 +36,14 @@ import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepository;
 import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepository;
 import vrimplantacao2.dao.cadastro.convenio.receber.ConvenioReceberRepositoryProvider;
+import vrimplantacao2.dao.cadastro.desmembramento.AutorizadoraRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.ContaContabilFinanceiroRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.ContaContabilFiscalRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.desmembramento.HistoricoPadraoRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.TipoRecebivelRepository;
+import vrimplantacao2.dao.cadastro.desmembramento.TipoTefRepository;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroRepository;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.AutorizadoraRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.ContaContabilFinanceirolRepositoryProvider;
@@ -141,25 +146,70 @@ import vrimplantacao2.vo.importacao.HistoricoPadraoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.TipoTefIMP;
+import vrimplantacao2_5.Financeiro.IMP.AtivoImobilizadoIMP;
+import vrimplantacao2_5.Financeiro.IMP.CaixaDiferencaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CaixaVendaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopIMP;
+import vrimplantacao2_5.Financeiro.IMP.CfopSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeAbatimentoIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
+import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaContabilidadeIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoSaidaNotaFiscalSequenciaIMP;
+import vrimplantacao2_5.Financeiro.Provider.CfopEntradaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.CfopSaidaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.EntradaSaidaTipoEntradaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.EntradaSaidaTipoSaidaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.RecebivelConfiguracaoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.RecebivelConfiguracaoTabelaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoEntradaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoPlanoContaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoRecebivelFinalizadoraRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoSaidaContabilidadeRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoSaidaNotaSaidaSequenciaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoSaidaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Repository.CfopEntradaRepository;
+import vrimplantacao2_5.Financeiro.Repository.CfopSaidaRepository;
+import vrimplantacao2_5.Financeiro.Repository.EntradaSaidaTipoEntradaRepository;
+import vrimplantacao2_5.Financeiro.Repository.EntradaSaidaTipoSaidaRepository;
+import vrimplantacao2_5.Financeiro.Repository.RecebivelConfiguracaoRepository;
+import vrimplantacao2_5.Financeiro.Repository.RecebivelConfiguracaoTabelaRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoEntradaRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoPlanoContaRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoRecebivelFinalizadoraRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoSaidaContabilidadeRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoSaidaNotaSaidaSequenciaRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoSaidaRepository;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
-import vrimplantacao2_5.tipoRecebivel.IMP.CfopEntradaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.CfopSaidaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoEntradaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaContabilidadeIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaIMP;
-import vrimplantacao2_5.tipoRecebivel.IMP.TipoSaidaNotaFiscalSequenciaIMP;
-import vrimplantacao2_5.tipoRecebivel.Provider.CfopEntradaRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Provider.CfopSaidaRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Provider.TipoEntradaRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaContabilidadeRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaNotaSaidaSequenciaRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Provider.TipoSaidaRepositoryProvider;
-import vrimplantacao2_5.tipoRecebivel.Repository.CfopEntradaRepository;
-import vrimplantacao2_5.tipoRecebivel.Repository.CfopSaidaRepository;
-import vrimplantacao2_5.tipoRecebivel.Repository.TipoEntradaRepository;
-import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaContabilidadeRepository;
-import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaNotaSaidaSequenciaRepository;
-import vrimplantacao2_5.tipoRecebivel.Repository.TipoSaidaRepository;
+import vrimplantacao2_5.Financeiro.IMP.GrupoAtivoIMP;
+import vrimplantacao2_5.Financeiro.IMP.MapaResumoIMP;
+import vrimplantacao2_5.Financeiro.Provider.AtivoImobilizadoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.CaixaDiferencaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.CaixaVendaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.CfopRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.ContabilidadeAbatimentoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.ContabilidadeTipoEntradaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.ContabilidadeTipoSaidaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.GrupoAtivoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.MapaResumoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Repository.AtivoImobilizadoRepository;
+import vrimplantacao2_5.Financeiro.Repository.CaixaDiferencaRepository;
+import vrimplantacao2_5.Financeiro.Repository.CaixaVendaRepository;
+import vrimplantacao2_5.Financeiro.Repository.CfopRepository;
+import vrimplantacao2_5.Financeiro.Repository.ContabilidadeAbatimentoRepository;
+import vrimplantacao2_5.Financeiro.Repository.ContabilidadeTipoEntradaRepository;
+import vrimplantacao2_5.Financeiro.Repository.ContabilidadeTipoSaidaRepository;
+import vrimplantacao2_5.Financeiro.Repository.GrupoAtivoRepository;
+import vrimplantacao2_5.Financeiro.Repository.MapaResumoRepository;
 
 public class Importador {
 
@@ -551,23 +601,81 @@ public class Importador {
         ProgressBar.setStatus("Carregando Dados...");
 
         // Instanciação das listas
-        
+        //public.cfop
+        List<CfopIMP> cfopmImp = getInterfaceDAO().getCfop();
+        CfopRepositoryProvider cfopProv = new CfopRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        List<CaixaVendaIMP> caixaVendaImp = getInterfaceDAO().getCaixa();
+        CaixaVendaRepositoryProvider caixaPro = new CaixaVendaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.tipoentrada
+        List<MapaResumoIMP> mapaImp = getInterfaceDAO().getMapa();
+        MapaResumoRepositoryProvider mapaPro = new MapaResumoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.tipoentrada
+        List<AtivoImobilizadoIMP> ativoImp = getInterfaceDAO().getAtivo();
+        AtivoImobilizadoRepositoryProvider AtivoPro = new AtivoImobilizadoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.tipoentrada
+        List<ContabilidadeAbatimentoIMP> abatimentoImp = getInterfaceDAO().getAbatimento();
+        ContabilidadeAbatimentoRepositoryProvider abatimentoProvider = new ContabilidadeAbatimentoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.tipoentrada
+        List<ContabilidadeTipoSaidaIMP> tipoSaidaContabil = getInterfaceDAO().getTipoSaidaContabil();
+        ContabilidadeTipoSaidaRepositoryProvider saidaProvider = new ContabilidadeTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.tipoentrada
+        List<ContabilidadeTipoEntradaIMP> tipoEntradaContabil = getInterfaceDAO().getTipoEntradaContabil();
+        ContabilidadeTipoEntradaRepositoryProvider EntradaProvider = new ContabilidadeTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //ativo.grupoativo
+        List<GrupoAtivoIMP> grup = getInterfaceDAO().getGrupoAtivo();
+        GrupoAtivoRepositoryProvider grppPro = new GrupoAtivoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //contabilidade.caixadiferenca
+        List<CaixaDiferencaIMP> caixaImp = getInterfaceDAO().getCaixaDiferenca();
+        CaixaDiferencaRepositoryProvider caixaProv = new CaixaDiferencaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.tipoplanoconta
+        List<TipoPlanoContaIMP> tipoImp = getInterfaceDAO().getTipoPlanoConta();
+        TipoPlanoContaRepositoryProvider planoProv = new TipoPlanoContaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.recebivelconfiguracaotabela
+        List<RecebivelConfiguracaoTabelaIMP> recConf = getInterfaceDAO().getConfiguracaoRecebivelTabela();
+        RecebivelConfiguracaoTabelaRepositoryProvider confRecTab = new RecebivelConfiguracaoTabelaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.recebivelconfiguracao
+        List<RecebivelConfiguracaoIMP> confRe = getInterfaceDAO().getConfiguracaoRecebivel();
+        RecebivelConfiguracaoRepositoryProvider confPro = new RecebivelConfiguracaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.tiporecebivelfinalizadora
+        List<TipoRecebivelFinalizadoraIMP> tpRec = getInterfaceDAO().getTipoRecebivelFinalizadora();
+        TipoRecebivelFinalizadoraRepositoryProvider tpPro = new TipoRecebivelFinalizadoraRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.entradasaidatipoentrada
+        List<EntradaSaidaTipoEntradaIMP> entradaSaidaTipoEntrada = getInterfaceDAO().getEntradaSaidaTipoEntrada();
+        EntradaSaidaTipoEntradaRepositoryProvider entradaSaidaEntrada = new EntradaSaidaTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //public.entradasaidatiposaida
+        List<EntradaSaidaTipoSaidaIMP> entradaSaidaTipoSaida = getInterfaceDAO().getEntradaSaida();
+        EntradaSaidaTipoSaidaRepositoryProvider entradaSaida = new EntradaSaidaTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
         //public.tiposaidacontabilidade
         List<TipoSaidaContabilidadeIMP> tipoSaidaConta = getInterfaceDAO().getSaidaContabil();
         TipoSaidaContabilidadeRepositoryProvider saidaContabil = new TipoSaidaContabilidadeRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         // public.tiposaidanotasaidasequencia
-        List<TipoSaidaNotaFiscalSequenciaIMP>seqSaida = getInterfaceDAO().getSequenceSaida();
+        List<TipoSaidaNotaFiscalSequenciaIMP> seqSaida = getInterfaceDAO().getSequenceSaida();
         TipoSaidaNotaSaidaSequenciaRepositoryProvider seqrep = new TipoSaidaNotaSaidaSequenciaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         // CFOP SAIDA  public.cfoptiposaida
-        List<CfopSaidaIMP>cfopSaida = getInterfaceDAO().getCfopSaida();
+        List<CfopSaidaIMP> cfopSaida = getInterfaceDAO().getCfopSaida();
         CfopSaidaRepositoryProvider cforef = new CfopSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //  TIPO SAIDA public.tiposaida
         List<TipoSaidaIMP> saida = getInterfaceDAO().getTipoSaida();
         TipoSaidaRepositoryProvider saidarep = new TipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         // CFOP ENTRADA public.tipoentrada
         List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
         CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
@@ -575,70 +683,116 @@ public class Importador {
         //Tipo Entrada  public.tipoentrada
         List<TipoEntradaIMP> entrada = getInterfaceDAO().getTipoEntrada();
         TipoEntradaRepositoryProvider entradaP = new TipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //Historico Padrão public.historicopadrao
         List<HistoricoPadraoIMP> historico = getInterfaceDAO().getHistorico();
         HistoricoPadraoRepositoryProvider rephis = new HistoricoPadraoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //Conta Contabil Financeiro
         List<ContaContabilFinanceiroIMP> financeiro = getInterfaceDAO().getContaContabilFinanceiro();
         ContaContabilFinanceirolRepositoryProvider financeiroprovi = new ContaContabilFinanceirolRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //Conta Contabil Fiscal
         List<ContaContabilFiscalIMP> conta = getInterfaceDAO().getContaContabilFiscal();
         ContaContabilFiscalRepositoryProvider provi = new ContaContabilFiscalRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //pdv.tipotef
         List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
         TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
-        
+
         //public.tiporecebivel
         List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
         TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
-        
+
         //pdv.autorizadora
         List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
         AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
 
-        
-        
-        
+        ContaContabilFinanceiroRepository fina = new ContaContabilFinanceiroRepository(financeiroprovi);
+        fina.importarContaContabilFiscal(financeiro);
+
+        ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
+        cont.importarContaContabilFiscal(conta);
+
         HistoricoPadraoRepository hispad = new HistoricoPadraoRepository(rephis);
         hispad.importarHistoricoPadrao(historico);
+
+        CaixaDiferencaRepository caixaRep = new CaixaDiferencaRepository(caixaProv);
+        caixaRep.importarCaixaDiferenca(caixaImp);
+
+        ContabilidadeAbatimentoRepository abat = new ContabilidadeAbatimentoRepository(abatimentoProvider);
+        abat.importarAbatimento(abatimentoImp);
+
+        AtivoImobilizadoRepository ativoRep = new AtivoImobilizadoRepository(AtivoPro);
+        ativoRep.importarAtivo(ativoImp);
+
+        CaixaVendaRepository caixaRepository = new CaixaVendaRepository(caixaPro);
+        caixaRepository.importarCaixaVenda(caixaVendaImp);
+
+        MapaResumoRepository mapaRep = new MapaResumoRepository(mapaPro);
+        mapaRep.importarCaixaDiferenca(mapaImp);
+
+        ContabilidadeTipoSaidaRepository contSaida = new ContabilidadeTipoSaidaRepository(saidaProvider);
+        contSaida.importarTipoEntradaContabil(tipoSaidaContabil);
+
+        ContabilidadeTipoEntradaRepository contEntrada = new ContabilidadeTipoEntradaRepository(EntradaProvider);
+        contEntrada.importarTipoEntradaContabil(tipoEntradaContabil);
+
+        GrupoAtivoRepository grppRepo = new GrupoAtivoRepository(grppPro);
+        grppRepo.importarGrupoAtivo(grup);
+
+        TipoPlanoContaRepository planoRepo = new TipoPlanoContaRepository(planoProv);
+        planoRepo.importarTipoPlano(tipoImp);
 
         TipoEntradaRepository entrarep = new TipoEntradaRepository(entradaP);
         entrarep.importarTipoEntrada(entrada);
 
+        CfopRepository cfopRep = new CfopRepository(cfopProv);
+        cfopRep.importarCfop(cfopmImp);
+        cfopmImp.clear();
+
         CfopEntradaRepository cfop = new CfopEntradaRepository(cfopRe);
         cfop.importarCfopEntrada(cfopE);
-        
+
         TipoSaidaRepository saidar = new TipoSaidaRepository(saidarep);
         saidar.importarTipoSaida(saida);
-        
+
         CfopSaidaRepository cfopSaidaRep = new CfopSaidaRepository(cforef);
         cfopSaidaRep.importarCfopSaida(cfopSaida);
-        
+
         TipoSaidaNotaSaidaSequenciaRepository seqRep = new TipoSaidaNotaSaidaSequenciaRepository(seqrep);
         seqRep.importarSequenceTipoSaida(seqSaida);
-        
+
         TipoSaidaContabilidadeRepository saiRep = new TipoSaidaContabilidadeRepository(saidaContabil);
         saiRep.importarTipoSaidaContabil(tipoSaidaConta);
 
-        /*  ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
-        cont.importarContaContabilFiscal(conta);
-        
-        ContaContabilFinanceiroRepository fina = new ContaContabilFinanceiroRepository(financeiroprovi);
-        fina.importarContaContabilFiscal(financeiro);
-        
+        EntradaSaidaTipoSaidaRepository entradarep = new EntradaSaidaTipoSaidaRepository(entradaSaida);
+        entradarep.importarEntradaSaidaTipoSaida(entradaSaidaTipoSaida);
+
+        EntradaSaidaTipoEntradaRepository entradaSaidarep = new EntradaSaidaTipoEntradaRepository(entradaSaidaEntrada);
+        entradaSaidarep.importarEntradaSaidaTipoEntrada(entradaSaidaTipoEntrada);
+
         AutorizadoraRepository auto = new AutorizadoraRepository(aut);
         auto.importarAutorizadora(autorizadora);
-                
+
         TipoTefRepository repository = new TipoTefRepository(prov);
         repository.importarTipoTef(tef);
         
+        //METODO DE IMPORTAR FORNECEDORES
+        importarFornecedor();
+
         TipoRecebivelRepository rep = new TipoRecebivelRepository(provider);
         rep.importarRecebivel(recebivel);
-         */
+
+        TipoRecebivelFinalizadoraRepository tprRepo = new TipoRecebivelFinalizadoraRepository(tpPro);
+        tprRepo.importarTipoRecebivelFinalizadora(tpRec);
+
+        RecebivelConfiguracaoRepository configRep = new RecebivelConfiguracaoRepository(confPro);
+        configRep.importarConfiguracaoRecebivel(confRe);
+
+        RecebivelConfiguracaoTabelaRepository confRepo = new RecebivelConfiguracaoTabelaRepository(confRecTab);
+        confRepo.importarConfiguracaoRecebivelTabela(recConf);
+
     }
 
     /**
