@@ -61,7 +61,7 @@ public class TipoRecebivelDAO {
 
             sql.setTableName("tiporecebivel");
 
-            sql.put("id", ultimoId());
+            sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
             sql.put("percentual", vo.getPercentual());
             sql.put("id_tipotef", vo.getId_TipoTef() <=0 ? null : vo.getId_TipoTef());

@@ -75,8 +75,14 @@ import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.FinalizadoraConfiguracaoIMP;
+import vrimplantacao2_5.Financeiro.IMP.FinalizadoraIMP;
+import vrimplantacao2_5.Financeiro.IMP.FinalizadoraLayoutRetornoIMP;
 import vrimplantacao2_5.Financeiro.IMP.GrupoAtivoIMP;
 import vrimplantacao2_5.Financeiro.IMP.MapaResumoIMP;
+import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoIMP;
+import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoOperadorIMP;
+import vrimplantacao2_5.Financeiro.IMP.PdvTecladoFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
@@ -864,9 +870,39 @@ public abstract class InterfaceDAO {
     public List<CaixaVendaIMP> getCaixa() throws Exception {
         return new ArrayList<>();
     }
-    
+
     //Contabilidade Caixa Venda
     public List<CfopIMP> getCfop() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV Finalizadora
+    public List<FinalizadoraIMP> getPdvFinalizadora() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV finalizadora layout retorno
+    public List<FinalizadoraLayoutRetornoIMP> getFinalizadoraLayout() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV Finalizadora configuracao
+    public List<FinalizadoraConfiguracaoIMP> getFinalizadoraConfiguracao() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV Funcao
+    public List<PdvFuncaoIMP> getPdvFuncao() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV Funcao Nivel Operador
+    public List<PdvFuncaoOperadorIMP> getPdvFuncaoOperador() throws Exception {
+        return new ArrayList<>();
+    }
+    
+      //PDV Funcao teclado Operador
+    public List<PdvTecladoFuncaoIMP> getPdvFuncaoTeclado() throws Exception {
         return new ArrayList<>();
     }
 

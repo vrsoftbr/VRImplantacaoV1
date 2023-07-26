@@ -27,7 +27,7 @@ public class TipoRecebivelFinalizadoraDAO {
             sql.setTableName("tiporecebivelfinalizadora");
 
             sql.put("id", vo.getId());
-            sql.put("id_tiporecebivel", vo.getId_finalizadora());
+            sql.put("id_tiporecebivel", vo.getId_TipoRecebivel());
             sql.put("id_finalizadora", vo.getId_finalizadora());
             
 

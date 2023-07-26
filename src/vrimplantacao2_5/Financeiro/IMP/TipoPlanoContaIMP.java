@@ -11,9 +11,10 @@ public class TipoPlanoContaIMP {
 
     private Integer id;
     private Integer planoConta1;
-    private Integer planoConta2;
+    private String planoConta2 = null;
     private Integer nivel;
     private String descricao;
+
     /**
      * @return the importSistema
      */
@@ -85,20 +86,6 @@ public class TipoPlanoContaIMP {
     }
 
     /**
-     * @return the planoConta2
-     */
-    public Integer getPlanoConta2() {
-        return planoConta2;
-    }
-
-    /**
-     * @param planoConta2 the planoConta2 to set
-     */
-    public void setPlanoConta2(Integer planoConta2) {
-        this.planoConta2 = planoConta2;
-    }
-
-    /**
      * @return the nivel
      */
     public Integer getNivel() {
@@ -112,5 +99,18 @@ public class TipoPlanoContaIMP {
         this.nivel = nivel;
     }
 
-   
+    /**
+     * @return the planoConta2
+     */
+    public String getPlanoConta2() {
+        return planoConta2;
+    }
+
+    /**
+     * @param planoConta2 the planoConta2 to set
+     */
+    public void setPlanoConta2(String planoConta2) {
+        this.planoConta2 = planoConta2;
+    }
+
 }

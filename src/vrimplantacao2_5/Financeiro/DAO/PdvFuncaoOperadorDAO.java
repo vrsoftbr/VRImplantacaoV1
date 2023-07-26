@@ -4,33 +4,32 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.Financeiro.VO.TipoPlanoContaVO;
+import vrimplantacao2_5.Financeiro.VO.PdvFuncaoOperadorVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class TipoPlanoContaDAO {
+public class PdvFuncaoOperadorDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(TipoPlanoContaDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(PdvFuncaoOperadorDAO.class.getName());
 
-    public void salvar(TipoPlanoContaVO vo) throws Exception {
+    public void salvar(PdvFuncaoOperadorVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
-            sql.setSchema("public");
-            sql.setTableName("tipoplanoconta");
+            sql.setSchema("pdv");
+            sql.setTableName("funcaoniveloperador");
 
             sql.put("id", vo.getId());
-            sql.put("planoconta1", vo.getPlanoConta1());
-            sql.put("planoconta2", vo.getPlanoConta2() == null ? null : Integer.parseInt(vo.getPlanoConta2()));
-            sql.put("nivel", vo.getNivel());
-            sql.put("descricao", vo.getDescricao());
+            sql.put("id_loja", vo.getId_loja());
+            sql.put("id_funcao", vo.getId_funcao());
+            sql.put("id_tiponiveloperador", vo.getId_tipoNivelOperador());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {

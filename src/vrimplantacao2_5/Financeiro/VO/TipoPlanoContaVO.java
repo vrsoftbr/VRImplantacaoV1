@@ -4,7 +4,7 @@ public class TipoPlanoContaVO {
 
     private Integer id;
     private Integer planoConta1;
-    private Integer planoConta2;
+    private String planoConta2 = null;
     private Integer nivel;
     private String descricao;
 
@@ -37,20 +37,6 @@ public class TipoPlanoContaVO {
     }
 
     /**
-     * @return the planoConta2
-     */
-    public Integer getPlanoConta2() {
-        return planoConta2;
-    }
-
-    /**
-     * @param planoConta2 the planoConta2 to set
-     */
-    public void setPlanoConta2(Integer planoConta2) {
-        this.planoConta2 = planoConta2;
-    }
-
-    /**
      * @return the nivel
      */
     public Integer getNivel() {
@@ -76,6 +62,20 @@ public class TipoPlanoContaVO {
      */
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    /**
+     * @return the planoConta2
+     */
+    public String getPlanoConta2() {
+        return planoConta2;
+    }
+
+    /**
+     * @param planoConta2 the planoConta2 to set
+     */
+    public void setPlanoConta2(String planoConta2) {
+        this.planoConta2 = planoConta2;
     }
 
 }

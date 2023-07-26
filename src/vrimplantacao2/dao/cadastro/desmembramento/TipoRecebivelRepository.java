@@ -1,7 +1,6 @@
 package vrimplantacao2.dao.cadastro.desmembramento;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.TipoRecebivelRepositoryProvider;
 import vrimplantacao2.vo.cadastro.TipoRecebivelVO;

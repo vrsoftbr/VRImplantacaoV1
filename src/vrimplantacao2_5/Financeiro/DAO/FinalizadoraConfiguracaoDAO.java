@@ -4,33 +4,43 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.Financeiro.VO.TipoPlanoContaVO;
+import vrimplantacao2_5.Financeiro.VO.FinalizadoraConfiguracaoVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class TipoPlanoContaDAO {
+public class FinalizadoraConfiguracaoDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(TipoPlanoContaDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(FinalizadoraConfiguracaoDAO.class.getName());
 
-    public void salvar(TipoPlanoContaVO vo) throws Exception {
+    public void salvar(FinalizadoraConfiguracaoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
-            sql.setSchema("public");
-            sql.setTableName("tipoplanoconta");
+            sql.setSchema("pdv");
+            sql.setTableName("finalizadoraconfiguracao");
 
             sql.put("id", vo.getId());
-            sql.put("planoconta1", vo.getPlanoConta1());
-            sql.put("planoconta2", vo.getPlanoConta2() == null ? null : Integer.parseInt(vo.getPlanoConta2()));
-            sql.put("nivel", vo.getNivel());
-            sql.put("descricao", vo.getDescricao());
+            sql.put("id_loja", vo.getId_loja());
+            sql.put("id_finalizadora", vo.getId_finalizadora());
+            sql.put("aceitatroco", vo.isAceitaTroco());
+            sql.put("aceitaretirada", vo.isAceitaRetirada());
+            sql.put("aceitaabastecimento", vo.isAceitaAbastecimento());
+            sql.put("aceitarecebimento", vo.isAceitaRecebimento());
+            sql.put("utilizacontravale", vo.isUtilizaContraVale());
+            sql.put("retiradatotal", vo.isRetiradaTotal());
+            sql.put("valormaximotroco", vo.getValorMaximoTroco());
+            sql.put("juros", vo.getJuros());
+            sql.put("aceitaretiradacf", vo.isAceitaRetiradaCf());
+            sql.put("retiradatotalcf", vo.isRetiradaTotalCf());
+            sql.put("utilizado", vo.isUtilizado());
+            sql.put("avisaretirada", vo.isAvisaRetirada());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {
