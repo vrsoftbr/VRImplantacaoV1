@@ -182,6 +182,7 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.CLIENTE_EVENTUAL,
@@ -584,7 +585,11 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     + "    C.FAX,\n"
                     + "    C.FONECELULAR celular,\n"
                     + "    C.EMAIL,\n"
-                    + "    C.OBS\n"
+                    + "    C.OBS,\n"
+                    + "	CASE \n"
+                    + "	WHEN c.LIMITEGLOBAL  = 'N'\n"
+                    + "	THEN 1 ELSE 0 END \n"
+                    + "	AS ativo\n"
                     + "FROM\n"
                     + "    TRECCLIENTEGERAL c\n"
                     + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE\n"
@@ -629,6 +634,8 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setEmpresa(rs.getString("empresa"));
+                    
+                    imp.setAtivo(rs.getBoolean("ativo"));
 
                     result.add(imp);
                 }
@@ -913,7 +920,7 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
 
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
-                       // next.setSequencia(rst.getInt("nroitem"));
+                        // next.setSequencia(rst.getInt("nroitem"));
                         next.setProduto(rst.getString("produto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
