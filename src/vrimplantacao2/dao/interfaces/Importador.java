@@ -155,6 +155,8 @@ import vrimplantacao2_5.Financeiro.IMP.CfopSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeAbatimentoIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.FinalizadoraConfiguracaoIMP;
@@ -198,6 +200,7 @@ import vrimplantacao2_5.Financeiro.IMP.MapaResumoIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoOperadorIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvTecladoFuncaoIMP;
+import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
 import vrimplantacao2_5.Financeiro.Provider.AtivoImobilizadoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.CaixaDiferencaRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.CaixaVendaRepositoryProvider;
@@ -205,6 +208,8 @@ import vrimplantacao2_5.Financeiro.Provider.CfopRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.ContabilidadeAbatimentoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.ContabilidadeTipoEntradaRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.ContabilidadeTipoSaidaRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.EcfLayoutRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.EcfRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.FinalizadoraConfiguracaoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.FinalizadoraLayoutRetornoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.FinalizadoraRepositoryProvider;
@@ -213,6 +218,7 @@ import vrimplantacao2_5.Financeiro.Provider.MapaResumoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.PdvFuncaoOperadorRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.PdvFuncaoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.PdvTecladoFuncaoRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TecladoLayoutRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Repository.AtivoImobilizadoRepository;
 import vrimplantacao2_5.Financeiro.Repository.CaixaDiferencaRepository;
 import vrimplantacao2_5.Financeiro.Repository.CaixaVendaRepository;
@@ -220,6 +226,8 @@ import vrimplantacao2_5.Financeiro.Repository.CfopRepository;
 import vrimplantacao2_5.Financeiro.Repository.ContabilidadeAbatimentoRepository;
 import vrimplantacao2_5.Financeiro.Repository.ContabilidadeTipoEntradaRepository;
 import vrimplantacao2_5.Financeiro.Repository.ContabilidadeTipoSaidaRepository;
+import vrimplantacao2_5.Financeiro.Repository.EcPdvRepository;
+import vrimplantacao2_5.Financeiro.Repository.EcfLayoutRepository;
 import vrimplantacao2_5.Financeiro.Repository.FinalizadoraConfiguracaoRepository;
 import vrimplantacao2_5.Financeiro.Repository.FinalizadoraLayoutRetornoRepository;
 import vrimplantacao2_5.Financeiro.Repository.FinalizadoraRepository;
@@ -228,6 +236,7 @@ import vrimplantacao2_5.Financeiro.Repository.MapaResumoRepository;
 import vrimplantacao2_5.Financeiro.Repository.PdvFuncaoOperadorRepository;
 import vrimplantacao2_5.Financeiro.Repository.PdvFuncaoRepository;
 import vrimplantacao2_5.Financeiro.Repository.PdvTecladoFuncaoRepository;
+import vrimplantacao2_5.Financeiro.Repository.TecladoLayoutRepository;
 
 public class Importador {
 
@@ -620,17 +629,30 @@ public class Importador {
 
         // Instanciação das listas
         
-        List<PdvTecladoFuncaoIMP> tecladoImp = getInterfaceDAO().getPdvFuncaoTeclado();
-        PdvTecladoFuncaoRepositoryProvider tecladoprov = new PdvTecladoFuncaoRepositoryProvider(getSistema(), getLojaOrigem(),lojaVR);
+        //pdv.ecf
+        List<EcfIMP> ecf = getInterfaceDAO().getPdvEcf();
+        EcfRepositoryProvider ecfProvider = new EcfRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
         
+        //pdv.ecflayout
+        List<EcfLayoutIMP> ecfLayout = getInterfaceDAO().getEcfLayout();
+        EcfLayoutRepositoryProvider ecfLayoutProvider = new EcfLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //pdv.tecladolayout
+        List<TecladoLayoutIMP> tecladoLayout = getInterfaceDAO().getTecladoLayout();
+        TecladoLayoutRepositoryProvider tecladoLayoutProvider = new TecladoLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
+        //pdv.tecladolayoutfuncao
+        List<PdvTecladoFuncaoIMP> tecladoImp = getInterfaceDAO().getPdvFuncaoTeclado();
+        PdvTecladoFuncaoRepositoryProvider tecladoprov = new PdvTecladoFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
         //pdv.funcaoniveloperador
         List<PdvFuncaoOperadorIMP> funcaoOperador = getInterfaceDAO().getPdvFuncaoOperador();
-        PdvFuncaoOperadorRepositoryProvider opePro = new PdvFuncaoOperadorRepositoryProvider(getSistema(), getLojaOrigem(),lojaVR);
-        
+        PdvFuncaoOperadorRepositoryProvider opePro = new PdvFuncaoOperadorRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
         //pdv.funcao
         List<PdvFuncaoIMP> funcaoImp = getInterfaceDAO().getPdvFuncao();
-        PdvFuncaoRepositoryProvider funcaoPro = new PdvFuncaoRepositoryProvider(getSistema(), getLojaOrigem(),lojaVR);
-        
+        PdvFuncaoRepositoryProvider funcaoPro = new PdvFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+
         //pdv.finalizadoraconfiguracao
         List<FinalizadoraConfiguracaoIMP> finalizadoraConf = getInterfaceDAO().getFinalizadoraConfiguracao();
         FinalizadoraConfiguracaoRepositoryProvider configuracao = new FinalizadoraConfiguracaoRepositoryProvider(
@@ -821,20 +843,30 @@ public class Importador {
         entradaSaidarep.importarEntradaSaidaTipoEntrada(entradaSaidaTipoEntrada);
 //************//
 
-       //inserir funcao
+        //inserir tipomodelo
         
+        EcPdvRepository ecfRepository = new EcPdvRepository(ecfProvider);
+        ecfRepository.importarEcf(ecf);
+
+        
+        EcfLayoutRepository ecfLayoutRep = new EcfLayoutRepository(ecfLayoutProvider);
+        ecfLayoutRep.importarEcfLayout(ecfLayout);
+        
+        PdvFuncaoRepository funcaorepository = new PdvFuncaoRepository(funcaoPro);
+        funcaorepository.importarPdvFuncao(funcaoImp);
+
+        TecladoLayoutRepository tecRep = new TecladoLayoutRepository(tecladoLayoutProvider);
+        tecRep.importarTecladoLayout(tecladoLayout);
+
         PdvTecladoFuncaoRepository tecladoRep = new PdvTecladoFuncaoRepository(tecladoprov);
         tecladoRep.importarFuncaoeTeclado(tecladoImp);
-    
+
         PdvFuncaoOperadorRepository funcaoRepository = new PdvFuncaoOperadorRepository(opePro);
         funcaoRepository.importarFuncaoOperador(funcaoOperador);
 
-
-        
-
         FinalizadoraRepository finRep = new FinalizadoraRepository(finProv);
         finRep.importarFinalizadora(finImp);
-        
+
         FinalizadoraConfiguracaoRepository confReposi = new FinalizadoraConfiguracaoRepository(configuracao);
         confReposi.finalizadoraConf(finalizadoraConf);
 

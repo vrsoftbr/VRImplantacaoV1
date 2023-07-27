@@ -4,38 +4,36 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.Financeiro.VO.PdvFuncaoVO;
+import vrimplantacao2_5.Financeiro.VO.EcfLayoutVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class PdvFuncaoDAO {
+public class EcfLayoutDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(PdvFuncaoDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(EcfLayoutDAO.class.getName());
 
-    public void salvar(PdvFuncaoVO vo) throws Exception {
+    public void salvar(EcfLayoutVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setSchema("pdv");
-            sql.setTableName("funcao");
+            sql.setTableName("ecflayout");
 
             sql.put("id", vo.getId());
-            sql.put("descricao", vo.getDescricao());
-            sql.put("parcial", vo.isParcial());
-            sql.put("fechado", vo.isFechado());
-            sql.put("disponivel", vo.isDisponivel());
-            sql.put("venda", vo.isVenda());
-            sql.put("pagamento", vo.isPagamento());
-            sql.put("pausa", vo.isPausa());
-            sql.put("selfcheckout", vo.isSelfCheckout());
-            sql.put("balanco", vo.isBalanco());
+            sql.put("id_ecf", vo.getId_ecf());
+            sql.put("id_tecladolayout", vo.getId_aliquotaLayout());
+            sql.put("id_finalizadoralayout", vo.getId_finalizadoraLayout());
+            sql.put("id_acumuladorlayout", vo.getId_acumuladorLayout());
+            sql.put("id_aliquotalayout", vo.getId_aliquotaLayout());
+            sql.put("regracalculo", vo.getRegraCalculo());
+            sql.put("arredondamentoabnt", vo.isArredondamentoAbnt());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {

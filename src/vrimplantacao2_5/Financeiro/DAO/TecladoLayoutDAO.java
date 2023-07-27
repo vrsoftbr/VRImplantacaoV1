@@ -4,38 +4,31 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.Financeiro.VO.PdvFuncaoVO;
+import vrimplantacao2_5.Financeiro.VO.TecladoLayoutVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class PdvFuncaoDAO {
+public class TecladoLayoutDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(PdvFuncaoDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(TecladoLayoutDAO.class.getName());
 
-    public void salvar(PdvFuncaoVO vo) throws Exception {
+    public void salvar(TecladoLayoutVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setSchema("pdv");
-            sql.setTableName("funcao");
+            sql.setTableName("tecladolayout");
 
             sql.put("id", vo.getId());
+            sql.put("id_loja", vo.getId_loja());
             sql.put("descricao", vo.getDescricao());
-            sql.put("parcial", vo.isParcial());
-            sql.put("fechado", vo.isFechado());
-            sql.put("disponivel", vo.isDisponivel());
-            sql.put("venda", vo.isVenda());
-            sql.put("pagamento", vo.isPagamento());
-            sql.put("pausa", vo.isPausa());
-            sql.put("selfcheckout", vo.isSelfCheckout());
-            sql.put("balanco", vo.isBalanco());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {

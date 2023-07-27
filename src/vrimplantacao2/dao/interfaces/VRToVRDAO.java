@@ -74,6 +74,8 @@ import vrimplantacao2_5.Financeiro.IMP.CfopIMP;
 import vrimplantacao2_5.Financeiro.IMP.CfopSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.FinalizadoraConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.FinalizadoraIMP;
@@ -85,6 +87,7 @@ import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoOperadorIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvTecladoFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
@@ -1439,9 +1442,146 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 imp.setId(rs.getInt("id"));
                 imp.setId_finalizadoraLayout(rs.getInt("id_finalizadoralayout"));
-                imp.setId_finalizadora(rs.getInt("id_finalizadoralayout"));
+                imp.setId_finalizadora(rs.getInt("id_finalizadora"));
                 imp.setRetorno(rs.getString("retorno"));
                 imp.setUtilizado(rs.getBoolean("utilizado"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<TecladoLayoutIMP> getTecladoLayout() throws Exception {
+        List<TecladoLayoutIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id,\n"
+                        + "	id_loja ,\n"
+                        + "	descricao \n"
+                        + "from\n"
+                        + "	pdv.tecladolayout")) {
+            while (rs.next()) {
+                TecladoLayoutIMP imp = new TecladoLayoutIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_loja(rs.getInt("id_loja"));
+                imp.setDescricao(rs.getString("descricao"));
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<EcfLayoutIMP> getEcfLayout() throws Exception {
+        List<EcfLayoutIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n"
+                        + "	id,\n"
+                        + "	id_ecf ,\n"
+                        + "	id_tecladolayout ,\n"
+                        + "	id_finalizadoralayout ,\n"
+                        + "	id_acumuladorlayout ,\n"
+                        + "	id_aliquotalayout ,\n"
+                        + "	regracalculo ,\n"
+                        + "	arredondamentoabnt \n"
+                        + "from\n"
+                        + "	pdv.ecflayout")) {
+            while (rs.next()) {
+                EcfLayoutIMP imp = new EcfLayoutIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_ecf(rs.getInt("id_ecf"));
+                imp.setId_tecladoLayout(rs.getInt("id_tecladolayout"));
+                imp.setId_finalizadoraLayout(rs.getInt("id_finalizadoralayout"));
+                imp.setId_acumuladorLayout(rs.getInt("id_acumuladorlayout"));
+                imp.setId_aliquotaLayout(rs.getInt("id_aliquotalayout"));
+                imp.setRegraCalculo(rs.getString("regracalculo"));
+                imp.setArredondamentoAbnt(rs.getBoolean("arredondamentoabnt"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<EcfIMP> getPdvEcf() throws Exception {
+        List<EcfIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select \n"
+                        + "	id ,\n"
+                        + "	id_loja ,\n"
+                        + "	ecf ,\n"
+                        + "	descricao ,\n"
+                        + "	id_tipomarca ,\n"
+                        + "	id_tipomodelo ,\n"
+                        + "	id_situacaocadastro,\n"
+                        + "	numeroserie ,\n"
+                        + "	mfadicional ,\n"
+                        + "	numerousuario ,\n"
+                        + "	versaosb ,\n"
+                        + "	datahoragravacaosb ,\n"
+                        + "	datahoracadastro ,\n"
+                        + "	incidenciadesconto,\n"
+                        + "	versaobiblioteca ,\n"
+                        + "	geranfpaulista ,\n"
+                        + "	id_tipoestado ,\n"
+                        + "	versao ,\n"
+                        + "	datamovimento ,\n"
+                        + "	cargagdata ,\n"
+                        + "	cargaparam,\n"
+                        + "	cargalayout,\n"
+                        + "	cargaimagem ,\n"
+                        + "	id_tipolayoutnotapaulista ,\n"
+                        + "	touch ,\n"
+                        + "	alteradopaf ,\n"
+                        + "	horamovimento ,\n"
+                        + "	id_tipoemissor ,\n"
+                        + "	id_modelopdv \n"
+                        + "	from \n"
+                        + "	pdv.ecf \n"
+                        + "	where id_loja = " + getLojaOrigem())) {
+            while (rs.next()) {
+                EcfIMP imp = new EcfIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_loja(rs.getInt("id_loja"));
+                imp.setEcf(rs.getInt("ecf"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setId_tipoMarca(rs.getInt("id_tipomarca"));
+                imp.setId_tipoModelo(rs.getInt("id_tipomodelo"));
+                imp.setId_situacaoCadastro(rs.getInt("id_situacaocadastro"));
+                imp.setNumeroSerie(rs.getString("numeroserie"));
+                imp.setMfAdicional(rs.getString("mfadicional"));
+                imp.setNumeroUsuario(rs.getInt("numerousuario"));
+                imp.setVersaoSb(rs.getString("versaosb"));
+                imp.setDatHoraGravacaoSb(rs.getDate("datahoragravacaosb"));
+                imp.setDataHoraCadastro(rs.getDate("datahoracadastro"));
+                imp.setIncidenciaDesconto(rs.getBoolean("incidenciadesconto"));
+                imp.setVersaoBiblioteca(rs.getInt("versaobiblioteca"));
+                imp.setGeraNfPaulista(rs.getBoolean("geranfpaulista"));
+                imp.setId_tipoEstado(rs.getInt("id_tipoestado"));
+                imp.setVersao(rs.getString("versao"));
+                imp.setDataMovimento(rs.getDate("datamovimento"));
+                imp.setCargaGData(rs.getBoolean("cargagdata"));
+                imp.setCargaParam(rs.getBoolean("cargaparam"));
+                imp.setCargaLayout(rs.getBoolean("cargalayout"));
+                imp.setCargaImagem(rs.getBoolean("cargaimagem"));
+                imp.setId_tipoLayoutNotaPaulista(rs.getInt("id_tipolayoutnotapaulista"));
+                imp.setTouch(rs.getBoolean("touch"));
+                imp.setAlteradoPaf(rs.getBoolean("alteradopaf"));
+                imp.setHoraMovimento(rs.getDate("horamovimento"));
+                imp.setId_tipoEmissor(rs.getInt("id_tipoemissor"));
+                imp.setId_modeloPdv(rs.getInt("id_modelopdv"));
 
                 result.add(imp);
             }
@@ -1535,7 +1675,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setId_tecladoLayout(rs.getInt("id_tecladolayout"));
                 imp.setCodigoRetorno(rs.getInt("id_funcao"));
                 imp.setId_funcao(rs.getInt("id_funcao"));
-
 
                 result.add(imp);
             }

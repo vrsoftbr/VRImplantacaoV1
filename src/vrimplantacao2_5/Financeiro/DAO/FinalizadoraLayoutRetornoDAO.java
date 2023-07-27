@@ -30,7 +30,7 @@ public class FinalizadoraLayoutRetornoDAO {
             sql.put("id_finalizadoralayout", vo.getId_finalizadoraLayout());
             sql.put("id_finalizadora", vo.getId_finalizadora());
             sql.put("retorno", vo.getRetorno());
-            sql.put("utiliado", vo.isUtilizado());
+            sql.put("utilizado", vo.isUtilizado());
                     
 
             stm.execute(sql.getInsert());

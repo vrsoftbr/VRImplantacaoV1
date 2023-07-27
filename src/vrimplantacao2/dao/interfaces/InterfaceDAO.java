@@ -73,6 +73,8 @@ import vrimplantacao2_5.Financeiro.IMP.CfopSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeAbatimentoIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.ContabilidadeTipoSaidaIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfIMP;
+import vrimplantacao2_5.Financeiro.IMP.EcfLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.EntradaSaidaTipoSaidaIMP;
 import vrimplantacao2_5.Financeiro.IMP.FinalizadoraConfiguracaoIMP;
@@ -85,6 +87,7 @@ import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoOperadorIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvTecladoFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
@@ -900,9 +903,24 @@ public abstract class InterfaceDAO {
     public List<PdvFuncaoOperadorIMP> getPdvFuncaoOperador() throws Exception {
         return new ArrayList<>();
     }
-    
-      //PDV Funcao teclado Operador
+
+    //PDV Teclado layout
+    public List<TecladoLayoutIMP> getTecladoLayout() throws Exception {
+        return new ArrayList<>();
+    }
+
+    //PDV Funcao teclado Operador
     public List<PdvTecladoFuncaoIMP> getPdvFuncaoTeclado() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    //PDV Ecf layout
+    public List<EcfLayoutIMP> getEcfLayout() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    //PDV Ecf 
+    public List<EcfIMP> getPdvEcf() throws Exception {
         return new ArrayList<>();
     }
 

@@ -4,38 +4,57 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.Financeiro.VO.PdvFuncaoVO;
+import vrimplantacao2_5.Financeiro.VO.EcfVO;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
  *
  * @author Bruno
  */
-public class PdvFuncaoDAO {
+public class EcfDAO {
 
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
 
-    private static Logger LOG = Logger.getLogger(PdvFuncaoDAO.class.getName());
+    private static Logger LOG = Logger.getLogger(EcfDAO.class.getName());
 
-    public void salvar(PdvFuncaoVO vo) throws Exception {
+    public void salvar(EcfVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setSchema("pdv");
-            sql.setTableName("funcao");
+            sql.setTableName("ecf");
 
             sql.put("id", vo.getId());
+            sql.put("id_loja", vo.getId_loja());
+            sql.put("ecf", vo.getEcf());
             sql.put("descricao", vo.getDescricao());
-            sql.put("parcial", vo.isParcial());
-            sql.put("fechado", vo.isFechado());
-            sql.put("disponivel", vo.isDisponivel());
-            sql.put("venda", vo.isVenda());
-            sql.put("pagamento", vo.isPagamento());
-            sql.put("pausa", vo.isPausa());
-            sql.put("selfcheckout", vo.isSelfCheckout());
-            sql.put("balanco", vo.isBalanco());
+            sql.put("id_tipomarca", vo.getId_tipoMarca());
+            sql.put("id_tipomodelo", vo.getId_tipoModelo());
+            sql.put("id_situacaocadastro", vo.getId_situacaoCadastro());
+            sql.put("numeroserie", vo.getNumeroSerie());
+            sql.put("mfadicional", vo.getMfAdicional());
+            sql.put("numerousuario", vo.getNumeroUsuario());
+            sql.put("tipoecf", vo.getTipoEcf());
+            sql.put("versaosb", vo.getVersaoSb());
+            sql.put("datahoragravacaosb", vo.getDatHoraGravacaoSb());
+            sql.put("datahoracadastro", vo.getDataHoraCadastro());
+            sql.put("incidenciadesconto", vo.isIncidenciaDesconto());
+            sql.put("versaobiblioteca", vo.getVersaoBiblioteca());
+            sql.put("geranfpaulista", vo.isGeraNfPaulista());
+            sql.put("id_tipoestado", vo.getId_tipoEstado());
+            sql.put("versao", vo.getVersao());
+            sql.put("datamovimento", vo.getDataMovimento());
+            sql.put("cargagdata", vo.isCargaGData());
+            sql.put("cargaparam", vo.isCargaParam());
+            sql.put("cargalayout", vo.isCargaLayout());
+            sql.put("cargaimagem", vo.isCargaImagem());
+            sql.put("id_tipolayoutnotapaulista", vo.getId_tipoLayoutNotaPaulista());
+            sql.put("touch", vo.isTouch());
+            sql.put("alteradopaf", vo.isAlteradoPaf());
+            sql.put("horamovimento", vo.getHoraMovimento());
+            sql.put("id_modelopdv", vo.getId_modeloPdv());
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {
