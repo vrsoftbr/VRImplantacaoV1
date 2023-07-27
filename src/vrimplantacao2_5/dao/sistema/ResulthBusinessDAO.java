@@ -105,7 +105,9 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.TIPO_INSCRICAO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.VALOR_LIMITE,
@@ -263,7 +265,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	PRODUTO p\n"
                     + "	JOIN COMPPROD c ON c.CODPROD = p.CODPROD \n"
                     + "	JOIN CLASFISC fisc ON fisc.CODCLASFIS = p.CODCLASFIS \n"
-                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD" 
+                    + "	JOIN PRODUTODETALHE pd ON pd.CODPROD = p.CODPROD"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -443,30 +445,30 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	CODCLIENTE AS id, \n"
+                    + "	CODCLIENTE AS id,\n"
                     + "	NOME AS razao,\n"
                     + "	NOMEFANTASIA AS fantasia,\n"
                     + "	CGCCPF AS cpf,\n"
                     + "	INSCEST AS rg_ie,\n"
                     + "	ENDERECO AS endereco,\n"
                     + "	NUMERO AS numero,\n"
-                    + "	c.COMPLEMENTO AS complemento,\n"
-                    + "	BAIRRO AS bairro,\n"
+                    + "	COMPLEMENTO AS complemento,\n"
+                    + "	BAIRRO ,\n"
                     + "	c2.CIDADE AS cidade,\n"
-                    + "	c2.ESTADO AS uf,\n"
-                    + "	CEP AS cep,\n"
+                    + "	c2.ESTADO  AS uf,\n"
+                    + "	CEP ,\n"
                     + "	DT_CADASTRO AS data_cad,\n"
                     + "	CASE \n"
-                    + "	WHEN ativo = 'S' THEN 1\n"
-                    + "	ELSE 0\n"
-                    + "	END ativo,\n"
-                    + "	fone AS telefone,\n"
-                    + "	OBSERVACAO AS obs,\n"
-                    + "	EMAIL AS email,\n"
-                    + "	PESSOA_FJ AS tipopessoa\n"
+                    + "	WHEN ATIVO = 'S'THEN 1 ELSE 0\n"
+                    + "	END AS ativo,\n"
+                    + "	FONE ,\n"
+                    + "	EMAIL ,\n"
+                    + "	CASE WHEN PESSOA_FJ = 'J' THEN 0 ELSE 1 END AS tipoinscricao ,\n"
+                    + "	OBSERVACAO \n"
                     + "FROM\n"
-                    + "	CLIENTE c  \n"
-                    + "	JOIN CIDADES c2 ON c2.CODCIDADE = c.CODCIDADE "
+                    + "	CLIENTE c\n"
+                    + "	JOIN CIDADES c2 ON c.CODCIDADE = c2.CODCIDADE \n"
+                    //        + "WHERE CODCLIENTE = '00000016'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -487,10 +489,10 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
 
                     imp.setDataCadastro(rs.getDate("data_cad"));
                     imp.setAtivo(rs.getBoolean("ativo"));
-                    imp.setTelefone(rs.getString("telefone"));
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setTelefone(rs.getString("FONE"));
+                    imp.setObservacao(rs.getString("OBSERVACAO"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setTipoInscricao(rs.getString("tipopessoa").equals("J") ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+                    imp.setTipoInscricao(rs.getInt("tipoinscricao") == 0 ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
 
                     result.add(imp);
                 }

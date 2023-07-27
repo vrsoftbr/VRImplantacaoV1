@@ -1,30 +1,31 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import vrframework.bean.internalFrame.VRInternalFrame;
-import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrframework.classe.ProgressBar;
+import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2_5.dao.sistema.SisMoura2_5DAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
-import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.EcoCentauro2_5DAO;
-import vrimplantacao2_5.vo.enums.ESistema;
 
-public class EcoCentauro2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ECO_CENTAURO.getNome();
-    private static EcoCentauro2_5GUI instance;
+public class SisMoura2_5GUI extends VRInternalFrame {
 
-    private final EcoCentauro2_5DAO dao = new EcoCentauro2_5DAO();
+    private static final String SISTEMA = ESistema.SISMOURA.getNome();
+    private static SisMoura2_5GUI instance;
+
+    private final SisMoura2_5DAO dao = new SisMoura2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public EcoCentauro2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public SisMoura2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -59,7 +60,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ECO_CENTAURO);
+        pnlConn.setSistema(ESistema.SISMOURA);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -104,14 +105,6 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
-                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
-                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
-                    }
-                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
-                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-                    }
-
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -124,6 +117,8 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
+                            /*case 3:
+                                break;*/
                             default:
                                 break;
 
@@ -151,7 +146,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new EcoCentauro2_5GUI(i_mdiFrame);
+                instance = new SisMoura2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -183,7 +178,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Eco Centauro");
+        setTitle("Modelo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

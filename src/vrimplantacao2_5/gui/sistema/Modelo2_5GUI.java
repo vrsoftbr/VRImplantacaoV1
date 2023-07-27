@@ -1,30 +1,31 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import vrframework.bean.internalFrame.VRInternalFrame;
-import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrframework.classe.ProgressBar;
+import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2_5.dao.sistema.Modelo2_5DAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
-import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.EcoCentauro2_5DAO;
-import vrimplantacao2_5.vo.enums.ESistema;
 
-public class EcoCentauro2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.ECO_CENTAURO.getNome();
-    private static EcoCentauro2_5GUI instance;
+public class Modelo2_5GUI extends VRInternalFrame {
 
-    private final EcoCentauro2_5DAO dao = new EcoCentauro2_5DAO();
+    private static final String SISTEMA = ESistema.MODELO.getNome();
+    private static Modelo2_5GUI instance;
+
+    private final Modelo2_5DAO dao = new Modelo2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public EcoCentauro2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Modelo2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -59,7 +60,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.ECO_CENTAURO);
+        pnlConn.setSistema(ESistema.MODELO);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -104,14 +105,13 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
+
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
                         dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
                         dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                     }
-
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -124,6 +124,8 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
+                            /*case 3:
+                                break;*/
                             default:
                                 break;
 
@@ -151,7 +153,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new EcoCentauro2_5GUI(i_mdiFrame);
+                instance = new Modelo2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -176,6 +178,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        tabParametro = new javax.swing.JPanel();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -183,7 +186,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Eco Centauro");
+        setTitle("Modelo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -259,6 +262,19 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
+        tabParametro.setLayout(tabParametroLayout);
+        tabParametroLayout.setHorizontalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 593, Short.MAX_VALUE)
+        );
+        tabParametroLayout.setVerticalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 230, Short.MAX_VALUE)
+        );
+
+        tabImportacao.addTab("Ajuste", tabParametro);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -323,6 +339,7 @@ public class EcoCentauro2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
+    private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     // End of variables declaration//GEN-END:variables
 }

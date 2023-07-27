@@ -94,6 +94,7 @@ public class Milenio2_5GUI extends VRInternalFrame {
 
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
+                    dao.setUtilizarREFPLU(chkUtilizarRefPlu.isSelected());
 
                     Importador importador = new Importador(dao);
 
@@ -168,6 +169,8 @@ public class Milenio2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        tabParametro = new javax.swing.JPanel();
+        chkUtilizarRefPlu = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -251,6 +254,32 @@ public class Milenio2_5GUI extends VRInternalFrame {
 
         tabImportacao.addTab("Clientes", tabCli);
 
+        chkUtilizarRefPlu.setText("Utilizar REFPLU");
+        chkUtilizarRefPlu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkUtilizarRefPluActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
+        tabParametro.setLayout(tabParametroLayout);
+        tabParametroLayout.setHorizontalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkUtilizarRefPlu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(490, Short.MAX_VALUE))
+        );
+        tabParametroLayout.setVerticalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkUtilizarRefPlu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(200, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Ajuste", tabParametro);
+
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
 
@@ -303,8 +332,13 @@ public class Milenio2_5GUI extends VRInternalFrame {
         tabFornecedores.limparFornecedor();
     }//GEN-LAST:event_jBLimparActionPerformed
 
+    private void chkUtilizarRefPluActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUtilizarRefPluActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkUtilizarRefPluActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkUtilizarRefPlu;
     private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
@@ -315,6 +349,7 @@ public class Milenio2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
+    private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     // End of variables declaration//GEN-END:variables
 }

@@ -71,6 +71,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
     public boolean apenasAtivo = false;
+    public boolean apenasProdutoAtivo = false;
 
     public boolean importarRotativoBaixados = false;
     public boolean importarConveniosBaixados = false;
@@ -594,6 +595,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		p.ncm2 = pf.ncm2 and\n"
                     + "		p.ncm3 = pf.ncm3 and\n"
                     + "		aliq.excecao = pf.excecao\n"
+                    + (apenasProdutoAtivo == true ? " where vend.id_situacaocadastro = 1" : "")
                     + "order by\n"
                     + "	p.id"
             )) {

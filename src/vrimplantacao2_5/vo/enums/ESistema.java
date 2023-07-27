@@ -249,6 +249,7 @@ import vrimplantacao2_5.dao.sistema.ManagerDAO;
 import vrimplantacao2_5.dao.sistema.MbdDAO;
 import vrimplantacao2_5.dao.sistema.MegaSoftwareDAO;
 import vrimplantacao2_5.dao.sistema.Milenio2_5DAO;
+import vrimplantacao2_5.dao.sistema.Modelo2_5DAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.PallasDAO;
@@ -258,6 +259,7 @@ import vrimplantacao2_5.dao.sistema.STI32_5DAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
+import vrimplantacao2_5.dao.sistema.SisMoura2_5DAO;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
@@ -340,6 +342,7 @@ import vrimplantacao2_5.gui.sistema.MegaSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.MicroTab2_5GUI;
 import vrimplantacao2_5.gui.sistema.Milenio2_5GUI;
 import vrimplantacao2_5.gui.sistema.Mobility2_5GUI;
+import vrimplantacao2_5.gui.sistema.Modelo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Pallas2_5GUI;
@@ -357,6 +360,7 @@ import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
+import vrimplantacao2_5.gui.sistema.SisMoura2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sismaster2_5GUI;
 import vrimplantacao2_5.gui.sistema.SoftLog2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
@@ -1293,6 +1297,18 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
+    MODELO(122, "MODELO", new Modelo2_5DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Modelo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
     PROTON(123, "PROTON", new ProtonDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
@@ -1499,10 +1515,16 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    SISMOURA(154, "SISMOURA", new SisMouraDAO()) {
+    SISMOURA(154, "SISMOURA", new SisMoura2_5DAO()) {
         @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new SisMoura2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     SNSISTEMA(155, "SNSISTEMA", new SnSistemaDAO()) {

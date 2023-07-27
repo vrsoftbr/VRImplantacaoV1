@@ -39,6 +39,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
                 || opt.contains(OpcaoCliente.CNPJ)
+                || opt.contains(OpcaoCliente.TIPO_INSCRICAO)
                 || opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
 
             chkClientePreferencial.setVisible(opt.contains(OpcaoCliente.DADOS));
@@ -46,6 +47,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             chkNome.setVisible(opt.contains(OpcaoCliente.RAZAO));
             chkCnpj.setVisible(opt.contains(OpcaoCliente.CNPJ));
             chkIE.setVisible(opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL));
+            chkTipoInscricao.setVisible(opt.contains(OpcaoCliente.TIPO_INSCRICAO));
 
             tabImportacao.add(pnlDados);
         } else {
@@ -199,12 +201,14 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
                 || opt.contains(OpcaoCliente.CNPJ)
+                || opt.contains((OpcaoCliente.TIPO_INSCRICAO))
                 || opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
 
             chkClientePreferencial.setVisible(opt.contains(OpcaoCliente.DADOS));
             chkClienteEventual.setVisible(opt.contains(OpcaoCliente.DADOS));
             chkNome.setVisible(opt.contains(OpcaoCliente.RAZAO));
             chkCnpj.setVisible(opt.contains(OpcaoCliente.CNPJ));
+            chkTipoInscricao.setVisible(opt.contains((OpcaoCliente.TIPO_INSCRICAO)));
             chkIE.setVisible(opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL));
 
             tabImportacao.add(pnlDados);
@@ -380,6 +384,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         }
         if (chkIE.isSelected()) {
             opcao.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+        }
+        if(chkTipoInscricao.isSelected()){
+            opcao.add(OpcaoCliente.TIPO_INSCRICAO);
         }
         if (chkEndereco.isSelected()) {
             opcao.add(OpcaoCliente.ENDERECO);
@@ -606,6 +613,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkCnpj = new vrframework.bean.checkBox.VRCheckBox();
         chkIE = new vrframework.bean.checkBox.VRCheckBox();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoInscricao = new vrframework.bean.checkBox.VRCheckBox();
         pnlEndereco = new vrframework.bean.panel.VRPanel();
         jLabel6 = new javax.swing.JLabel();
         chkEndereco = new vrframework.bean.checkBox.VRCheckBox();
@@ -729,6 +737,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkClientePreferencial, "Cliente Preferencial");
         chkClientePreferencial.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkTipoInscricao, "Tipo Inscrição");
+        chkTipoInscricao.setToolTipText("Corrige o relacionamento entre o produto e a família.");
+
         javax.swing.GroupLayout pnlDadosLayout = new javax.swing.GroupLayout(pnlDados);
         pnlDados.setLayout(pnlDadosLayout);
         pnlDadosLayout.setHorizontalGroup(
@@ -746,8 +757,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(387, Short.MAX_VALUE))
+                        .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(309, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -759,8 +772,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -1345,6 +1359,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkSexo;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
+    public vrframework.bean.checkBox.VRCheckBox chkTipoInscricao;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public vrframework.bean.checkBox.VRCheckBox chkValorLimite;

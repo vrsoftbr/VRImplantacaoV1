@@ -414,6 +414,11 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
         tabParametros.setMinimumSize(new java.awt.Dimension(170, 64));
 
         chkUtilizarRefPlu.setText("Utilizar REFPLU");
+        chkUtilizarRefPlu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkUtilizarRefPluActionPerformed(evt);
+            }
+        });
 
         vRLabel1.setText("Parâmetros do Milênio");
         vRLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -692,6 +697,10 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
+
+    private void chkUtilizarRefPluActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUtilizarRefPluActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkUtilizarRefPluActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
