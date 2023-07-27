@@ -50,6 +50,8 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -570,6 +572,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.DATA_CADASTRO,
+                OpcaoFornecedor.TIPO_FORNECEDOR,
+                OpcaoFornecedor.TIPO_EMPRESA,
                 OpcaoFornecedor.OUTRAS_RECEITAS));
     }
 
@@ -627,6 +632,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	F.TIP_CODIGO||F.TIP_DIGITO id_fabricante,\n"
                     + "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n"
                     + "	case when p.GIT_DAT_SAI_LIN = 0 then 1 else 0 end id_situacaocadastral,\n"
+                    + " CASE WHEN sit.LINF_VAREJO IS NULL THEN 0 ELSE 1 END situacaocadastro,\n"
                     + "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n"
                     + "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n"
                     + "	(p.GIT_TOT_FALTA/100)*est.GET_ESTQ_TROCA estoqueminimo,\n"
@@ -684,6 +690,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "       p.git_digito = familia.it_digito\n"
                     + "left join AA2CLOJA loja on\n"
                     + "	    loja.loj_codigo || loja.loj_digito = " + SQLUtils.stringSQL(getLojaOrigem()) + "\n"
+                    + "LEFT JOIN AA1LINHF sit ON sit.LINF_PRODUTO = p.GIT_COD_ITEM \n"
+                    + "			AND sit.LINF_FILIAL = loja.LOJ_CODIGO \n"
                     + "left join AG1PBACO bal on\n"
                     + "	    bal.BALCOL_CODIGO = p.GIT_COD_ITEM and\n"
                     + "	    bal.BALCOL_DIGITO = p.GIT_DIGITO and\n"
@@ -770,6 +778,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setCodigoSped(rst.getString("codigosped"));
                     imp.setDataCadastro(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datacadastro")))));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
@@ -787,7 +796,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
                     imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
-                    imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("id_situacaocadastral"))));
+                    //imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("id_situacaocadastral"))));
                     imp.setPesoBruto(rst.getDouble("pesoliquido"));
                     imp.setPesoLiquido(rst.getDouble("pesobruto"));
                     if (rst.getInt("saidadelinha") > 0) {
@@ -809,11 +818,10 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     if ("20".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.LOJA);
                     }
-                    if("1".equals(tipoCompra)){
+                    if ("1".equals(tipoCompra)) {
                         imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                         imp.setEstoqueMinimo(1);
-                    }
-                    else{
+                    } else {
                         imp.setEstoqueMaximo(0);
                         imp.setEstoqueMinimo(1);
                     }
@@ -1150,12 +1158,15 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f2.FOR_PRZ_ENTREGA entrega,\n"
                     + "	f2.FOR_FREQ_VISITA visita,\n"
                     + "	f3.FOR_PED_MIN_EMB qtd_pedido_minimo,\n"
-                    + "	f3.FOR_PED_MIN_VLR valor_pedido_minimo\n"
+                    + "	f3.FOR_PED_MIN_VLR valor_pedido_minimo,\n"
+                    + " F.TIP_NATUREZA tipofornecedor,\n"
+                    + " f5.DTIP_SIMPLES_NACIONAL tipoempresa\n"
                     + "FROM\n"
                     + "	AA2CTIPO F\n"
                     + "	left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n"
                     + "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n"
-                    + "   left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n"
+                    + " left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n"
+                    + " LEFT JOIN AA1DTIPO f5 ON f.tip_codigo = f5.DTIP_CODIGO\n"
                     + "WHERE\n"
                     + "	F.TIP_LOJ_CLI in ('F', 'L', 'D')\n"
                     + "order by\n"
@@ -1229,6 +1240,28 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoVisita(rst.getInt("visita"));
                     imp.setPrazoSeguranca(0);
                     imp.setCondicaoPagamento(rst.getInt("condicaopag"));
+
+                    switch (rst.getString("tipofornecedor")) {
+                        case "FD":
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            break;
+                        case "FF":
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            break;
+                        case "FP":
+                            imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
+                            break;
+                        case "FS":
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            break;
+                        default:
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            break;
+                    }
+
+                    if ("S".equals(rst.getString("tipoempresa"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    }
 
                     int cargo = rst.getInt("cargo");
                     imp.addContato(null,
