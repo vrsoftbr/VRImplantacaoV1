@@ -89,6 +89,7 @@ import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoModeloIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoSaidaContabilidadeIMP;
@@ -921,6 +922,11 @@ public abstract class InterfaceDAO {
     
     //PDV Ecf 
     public List<EcfIMP> getPdvEcf() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    //PDV Tipo Modelo 
+    public List<TipoModeloIMP> getModeloEcf() throws Exception {
         return new ArrayList<>();
     }
 

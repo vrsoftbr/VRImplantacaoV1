@@ -201,6 +201,7 @@ import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvFuncaoOperadorIMP;
 import vrimplantacao2_5.Financeiro.IMP.PdvTecladoFuncaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoModeloIMP;
 import vrimplantacao2_5.Financeiro.Provider.AtivoImobilizadoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.CaixaDiferencaRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.CaixaVendaRepositoryProvider;
@@ -219,6 +220,7 @@ import vrimplantacao2_5.Financeiro.Provider.PdvFuncaoOperadorRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.PdvFuncaoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.PdvTecladoFuncaoRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Provider.TecladoLayoutRepositoryProvider;
+import vrimplantacao2_5.Financeiro.Provider.TipoModeloRepositoryProvider;
 import vrimplantacao2_5.Financeiro.Repository.AtivoImobilizadoRepository;
 import vrimplantacao2_5.Financeiro.Repository.CaixaDiferencaRepository;
 import vrimplantacao2_5.Financeiro.Repository.CaixaVendaRepository;
@@ -237,6 +239,7 @@ import vrimplantacao2_5.Financeiro.Repository.PdvFuncaoOperadorRepository;
 import vrimplantacao2_5.Financeiro.Repository.PdvFuncaoRepository;
 import vrimplantacao2_5.Financeiro.Repository.PdvTecladoFuncaoRepository;
 import vrimplantacao2_5.Financeiro.Repository.TecladoLayoutRepository;
+import vrimplantacao2_5.Financeiro.Repository.TipoModeloRepository;
 
 public class Importador {
 
@@ -629,6 +632,10 @@ public class Importador {
 
         // Instanciação das listas
         
+        //pdv.tipomodelo
+        List<TipoModeloIMP> modelo = getInterfaceDAO().getModeloEcf();
+        TipoModeloRepositoryProvider modeloprovider = new TipoModeloRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+        
         //pdv.ecf
         List<EcfIMP> ecf = getInterfaceDAO().getPdvEcf();
         EcfRepositoryProvider ecfProvider = new EcfRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
@@ -844,6 +851,9 @@ public class Importador {
 //************//
 
         //inserir tipomodelo
+        
+        TipoModeloRepository modeloRepo = new TipoModeloRepository(modeloprovider);
+        modeloRepo.importarModelo(modelo);
         
         EcPdvRepository ecfRepository = new EcPdvRepository(ecfProvider);
         ecfRepository.importarEcf(ecf);

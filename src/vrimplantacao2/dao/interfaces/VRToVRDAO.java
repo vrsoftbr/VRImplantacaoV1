@@ -89,6 +89,7 @@ import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoIMP;
 import vrimplantacao2_5.Financeiro.IMP.RecebivelConfiguracaoTabelaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TecladoLayoutIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoEntradaIMP;
+import vrimplantacao2_5.Financeiro.IMP.TipoModeloIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoPlanoContaIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoRecebivelFinalizadoraIMP;
 import vrimplantacao2_5.Financeiro.IMP.TipoSaidaContabilidadeIMP;
@@ -1512,6 +1513,35 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<TipoModeloIMP> getModeloEcf() throws Exception {
+        List<TipoModeloIMP> result = new ArrayList<>();
+
+        try (Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "	select\n"
+                        + "	id,\n"
+                        + "	id_tipomarca ,\n"
+                        + "	descricao ,\n"
+                        + "	codigom ,\n"
+                        + "	sat \n"
+                        + "from\n"
+                        + "	pdv.tipomodelo ")) {
+            while (rs.next()) {
+                TipoModeloIMP imp = new TipoModeloIMP();
+
+                imp.setId(rs.getInt("id"));
+                imp.setId_tipoMarca(rs.getInt("id_tipomarca"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.setCodigoM(rs.getString("codigom"));
+                imp.setSat(rs.getBoolean("sat"));
+
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<EcfIMP> getPdvEcf() throws Exception {
         List<EcfIMP> result = new ArrayList<>();
 
@@ -1549,7 +1579,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_modelopdv \n"
                         + "	from \n"
                         + "	pdv.ecf \n"
-                        + "	where id_loja = " + getLojaOrigem())) {
+                      	)) {
             while (rs.next()) {
                 EcfIMP imp = new EcfIMP();
 
