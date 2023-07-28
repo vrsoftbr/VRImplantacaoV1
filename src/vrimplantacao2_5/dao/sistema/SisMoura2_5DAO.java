@@ -1,5 +1,6 @@
 package vrimplantacao2_5.dao.sistema;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
@@ -11,9 +12,11 @@ import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -190,7 +193,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	(\n"
                     + "	select\n"
                     + "		codigo,\n"
-                    + "		codigo_barra ean,\n"
+                    + "		case when Balanca = 1 then Codigo else replace(codigo_barra,'C','') end ean,\n"
                     + "		p.unidade\n"
                     + "	from\n"
                     + "		produto p\n"
@@ -272,6 +275,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + (apenasProdutoAtivo == true ? " where p.Inativo = 'N'" : "")
                     + "order by p.codigo"
             )) {
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -280,6 +284,15 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca((rst.getInt("e_balanca") == 1));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida((rst.getString("descricaoreduzida") == null ? imp.getDescricaoCompleta() : rst.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
