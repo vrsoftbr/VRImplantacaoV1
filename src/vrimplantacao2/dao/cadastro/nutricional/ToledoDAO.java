@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.nutricional;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.utils.collection.IDStack;
@@ -13,6 +14,8 @@ import vrimplantacao2.utils.sql.SQLBuilder;
  * @author Leandro
  */
 public class ToledoDAO {
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void gravar(NutricionalToledoVO vo) throws Exception {        
         try (Statement stm = Conexao.createStatement()) {
@@ -50,6 +53,11 @@ public class ToledoDAO {
             sql.put("medidainteira", vo.getMedidainteira());
             sql.put("id_tipomedidadecimal", vo.getId_tipomedidadecimal());
             sql.put("id_tipomedida", vo.getId_tipomedida());
+            
+            if (versao.igualOuMaiorQue(4, 1, 39)) {
+                sql.put("acucaresadicionados", vo.getAcucaresAdicionados());
+                sql.put("acucarestotais", vo.getAcucaresTotais());
+            }
             
             for (int i = 0; i < vo.getMensagemAlergico().size(); i++) {
                 sql.put("mensagemalergico" + (i + 1), vo.getMensagemAlergico().get(i));

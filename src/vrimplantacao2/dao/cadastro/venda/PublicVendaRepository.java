@@ -860,7 +860,7 @@ public class PublicVendaRepository {
                 item.getAliquota(),
                 item.getAliquota(),
                 //valor total
-                item.getQuantidade() * item.getPrecoVenda(),
+                (((item.getQuantidade() * item.getPrecoVenda()) + item.getValorAcrescimo()) - item.getValorDesconto()),
                 item.getCustoSemImposto(),
                 false,
                 0,

@@ -64,7 +64,7 @@ public class OperacoesArquivoMgvToledo {
 
         for (int i = 0; i < vToledo.size(); i++) {
             ItensMgvVO toledo = new ItensMgvVO();
-            mgvColuna8Fim = vToledo.get(i).trim().length();
+            mgvColuna8Fim = vToledo.get(i).length();
             if (!vToledo.get(i).trim().isEmpty()) {
                 if ("0".equals(vToledo.get(i).substring(2, 3))) {
                     toledo.setDepartamento(vToledo.get(i).substring(mgvColuna1Inicio, mgvColuna1Fim));

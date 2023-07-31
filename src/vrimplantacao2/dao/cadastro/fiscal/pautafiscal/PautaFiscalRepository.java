@@ -97,7 +97,7 @@ public class PautaFiscalRepository {
             if (!ncmsNaoEncontrados.isEmpty()) {
                 try (FileWriter fw = new FileWriter("ncms-nao-encontrados.log")) {
                     for (String ncm: ncmsNaoEncontrados) {
-                        fw.write(ncm + "\n");
+                        fw.write(ncm + "\n\n");
                     }
                 }
                 if (naoImportarPautaSeAlgumNcmNaoExistir) {                    

@@ -35,7 +35,7 @@ public class ConversorGUI extends javax.swing.JFrame {
     public ConversorGUI() throws Exception {
         this.dao = new ConversorDAO();
         try {
-            dao.criarControleDeDadosConvertidos();
+            dao.criarControleDeDadosConvertidosProperties();
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

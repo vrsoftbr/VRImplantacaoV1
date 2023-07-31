@@ -2416,7 +2416,8 @@ public class NutricionalArqGUI extends javax.swing.JFrame {
                 + "    i.acucares_total,\n"
                 + "    '' alergenicos\n"
                 + "from implantacao.itens_mgv6 m \n"
-                + "join implantacao.infnutri_v6 i on m.codigo_nutricional = i.codigo_nutricional";
+                + "join implantacao.infnutri_v6 i on m.codigo_nutricional = i.codigo_nutricional\n"
+                + "--Caso exista txtinfo com alergenicos, fazer join com implantacao.txtinfo_v6";
         return sqlCompleta;
     }
 

@@ -331,6 +331,7 @@ import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.LCSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Lince2_5GUI;
 import vrimplantacao2_5.gui.sistema.Linear2_5GUI;
 import vrimplantacao2_5.gui.sistema.Logus2_5GUI;
 import vrimplantacao2_5.gui.sistema.MRC62_5GUI;
@@ -1106,7 +1107,12 @@ public enum ESistema {
     LINCE(95, "LINCE", new LinceDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Lince2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "Erro ao abrir Lince GUI em Esistema");
+            }
+            return null;
         }
     },
     LINNER(96, "LINNER", new LinnerDAO()) {

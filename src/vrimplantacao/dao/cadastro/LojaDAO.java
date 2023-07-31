@@ -465,6 +465,7 @@ public class LojaDAO {
         return result;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Metodo deletar loja">
     public void deletarLoja(LojaVO i_loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("do $$\n"
@@ -827,4 +828,5 @@ public class LojaDAO {
                     + "Entre em contato com o setor de Migração.");
         }
     }
+    //</editor-fold>
 }
