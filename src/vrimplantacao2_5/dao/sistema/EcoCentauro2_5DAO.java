@@ -292,19 +292,40 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     + "    icm_s.vendareducao1 AS reducao_saida,\n"
                     + "    icm_e.compracsf AS cst_entrada,\n"
                     + "    icm_e.compraicms AS aliquota_entrada,\n"
+                    + "    CASE \n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 1 THEN 50\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 2 THEN 73\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 3 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 4 THEN 75\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 5 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 6 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 7 THEN 73\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 8 THEN 75\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 9 THEN 50\n"
+                    + "    END pfcredito,\n"
+                    + "    CASE \n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 1 THEN 01\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 2 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 3 THEN 04\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 4 THEN 05\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 5 THEN 04\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 6 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 7 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 8 THEN 05\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 9 THEN 01\n"
+                    + "    END pfdebito ,\n"
+                    + "    nat.CODIGO AS nat_rec,\n"
                     + "    icm_e.comprareducao AS reducao_entrada\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                    + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo\n"
-                    + "    AND icm_s.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_s.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
-                    + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo\n"
-                    + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo   AND icm_s.empresa = '01'  AND icm_s.estado = 'MS'\n"
+                    + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo AND icm_e.empresa = '01'  AND icm_e.estado = '01'\n"
+                    + "JOIN TESTTABELAPISCOFINSITEM nat  ON nat.IDTABELAPISCOFINS  = p.IDTABELAPISITEM \n"
+                    + "JOIN TESTGRUPOTRIBUTACAO t ON t.IDGRUPOTRIBUTACAO = p.IDGRUPOTRIBUTACAO \n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
-                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
+                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)\n"
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -360,6 +381,8 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("nat_rec"));
+                    
 
                     String idIcmsDebito, IdIcmsCredito;
 
@@ -378,6 +401,8 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                             imp.setDescricaoCompleta(rst.getString("descricao") + " " + rst.getString("referencia"));
                         }
                     }
+                    imp.setPiscofinsCstCredito(rst.getString("pfcredito"));
+                    imp.setPiscofinsCstDebito(rst.getString("pfdebito"));
                     result.add(imp);
                 }
             }
