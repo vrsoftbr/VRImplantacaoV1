@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
@@ -48,7 +43,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 
 /**
  *
- * @author Wagner
+ * @author Michael
  */
 public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 

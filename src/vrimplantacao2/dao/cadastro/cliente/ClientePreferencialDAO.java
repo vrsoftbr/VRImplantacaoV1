@@ -96,7 +96,7 @@ public class ClientePreferencialDAO {
             if (versao.igualOuMaiorQue(3,17)) {
                 sql.put("utilizaappdescontos", false);
             }
-            sql.putNull("id_grupo");
+            sql.put("id_grupo", cliente.getGrupo() == 0 ? null : cliente.getGrupo());
 
             try {
                 stm.execute(sql.getInsert());
