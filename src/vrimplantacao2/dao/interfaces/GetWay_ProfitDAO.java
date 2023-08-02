@@ -78,11 +78,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;
     public boolean v_usar_arquivoBalanca;
-    public boolean v_usar_arquivoBalancaUnificacao;        
-    public boolean usarQtdEmbDoProduto = false;    
+    public boolean v_usar_arquivoBalancaUnificacao;
+    public boolean usarQtdEmbDoProduto = false;
     public boolean usarMargemBruta = false;
-    public boolean usaMargemLiquidaPraticada = false;    
-    public boolean usaMargemSobreVenda = false;    
+    public boolean usaMargemLiquidaPraticada = false;
+    public boolean usaMargemSobreVenda = false;
     private boolean desconsiderarSetorBalanca = false;
     private boolean pesquisarKGnaDescricao;
     private boolean utilizarEmbalagemDeCompra = false;
@@ -91,9 +91,9 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean utilizaMetodoAjustaAliquota = false;
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean removerCodigoCliente = false;
-    
+
     private Set<Integer> TipoDocumentoRotativo;
-    private Set<Integer> TipoDocumentoCheque;    
+    private Set<Integer> TipoDocumentoCheque;
 
     public void setTipoDocumentoRotativo(Set<Integer> TipoDocumentoRotativo) {
         this.TipoDocumentoRotativo = TipoDocumentoRotativo;
@@ -102,7 +102,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public void setTipoDocumentoCheque(Set<Integer> TipoDocumentoCheque) {
         this.TipoDocumentoCheque = TipoDocumentoCheque;
     }
-    
+
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
     }
@@ -165,7 +165,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.MAPA_TRIBUTACAO
         ));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -179,8 +179,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
-    
-    
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -309,8 +308,8 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
 
-        LOG.log(Level.CONFIG, 
-                "Parametros:\r\n - Desconsiderar setor de balan\u00e7a:{0}\r\n", 
+        LOG.log(Level.CONFIG,
+                "Parametros:\r\n - Desconsiderar setor de balan\u00e7a:{0}\r\n",
                 desconsiderarSetorBalanca);
 
         StringBuilder rep = new StringBuilder();
@@ -440,21 +439,21 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque") == 0 ? 
                             rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
-                    
+
                     imp.setTroca(rst.getDouble("estoquetroca"));
-                    
+
                     imp.setCustoComImposto(rst.getDouble("custocomimposto") == 0 ? 
                             rst.getDouble("custo_produto") : rst.getDouble("custocomimposto"));
-                    
+
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto") == 0 ? 
                             rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
-                    
+
                     imp.setPrecovenda(rst.getDouble("precovenda") == 0 ? 
                             rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
-                    
+
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
                     } else if (usaMargemLiquidaPraticada) {
@@ -590,8 +589,8 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     vResult.add(imp);
                 }
             }
-            LOG.log(Level.FINE, 
-                    "Produtos de balan\u00e7a: {0} normais: {1}", 
+            LOG.log(Level.FINE,
+                    "Produtos de balan\u00e7a: {0} normais: {1}",
                     new Object[]{qtdBalanca, qtdNormal});
         }
         return vResult;
@@ -1965,16 +1964,16 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-                        
+
             StringBuilder builder = new StringBuilder();
-            
+
             for (Iterator<Integer> iterator = this.TipoDocumentoCheque.iterator(); iterator.hasNext();) {
                 builder.append(iterator.next());
                 if (iterator.hasNext()) {
                     builder.append(",");
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
                     + "CODRECEBER AS ID, "
@@ -2060,7 +2059,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     }
 
     public static class TipoDocumentoRecord {
-        
+
         public int id;
         public String descricao;
         public boolean selected = false;
@@ -2071,7 +2070,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         }
 
     }
-    
+
     public List<TipoDocumentoRecord> getTipoDocumentoReceber() throws Exception {
         List<TipoDocumentoRecord> result = new ArrayList<>();
 
@@ -2088,8 +2087,8 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
             }
         }
         return result;
-    }   
-    
+    }
+
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         int decisao = JOptionPane.showConfirmDialog(null, "Deseja importar apenas contas em aberto?");
@@ -2165,12 +2164,12 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         parc.setNumeroParcela(Integer.valueOf(parcela));
 
                     }
-                    if ("BP".equals(rst.getString("SITUACAO").trim()) || "BT".equals(rst.getString("SITUACAO").trim())){
+                    /*if ("BP".equals(rst.getString("SITUACAO").trim()) || "BT".equals(rst.getString("SITUACAO").trim())){
                         imp.addVencimento(
                                 rst.getDate("DTVENCTO"),
                                 rst.getDouble("VALORPAGO"),
                                 rst.getDate("DTPAGTO")).setObservacao(imp.getObservacao());
-                    }
+                    }*/
 
                     vResult.add(imp);
                 }
