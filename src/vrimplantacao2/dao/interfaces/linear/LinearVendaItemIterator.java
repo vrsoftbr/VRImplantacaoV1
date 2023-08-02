@@ -44,7 +44,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "	v.codprod id_produto,\n" +
             "	p.es1_compl descricaoreduzida,\n" +
             "	v.quant qtd,\n" +
-            "	v.total total,\n" +
+            "	v.prunit total,\n" +
             "	case\n" +
             "		when v.tipo = 1 then 0\n" +
             "		else 1\n" +
@@ -65,6 +65,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "where\n" +
             "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
             "	and pc.es1_empresa = " + idLoja + "\n" +
+            "   and v.tipo = 1 \n" +
             "order by\n" +
             "	v.cupom,\n" +
             "	v.caixa,\n" +
@@ -88,7 +89,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             v.setProduto(rs.getString("id_produto"));
             v.setDescricaoReduzida(rs.getString("descricaoreduzida"));
             v.setQuantidade(rs.getDouble("qtd"));
-            v.setTotalBruto(rs.getDouble("total"));
+            v.setPrecoVenda(rs.getDouble("total"));
             v.setCancelado(rs.getBoolean("cancelado"));
             v.setValorDesconto(rs.getDouble("valorDesconto"));
             v.setValorAcrescimo(rs.getDouble("valorAcrescimo"));

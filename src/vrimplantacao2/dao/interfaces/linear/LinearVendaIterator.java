@@ -144,10 +144,10 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
             v.setIdClientePreferencial(rs.getString("id_clientepreferencial"));
             v.setHoraInicio(rs.getDate("horainicio"));
             v.setHoraTermino(rs.getDate("horatermino"));
-            v.setCancelado(rs.getBoolean("cancelado"));
-            v.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
-            v.setValorDesconto(rs.getDouble("valorDesconto"));
-            v.setValorAcrescimo(rs.getDouble("valorAcrescimo"));
+            //v.setCancelado(rs.getBoolean("cancelado"));
+            //v.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+            //v.setValorDesconto(rs.getDouble("valorDesconto"));
+            //v.setValorAcrescimo(rs.getDouble("valorAcrescimo"));
             v.setNumeroSerie(rs.getString("serie"));
             v.setChaveCfe(rs.getString("chave"));          
             

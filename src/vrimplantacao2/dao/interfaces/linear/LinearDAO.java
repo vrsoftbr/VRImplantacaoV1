@@ -20,11 +20,14 @@ import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -40,10 +43,12 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -103,10 +108,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CNPJ,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
                 OpcaoCliente.INSCRICAO_ESTADUAL,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.TIPO_INSCRICAO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CONVENIO_EMPRESA,
@@ -162,8 +170,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM_MAXIMA,
                     OpcaoProduto.MARGEM_MINIMA,
                     OpcaoProduto.OFERTA,
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                     OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.NUTRICIONAL,
+                    OpcaoProduto.RECEITA_BALANCA,
+                    OpcaoProduto.ASSOCIADO
                 }
         ));
     }
@@ -196,18 +209,19 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	f.fn2_num id, \n"
+                    + "	f.fn2_num id,\n"
                     + "	f.cg2_cod idfornecedor,\n"
                     + "	f.fn2_emis dataemissao,\n"
-                    + "	f.fn2_venc dtvencimento,\n"
-                    + "	f.fn2_valor-fn2_vdesc valor,\n"
+                    + "	f.fn2_vencreal dtvencimento,\n"
+                    + "	f.fn2_valor + fn2_vjuros + fn2_vmulta - fn2_vdesc valor,\n"
+                    + "	fn2_multabaixa,\n"
                     + "	f.fn2_doc numeroDocumento,\n"
-                    + "	fn2_hist obs\n"
+                    + "	concat(' boleto - ', f.fn2_barras, ' juros - ', fn2_vjuros, ' multa - ', fn2_vmulta, ' desconto - ', fn2_vdesc) obs\n"
                     + "from\n"
                     + "	fn2 f\n"
                     + "where\n"
-                    + "	f.fn2_dtbaixa is null\n	"
-                    + " and f.cg6_cod != -1\n"
+                    + "	f.fn2_dtbaixa is null\n"
+                    + "	and f.cg6_cod != -1\n"
                     + "	and f.fn2_empresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
@@ -228,7 +242,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -284,7 +298,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("merc1"));
@@ -298,6 +312,67 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "  select\n"
+                    + "n.codigo id,\n"
+                    + "	p.es1_cod idprod,\n"
+                    + "	n.nome descritivo,\n"
+                    + "	1 as id_situacaocadastro,\n"
+                    + "	n.calorico caloria,\n"
+                    + "	n.carboidratos,\n"
+                    + "	n.proteinas proteina,\n"
+                    + "	n.gordtotais gorduras,\n"
+                    + "	n.gordsat gorduras_saturada,\n"
+                    + "	n.colesterol,\n"
+                    + "	n.fibra fibra_alimentar,\n"
+                    + "	n.calcio,\n"
+                    + "	n.ferro,\n"
+                    + "	n.sodio,\n"
+                    + "	n.porcao medidainteira,\n"
+                    + "	n.deccaseira id_tipomedidadecimal, \n"
+                    + "	n.medidacaseira id_tipomedida, \n"
+                    + "	n.obs mensagemalergico,\n"
+                    + "	n.infnutricionista receita\n"
+                    + "from\n"
+                    + "	infnutricionais n\n"
+                    + "join es1 p on\n"
+                    + "	p.es1_nutri = n.codigo\n"
+                    + "where\n"
+                    + "	p.es1_empresa = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setGorduraSaturada(rst.getDouble("gorduras_saturada"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao(rst.getString("medidainteira"));
+                    imp.setIdTipoMedida(rst.getInt("id_tipomedida"));
+                    imp.setId_tipomedidadecimal(rst.getInt("id_tipomedidadecimal"));
+                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+                    imp.addProduto(rst.getString("idprod"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -379,7 +454,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pc.pis_natreceita naturezareceita,\n"
                     + "	st.tab_valor iva,\n"
                     + "	pc.es1_icmsent idicmspauta,\n"
-                    + "	icmsst.cst cstst\n"
+                    + "	icmsst.cst cstst,\n"
+                    + "	pc.es1_umgondola tipoVolume,\n"
+                    + "	pc.es1_pesol pesoliquido,\n"
+                    + "	pc.es1_pesob pesobruto \n"
                     + "FROM\n"
                     + "	es1p pr\n"
                     + "	JOIN es1 pc ON\n"
@@ -398,7 +476,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -435,7 +513,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(rs.getString("idicmsentrada"));
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
-                    imp.setMargem(rs.getDouble("margemvarejo"));
+                    imp.setMargem(rs.getDouble("margempadrao"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedioComImposto(rs.getDouble("customedio"));
                     imp.setCustoMedioSemImposto(rs.getDouble("customedio"));
@@ -449,6 +527,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setPiscofinsCstCredito(rs.getString("cstpisent"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setTipoEmbalagemVolume(rs.getString("tipoVolume"));
+                    imp.setVolume(rs.getDouble("pesobruto"));
 
                     if (rs.getString("cstst") != null) {
                         imp.setPautaFiscalId(buildPautaKey(rs.getString("ncm"), rs.getDouble("iva"), rs.getString("idicmspauta")));
@@ -720,13 +800,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "   cg1_cod id,\n"
                     + "   cg1_nome razao,\n"
-                    + "   cg1_cpf cnpj,\n"
+                    + "   case when cg1_tipopessoa = 'F' then cg1_cpf else cg1_cgc end cnpj,\n"
                     + "   cg1_convenio idconvenio,\n"
                     + "   cg1_limite limite,\n"
                     + "   cg1_bloqueadovp,\n"
                     + "   cg1_observacao \n"
                     + "  from cg1\n"
-                    + "   where cg1_convenio <> 0;"
+                    + "   where cg1_convenio > 1;"
             )) {
                 while (rs.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
@@ -768,7 +848,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	fn1 f\n"
                     + "	JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
                     + "WHERE \n"
-                    + " c.cg1_convenio <> 0 and \n"
+                    + " c.cg1_convenio > 1 and \n"
                     + "	f.fn1_dtbaixa IS null AND\n"
                     + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
                     + "	f.fn1_tipo NOT IN (37, 62, 64)"
@@ -862,9 +942,17 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.cg1_fonecobre fonecobranca,\n"
                     + "	c.cg1_observacao obs,\n"
                     + "	c.cg1_empresacliente empresa,\n"
-                    + "	c.cg1_nomeconjuge conjuge\n"
+                    + "	c.cg1_nomeconjuge conjuge,\n"
+                    + "	c.cg1_bloqueadovp bloqueado,\n"
+                    + "case \n"
+                    + "		when c.cg1_convenio = 1\n"
+                    + "		then cg1_empresa\n"
+                    + "		else '0'\n"
+                    + "	end grupo	"
                     + "FROM\n"
-                    + "	cg1 c"
+                    + "	cg1 c\n"
+                    + "where cg1_empresa = " + getLojaOrigem() + "\n"
+                    + "order by c.cg1_ativo desc"
             //+ " where cg1_convenio = 0;"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -873,7 +961,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rs.getString("id"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
-                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setCnpj(Utils.formataNumero(rs.getString("cpf_cnpj")));
                     imp.setInscricaoestadual(rs.getString("rg_ie"));
 
                     /*String cpf, cnpj, rg, ie;
@@ -905,9 +993,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipioIBGE(rs.getString("ibgecidade"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
-                    imp.setCelular(rs.getString("celular"));
-                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(String.valueOf(Long.parseLong(Utils.formataNumero(rs.getString("celular")))));
+                    imp.setTelefone(String.valueOf(Long.parseLong(Utils.formataNumero(rs.getString("telefone")))));
                     imp.setFax(rs.getString("fax"));
+                    imp.setBloqueado(rs.getInt("bloqueado") == 1);
 
                     String contato = rs.getString("contato");
                     if (contato != null && !"".equals(contato)) {
@@ -915,7 +1004,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     imp.setSexo(rs.getInt("sexo") == 2 ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                    imp.setAtivo(rs.getInt("ativo") == 0);
+                    imp.setAtivo(rs.getInt("ativo") == 1);
                     imp.setEmail(rs.getString("email"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
@@ -935,7 +1024,33 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresa(rs.getString("empresa"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
                     imp.setObservacao(rs.getString("obs"));
-
+                    
+                    switch (rs.getInt("grupo")) {
+                        case 1: {
+                            imp.setGrupo(1);
+                            break;
+                        }
+                        case 2: {
+                            imp.setGrupo(3);
+                            break;
+                        }
+                        case 3: {
+                            imp.setGrupo(4);
+                            break;
+                        }
+                        case 4: {
+                            imp.setGrupo(2);
+                            break;
+                        }
+                        case 5: {
+                            imp.setGrupo(5);
+                            break;
+                        }
+                        case 6: {
+                            imp.setGrupo(6);
+                            break;
+                        }
+                    }
                     result.add(imp);
                 }
             }
@@ -969,7 +1084,29 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " c.cg1_convenio = 0 AND\n"
                     + "	f.fn1_dtbaixa IS null\n"
                     + "	AND f.fn1_empresa = " + getLojaOrigem() + "\n"
-                    + "	AND f.fn1_tipo NOT IN (2,3)"
+                    + "	AND f.fn1_tipo IN (7) \n"
+                    + "UNION \n"
+                    + "SELECT \n"
+                    + "	f.FN1_NUM id,\n"
+                    + "	f.FN1_PARC parcela,\n"
+                    + "	f.CG1_COD idcliente,\n"
+                    + "	f.fn1_doc documento,\n"
+                    + "	f.caixa,\n"
+                    + "	f.cupom,\n"
+                    + "	f.FN1_EMISSAO emissao,\n"
+                    + "	f.FN1_VENC vencimento,\n"
+                    + "	f.fn1_hist observacao,\n"
+                    + "	f.FN1_JUROS juros,\n"
+                    + "	f.FN1_MULTA multa,\n"
+                    + "	f.FN1_VALOR valor\n"
+                    + "FROM \n"
+                    + "	fn1 f\n"
+                    + "	JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
+                    + "WHERE \n"
+                    + " c.cg1_convenio = 1 and \n"
+                    + "	f.fn1_dtbaixa IS null AND\n"
+                    + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
+                    + "	f.fn1_tipo NOT IN (37, 62, 64)"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1150,6 +1287,36 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "  select\n"
+                    + "	n.codigo id,\n"
+                    + "	p.es1_cod idprod,\n"
+                    + "	n.nome descritivo,\n"
+                    + "	n.infnutricionista receita\n"
+                    + "from\n"
+                    + "	infnutricionais n\n"
+                    + "join es1 p on\n"
+                    + "	p.es1_nutri = n.codigo\n"
+                    + "where\n"
+                    + "	p.es1_empresa = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setReceita(rst.getString("receita"));
+                    imp.getProdutos().add(rst.getString("idprod"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         List<AssociadoIMP> result = new ArrayList<>();
 
@@ -1158,9 +1325,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "  a.es1_cod id_pai,\n"
                     + "  a.es1_item id_filho,\n"
-                    + "  a.es1_quant qtde\n"
+                    + "  a.es1_quant qtde,\n"
+                    + "  p.Es1_Ativo\n"
                     + " from es1c a\n"
-                    + "where a.es1_empresa = " + getLojaOrigem()
+                    + " join es1 p on a.es1_cod = p.es1_cod \n"
+                    + "where a.es1_empresa = " + getLojaOrigem() + "\n"
+                    + "and p.Es1_Ativo = 1 \n"
+                    + "and p.es1_empresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
@@ -1168,7 +1339,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id_pai"));
                     imp.setQtdEmbalagem(rst.getInt("qtde"));
                     imp.setProdutoAssociadoId(rst.getString("id_filho"));
-                    imp.setQtdEmbalagemItem(rst.getInt("qtde"));
+                    imp.setQtdEmbalagemItem(1);
 
                     result.add(imp);
                 }
