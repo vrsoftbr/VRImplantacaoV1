@@ -154,6 +154,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                             importador.importarFornecedor();
                         }
                         if(chkTipoRecebível.isSelected()){
+                            dao.apagarDadosRecebivel();
                             importador.importarTipoRecebivel();
                         }
                         if (chkProdutoFornecedor.isSelected()) {

@@ -631,15 +631,14 @@ public class Importador {
         ProgressBar.setStatus("Carregando Dados...");
 
         // Instanciação das listas
-        
         //pdv.tipomodelo
         List<TipoModeloIMP> modelo = getInterfaceDAO().getModeloEcf();
         TipoModeloRepositoryProvider modeloprovider = new TipoModeloRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //pdv.ecf
         List<EcfIMP> ecf = getInterfaceDAO().getPdvEcf();
         EcfRepositoryProvider ecfProvider = new EcfRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-        
+
         //pdv.ecflayout
         List<EcfLayoutIMP> ecfLayout = getInterfaceDAO().getEcfLayout();
         EcfLayoutRepositoryProvider ecfLayoutProvider = new EcfLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
@@ -851,17 +850,12 @@ public class Importador {
 //************//
 
         //inserir tipomodelo
-        
         TipoModeloRepository modeloRepo = new TipoModeloRepository(modeloprovider);
         modeloRepo.importarModelo(modelo);
-        
+
         EcPdvRepository ecfRepository = new EcPdvRepository(ecfProvider);
         ecfRepository.importarEcf(ecf);
 
-        
-        EcfLayoutRepository ecfLayoutRep = new EcfLayoutRepository(ecfLayoutProvider);
-        ecfLayoutRep.importarEcfLayout(ecfLayout);
-        
         PdvFuncaoRepository funcaorepository = new PdvFuncaoRepository(funcaoPro);
         funcaorepository.importarPdvFuncao(funcaoImp);
 
@@ -870,6 +864,9 @@ public class Importador {
 
         PdvTecladoFuncaoRepository tecladoRep = new PdvTecladoFuncaoRepository(tecladoprov);
         tecladoRep.importarFuncaoeTeclado(tecladoImp);
+
+        EcfLayoutRepository ecfLayoutRep = new EcfLayoutRepository(ecfLayoutProvider);
+        ecfLayoutRep.importarEcfLayout(ecfLayout);
 
         PdvFuncaoOperadorRepository funcaoRepository = new PdvFuncaoOperadorRepository(opePro);
         funcaoRepository.importarFuncaoOperador(funcaoOperador);

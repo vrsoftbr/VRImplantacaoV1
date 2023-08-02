@@ -1276,6 +1276,71 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    public void apagarDadosRecebivel() throws Exception {
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+
+            st.execute(apagarRecebivel());
+
+        }
+    }
+
+    private String apagarRecebivel() throws Exception {
+        String sql
+                = "delete from fornecedorcontato ;\n"
+                + "delete from implantacao.codant_fornecedor;\n"
+                + "delete from fornecedorprazopedido ;\n"
+                + "delete from fornecedorprazo; \n"
+                + "delete from fornecedor where id <> 1;\n"
+                + "delete from recebivelconfiguracaotabela;\n"
+                + "delete from recebivelconfiguracao;\n"
+                + "delete from tiporecebivelfinalizadora;\n"
+                + "delete from tiporecebivel ;\n"
+                + "delete from tiporecebivel;\n"
+                + "delete from tiporecebivelfinalizadora;\n"
+                + "delete from entradasaidatipoentrada;\n"
+                + "delete from tiposaidacontabilidade;\n"
+                + "delete from tiposaidanotasaidasequencia;\n"
+                + "delete from cfoptiposaida;\n"
+                + "delete from tiposaida ;\n"
+                + "delete from contabilidade.tipoentrada ;\n"
+                + "delete from contabilidade.tiposaida;\n"
+                + "delete from cfoptipoentrada;\n"
+                + "delete from tipoentrada;\n"
+                + "delete from tipoplanoconta ;\n"
+                + "delete from ativo.grupo ;\n"
+                + "delete from contabilidade.ativoimobilizado;\n"
+                + "delete from contabilidade.tiposaida;\n"
+                + "delete from contabilidade.caixavenda; \n"
+                + "delete from contabilidade.maparesumo;\n"
+                + "delete from contabilidade.tipoentrada ;\n"
+                + "delete from contabilidade.tipoabatimento;\n"
+                + "delete from contabilidade.caixadiferenca ;\n"
+                + "delete from contacontabilfinanceiro;\n"
+                + "delete from contacontabilfiscal; \n"
+                + "delete from historicopadrao;\n"
+                + "delete from cfop;\n"
+                + "delete from cfoptipoentrada;\n"
+                + "delete from entradasaidatiposaida;\n"
+                + "delete from tiposaida;\n"
+                + "delete from historicopadrao;\n"
+                + "delete from tipoplanoconta ;\n"
+                + "delete from pdv.tipotef ;\n"
+                + "delete from pdv.autorizadora ;\n"
+                + "delete from pdv.finalizadoraconfiguracao;\n"
+                + "delete from pdv.finalizadoralayoutretorno;\n"
+                + "delete from pdv.finalizadora;\n"
+                + "delete from pdv.ecflayout;\n"
+                + "delete from pdv.ecf;\n"
+                + "delete from pdv.tipomodelo ;\n"
+                + "delete from pdv.tecladolayoutfuncao;	\n"
+                + "delete from pdv.tecladolayout ;\n"
+                + "delete from pdv.finalizadoralayoutretorno ;\n"
+                + "delete from pdv.funcaoniveloperador f;	\n"
+                + "delete from pdv.funcao f;";
+
+        return sql;
+    }
+
     @Override
     public List<ContaContabilFiscalIMP> getContaContabilFiscal() throws Exception {
         List<ContaContabilFiscalIMP> result = new ArrayList<>();
@@ -1464,7 +1529,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_loja ,\n"
                         + "	descricao \n"
                         + "from\n"
-                        + "	pdv.tecladolayout")) {
+                        + "	pdv.tecladolayout \n"
+                                + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 TecladoLayoutIMP imp = new TecladoLayoutIMP();
 
@@ -1579,7 +1645,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_modelopdv \n"
                         + "	from \n"
                         + "	pdv.ecf \n"
-                      	)) {
+                        + "where id_loja = " + getLojaOrigem() + " \n"
+                )) {
             while (rs.next()) {
                 EcfIMP imp = new EcfIMP();
 
@@ -1670,7 +1737,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_funcao ,\n"
                         + "	id_tiponiveloperador \n"
                         + "from\n"
-                        + "	pdv.funcaoniveloperador")) {
+                        + "	pdv.funcaoniveloperador \n"
+                                + "where id_loja = "+ getLojaOrigem())) {
             while (rs.next()) {
                 PdvFuncaoOperadorIMP imp = new PdvFuncaoOperadorIMP();
 
@@ -1736,7 +1804,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	utilizado ,\n"
                         + "	avisaretirada \n"
                         + "from\n"
-                        + "	pdv.finalizadoraconfiguracao")) {
+                        + "	pdv.finalizadoraconfiguracao \n"
+                                + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 FinalizadoraConfiguracaoIMP imp = new FinalizadoraConfiguracaoIMP();
 
@@ -2165,7 +2234,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	diasuteis,\n"
                         + "	proximodiautil\n"
                         + "	from \n"
-                        + "	recebivelconfiguracao")) {
+                        + "	recebivelconfiguracao \n"
+                                + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 RecebivelConfiguracaoIMP imp = new RecebivelConfiguracaoIMP();
 
