@@ -122,14 +122,26 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "	Codigo id,\n"
                     + "	Descricao,\n"
                     + "	'0' cst,\n"
                     + "	COALESCE (Icms,0) aliq,\n"
                     + "	'0' red\n"
                     + "from\n"
-                    + "	Taxa_Tributaria"
+                    + "	Taxa_Tributaria"*/
+                    "select\n"
+                    + "	Tipo_Regra_Imposto id,\n"
+                    + "	CONCAT(Tipo_Regra_Imposto,'-',cst,'-',Aliquota_ICMS) descricao,\n"
+                    + "	CST cst,\n"
+                    + "	Aliquota_ICMS aliq,\n"
+                    + "	0 red\n"
+                    + "from\n"
+                    + "	Fiscal_Regra_Imposto\n"
+                    + "where\n"
+                    + "	UF_Origem = 'AC' and UF_Destino = 'AC'\n"
+                    + "	and Tipo_Regra_Imposto BETWEEN 10 and 20\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -241,13 +253,12 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "isnull(p.Data_Cadastro, @primeirocadastro) datacadastro,\n"
                     + "p.grupo mercadologico1,\n"
                     + "isnull(p.SubGrupo, 1) mercadologico2,\n"
-                    + "1 as mercadologico3,\n"
                     + "p.ncm,\n"
                     + "p.Codigo_CEST cest,\n"
                     + "c.Codigo_CEST,\n"
                     + "p.Margem,\n"
                     + "p.Quantidade qtdEmbalagem,\n"
-                    + "p.Codigo_Barra ean,      \n"
+                    + "case when p.Balanca = 1 then p.Codigo else replace(p.codigo_barra,'C','') end ean,\n"
                     + "p.balanca e_balanca,\n"
                     + "p.Validade,\n"
                     + "p.Unidade id_tipoembalagem,\n"
@@ -256,9 +267,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "fs.ST_PIS pisconfinssaida,\n"
                     + "fs.ST_PIS_Entrada pisconfisentrada,\n"
                     + "p.Codigo_Incidencia_Monofasica pisconfinsnatureza,\n"
-                    + "fs.CST icms_cst,\n"
-                    + "fs.Aliquota_ICMS icms_aliquota,\n"
-                    + "0 icms_reducao,\n"
+                    + "imp.tipo_regra_imposto id_icms,"
                     + "est.Qtde estoque,\n"
                     + "p.Estoque_maximo,\n"
                     + "p.Estoque_minimo,\n"
@@ -268,7 +277,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "p.Unidade\n"
                     + "from\n"
                     + "Produto p\n"
-                    + "left join Produto_Regra_Imposto imp on p.Codigo = imp.Produto\n"
+                    + "left join Produto_Regra_Imposto imp on p.Codigo = imp.Produto and imp.empresa = " + getLojaOrigem() + "\n"
                     + "left join Fiscal_Regra_Imposto fs on imp.Tipo_Regra_Imposto = fs.Tipo_Regra_Imposto\n"
                     + "left join Estoque est on p.Codigo = est.Produto and est.Deposito = 1 \n"
                     + "left join Produto_CEST c on c.Codigo = p.Codigo_CEST\n"
@@ -284,7 +293,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca((rst.getInt("e_balanca") == 1));
-                    
+
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
 
                     if (bal != null) {
@@ -292,13 +301,15 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setEan(String.valueOf(bal.getCodigo()));
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida((rst.getString("descricaoreduzida") == null ? imp.getDescricaoCompleta() : rst.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
+
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setCodMercadologico3(imp.getCodMercadologico2());
+
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSituacaoCadastro(("N".equals(rst.getString("Inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setTipoEmbalagem(rst.getString("Unidade"));
@@ -315,11 +326,14 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoqueMaximo(rst.getDouble("Estoque_maximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("Codigo_CEST"));
+
+                    imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsConsumidorId(rst.getString("id_icms"));
+
                     imp.setPiscofinsCstDebito(rst.getInt("pisconfinssaida"));
                     imp.setPiscofinsCstCredito(rst.getInt("pisconfisentrada"));
                     imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("pisconfinsnatureza"))));
-                    imp.setIcmsDebitoId(rst.getString("Taxa_Tributaria"));
-                    imp.setIcmsCreditoId(rst.getString("Taxa_Tributaria"));
 
                     result.add(imp);
                 }
@@ -369,7 +383,8 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.Codigo id,\n"
-                    + "	p.Data_Cadastro dataCadastro,\n"
+                    + "	p.cpf cnpj,\n"
+                    + "	p.RG ie,\n"
                     + "	p.Nome razao,\n"
                     + "	p.Nome_Fantasia fantasia,\n"
                     + "	p.Endereco_Nome endereco,\n"
@@ -379,6 +394,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	cast(cd.Codigo_Cidade_IBGE as integer) id_municipio,\n"
                     + "	cd.Codigo_UF_IBGE id_estado,\n"
                     + "	p.Cep,\n"
+                    + "	cast(p.Data_Cadastro as date) dataCadastro,\n"
                     + "	p.Endereco_Pagamento cob_endereco,\n"
                     + "	0 as cob_numero,\n"
                     + "	p.Bairro_Pagamento cob_bairro,\n"
@@ -386,14 +402,12 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	cob_cd.Estado cob_id_estado,\n"
                     + "	p.Cep_Pagamento cob_cep,\n"
                     + "	p.Fone fone1,\n"
-                    + "	p.RG inscricaoestadual,\n"
-                    + "	p.cpf cnpj,\n"
-                    + "	p.Obs,\n"
                     + "	p.Fone2,\n"
+                    + "	p.Contato fone3,\n"
                     + "	p.Fax,\n"
                     + "	coalesce(p.Email, p.email_utilizado, p.Emails_Promocionais) email,\n"
-                    + "	p.Contato observacoes,\n"
-                    + "	case when p.Inativo = 'N' then 1 else 0 end id_situacaocadastro\n"
+                    + "	p.Obs,\n"
+                    + "	case when p.Inativo = 'N' then 1 else 0 end ativo\n"
                     + "from\n"
                     + "	Fornecedor f\n"
                     + "	join Pessoa p on f.Pessoa = p.Codigo\n"
@@ -407,10 +421,11 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
-                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("Numero"));
                     imp.setComplemento(rst.getString("Complemento"));
@@ -418,23 +433,15 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCep(rst.getString("Cep"));
                     imp.setIbge_municipio(rst.getInt("id_municipio"));
                     imp.setIbge_uf(rst.getInt("id_estado"));
-                    imp.setDatacadastro(rst.getDate("dataCadastro"));
 
-                    if ((rst.getString("fone1") != null)
-                            && (!rst.getString("fone1").trim().isEmpty())) {
-                        imp.setTel_principal(rst.getString("fone1"));
-                    } else {
-                        imp.setTel_principal(rst.getString("Fone2"));
-                    }
-
-                    imp.setObservacao(rst.getString("Obs"));
-                    imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
                     imp.setCob_endereco(rst.getString("cob_endereco"));
                     imp.setCob_numero(rst.getString("cob_numero"));
                     imp.setCob_bairro(rst.getString("cob_bairro"));
                     imp.setCob_ibge_municipio(rst.getInt("cob_id_municipio"));
                     imp.setCob_uf(rst.getString("cob_id_estado"));
                     imp.setCob_cep(rst.getString("cob_cep"));
+
+                    imp.setTel_principal(rst.getString("fone1"));
 
                     if ((rst.getString("Fone2") != null)
                             && (!rst.getString("Fone2").trim().isEmpty())) {
@@ -447,10 +454,21 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                                 null
                         );
                     }
+                    if ((rst.getString("fone3") != null)
+                            && (!rst.getString("fone3").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TELEFONE 3",
+                                rst.getString("Fone3"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
                     if ((rst.getString("Fax") != null)
                             && (!rst.getString("Fax").trim().isEmpty())) {
                         imp.addContato(
-                                "2",
+                                "3",
                                 "FAX",
                                 rst.getString("Fax"),
                                 null,
@@ -461,7 +479,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     if ((rst.getString("email") != null)
                             && (!rst.getString("email").trim().isEmpty())) {
                         imp.addContato(
-                                "3",
+                                "4",
                                 "EMAIL",
                                 null,
                                 null,
@@ -469,6 +487,10 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                                 rst.getString("email").toLowerCase()
                         );
                     }
+
+                    imp.setDatacadastro(rst.getDate("dataCadastro"));
+                    imp.setObservacao(rst.getString("Obs"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
                 }
