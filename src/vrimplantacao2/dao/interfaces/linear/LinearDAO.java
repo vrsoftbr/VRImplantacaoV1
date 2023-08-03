@@ -120,6 +120,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONVENIO_EMPRESA,
                 OpcaoCliente.CONVENIO_TRANSACAO,
                 OpcaoCliente.RECEBER_CHEQUE,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.CONVENIO_CONVENIADO));
     }
 
@@ -1004,7 +1006,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     imp.setSexo(rs.getInt("sexo") == 2 ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                    imp.setAtivo(rs.getInt("ativo") == 1);
+                    imp.setAtivo(rs.getInt("ativo2") == 1);
                     imp.setEmail(rs.getString("email"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
@@ -1024,7 +1026,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresa(rs.getString("empresa"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
                     imp.setObservacao(rs.getString("obs"));
-                    
+
                     switch (rs.getInt("grupo")) {
                         case 1: {
                             imp.setGrupo(1);
