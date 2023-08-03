@@ -264,9 +264,9 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "p.Unidade id_tipoembalagem,\n"
                     + "p.Peso_Produto peso_bruto,\n"
                     + "p.Peso_Produto peso_liquido,\n"
-                    + "fs.ST_PIS pisconfinssaida,\n"
-                    + "fs.ST_PIS_Entrada pisconfisentrada,\n"
-                    + "p.Codigo_Incidencia_Monofasica pisconfinsnatureza,\n"
+                    + "fs.ST_PIS piscof_debito,\n"
+                    + "fs.ST_PIS_Entrada piscof_credito,\n"
+                    + "p.Codigo_Incidencia_Monofasica nat_rec,\n"
                     + "imp.tipo_regra_imposto id_icms,"
                     + "est.Qtde estoque,\n"
                     + "p.Estoque_maximo,\n"
@@ -278,7 +278,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "from\n"
                     + "Produto p\n"
                     + "left join Produto_Regra_Imposto imp on p.Codigo = imp.Produto and imp.empresa = " + getLojaOrigem() + "\n"
-                    + "left join Fiscal_Regra_Imposto fs on imp.Tipo_Regra_Imposto = fs.Tipo_Regra_Imposto\n"
+                    + "left join Fiscal_Regra_Imposto fs on imp.Tipo_Regra_Imposto = fs.Tipo_Regra_Imposto and UF_Origem = UF_Destino\n"
                     + "left join Estoque est on p.Codigo = est.Produto and est.Deposito = 1 \n"
                     + "left join Produto_CEST c on c.Codigo = p.Codigo_CEST\n"
                     + (apenasProdutoAtivo == true ? " where p.Inativo = 'N'" : "")
@@ -331,9 +331,9 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));
 
-                    imp.setPiscofinsCstDebito(rst.getInt("pisconfinssaida"));
-                    imp.setPiscofinsCstCredito(rst.getInt("pisconfisentrada"));
-                    imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("pisconfinsnatureza"))));
+                    imp.setPiscofinsCstDebito(rst.getInt("piscof_debito"));
+                    imp.setPiscofinsCstCredito(rst.getInt("piscof_credito"));
+                    imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("nat_rec"))));
 
                     result.add(imp);
                 }
