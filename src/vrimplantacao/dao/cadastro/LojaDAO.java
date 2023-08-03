@@ -335,7 +335,7 @@ public class LojaDAO {
 
         sql.put("descricao", i_loja.getDescricao());
         sql.put("id_fornecedor", i_loja.getIdFornecedor());
-        sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+        //sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
         sql.put("nomeservidor", i_loja.getNomeServidor());
         sql.put("servidorcentral", i_loja.isServidorCentral());
         sql.put("id_regiao", i_loja.getIdRegiao());

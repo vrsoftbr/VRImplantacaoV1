@@ -17,13 +17,13 @@ import vrimplantacao2.utils.sql.SQLBuilder;
  * @author Desenvolvimento
  */
 public class LojaGeradorScripts {
-    
+
     private Versao versao = null;
 
     public LojaGeradorScripts(Versao versao) {
         this.versao = versao;
-    }    
-    
+    }
+
     public SQLBuilder criarLoja(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("public");
@@ -40,7 +40,7 @@ public class LojaGeradorScripts {
 
         return sql;
     }
-    
+
     public String copiarProdutoComplemento(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO produtocomplemento ("
                 + "id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, dataultimopreco, \n"
@@ -83,7 +83,7 @@ public class LojaGeradorScripts {
 
         return sql;
     }
-    
+
     public String copiarFornecedorPrazo(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO fornecedorprazo("
                 + "id_fornecedor, id_loja, id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca)"
@@ -92,7 +92,7 @@ public class LojaGeradorScripts {
 
         return sql;
     }
-    
+
     public String copiarFornecedorPrazoPedido(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO fornecedorprazopedido(id_fornecedor, id_loja, \n"
                 + "diasentregapedido,diasatualizapedidoparcial) \n"
@@ -135,7 +135,7 @@ public class LojaGeradorScripts {
 
         return sql;
     }
-    
+
     public String copiarParametroAgendaecebimento(LojaVO i_loja) {
         String sqlUpdateParametroAgendaRecebimento = " insert\n"
                 + "	into\n"
@@ -157,7 +157,7 @@ public class LojaGeradorScripts {
                 + "where id_loja = " + i_loja.getIdCopiarLoja();
         return sqlUpdateParametroAgendaRecebimento;
     }
-    
+
     public String copiarPdvFinalizadoraConfiguracao(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento, \n"
                 + "aceitarecebimento,utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado)\n"
@@ -196,7 +196,10 @@ public class LojaGeradorScripts {
 
     public String copiaAliquotaLayoutRetorno(LojaVO i_loja) throws Exception {
         String sql = "insert into pdv.aliquotalayoutretorno ( id_aliquotalayout ,id_aliquota , retorno , codigoleitura )\n"
-                + "(select (select max((id_aliquotalayout)+1) from pdv.aliquotalayoutretorno), id_aliquota , retorno , codigoleitura from pdv.aliquotalayoutretorno\n"
+                + "(select (select max((id_aliquotalayout)+1) from pdv.aliquotalayoutretorno ), id_aliquota , retorno , codigoleitura \n"
+                + "from pdv.aliquotalayoutretorno ret\n"
+                + "join pdv.aliquotalayout ali on ali.id = ret.id_aliquota\n"
+                + "where ali.id_loja = " + i_loja.getId() + "\n"
                 + "group by id_aliquota, retorno, codigoleitura )";
 
         return sql;
@@ -284,22 +287,10 @@ public class LojaGeradorScripts {
     }
 
     public String inserirGrupoEconomicoLoja(LojaVO i_loja) throws Exception {
-        String sql = "insert\n"
-                + "	into\n"
-                + "	contabilidade.grupoeconomicoloja\n"
-                + "select\n"
-                + "	(\n"
-                + "	select\n"
-                + "		max(id) + 1\n"
-                + "	from\n"
-                + "		contabilidade.grupoeconomicoloja) as id,\n"
-                + "	id_grupoeconomico,\n"
-                + "	" + i_loja.getId() + " id_loja,\n"
-                + "	false\n"
-                + "from\n"
-                + "	contabilidade.grupoeconomicoloja\n"
-                + "where\n"
-                + "	id_loja = " + i_loja.getIdCopiarLoja();
+        String sql = "insert into contabilidade.grupoeconomicoloja\n"
+                + "select distinct (select max(id) + 1	from contabilidade.grupoeconomicoloja) as id, id_grupoeconomico," + i_loja.getId() + ",false \n"
+                + "from contabilidade.grupoeconomicoloja \n"
+                + "where id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }
