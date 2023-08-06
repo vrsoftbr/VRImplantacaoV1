@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import static vrimplantacao2.dao.cadastro.produto.OpcaoProduto.INVENTARIO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
@@ -31,6 +32,7 @@ import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
@@ -63,10 +65,12 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -110,6 +114,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PRODUTOS);
         result.add(OpcaoProduto.EAN);
         result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);
+        result.add(OpcaoProduto.NUTRICIONAL);
+        result.add(OpcaoProduto.RECEITA_BALANCA);
         result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
         result.add(OpcaoProduto.ASSOCIADO);
 
@@ -173,6 +179,64 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             ProgressBar.setStatus("Carregando mercadológico..." + cont);
         }
 
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        Arquivo nutricionais = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        ProgressBar.setStatus("Carregando nutriional de produtos...");
+        int cont = 0;
+
+        for (LinhaArquivo linha : nutricionais) {
+            NutricionalIMP imp = new NutricionalIMP();
+
+            imp.setId(linha.getString("id_nutricional") == null ? "0" : linha.getString("id_nutricional"));
+            imp.setDescricao(linha.getString("descricao") == null ? "DESCRICAO VAZIA" : Utils.acertarTexto(linha.getString("descricao")) /*+ " " + Integer.parseInt(linha.getString("quantidade"))*/);
+            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+            imp.setCaloria(linha.getString("caloria") == null ? 0 : linha.getInt("caloria"));
+            imp.setCarboidrato(linha.getString("carboidrato") == null ? 0 : linha.getDouble("carboidrato"));
+            imp.setProteina(linha.getString("proteina") == null ? 0 : linha.getDouble("proteina"));
+            imp.setGordura(linha.getString("gordura") == null ? 0 : linha.getDouble("gordura"));
+            imp.setGorduraSaturada(linha.getString("gordurasaturada") == null ? 0 : linha.getDouble("gordurasaturada"));
+            imp.setGorduraTrans(linha.getString("gorduratrans") == null ? 0 : linha.getDouble("gorduratrans"));
+            imp.setFibra(linha.getString("fibra") == null ? 0 : linha.getDouble("fibra"));
+            imp.setSodio(linha.getString("sodio") == null ? 0 : linha.getDouble("sodio"));
+            imp.setPorcao(linha.getString("quantidade") == null ? "0" : linha.getString("quantidade"));
+            imp.setId_tipounidadeporcao(linha.getString("Id_tipounidadeporcao") == null ? 2 : linha.getInt("Id_tipounidadeporcao"));
+            imp.setMedidaInteira(linha.getString("medidaInteira") == null ? 1 : linha.getInt("medidaInteira"));
+            imp.setId_tipomedidadecimal(linha.getString("id_tipomedidadecimal") == null ? 5 : linha.getInt("id_tipomedidadecimal"));
+            imp.setIdTipoMedida(linha.getString("id_tipomedida") == null ? -1 : linha.getInt("id_tipomedida"));
+            imp.setAcucaresadicionados(linha.getDouble("acucaresadicionados"));
+            imp.setAcucarestotais(linha.getDouble("acucarestotais"));
+            imp.addProduto(linha.getString("id_produto") == null ? "0" : linha.getString("id_produto"));
+            imp.getMensagemAlergico().add(linha.getString("alergenicos") == null ? "" : Utils.acertarTexto(linha.getString("alergenicos")));
+
+            result.add(imp);
+            cont++;
+            ProgressBar.setStatus("Carregando mercadológico..." + cont);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+        Arquivo receitas = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        ProgressBar.setStatus("Carregando Receita de produtos...");
+        int cont = 0;
+
+        for (LinhaArquivo linha : receitas) {
+            ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+            imp.setId(linha.getString("id_receita"));
+            imp.setDescricao(linha.getString("descricao"));
+            imp.setReceita(linha.getString("receita"));
+            imp.getProdutos().add(linha.getString("id_produto"));
+            result.add(imp);
+            cont++;
+            ProgressBar.setStatus("Carregando receitas de produtos... " + cont);
+        }
         return result;
     }
 

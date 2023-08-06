@@ -292,19 +292,40 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     + "    icm_s.vendareducao1 AS reducao_saida,\n"
                     + "    icm_e.compracsf AS cst_entrada,\n"
                     + "    icm_e.compraicms AS aliquota_entrada,\n"
+                    + "    CASE \n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 1 THEN 50\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 2 THEN 73\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 3 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 4 THEN 75\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 5 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 6 THEN 70\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 7 THEN 73\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 8 THEN 75\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 9 THEN 50\n"
+                    + "    END pfcredito,\n"
+                    + "    CASE \n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 1 THEN 01\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 2 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 3 THEN 04\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 4 THEN 05\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 5 THEN 04\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 6 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 7 THEN 06\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 8 THEN 05\n"
+                    + "    WHEN t.IDGRUPOTRIBUTACAO = 9 THEN 01\n"
+                    + "    END pfdebito ,\n"
+                    + "    nat.CODIGO AS nat_rec,\n"
                     + "    icm_e.comprareducao AS reducao_entrada\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                    + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo\n"
-                    + "    AND icm_s.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_s.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
-                    + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo\n"
-                    + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
-                    + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo   AND icm_s.empresa = '01'  AND icm_s.estado = 'MS'\n"
+                    + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo AND icm_e.empresa = '01'  AND icm_e.estado = '01'\n"
+                    + "JOIN TESTTABELAPISCOFINSITEM nat  ON nat.IDTABELAPISCOFINS  = p.IDTABELAPISITEM \n"
+                    + "JOIN TESTGRUPOTRIBUTACAO t ON t.IDGRUPOTRIBUTACAO = p.IDGRUPOTRIBUTACAO \n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
-                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
+                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)\n"
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -360,6 +381,8 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("nat_rec"));
+                    
 
                     String idIcmsDebito, IdIcmsCredito;
 
@@ -378,6 +401,8 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                             imp.setDescricaoCompleta(rst.getString("descricao") + " " + rst.getString("referencia"));
                         }
                     }
+                    imp.setPiscofinsCstCredito(rst.getString("pfcredito"));
+                    imp.setPiscofinsCstDebito(rst.getString("pfdebito"));
                     result.add(imp);
                 }
             }
@@ -576,7 +601,7 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     + "    C.CEP,\n"
                     + "    coalesce(SUBSTRING(P.datanasc from 9 FOR 2)||'/'||SUBSTRING(P.datanasc from 6 FOR 2)||'/'||SUBSTRING(P.datanasc from 1 FOR 4), '') datanascimento,\n"
                     + "    C.datacadastro data_cadastro,\n"
-                    + "    CASE WHEN C.bloqueado = 'S' THEN 1 ELSE 0 END BLOQUEADO,\n"
+                    + "    CASE WHEN C.bloqueado = 'S' THEN 0 ELSE 1 END BLOQUEADO,\n"
                     + "    p.localtrabalho empresa,\n"
                     + "    C.LIMITE,\n"
                     + "    p.nomepai,\n"
@@ -586,15 +611,16 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     + "    C.FONECELULAR celular,\n"
                     + "    C.EMAIL,\n"
                     + "    C.OBS,\n"
-                    + "	CASE \n"
-                    + "	WHEN c.LIMITEGLOBAL  = 'N'\n"
-                    + "	THEN 1 ELSE 0 END \n"
-                    + "	AS ativo\n"
+                    + "	CASE\n"
+                    + "	WHEN a.ativo = 'S' THEN 1 ELSE 0\n"
+                    + "	END ativo,\n"
+                    + "	c.CONVENIOCANCELADO \n"
                     + "FROM\n"
                     + "    TRECCLIENTEGERAL c\n"
                     + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE\n"
                     + "left JOIN trecpfisica p ON  C.codigo = P.codigo\n"
-                    + "ORDER BY 1"
+                    + "JOIN TRECCLIENTE A ON A.CODIGO = c.CODIGO \n"
+                    + "ORDER BY 2"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -605,7 +631,7 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCnpj(rs.getString("CPFCNPJ"));
                     imp.setInscricaoestadual(rs.getString("RGIE"));
                     imp.setInscricaoMunicipal(rs.getString("im"));
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    //  imp.setAtivo(rs.getBoolean("bloqueado"));
 
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -621,7 +647,7 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                         imp.setDataNascimento(new java.sql.Date(fmt.parse(rs.getString("datanascimento")).getTime()));
                     }
 
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    // imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
                     imp.setTelefone(rs.getString("telefone"));
@@ -630,11 +656,11 @@ public class EcoCentauro2_5DAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setEmail(rs.getString("email"));
                     imp.setObservacao(rs.getString("obs"));
 
-                    imp.setBloqueado(rs.getInt("BLOQUEADO") == 1);
+                    //   imp.setBloqueado(rs.getInt("BLOQUEADO") == 1);
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setEmpresa(rs.getString("empresa"));
-                    
+
                     imp.setAtivo(rs.getBoolean("ativo"));
 
                     result.add(imp);

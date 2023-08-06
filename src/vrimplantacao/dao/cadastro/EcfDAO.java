@@ -154,18 +154,21 @@ public class EcfDAO {
     }
 
     public List<String> carregarCopiaEcfLayout(LojaVO i_loja) throws Exception {
-        String sql = "with dadosLayout as (select l.regracalculo, l.arredondamentoabnt, e.id from pdv.ecflayout l join pdv.ecf e on l.id_ecf = e.id where e.id_loja = " + i_loja.getIdCopiarLoja() + ")\n"
-                + "select \n"
-                + " distinct e2.id id_ecf,\n"
-                + " (select id from pdv.tecladolayout where id_loja = " + i_loja.getId() + ") as id_teclado,\n"
-                + " (select id from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ") as id_finalizadora,\n"
-                + " (select id from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ") as id_acumaldor,\n"
-                + " (select id from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ") as id_aliquotalayout,\n"
-                + " lay.regracalculo ,\n"
-                + " lay.arredondamentoabnt \n"
-                + " from pdv.ecf ecf \n"
-                + " join dadosLayout lay on ecf.id_loja = " + i_loja.getIdCopiarLoja() + " and ecf.id = lay.id\n"
-                + " cross join pdv.ecf e2 where e2.id_loja = " + i_loja.getId();
+        String sql = "select \n"
+                + " distinct ec.id  as id_ecf,\n"
+                + " t.id as id_teclado ,\n"
+                + " f.id as id_finalizadora ,\n"
+                + " a.id as id_acumaldor,\n"
+                + " a2.id as id_aliquotalayout,\n"
+                + " e.regracalculo ,\n"
+                + " e.arredondamentoabnt \n"
+                + " from pdv.ecf ec\n"
+                + " left join pdv.tecladolayout t on t.id_loja = ec.id_loja and ec.id_loja = " + i_loja.idCopiarLoja +  "\n"
+                + " left join pdv.finalizadoralayout f on f.id_loja = ec.id_loja  and ec.id_loja = " + i_loja.idCopiarLoja +  "\n"
+                + " left join pdv.acumuladorlayout a on a.id_loja = ec.id_loja and ec.id_loja = " + i_loja.idCopiarLoja +  "\n"
+                + " left join pdv.aliquotalayout a2 on a2.id_loja = ec.id_loja and ec.id_loja = " + i_loja.idCopiarLoja +  "\n"
+                + " left join pdv.ecflayout e  on e.id_ecf = ec.id and ec.id_loja = " + i_loja.idCopiarLoja + "\n"
+                        + " where ec.id_loja = " + i_loja.idCopiarLoja;
         String sqlInsert = null;
         List<String> listaDeInserts = new ArrayList<>();
 

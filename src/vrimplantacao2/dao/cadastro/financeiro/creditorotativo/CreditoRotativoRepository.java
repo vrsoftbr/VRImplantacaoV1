@@ -285,7 +285,7 @@ public class CreditoRotativoRepository {
         vo.setDataPagamento(impParc.getDataPagamento());
         vo.setDatabaixa(impParc.getDataPagamento());
         vo.setId_loja(provider.getLojaVR());
-        vo.setObservacao("IMPORTADO VR " + impParc.getObservacao());
+        vo.setObservacao("IMPORTADO VR " + impParc.getCreditoRotativo().getObservacao());
         vo.setValor(impParc.getValor());
         vo.setValorDesconto(impParc.getDesconto());
         vo.setValorMulta(impParc.getMulta());

@@ -335,7 +335,7 @@ public class LojaDAO {
 
         sql.put("descricao", i_loja.getDescricao());
         sql.put("id_fornecedor", i_loja.getIdFornecedor());
-        sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+        //sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
         sql.put("nomeservidor", i_loja.getNomeServidor());
         sql.put("servidorcentral", i_loja.isServidorCentral());
         sql.put("id_regiao", i_loja.getIdRegiao());
@@ -465,6 +465,7 @@ public class LojaDAO {
         return result;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Metodo deletar loja">
     public void deletarLoja(LojaVO i_loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("do $$\n"
@@ -827,4 +828,5 @@ public class LojaDAO {
                     + "Entre em contato com o setor de Migração.");
         }
     }
+    //</editor-fold>
 }

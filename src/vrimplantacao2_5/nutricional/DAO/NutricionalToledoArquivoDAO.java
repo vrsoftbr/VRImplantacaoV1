@@ -26,11 +26,11 @@ import vrimplantacao2_5.nutricional.vo.TxtInfoVO;
 
 /**
  *
- * @author Desenvolvimento
+ * @author Michael
  */
 @SuppressWarnings("static-access")
 public class NutricionalToledoArquivoDAO extends InterfaceDAO {
-    
+
     ConexaoPostgres con = new ConexaoPostgres();
     Properties prop = App.properties();
     private final String ip = prop.get("database.ip");
@@ -104,8 +104,8 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setProteina(rst.getString("proteina") == null ? 0 : rst.getDouble("proteina"));
                             imp.setProteinaInferior(rst.getString("proteinaInferior") == null ? false : "1".equals(rst.getString("proteinaInferior")));
                             imp.setGordura(rst.getString("gordura") == null ? 0 : rst.getDouble("gordura"));
-                            imp.setGorduraSaturada(rst.getString("gorduraSaturada") == null ? 0 : rst.getDouble("gorduraSaturada"));
-                            imp.setGorduraTrans(rst.getString("gorduraTrans") == null ? 0 : rst.getDouble("gorduraTrans"));
+                            imp.setGorduraSaturada(rst.getString("gordurasaturada") == null ? 0 : rst.getDouble("gordurasaturada"));
+                            imp.setGorduraTrans(rst.getString("gorduratrans") == null ? 0 : rst.getDouble("gorduratrans"));
                             imp.setColesterolInferior(rst.getString("colesterolInferior") == null ? false : "1".equals(rst.getString("colesterolInferior")));
                             imp.setFibra(rst.getString("fibra") == null ? 0 : rst.getDouble("fibra"));
                             imp.setFibraInferior(rst.getString("fibraInferior") == null ? false : "1".equals(rst.getString("fibraInferior")));
@@ -116,6 +116,8 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setPorcao(rst.getString("quantidade") == null ? "0" : rst.getString("quantidade"));
                             imp.setId_tipomedidadecimal(rst.getString("id_tipomedidadecimal") == null ? 0 : rst.getInt("id_tipomedidadecimal"));
                             imp.setIdTipoMedida(rst.getString("id_tipomedida") == null ? -1 : rst.getInt("id_tipomedida"));
+                            imp.setAcucaresadicionados(rst.getString("acucares") == null ? 0 : rst.getString("acucares").equals("") ? 0 : rst.getDouble("acucares"));
+                            imp.setAcucarestotais(rst.getString("acucares_total") == null ? 0 : rst.getString("acucares_total").equals("") ? 0 : rst.getDouble("acucares_total"));
                             imp.setId_tipounidadeporcao(rst.getString("Id_tipounidadeporcao") == null ? 1 : rst.getInt("Id_tipounidadeporcao"));
                             imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : rst.getString("alergenicos"));
                             imp.addProduto(rst.getString("id_produto") == null ? "0" : rst.getString("id_produto"));
@@ -131,8 +133,8 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setCarboidrato(rst.getString("carboidrato") == null ? 0 : rst.getDouble("carboidrato"));
                             imp.setProteina(rst.getString("proteina") == null ? 0 : rst.getDouble("proteina"));
                             imp.setGordura(rst.getString("gordura") == null ? 0 : rst.getDouble("gordura"));
-                            imp.setGorduraSaturada(rst.getString("gorduraSaturada") == null ? 0 : rst.getDouble("gorduraSaturada"));
-                            imp.setGorduraTrans(rst.getString("gorduraTrans") == null ? 0 : rst.getDouble("gorduraTrans"));
+                            imp.setGorduraSaturada(rst.getString("gordurasaturada") == null ? 0 : rst.getDouble("gordurasaturada"));
+                            imp.setGorduraTrans(rst.getString("gorduratrans") == null ? 0 : rst.getDouble("gorduratrans"));
                             imp.setFibra(rst.getString("fibra") == null ? 0 : rst.getDouble("fibra"));
                             imp.setSodio(rst.getString("sodio") == null ? 0 : rst.getDouble("sodio"));
                             imp.setMedidaInteira(rst.getString("medidaInteira") == null ? 1 : rst.getInt("medidaInteira"));
@@ -140,6 +142,8 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setId_tipomedidadecimal(rst.getString("id_tipomedidadecimal") == null ? 5 : rst.getInt("id_tipomedidadecimal"));
                             imp.setIdTipoMedida(rst.getString("id_tipomedida") == null ? -1 : rst.getInt("id_tipomedida"));
                             imp.setId_tipounidadeporcao(rst.getString("Id_tipounidadeporcao") == null ? 2 : rst.getInt("Id_tipounidadeporcao"));
+                            imp.setAcucaresadicionados(rst.getString("acucares") == null ? 0 : rst.getString("acucares").equals("") ? 0 : rst.getDouble("acucares"));
+                            imp.setAcucarestotais(rst.getString("acucares_total") == null ? 0 : rst.getString("acucares_total").equals("") ? 0 : rst.getDouble("acucares_total"));
                             imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : rst.getString("alergenicos"));
                             imp.addProduto(rst.getString("id_produto") == null ? "0" : rst.getString("id_produto"));
                         }
@@ -274,7 +278,7 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
             sql.put("gorduras_trans", vo.getGordurasTrans());
             sql.put("fibra_alimentar", vo.getFibra());
             sql.put("sodio", vo.getSodio());
-            sql.put("acucares",vo.getAcucares());
+            sql.put("acucares", vo.getAcucares());
             sql.put("acucares_total", vo.getAcucaresTotais());
 
             stm.execute(sql.getInsert());

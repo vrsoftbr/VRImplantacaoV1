@@ -36,6 +36,7 @@ public class ConversorDAO {
     ConexaoPostgres con = new ConexaoPostgres();
     Properties prop = App.properties();
     private String ip = prop.get("database.ip");
+    private String bancoProperties = prop.get("database.nome");
     private int porta = Integer.parseInt(prop.get("database.porta"));
     private String regexp = "([\\W])";
 
@@ -103,7 +104,7 @@ public class ConversorDAO {
             for (String dado : dados) {
                 if (contador < dados.size()) {
                     dado = dados.get(contador++);
-                   campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
+                    campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
                 }
             }
             System.out.println(sql + campos.substring(0, campos.length() - 2) + "\n);");
@@ -181,7 +182,7 @@ public class ConversorDAO {
                     + "    populada varchar\n"
                     + ");";
             stm.execute(sql);
-             fecharConexao();
+            fecharConexao();
         }
     }
 
@@ -192,7 +193,7 @@ public class ConversorDAO {
                     + "(banco,	nome_tabela, populada)\n"
                     + "values ('" + banco + "', '" + tabela + "', 'não')";
             stm.execute(sql);
-             fecharConexao();
+            fecharConexao();
         } catch (PSQLException e) {
             System.out.println("erro em insereDeDadosConvertidos = " + e.getMessage());
             e.printStackTrace();
@@ -240,12 +241,26 @@ public class ConversorDAO {
         }
         return result;
     }
-    
+
     public void abrirConexao() throws Exception {
         con.abrirConexao(ip, porta, getNomeBanco(), "postgres", "VrPost@Server");
     }
 
     public void fecharConexao() throws Exception {
         con.close();
-    }        
+    }
+
+    public void criarControleDeDadosConvertidosProperties() throws Exception {
+        con.abrirConexao(ip, porta, bancoProperties, "postgres", "VrPost@Server");
+        try (Statement stm = con.getConexao().createStatement();) {
+            stm.execute("CREATE SCHEMA IF NOT EXISTS conversao");
+            String sql = "CREATE TABLE IF NOT EXISTS conversao.dados(\n"
+                    + "    banco varchar,\n"
+                    + "    nome_tabela varchar, \n"
+                    + "    populada varchar\n"
+                    + ");";
+            stm.execute(sql);
+            con.close();
+        }
+    }
 }

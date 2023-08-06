@@ -217,7 +217,7 @@ public class NutricionalToledoArquivoRepository {
                     JOptionPane.showMessageDialog(null, "Houve algum erro durante a importação:\n\n" + ex.getMessage());
                     System.out.println(ex.getMessage());
                     ProgressBar.dispose();
-                    Exceptions.printStackTrace(ex);
+                    ex.printStackTrace();
                 }
                 ProgressBar.dispose();
             }

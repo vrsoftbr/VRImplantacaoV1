@@ -42,7 +42,9 @@ public class NutricionalToledoVO {
     private int id_tipounidadeporcao = 0;
     private int medidainteira = 0;
     private int id_tipomedidadecimal = 0;
-    private int id_tipomedida = 5;
+    private int id_tipomedida = 5;    
+    private double acucaresadicionados = 0;
+    private double acucarestotais = 0;
     private List<String> mensagemAlergico = new ArrayList<>(15);
     private Set<String> idProdutos = new HashSet<>();
     public List<NutricionalToledoItemVO> vNutricionalToledoItem = new ArrayList<>();
@@ -516,4 +518,21 @@ public class NutricionalToledoVO {
     public void setIdProduto(int idProduto) {
         this.idProduto = idProduto;
     }
+
+    public double getAcucaresAdicionados() {
+        return acucaresadicionados;
+    }
+
+    public void setAcucaresAdicionados(double acucaresadicionados) {
+        this.acucaresadicionados = acucaresadicionados;
+    }
+
+    public double getAcucaresTotais() {
+        return acucarestotais;
+    }
+
+    public void setAcucaresTotais(double acucarestotais) {
+        this.acucarestotais = acucarestotais;
+    }
+    
 }

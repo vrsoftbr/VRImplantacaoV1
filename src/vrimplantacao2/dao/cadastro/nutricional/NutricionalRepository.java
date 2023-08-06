@@ -199,6 +199,7 @@ public class NutricionalRepository {
         nut.setProteinainferior(imp.isProteinaInferior());
         nut.setGordura(imp.getGordura());
         nut.setGordurasaturada(imp.getGorduraSaturada());
+        nut.setGorduratrans(imp.getGorduraTrans());
         nut.setColesterolinferior(imp.isColesterolInferior());
         nut.setFibra(imp.getFibra());
         nut.setFibrainferior(imp.isFibraInferior());
@@ -217,6 +218,8 @@ public class NutricionalRepository {
         nut.setQuantidade(Utils.stringToInt(imp.getPorcao()));
         nut.setId_tipomedidadecimal(imp.getId_tipomedidadecimal());
         nut.setId_tipounidadeporcao(imp.getId_tipounidadeporcao());
+        nut.setAcucaresAdicionados(imp.getAcucaresadicionados());
+        nut.setAcucaresTotais(imp.getAcucarestotais());
         if (imp.getIdTipoMedida() > 0) {
             nut.setId_tipomedida(imp.getIdTipoMedida());
         }

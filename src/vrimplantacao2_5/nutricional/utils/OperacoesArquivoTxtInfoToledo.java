@@ -109,7 +109,7 @@ public class OperacoesArquivoTxtInfoToledo {
 
         for (int i = 0; i < vToledo.size(); i++) {
                 TxtInfoVO vo = new TxtInfoVO();
-                txtInfoColuna16Fim = vToledo.get(i).trim().length();
+                txtInfoColuna16Fim = vToledo.get(i).length();
                 if (!vToledo.get(i).trim().isEmpty()) {
 
                     vo.setCodigo(Integer.parseInt(vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim).equals("") ? "0" : vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim)));

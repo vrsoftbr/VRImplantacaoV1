@@ -851,7 +851,7 @@ public class PublicVendaRepository {
         PublicVendaVO vo = new PublicVendaVO(item.getVenda().getId_loja(),
                 item.getId_produto(),
                 item.getData(),
-                item.getPrecoVenda(),
+                item.getPrecoVenda() - (item.getValorDesconto() / item.getQuantidade()),
                 item.getQuantidade(),
                 1,
                 item.getCustoComImposto(),
@@ -860,7 +860,7 @@ public class PublicVendaRepository {
                 item.getAliquota(),
                 item.getAliquota(),
                 //valor total
-                item.getQuantidade() * item.getPrecoVenda(),
+                (((item.getQuantidade() * item.getPrecoVenda()) + item.getValorAcrescimo()) - item.getValorDesconto()),
                 item.getCustoSemImposto(),
                 false,
                 0,
