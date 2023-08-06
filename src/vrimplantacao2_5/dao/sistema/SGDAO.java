@@ -280,8 +280,15 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+
+                    if (rs.getDouble("custocomimposto") < rs.getDouble("custosemimposto")) {
+                        imp.setCustoComImposto(rs.getDouble("custosemimposto"));
+                        imp.setCustoSemImposto(rs.getDouble("custocomimposto"));
+                    } else {
+                        imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                        imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    }
+
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem"));
@@ -463,7 +470,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    
+
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setCodigoExterno(rs.getString("codexterno"));
@@ -541,7 +548,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + " c.lanent15 id,\n"
+                    + " c.lanent15::varchar||ordpag15::varchar id,\n"
                     + " f.codforn02 idfornecedor,\n"
                     + " c.codfil15 loja,\n"
                     + " c.datemis15 dtemissao,\n"

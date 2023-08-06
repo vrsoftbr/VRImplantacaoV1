@@ -106,6 +106,8 @@ public class RMS2_5GUI extends VRInternalFrame {
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
                     dao.setUtilizarViewMixFiscal(chkUtilizarViewMixFiscal.isSelected());
+                    dao.setDataFinalTroca(edtDataTroca.getDate());
+                    dao.setProdutoFornecedorSemCusto(chkProdutoFornecedorSemCusto.isSelected());
 
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
@@ -215,6 +217,9 @@ public class RMS2_5GUI extends VRInternalFrame {
         chkBancoUnificado = new vrframework.bean.checkBox.VRCheckBox();
         jPanel1 = new javax.swing.JPanel();
         chkUtilizarViewMixFiscal = new vrframework.bean.checkBox.VRCheckBox();
+        edtDataTroca = new org.jdesktop.swingx.JXDatePicker();
+        jLabel3 = new javax.swing.JLabel();
+        chkProdutoFornecedorSemCusto = new vrframework.bean.checkBox.VRCheckBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -431,21 +436,37 @@ public class RMS2_5GUI extends VRInternalFrame {
 
         chkUtilizarViewMixFiscal.setText("Utilizar View de Mix Fiscal");
 
+        jLabel3.setText("Data da Troca");
+
+        chkProdutoFornecedorSemCusto.setText("ProdutoFornecedor sem custo");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(423, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkProdutoFornecedorSemCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(edtDataTroca, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addContainerGap(217, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(216, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkProdutoFornecedorSemCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel3)
+                .addGap(3, 3, 3)
+                .addComponent(edtDataTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(169, Short.MAX_VALUE))
         );
 
         tabMenu.addTab("Extras", jPanel1);
@@ -457,7 +478,7 @@ public class RMS2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
+                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 603, Short.MAX_VALUE)
                     .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -472,8 +493,6 @@ public class RMS2_5GUI extends VRInternalFrame {
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("RMS");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -568,12 +587,15 @@ public class RMS2_5GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkBancoUnificado;
     private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedorSemCusto;
     private vrframework.bean.checkBox.VRCheckBox chkUtilizarViewMixFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;
     private vrframework.bean.textField.VRTextField dtVenda;
+    private org.jdesktop.swingx.JXDatePicker edtDataTroca;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtFim;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
     private javax.swing.JButton jBLimpar;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private vrframework.bean.label.VRLabel lblMesVenda;
     private vrframework.bean.label.VRLabel lblMesVenda1;

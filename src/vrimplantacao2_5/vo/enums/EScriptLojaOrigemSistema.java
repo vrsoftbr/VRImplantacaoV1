@@ -145,7 +145,8 @@ public enum EScriptLojaOrigemSistema {
     CENTER_INFORMATICA(256, 5, "SELECT COD_EMP AS id , razao AS descricao FROM CONFIG c"),
     ARGO(257, 13, "select codemp id, razemp descricao from empresa"),
     VIVASISTEMAS(258, 5, "SELECT EMPR_PK id, EMPR_FANTASIA descricao FROM CDTR_EMPRESA"),
-    RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e ");
+    RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e "),
+    LJSISTEMAS_SIG(260, 5, "SELECT EMPCONTADOR id, DESCEMPRESA descricao  FROM EMP001");
     
     
 

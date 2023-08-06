@@ -42,7 +42,7 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
-import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+//import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -66,6 +66,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
@@ -93,6 +94,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     public static int digito;
     private boolean digitoCliente = false;
     private boolean contaPagarBaixado = false;
+    private boolean produtoFornecedorSemCusto = false;
 
     private boolean utilizarViewMixFiscal = true;
     private Date dataFinalTroca;
@@ -103,6 +105,14 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean isContaPagarBaixado() {
         return contaPagarBaixado;
+    }
+
+    public boolean produtoFornecedorSemCusto() {
+        return produtoFornecedorSemCusto;
+    }
+
+    public void setProdutoFornecedorSemCusto(boolean produtoFornecedorSemCusto) {
+        this.produtoFornecedorSemCusto = produtoFornecedorSemCusto;
     }
 
     public void setContaPagarBaixado(boolean contaPagarBaixado) {
@@ -288,7 +298,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
@@ -416,6 +426,91 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return new ArrayList<>(merc.values());
+    }*/
+    
+    //Feito Para atender um cliente
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "WITH merc1 AS (\n"
+                    + "select \n"
+                    + "    NCC_SECAO as merc1,\n"
+                    + "    NCC_DESCRICAO as merc1_desc\n"
+                    + "from\n"
+                    + "    AA3CNVCC merc1        \n"
+                    + "where\n"
+                    + "    NCC_SECAO > 0\n"
+                    + "    and NCC_GRUPO = 0\n"
+                    + "    and NCC_SUBGRUPO = 0\n"
+                    + "order by\n"
+                    + "    merc1.ncc_departamento,\n"
+                    + "    merc1.ncc_secao\n"
+                    + "), \n"
+                    + "merc2 AS (\n"
+                    + "select \n"
+                    + "    NCC_SECAO as merc1,\n"
+                    + "	NCC_GRUPO as merc2,\n"
+                    + "    NCC_DESCRICAO as merc2_desc\n"
+                    + "from\n"
+                    + "    AA3CNVCC        \n"
+                    + "where\n"
+                    + "    NCC_SECAO > 0\n"
+                    + "    and NCC_GRUPO > 0\n"
+                    + "    and NCC_SUBGRUPO = 0\n"
+                    + "order by\n"
+                    + "    ncc_departamento,\n"
+                    + "    ncc_secao,\n"
+                    + "    ncc_grupo\n"
+                    + "),\n"
+                    + "merc3 AS (\n"
+                    + "select \n"
+                    + "    NCC_SECAO as merc1,\n"
+                    + "    NCC_GRUPO as merc2,\n"
+                    + "    NCC_SUBGRUPO as merc3,\n"
+                    + "    NCC_DESCRICAO as merc3_desc\n"
+                    + "from\n"
+                    + "    AA3CNVCC        \n"
+                    + "where\n"
+                    + "    NCC_SECAO > 0\n"
+                    + "    and NCC_GRUPO > 0\n"
+                    + "    and NCC_SUBGRUPO > 0\n"
+                    + "order by\n"
+                    + "    ncc_departamento,\n"
+                    + "    ncc_secao,\n"
+                    + "    ncc_grupo,\n"
+                    + "    ncc_subgrupo\n"
+                    + ")\n"
+                    + "SELECT \n"
+                    + "  merc1.merc1,\n"
+                    + "  merc1.merc1_desc,\n"
+                    + "  merc2.merc2,\n"
+                    + "  merc2.merc2_desc,\n"
+                    + "  merc3.merc3,\n"
+                    + "  merc3.merc3_desc\n"
+                    + "FROM merc1\n"
+                    + "JOIN merc2 ON merc2.merc1 = merc1.merc1\n"
+                    + "JOIN merc3 ON merc3.merc2 = merc2.merc2 AND merc3.merc1 = merc1.merc1\n"
+                    + "ORDER BY 1,3,5"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("merc1_desc"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("merc2_desc"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("merc3_desc"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -503,7 +598,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO,
+                //OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
@@ -623,11 +719,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.GIT_DESCRICAO descricaocompleta,\n"
                     + "	p.GIT_DESC_REDUZ descricaoreduzida,\n"
                     + "	p.GIT_DESCRICAO descricaogondola,\n"
-                    + "	p.git_depto merc1,\n"
-                    + "	p.GIT_SECAO merc2,\n"
-                    + "	p.GIT_GRUPO merc3,\n"
-                    + "	p.GIT_SUBGRUPO merc4,\n"
-                    + "	p.GIT_CATEGORIA merc5,\n"
+                    //+ "	p.git_depto merc1,\n"
+                    + "	p.GIT_SECAO merc1,\n"
+                    + "	p.GIT_GRUPO merc2,\n"
+                    + "	p.GIT_SUBGRUPO merc3,\n"
+                    //+ "	p.GIT_CATEGORIA merc5,\n"
                     + "	p.GIT_COMPRADOR id_comprador,\n"
                     + "	F.TIP_CODIGO||F.TIP_DIGITO id_fabricante,\n"
                     + "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n"
@@ -792,7 +888,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    //imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
                     imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
@@ -805,6 +901,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setEstoque(rst.getDouble("estoque"));
 
+                    //Feito Para atender um cliente
                     String tipoCompra = rst.getString("tipocompra");
                     if ("1".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.CENTRALIZADO);
@@ -818,6 +915,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     if ("20".equals(tipoCompra)) {
                         imp.setTipoCompra(TipoCompra.LOJA);
                     }
+                    //Feito Para atender um cliente
                     if ("1".equals(tipoCompra)) {
                         imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                         imp.setEstoqueMinimo(1);
@@ -863,7 +961,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         //FEITO PARA ATENDER UM CLIENTE - COLORADO
                         //FORA DO PADRÃO
-                        String mercadologico = imp.getCodMercadologico1()
+                        /*String mercadologico = imp.getCodMercadologico1()
                                 + imp.getCodMercadologico2()
                                 + imp.getCodMercadologico3()
                                 + imp.getCodMercadologico4();
@@ -888,7 +986,10 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
                             imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
-                        }
+                        }*/
+                        
+                        imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
 
                         imp.setIcmsDebitoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
@@ -914,7 +1015,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n"
+                        /*"select\n"
                         + "       cd_fil_origem id_loja,\n"
                         + "       cd_prod, \n"
                         + "       sum(qtde_mvto) troca\n"
@@ -992,7 +1093,15 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "  SERIE_NOTA,\n"
                         + "  GIT_TPO_EMB_VENDA, GIT_TIPO_ETQ, GIT_TIPO_PRO, CD_USR_NTF, DET_DEST_DEP_TROCAS\n"
                         + " order by dt_mvto, cd_fil_origem, nr_seq, cd_prod) troca\n"
-                        + " group by cd_fil_origem, cd_prod"
+                        + " group by cd_fil_origem, cd_prod"*/
+                        "select  \n"
+                        + " CD_PROD,\n"
+                        + " QTD_ESTOQUE_TROCA troca\n"
+                        + "from AGG_ESTQ_PROD a\n"
+                        + "WHERE \n"
+                        + "QTD_ESTOQUE_TROCA <> 0\n"
+                        + "AND \n"
+                        + "DTA_INTG_ESTQ = (SELECT max(b.DTA_INTG_ESTQ) FROM AGG_ESTQ_PROD b WHERE b.CD_PROD = a.CD_PROD)"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -1286,66 +1395,28 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    /*"SELECT DISTINCT\n"
-                    + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
-                    + "	GIT_COD_ITEM PRODUTO,\n"
-                    + "	FORITE_REFERENCIA AS REFERENCIA,\n"
-                    + "	forn.forite_uf_fator_conv AS FATOR_COVERSAO  \n"
-                    + "FROM \n"
-                    + "	AA1FORIT FORN\n"
-                    + "	join AA3CITEM PROD on\n"
-                    + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
-                    + "where\n"
-                    + "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n"
-                    + "union\n"
-                    + "SELECT\n"
-                    + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
-                    + "	p.GIT_COD_ITEM PRODUTO,\n"
-                    + "    p.git_referencia  AS REFERENCIA,\n"
-                    + "	p.git_emb_for fator_conversao\n"
-                    + "FROM \n"
-                    + "	AA3CITEM p\n"
-                    + "	join AA2CTIPO f on\n"
-                    + "        p.git_cod_for = f.tip_codigo\n"
-                    + "where\n"
-                    + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'"*/
-                    "WITH teste AS (	  \n"
+
+            String sql
+                    = "WITH teste AS (	  \n"
                     + "SELECT DISTINCT\n"
                     + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
                     + "	GIT_COD_ITEM AS PRODUTO,\n"
                     + "	FORITE_REFERENCIA AS REFERENCIA,\n"
-                    + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO,\n"
-                    + "	CASE WHEN PROD.GIT_ENT_ACM_CUS = 0 THEN PROD.GIT_CUS_ULT_ENT_BRU\n"
-                    + "		ELSE (PROD.GIT_ENT_ACM_CUS / PROD.GIT_ENT_ACM_UN) END custo_compra,\n"
-                    + "		PROD.GIT_ENT_ACM_CUS,\n"
-                    + "		PROD.GIT_ENT_ACM_UN,\n"
-                    + "	PROD.git_cus_ult_ent_bru as custocomimposto,\n"
-                    + " 	PROD.git_cus_ult_ent as custosemimposto\n"
+                    + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO\n"
                     + "FROM \n"
                     + "	AA1FORIT FORN\n"
                     + "	join AA3CITEM PROD on\n"
                     + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
-                    + "where\n"
-                    + "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n"
                     + "UNION\n"
                     + "SELECT\n"
                     + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
                     + "	p.GIT_COD_ITEM AS PRODUTO,\n"
                     + "    p.git_referencia  AS REFERENCIA,\n"
-                    + "	p.git_emb_for as fator_conversao,\n"
-                    + "	CASE WHEN p.GIT_ENT_ACM_CUS = 0 THEN p.GIT_CUS_ULT_ENT_BRU\n"
-                    + "		ELSE (p.GIT_ENT_ACM_CUS / p.GIT_ENT_ACM_UN) END custo_compra,\n"
-                    + "		p.GIT_ENT_ACM_CUS,\n"
-                    + "		p.GIT_ENT_ACM_UN,\n"
-                    + "	p.git_cus_ult_ent_bru as custocomimposto,\n"
-                    + " 	p.git_cus_ult_ent as custosemimposto\n"
+                    + "	p.git_emb_for as fator_conversao\n"
                     + "FROM \n"
                     + "	AA3CITEM p\n"
                     + "	join AA2CTIPO f on\n"
                     + "        p.git_cod_for = f.tip_codigo\n"
-                    + "where\n"
-                    + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'\n"
                     + ")\n"
                     + "select DISTINCT\n"
                     + " teste.fornecedor,\n"
@@ -1361,7 +1432,103 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "			from AG1IENSA b\n"
                     + "			WHERE b.ESITC_CODIGO = a.ESITC_CODIGO\n"
                     + "			AND ESCHC_AGENDA = 1)\n"
-                    + "			AND ESCHC_AGENDA = 1"
+                    + "			AND ESCHC_AGENDA = 1\n"
+                    + "UNION \n"
+                    + "SELECT DISTINCT\n"
+                    + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
+                    + "	GIT_COD_ITEM AS PRODUTO,\n"
+                    + "	FORITE_REFERENCIA AS REFERENCIA,\n"
+                    + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO,\n"
+                    + "	0 custo_compra\n"
+                    + "FROM \n"
+                    + "	AA1FORIT FORN\n"
+                    + "	join AA3CITEM PROD on\n"
+                    + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
+                    + "UNION\n"
+                    + "SELECT DISTINCT\n"
+                    + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
+                    + "	p.GIT_COD_ITEM AS PRODUTO,\n"
+                    + "    p.git_referencia  AS REFERENCIA,\n"
+                    + "	p.git_emb_for as fator_conversao,\n"
+                    + "	0 custo_compra\n"
+                    + "FROM \n"
+                    + "	AA3CITEM p\n"
+                    + "	join AA2CTIPO f on\n"
+                    + "        p.git_cod_for = f.tip_codigo\n";
+            if (produtoFornecedorSemCusto) {
+                sql = "WITH teste AS (	  \n"
+                        + "SELECT DISTINCT\n"
+                        + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
+                        + "	GIT_COD_ITEM AS PRODUTO,\n"
+                        + "	FORITE_REFERENCIA AS REFERENCIA,\n"
+                        + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO\n"
+                        + "FROM \n"
+                        + "	AA1FORIT FORN\n"
+                        + "	join AA3CITEM PROD on\n"
+                        + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
+                        + "where\n"
+                        + "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n"
+                        + "UNION\n"
+                        + "SELECT DISTINCT\n"
+                        + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
+                        + "	p.GIT_COD_ITEM AS PRODUTO,\n"
+                        + "    p.git_referencia  AS REFERENCIA,\n"
+                        + "	p.git_emb_for as fator_conversao\n"
+                        + "FROM \n"
+                        + "	AA3CITEM p\n"
+                        + "	join AA2CTIPO f on\n"
+                        + "        p.git_cod_for = f.tip_codigo\n"
+                        + "where\n"
+                        + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'\n"
+                        + ")\n"
+                        + "SELECT DISTINCT\n"
+                        + " teste.fornecedor,\n"
+                        + " teste.produto,\n"
+                        + " teste.referencia,\n"
+                        + " teste.FATOR_COVERSAO,\n"
+                        + " 0 custo_compra\n"
+                        + "FROM teste\n"
+                        + "WHERE teste.produto NOT IN (\n"
+                        + "WITH teste AS (	  \n"
+                        + "SELECT DISTINCT\n"
+                        + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
+                        + "	GIT_COD_ITEM AS PRODUTO,\n"
+                        + "	FORITE_REFERENCIA AS REFERENCIA,\n"
+                        + "	PROD.GIT_EMB_FOR AS FATOR_COVERSAO\n"
+                        + "FROM \n"
+                        + "	AA1FORIT FORN\n"
+                        + "	join AA3CITEM PROD on\n"
+                        + "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n"
+                        + "where\n"
+                        + "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n"
+                        + "UNION\n"
+                        + "SELECT\n"
+                        + "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n"
+                        + "	p.GIT_COD_ITEM AS PRODUTO,\n"
+                        + "    p.git_referencia  AS REFERENCIA,\n"
+                        + "	p.git_emb_for as fator_conversao\n"
+                        + "FROM \n"
+                        + "	AA3CITEM p\n"
+                        + "	join AA2CTIPO f on\n"
+                        + "        p.git_cod_for = f.tip_codigo\n"
+                        + "where\n"
+                        + "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'\n"
+                        + ")\n"
+                        + "select DISTINCT\n"
+                        + " teste.produto\n"
+                        + "from AG1IENSA a\n"
+                        + "JOIN teste ON teste.PRODUTO = a.ESITC_CODIGO\n"
+                        + "WHERE \n"
+                        + "a.ESCHC_DATA = (select \n"
+                        + "			max(ESCHC_DATA3) \n"
+                        + "			from AG1IENSA b\n"
+                        + "			WHERE b.ESITC_CODIGO = a.ESITC_CODIGO\n"
+                        + "			AND ESCHC_AGENDA = 1)\n"
+                        + "			AND ESCHC_AGENDA = 1\n"
+                        + ")";
+            }
+
+            try (ResultSet rst = stm.executeQuery(sql
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
