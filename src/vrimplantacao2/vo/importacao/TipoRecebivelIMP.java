@@ -21,7 +21,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
     private int id_ContaContabilFiscalDebito;
     private int id_ContaContabilFiscalCredito;
     private int id_HistoricoPadrao;
-    private SituacaoCadastro situacaoCadastro;
+    private Integer situacaoCadastro;
     private int id_TipoVistaPrazo;
     private int id_TipoCartaoTef;
     private int id_Fornecedor;
@@ -172,19 +172,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
         this.id_HistoricoPadrao = id_HistoricoPadrao;
     }
 
-    /**
-     * @return the situacaoCadastro
-     */
-    public SituacaoCadastro getSituacaoCadastro() {
-        return situacaoCadastro;
-    }
-
-    /**
-     * @param situacaoCadastro the situacaoCadastro to set
-     */
-    public void setSituacaoCadastro(int situacaoCadastro) {
-        this.situacaoCadastro = SituacaoCadastro.getById(situacaoCadastro);
-    }
+   
 
     /**
      * @return the id_TipoVistaPrazo
@@ -296,6 +284,20 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
      */
     public void setId_tipoTef(Integer id_tipoTef) {
         this.id_tipoTef = id_tipoTef;
+    }
+
+    /**
+     * @return the situacaoCadastro
+     */
+    public Integer getSituacaoCadastro() {
+        return situacaoCadastro;
+    }
+
+    /**
+     * @param situacaoCadastro the situacaoCadastro to set
+     */
+    public void setSituacaoCadastro(Integer situacaoCadastro) {
+        this.situacaoCadastro = situacaoCadastro;
     }
 
     

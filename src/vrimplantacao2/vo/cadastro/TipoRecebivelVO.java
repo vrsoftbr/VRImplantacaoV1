@@ -1,30 +1,28 @@
 package vrimplantacao2.vo.cadastro;
 
-import vrimplantacao2.vo.enums.SituacaoCadastro;
-
 public class TipoRecebivelVO {
 
-    private int id ;
-    private String descricao ;
+    private int id;
+    private String descricao;
     private int percentual;
-    private int id_TipoTef ;
-    private int id_TipoTicket ;
+    private int id_TipoTef;
+    private int id_TipoTicket;
     private boolean geraRecebimento;
-    private int id_contaContabilFiscalDebito ;
-    private int id_ContaContabilFiscalCredito ;
-    private int id_HistoricoPadrao ;
-    private SituacaoCadastro id_situacaoCadastro;
-    private int id_TipoPrazo ;
-    private int id_TipoCartaoTef ;
-    private int id_Fornecedor ;
+    private int id_contaContabilFiscalDebito;
+    private int id_ContaContabilFiscalCredito;
+    private int id_HistoricoPadrao;
+    private Integer id_situacaoCadastro;
+    private int id_TipoPrazo;
+    private int id_TipoCartaoTef;
+    private int id_Fornecedor;
     private boolean tef;
-    private int id_tiporecebimento ;
-    private boolean contabiliza ;
-    private int id_ContaContabilFinanceiro ;
-    
-    public TipoRecebivelVO (){     
+    private int id_tiporecebimento;
+    private boolean contabiliza;
+    private int id_ContaContabilFinanceiro;
+
+    public TipoRecebivelVO() {
     }
- 
+
     /**
      * @return the id
      */
@@ -117,7 +115,8 @@ public class TipoRecebivelVO {
     }
 
     /**
-     * @param id_contaContabilFiscalDebito the id_contaContabilFiscalDebito to set
+     * @param id_contaContabilFiscalDebito the id_contaContabilFiscalDebito to
+     * set
      */
     public void setId_contaContabilFiscalDebito(Integer id_contaContabilFiscalDebito) {
         this.id_contaContabilFiscalDebito = id_contaContabilFiscalDebito;
@@ -131,7 +130,8 @@ public class TipoRecebivelVO {
     }
 
     /**
-     * @param id_ContaContabilFiscalCredito the id_ContaContabilFiscalCredito to set
+     * @param id_ContaContabilFiscalCredito the id_ContaContabilFiscalCredito to
+     * set
      */
     public void setId_ContaContabilFiscalCredito(Integer id_ContaContabilFiscalCredito) {
         this.id_ContaContabilFiscalCredito = id_ContaContabilFiscalCredito;
@@ -150,6 +150,7 @@ public class TipoRecebivelVO {
     public void setId_HistoricoPadrao(Integer id_HistoricoPadrao) {
         this.id_HistoricoPadrao = id_HistoricoPadrao;
     }
+
     /**
      * @return the id_TipoPrazo
      */
@@ -251,18 +252,15 @@ public class TipoRecebivelVO {
     /**
      * @return the id_situacaoCadastro
      */
-    public SituacaoCadastro getId_situacaoCadastro() {
+    public Integer getId_situacaoCadastro() {
         return id_situacaoCadastro;
     }
 
     /**
      * @param id_situacaoCadastro the id_situacaoCadastro to set
      */
-    public void setId_situacaoCadastro(SituacaoCadastro id_situacaoCadastro) {
+    public void setId_situacaoCadastro(Integer id_situacaoCadastro) {
         this.id_situacaoCadastro = id_situacaoCadastro;
     }
 
 }
-
-    
-    

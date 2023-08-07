@@ -21,6 +21,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
+import vrimplantacao2.vo.cadastro.AutorizadoraVO;
+import vrimplantacao2.vo.cadastro.TipoRecebivelVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -29,7 +31,6 @@ import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
-import vrimplantacao2.vo.importacao.AutorizadoraIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -58,7 +59,6 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
-import vrimplantacao2.vo.importacao.TipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.TipoTefIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -751,7 +751,7 @@ public abstract class InterfaceDAO {
     }
 
     // TIPO RECEBÍVEIS
-    public List<TipoRecebivelIMP> getRecebivel() throws Exception {
+    public List<TipoRecebivelVO> getRecebivel() throws Exception {
         return new ArrayList<>();
     }
 
@@ -761,7 +761,7 @@ public abstract class InterfaceDAO {
     }
 
     // PDV.AUTORIZADORA
-    public List<AutorizadoraIMP> getAutorizadora() throws Exception {
+    public List<AutorizadoraVO> getAutorizadora() throws Exception {
         return new ArrayList<>();
     }
 

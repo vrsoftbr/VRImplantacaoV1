@@ -627,278 +627,278 @@ public class Importador {
         dao.salvarEANemBranco();
     }
 
-    public void importarTipoRecebivel() throws Exception {
-        ProgressBar.setStatus("Carregando Dados...");
-
-        // Instanciação das listas
-        //pdv.tipomodelo
-        List<TipoModeloIMP> modelo = getInterfaceDAO().getModeloEcf();
-        TipoModeloRepositoryProvider modeloprovider = new TipoModeloRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.ecf
-        List<EcfIMP> ecf = getInterfaceDAO().getPdvEcf();
-        EcfRepositoryProvider ecfProvider = new EcfRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.ecflayout
-        List<EcfLayoutIMP> ecfLayout = getInterfaceDAO().getEcfLayout();
-        EcfLayoutRepositoryProvider ecfLayoutProvider = new EcfLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.tecladolayout
-        List<TecladoLayoutIMP> tecladoLayout = getInterfaceDAO().getTecladoLayout();
-        TecladoLayoutRepositoryProvider tecladoLayoutProvider = new TecladoLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.tecladolayoutfuncao
-        List<PdvTecladoFuncaoIMP> tecladoImp = getInterfaceDAO().getPdvFuncaoTeclado();
-        PdvTecladoFuncaoRepositoryProvider tecladoprov = new PdvTecladoFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.funcaoniveloperador
-        List<PdvFuncaoOperadorIMP> funcaoOperador = getInterfaceDAO().getPdvFuncaoOperador();
-        PdvFuncaoOperadorRepositoryProvider opePro = new PdvFuncaoOperadorRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.funcao
-        List<PdvFuncaoIMP> funcaoImp = getInterfaceDAO().getPdvFuncao();
-        PdvFuncaoRepositoryProvider funcaoPro = new PdvFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.finalizadoraconfiguracao
-        List<FinalizadoraConfiguracaoIMP> finalizadoraConf = getInterfaceDAO().getFinalizadoraConfiguracao();
-        FinalizadoraConfiguracaoRepositoryProvider configuracao = new FinalizadoraConfiguracaoRepositoryProvider(
-                getSistema(),
-                getLojaOrigem(),
-                lojaVR);
-
-        //pdv.finalizadoralayoutretorno
-        List<FinalizadoraLayoutRetornoIMP> retImp = getInterfaceDAO().getFinalizadoraLayout();
-        FinalizadoraLayoutRetornoRepositoryProvider layRep = new FinalizadoraLayoutRetornoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.finalizadora
-        List<FinalizadoraIMP> finImp = getInterfaceDAO().getPdvFinalizadora();
-        FinalizadoraRepositoryProvider finProv = new FinalizadoraRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.cfop
-        List<CfopIMP> cfopmImp = getInterfaceDAO().getCfop();
-        CfopRepositoryProvider cfopProv = new CfopRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        List<CaixaVendaIMP> caixaVendaImp = getInterfaceDAO().getCaixa();
-        CaixaVendaRepositoryProvider caixaPro = new CaixaVendaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.tipoentrada
-        List<MapaResumoIMP> mapaImp = getInterfaceDAO().getMapa();
-        MapaResumoRepositoryProvider mapaPro = new MapaResumoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.tipoentrada
-        List<AtivoImobilizadoIMP> ativoImp = getInterfaceDAO().getAtivo();
-        AtivoImobilizadoRepositoryProvider AtivoPro = new AtivoImobilizadoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.tipoentrada
-        List<ContabilidadeAbatimentoIMP> abatimentoImp = getInterfaceDAO().getAbatimento();
-        ContabilidadeAbatimentoRepositoryProvider abatimentoProvider = new ContabilidadeAbatimentoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.tipoentrada
-        List<ContabilidadeTipoSaidaIMP> tipoSaidaContabil = getInterfaceDAO().getTipoSaidaContabil();
-        ContabilidadeTipoSaidaRepositoryProvider saidaProvider = new ContabilidadeTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.tipoentrada
-        List<ContabilidadeTipoEntradaIMP> tipoEntradaContabil = getInterfaceDAO().getTipoEntradaContabil();
-        ContabilidadeTipoEntradaRepositoryProvider EntradaProvider = new ContabilidadeTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //ativo.grupoativo
-        List<GrupoAtivoIMP> grup = getInterfaceDAO().getGrupoAtivo();
-        GrupoAtivoRepositoryProvider grppPro = new GrupoAtivoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //contabilidade.caixadiferenca
-        List<CaixaDiferencaIMP> caixaImp = getInterfaceDAO().getCaixaDiferenca();
-        CaixaDiferencaRepositoryProvider caixaProv = new CaixaDiferencaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.tipoplanoconta
-        List<TipoPlanoContaIMP> tipoImp = getInterfaceDAO().getTipoPlanoConta();
-        TipoPlanoContaRepositoryProvider planoProv = new TipoPlanoContaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.recebivelconfiguracaotabela
-        List<RecebivelConfiguracaoTabelaIMP> recConf = getInterfaceDAO().getConfiguracaoRecebivelTabela();
-        RecebivelConfiguracaoTabelaRepositoryProvider confRecTab = new RecebivelConfiguracaoTabelaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.recebivelconfiguracao
-        List<RecebivelConfiguracaoIMP> confRe = getInterfaceDAO().getConfiguracaoRecebivel();
-        RecebivelConfiguracaoRepositoryProvider confPro = new RecebivelConfiguracaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.tiporecebivelfinalizadora
-        List<TipoRecebivelFinalizadoraIMP> tpRec = getInterfaceDAO().getTipoRecebivelFinalizadora();
-        TipoRecebivelFinalizadoraRepositoryProvider tpPro = new TipoRecebivelFinalizadoraRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.entradasaidatipoentrada
-        List<EntradaSaidaTipoEntradaIMP> entradaSaidaTipoEntrada = getInterfaceDAO().getEntradaSaidaTipoEntrada();
-        EntradaSaidaTipoEntradaRepositoryProvider entradaSaidaEntrada = new EntradaSaidaTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.entradasaidatiposaida
-        List<EntradaSaidaTipoSaidaIMP> entradaSaidaTipoSaida = getInterfaceDAO().getEntradaSaida();
-        EntradaSaidaTipoSaidaRepositoryProvider entradaSaida = new EntradaSaidaTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //public.tiposaidacontabilidade
-        List<TipoSaidaContabilidadeIMP> tipoSaidaConta = getInterfaceDAO().getSaidaContabil();
-        TipoSaidaContabilidadeRepositoryProvider saidaContabil = new TipoSaidaContabilidadeRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        // public.tiposaidanotasaidasequencia
-        List<TipoSaidaNotaFiscalSequenciaIMP> seqSaida = getInterfaceDAO().getSequenceSaida();
-        TipoSaidaNotaSaidaSequenciaRepositoryProvider seqrep = new TipoSaidaNotaSaidaSequenciaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        // CFOP SAIDA  public.cfoptiposaida
-        List<CfopSaidaIMP> cfopSaida = getInterfaceDAO().getCfopSaida();
-        CfopSaidaRepositoryProvider cforef = new CfopSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //  TIPO SAIDA public.tiposaida
-        List<TipoSaidaIMP> saida = getInterfaceDAO().getTipoSaida();
-        TipoSaidaRepositoryProvider saidarep = new TipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        // CFOP ENTRADA public.tipoentrada
-        List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
-        CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //Tipo Entrada  public.tipoentrada
-        List<TipoEntradaIMP> entrada = getInterfaceDAO().getTipoEntrada();
-        TipoEntradaRepositoryProvider entradaP = new TipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //Historico Padrão public.historicopadrao
-        List<HistoricoPadraoIMP> historico = getInterfaceDAO().getHistorico();
-        HistoricoPadraoRepositoryProvider rephis = new HistoricoPadraoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //Conta Contabil Financeiro
-        List<ContaContabilFinanceiroIMP> financeiro = getInterfaceDAO().getContaContabilFinanceiro();
-        ContaContabilFinanceirolRepositoryProvider financeiroprovi = new ContaContabilFinanceirolRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //Conta Contabil Fiscal
-        List<ContaContabilFiscalIMP> conta = getInterfaceDAO().getContaContabilFiscal();
-        ContaContabilFiscalRepositoryProvider provi = new ContaContabilFiscalRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
-
-        //pdv.tipotef
-        List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
-        TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
-
-        //public.tiporecebivel
-        List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
-        TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
-
-        //pdv.autorizadora
-        List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
-        AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
-
-        HistoricoPadraoRepository hispad = new HistoricoPadraoRepository(rephis);
-        hispad.importarHistoricoPadrao(historico);
-
-        ContaContabilFinanceiroRepository fina = new ContaContabilFinanceiroRepository(financeiroprovi);
-        fina.importarContaContabilFiscal(financeiro);
-
-        //METODO DE IMPORTAR FORNECEDORES
-        importarFornecedor();
-
-        ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
-        cont.importarContaContabilFiscal(conta);
-
-        CaixaDiferencaRepository caixaRep = new CaixaDiferencaRepository(caixaProv);
-        caixaRep.importarCaixaDiferenca(caixaImp);
-
-        ContabilidadeAbatimentoRepository abat = new ContabilidadeAbatimentoRepository(abatimentoProvider);
-        abat.importarAbatimento(abatimentoImp);
-
-        AtivoImobilizadoRepository ativoRep = new AtivoImobilizadoRepository(AtivoPro);
-        ativoRep.importarAtivo(ativoImp);
-
-        CaixaVendaRepository caixaRepository = new CaixaVendaRepository(caixaPro);
-        caixaRepository.importarCaixaVenda(caixaVendaImp);
-
-        MapaResumoRepository mapaRep = new MapaResumoRepository(mapaPro);
-        mapaRep.importarCaixaDiferenca(mapaImp);
-
-        ContabilidadeTipoSaidaRepository contSaida = new ContabilidadeTipoSaidaRepository(saidaProvider);
-        contSaida.importarTipoEntradaContabil(tipoSaidaContabil);
-
-        ContabilidadeTipoEntradaRepository contEntrada = new ContabilidadeTipoEntradaRepository(EntradaProvider);
-        contEntrada.importarTipoEntradaContabil(tipoEntradaContabil);
-
-        GrupoAtivoRepository grppRepo = new GrupoAtivoRepository(grppPro);
-        grppRepo.importarGrupoAtivo(grup);
-
-        TipoPlanoContaRepository planoRepo = new TipoPlanoContaRepository(planoProv);
-        planoRepo.importarTipoPlano(tipoImp);
-
-        TipoEntradaRepository entrarep = new TipoEntradaRepository(entradaP);
-        entrarep.importarTipoEntrada(entrada);
-
-        CfopRepository cfopRep = new CfopRepository(cfopProv);
-        cfopRep.importarCfop(cfopmImp);
-        cfopmImp.clear();
-
-        CfopEntradaRepository cfop = new CfopEntradaRepository(cfopRe);
-        cfop.importarCfopEntrada(cfopE);
-
-        TipoSaidaRepository saidar = new TipoSaidaRepository(saidarep);
-        saidar.importarTipoSaida(saida);
-
-        CfopSaidaRepository cfopSaidaRep = new CfopSaidaRepository(cforef);
-        cfopSaidaRep.importarCfopSaida(cfopSaida);
-
-        TipoSaidaNotaSaidaSequenciaRepository seqRep = new TipoSaidaNotaSaidaSequenciaRepository(seqrep);
-        seqRep.importarSequenceTipoSaida(seqSaida);
-
-        TipoSaidaContabilidadeRepository saiRep = new TipoSaidaContabilidadeRepository(saidaContabil);
-        saiRep.importarTipoSaidaContabil(tipoSaidaConta);
-
-        EntradaSaidaTipoSaidaRepository entradarep = new EntradaSaidaTipoSaidaRepository(entradaSaida);
-        entradarep.importarEntradaSaidaTipoSaida(entradaSaidaTipoSaida);
-
-        EntradaSaidaTipoEntradaRepository entradaSaidarep = new EntradaSaidaTipoEntradaRepository(entradaSaidaEntrada);
-        entradaSaidarep.importarEntradaSaidaTipoEntrada(entradaSaidaTipoEntrada);
-//************//
-
-        //inserir tipomodelo
-        TipoModeloRepository modeloRepo = new TipoModeloRepository(modeloprovider);
-        modeloRepo.importarModelo(modelo);
-
-        EcPdvRepository ecfRepository = new EcPdvRepository(ecfProvider);
-        ecfRepository.importarEcf(ecf);
-
-        PdvFuncaoRepository funcaorepository = new PdvFuncaoRepository(funcaoPro);
-        funcaorepository.importarPdvFuncao(funcaoImp);
-
-        TecladoLayoutRepository tecRep = new TecladoLayoutRepository(tecladoLayoutProvider);
-        tecRep.importarTecladoLayout(tecladoLayout);
-
-        PdvTecladoFuncaoRepository tecladoRep = new PdvTecladoFuncaoRepository(tecladoprov);
-        tecladoRep.importarFuncaoeTeclado(tecladoImp);
-
-        EcfLayoutRepository ecfLayoutRep = new EcfLayoutRepository(ecfLayoutProvider);
-        ecfLayoutRep.importarEcfLayout(ecfLayout);
-
-        PdvFuncaoOperadorRepository funcaoRepository = new PdvFuncaoOperadorRepository(opePro);
-        funcaoRepository.importarFuncaoOperador(funcaoOperador);
-
-        FinalizadoraRepository finRep = new FinalizadoraRepository(finProv);
-        finRep.importarFinalizadora(finImp);
-
-        FinalizadoraConfiguracaoRepository confReposi = new FinalizadoraConfiguracaoRepository(configuracao);
-        confReposi.finalizadoraConf(finalizadoraConf);
-
-        FinalizadoraLayoutRetornoRepository layRepo = new FinalizadoraLayoutRetornoRepository(layRep);
-        layRepo.importarFinalizadoraLayout(retImp);
-
-        AutorizadoraRepository auto = new AutorizadoraRepository(aut);
-        auto.importarAutorizadora(autorizadora);
-
-        TipoTefRepository repository = new TipoTefRepository(prov);
-        repository.importarTipoTef(tef);
-
-        TipoRecebivelRepository rep = new TipoRecebivelRepository(provider);
-        rep.importarRecebivel(recebivel);
-
-        RecebivelConfiguracaoRepository configRep = new RecebivelConfiguracaoRepository(confPro);
-        configRep.importarConfiguracaoRecebivel(confRe);
-
-        RecebivelConfiguracaoTabelaRepository confRepo = new RecebivelConfiguracaoTabelaRepository(confRecTab);
-        confRepo.importarConfiguracaoRecebivelTabela(recConf);
-
-        TipoRecebivelFinalizadoraRepository tprRepo = new TipoRecebivelFinalizadoraRepository(tpPro);
-        tprRepo.importarTipoRecebivelFinalizadora(tpRec);
-
-    }
+//    public void importarTipoRecebivel() throws Exception {
+//        ProgressBar.setStatus("Carregando Dados...");
+//
+//        // Instanciação das listas
+//        //pdv.tipomodelo
+//        List<TipoModeloIMP> modelo = getInterfaceDAO().getModeloEcf();
+//        TipoModeloRepositoryProvider modeloprovider = new TipoModeloRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.ecf
+//        List<EcfIMP> ecf = getInterfaceDAO().getPdvEcf();
+//        EcfRepositoryProvider ecfProvider = new EcfRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.ecflayout
+//        List<EcfLayoutIMP> ecfLayout = getInterfaceDAO().getEcfLayout();
+//        EcfLayoutRepositoryProvider ecfLayoutProvider = new EcfLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.tecladolayout
+//        List<TecladoLayoutIMP> tecladoLayout = getInterfaceDAO().getTecladoLayout();
+//        TecladoLayoutRepositoryProvider tecladoLayoutProvider = new TecladoLayoutRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.tecladolayoutfuncao
+//        List<PdvTecladoFuncaoIMP> tecladoImp = getInterfaceDAO().getPdvFuncaoTeclado();
+//        PdvTecladoFuncaoRepositoryProvider tecladoprov = new PdvTecladoFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.funcaoniveloperador
+//        List<PdvFuncaoOperadorIMP> funcaoOperador = getInterfaceDAO().getPdvFuncaoOperador();
+//        PdvFuncaoOperadorRepositoryProvider opePro = new PdvFuncaoOperadorRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.funcao
+//        List<PdvFuncaoIMP> funcaoImp = getInterfaceDAO().getPdvFuncao();
+//        PdvFuncaoRepositoryProvider funcaoPro = new PdvFuncaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.finalizadoraconfiguracao
+//        List<FinalizadoraConfiguracaoIMP> finalizadoraConf = getInterfaceDAO().getFinalizadoraConfiguracao();
+//        FinalizadoraConfiguracaoRepositoryProvider configuracao = new FinalizadoraConfiguracaoRepositoryProvider(
+//                getSistema(),
+//                getLojaOrigem(),
+//                lojaVR);
+//
+//        //pdv.finalizadoralayoutretorno
+//        List<FinalizadoraLayoutRetornoIMP> retImp = getInterfaceDAO().getFinalizadoraLayout();
+//        FinalizadoraLayoutRetornoRepositoryProvider layRep = new FinalizadoraLayoutRetornoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.finalizadora
+//        List<FinalizadoraIMP> finImp = getInterfaceDAO().getPdvFinalizadora();
+//        FinalizadoraRepositoryProvider finProv = new FinalizadoraRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.cfop
+//        List<CfopIMP> cfopmImp = getInterfaceDAO().getCfop();
+//        CfopRepositoryProvider cfopProv = new CfopRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        List<CaixaVendaIMP> caixaVendaImp = getInterfaceDAO().getCaixa();
+//        CaixaVendaRepositoryProvider caixaPro = new CaixaVendaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.tipoentrada
+//        List<MapaResumoIMP> mapaImp = getInterfaceDAO().getMapa();
+//        MapaResumoRepositoryProvider mapaPro = new MapaResumoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.tipoentrada
+//        List<AtivoImobilizadoIMP> ativoImp = getInterfaceDAO().getAtivo();
+//        AtivoImobilizadoRepositoryProvider AtivoPro = new AtivoImobilizadoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.tipoentrada
+//        List<ContabilidadeAbatimentoIMP> abatimentoImp = getInterfaceDAO().getAbatimento();
+//        ContabilidadeAbatimentoRepositoryProvider abatimentoProvider = new ContabilidadeAbatimentoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.tipoentrada
+//        List<ContabilidadeTipoSaidaIMP> tipoSaidaContabil = getInterfaceDAO().getTipoSaidaContabil();
+//        ContabilidadeTipoSaidaRepositoryProvider saidaProvider = new ContabilidadeTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.tipoentrada
+//        List<ContabilidadeTipoEntradaIMP> tipoEntradaContabil = getInterfaceDAO().getTipoEntradaContabil();
+//        ContabilidadeTipoEntradaRepositoryProvider EntradaProvider = new ContabilidadeTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //ativo.grupoativo
+//        List<GrupoAtivoIMP> grup = getInterfaceDAO().getGrupoAtivo();
+//        GrupoAtivoRepositoryProvider grppPro = new GrupoAtivoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //contabilidade.caixadiferenca
+//        List<CaixaDiferencaIMP> caixaImp = getInterfaceDAO().getCaixaDiferenca();
+//        CaixaDiferencaRepositoryProvider caixaProv = new CaixaDiferencaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.tipoplanoconta
+//        List<TipoPlanoContaIMP> tipoImp = getInterfaceDAO().getTipoPlanoConta();
+//        TipoPlanoContaRepositoryProvider planoProv = new TipoPlanoContaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.recebivelconfiguracaotabela
+//        List<RecebivelConfiguracaoTabelaIMP> recConf = getInterfaceDAO().getConfiguracaoRecebivelTabela();
+//        RecebivelConfiguracaoTabelaRepositoryProvider confRecTab = new RecebivelConfiguracaoTabelaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.recebivelconfiguracao
+//        List<RecebivelConfiguracaoIMP> confRe = getInterfaceDAO().getConfiguracaoRecebivel();
+//        RecebivelConfiguracaoRepositoryProvider confPro = new RecebivelConfiguracaoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.tiporecebivelfinalizadora
+//        List<TipoRecebivelFinalizadoraIMP> tpRec = getInterfaceDAO().getTipoRecebivelFinalizadora();
+//        TipoRecebivelFinalizadoraRepositoryProvider tpPro = new TipoRecebivelFinalizadoraRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.entradasaidatipoentrada
+//        List<EntradaSaidaTipoEntradaIMP> entradaSaidaTipoEntrada = getInterfaceDAO().getEntradaSaidaTipoEntrada();
+//        EntradaSaidaTipoEntradaRepositoryProvider entradaSaidaEntrada = new EntradaSaidaTipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.entradasaidatiposaida
+//        List<EntradaSaidaTipoSaidaIMP> entradaSaidaTipoSaida = getInterfaceDAO().getEntradaSaida();
+//        EntradaSaidaTipoSaidaRepositoryProvider entradaSaida = new EntradaSaidaTipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //public.tiposaidacontabilidade
+//        List<TipoSaidaContabilidadeIMP> tipoSaidaConta = getInterfaceDAO().getSaidaContabil();
+//        TipoSaidaContabilidadeRepositoryProvider saidaContabil = new TipoSaidaContabilidadeRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        // public.tiposaidanotasaidasequencia
+//        List<TipoSaidaNotaFiscalSequenciaIMP> seqSaida = getInterfaceDAO().getSequenceSaida();
+//        TipoSaidaNotaSaidaSequenciaRepositoryProvider seqrep = new TipoSaidaNotaSaidaSequenciaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        // CFOP SAIDA  public.cfoptiposaida
+//        List<CfopSaidaIMP> cfopSaida = getInterfaceDAO().getCfopSaida();
+//        CfopSaidaRepositoryProvider cforef = new CfopSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //  TIPO SAIDA public.tiposaida
+//        List<TipoSaidaIMP> saida = getInterfaceDAO().getTipoSaida();
+//        TipoSaidaRepositoryProvider saidarep = new TipoSaidaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        // CFOP ENTRADA public.tipoentrada
+//        List<CfopEntradaIMP> cfopE = getInterfaceDAO().getCfopEntrada();
+//        CfopEntradaRepositoryProvider cfopRe = new CfopEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //Tipo Entrada  public.tipoentrada
+//        List<TipoEntradaIMP> entrada = getInterfaceDAO().getTipoEntrada();
+//        TipoEntradaRepositoryProvider entradaP = new TipoEntradaRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //Historico Padrão public.historicopadrao
+//        List<HistoricoPadraoIMP> historico = getInterfaceDAO().getHistorico();
+//        HistoricoPadraoRepositoryProvider rephis = new HistoricoPadraoRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //Conta Contabil Financeiro
+//        List<ContaContabilFinanceiroIMP> financeiro = getInterfaceDAO().getContaContabilFinanceiro();
+//        ContaContabilFinanceirolRepositoryProvider financeiroprovi = new ContaContabilFinanceirolRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //Conta Contabil Fiscal
+//        List<ContaContabilFiscalIMP> conta = getInterfaceDAO().getContaContabilFiscal();
+//        ContaContabilFiscalRepositoryProvider provi = new ContaContabilFiscalRepositoryProvider(getSistema(), getLojaOrigem(), lojaVR);
+//
+//        //pdv.tipotef
+//        List<TipoTefIMP> tef = getInterfaceDAO().getTipoTef();
+//        TipoTefRepositoryProvider prov = new TipoTefRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+//
+//        //public.tiporecebivel
+//      /*  List<TipoRecebivelIMP> recebivel = getInterfaceDAO().getRecebivel();
+//        TipoRecebivelRepositoryProvider provider = new TipoRecebivelRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());*/
+//
+//        //pdv.autorizadora
+//        List<AutorizadoraIMP> autorizadora = getInterfaceDAO().getAutorizadora();
+//        AutorizadoraRepositoryProvider aut = new AutorizadoraRepositoryProvider(getSistema(), getLojaOrigem(), getLojaVR());
+//
+//        HistoricoPadraoRepository hispad = new HistoricoPadraoRepository(rephis);
+//        hispad.importarHistoricoPadrao(historico);
+//
+//        ContaContabilFinanceiroRepository fina = new ContaContabilFinanceiroRepository(financeiroprovi);
+//        fina.importarContaContabilFiscal(financeiro);
+//
+//        //METODO DE IMPORTAR FORNECEDORES
+//        importarFornecedor();
+//
+//        ContaContabilFiscalRepository cont = new ContaContabilFiscalRepository(provi);
+//        cont.importarContaContabilFiscal(conta);
+//
+//        CaixaDiferencaRepository caixaRep = new CaixaDiferencaRepository(caixaProv);
+//        caixaRep.importarCaixaDiferenca(caixaImp);
+//
+//        ContabilidadeAbatimentoRepository abat = new ContabilidadeAbatimentoRepository(abatimentoProvider);
+//        abat.importarAbatimento(abatimentoImp);
+//
+//        AtivoImobilizadoRepository ativoRep = new AtivoImobilizadoRepository(AtivoPro);
+//        ativoRep.importarAtivo(ativoImp);
+//
+//        CaixaVendaRepository caixaRepository = new CaixaVendaRepository(caixaPro);
+//        caixaRepository.importarCaixaVenda(caixaVendaImp);
+//
+//        MapaResumoRepository mapaRep = new MapaResumoRepository(mapaPro);
+//        mapaRep.importarCaixaDiferenca(mapaImp);
+//
+//        ContabilidadeTipoSaidaRepository contSaida = new ContabilidadeTipoSaidaRepository(saidaProvider);
+//        contSaida.importarTipoEntradaContabil(tipoSaidaContabil);
+//
+//        ContabilidadeTipoEntradaRepository contEntrada = new ContabilidadeTipoEntradaRepository(EntradaProvider);
+//        contEntrada.importarTipoEntradaContabil(tipoEntradaContabil);
+//
+//        GrupoAtivoRepository grppRepo = new GrupoAtivoRepository(grppPro);
+//        grppRepo.importarGrupoAtivo(grup);
+//
+//        TipoPlanoContaRepository planoRepo = new TipoPlanoContaRepository(planoProv);
+//        planoRepo.importarTipoPlano(tipoImp);
+//
+//        TipoEntradaRepository entrarep = new TipoEntradaRepository(entradaP);
+//        entrarep.importarTipoEntrada(entrada);
+//
+//        CfopRepository cfopRep = new CfopRepository(cfopProv);
+//        cfopRep.importarCfop(cfopmImp);
+//        cfopmImp.clear();
+//
+//        CfopEntradaRepository cfop = new CfopEntradaRepository(cfopRe);
+//        cfop.importarCfopEntrada(cfopE);
+//
+//        TipoSaidaRepository saidar = new TipoSaidaRepository(saidarep);
+//        saidar.importarTipoSaida(saida);
+//
+//        CfopSaidaRepository cfopSaidaRep = new CfopSaidaRepository(cforef);
+//        cfopSaidaRep.importarCfopSaida(cfopSaida);
+//
+//        TipoSaidaNotaSaidaSequenciaRepository seqRep = new TipoSaidaNotaSaidaSequenciaRepository(seqrep);
+//        seqRep.importarSequenceTipoSaida(seqSaida);
+//
+//        TipoSaidaContabilidadeRepository saiRep = new TipoSaidaContabilidadeRepository(saidaContabil);
+//        saiRep.importarTipoSaidaContabil(tipoSaidaConta);
+//
+//        EntradaSaidaTipoSaidaRepository entradarep = new EntradaSaidaTipoSaidaRepository(entradaSaida);
+//        entradarep.importarEntradaSaidaTipoSaida(entradaSaidaTipoSaida);
+//
+//        EntradaSaidaTipoEntradaRepository entradaSaidarep = new EntradaSaidaTipoEntradaRepository(entradaSaidaEntrada);
+//        entradaSaidarep.importarEntradaSaidaTipoEntrada(entradaSaidaTipoEntrada);
+////************//
+//
+//        //inserir tipomodelo
+//        TipoModeloRepository modeloRepo = new TipoModeloRepository(modeloprovider);
+//        modeloRepo.importarModelo(modelo);
+//
+//        EcPdvRepository ecfRepository = new EcPdvRepository(ecfProvider);
+//        ecfRepository.importarEcf(ecf);
+//
+//        PdvFuncaoRepository funcaorepository = new PdvFuncaoRepository(funcaoPro);
+//        funcaorepository.importarPdvFuncao(funcaoImp);
+//
+//        TecladoLayoutRepository tecRep = new TecladoLayoutRepository(tecladoLayoutProvider);
+//        tecRep.importarTecladoLayout(tecladoLayout);
+//
+//        PdvTecladoFuncaoRepository tecladoRep = new PdvTecladoFuncaoRepository(tecladoprov);
+//        tecladoRep.importarFuncaoeTeclado(tecladoImp);
+//
+//        EcfLayoutRepository ecfLayoutRep = new EcfLayoutRepository(ecfLayoutProvider);
+//        ecfLayoutRep.importarEcfLayout(ecfLayout);
+//
+//        PdvFuncaoOperadorRepository funcaoRepository = new PdvFuncaoOperadorRepository(opePro);
+//        funcaoRepository.importarFuncaoOperador(funcaoOperador);
+//
+//        FinalizadoraRepository finRep = new FinalizadoraRepository(finProv);
+//        finRep.importarFinalizadora(finImp);
+//
+//        FinalizadoraConfiguracaoRepository confReposi = new FinalizadoraConfiguracaoRepository(configuracao);
+//        confReposi.finalizadoraConf(finalizadoraConf);
+//
+//        FinalizadoraLayoutRetornoRepository layRepo = new FinalizadoraLayoutRetornoRepository(layRep);
+//        layRepo.importarFinalizadoraLayout(retImp);
+//
+//        AutorizadoraRepository auto = new AutorizadoraRepository(aut);
+//        auto.importarAutorizadora(autorizadora);
+//
+//        TipoTefRepository repository = new TipoTefRepository(prov);
+//        repository.importarTipoTef(tef);
+//
+///*        TipoRecebivelRepository rep = new TipoRecebivelRepository(provider);
+//        rep.importarRecebivel(recebivel);
+//*/
+//        RecebivelConfiguracaoRepository configRep = new RecebivelConfiguracaoRepository(confPro);
+//        configRep.importarConfiguracaoRecebivel(confRe);
+//
+//        RecebivelConfiguracaoTabelaRepository confRepo = new RecebivelConfiguracaoTabelaRepository(confRecTab);
+//        confRepo.importarConfiguracaoRecebivelTabela(recConf);
+//
+//        TipoRecebivelFinalizadoraRepository tprRepo = new TipoRecebivelFinalizadoraRepository(tpPro);
+//        tprRepo.importarTipoRecebivelFinalizadora(tpRec);
+//
+//    }
 
     /**
      * Importa os ECFs do banquinho pdv Firebird.

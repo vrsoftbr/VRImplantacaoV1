@@ -70,7 +70,7 @@ public class TipoRecebivelDAO {
             sql.put("id_contacontabilfiscaldebito", vo.getId_contaContabilFiscalDebito() <= 0 ? null : vo.getId_contaContabilFiscalDebito());
             sql.put("id_contacontabilfiscalcredito", vo.getId_ContaContabilFiscalCredito() <= 0 ? null : vo.getId_ContaContabilFiscalCredito());
             sql.put("id_historicopadrao", vo.getId_HistoricoPadrao() <=0 ? null : vo.getId_HistoricoPadrao());
-            sql.put("id_situacaocadastro", vo.getId_situacaoCadastro().getId());
+            sql.put("id_situacaocadastro", vo.getId_situacaoCadastro());
             sql.put("id_tipovistaprazo", vo.getId_TipoPrazo());
             sql.put("id_tipocartaotef", vo.getId_TipoCartaoTef() <=0 ? null : vo.getId_TipoCartaoTef());
             sql.put("id_fornecedor", vo.getId_Fornecedor() <= 0 ? null : vo.getId_Fornecedor());

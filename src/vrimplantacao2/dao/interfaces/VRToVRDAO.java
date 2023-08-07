@@ -26,6 +26,10 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.AutorizadoraVO;
+import vrimplantacao2.vo.cadastro.TipoRecebivelVO;
+import vrimplantacao2.vo.cadastro.TipoTefVO;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -1220,60 +1224,99 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<TipoRecebivelIMP> getRecebivel() throws Exception {
-        List<TipoRecebivelIMP> result = new ArrayList<>();
+    private String importarRecebivel() throws Exception {
+        String sql
+                = "INSERT INTO tiporecebivel(id,descricao,percentual,id_tipotef,id_tipoticket,gerarecebimento,id_contacontabilfiscaldebito,id_contacontabilfiscalcredito,\n"
+                + "id_historicopadrao,id_situacaocadastro,id_tipovistaprazo,id_tipocartaotef,id_fornecedor,tef,id_tiporecebimento,contabiliza,id_contacontabilfinanceiro)\n"
+                + "select id,descricao,percentual,id_tipotef,id_tipoticket,gerarecebimento,id_contacontabilfiscaldebito,id_contacontabilfiscalcredito,id_historicopadrao,"
+                + "id_situacaocadastro,id_tipovistaprazo,id_tipocartaotef,id_fornecedor,tef,id_tiporecebimento,contabiliza,id_contacontabilfinanceiro \n"
+                + "from\n"
+                + "tiporecebivel t \n"
+                + "order by 1";
 
-        try (Statement st = ConexaoPostgres.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select\n"
-                        + "	id,\n"
-                        + "	descricao ,\n"
-                        + "	percentual ,\n"
-                        + "	id_tipotef ,\n"
-                        + "	id_tipoticket ,\n"
-                        + "	gerarecebimento ,\n"
-                        + "	id_contacontabilfiscaldebito ,\n"
-                        + "	id_contacontabilfiscalcredito ,\n"
-                        + "	id_historicopadrao ,\n"
-                        + "	id_situacaocadastro ,\n"
-                        + "	id_tipovistaprazo ,\n"
-                        + "	id_tipocartaotef ,\n"
-                        + "	id_fornecedor ,\n"
-                        + "	tef ,\n"
-                        + "	id_tiporecebimento ,\n"
-                        + "	contabiliza ,\n"
-                        + "	id_contacontabilfinanceiro \n"
-                        + "from\n"
-                        + "	tiporecebivel t \n"
-                        + "order by 1")) {
-            while (rs.next()) {
-                TipoRecebivelIMP imp = new TipoRecebivelIMP();
+        return sql;
+    }
 
-                imp.setId(rs.getInt("id"));
-                imp.setDescricao(rs.getString("descricao"));
-                imp.setPercentual(rs.getInt("percentual"));
-                imp.setId_tipoTef(rs.getInt("id_tipotef"));
-                imp.setId_tipotiket(rs.getInt("id_tipoticket"));
-                imp.setGeraRecebimento(rs.getBoolean("gerarecebimento"));
-                imp.setId_ContaContabilFiscalDebito(rs.getInt("id_contacontabilfiscaldebito"));
-                imp.setId_ContaContabilFiscalCredito(rs.getInt("id_contacontabilfiscalcredito"));
-                imp.setId_HistoricoPadrao(rs.getInt("id_historicopadrao"));
-                imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
-                imp.setId_TipoVistaPrazo(rs.getInt("id_tipovistaprazo"));
-                imp.setId_TipoCartaoTef(rs.getInt("id_tipocartaotef"));
-                imp.setId_Fornecedor(rs.getInt("id_fornecedor"));
-                imp.setTef(rs.getBoolean("tef"));
-                imp.setId_TipoRecebimento(rs.getInt("id_tiporecebimento"));
-                imp.setContabiliza(rs.getBoolean("contabiliza"));
-                imp.setId_contaContabilFinanceiro(rs.getInt("id_contacontabilfinanceiro"));
+    private String importarVendaOperador() throws Exception {
 
-                result.add(imp);
+        String sql
+                = "insert into pdv.vendaoperadorrecebivel (id, id_vendaoperadorfinalizadora, id_vendaoperador, id_tiporecebivel, valor,valorrecebimentogeral,\n"
+                + "valorrecargacelular, valorvalegas, valorrecebimento , valordoacao , valorvalepresente, valortrocodigital  )\n"
+                + "select id, id_vendaoperadorfinalizadora, id_vendaoperador, id_tiporecebivel, valor,valorrecebimentogeral,\n"
+                + "valorrecargacelular, valorvalegas, valorrecebimento , valordoacao , valorvalepresente, valortrocodigital \n"
+                + "from pdv.vendaoperadorrecebivel";
 
-            }
+        return sql;
+    }
 
+    private String importarVendaOperadorAuditoria() throws Exception {
+        String sql = "insert into pdv.vendaoperadorrecebivelauditoria \n"
+                + "(id, id_vendaoperadorfinalizadoraauditoria,id_vendaoperadorauditoria,id_tiporecebivel,valor,valorrecebimentogeral, valorrecargacelular\n"
+                + "valorvalegas, valorrecebimento,valordoacao,valorvalepresente,valortrocodigital)\n"
+                + "select id, id_vendaoperadorfinalizadoraauditoria,id_vendaoperadorauditoria,id_tiporecebivel,valor,valorrecebimentogeral, valorrecargacelular\n"
+                + "valorvalegas, valorrecebimento,valordoacao,valorvalepresente,valortrocodigital\n"
+                + "from pdv.vendaoperadorrecebivelauditoria aud\n"
+                + "join pdv.vendaoperadorfinalizadoraauditoria fin on fin.id = aud.id_vendaoperadorfinalizadoraauditoria \n"
+                + "join pdv.vendaoperadorauditoria ve on ve.id = fin.id_vendaoperadorauditoria \n"
+                + "where ve.id_loja = " + getLojaOrigem();
+
+        return sql;
+
+    }
+
+    private String importarCaixa() throws Exception {
+        String sql = "insert into caixa (id, id_caixa, id_tiporecebivel ,valor , troco)\n"
+                + "select id, id_caixa, id_tiporecebivel ,valor , troco from caixaitem ci\n"
+                + "join caixa cx on cx.id = ci.id_caixa \n"
+                + "where cx.id_loja = " + getLojaOrigem();
+
+        return sql;
+    }
+
+    private String caixaVencimento() throws Exception {
+
+        String sql
+                = "insert into caixavencimento (id, id_caixaitem,datavencimento,valor,id_caixa)\n"
+                + "select cx.id, id_caixaitem , datavencimento, valor,id_caixa from caixavencimento c \n"
+                + "join caixa cx on cx.id = c.id_caixa \n"
+                + "where cx.id_loja = " + getLojaOrigem();
+
+        return sql;
+    }
+
+    private String caixaItem() throws Exception {
+
+        String sql = "insert into caixaitem (cx.id, id_caixa , id_tiporecebivel ,valor , cx.troco)\n"
+                + "select cx.id, id_caixa , id_tiporecebivel ,valor , cx.troco from caixaitem cx \n"
+                + "join caixa c on cx.id = cx.id_caixa \n"
+                + "where c.id_loja = " + getLojaOrigem();
+
+        return sql;
+    }
+
+    private String receberCaixa() throws Exception {
+
+        String sql = "insert into recebercaixa(id, id_tiporecebivel ,dataemissao, id_situacaorecebercaixa,valor,observacao,id_tipolocalcobranca,id_tiporecebimento\n"
+                + "datavencimento,id_loja,datahoraalteracao)\n"
+                + "select id, id_tiporecebivel ,dataemissao, id_situacaorecebercaixa,valor,observacao,id_tipolocalcobranca,id_tiporecebimento\n"
+                + "datavencimento,datahoraalteracao from recebercaixa\n"
+                + "where id_loja = " + getLojaOrigem();
+
+        return sql;
+    }
+
+    public void importarTipoRecebivel() throws Exception {
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+            st.execute(receberCaixa());
+            st.execute(caixaItem());
+            st.execute(caixaVencimento());
+            st.execute(importarCaixa());
+            st.execute(importarVendaOperadorAuditoria());
+            st.execute(importarVendaOperador());
+            st.execute(importarRecebivel());
+        } catch (Exception e) {
+            throw e;
         }
-        return result;
     }
 
     public void apagarDadosRecebivel() throws Exception {
@@ -1286,57 +1329,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String apagarRecebivel() throws Exception {
         String sql
-                = "delete from fornecedorcontato ;\n"
-                + "delete from implantacao.codant_fornecedor;\n"
-                + "delete from fornecedorprazopedido ;\n"
-                + "delete from fornecedorprazo; \n"
-                + "delete from fornecedor where id <> 1;\n"
-                + "delete from recebivelconfiguracaotabela;\n"
-                + "delete from recebivelconfiguracao;\n"
-                + "delete from tiporecebivelfinalizadora;\n"
-                + "delete from tiporecebivel ;\n"
-                + "delete from tiporecebivel;\n"
-                + "delete from tiporecebivelfinalizadora;\n"
-                + "delete from entradasaidatipoentrada;\n"
-                + "delete from tiposaidacontabilidade;\n"
-                + "delete from tiposaidanotasaidasequencia;\n"
-                + "delete from cfoptiposaida;\n"
-                + "delete from tiposaida ;\n"
-                + "delete from contabilidade.tipoentrada ;\n"
-                + "delete from contabilidade.tiposaida;\n"
-                + "delete from cfoptipoentrada;\n"
-                + "delete from tipoentrada;\n"
-                + "delete from tipoplanoconta ;\n"
-                + "delete from ativo.grupo ;\n"
-                + "delete from contabilidade.ativoimobilizado;\n"
-                + "delete from contabilidade.tiposaida;\n"
-                + "delete from contabilidade.caixavenda; \n"
-                + "delete from contabilidade.maparesumo;\n"
-                + "delete from contabilidade.tipoentrada ;\n"
-                + "delete from contabilidade.tipoabatimento;\n"
-                + "delete from contabilidade.caixadiferenca ;\n"
-                + "delete from contacontabilfinanceiro;\n"
-                + "delete from contacontabilfiscal; \n"
-                + "delete from historicopadrao;\n"
-                + "delete from cfop;\n"
-                + "delete from cfoptipoentrada;\n"
-                + "delete from entradasaidatiposaida;\n"
-                + "delete from tiposaida;\n"
-                + "delete from historicopadrao;\n"
-                + "delete from tipoplanoconta ;\n"
-                + "delete from pdv.tipotef ;\n"
-                + "delete from pdv.autorizadora ;\n"
-                + "delete from pdv.finalizadoraconfiguracao;\n"
-                + "delete from pdv.finalizadoralayoutretorno;\n"
-                + "delete from pdv.finalizadora;\n"
-                + "delete from pdv.ecflayout;\n"
-                + "delete from pdv.ecf;\n"
-                + "delete from pdv.tipomodelo ;\n"
-                + "delete from pdv.tecladolayoutfuncao;	\n"
-                + "delete from pdv.tecladolayout ;\n"
-                + "delete from pdv.finalizadoralayoutretorno ;\n"
-                + "delete from pdv.funcaoniveloperador f;	\n"
-                + "delete from pdv.funcao f;";
+                = "delete from pdv.vendaoperadorrecebivel; \n"
+                + "delete from pdv.vendaoperadorrecebivelauditoria; \n"
+                + "delete from caixavencimento; \n"
+                + "delete from caixaitem; \n";
 
         return sql;
     }
@@ -1421,6 +1417,29 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    public void gravarTipoTef(TipoTefVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+
+            sql.setSchema("pdv");
+            sql.setTableName("tipotef");
+
+            sql.put("id", vo.getId());
+            sql.put("descricao", vo.getDescricao());
+            sql.put("tipocomunicacao", vo.getTipocomunicao());
+            sql.put("bandeira", vo.getBandeira());
+            sql.put("imprimecupom", vo.isImprimeCupom());
+            sql.put("id_situacaocadastro", vo.getId_situacaoCadastro());
+            sql.put("numeroparcela", vo.getNumeroParcela());
+            sql.put("id_autorizadora", vo.getId_autorizadora());
+
+            stm.execute(sql.getInsert());
+
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
@@ -1530,7 +1549,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	descricao \n"
                         + "from\n"
                         + "	pdv.tecladolayout \n"
-                                + "where id_loja = " + getLojaOrigem())) {
+                        + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 TecladoLayoutIMP imp = new TecladoLayoutIMP();
 
@@ -1738,7 +1757,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_tiponiveloperador \n"
                         + "from\n"
                         + "	pdv.funcaoniveloperador \n"
-                                + "where id_loja = "+ getLojaOrigem())) {
+                        + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 PdvFuncaoOperadorIMP imp = new PdvFuncaoOperadorIMP();
 
@@ -1805,7 +1824,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	avisaretirada \n"
                         + "from\n"
                         + "	pdv.finalizadoraconfiguracao \n"
-                                + "where id_loja = " + getLojaOrigem())) {
+                        + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 FinalizadoraConfiguracaoIMP imp = new FinalizadoraConfiguracaoIMP();
 
@@ -1968,8 +1987,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<AutorizadoraIMP> getAutorizadora() throws Exception {
-        List<AutorizadoraIMP> result = new ArrayList<>();
+    public List<AutorizadoraVO> getAutorizadora() throws Exception {
+        List<AutorizadoraVO> result = new ArrayList<>();
 
         try (Statement st = ConexaoPostgres.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
@@ -1980,16 +1999,34 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "from\n"
                         + "	pdv.autorizadora")) {
             while (rs.next()) {
-                AutorizadoraIMP imp = new AutorizadoraIMP();
+                AutorizadoraVO vo = new AutorizadoraVO();
 
-                imp.setId(rs.getInt("id"));
-                imp.setDescricao(rs.getString("descricao"));
-                imp.setUtilizado(rs.getBoolean("utilizado"));
+                vo.setId(rs.getInt("id"));
+                vo.setDescricao(rs.getString("descricao"));
+                vo.setUtilizado(rs.getBoolean("utilizado"));
 
-                result.add(imp);
+                result.add(vo);
             }
         }
         return result;
+    }
+
+    public void gravarAutorizadora(AutorizadoraVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+
+            sql.setSchema("pdv");
+            sql.setTableName("autorizadora");
+
+            sql.put("id", vo.getId());
+            sql.put("descricao", vo.getDescricao());
+            sql.put("utilizado", vo.isUtilizado());
+
+            stm.execute(sql.getInsert());
+
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
@@ -2235,7 +2272,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	proximodiautil\n"
                         + "	from \n"
                         + "	recebivelconfiguracao \n"
-                                + "where id_loja = " + getLojaOrigem())) {
+                        + "where id_loja = " + getLojaOrigem())) {
             while (rs.next()) {
                 RecebivelConfiguracaoIMP imp = new RecebivelConfiguracaoIMP();
 

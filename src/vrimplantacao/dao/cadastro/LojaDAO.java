@@ -611,7 +611,8 @@ public class LojaDAO {
 
     private String copiaUsuarioPermissao(LojaVO i_loja) throws Exception {
         String sql = "insert into permissaoloja (id, id_loja,id_permissao)\n"
-                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja ";
+                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja \n"
+                + "where id_loja = " + i_loja.idCopiarLoja;
 
         return sql;
     }
