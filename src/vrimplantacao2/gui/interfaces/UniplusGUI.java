@@ -14,6 +14,8 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.UniplusDAO;
 import vrimplantacao2.dao.interfaces.UniplusDAO.TabelaPreco;
@@ -174,6 +176,9 @@ public class UniplusGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
+                        /*if (chkProdutoNota.isSelected()) {
+                            importador.importarProdutoFornecedor(OpcaoProdutoFornecedor.QTDEMBALAGEM);
+                        }*/
                         if (chkContasAPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }

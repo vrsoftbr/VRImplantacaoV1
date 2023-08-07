@@ -88,7 +88,10 @@ public enum OpcaoCliente {
     IMPORTAR_SOMENTE_ATIVO_PREFERENCIAL,
     IMPORTAR_SOMENTE_ATIVO_EVENTUAL,
     IMPORTAR_SOMENTE_ATIVO,
-    FORCAR_UNIFICACAO;
+    FORCAR_UNIFICACAO,
+    CONVENIO_EMPRESA,
+    CONVENIO_CONVENIADO,
+    CONVENIO_TRANSACAO;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
@@ -159,5 +162,13 @@ public enum OpcaoCliente {
         result.addAll(getContato());
         
         return result;
+    }
+    
+    public static Set<OpcaoCliente> getClienteConvenio() {
+        return new HashSet<>(Arrays.asList(
+                CONVENIO_CONVENIADO,
+                CONVENIO_EMPRESA,
+                CONVENIO_TRANSACAO
+        ));
     }
 }

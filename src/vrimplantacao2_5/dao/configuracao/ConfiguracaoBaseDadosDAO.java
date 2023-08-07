@@ -199,7 +199,8 @@ public class ConfiguracaoBaseDadosDAO {
                     + "	c.id,\n"
                     + "	id_conexao,\n"
                     + "	id_lojaorigem,\n"
-                    + " ljo.descricao as descricaolojadestino,"
+                    //+ " substring(ljo.descricao, 5) as descricaolojadestino,"
+                    + " ljo.descricao as descricaolojadestino,"                            
                     + "	id_lojadestino,\n"
                     + "	l.descricao destino,\n"
                     + "	id_situacaomigracao,\n"
@@ -298,6 +299,57 @@ public class ConfiguracaoBaseDadosDAO {
         }
 
         return result;
+    }
+    
+    public ConfiguracaoBaseDadosVO getConexao(int idConexao) throws Exception {
+        ConfiguracaoBaseDadosVO configuracaoVO = null;
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	c.id,\n"
+                    + "	c.descricao,\n"
+                    + "	s.id id_sistema,\n"
+                    + "	s.nome sistema,\n"
+                    + "	b.id id_bancodados,\n"
+                    + "	b.nome bancodados,\n"
+                    + "	c.host,\n"
+                    + "	c.porta,\n"
+                    + "	c.usuario,\n"
+                    + "	c.nomeschema,\n"
+                    + " c.senha,\n"
+                    + " c.complemento\n"        
+                    + "from \n"
+                    + "	implantacao2_5.conexao c\n"
+                    + "join implantacao2_5.sistema s\n"
+                    + "		on c.id_sistema = s.id\n"
+                    + "join implantacao2_5.bancodados b\n"
+                    + "		on c.id_bancodados = b.id\n"
+                    + " where c.id = " + idConexao)) {
+                while (rs.next()) {
+                    configuracaoVO = new ConfiguracaoBaseDadosVO();
+                    SistemaVO sistemaVO = new SistemaVO();
+                    BancoDadosVO bancoDadosVO = new BancoDadosVO();
+
+                    configuracaoVO.setId(rs.getInt("id"));
+                    configuracaoVO.setDescricao(rs.getString("descricao"));
+                    sistemaVO.setId(rs.getInt("id_sistema"));
+                    sistemaVO.setNome(rs.getString("sistema"));
+                    configuracaoVO.setSistema(sistemaVO);
+                    bancoDadosVO.setId(rs.getInt("id_bancodados"));
+                    bancoDadosVO.setNome(rs.getString("bancodados"));
+                    configuracaoVO.setBancoDados(bancoDadosVO);
+                    configuracaoVO.setHost(rs.getString("host"));
+                    configuracaoVO.setPorta(rs.getInt("porta"));
+                    configuracaoVO.setUsuario(rs.getString("usuario"));
+                    configuracaoVO.setSchema(rs.getString("nomeschema"));
+                    configuracaoVO.setSenha(rs.getString("senha"));
+                    configuracaoVO.setComplemento(rs.getString("complemento"));
+                }
+            }
+        }
+
+        return configuracaoVO;
     }
     
     public boolean existeConexao(ConfiguracaoBaseDadosVO configuracaoVO) throws Exception {

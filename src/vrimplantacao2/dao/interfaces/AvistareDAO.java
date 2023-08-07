@@ -46,12 +46,13 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
 public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public AvistareVO avistareVO = null;
+    private final String SISTEMA = "Avistare";
     
     @Override
     public String getSistema() {
-        return "Avistare";
+        return SISTEMA;
     }
-
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -261,6 +262,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setValidade(0);
+                        imp.seteBalanca(false);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
@@ -620,7 +622,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.VndEstacaoID as ecf,\n"
                     + "	t.CliSaldoMovValor as valor,\n"
                     + "	t.CliSaldoMovObservacao as observacao,\n"
-                    + "	tc.CliCodigoPessoal as id_cliente\n"
+                    + "	coalesce(tc.CliCodigoPessoal, tc.cliId) as id_cliente\n"
                   //+ "	t.CliSaldoMovCliID as id_cliente\n"             // ROTATIVO POR ID_CLIENTE
                     + "from\n"
                     + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
@@ -653,28 +655,17 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
-
-    public void setDataInicioVenda(Date dataInicioVenda) {
-        this.dataInicioVenda = dataInicioVenda;
-    }
-
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
-        this.dataTerminoVenda = dataTerminoVenda;
-    }
-
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.avistareVO.getDataInicioVenda(), this.avistareVO.getDataTerminoVenda());
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
-    }
-
-    private static class VendaIterator implements Iterator<VendaIMP> {
+        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.avistareVO.getDataInicioVenda(), this.avistareVO.getDataTerminoVenda());
+    }    
+    
+    public static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -783,7 +774,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     }
 
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+    public static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;

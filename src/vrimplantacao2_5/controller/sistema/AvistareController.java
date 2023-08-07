@@ -21,27 +21,14 @@ import vrimplantacao2_5.vo.sistema.AvistareVO;
  */
 public class AvistareController extends InterfaceController {
 
-    private AvistareDAO dao = null;
-    private final String SISTEMA = "Avistare";
-    private String complementoSistema = "";
+    public AvistareDAO dao = null;
     
-    public AvistareController() {}
+    public AvistareController() {
+        this.dao = new AvistareDAO();
+    }
     
     public AvistareController(AvistareDAO dao) {
         this.dao = dao;
-    }
-    
-    @Override
-    public String getSistema() {
-        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
-    }
-    
-    public String getComplementoSistema() {
-        return this.complementoSistema;
-    }
-    
-    public void setComplementoSistema(String complementoSistema) {
-        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
     public void setAvistare(AvistareVO avistareVO) {
@@ -89,7 +76,8 @@ public class AvistareController extends InterfaceController {
                     OpcaoProduto.ICMS_CONSUMIDOR,
                     OpcaoProduto.VOLUME_QTD,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.PDV_VENDA
                 }
         ));
     }

@@ -29,6 +29,10 @@ public class SelecaoLojaController {
         return service.consultar(idSistema);
     }
     
+    public ConfiguracaoBaseDadosVO getConexao(int idConexao) throws Exception {
+        return service.getConexao(idConexao);
+    }
+    
     public List<ConfiguracaoBancoLojaVO> getLojaMapeada(int idConexao) {
         return service.getLojaMapeada(idConexao);
     }

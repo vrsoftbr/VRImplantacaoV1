@@ -17,13 +17,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 public abstract class InterfaceController {
 
     private String lojaOrigem = "";
-    
-    /**
-     * Retorna o nome do sistema que será importado.
-     * @return Nome do sistema.
-     */
-    public abstract String getSistema();
-    
+        
     /**
      * Retorna o código da loja de origem selecionada.
      * @return 

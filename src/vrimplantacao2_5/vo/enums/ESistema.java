@@ -79,7 +79,7 @@ import vrimplantacao2.dao.interfaces.GondolaDAO;
 import vrimplantacao2.dao.interfaces.GuiaSistemasDAO;
 import vrimplantacao2.dao.interfaces.HRTechDAO;
 import vrimplantacao2.dao.interfaces.HerculesIntCashDAO;
-import vrimplantacao2.dao.interfaces.HipcomDAO;
+import vrimplantacao2_5.dao.sistema.HipcomDAO;
 import vrimplantacao2.dao.interfaces.HiperDAO;
 import vrimplantacao2.dao.interfaces.ICommerceDAO;
 import vrimplantacao2.dao.interfaces.IQSistemasDAO;
@@ -199,10 +199,19 @@ import vrimplantacao2.dao.interfaces.ZoomboxDAO;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
+import vrimplantacao2_5.dao.sistema.AssistDAO;
+import vrimplantacao2_5.dao.sistema.ConsincoDAO;
+import vrimplantacao2_5.dao.sistema.DSICDAO;
+import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
+import vrimplantacao2_5.dao.sistema.DataByteDAO;
+import vrimplantacao2_5.dao.sistema.FXSistemasDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.dao.sistema.MRC6DAO;
+import vrimplantacao2_5.dao.sistema.MicroTabDAO;
 import vrimplantacao2_5.dao.sistema.Provenco_TentaculoDAO;
 import vrimplantacao2_5.dao.sistema.SGDAO;
 import vrimplantacao2_5.dao.sistema.SygmaDAO;
+import vrimplantacao2_5.dao.sistema.VersatilDAO;
 
 /**
  *
@@ -410,10 +419,19 @@ public enum ESistema {
     GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()),
     SG(199, "SG", new SGDAO()),
     SYGMA(200, "SYGMA", new SygmaDAO()),
+    MICROTAB(201, "MICROTAB", new MicroTabDAO()),
+    MRC6(202,"MRC6", new MRC6DAO()),
     BOMSOFT(203, "BOMSOFT", new BomSoftDAO()),
-    TENTACULO(205, "TENTACULO", new Provenco_TentaculoDAO());
+    ASSIST(204, "ASSIST", new AssistDAO()),
+    DATABYTE(205, "DATABYTE", new DataByteDAO()),
+    DOBESCGA(206,"DOBESCGA", new Dobes_CgaDAO()),
+    TENTACULO(207, "TENTACULO", new Provenco_TentaculoDAO()),
+    CONSINCO(209, "CONSINCO", new ConsincoDAO()),
+    FXSISTEMAS(208, "FXSISTEMAS", new FXSistemasDAO()),
+    VERSATIL(210, "VERSATIL", new VersatilDAO()),
+    DSIC(211, "DSIC", new DSICDAO());
     //SUPERCONTROLE(198, "SUPERCONTROLE", "SuperControleDAO");
-
+    
     private int id;
     private String nome;
     private InterfaceDAO dao;

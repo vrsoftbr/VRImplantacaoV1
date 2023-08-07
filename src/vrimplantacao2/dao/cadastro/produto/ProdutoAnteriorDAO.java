@@ -1342,19 +1342,25 @@ public class ProdutoAnteriorDAO {
     public int verificaRegistro() throws Exception {
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    /*"select \n" +
                     "	count(*) qtd \n" +
                     "from \n" +
                     "	implantacao.codant_produto \n" +
                     "where \n" +
-                    "	codigoatual in (select codigoatual from implantacao.codant_produto limit 100)")) {
+                    "	codigoatual in (select codigoatual from implantacao.codant_produto limit 100)"*/
+                    "select\n" +
+                    "	count(*) qtd\n" +
+                    "	from\n" +
+                    "implantacao.codant_produto\n" +
+                    "where codigoatual is not null"
+            )) {
                 if (rs.next()) {
                     return rs.getInt("qtd");
+                } else {
+                    return 0;
                 }
             }
         }
-        
-        return 0;
     }
     
     public int getConexaoMigrada(int idConexao, String sistema) throws Exception {
@@ -1550,7 +1556,37 @@ public class ProdutoAnteriorDAO {
                 "			ncm, \n" +
                 "			cest, \n" +
                 "			contadorimportacao, \n" +
-                "			novo\n" +
+                "			novo,\n" +
+                "                       codigosped,\n" +
+                "                       situacaocadastro,\n" +
+                "                       dataimportacao,\n" +
+                "                       obsimportacao,\n" +
+                "                       icmscstsaida,\n" +
+                "                       icmsaliqsaida,\n" +
+                "                       icmsreducaosaida,\n" +
+                "                       icmscstsaidaforaestado,\n" +
+                "                       icmsaliqsaidaforaestado,\n" +
+                "                       icmsreducaosaidaforaestado,\n" +
+                "                       icmscstsaidaforaestadonf,\n" +
+                "                       icmsaliqsaidaforaestadonf,\n" +
+                "                       icmsreducaosaidaforaestadonf,\n" +
+                "                       icmscstentrada,\n" +
+                "                       icmsaliqentrada,\n" +
+                "                       icmsreducaoentrada,\n" +
+                "                       icmscstentradaforaestado,\n" +
+                "                       icmsaliqentradaforaestado,\n" +
+                "                       icmsreducaoentradaforaestado,\n" +
+                "                       icmscstconsumidor,\n" +
+                "                       icmsaliqconsumidor,\n" +
+                "                       icmsreducaoconsumidor,\n" +
+                "                       icmsdebitoid,\n" +
+                "                       icmsdebitoforaestadoid,\n" +
+                "                       icmsdebitoforaestadonfid,\n" +
+                "                       icmscreditoid,\n" +
+                "                       icmscreditoforaestadoid,\n" +
+                "                       icmsconsumidorid,\n" +
+                "                       datacadastro,\n" +
+                "                       id_conexao\n" +
                 "		FROM \n" +
                 "			implantacao.codant_produto\n" +
                 "		where\n" +

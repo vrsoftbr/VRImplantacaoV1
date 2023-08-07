@@ -33,10 +33,20 @@ import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 public class GatewaySistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public GatewaySistemasVO gatewaySistemasVO = null;
+    private final String SISTEMA = "Gateway Sistemas";
+    private String complementoSistema = "";
     
     @Override
     public String getSistema() {
-        return "Gateway Sistemas";
+        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
+    }
+    
+    public String getComplementoSistema() {
+        return this.complementoSistema;
+    }
+    
+    public void setComplementoSistema(String complementoSistema) {
+        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {

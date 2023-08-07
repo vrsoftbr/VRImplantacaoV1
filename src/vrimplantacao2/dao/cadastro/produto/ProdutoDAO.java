@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Set;
@@ -84,7 +85,7 @@ public class ProdutoDAO {
             ProgressBar.setMaximum(produtos.size());
             for (ProdutoIMP imp: produtos) {
                 ProdutoAnteriorVO anterior = getCodigoAnterior().get(
-                        imp.getImportSistema(),
+                        getImportSistema(),
                         imp.getImportLoja(),
                         imp.getImportId()
                 );

@@ -149,7 +149,6 @@ public class AtualizadorDAO {
                     + "     id_sistema integer NOT NULL,\n"
                     + "     id_bancodados integer NOT NULL,\n"
                     + "     complemento varchar(10) NULL,\n"
-                    + "     CONSTRAINT un_conexao_sistema UNIQUE (id_sistema, complemento),\n"
                     + "     CONSTRAINT fk_id_bancodados FOREIGN KEY (id_bancodados)\n"
                     + "         REFERENCES implantacao2_5.bancodados (id) MATCH SIMPLE\n"
                     + "      ON UPDATE NO ACTION ON DELETE NO ACTION,\n"
@@ -186,7 +185,7 @@ public class AtualizadorDAO {
                     + "        ON DELETE NO ACTION\n"
                     + ");\n"
                     + "CREATE TABLE IF NOT EXISTS implantacao2_5.lojaorigem (\n"
-                    + "     id VARCHAR(10) NOT NULL,\n"
+                    + "     id VARCHAR(20) NOT NULL,\n"
                     + "     descricao VARCHAR(100) NOT NULL,\n"
                     + "     mixprincipal boolean default false,\n"
                     + "     id_conexaoloja INTEGER,\n"
@@ -313,7 +312,8 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'GUILHERME', 'GUILHERME', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'LUCAS', 'LUCAS', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");\n"
+            + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ");");
         }
     }
     

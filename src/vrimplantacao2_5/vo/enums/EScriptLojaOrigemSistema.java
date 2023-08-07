@@ -1,5 +1,7 @@
 package vrimplantacao2_5.vo.enums;
 
+import vrimplantacao2_5.dao.sistema.DSICDAO;
+
 /**
  *
  * @author Desenvolvimento
@@ -43,13 +45,58 @@ public enum EScriptLojaOrigemSistema {
             + " FANTASIA_CFG descricao "
             + "FROM CONFIG "
             + "ORDER BY 1"),
-    TENTACULO(205, 5,
+    MICROTAB(201, 5, "SELECT "
+            + " 1 as id,"
+            + " ''Loja_01'' descricao"
+            + " FROM CONFIG"),
+    MRC6(202, 13, "select"
+            + " codigo as id, "
+            + " nome as descricao,"
+            + " cnpj "
+            + " from "
+            + " entidades"),
+    ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
+    DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
+    DOBESCGA(206, 5, "select\n"
+            + " ret000.\"Codigo\" as id,\n"
+            + " ret000.\"Fantasia\" as descricao,\n"
+            + " ret000.\"CNPJ\"\n"
+            + " from ret000\n"
+            + " order by ret000.\"Codigo\""),
+    TENTACULO(207, 5,
             "SELECT "
             + "	EMP_CODIGO id, "
             + "	EMP_FANTASIA descricao "
             + "FROM "
             + "	EMPRESAS "
-            + "ORDER BY 1");
+            + "ORDER BY 1"),
+    CONSINCO(209, 9, "SELECT \n"
+            + "	nroempresa id,\n"
+            + "	nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao\n"
+            + "FROM \n"
+            + "	consinco.ge_empresa\n"
+            + "WHERE \n"
+            + "	status = ''A''"),
+    FXSISTEMAS(208, 5, "SELECT "
+            + "	e.ID, "
+            + "	e.RAZAO_SOCIAL descricao "
+            + "FROM "
+            + "	EMPRESA e"),
+    VERSATIL(210, 5, "SELECT\n"
+            + "	COD_EMPRESA id,\n"
+            + "	FANTASIA descricao\n"
+            + "FROM\n"
+            + "	EMPRESA"),
+    VRMASTER(182, 11, "select\n"
+            + "	l.id,\n"
+            + "	l.descricao\n"
+            + "from \n"
+            + "	loja l \n"
+            + "inner join fornecedor f on l.id_fornecedor = f.id \n"
+            + "where l.id_situacaocadastro = 1\n"
+            + "order by\n"
+            + "	l.id"),
+    DSIC(211, 11, "select emp_id id, emp_nomefantasia descricao from empresa");
 
     private int idSistema;
     private int idBancoDados;

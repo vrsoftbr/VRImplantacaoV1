@@ -57,6 +57,7 @@ public enum OpcaoFornecedor {
     IMPORTAR_SOMENTE_ATIVOS,
     DATA_CADASTRO,
     PAGAR_FORNECEDOR,
+    OUTRAS_RECEITAS,
     FORCAR_UNIFICACAO;
     //TODO: SUFRAMA
     //TODO: DATACADASTRO
@@ -108,7 +109,8 @@ public enum OpcaoFornecedor {
                 PRAZO_FORNECEDOR,
                 CONDICAO_PAGAMENTO,
                 TIPO_INDICADOR_IE,
-                OBSERVACAO
+                OBSERVACAO,
+                TIPO_EMPRESA
         ));
     }
     

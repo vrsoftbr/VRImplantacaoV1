@@ -25,23 +25,12 @@ public class GatewaySistemasController extends InterfaceController {
     private String complementoSistema = "";
     private final String SISTEMA = "Gateway Sistemas";
     
-    public GatewaySistemasController() {}
+    public GatewaySistemasController() {
+        this.dao = new GatewaySistemasDAO();
+    }
     
     public GatewaySistemasController(GatewaySistemasDAO dao) {                
         this.dao = dao;
-    }
-
-    @Override
-    public String getSistema() {
-        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + SISTEMA;
-    }
-    
-    public String getComplementoSistema() {
-        return this.complementoSistema;
-    }
-    
-    public void setComplementoSistema(String complementoSistema) {
-        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
     }
     
     public void setGatewaySistemas(GatewaySistemasVO gatewaySistemasVO) {

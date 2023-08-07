@@ -5,14 +5,11 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.controller.sistema.AvistareController;
-import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.sistema.AvistareVO;
@@ -23,11 +20,8 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private static Avistare2_5GUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private AvistareDAO dao = null;
     private AvistareVO vo = new AvistareVO();
     private AvistareController controller = null;
-    private MapaLojaController mapaLojaController = null;
-    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -53,51 +47,44 @@ public class Avistare2_5GUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private void alterarSituacaoMigracao() throws Exception {
-        String lojaOrigem = pnlConn.getLojaOrigem();
-        int lojaVR = pnlConn.getLojaVR();
-        
-        mapaLojaController = new MapaLojaController(configuracaoBaseDadosGUI);
-        
-        mapaLojaController.alterarSituacaoMigracao(lojaOrigem, lojaVR, 2, pnlConn.idConexao);
-    }
-
     private AvistareVO carregarOpcaoesMigracaoSistema() throws Exception {
         
         vo.setTemArquivoBalanca(chkProdTemArquivoBalanca.isSelected());
         
+        if (tabProdutos.edtDtVendaIni.getDate() != null) {
+            vo.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
+        }
+        if (tabProdutos.edtDtVendaFim.getDate() != null) {
+            vo.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+        }
+        
         return vo;        
     }
     
-    public Avistare2_5GUI(VRMdiFrame i_mdiFrame, ConfiguracaoBaseDadosGUI baseDadosGui) throws Exception {
+    public Avistare2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
         
-        configuracaoBaseDadosGUI = baseDadosGui;
-        
         carregarParametros();
 
-        dao = new AvistareDAO();
+        controller = new AvistareController();
         
-        controller = new AvistareController(dao);
-        
-        tabProdutos.setOpcoesDisponiveis(controller);                
+        tabProdutos.setOpcoesDisponiveis(controller);
         tabFornecedores.setOpcoesDisponiveis(controller);
-        tabClientes.setOpcoesDisponiveis(controller);        
+        tabClientes.setOpcoesDisponiveis(controller);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
-                return dao;
+                return controller.dao;
             }
 
             @Override
             public String getSistema() {
-                controller.setComplementoSistema(pnlConn.getComplemento());
-                return dao.getSistema();
+                return controller.dao.getSistema() + " - " + pnlConn.idConexao;
             }
 
             @Override
@@ -131,7 +118,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Avistare2_5GUI(i_mdiFrame, null);
+                instance = new Avistare2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -151,13 +138,13 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    Importador importador = new Importador(dao);
+                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
+                    
+                    Importador importador = new Importador(controller.dao);
                     importador.setLojaOrigem(pnlConn.getLojaOrigem());
                     importador.setLojaVR(pnlConn.getLojaVR());
                     importador.setIdConexao(pnlConn.idConexao);
 
-                    controller.setAvistare(carregarOpcaoesMigracaoSistema());
-                    
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
@@ -179,16 +166,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
                                 default:
                                     break;
                             }   break;
-                        case 2:
-                            if (chkUnifProdutoFornecedor.isSelected()) {
-                                importador.unificarProdutoFornecedor();
-                            }
-                            if (chkUnifClientePreferencial.isSelected()) {
-                                importador.unificarClientePreferencial();
-                            }
-                            if (chkUnifClienteEventual.isSelected()) {
-                                importador.unificarClienteEventual();
-                            }   break;
                         default:
                             break;
                     }
@@ -198,8 +175,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
                     ProgressBar.dispose();
                     
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    //alterarSituacaoMigracao();
                     
                 } catch (Exception ex) {                    
                     ProgressBar.dispose();
@@ -231,10 +206,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
         vRPanel8 = new vrframework.bean.panel.VRPanel();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
-        chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         jPanel1 = new javax.swing.JPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
@@ -243,7 +214,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Importação Gateway Sistemas");
+        setTitle("Importação Avistare");
         setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
@@ -390,38 +361,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
 
         tabs.addTab("Importação", tabImportacao);
 
-        chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
-
-        chkUnifClientePreferencial.setText("Cliente Preferencial (Somente com CPF/CNPJ)");
-
-        chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
-
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(738, Short.MAX_VALUE))
-        );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(442, Short.MAX_VALUE))
-        );
-
-        tabs.addTab("Unificação", vRPanel2);
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -459,7 +398,7 @@ public class Avistare2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))
@@ -494,9 +433,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vr.view.components.checkbox.VRCheckBox chkProdTemArquivoBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
@@ -509,7 +445,6 @@ public class Avistare2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
-    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.panel.VRPanel vRPanel8;

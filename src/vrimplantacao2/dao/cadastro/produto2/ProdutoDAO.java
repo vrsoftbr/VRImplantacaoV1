@@ -27,7 +27,7 @@ import vrimplantacao2.vo.enums.NcmVO;
 public class ProdutoDAO {
 
     private static final Logger LOG = Logger.getLogger(ProdutoDAO.class.getName());
-    
+
     private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     /**
@@ -233,13 +233,13 @@ public class ProdutoDAO {
             sql.put("mercadologico3", mercadologico.getMercadologico3());
             sql.put("mercadologico4", mercadologico.getMercadologico4());
             sql.put("mercadologico5", mercadologico.getMercadologico5());
-            
-            LOG.fine("Prod: " + vo.getId() + 
-                    " Merc1: " + mercadologico.getMercadologico1() + 
-                    " Merc2: " + mercadologico.getMercadologico2() + 
-                    " Merc3: " + mercadologico.getMercadologico3() + 
-                    " Merc4: " + mercadologico.getMercadologico4() + 
-                    " Merc5: " + mercadologico.getMercadologico5());
+
+            LOG.fine("Prod: " + vo.getId()
+                    + " Merc1: " + mercadologico.getMercadologico1()
+                    + " Merc2: " + mercadologico.getMercadologico2()
+                    + " Merc3: " + mercadologico.getMercadologico3()
+                    + " Merc4: " + mercadologico.getMercadologico4()
+                    + " Merc5: " + mercadologico.getMercadologico5());
         }
         if (opt.contains(OpcaoProduto.CEST)) {
             sql.put("id_cest", (vo.getCest() == null ? null : vo.getCest().getId()));
@@ -391,7 +391,37 @@ public class ProdutoDAO {
         }
         return result;
     }
-    
+
+    public int getProduto() throws Exception {
+        int idProduto = 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from produto \n"
+                    + "limit 1"
+            )) {
+                if (rst.next()) {
+                    idProduto = rst.getInt("id");
+                }
+            }
+        }
+        return idProduto;
+    }
+
+    public long getEan(int id) throws Exception {
+        long eanProduto = 0L;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigobarras from produtoautomacao p \n"
+                    + "where id_produto = " + id + ""
+            )) {
+                if (rst.next()) {
+                    eanProduto = rst.getLong("codigobarras");
+                }
+            }
+        }
+        return eanProduto;
+    }
+
     public Map<String, Integer> getCodigoANP() throws Exception {
         Map<String, Integer> result = new HashMap<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -407,7 +437,7 @@ public class ProdutoDAO {
         }
         return result;
     }
-    
+
     public void salvarLojaVirtual(ProdutoVO vo, long ean) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -417,10 +447,10 @@ public class ProdutoDAO {
             sql.put("descricao", vo.getDescricaoCompleta());
             sql.put("id_tipoorigemimagem", 1);
 
-            if(versao.maiorQue(3, 21)) {
+            if (versao.maiorQue(3, 21)) {
                 sql.put("codigobarras", ean);
             }
-            
+
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {

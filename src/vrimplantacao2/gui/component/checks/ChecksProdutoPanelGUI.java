@@ -1,13 +1,17 @@
 package vrimplantacao2.gui.component.checks;
 
+import com.ibm.db2.jcc.resources.ResourceKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JTabbedPane;
+import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -38,7 +42,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (gui.chkMercadologicoNaoExcluir.isSelected()) {
                 opt.add(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR);
             }
-            
+
             if (gui.chkManterCodigoMercadologico.isSelected()) {
                 opt.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);
             }
@@ -51,7 +55,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
             }
         }
-        
+
     };
 
     public void setParametrosExtras(List<OpcaoProduto> parametrosExtras) {
@@ -74,44 +78,38 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         this.opt = dao.getOpcoesDisponiveisProdutos();
         tabImportacao.removeAll();
         tabParametros.removeAll();
-                
+
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
         chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
         chkManterEANsMenores.setVisible(opt.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
         chkManterDescricaoProduto.setVisible(opt.contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO));
-                
-        if (
-                opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
-                opt.contains(OpcaoProduto.MERCADOLOGICO) ||
-                opt.contains(OpcaoProduto.FAMILIA) ||
-                opt.contains(OpcaoProduto.FAMILIA_PRODUTO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO)
+                || opt.contains(OpcaoProduto.MERCADOLOGICO)
+                || opt.contains(OpcaoProduto.FAMILIA)
+                || opt.contains(OpcaoProduto.FAMILIA_PRODUTO)) {
             chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO) || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
             chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
             chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
             chkManterCodigoMercadologico.setVisible(opt.contains(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO));
-            
+
             if (chkMercadologico.isVisible()) {
-                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));                
-                if (
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL) ||
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR) ||
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)
-                ) {
+                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));
+                if (opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL)
+                        || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR)
+                        || opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)) {
                     tabParametros.add(pnlOptMercadologico);
                 }
             }
-            
+
             chkFamilia.setVisible(opt.contains(OpcaoProduto.FAMILIA));
             chkFamiliaProduto.setVisible(opt.contains(OpcaoProduto.FAMILIA_PRODUTO));
-            tabImportacao.add(pnlImpMercadologico);            
+            tabImportacao.add(pnlImpMercadologico);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PRODUTOS) ||
-                opt.contains(OpcaoProduto.EAN) ||
-                opt.contains(OpcaoProduto.EAN_EM_BRANCO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.PRODUTOS)
+                || opt.contains(OpcaoProduto.EAN)
+                || opt.contains(OpcaoProduto.EAN_EM_BRANCO)) {
             chkProdutos.setVisible(opt.contains(OpcaoProduto.PRODUTOS));
             if (opt.contains(OpcaoProduto.PRODUTOS)) {
                 tabParametros.add(pnlOptProduto);
@@ -121,25 +119,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkEANemBranco.setVisible(opt.contains(OpcaoProduto.EAN_EM_BRANCO));
             tabImportacao.add(pnlImpProduto);
         }
-               
-        if (
-                opt.contains(OpcaoProduto.PRECO) ||
-                opt.contains(OpcaoProduto.CUSTO) ||
-                opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) ||
-                opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) ||
-                opt.contains(OpcaoProduto.ESTOQUE) ||
-                opt.contains(OpcaoProduto.ESTOQUE_MINIMO) ||
-                opt.contains(OpcaoProduto.ESTOQUE_MAXIMO) ||
-                opt.contains(OpcaoProduto.ATIVO) ||
-                opt.contains(OpcaoProduto.DESCONTINUADO) ||
-                opt.contains(OpcaoProduto.ATACADO) ||
-                opt.contains(OpcaoProduto.OFERTA) ||
-                opt.contains(OpcaoProduto.MARGEM) ||
-                opt.contains(OpcaoProduto.TIPO_PRODUTO) ||
-                opt.contains(OpcaoProduto.FABRICANTE) ||
-                opt.contains(OpcaoProduto.FABRICACAO_PROPRIA) ||
-                opt.contains(OpcaoProduto.NORMA_REPOSICAO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.PRECO)
+                || opt.contains(OpcaoProduto.CUSTO)
+                || opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO)
+                || opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO)
+                || opt.contains(OpcaoProduto.ESTOQUE)
+                || opt.contains(OpcaoProduto.ESTOQUE_MINIMO)
+                || opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)
+                || opt.contains(OpcaoProduto.ATIVO)
+                || opt.contains(OpcaoProduto.DESCONTINUADO)
+                || opt.contains(OpcaoProduto.ATACADO)
+                || opt.contains(OpcaoProduto.OFERTA)
+                || opt.contains(OpcaoProduto.MARGEM)
+                || opt.contains(OpcaoProduto.TIPO_PRODUTO)
+                || opt.contains(OpcaoProduto.FABRICANTE)
+                || opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)
+                || opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
             chkPreco.setVisible(opt.contains(OpcaoProduto.PRECO));
             chkCusto.setVisible(opt.contains(OpcaoProduto.CUSTO));
             chkCustoComImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO));
@@ -165,22 +161,20 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkTeclaAssociada.setVisible(opt.contains(OpcaoProduto.TECLA_ASSOCIADA));
             tabImportacao.add(pnlImpCompl);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PIS_COFINS) ||
-                opt.contains(OpcaoProduto.NATUREZA_RECEITA) ||
-                opt.contains(OpcaoProduto.ICMS_LOJA) ||
-                opt.contains(OpcaoProduto.ICMS) ||
-                opt.contains(OpcaoProduto.ICMS_SAIDA) ||
-                opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) ||
-                opt.contains(OpcaoProduto.ICMS_ENTRADA) ||
-                opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) ||
-                opt.contains(OpcaoProduto.ICMS_CONSUMIDOR) ||
-                opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA) ||
-                opt.contains(OpcaoProduto.NCM) ||
-                opt.contains(OpcaoProduto.CEST) ||
-                opt.contains(OpcaoProduto.CODIGO_BENEFICIO) 
-        ) {
+
+        if (opt.contains(OpcaoProduto.PIS_COFINS)
+                || opt.contains(OpcaoProduto.NATUREZA_RECEITA)
+                || opt.contains(OpcaoProduto.ICMS_LOJA)
+                || opt.contains(OpcaoProduto.ICMS)
+                || opt.contains(OpcaoProduto.ICMS_SAIDA)
+                || opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)
+                || opt.contains(OpcaoProduto.ICMS_ENTRADA)
+                || opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO)
+                || opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)
+                || opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)
+                || opt.contains(OpcaoProduto.NCM)
+                || opt.contains(OpcaoProduto.CEST)
+                || opt.contains(OpcaoProduto.CODIGO_BENEFICIO)) {
             chkPisCofins.setVisible(opt.contains(OpcaoProduto.PIS_COFINS));
             chkNatReceita.setVisible(opt.contains(OpcaoProduto.NATUREZA_RECEITA));
             chkIcmsLoja.setVisible(opt.contains(OpcaoProduto.ICMS_LOJA));
@@ -191,7 +185,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
             chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
             chkIcmsConsumidor.setVisible(opt.contains(OpcaoProduto.ICMS_CONSUMIDOR));
-            btnMapaTribut.setVisible(chkICMS.isVisible()); 
+            btnMapaTribut.setVisible(chkICMS.isVisible());
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkCodigoBeneficio.setVisible(opt.contains(OpcaoProduto.CODIGO_BENEFICIO));
@@ -200,17 +194,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
                 tabParametros.add(pnlOptPautaFiscal);
             }
-            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)||
-                    opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
+            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)
+                    || opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
                 tabParametros.add(pnlOptIcms);
             }
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO) ||
-                opt.contains(OpcaoProduto.PAUTA_FISCAL)
-                ) {
-            
+
+        if (opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO)
+                || opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
+
             chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
             chkPautaFiscalProduto.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
             chkPfIcmsCredito.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
@@ -222,25 +214,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPfIcmsTipoIva.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
             tabImportacao.add(pnlImpPautaFiscal);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.DESC_COMPLETA) ||
-                opt.contains(OpcaoProduto.DESC_REDUZIDA) ||
-                opt.contains(OpcaoProduto.DESC_GONDOLA) ||
-                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) ||
-                opt.contains(OpcaoProduto.VALIDADE) ||
-                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN) ||
-                opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO) ||
-                opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN) ||
-                opt.contains(OpcaoProduto.SUGESTAO_PEDIDO) ||
-                opt.contains(OpcaoProduto.SUGESTAO_COTACAO) ||
-                opt.contains(OpcaoProduto.VENDA_PDV) ||
-                opt.contains(OpcaoProduto.PESO_BRUTO) ||
-                opt.contains(OpcaoProduto.PESO_LIQUIDO) ||
-                opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM) ||
-                opt.contains(OpcaoProduto.VOLUME_QTD) ||
-                opt.contains(OpcaoProduto.VENDA_CONTROLADA)
-        ) {
+
+        if (opt.contains(OpcaoProduto.DESC_COMPLETA)
+                || opt.contains(OpcaoProduto.DESC_REDUZIDA)
+                || opt.contains(OpcaoProduto.DESC_GONDOLA)
+                || opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO)
+                || opt.contains(OpcaoProduto.VALIDADE)
+                || opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN)
+                || opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO)
+                || opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN)
+                || opt.contains(OpcaoProduto.SUGESTAO_PEDIDO)
+                || opt.contains(OpcaoProduto.SUGESTAO_COTACAO)
+                || opt.contains(OpcaoProduto.VENDA_PDV)
+                || opt.contains(OpcaoProduto.PESO_BRUTO)
+                || opt.contains(OpcaoProduto.PESO_LIQUIDO)
+                || opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM)
+                || opt.contains(OpcaoProduto.VOLUME_QTD)
+                || opt.contains(OpcaoProduto.VENDA_CONTROLADA)) {
             chkDescCompleta.setVisible(opt.contains(OpcaoProduto.DESC_COMPLETA));
             chkDescReduzida.setVisible(opt.contains(OpcaoProduto.DESC_REDUZIDA));
             chkDescGondola.setVisible(opt.contains(OpcaoProduto.DESC_GONDOLA));
@@ -260,18 +250,16 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDataCadastro.setVisible(opt.contains(OpcaoProduto.DATA_CADASTRO));
             tabImportacao.add(pnlImpInfoAdic);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.ASSOCIADO) ||
-                opt.contains(OpcaoProduto.COMPRADOR) ||
-                opt.contains(OpcaoProduto.COMPRADOR_PRODUTO) ||
-                opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
-                opt.contains(OpcaoProduto.INVENTARIO) ||
-                opt.contains(OpcaoProduto.NUTRICIONAL) ||
-                opt.contains(OpcaoProduto.RECEITA) ||
-                opt.contains(OpcaoProduto.DIVISAO) ||
-                opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.ASSOCIADO)
+                || opt.contains(OpcaoProduto.COMPRADOR)
+                || opt.contains(OpcaoProduto.COMPRADOR_PRODUTO)
+                || opt.contains(OpcaoProduto.RECEITA_BALANCA)
+                || opt.contains(OpcaoProduto.INVENTARIO)
+                || opt.contains(OpcaoProduto.NUTRICIONAL)
+                || opt.contains(OpcaoProduto.RECEITA)
+                || opt.contains(OpcaoProduto.DIVISAO)
+                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
                 chkInverterAssociado.setVisible(chkAssociado.isVisible());
@@ -288,61 +276,58 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
-            if (
-                    chkNutricionalFilizola.isVisible() || 
-                    chkNutricionalToledo.isVisible()
-                    ) {
+            if (chkNutricionalFilizola.isVisible()
+                    || chkNutricionalToledo.isVisible()) {
                 tabParametros.add(pnlOptOptNutricional);
             }
             tabImportacao.add(pnlImpOutrosDados);
         }
+
+        if (!opt.contains(OpcaoProduto.PDV_VENDA)) {
+            this.remove(tabImportacaoVendas);
+        }
+
         tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
-        
+
     }
 
     public void setOpcoesDisponiveis(InterfaceController controller) {
         this.opt = controller.getOpcoesDisponiveisProdutos();
         tabImportacao.removeAll();
         tabParametros.removeAll();
-                
+
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
         chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
         chkManterEANsMenores.setVisible(opt.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
         chkManterDescricaoProduto.setVisible(opt.contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO));
-                
-        if (
-                opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
-                opt.contains(OpcaoProduto.MERCADOLOGICO) ||
-                opt.contains(OpcaoProduto.FAMILIA) ||
-                opt.contains(OpcaoProduto.FAMILIA_PRODUTO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO)
+                || opt.contains(OpcaoProduto.MERCADOLOGICO)
+                || opt.contains(OpcaoProduto.FAMILIA)
+                || opt.contains(OpcaoProduto.FAMILIA_PRODUTO)) {
             chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO) || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
             chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
             chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
             chkManterCodigoMercadologico.setVisible(opt.contains(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO));
-            
+
             if (chkMercadologico.isVisible()) {
-                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));                
-                if (
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL) ||
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR) ||
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)
-                ) {
+                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));
+                if (opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL)
+                        || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR)
+                        || opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)) {
                     tabParametros.add(pnlOptMercadologico);
                 }
             }
-            
+
             chkFamilia.setVisible(opt.contains(OpcaoProduto.FAMILIA));
             chkFamiliaProduto.setVisible(opt.contains(OpcaoProduto.FAMILIA_PRODUTO));
-            tabImportacao.add(pnlImpMercadologico);            
+            tabImportacao.add(pnlImpMercadologico);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PRODUTOS) ||
-                opt.contains(OpcaoProduto.EAN) ||
-                opt.contains(OpcaoProduto.EAN_EM_BRANCO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.PRODUTOS)
+                || opt.contains(OpcaoProduto.EAN)
+                || opt.contains(OpcaoProduto.EAN_EM_BRANCO)) {
             chkProdutos.setVisible(opt.contains(OpcaoProduto.PRODUTOS));
             if (opt.contains(OpcaoProduto.PRODUTOS)) {
                 tabParametros.add(pnlOptProduto);
@@ -352,25 +337,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkEANemBranco.setVisible(opt.contains(OpcaoProduto.EAN_EM_BRANCO));
             tabImportacao.add(pnlImpProduto);
         }
-               
-        if (
-                opt.contains(OpcaoProduto.PRECO) ||
-                opt.contains(OpcaoProduto.CUSTO) ||
-                opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) ||
-                opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) ||
-                opt.contains(OpcaoProduto.ESTOQUE) ||
-                opt.contains(OpcaoProduto.ESTOQUE_MINIMO) ||
-                opt.contains(OpcaoProduto.ESTOQUE_MAXIMO) ||
-                opt.contains(OpcaoProduto.ATIVO) ||
-                opt.contains(OpcaoProduto.DESCONTINUADO) ||
-                opt.contains(OpcaoProduto.ATACADO) ||
-                opt.contains(OpcaoProduto.OFERTA) ||
-                opt.contains(OpcaoProduto.MARGEM) ||
-                opt.contains(OpcaoProduto.TIPO_PRODUTO) ||
-                opt.contains(OpcaoProduto.FABRICANTE) ||
-                opt.contains(OpcaoProduto.FABRICACAO_PROPRIA) ||
-                opt.contains(OpcaoProduto.NORMA_REPOSICAO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.PRECO)
+                || opt.contains(OpcaoProduto.CUSTO)
+                || opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO)
+                || opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO)
+                || opt.contains(OpcaoProduto.ESTOQUE)
+                || opt.contains(OpcaoProduto.ESTOQUE_MINIMO)
+                || opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)
+                || opt.contains(OpcaoProduto.ATIVO)
+                || opt.contains(OpcaoProduto.DESCONTINUADO)
+                || opt.contains(OpcaoProduto.ATACADO)
+                || opt.contains(OpcaoProduto.OFERTA)
+                || opt.contains(OpcaoProduto.MARGEM)
+                || opt.contains(OpcaoProduto.TIPO_PRODUTO)
+                || opt.contains(OpcaoProduto.FABRICANTE)
+                || opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)
+                || opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
             chkPreco.setVisible(opt.contains(OpcaoProduto.PRECO));
             chkCusto.setVisible(opt.contains(OpcaoProduto.CUSTO));
             chkCustoComImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO));
@@ -396,22 +379,20 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkTeclaAssociada.setVisible(opt.contains(OpcaoProduto.TECLA_ASSOCIADA));
             tabImportacao.add(pnlImpCompl);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PIS_COFINS) ||
-                opt.contains(OpcaoProduto.NATUREZA_RECEITA) ||
-                opt.contains(OpcaoProduto.ICMS_LOJA) ||
-                opt.contains(OpcaoProduto.ICMS) ||
-                opt.contains(OpcaoProduto.ICMS_SAIDA) ||
-                opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) ||
-                opt.contains(OpcaoProduto.ICMS_ENTRADA) ||
-                opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) ||
-                opt.contains(OpcaoProduto.ICMS_CONSUMIDOR) ||
-                opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA) ||
-                opt.contains(OpcaoProduto.NCM) ||
-                opt.contains(OpcaoProduto.CEST) ||
-                opt.contains(OpcaoProduto.CODIGO_BENEFICIO) 
-        ) {
+
+        if (opt.contains(OpcaoProduto.PIS_COFINS)
+                || opt.contains(OpcaoProduto.NATUREZA_RECEITA)
+                || opt.contains(OpcaoProduto.ICMS_LOJA)
+                || opt.contains(OpcaoProduto.ICMS)
+                || opt.contains(OpcaoProduto.ICMS_SAIDA)
+                || opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)
+                || opt.contains(OpcaoProduto.ICMS_ENTRADA)
+                || opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO)
+                || opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)
+                || opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)
+                || opt.contains(OpcaoProduto.NCM)
+                || opt.contains(OpcaoProduto.CEST)
+                || opt.contains(OpcaoProduto.CODIGO_BENEFICIO)) {
             chkPisCofins.setVisible(opt.contains(OpcaoProduto.PIS_COFINS));
             chkNatReceita.setVisible(opt.contains(OpcaoProduto.NATUREZA_RECEITA));
             chkIcmsLoja.setVisible(opt.contains(OpcaoProduto.ICMS_LOJA));
@@ -422,7 +403,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
             chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
             chkIcmsConsumidor.setVisible(opt.contains(OpcaoProduto.ICMS_CONSUMIDOR));
-            btnMapaTribut.setVisible(chkICMS.isVisible()); 
+            btnMapaTribut.setVisible(chkICMS.isVisible());
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkCodigoBeneficio.setVisible(opt.contains(OpcaoProduto.CODIGO_BENEFICIO));
@@ -431,17 +412,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
                 tabParametros.add(pnlOptPautaFiscal);
             }
-            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)||
-                    opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
+            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)
+                    || opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
                 tabParametros.add(pnlOptIcms);
             }
         }
-        
-        if (
-                opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO) ||
-                opt.contains(OpcaoProduto.PAUTA_FISCAL)
-                ) {
-            
+
+        if (opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO)
+                || opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
+
             chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
             chkPautaFiscalProduto.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
             chkPfIcmsCredito.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
@@ -453,25 +432,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPfIcmsTipoIva.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
             tabImportacao.add(pnlImpPautaFiscal);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.DESC_COMPLETA) ||
-                opt.contains(OpcaoProduto.DESC_REDUZIDA) ||
-                opt.contains(OpcaoProduto.DESC_GONDOLA) ||
-                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) ||
-                opt.contains(OpcaoProduto.VALIDADE) ||
-                opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN) ||
-                opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO) ||
-                opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN) ||
-                opt.contains(OpcaoProduto.SUGESTAO_PEDIDO) ||
-                opt.contains(OpcaoProduto.SUGESTAO_COTACAO) ||
-                opt.contains(OpcaoProduto.VENDA_PDV) ||
-                opt.contains(OpcaoProduto.PESO_BRUTO) ||
-                opt.contains(OpcaoProduto.PESO_LIQUIDO) ||
-                opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM) ||
-                opt.contains(OpcaoProduto.VOLUME_QTD) ||
-                opt.contains(OpcaoProduto.VENDA_CONTROLADA)
-        ) {
+
+        if (opt.contains(OpcaoProduto.DESC_COMPLETA)
+                || opt.contains(OpcaoProduto.DESC_REDUZIDA)
+                || opt.contains(OpcaoProduto.DESC_GONDOLA)
+                || opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO)
+                || opt.contains(OpcaoProduto.VALIDADE)
+                || opt.contains(OpcaoProduto.TIPO_EMBALAGEM_EAN)
+                || opt.contains(OpcaoProduto.QTD_EMBALAGEM_COTACAO)
+                || opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN)
+                || opt.contains(OpcaoProduto.SUGESTAO_PEDIDO)
+                || opt.contains(OpcaoProduto.SUGESTAO_COTACAO)
+                || opt.contains(OpcaoProduto.VENDA_PDV)
+                || opt.contains(OpcaoProduto.PESO_BRUTO)
+                || opt.contains(OpcaoProduto.PESO_LIQUIDO)
+                || opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM)
+                || opt.contains(OpcaoProduto.VOLUME_QTD)
+                || opt.contains(OpcaoProduto.VENDA_CONTROLADA)) {
             chkDescCompleta.setVisible(opt.contains(OpcaoProduto.DESC_COMPLETA));
             chkDescReduzida.setVisible(opt.contains(OpcaoProduto.DESC_REDUZIDA));
             chkDescGondola.setVisible(opt.contains(OpcaoProduto.DESC_GONDOLA));
@@ -491,18 +468,16 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDataCadastro.setVisible(opt.contains(OpcaoProduto.DATA_CADASTRO));
             tabImportacao.add(pnlImpInfoAdic);
         }
-        
-        if (
-                opt.contains(OpcaoProduto.ASSOCIADO) ||
-                opt.contains(OpcaoProduto.COMPRADOR) ||
-                opt.contains(OpcaoProduto.COMPRADOR_PRODUTO) ||
-                opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
-                opt.contains(OpcaoProduto.INVENTARIO) ||
-                opt.contains(OpcaoProduto.NUTRICIONAL) ||
-                opt.contains(OpcaoProduto.RECEITA) ||
-                opt.contains(OpcaoProduto.DIVISAO) ||
-                opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
-        ) {
+
+        if (opt.contains(OpcaoProduto.ASSOCIADO)
+                || opt.contains(OpcaoProduto.COMPRADOR)
+                || opt.contains(OpcaoProduto.COMPRADOR_PRODUTO)
+                || opt.contains(OpcaoProduto.RECEITA_BALANCA)
+                || opt.contains(OpcaoProduto.INVENTARIO)
+                || opt.contains(OpcaoProduto.NUTRICIONAL)
+                || opt.contains(OpcaoProduto.RECEITA)
+                || opt.contains(OpcaoProduto.DIVISAO)
+                || opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
                 chkInverterAssociado.setVisible(chkAssociado.isVisible());
@@ -519,28 +494,31 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
-            if (
-                    chkNutricionalFilizola.isVisible() || 
-                    chkNutricionalToledo.isVisible()
-                    ) {
+            if (chkNutricionalFilizola.isVisible()
+                    || chkNutricionalToledo.isVisible()) {
                 tabParametros.add(pnlOptOptNutricional);
             }
             tabImportacao.add(pnlImpOutrosDados);
         }
+
+        if (!opt.contains(OpcaoProduto.PDV_VENDA)) {
+            this.remove(tabImportacaoVendas);
+        }
+
         tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
-        
+
     }
-    
+
     public Set<OpcaoProduto> getOpcoesDisponiveis() {
         return opt;
     }
-    
+
     public void setProvider(MapaTributacaoButtonProvider provider) {
         btnMapaTribut.setProvider(provider);
         btnMapaTribut.setEnabled(provider != null);
     }
-    
+
     /**
      * Creates new form ChecksProdutoPanelGUI
      */
@@ -548,8 +526,112 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         super();
         initComponents();
     }
-    
-    
+
+    public void limparProduto() {
+        chkEAN.setSelected(false);
+        chkAssociado.setSelected(false);
+        chkAtacado.setSelected(false);
+        chkAtualizarSomenteIncluidosUnificacao.setSelected(false);
+        chkCest.setSelected(false);
+        chkCodigoBeneficio.setSelected(false);
+        chkComprador.setSelected(false);
+        chkCompradorProduto.setSelected(false);
+        chkCopiarIcmsDebitoNaEntrada.setSelected(false);
+        chkCusto.setSelected(false);
+        chkCustoComImposto.setSelected(false);
+        chkCustoSemImposto.setSelected(false);
+        chkDataCadastro.setSelected(false);
+        chkDescCompleta.setSelected(false);
+        chkDescGondola.setSelected(false);
+        chkDescReduzida.setSelected(false);
+        chkDescontinuado.setSelected(false);
+        chkDivisao.setSelected(false);
+        chkDivisaoProduto.setSelected(false);
+        chkEAN.setSelected(false);
+        chkEANemBranco.setSelected(false);
+        chkEstoque.setSelected(false);
+        chkEstoqueMaximo.setSelected(false);
+        chkEstoqueMinimo.setSelected(false);
+        chkEstoqueTroca.setSelected(false);
+        chkFabricacaoPropria.setSelected(false);
+        chkFabricante.setSelected(false);
+        chkFamilia.setSelected(false);
+        chkFamiliaProduto.setSelected(false);
+        chkForcarPrecoCusto.setSelected(false);
+        chkForcarUnificacao.setSelected(false);
+        chkICMS.setSelected(false);
+        chkIcmsConsumidor.setSelected(false);
+        chkIcmsCredito.setSelected(false);
+        chkIcmsCreditoForaEstado.setSelected(false);
+        chkIcmsDebito.setSelected(false);
+        chkIcmsDebitoForaEstado.setSelected(false);
+        chkIcmsDebitoForaEstadoNF.setSelected(false);
+        chkIcmsLoja.setSelected(false);
+        chkImportarSomenteProdutosAtivos.setSelected(false);
+        chkInventario.setSelected(false);
+        chkInverterAssociado.setSelected(false);
+        chkManterBalanca.setSelected(false);
+        chkManterCodigoMercadologico.setSelected(false);
+        chkManterDescricaoProduto.setSelected(false);
+        chkManterEANsMenores.setSelected(false);
+        chkMargem.setSelected(false);
+        chkMargemMaxima.setSelected(false);
+        chkMargemMinima.setSelected(false);
+        chkMercadologico.setSelected(false);
+        chkMercadologicoNaoExcluir.setSelected(false);
+        chkMercadologicoPorNivelReplicar.setSelected(false);
+        chkNaoTransformarEANemUN.setSelected(false);
+        chkNatReceita.setSelected(false);
+        chkNcm.setSelected(false);
+        chkNormaReposicao.setSelected(false);
+        chkNumeroParcela.setSelected(false);
+        chkNutricionalFilizola.setSelected(false);
+        chkNutricionalResetarIDs.setSelected(false);
+        chkNutricionalToledo.setSelected(false);
+        chkOferta.setSelected(false);
+        chkPautaFiscal.setSelected(false);
+        chkPautaFiscalProduto.setSelected(false);
+        chkPautaUsarEansMenores.setSelected(false);
+        chkPdvVendas.setSelected(false);
+        chkPesoBruto.setSelected(false);
+        chkPesoLiquido.setSelected(false);
+        chkPfIcmsCredito.setSelected(false);
+        chkPfIcmsCreditoForaEst.setSelected(false);
+        chkPfIcmsDebito.setSelected(false);
+        chkPfIcmsDebitoForaEst.setSelected(false);
+        chkPfIcmsIva.setSelected(false);
+        chkPfIcmsIvaAjustado.setSelected(false);
+        chkPfIcmsTipoIva.setSelected(false);
+        chkPisCofins.setSelected(false);
+        chkPrateleira.setSelected(false);
+        chkPreco.setSelected(false);
+        chkProdMercadologico.setSelected(false);
+        chkProdutos.setSelected(false);
+        chkProdutosBalanca.setSelected(false);
+        chkQtdEmbalagemEAN.setSelected(false);
+        chkQtdEmbalagemProd.setSelected(false);
+        chkReceitaFilizola.setSelected(false);
+        chkReceitaProduto.setSelected(false);
+        chkReceitaToledo.setSelected(false);
+        chkResetarCodigoBalanca.setSelected(false);
+        chkResetarIdsNormais.setSelected(false);
+        chkSecao.setSelected(false);
+        chkSituacaoCadastro.setSelected(false);
+        chkSomarEstoqueAoProduto.setSelected(false);
+        chkSugestaoCotacao.setSelected(false);
+        chkSugestaoPedido.setSelected(false);
+        chkTeclaAssociada.setSelected(false);
+        chkTipoEmbalagemEAN.setSelected(false);
+        chkTipoEmbalagemProd.setSelected(false);
+        chkTipoProduto.setSelected(false);
+        chkUsarEANAnterior.setSelected(false);
+        chkValidade.setSelected(false);
+        chkVendaControlada.setSelected(false);
+        chkVendaPdv.setSelected(false);
+        chkVolumeEmbalagem.setSelected(false);
+        chkVolumeQtd.setSelected(false);
+        chkVrAtacado.setSelected(false);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -698,6 +780,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkDivisao = new vrframework.bean.checkBox.VRCheckBox();
         chkDivisaoProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkNumeroParcela = new vrframework.bean.checkBox.VRCheckBox();
+        tabImportacaoVendas = new javax.swing.JPanel();
+        pnlImpPdvVenda = new vrframework.bean.panel.VRPanel();
+        jLabel15 = new javax.swing.JLabel();
+        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
+        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkUsarEANAnterior = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -733,7 +822,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkManterCodigoMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addContainerGap(169, Short.MAX_VALUE))
         );
         pnlOptMercadologicoLayout.setVerticalGroup(
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -810,7 +899,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkImportarSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 249, Short.MAX_VALUE))))
+                        .addGap(0, 292, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -862,7 +951,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
                 .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(479, Short.MAX_VALUE))
+                .addContainerGap(522, Short.MAX_VALUE))
         );
         pnlOptAssociadoLayout.setVerticalGroup(
             pnlOptAssociadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -926,7 +1015,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(rdbPautaEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkPautaUsarEansMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
         pnlOptPautaFiscalLayout.setVerticalGroup(
             pnlOptPautaFiscalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -961,7 +1050,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(376, Short.MAX_VALUE))
+                .addContainerGap(419, Short.MAX_VALUE))
         );
         pnlOptIcmsLayout.setVerticalGroup(
             pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -993,7 +1082,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkNutricionalResetarIDs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(340, Short.MAX_VALUE))
+                .addContainerGap(417, Short.MAX_VALUE))
         );
         pnlOptOptNutricionalLayout.setVerticalGroup(
             pnlOptOptNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1027,7 +1116,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkResetarIdsNormais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(242, Short.MAX_VALUE))
+                .addContainerGap(330, Short.MAX_VALUE))
         );
         pnlResetarIdsLayout.setVerticalGroup(
             pnlResetarIdsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1246,7 +1335,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkPrateleira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkTeclaAssociada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
         pnlImpComplLayout.setVerticalGroup(
             pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1686,11 +1775,98 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         scrollImportação.setViewportView(tabImportacao);
 
         addTab("Importação de Produtos", scrollImportação);
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel15, "PDV VENDA");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPdvVendas, "Pdv Venda");
+        chkPdvVendas.setEnabled(true);
+
+        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaIniActionPerformed(evt);
+            }
+        });
+
+        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaFimActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkUsarEANAnterior, "Usar código EAN anterior para importar as vendas");
+        chkUsarEANAnterior.setEnabled(true);
+
+        javax.swing.GroupLayout pnlImpPdvVendaLayout = new javax.swing.GroupLayout(pnlImpPdvVenda);
+        pnlImpPdvVenda.setLayout(pnlImpPdvVendaLayout);
+        pnlImpPdvVendaLayout.setHorizontalGroup(
+            pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                        .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel15))
+                            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(422, Short.MAX_VALUE))
+        );
+        pnlImpPdvVendaLayout.setVerticalGroup(
+            pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlImpPdvVendaLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlImpPdvVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUsarEANAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabImportacaoVendasLayout = new javax.swing.GroupLayout(tabImportacaoVendas);
+        tabImportacaoVendas.setLayout(tabImportacaoVendasLayout);
+        tabImportacaoVendasLayout.setHorizontalGroup(
+            tabImportacaoVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlImpPdvVenda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabImportacaoVendasLayout.setVerticalGroup(
+            tabImportacaoVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabImportacaoVendasLayout.createSequentialGroup()
+                .addComponent(pnlImpPdvVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 547, Short.MAX_VALUE))
+        );
+
+        addTab("Importação de Vendas", tabImportacaoVendas);
     }// </editor-fold>//GEN-END:initComponents
 
     private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
         chkPautaUsarEansMenores.setEnabled(rdbPautaEan.isSelected());
     }//GEN-LAST:event_rdbPautaEanActionPerformed
+
+    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
+        if (edtDtVendaIni.getDate() == null) {
+            edtDtVendaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaIniActionPerformed
+
+    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
+        if (edtDtVendaFim.getDate() == null) {
+            edtDtVendaFim.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1759,6 +1935,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     public vrframework.bean.checkBox.VRCheckBox chkPautaUsarEansMenores;
+    public vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     public vrframework.bean.checkBox.VRCheckBox chkPesoBruto;
     public vrframework.bean.checkBox.VRCheckBox chkPesoLiquido;
     public vrframework.bean.checkBox.VRCheckBox chkPfIcmsCredito;
@@ -1790,18 +1967,22 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProd;
     public vrframework.bean.checkBox.VRCheckBox chkTipoProduto;
+    public vrframework.bean.checkBox.VRCheckBox chkUsarEANAnterior;
     public vrframework.bean.checkBox.VRCheckBox chkValidade;
     public vrframework.bean.checkBox.VRCheckBox chkVendaControlada;
     public vrframework.bean.checkBox.VRCheckBox chkVendaPdv;
     public vrframework.bean.checkBox.VRCheckBox chkVolumeEmbalagem;
     public vrframework.bean.checkBox.VRCheckBox chkVolumeQtd;
     public vrframework.bean.checkBox.VRCheckBox chkVrAtacado;
+    public org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
+    public org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel14;
+    public javax.swing.JLabel jLabel15;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1815,6 +1996,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlImpMercadologico;
     public vrframework.bean.panel.VRPanel pnlImpOutrosDados;
     public vrframework.bean.panel.VRPanel pnlImpPautaFiscal;
+    public vrframework.bean.panel.VRPanel pnlImpPdvVenda;
     public vrframework.bean.panel.VRPanel pnlImpProduto;
     public vrframework.bean.panel.VRPanel pnlImpTributacao;
     public vrframework.bean.panel.VRPanel pnlOptAssociado;
@@ -1830,6 +2012,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JScrollPane scrollParametros;
     public vrframework.bean.panel.VRPanel tabImportacao;
+    public javax.swing.JPanel tabImportacaoVendas;
     public vrframework.bean.panel.VRPanel tabParametros;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
@@ -1837,74 +2020,82 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public void executarImportacao() throws Exception {
         new ProdutoPanelImportador().importar();
     }
+
     public void executarImportacao(ProdutoPanelImportador produtoPanelImportador) throws Exception {
         if (produtoPanelImportador != null) {
             produtoPanelImportador.importar();
         }
     }
-    
+
     private String[] concat(String[] params, String novo) {
         params = Arrays.copyOf(params, params.length + 1);
         params[params.length - 1] = novo;
         return params;
     }
 
-    public void gravarParametros(Parametros parametros, String... params) {        
-        
-        parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" ));
+    public void gravarParametros(Parametros parametros, String... params) {
+
+        parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR"));
         parametros.put(chkManterCodigoMercadologico.isSelected(), concat(params, "MANTER_CODIGO_MERCADOLOGICO"));
-        parametros.put(chkManterBalanca.isSelected(), concat(params, "MANTER_PLU_BALANCA" ));
-        parametros.put(chkInverterAssociado.isSelected(), concat(params, "INVERTER_ASSOCIADO" ));
-        parametros.put(chkImportarSomenteProdutosAtivos.isSelected(), concat(params, "SOMENTES_PRODUTOS_ATIVOS" ));
-        parametros.put(chkManterEANsMenores.isSelected(), concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS" ));
+        parametros.put(chkManterBalanca.isSelected(), concat(params, "MANTER_PLU_BALANCA"));
+        parametros.put(chkInverterAssociado.isSelected(), concat(params, "INVERTER_ASSOCIADO"));
+        parametros.put(chkImportarSomenteProdutosAtivos.isSelected(), concat(params, "SOMENTES_PRODUTOS_ATIVOS"));
+        parametros.put(chkManterEANsMenores.isSelected(), concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS"));
         parametros.put(chkManterDescricaoProduto.isSelected(), concat(params, "MANTER_DESCRICAO_PRODUTO"));
         parametros.put(chkForcarUnificacao.isSelected(), concat(params, "FORCAR UNIFICACAO"));
-        
+
         if (rdbPautaIdPauta.isSelected()) {
-            parametros.put(1, concat(params, "PAUTA_OPCAO" ));
+            parametros.put(1, concat(params, "PAUTA_OPCAO"));
         } else if (rdbPautaIdProduto.isSelected()) {
-            parametros.put(2, concat(params, "PAUTA_OPCAO" ));
+            parametros.put(2, concat(params, "PAUTA_OPCAO"));
         } else if (rdbPautaEan.isSelected()) {
-            parametros.put(3, concat(params, "PAUTA_OPCAO" ));
+            parametros.put(3, concat(params, "PAUTA_OPCAO"));
         }
-        parametros.put(chkPautaUsarEansMenores.isSelected(), concat(params, "PAUTA_USAR_EANS_MENORES" ));
-        parametros.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), concat(params, "COPIAR_DEBITO_NO_CREDITO" ));
+        parametros.put(chkPautaUsarEansMenores.isSelected(), concat(params, "PAUTA_USAR_EANS_MENORES"));
+        parametros.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), concat(params, "COPIAR_DEBITO_NO_CREDITO"));
         parametros.put(chkResetarCodigoBalanca.isSelected(), concat(params, "RESETAR_BALANCA"));
         parametros.put(chkResetarIdsNormais.isSelected(), concat(params, "RESETAR_NORMAIS"));
-        
+
     }
 
     public void carregarParametros(Parametros parametros, String... params) {
-        
-        chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" )));
+
+        chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR")));
         chkManterCodigoMercadologico.setSelected(parametros.getBool(concat(params, "MANTER_CODIGO_MERCADOLOGICO")));
-        chkManterBalanca.setSelected(parametros.getBool(concat(params, "MANTER_PLU_BALANCA" )));
-        chkInverterAssociado.setSelected(parametros.getBool(concat(params, "INVERTER_ASSOCIADO" )));
-        chkImportarSomenteProdutosAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_PRODUTOS_ATIVOS" )));
+        chkManterBalanca.setSelected(parametros.getBool(concat(params, "MANTER_PLU_BALANCA")));
+        chkInverterAssociado.setSelected(parametros.getBool(concat(params, "INVERTER_ASSOCIADO")));
+        chkImportarSomenteProdutosAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_PRODUTOS_ATIVOS")));
         chkManterEANsMenores.setSelected(parametros.getBool(concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS")));
         chkManterDescricaoProduto.setSelected(parametros.getBool(concat(params, "MANTER_DESCRICAO_PRODUTO")));
         chkForcarUnificacao.setSelected(parametros.getBool("FORCAR UNIFICACAO"));
-        
-        switch (parametros.getInt(concat(params, "PAUTA_OPCAO" ))) {
-            case 2: rdbPautaIdProduto.setSelected(true); break;
-            case 3: rdbPautaEan.setSelected(true); break;
-            default: rdbPautaIdPauta.setSelected(true); break;
+
+        switch (parametros.getInt(concat(params, "PAUTA_OPCAO"))) {
+            case 2:
+                rdbPautaIdProduto.setSelected(true);
+                break;
+            case 3:
+                rdbPautaEan.setSelected(true);
+                break;
+            default:
+                rdbPautaIdPauta.setSelected(true);
+                break;
         }
         rdbPautaEanActionPerformed(null);
-        chkPautaUsarEansMenores.setSelected(parametros.getBool(concat(params, "PAUTA_USAR_EANS_MENORES" )));
-        chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO" )));
+        chkPautaUsarEansMenores.setSelected(parametros.getBool(concat(params, "PAUTA_USAR_EANS_MENORES")));
+        chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO")));
         chkResetarCodigoBalanca.setSelected(parametros.getBool(concat(params, "RESETAR_BALANCA")));
         chkResetarIdsNormais.setSelected(parametros.getBool(concat(params, "RESETAR_NORMAIS")));
-        
+
     }
-    
+
     public class ProdutoPanelImportador {
+
         public void importar() throws Exception {
-            
+
             if (chkFamiliaProduto.isSelected()) {
                 importador.importarFamiliaProduto();
             }
-            
+
             importadorMercadologico.importarMercadologico();
 
             if (chkProdutos.isSelected()) {
@@ -1939,15 +2130,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
             }
-            
+
             if (chkProdutosBalanca.isSelected()) {
                 importador.importarProdutosBalanca(opt.toArray(new OpcaoProduto[]{}));
             }
-            
+
             if (chkPautaFiscal.isSelected()) {
-                
+
                 List<OpcaoFiscal> opcoes = new ArrayList<>();
-                
+
                 if (rdbPautaIdProduto.isSelected()) {
                     opcoes.add(OpcaoFiscal.USAR_IDPRODUTO);
                 }
@@ -1958,7 +2149,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     opcoes.add(OpcaoFiscal.UTILIZAR_EANS_MENORES);
                 }
                 opcoes.add(OpcaoFiscal.NOVOS);
-                
+
                 if (chkPfIcmsCredito.isSelected()) {
                     opcoes.add(OpcaoFiscal.ALIQUOTA_CREDITO);
                 }
@@ -1980,7 +2171,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkPfIcmsTipoIva.isSelected()) {
                     opcoes.add(OpcaoFiscal.TIPO_IVA);
                 }
-                
+
                 if (!opcoes.isEmpty()) {
                     importador.importarPautaFiscal(opcoes.toArray(new OpcaoFiscal[]{}));
                 }
@@ -1998,7 +2189,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkAtualizarSomenteIncluidosUnificacao.isSelected()) {
                     opcoes.add(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
                 }
-                
+
                 if (chkSomarEstoqueAoProduto.isSelected()) {
                     opcoes.add(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
                 }
@@ -2169,7 +2360,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkVolumeQtd.isSelected()) {
                     opcoes.add(OpcaoProduto.VOLUME_QTD);
-                }            
+                }
                 if (chkCopiarIcmsDebitoNaEntrada.isSelected()) {
                     opcoes.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
@@ -2212,8 +2403,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     opcoes.add(OpcaoNutricional.RESETAR_IDS);
                 }
                 if (!opcoes.isEmpty()) {
-                    importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
-                }                            
+                    importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[]{}));
+                }
             }
 
             {
@@ -2225,24 +2416,24 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     opcoes.add(OpcaoReceitaBalanca.TOLEDO);
                 }
                 if (!opcoes.isEmpty()) {
-                    importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[] {}));
-                }                            
+                    importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[]{}));
+                }
             }
 
             if (chkOferta.isSelected()) {
                 importador.importarOfertas(new Date());
             }
-            
+
             if (chkInventario.isSelected()) {
                 importador.importarInventario();
             }
-            
+
             if (chkReceitaProduto.isSelected()) {
                 importador.importarReceitas();
             }
-            
+
             if (chkAssociado.isSelected()) {
-                
+
                 List<OpcaoAssociado> opt = new ArrayList<>();
                 if (chkInverterAssociado.isSelected()) {
                     opt.add(OpcaoAssociado.IMP_INVERTER);
@@ -2252,12 +2443,20 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 importador.importarAssociado(opt.toArray(new OpcaoAssociado[]{}));
             }
-        }
-        
 
-        
+            if (chkPdvVendas.isSelected()
+                    && edtDtVendaIni.getDate() != null
+                    && edtDtVendaFim.getDate() != null) {
+
+                if (chkUsarEANAnterior.isSelected()) {
+                    importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
+                } else {
+                    importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                }
+            }
+        }
     }
-    
+
     /**
      * Utilize esta classe para customizar o acionamento de importações.
      */
@@ -2272,5 +2471,5 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         public abstract void importarMercadologico() throws Exception;
 
     }
-   
+
 }

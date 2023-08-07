@@ -1,23 +1,28 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -29,6 +34,8 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
@@ -45,6 +52,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
+                OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
@@ -58,7 +66,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
@@ -70,6 +78,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
@@ -84,7 +93,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.FABRICANTE
         ));
     }
 
@@ -95,7 +105,10 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR));
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
     }
 
     @Override
@@ -106,6 +119,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -116,10 +131,10 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "	CODITR id,\n"
-                    + "    NOMETR descricao,\n"
-                    + "    CODICST cst_saida,\n"
-                    + "    PERC_ICM aliquota_saida,\n"
-                    + "    PERC_RED reducao_saida\n"
+                    + " NOMETR descricao,\n"
+                    + " CODICST cst_saida,\n"
+                    + " PERC_ICM aliquota_saida,\n"
+                    + " PERC_RED reducao_saida\n"
                     + "FROM\n"
                     + "	TRIBUTA TR\n"
                     + "ORDER BY 1"
@@ -158,8 +173,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
 
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("desc_merc1"));
@@ -248,22 +263,34 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"WITH estoque AS (\n"
+                    + "SELECT\n"
+                    + "	CODIPRO,\n"
+                    + "	max(CAST(ANO || '-' || MES || '-' || '01' AS date)) AS DATA\n"
+                    + "	FROM ESTOSI\n"
+                    + "	WHERE EMP_CODIGO = " + getLojaOrigem() + "\n"
+                    + "	GROUP BY CODIPRO)\n"
+                    + "SELECT\n"
                     + "	p.CODIPRO idproduto,\n"
-                    + " CASE \n"
-                    + "	  WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
-                    + "	  THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
-                    + "	  ELSE ean.COD_BARR\n"
+                    + "	CASE\n"
+                    + "		WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
+                    + "	  	THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
+                    + "		ELSE ean.COD_BARR\n"
                     + "	END ean,\n"
                     + "	(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR)) AS digito,\n"
                     + "	DESCRICAO descricaocompleta,\n"
                     + "	DESCRI_AB descricaoreduzida,\n"
-                    + "	un.ABRE_EMB tipoembalagem,\n"
+                    + "	un_v.ABRE_EMB tipoembalagem,\n"
+                    + "	un_c.ABRE_EMB emb_compra,\n"
                     + "	ean.QTD_UNI qtdembalagem,\n"
                     + "	PESO_BRU pesobruto,\n"
-                    + "	PESO_LIQ pesoliquido,	\n"
-                    + "	CASE WHEN balanca = 'S' THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	PESO_LIQ pesoliquido,\n"
+                    + "	CASE\n"
+                    + "		WHEN balanca = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END e_balanca,\n"
                     + "	CODIFAM familia,\n"
+                    + "	p.codifab fabricante,\n"
                     + "	CODIGRU merc1,\n"
                     + "	CODISGR merc2,\n"
                     + "	CODISGR merc3,\n"
@@ -273,27 +300,110 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	pl.UC_CUSTO_C custocomimposto,\n"
                     + "	pl.UC_CUSTO_S custosemimposto,\n"
                     + "	pr.PREVE precovenda,\n"
-                    + "	COALESCE (p.ESTOMIN,0) estmin,\n"
+                    + "	COALESCE (p.ESTOMIN,\n"
+                    + "	0) estmin,\n"
                     + "	p.ESTOMAX estmax,\n"
-                    + "	t.CODICST cst_saida,\n"
-                    + "	t.PERC_ICM aliq_saida,\n"
-                    + "	t.PERC_RED red_saida,\n"
+                    + "	CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) DATA,\n"
+                    + "	a.CODIPRO,\n"
+                    + "	a.ESTOANT estoque,\n"
+                    + "	tc.CODITR id_credito,\n"
+                    + "	td.CODITR id_debito,\n"
+                    + "	tdfe.CODITR id_debito_fe,\n"
                     + "	DATA_ALTERA data_alteracao,\n"
-                    + " pcc.CST_PIS piscofinscredito,\n"
-                    + " pcd.CST_PIS piscofinsdebito,\n"
-                    + " CASE WHEN p.atides = 'A' THEN 1 ELSE 0 END situacaocadastro\n"
+                    + "	pcc.CST_PIS piscofinscredito,\n"
+                    + "	pcd.CST_PIS piscofinsdebito,\n"
+                    + "	CASE\n"
+                    + "		WHEN p.atides = 'A' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END situacaocadastro\n"
                     + "FROM\n"
                     + "	PRODUTOS p\n"
-                    + "	LEFT JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
-                    + "	LEFT JOIN EMBALAG un ON un.CODIEMB = p.CODIEMB_V\n"
-                    + "	LEFT JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO  AND pr.AGP_CODIGO = p.CODILF\n"
-                    + "	LEFT JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF \n"
-                    + "	LEFT JOIN TRIBUTA_LOJAS i ON i.CODIPRO = p.CODIPRO\n"
-                    + "	LEFT JOIN TRIBUTA t ON t.CODITR = i.CODITRC\n"
-                    + " LEFT JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
-                    + "	LEFT JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
+                    + "	JOIN estosi a ON a.EMP_CODIGO = p.CODILF AND a.CODIPRO = p.CODIPRO\n"
+                    + "	JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "	JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
+                    + "	JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
+                    + "	JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO AND pr.AGP_CODIGO = p.CODILF\n"
+                    + "	JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO AND pl.EMP_CODIGO = p.CODILF\n"
+                    + "	JOIN TRIBUTA_LOJAS ti ON ti.CODIPRO = p.CODIPRO\n"
+                    + "	JOIN TRIBUTA tc ON tc.CODITR = ti.CODITRE \n"
+                    + "	JOIN TRIBUTA td ON td.CODITR = ti.CODITRC\n"
+                    + "	JOIN TRIBUTA tdfe ON tdfe.CODITR = ti.CODITRI\n"
+                    + "	JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
+                    + "	JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
+                    + "	JOIN estoque e ON e.CODIPRO = a.CODIPRO AND CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) = e.data\n"
                     + "WHERE\n"
-                    + "	CODILF = " + getLojaOrigem() + ""
+                    + "	CODILF = " + getLojaOrigem() + "\n"
+                    + "ORDER BY 1 DESC"*/
+                    "WITH estoque AS (\n"
+                    + "SELECT\n"
+                    + "	CODIPRO,\n"
+                    + "	max(CAST(ANO || '-' || MES || '-' || '01' AS date)) AS DATA\n"
+                    + "	FROM ESTOSI\n"
+                    + "	WHERE EMP_CODIGO = " + getLojaOrigem() + "\n"
+                    + "	GROUP BY CODIPRO)\n"
+                    + "SELECT\n"
+                    + "	p.CODIPRO idproduto,\n"
+                    + "	CASE\n"
+                    + "		WHEN CAST(ean.COD_BARR AS bigint) > 999999\n"
+                    + "	  	THEN ean.COD_BARR ||(SELECT * FROM SP_PAF_DIGITO_EAN13(ean.COD_BARR))\n"
+                    + "		ELSE ean.COD_BARR\n"
+                    + "	END ean,\n"
+                    + "	DESCRICAO descricaocompleta,\n"
+                    + "	DESCRI_AB descricaoreduzida,\n"
+                    + "	un_v.ABRE_EMB tipoembalagem,\n"
+                    + "	un_c.ABRE_EMB emb_compra,\n"
+                    + "	ean.QTD_UNI qtdembalagem,\n"
+                    + "	PESO_BRU pesobruto,\n"
+                    + "	PESO_LIQ pesoliquido,\n"
+                    + "	CASE\n"
+                    + "		WHEN balanca = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END e_balanca,\n"
+                    + "	CODIFAM familia,\n"
+                    + "	p.codifab fabricante,\n"
+                    + "	CODIGRU merc1,\n"
+                    + "	CODISGR merc2,\n"
+                    + "	CODISGR merc3,\n"
+                    + "	CODINCM ncm,\n"
+                    + "	p.CEST cest,\n"
+                    + "	p.PERC_LUC margem,\n"
+                    + "	pl.UC_CUSTO_C custocomimposto,\n"
+                    + "	pl.UC_CUSTO_S custosemimposto,\n"
+                    + "	pr.PREVE precovenda,\n"
+                    + "	COALESCE (p.ESTOMIN,\n"
+                    + "	0) estmin,\n"
+                    + "	p.ESTOMAX estmax,\n"
+                    + "	CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) DATA,\n"
+                    + "	a.CODIPRO,\n"
+                    + "	a.ESTOANT estoque,\n"
+                    + "	tc.CODITR id_credito,\n"
+                    + "	td.CODITR id_debito,\n"
+                    + "	tdfe.CODITR id_debito_fe,\n"
+                    + "	DATA_ALTERA data_alteracao,\n"
+                    + "	pcc.CST_PIS piscofinscredito,\n"
+                    + "	pcd.CST_PIS piscofinsdebito,\n"
+                    + "	CASE\n"
+                    + "		WHEN p.atides = 'A' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END situacaocadastro\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "	JOIN PRODUTOS_LOJAS pl ON pl.CODIPRO = p.CODIPRO\n"
+                    + "	JOIN estosi a ON a.CODIPRO = p.CODIPRO AND a.EMP_CODIGO = pl.EMP_CODIGO\n"
+                    + "	JOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "	JOIN EMBALAG un_v ON un_v.CODIEMB = p.CODIEMB_V\n"
+                    + "	JOIN EMBALAG un_c ON un_c.CODIEMB = p.CODIEMB_C\n"
+                    + "	JOIN PRECOS_LOJAS pr ON p.CODIPRO = pr.CODIPRO AND pr.AGP_CODIGO = 1\n"
+                    + "	JOIN TRIBUTA_LOJAS ti ON ti.CODIPRO = p.CODIPRO\n"
+                    + "	JOIN TRIBUTA tc ON tc.CODITR = ti.CODITRE \n"
+                    + "	JOIN TRIBUTA td ON td.CODITR = ti.CODITRC\n"
+                    + "	JOIN TRIBUTA tdfe ON tdfe.CODITR = ti.CODITRI\n"
+                    + "	JOIN TRIBUTA_PIS pcc ON pcc.CODITRPIS = p.TRPIS_C AND pcc.ENTR_SAI = 'E'\n"
+                    + "	JOIN TRIBUTA_PIS pcd ON pcd.CODITRPIS = p.TRPIS_V AND pcd.ENTR_SAI = 'S'\n"
+                    + "	JOIN estoque e ON e.CODIPRO = a.CODIPRO AND CAST(a.ANO || '-' || a.MES || '-' || '01' AS date) = e.data\n"
+                    + "WHERE\n"
+                    + "	pl.EMP_CODIGO = " + getLojaOrigem() + "\n"
+                    + "ORDER BY 1 DESC"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -302,19 +412,22 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
                     imp.setImportId(rst.getString("idproduto"));
                     imp.setEan(rst.getString("ean"));
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("emb_compra"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setCodMercadologico3(imp.getCodMercadologico2());
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -325,22 +438,23 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
-                    //imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque"));
 
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
 
-                    String idIcmsDebito;//, IdIcmsCredito;
+                    String idIcmsDebito, IdIcmsCredito, IdIcmsForaEstado;
 
-                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliq_saida") + "-" + rst.getString("red_saida");
-                    //IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+                    idIcmsDebito = rst.getString("id_debito");
+                    IdIcmsCredito = rst.getString("id_credito");
+                    IdIcmsForaEstado = rst.getString("id_debito_fe");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoId(IdIcmsForaEstado);
+                    imp.setIcmsDebitoForaEstadoNfId(IdIcmsForaEstado);
                     imp.setIcmsConsumidorId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
-                    imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
-                    //imp.setIcmsCreditoId(IdIcmsCredito);
-                    //imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsCreditoId(IdIcmsCredito);
+                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
 
                     imp.setPiscofinsCstCredito(rst.getString("piscofinscredito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofinsdebito"));
@@ -438,6 +552,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	FOR_FANTASIA fantasia,\n"
                     + "	FOR_CGC cnpj,\n"
                     + "	FOR_INSC ie,\n"
+                    + " COALESCE(FOR_PRODUTOR,'N') produtor,\n"
+                    + " COALESCE(FOR_OPT_SIMPLES,'N') simples_nacional,\n"
                     + "	FOR_ENDERECO endereco,\n"
                     + "	FOR_NUMEND numero,\n"
                     + "	FOR_BAIRRO bairro,\n"
@@ -478,6 +594,16 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                                 (email.length() > 50 ? email.substring(0, 50) : email));
                     }
 
+                    if ("S".equals(rs.getString("produtor"))) {
+                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        }
+                    } else if ("S".equals(rs.getString("simples_nacional"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    }
+
                     result.add(imp);
                 }
             }
@@ -492,14 +618,16 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "    fornecedor AS idfornecedor,\n"
-                    + "    produto AS idproduto,\n"
-                    + "    ultcompraqtde AS qtdembalagem,\n"
-                    + "    ultcompradata AS dataalteracao,\n"
-                    + "    codnofornecedor AS codigoexterno\n"
-                    + "FROM testfornecproduto\n"
-                    + "ORDER BY 1, 2"
+                    "SELECT DISTINCT\n"
+                    + "	p.CODIPRO idproduto,\n"
+                    + "	CODIFAB idfornecedor,\n"
+                    + "	ean.QTD_UNI qtdembalagem\n"
+                    + "FROM\n"
+                    + "	PRODUTOS p\n"
+                    + "	jOIN COD_BARR ean ON p.CODIPRO = ean.CODIPRO\n"
+                    + "WHERE\n"
+                    + "	CODIFAB IS NOT NULL \n"
+                    + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -508,9 +636,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
 
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
 
                     result.add(imp);
                 }
@@ -589,6 +715,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "     ELSE 0\n"
                     + "	END bloqueado,\n"
                     + "	TRUNC(CLI_LIMITE,11) limite,\n"
+                    + " vc.vcnv_dia_rece vencimento,\n"
                     + "	CLI_NASCIMENTO data_nascimento,\n"
                     + "	CLI_DTULCO data_cadastro,\n"
                     + "	CLI_EST_CIVIL estadocivil,\n"
@@ -605,6 +732,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "FROM\n"
                     + "	CLIENTES c\n"
                     + "	JOIN CIDADES m ON c.CID_CODIGO = m.CID_CODIGO \n"
+                    + "	LEFT JOIN VENCIMENTO_CONVENIO vc ON C.VCNV_CODIGO = vc.VCNV_CODIGO AND vc.CNV_CODIGO = c.CNV_CODIGO\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -631,6 +759,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setValorLimite(rs.getDouble("limite"));
                     }
 
+                    imp.setDiaVencimento(rs.getInt("vencimento"));
                     imp.setDataNascimento(rs.getDate("data_nascimento"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setEstadoCivil(rs.getString("estadocivil"));
@@ -692,32 +821,29 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
-        
+
         return result;
     }
-    
-    /*
-        DEV DE VENDAS INTERROMPIDO, NÃO TESTADAS AINDA
-    
-    private Date vendaDataIni;
-    private Date vendaDataFim;
 
-    public void setVendaDataIni(Date vendaDataIni) {
-        this.vendaDataIni = vendaDataIni;
-    }
-
-    public void setVendaDataFim(Date vendaDataFim) {
-        this.vendaDataFim = vendaDataFim;
-    }
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new Provenco_TentaculoDAO.VendaIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+        return new Provenco_TentaculoDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new Provenco_TentaculoDAO.VendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+        return new Provenco_TentaculoDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    public void setDataInicioVenda(Date date) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date date) {
+        this.dataTerminoVenda = dataTerminoVenda;
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -773,7 +899,8 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	MOV_ECF ecf,\n"
                     + "	MOV_COO numerocupom,\n"
                     + "	MOV_DT_MOVIMENTO data,\n"
-                    + " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) hora,\n"
+                    //+ " SUBSTRING(MOV_DTHR_REGISTRO FROM 12 FOR 8) hora,\n"
+                    + " '00:00:00' hora,\n"
                     + "	CAST(sum(MOV_VLR_TOTAL) AS numeric(11,2)) total,\n"
                     + "	CAST(sum(MOV_DESCONTO_CUPOM) AS numeric(11,2)) desconto,\n"
                     + "	CAST(sum(MOV_ACRESCIMO_CUPOM) AS numeric(11,2)) acrescimo\n"
@@ -783,7 +910,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	PRO_ID IS NOT NULL\n"
                     + "	AND MOV_LOJA = " + idLojaCliente + "\n"
                     + "	AND MOV_DT_MOVIMENTO BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
-                    + "GROUP BY 1, 2, 3, 4, 5, 6, 7";
+                    + "GROUP BY 1, 2, 3, 4, 5, 6";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -853,7 +980,7 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                     + "	pdv.MOV_COO AS numerocupom,\n"
                     + "	pdv.MOV_SEQ_COO AS sequencia,\n"
                     + "	pdv.MOV_DT_MOVIMENTO AS DATA,\n"
-                    + "	SUBSTRING(pdv.MOV_DTHR_REGISTRO FROM 11 FOR 9) AS hora,\n"
+                    + " '00:00:00' hora,\n"
                     + "	CASE\n"
                     + "	 WHEN pdv.MOV_TPO_REGISTRO = 10 THEN 1\n"
                     + "	 ELSE 0\n"
@@ -892,5 +1019,5 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    }*/
+    }
 }

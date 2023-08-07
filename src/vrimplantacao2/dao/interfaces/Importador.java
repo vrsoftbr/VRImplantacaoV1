@@ -189,7 +189,7 @@ public class Importador {
      * @return
      */
     public String getSistema() {
-        return interfaceDAO.getSistema();
+        return interfaceDAO.getSistema() + " - " + getIdConexao();
     }
 
     /**
@@ -218,8 +218,10 @@ public class Importador {
      */
     public void importarMercadologico(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();        
+        
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();
         Set<OpcaoProduto> opt = new HashSet<>(Arrays.asList(opcoes));
+        
         if (Parametros.OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva()) {
             MercadologicoRepository repository = new MercadologicoRepository(
                     getSistema(),
@@ -229,6 +231,9 @@ public class Importador {
             repository.salvarNormal(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
         } else {
             MercadologicoDAO dao = new MercadologicoDAO();
+            
+            dao.setSistema(getSistema());
+            dao.setIdLojaVR(getLojaVR());
             dao.salvar(mercadologicos, opt);
         }
     }
@@ -260,6 +265,7 @@ public class Importador {
         ProgressBar.setStatus("Carregando dados da família do produto...");
         List<FamiliaProdutoIMP> familias = getInterfaceDAO().getFamiliaProduto();
         FamiliaProdutoDAO dao = new FamiliaProdutoDAO();
+        dao.setSistema(getSistema());
         dao.salvar(familias);
     }
 
@@ -426,8 +432,8 @@ public class Importador {
         
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
         
-        dao.setImportSistema(getInterfaceDAO().getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportSistema(getSistema());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
@@ -442,8 +448,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANs();
         ProdutoDAO dao = new ProdutoDAO();
-        dao.setImportSistema(getInterfaceDAO().getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportSistema(getSistema());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
@@ -458,8 +464,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANsAtacado();
         ProdutoDAO dao = new ProdutoDAO();
-        dao.setImportSistema(getInterfaceDAO().getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportSistema(getSistema());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
@@ -473,8 +479,8 @@ public class Importador {
     public void importarEANemBranco() throws Exception {
         ProgressBar.setStatus("Preenchendo EANs em branco...");
         ProdutoDAO dao = new ProdutoDAO();
-        dao.setImportSistema(getInterfaceDAO().getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportSistema(getSistema());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEANemBranco();
     }
@@ -510,8 +516,8 @@ public class Importador {
             opt.setListaEspecial(getInterfaceDAO().getProdutos(opt));
         }
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLoja(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLoja(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         //TODO: Remover essa duplicidade para informar os parâmetros ao provider.
         if (isImportarIndividualLoja()) {
@@ -536,8 +542,8 @@ public class Importador {
         
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setIdConexao(getIdConexao());
         ClienteRepository rep = new ClienteRepository(provider);
@@ -550,8 +556,8 @@ public class Importador {
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesPreferenciais();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         
         ClienteRepository rep = new ClienteRepository(provider);
@@ -571,8 +577,8 @@ public class Importador {
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesEventuais();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setIdConexao(getIdConexao());
         
@@ -589,8 +595,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando clientes (VRFood)...");        
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesVRFood();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         ClienteRepository rep = new ClienteRepository(provider);
         rep.importarClienteVRFood(clientes, new HashSet<>(Arrays.asList(opcoes)));
@@ -600,8 +606,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
-                getInterfaceDAO().getSistema(),
-                getInterfaceDAO().getLojaOrigem(),
+                getSistema(),
+                getLojaOrigem(),
                 getLojaVR()
         );
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
@@ -612,8 +618,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
-                getInterfaceDAO().getSistema(),
-                getInterfaceDAO().getLojaOrigem(),
+                getSistema(),
+                getLojaOrigem(),
                 getLojaVR()
         );
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
@@ -644,8 +650,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos (Unificação)...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLoja(getInterfaceDAO().getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLoja(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
         if (Parametros.OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva()) {
@@ -691,8 +697,8 @@ public class Importador {
         ProgressBar.setStatus("Carregando produtos dos fornecedores (Unificação)...");
         List<ProdutoFornecedorIMP> produtos = getInterfaceDAO().getProdutosFornecedores();
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
-        dao.setImportSistema(getInterfaceDAO().getSistema());
-        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setImportSistema(getSistema());
+        dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }

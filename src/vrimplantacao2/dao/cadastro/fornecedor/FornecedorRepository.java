@@ -691,7 +691,7 @@ public class FornecedorRepository {
 
     public FornecedorAnteriorVO converterAnterior(FornecedorIMP imp) {
         FornecedorAnteriorVO ant = new FornecedorAnteriorVO();
-        ant.setImportSistema(imp.getImportSistema());
+        ant.setImportSistema(provider.getSistema());
         ant.setImportLoja(imp.getImportLoja());
         ant.setImportId(imp.getImportId());
         ant.setRazao(Utils.acertarTexto(imp.getRazao()));

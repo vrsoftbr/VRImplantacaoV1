@@ -30,7 +30,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             chkImportarClienteAtivo.setVisible(false);
         }
-                
+
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -134,27 +134,37 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosEmpresa.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
             chkClienteEventual.setVisible(true);
         } else {
             this.remove(tabClienteEventual);
         }
-        
-        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
+
+        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
             tabCreditoRotativo.add(pnlCreditoRotativo);
         } else {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
             tabCheque.add(pnlCheque);
         } else {
             pnlCheque.setVisible(false);
             this.remove(tabCheque);
+        }
+
+        if (opt.contains(OpcaoCliente.CONVENIO_CONVENIADO)) {
+            chkConveniado.setVisible(true);
+            chkConveniadoEmpresa.setVisible(true);
+            chkConveniadoTransacao.setVisible(true);
+            tabConvenio.add(pnlConvenio);
+        } else {
+            pnlConvenio.setVisible(false);
+            this.remove(tabConvenio);
         }
 
         tabImportacao.revalidate();
@@ -173,7 +183,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             chkImportarClienteAtivo.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -235,6 +245,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)
                 || opt.contains(OpcaoCliente.PERMITE_CHEQUE)
                 || opt.contains(OpcaoCliente.VALOR_LIMITE)
+                || opt.contains(OpcaoCliente.VENCIMENTO_ROTATIVO)
                 || opt.contains(OpcaoCliente.NOME_PAI)
                 || opt.contains(OpcaoCliente.NOME_MAE)
                 || opt.contains(OpcaoCliente.NOME_CONJUGE)
@@ -248,6 +259,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             chkPermiteCreditoRotativo.setVisible(opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO));
             chkPermiteCheque.setVisible(opt.contains(OpcaoCliente.PERMITE_CHEQUE));
             chkValorLimite.setVisible(opt.contains(OpcaoCliente.VALOR_LIMITE));
+            chkVencimento.setVisible(opt.contains(OpcaoCliente.VENCIMENTO_ROTATIVO));
             chkNomePai.setVisible(opt.contains(OpcaoCliente.NOME_PAI));
             chkNomeMae.setVisible(opt.contains(OpcaoCliente.NOME_MAE));
             chkNomeConjuge.setVisible(opt.contains(OpcaoCliente.NOME_CONJUGE));
@@ -277,17 +289,17 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosEmpresa.setVisible(false);
         }
-        
+
         if (!opt.contains(OpcaoCliente.DADOS)) {
             this.remove(scrollImportação);
         }
-        
+
         if (opt.contains(OpcaoCliente.CLIENTE_EVENTUAL)) {
             chkClienteEventual.setVisible(true);
         } else {
             this.remove(tabClienteEventual);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
             tabCreditoRotativo.add(pnlCreditoRotativo);
@@ -295,7 +307,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
         }
-        
+
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
             tabCheque.add(pnlCheque);
@@ -308,7 +320,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabCreditoRotativo.revalidate();
         tabCheque.revalidate();
     }
-    
+
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
         return opt;
     }
@@ -317,7 +329,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
      * Creates new form ChecksClientePanelGUI
      */
     public ChecksClientePanelGUI() {
-        super();        
+        super();
         initComponents();
     }
 
@@ -328,11 +340,11 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkForcarUnificacao.isSelected()) {
             opcao.add(OpcaoCliente.FORCAR_UNIFICACAO);
         }
-        
+
         if (chkImportarClienteAtivo.isSelected()) {
             opcao.add(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO);
         }
-        
+
         if (chkClientePreferencial.isSelected()) {
             importador.importarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
@@ -340,7 +352,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkClienteEventual.isSelected()) {
             importador.importarClienteEventual(opcao.toArray(new OpcaoCliente[]{}));
         }
-        
+
         if (chkNome.isSelected()) {
             opcao.add(OpcaoCliente.RAZAO);
         }
@@ -401,6 +413,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (chkValorLimite.isSelected()) {
             opcao.add(OpcaoCliente.VALOR_LIMITE);
         }
+        if (chkVencimento.isSelected()) {
+            opcao.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
+        }
         if (chkObservacao.isSelected()) {
             opcao.add(OpcaoCliente.OBSERVACOES);
         }
@@ -441,18 +456,76 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         if (!opcao.isEmpty()) {
             importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
         }
-        
+
         if (chkCreditoRotativo.isSelected()) {
             importador.importarCreditoRotativo();
         }
-        
+
         if (chkCheque.isSelected()) {
             importador.importarCheque();
+        }
+
+        if (chkConveniado.isSelected()) {
+            importador.importarConvenioConveniado();
+        }
+
+        if (chkConveniadoEmpresa.isSelected()) {
+            importador.importarConvenioEmpresa();
+        }
+
+        if (chkConveniadoTransacao.isSelected()) {
+            importador.importarConvenioTransacao();
         }
     }
 
     public void executarImportacao() throws Exception {
         importar();
+    }
+
+    public void limparCliente() {
+        chkBairro.setSelected(false);
+        chkBloqueado.setSelected(false);
+        chkCargo.setSelected(false);
+        chkCelular.setSelected(false);
+        chkCep.setSelected(false);
+        chkCheque.setSelected(false);
+        chkClienteEventual.setSelected(false);
+        chkClientePreferencial.setSelected(false);
+        chkCnpj.setSelected(false);
+        chkComplemento.setSelected(false);
+        chkContatoAdicional.setSelected(false);
+        chkConveniado.setSelected(false);
+        chkConveniadoEmpresa.setSelected(false);
+        chkConveniadoTransacao.setSelected(false);
+        chkCreditoRotativo.setSelected(false);
+        chkDataAdmissao.setSelected(false);
+        chkDataCadastro.setSelected(false);
+        chkDataNascimento.setSelected(false);
+        chkEmail.setSelected(false);
+        chkEmpresa.setSelected(false);
+        chkEndereco.setSelected(false);
+        chkEstadoCivil.setSelected(false);
+        chkForcarUnificacao.setSelected(false);
+        chkIE.setSelected(false);
+        chkImportarClienteAtivo.setSelected(false);
+        chkMunicipio.setSelected(false);
+        chkMunicipioIbge.setSelected(false);
+        chkNome.setSelected(false);
+        chkNomeConjuge.setSelected(false);
+        chkNomeMae.setSelected(false);
+        chkNomePai.setSelected(false);
+        chkNumero.setSelected(false);
+        chkObservacao.setSelected(false);
+        chkObservacao2.setSelected(false);
+        chkPermiteCheque.setSelected(false);
+        chkPermiteCreditoRotativo.setSelected(false);
+        chkSalario.setSelected(false);
+        chkSexo.setSelected(false);
+        chkSituacaoCadastro.setSelected(false);
+        chkTelefone.setSelected(false);
+        chkUf.setSelected(false);
+        chkUfIbge.setSelected(false);
+        chkValorLimite.setSelected(false);
     }
 
     /**
@@ -511,6 +584,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkSexo = new vrframework.bean.checkBox.VRCheckBox();
         chkEstadoCivil = new vrframework.bean.checkBox.VRCheckBox();
+        chkVencimento = new vrframework.bean.checkBox.VRCheckBox();
         pnlDadosEmpresa = new vrframework.bean.panel.VRPanel();
         jLabel10 = new javax.swing.JLabel();
         chkEmpresa = new vrframework.bean.checkBox.VRCheckBox();
@@ -529,6 +603,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         pnlCheque = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabConvenio = new javax.swing.JPanel();
+        pnlConvenio = new javax.swing.JPanel();
+        chkConveniado = new javax.swing.JCheckBox();
+        chkConveniadoEmpresa = new javax.swing.JCheckBox();
+        chkConveniadoTransacao = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -803,8 +883,11 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkSexo, "Sexo");
         chkSexo.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkEstadoCivil, "Estado Cívil");
+        org.openide.awt.Mnemonics.setLocalizedText(chkEstadoCivil, "Estado Civil");
         chkEstadoCivil.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkVencimento, "Vencimento Rotativo");
+        chkVencimento.setEnabled(true);
 
         javax.swing.GroupLayout pnlDadosComplementaresLayout = new javax.swing.GroupLayout(pnlDadosComplementares);
         pnlDadosComplementares.setLayout(pnlDadosComplementaresLayout);
@@ -845,8 +928,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(117, Short.MAX_VALUE))
         );
         pnlDadosComplementaresLayout.setVerticalGroup(
             pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -871,7 +956,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1089,7 +1176,60 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addGap(0, 327, Short.MAX_VALUE))
         );
 
-        addTab("Receber Cheque", tabCheque);
+        addTab("Importação Cheque", tabCheque);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniado, "Conveniado");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniadoEmpresa, "Empresa");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConveniadoTransacao, "Transação");
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Dados");
+
+        javax.swing.GroupLayout pnlConvenioLayout = new javax.swing.GroupLayout(pnlConvenio);
+        pnlConvenio.setLayout(pnlConvenioLayout);
+        pnlConvenioLayout.setHorizontalGroup(
+            pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlConvenioLayout.createSequentialGroup()
+                        .addComponent(chkConveniado)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkConveniadoEmpresa)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkConveniadoTransacao))
+                    .addComponent(jLabel1))
+                .addContainerGap(425, Short.MAX_VALUE))
+        );
+        pnlConvenioLayout.setVerticalGroup(
+            pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConvenioLayout.createSequentialGroup()
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkConveniado)
+                    .addComponent(chkConveniadoEmpresa)
+                    .addComponent(chkConveniadoTransacao))
+                .addGap(14, 14, 14))
+        );
+
+        javax.swing.GroupLayout tabConvenioLayout = new javax.swing.GroupLayout(tabConvenio);
+        tabConvenio.setLayout(tabConvenioLayout);
+        tabConvenioLayout.setHorizontalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlConvenio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabConvenioLayout.setVerticalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(289, Short.MAX_VALUE))
+        );
+
+        addTab("Importação Convênio", tabConvenio);
 
         getAccessibleContext().setAccessibleName("Importação de Clientes");
     }// </editor-fold>//GEN-END:initComponents
@@ -1112,6 +1252,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCnpj;
     public vrframework.bean.checkBox.VRCheckBox chkComplemento;
     public vrframework.bean.checkBox.VRCheckBox chkContatoAdicional;
+    public javax.swing.JCheckBox chkConveniado;
+    public javax.swing.JCheckBox chkConveniadoEmpresa;
+    public javax.swing.JCheckBox chkConveniadoTransacao;
     public vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkDataAdmissao;
     public vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
@@ -1141,6 +1284,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public vrframework.bean.checkBox.VRCheckBox chkValorLimite;
+    public vrframework.bean.checkBox.VRCheckBox chkVencimento;
+    public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
@@ -1151,6 +1296,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel9;
     public vrframework.bean.panel.VRPanel pnlCheque;
     public vrframework.bean.panel.VRPanel pnlContato;
+    public javax.swing.JPanel pnlConvenio;
     public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDados1;
@@ -1161,6 +1307,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JPanel tabCheque;
     public javax.swing.JPanel tabClienteEventual;
+    public javax.swing.JPanel tabConvenio;
     public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
     public javax.swing.JPanel tabParametros;

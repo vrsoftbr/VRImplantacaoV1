@@ -1042,7 +1042,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                    "SELECT DISTINCT\n"
                     + "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n"
                     + "	GIT_COD_ITEM PRODUTO,\n"
                     + "	FORITE_REFERENCIA AS REFERENCIA,\n"

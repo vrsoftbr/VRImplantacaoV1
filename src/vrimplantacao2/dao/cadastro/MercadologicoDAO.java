@@ -2,7 +2,9 @@ package vrimplantacao2.dao.cadastro;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +18,8 @@ import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2_5.controller.migracao.LogController;
+import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  * DAO responsável por gravar os dados do mercadológico no banco de dados.
@@ -31,6 +35,18 @@ public class MercadologicoDAO {
      */
     private MultiMap<String, MercadologicoVO> anteriores;
     private MercadologicoVO aAcertar;
+    private final LogController logController = new LogController();
+    private int idLojaVR;
+    
+    private String sistema;
+    
+    public String getSistema() {
+        return this.sistema;
+    }
+    
+    public void setSistema(String sistema) {
+        this.sistema = sistema;
+    }
 
     /**
      * Cria a tabela no banco de dados caso ela não exista.
@@ -95,6 +111,7 @@ public class MercadologicoDAO {
                 ProgressBar.setMaximum(getCodigoAnterior().size());
                 for (KeyList<String> imp : getCodigoAnterior().keySet()) {
                     String[] chave = imp.toArray();
+                    chave[0] = getSistema();
                     MercadologicoVO vo = getCodigoAnterior().get(chave);
                     MercadologicoAuxiliar item = organizados.get(chave);
 
@@ -105,7 +122,7 @@ public class MercadologicoDAO {
                         String sql = null;
 
                         MercadologicoVO pai = getCodigoAnterior().get(
-                                chave[0],
+                                getSistema(),
                                 chave[1],
                                 chave[2],
                                 vo.getNivel() > 2 ? chave[3] : "",
@@ -251,7 +268,7 @@ public class MercadologicoDAO {
                                     + "merc4 = " + vo.getMercadologico4() + ","
                                     + "merc5 = " + vo.getMercadologico5()
                                     + "where "
-                                    + "imp_sistema = " + Utils.quoteSQL(chave[0]) + " and "
+                                    + "imp_sistema = " + Utils.quoteSQL(getSistema()) + " and "
                                     + "imp_loja = " + Utils.quoteSQL(chave[1]) + " and "
                                     + "ant_merc1 = " + Utils.quoteSQL(chave[2]) + " and "
                                     + "ant_merc2 = " + Utils.quoteSQL(chave[3]) + " and "
@@ -269,6 +286,13 @@ public class MercadologicoDAO {
             }
 
             gerarAAcertar(nivelMax);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_MERCADOLOGICO.getId(),
+                    sdf.format(new Date()),
+                    getIdLojaVR());
 
             Conexao.commit();
         } catch (Exception ex) {
@@ -414,7 +438,7 @@ public class MercadologicoDAO {
                             + "	descricao,\n"
                             + "	nivel\n"
                             + ") VALUES (\n"
-                            + "	" + Utils.quoteSQL(chave[0]) + ", \n"
+                            + "	" + Utils.quoteSQL(getSistema()) + ", \n"
                             + "	" + Utils.quoteSQL(chave[1]) + ", \n"
                             + "	" + Utils.quoteSQL(chave[2]) + ", \n"
                             + "	" + Utils.quoteSQL(chave[3]) + ", \n"
@@ -539,9 +563,10 @@ public class MercadologicoDAO {
     private MultiMap<String, MercadologicoAuxiliar> organizarMercadologico(List<MercadologicoIMP> mercadologicos) {
         MultiMap<String, MercadologicoAuxiliar> result = new MultiMap<>();
 
-        //<editor-fold defaultstate="collapsed" desc="Elimina os mercadológicos duplicados">
+        //<editor-fold defaultstate="collapsed" desc="Elimina os mercadológicos duplicados">        
         MultiMap<String, MercadologicoIMP> unico = new MultiMap<>();
-        for (MercadologicoIMP merc : mercadologicos) {
+        for (MercadologicoIMP merc : mercadologicos) {            
+            merc.setImportSistema(getSistema());
             unico.put(merc,
                     merc.getImportSistema(),
                     merc.getImportLoja(),
@@ -557,6 +582,7 @@ public class MercadologicoDAO {
         //<editor-fold defaultstate="collapsed" desc="Cria na listagem o nivel 1 do mercadológico">
         for (MercadologicoIMP merc : unico.values()) {
             if (!"".equals(merc.getMerc1ID())) {
+                merc.setImportSistema(getSistema());
                 result.put(
                         new MercadologicoAuxiliar(1, merc.getMerc1Descricao()),
                         merc.getImportSistema(),
@@ -572,6 +598,7 @@ public class MercadologicoDAO {
 
         //<editor-fold defaultstate="collapsed" desc="Cria na listagem o nivel 2 do mercadológico">
         for (MercadologicoIMP merc : unico.values()) {
+            merc.setImportSistema(getSistema());
             if (!"".equals(merc.getMerc2ID())) {
                 result.put(
                         new MercadologicoAuxiliar(2, merc.getMerc2Descricao()),
@@ -606,6 +633,7 @@ public class MercadologicoDAO {
 
         //<editor-fold defaultstate="collapsed" desc="Cria na listagem o nivel 3 do mercadológico">
         for (MercadologicoIMP merc : unico.values()) {
+            merc.setImportSistema(getSistema());
             if (!"".equals(merc.getMerc3ID())) {
                 result.put(
                         new MercadologicoAuxiliar(3, merc.getMerc3Descricao()),
@@ -648,6 +676,7 @@ public class MercadologicoDAO {
 
         if (existeNivel4) {
             for (MercadologicoIMP merc : unico.values()) {
+                merc.setImportSistema(getSistema());
                 if (!"".equals(merc.getMerc4ID())) {
                     result.put(
                             new MercadologicoAuxiliar(4, merc.getMerc4Descricao()),
@@ -692,6 +721,7 @@ public class MercadologicoDAO {
         }
         if (existeNivel5) {
             for (MercadologicoIMP merc : unico.values()) {
+                merc.setImportSistema(getSistema());
                 if (!"".equals(merc.getMerc5ID())) {
                     result.put(
                             new MercadologicoAuxiliar(5, merc.getMerc5Descricao()),
@@ -886,7 +916,7 @@ public class MercadologicoDAO {
                                     + "merc4 = " + vo.getMercadologico4() + ","
                                     + "merc5 = " + vo.getMercadologico5()
                                     + "where "
-                                    + "imp_sistema = " + Utils.quoteSQL(chave[0]) + " and "
+                                    + "imp_sistema = " + Utils.quoteSQL(getSistema()) + " and "
                                     + "imp_loja = " + Utils.quoteSQL(chave[1]) + " and "
                                     + "ant_merc1 = " + Utils.quoteSQL(chave[2]) + " and "
                                     + "ant_merc2 = " + Utils.quoteSQL(chave[3]) + " and "
@@ -912,4 +942,11 @@ public class MercadologicoDAO {
         }
     }
 
+    public int getIdLojaVR() {
+        return idLojaVR;
+    }
+
+    public void setIdLojaVR(int idLojaVR) {
+        this.idLojaVR = idLojaVR;
+    }
 }
