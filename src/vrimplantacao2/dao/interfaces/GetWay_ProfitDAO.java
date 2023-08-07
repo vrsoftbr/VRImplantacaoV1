@@ -440,19 +440,19 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
 
-                    imp.setEstoque(rst.getDouble("estoque") == 0 ? 
-                            rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque") == 0
+                            ? rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
 
                     imp.setTroca(rst.getDouble("estoquetroca"));
 
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto") == 0 ? 
-                            rst.getDouble("custo_produto") : rst.getDouble("custocomimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto") == 0
+                            ? rst.getDouble("custo_produto") : rst.getDouble("custocomimposto"));
 
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto") == 0 ? 
-                            rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto") == 0
+                            ? rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
 
-                    imp.setPrecovenda(rst.getDouble("precovenda") == 0 ? 
-                            rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
+                    imp.setPrecovenda(rst.getDouble("precovenda") == 0
+                            ? rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
 
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
@@ -1903,8 +1903,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "RECEBER \n"
                     + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE \n"
                     + "where UPPER(SITUACAO) = 'AB'\n"
-                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") \n"
-                    + "and RECEBER.CODLOJA = " + getLojaOrigem() + "\n"
+                    + "and RECEBER.CODLOJA = " + getLojaOrigem()+ " \n"
                     + "order by DTEMISSAO";
 
             String sqlContasGerais = "SELECT \n"
@@ -1925,7 +1924,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "RECEBER \n"
                     + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE \n"
                     + "where UPPER(SITUACAO) != 'CA'\n"
-                    + "and RECEBER.CODTIPODOCUMENTO IN (" + builder.toString() + ") \n"
+                    + "and RECEBER.CODTIPODOCUMENTO IN ('" + builder + "') \n"
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + "\n"
                     + "order by DTEMISSAO";
 

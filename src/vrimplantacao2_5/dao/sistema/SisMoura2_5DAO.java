@@ -109,6 +109,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
@@ -133,14 +134,13 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     "select\n"
                     + "	Tipo_Regra_Imposto id,\n"
                     + "	CONCAT(Tipo_Regra_Imposto,'-',cst,'-',Aliquota_ICMS) descricao,\n"
-                    + "	CST cst,\n"
+                    + "	cast (CST as int) cst,\n"
                     + "	Aliquota_ICMS aliq,\n"
                     + "	0 red\n"
                     + "from\n"
                     + "	Fiscal_Regra_Imposto\n"
                     + "where\n"
-                    + "	UF_Origem = 'AC' and UF_Destino = 'AC'\n"
-                    + "	and Tipo_Regra_Imposto BETWEEN 10 and 20\n"
+                    + "	UF_Origem = 'SP' and UF_Destino = 'SP'\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -241,16 +241,16 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "declare @primeirocadastro date;\n"
-                    + "select @primeirocadastro = min(p.Data_Cadastro) from produto p\n"
-                    + "select\n"
+                    //    "declare @primeirocadastro date;\n"
+                    //    + "select @primeirocadastro = min(p.Data_Cadastro) from produto p\n"
+                    "select\n"
                     + "p.codigo id,\n"
                     + "p.Taxa_Tributaria,\n"
                     + "p.nome descricaocompleta,\n"
                     + "case when ltrim(rtrim(p.Descricao_Reduzida)) = '' then p.nome else p.Descricao_Reduzida end descricaoreduzida,\n"
                     + "p.nome descricaogondola,\n"
                     + "p.status id_situacaocadastral,\n"
-                    + "isnull(p.Data_Cadastro, @primeirocadastro) datacadastro,\n"
+                    //    + "isnull(p.Data_Cadastro, @primeirocadastro) datacadastro,\n"
                     + "p.grupo mercadologico1,\n"
                     + "isnull(p.SubGrupo, 1) mercadologico2,\n"
                     + "p.ncm,\n"
@@ -258,7 +258,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "c.Codigo_CEST,\n"
                     + "p.Margem,\n"
                     + "p.Quantidade qtdEmbalagem,\n"
-                    + "case when p.Balanca = 1 then p.Codigo else replace(p.codigo_barra,'C','') end ean,\n"
+                    + "case when p.Balanca = 1 then cast(p.Codigo as varchar) else replace(cast(p.codigo_barra as varchar),'C','') end ean,\n"
                     + "p.balanca e_balanca,\n"
                     + "p.Validade,\n"
                     + "p.Unidade id_tipoembalagem,\n"
@@ -310,7 +310,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
 
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                  //  imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSituacaoCadastro(("N".equals(rst.getString("Inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setTipoEmbalagem(rst.getString("Unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
