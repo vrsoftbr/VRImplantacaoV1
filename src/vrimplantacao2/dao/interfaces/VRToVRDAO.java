@@ -1224,119 +1224,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private String importarRecebivel() throws Exception {
-        String sql
-                = "INSERT INTO tiporecebivel(id,descricao,percentual,id_tipotef,id_tipoticket,gerarecebimento,id_contacontabilfiscaldebito,id_contacontabilfiscalcredito,\n"
-                + "id_historicopadrao,id_situacaocadastro,id_tipovistaprazo,id_tipocartaotef,id_fornecedor,tef,id_tiporecebimento,contabiliza,id_contacontabilfinanceiro)\n"
-                + "select id,descricao,percentual,id_tipotef,id_tipoticket,gerarecebimento,id_contacontabilfiscaldebito,id_contacontabilfiscalcredito,id_historicopadrao,"
-                + "id_situacaocadastro,id_tipovistaprazo,id_tipocartaotef,id_fornecedor,tef,id_tiporecebimento,contabiliza,id_contacontabilfinanceiro \n"
-                + "from\n"
-                + "tiporecebivel t \n"
-                + "order by 1";
-
-        return sql;
-    }
-
-    private String importarVendaOperador() throws Exception {
-
-        String sql
-                = "insert into pdv.vendaoperadorrecebivel (id, id_vendaoperadorfinalizadora, id_vendaoperador, id_tiporecebivel, valor,valorrecebimentogeral,\n"
-                + "valorrecargacelular, valorvalegas, valorrecebimento , valordoacao , valorvalepresente, valortrocodigital  )\n"
-                + "select id, id_vendaoperadorfinalizadora, id_vendaoperador, id_tiporecebivel, valor,valorrecebimentogeral,\n"
-                + "valorrecargacelular, valorvalegas, valorrecebimento , valordoacao , valorvalepresente, valortrocodigital \n"
-                + "from pdv.vendaoperadorrecebivel";
-
-        return sql;
-    }
-
-    private String importarVendaOperadorAuditoria() throws Exception {
-        String sql = "insert into pdv.vendaoperadorrecebivelauditoria \n"
-                + "(id, id_vendaoperadorfinalizadoraauditoria,id_vendaoperadorauditoria,id_tiporecebivel,valor,valorrecebimentogeral, valorrecargacelular\n"
-                + "valorvalegas, valorrecebimento,valordoacao,valorvalepresente,valortrocodigital)\n"
-                + "select id, id_vendaoperadorfinalizadoraauditoria,id_vendaoperadorauditoria,id_tiporecebivel,valor,valorrecebimentogeral, valorrecargacelular\n"
-                + "valorvalegas, valorrecebimento,valordoacao,valorvalepresente,valortrocodigital\n"
-                + "from pdv.vendaoperadorrecebivelauditoria aud\n"
-                + "join pdv.vendaoperadorfinalizadoraauditoria fin on fin.id = aud.id_vendaoperadorfinalizadoraauditoria \n"
-                + "join pdv.vendaoperadorauditoria ve on ve.id = fin.id_vendaoperadorauditoria \n"
-                + "where ve.id_loja = " + getLojaOrigem();
-
-        return sql;
-
-    }
-
-    private String importarCaixa() throws Exception {
-        String sql = "insert into caixa (id, id_caixa, id_tiporecebivel ,valor , troco)\n"
-                + "select id, id_caixa, id_tiporecebivel ,valor , troco from caixaitem ci\n"
-                + "join caixa cx on cx.id = ci.id_caixa \n"
-                + "where cx.id_loja = " + getLojaOrigem();
-
-        return sql;
-    }
-
-    private String caixaVencimento() throws Exception {
-
-        String sql
-                = "insert into caixavencimento (id, id_caixaitem,datavencimento,valor,id_caixa)\n"
-                + "select cx.id, id_caixaitem , datavencimento, valor,id_caixa from caixavencimento c \n"
-                + "join caixa cx on cx.id = c.id_caixa \n"
-                + "where cx.id_loja = " + getLojaOrigem();
-
-        return sql;
-    }
-
-    private String caixaItem() throws Exception {
-
-        String sql = "insert into caixaitem (cx.id, id_caixa , id_tiporecebivel ,valor , cx.troco)\n"
-                + "select cx.id, id_caixa , id_tiporecebivel ,valor , cx.troco from caixaitem cx \n"
-                + "join caixa c on cx.id = cx.id_caixa \n"
-                + "where c.id_loja = " + getLojaOrigem();
-
-        return sql;
-    }
-
-    private String receberCaixa() throws Exception {
-
-        String sql = "insert into recebercaixa(id, id_tiporecebivel ,dataemissao, id_situacaorecebercaixa,valor,observacao,id_tipolocalcobranca,id_tiporecebimento\n"
-                + "datavencimento,id_loja,datahoraalteracao)\n"
-                + "select id, id_tiporecebivel ,dataemissao, id_situacaorecebercaixa,valor,observacao,id_tipolocalcobranca,id_tiporecebimento\n"
-                + "datavencimento,datahoraalteracao from recebercaixa\n"
-                + "where id_loja = " + getLojaOrigem();
-
-        return sql;
-    }
-
-    public void importarTipoRecebivel() throws Exception {
-        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
-            st.execute(receberCaixa());
-            st.execute(caixaItem());
-            st.execute(caixaVencimento());
-            st.execute(importarCaixa());
-            st.execute(importarVendaOperadorAuditoria());
-            st.execute(importarVendaOperador());
-            st.execute(importarRecebivel());
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    public void apagarDadosRecebivel() throws Exception {
-        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
-
-            st.execute(apagarRecebivel());
-
-        }
-    }
-
-    private String apagarRecebivel() throws Exception {
-        String sql
-                = "delete from pdv.vendaoperadorrecebivel; \n"
-                + "delete from pdv.vendaoperadorrecebivelauditoria; \n"
-                + "delete from caixavencimento; \n"
-                + "delete from caixaitem; \n";
-
-        return sql;
-    }
-
     @Override
     public List<ContaContabilFiscalIMP> getContaContabilFiscal() throws Exception {
         List<ContaContabilFiscalIMP> result = new ArrayList<>();
@@ -1863,6 +1750,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	id_situacaocadastro \n"
                         + "from\n"
                         + "	historicopadrao ")) {
+            
             while (rs.next()) {
                 HistoricoPadraoIMP imp = new HistoricoPadraoIMP();
 

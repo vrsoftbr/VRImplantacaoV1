@@ -43,22 +43,21 @@ public class TipoRecebivelDAO {
             throw e;
         }
     }
-    
-    public void gravarAutorizadora(AutorizadoraVO vo) throws Exception{
-        try(Statement stm = Conexao.createStatement()){
-            SQLBuilder sql =  new SQLBuilder();
-            
+
+    public void gravarAutorizadora(AutorizadoraVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+
             sql.setSchema("pdv");
             sql.setTableName("autorizadora");
-            
+
             sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
             sql.put("utilizado", vo.isUtilizado());
-                    
-            
+
             stm.execute(sql.getInsert());
-        
-        }catch (Exception e){
+
+        } catch (Exception e) {
             throw e;
         }
     }
@@ -93,7 +92,62 @@ public class TipoRecebivelDAO {
             throw e;
         }
     }
-    
+
+    public void apagarRecebivel() throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            st.execute(
+                    "delete from fornecedorcontato ;\n"
+                    + "delete from implantacao.codant_fornecedor;\n"
+                    + "delete from fornecedorprazopedido ;\n"
+                    + "delete from fornecedorprazo; \n"
+                    + "delete from fornecedor where id <> 1;\n"
+                    + "delete from recebivelconfiguracaotabela;\n"
+                    + "delete from recebivelconfiguracao;\n"
+                    + "delete from tiporecebivelfinalizadora;\n"
+                    + "delete from tiporecebivel ;\n"
+                    + "delete from tiporecebivel;\n"
+                    + "delete from tiporecebivelfinalizadora;\n"
+                    + "delete from entradasaidatipoentrada;\n"
+                    + "delete from tiposaidacontabilidade;\n"
+                    + "delete from tiposaidanotasaidasequencia;\n"
+                    + "delete from cfoptiposaida;\n"
+                    + "delete from tiposaida ;\n"
+                    + "delete from contabilidade.tipoentrada ;\n"
+                    + "delete from contabilidade.tiposaida;\n"
+                    + "delete from cfoptipoentrada;\n"
+                    + "delete from tipoentrada;\n"
+                    + "delete from tipoplanoconta ;\n"
+                    + "delete from ativo.grupo ;\n"
+                    + "delete from contabilidade.ativoimobilizado;\n"
+                    + "delete from contabilidade.tiposaida;\n"
+                    + "delete from contabilidade.caixavenda; \n"
+                    + "delete from contabilidade.maparesumo;\n"
+                    + "delete from contabilidade.tipoentrada ;\n"
+                    + "delete from contabilidade.tipoabatimento;\n"
+                    + "delete from contabilidade.caixadiferenca ;\n"
+                    + "delete from contacontabilfinanceiro;\n"
+                    + "delete from contacontabilfiscal; \n"
+                    + "delete from cfop;\n"
+                    + "delete from cfoptipoentrada;\n"
+                    + "delete from entradasaidatiposaida;\n"
+                    + "delete from tiposaida;\n"
+                    + "delete from historicopadrao;\n"
+                    + "delete from tipoplanoconta ;\n"
+                    + "delete from pdv.tipotef ;\n"
+                    + "delete from pdv.autorizadora ;\n"
+                    + "delete from pdv.finalizadoraconfiguracao;\n"
+                    + "delete from pdv.finalizadoralayoutretorno;\n"
+                    + "delete from pdv.finalizadora;\n"
+                    + "delete from pdv.ecf;\n"
+                    + "delete from pdv.tipomodelo ;\n"
+                    + "delete from pdv.ecflayout;\n"
+                    + "delete from pdv.tecladolayout ;\n"
+                    + "delete from pdv.finalizadoralayoutretorno ;\n"
+                    + "delete from pdv.tecladolayoutfuncao;	\n"
+                    + "delete from pdv.funcaoniveloperador f;	\n"
+                    + "delete from pdv.funcao f;");
+        }
+    }
 
     /**
      * @return the idLojaVR

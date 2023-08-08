@@ -11,7 +11,6 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -21,6 +20,7 @@ import vrimplantacao2.dao.interfaces.VRToVRDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.Financeiro.DAO.TipoRecebivelDAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
@@ -31,6 +31,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
     private static final String SISTEMA = ESistema.VRMASTER.getNome();
 
+    private final TipoRecebivelDAO rec;
     private static VRToVR2_5GUI instance;
     private final VRToVRDAO dao;
 
@@ -57,6 +58,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     public VRToVR2_5GUI(VRMdiFrame frame) throws Exception {
         super(frame);
         this.dao = new VRToVRDAO();
+        this.rec = new TipoRecebivelDAO();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {
@@ -154,9 +156,8 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                             importador.importarFornecedor();
                         }
                         if (chkTipoRecebível.isSelected()) {
-                            dao.apagarDadosRecebivel();
-                            dao.importarTipoRecebivel();
-                            //                        importador.importarTipoRecebivel();
+                            rec.apagarRecebivel();
+                            importador.importarTipoRecebivel();
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
