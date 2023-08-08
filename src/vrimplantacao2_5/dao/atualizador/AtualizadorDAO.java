@@ -249,6 +249,13 @@ public class AtualizadorDAO {
         }
     }
 
+    public void alterarTabelas() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "ALTER TABLE implantacao2_5.sistemabancodados ADD COLUMN IF NOT EXISTS observacao text;");
+        }
+    }
+
     public void salvarBancoDados(EBancoDados eBancoDados) throws Exception {
         if (validarGenerico()) {
             try (Statement stm = Conexao.createStatement()) {
@@ -292,7 +299,8 @@ public class AtualizadorDAO {
                         + "usuario, "
                         + "senha, "
                         + "nomeschema, "
-                        + "porta"
+                        + "porta,"
+                        + "observacao"
                         + ")\n"
                         + "VALUES ("
                         + "(SELECT id FROM implantacao2_5.sistema\n"
@@ -302,7 +310,8 @@ public class AtualizadorDAO {
                         + "'" + eSistemaBancoDados.getUsuario() + "', "
                         + "'" + eSistemaBancoDados.getSenha() + "', "
                         + "'" + eSistemaBancoDados.getNomeSchema() + "', "
-                        + eSistemaBancoDados.getPorta() + ");"
+                        + eSistemaBancoDados.getPorta() + ", "
+                        + "'" + eSistemaBancoDados.getObservacao() + "');"
                 );
             }
         }

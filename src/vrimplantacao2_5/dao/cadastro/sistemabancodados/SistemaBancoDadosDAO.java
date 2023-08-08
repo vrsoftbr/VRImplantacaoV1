@@ -37,6 +37,7 @@ public class SistemaBancoDadosDAO {
         sql.put("usuario", vo.getUsuario());
         sql.put("senha", vo.getSenha());
         sql.put("porta", vo.getPorta());
+        sql.put("observacao", "");
 
         sql.getReturning().add("id");
 
@@ -63,6 +64,7 @@ public class SistemaBancoDadosDAO {
         sql.put("usuario", vo.getUsuario());
         sql.put("senha", vo.getSenha());
         sql.put("porta", vo.getPorta());
+        sql.put("observacao", "");
 
         sql.setWhere("id = " + vo.getId());
 
@@ -99,7 +101,8 @@ public class SistemaBancoDadosDAO {
                     + "	sb.nomeschema,\n"
                     + "	sb.usuario,\n"
                     + "	sb.senha,\n"
-                    + "	sb.porta\n"
+                    + "	sb.porta,\n"
+                    + " sb.observacao\n"
                     + "from implantacao2_5.sistemabancodados sb\n"
                     + "join implantacao2_5.sistema s on s.id = sb.id_sistema\n"
                     + "join implantacao2_5.bancodados b on b.id = sb.id_bancodados\n"
@@ -117,6 +120,7 @@ public class SistemaBancoDadosDAO {
                     sistemaBancoDadosVO.setUsuario(rst.getString("usuario"));
                     sistemaBancoDadosVO.setSenha(rst.getString("senha"));
                     sistemaBancoDadosVO.setPorta(rst.getInt("porta"));
+                    sistemaBancoDadosVO.setObservacao(rst.getString("observacao"));
                     result.add(sistemaBancoDadosVO);
                 }
             }

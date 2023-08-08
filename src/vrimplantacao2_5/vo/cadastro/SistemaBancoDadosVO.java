@@ -15,6 +15,15 @@ public class SistemaBancoDadosVO {
     private String usuario;
     private String senha;
     private int porta;
+    private String observacao;
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
     
     public int getId() {
         return this.id;

@@ -67,6 +67,10 @@ public class AtualizadorService {
     public void criarTabelas() throws Exception {
         this.atualizadorDAO.criarTabelas();
     }
+    
+    public void atualizarTabelas() throws Exception {
+        this.atualizadorDAO.alterarTabelas();
+    }
 
     public void salvarBancoDados() throws Exception {
         List<EBancoDados> eBancoDados = getBancoDados();
@@ -135,7 +139,7 @@ public class AtualizadorService {
             atualizadorDAO.inserirUnidade();
             atualizadorDAO.inserirUsuario();
         }
-
+        this.atualizarTabelas();
         this.salvarBancoDados();
         this.salvarSistema();
         this.deletarSistemaBancoDados();

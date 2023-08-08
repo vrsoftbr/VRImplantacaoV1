@@ -28,8 +28,8 @@ import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
+import vrimplantacao2_5.gui.senhasbancos.SenhasBancosGUI;
 import vrimplantacao2_5.vo.cadastro.ScriptLojaOrigemVO;
-import vrimplantacao2_5.vo.enums.EOpcoesMigracaoSistema;
 
 /**
  *
@@ -68,7 +68,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         migracaoSistemasController = new MigracaoSistemasController();
     }
-    
+
     private void setConfiguracao() throws Exception {
         centralizarForm();
         setTitle("Configuração de Base de Dados");
@@ -500,11 +500,18 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     private void btnDicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDicaActionPerformed
         try {
-            Util.exibirMensagem("Informe uma descrição para a conexão\n para uma melhor identificação!\n"
-                    + "Exemplo: CONEXÃO DA LOJA MATRIZ - SERVIDOR 0.0.0.0", getTitle());
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
+            SenhasBancosGUI senhaGui = new SenhasBancosGUI(this);
+            senhaGui.setVisible(true);
+            String msg = senhaGui.getMensagem();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        
+//        try {
+//            Util.exibirMensagem(msg, getTitle());
+//        } catch (Exception ex) {
+//            Util.exibirMensagemErro(ex, getTitle());
+//        }
     }//GEN-LAST:event_btnDicaActionPerformed
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
@@ -615,5 +622,22 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Seleção de Loja");
         }
+    }
+
+    public void carregaDados(int id) {
+        cboSistema.setId(id);
+        cboBD.setModel(new DefaultComboBoxModel());
+
+        List<BancoDadosVO> bancosPorSistema = controller.getBancoDadosPorSistema(id);
+
+        if (bancosPorSistema == null) {
+            return;
+        }
+
+        for (BancoDadosVO bdVO : bancosPorSistema) {
+            cboBD.addItem(new ItemComboVO(bdVO.getId(), bdVO.getNome()));
+        }
+
+        desabilitarBotao();
     }
 }
