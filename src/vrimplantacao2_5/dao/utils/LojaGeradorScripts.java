@@ -181,7 +181,8 @@ public class LojaGeradorScripts {
 
     public String copiaUsuarioPermissao(LojaVO i_loja) throws Exception {
         String sql = "insert into permissaoloja (id, id_loja,id_permissao)\n"
-                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja ";
+                + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja "
+                + " where id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }
@@ -250,25 +251,6 @@ public class LojaGeradorScripts {
                 + "	where id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
-    }
-
-    public String copiaPdvEcfLayout(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.ecflayout (id, id_ecf,id_tecladolayout,id_finalizadoralayout,id_acumuladorlayout,id_aliquotalayout,regracalculo,arredondamentoabnt)\n"
-                + "select \n"
-                + " nextval('pdv.ecflayout_id_seq') , \n"
-                + " (select id from pdv.ecf where id_loja = " + i_loja.getId() + ") as id_ecf,\n"
-                + " (select id from pdv.tecladolayout where id_loja = " + i_loja.getId() + ") as id_teclado,\n"
-                + " (select id from pdv.finalizadoralayout where id_loja = " + i_loja.getId() + ") as id_finalizadora,\n"
-                + " (select id from pdv.acumuladorlayout where id_loja = " + i_loja.getId() + ") as id_acumaldor,\n"
-                + " (select id from pdv.aliquotalayout where id_loja = " + i_loja.getId() + ") as id_aliquotalayout,\n"
-                + " regracalculo ,\n"
-                + " arredondamentoabnt \n"
-                + " from pdv.ecflayout ecf  \n"
-                + " join pdv.ecf e on e.id = ecf.id_ecf"
-                + " where e.id_loja = " + i_loja.getIdCopiarLoja();
-
-        return sql;
-
     }
 
     public String copiarOperador(LojaVO i_loja) throws Exception {
