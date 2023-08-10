@@ -1,6 +1,7 @@
 package vrimplantacao2_5.service.loja;
 
 import java.util.List;
+import javax.swing.JOptionPane;
 import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
@@ -35,7 +36,8 @@ public class LojaService {
 
             if (isLojaExiste(vo)) {
                 lojaDAO.atualizarLoja(vo);
-            } else {
+            } 
+            else {
                 lojaDAO.salvar(vo);
             }
             provider.commit();
@@ -51,6 +53,11 @@ public class LojaService {
 
     private boolean isLojaExiste(LojaVO vo) throws Exception {
         return lojaDAO.isLojaExiste(vo);
+    }
+    
+    
+    private boolean isFornecedorCadastrado(LojaVO vo) throws Exception {
+        return lojaDAO.isCnpjCadastrado(vo);
     }
 
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
