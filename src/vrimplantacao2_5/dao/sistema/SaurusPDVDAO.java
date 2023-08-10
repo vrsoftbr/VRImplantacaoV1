@@ -218,7 +218,8 @@ public class SaurusPDVDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tbProdutoCodigos ean on ean.pro_idProduto = p.pro_idProduto\n"
                     + "left join tbProdutoImpostos trib on trib.pro_idImposto = p.pro_idImposto \n"
                     + "left join tbProdutoNcms ncmcest on ncmcest.pro_idNcm = p.pro_idNcm \n"
-                    + "left join tbProdutoPrecos pv on pv.pro_idProduto = p.pro_idProduto"
+                    + "left join tbProdutoPrecos pv on pv.pro_idProduto = p.pro_idProduto\n"
+                    + " order by p.pro_tpBalanca desc"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -339,15 +340,21 @@ public class SaurusPDVDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + " p.pro_idProduto id,\n"
+                    + " SUBSTRING(p.pro_descMedida,1,2) embalagem,\n"
+                    + " ean.pro_codProduto ean\n"
+                    + "from tbProdutoDados p\n"
+                    + "left join tbProdutoCodigos ean on ean.pro_idProduto = p.pro_idProduto"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("produtoid"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("embalagem"));
 
                     result.add(imp);
                 }

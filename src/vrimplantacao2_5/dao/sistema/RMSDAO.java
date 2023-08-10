@@ -2771,7 +2771,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("dataemissao"),
                             rst.getString("valor"),
                             rst.getString("datavencimento"),
-                            rst.getString("duplicata")
+                            rst.getString("cpd_serie")
+                            //rst.getString("duplicata")
                     ));
                     vo.setIdFornecedor(rst.getString("id_fornecedor"));
 
