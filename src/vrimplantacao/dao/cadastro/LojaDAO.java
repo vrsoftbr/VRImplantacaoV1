@@ -164,6 +164,18 @@ public class LojaDAO {
             }
         }
     }
+    
+    public boolean isCnpjCadastrado(LojaVO i_loja) throws Exception {
+        String sql = "SELECT id_fornecedor FROM loja WHERE id = " + i_loja.getIdFornecedor();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
+        }
+    }
 
     public void salvar(LojaVO i_loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {

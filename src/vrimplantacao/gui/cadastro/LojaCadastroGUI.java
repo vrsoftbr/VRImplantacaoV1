@@ -1,13 +1,16 @@
 package vrimplantacao.gui.cadastro;
 
+import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
+import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.controller.loja.LojaController;
+import vrimplantacao2_5.provider.ConexaoProvider;
 
 public class LojaCadastroGUI extends VRInternalFrame {
 
@@ -144,6 +147,15 @@ public class LojaCadastroGUI extends VRInternalFrame {
 
             i++;
         }
+    }
+
+    public boolean fornecedorUsado() throws Exception {
+        LojaDAO dao = new LojaDAO();
+
+        boolean teste = !dao.isCnpjCadastrado(oLoja);
+
+        return teste;
+
     }
 
     @SuppressWarnings("unchecked")
@@ -581,43 +593,53 @@ public class LojaCadastroGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnSairActionPerformed
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        ProgressBar.show();
-                        ProgressBar.setCancel(false);
-                        ProgressBar.setStatus("Por favor aguarde.");
-                        salvar();
-                        ProgressBar.dispose();
-                        Util.exibirMensagem("Loja salva com sucesso!", "Cadastro Loja");
-                        //refresh nas lojas
-                        parentFrame.consultar();
-                    } catch (Exception ex) {
-                        ProgressBar.dispose();
-                        try {
-                            sair();
-                            parentFrame.consultar();
-                        } catch (Exception ex1) {
-                            Exceptions.printStackTrace(ex1);
+            if (fornecedorUsado()) {
+                JOptionPane.showMessageDialog(null, "Fornecedor já utilizado em outro Fornecedor!!");
+                //sair();
+            } else {
+                try {
+                    Thread thread = new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                ProgressBar.show();
+                                ProgressBar.setCancel(false);
+                                ProgressBar.setStatus("Por favor aguarde.");
+                                salvar();
+                                ProgressBar.dispose();
+                                Util.exibirMensagem("Loja salva com sucesso!", "Cadastro Loja");
+                                //refresh nas lojas
+                                parentFrame.consultar();
+                            } catch (Exception ex) {
+                                ProgressBar.dispose();
+                                try {
+                                    sair();
+                                    parentFrame.consultar();
+                                } catch (Exception ex1) {
+                                    Exceptions.printStackTrace(ex1);
+                                }
+                                System.out.println(ex.getMessage());
+                                Exceptions.printStackTrace(ex);
+                                Util.exibirMensagemErro(ex, getTitle());
+                            }
                         }
-                        System.out.println(ex.getMessage());
-                        Exceptions.printStackTrace(ex);
-                        Util.exibirMensagemErro(ex, getTitle());
+                    };
+                    thread.start();
+                } catch (Exception ex) {
+                    try {
+                        parentFrame.consultar();
+                        sair();
+                    } catch (Exception ex1) {
+                        Exceptions.printStackTrace(ex1);
                     }
+                    Util.exibirMensagemErro(ex, getTitle());
+                    dispose();
                 }
-            };
-            thread.start();
-        } catch (Exception ex) {
-            try {
-                parentFrame.consultar();
-                sair();
-            } catch (Exception ex1) {
-                Exceptions.printStackTrace(ex1);
             }
-            Util.exibirMensagemErro(ex, getTitle());
-            dispose();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
         }
+
     }//GEN-LAST:event_btnSalvarActionPerformed
     private void btnTbIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTbIncluirActionPerformed
         try {
