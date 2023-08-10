@@ -2,13 +2,20 @@ package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.util.ArrayList;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import vrframework.bean.panel.VRPanel;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -16,6 +23,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.linear.LinearDAO;
+import vrimplantacao2.dao.interfaces.linear.LinearDAO.TipoTitulo;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 public class Linear2_5GUI extends VRInternalFrame {
@@ -24,6 +32,54 @@ public class Linear2_5GUI extends VRInternalFrame {
     private static Linear2_5GUI instance;
 
     private final LinearDAO dao = new LinearDAO();
+    private Set<Integer> rotativoSelecionado = new HashSet<>();
+    private Set<Integer> convenioSelecionado = new HashSet<>();
+
+    private TipoDocumentoTableModel rotativoModel = new TipoDocumentoTableModel(new ArrayList<TipoTitulo>());
+    private TipoDocumentoTableModel convenioModel = new TipoDocumentoTableModel(new ArrayList<TipoTitulo>());
+
+    private void carregarTipoDocumento() throws Exception {
+        this.rotativoModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
+        
+        for (TipoTitulo t : this.rotativoModel.getItens()) {
+            t.selected = rotativoSelecionado.contains(t.id);
+        }
+
+        this.rotativoModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TipoTitulo item = rotativoModel.getItens().get(e.getLastRow());
+
+                if (item.selected) {
+                    rotativoSelecionado.add(item.id);
+                } else {
+                    rotativoSelecionado.remove(item.id);
+                }
+            }
+        });
+
+        tblRotativo.setModel(this.rotativoModel);
+        tblRotativo.getColumnModel().getColumn(2).setPreferredWidth(400);
+        
+        this.convenioModel = new TipoDocumentoTableModel(this.dao.getTipoDocumentoReceber());
+
+        for (TipoTitulo f : this.convenioModel.getItens()) {
+            f.selected = convenioSelecionado.contains(f.id);
+        }
+        this.convenioModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                TipoTitulo item = convenioModel.getItens().get(e.getLastRow());
+                if (item.selected) {
+                    convenioSelecionado.add(item.id);
+                } else {
+                    convenioSelecionado.remove(item.id);
+                }
+            }
+        });
+        tblConvenio.setModel(this.convenioModel);        
+        tblConvenio.getColumnModel().getColumn(2).setPreferredWidth(400);
+    }
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -38,6 +94,12 @@ public class Linear2_5GUI extends VRInternalFrame {
         initComponents();
 
         this.title = "Importação " + SISTEMA;
+
+        pnlConn.setOnConectar(() -> {
+            tabProdutos.btnMapaTribut.setEnabled(true);
+            carregarTipoDocumento();
+            gravarParametros();
+        });
 
         carregarParametros();
         tabProdutos.setOpcoesDisponiveis(dao);
@@ -117,6 +179,8 @@ public class Linear2_5GUI extends VRInternalFrame {
                     tabClientes.setImportador(importador);
                     dao.setMultiplicarQtdEmbalagemPeloVolume(chkUtilizarEs1ParaCotacao.isSelected());
                     dao.setFiltrarProdutos(chkFiltrarProdutos.isSelected());
+                    dao.setTipoDocumentoRotativo(rotativoSelecionado);
+                    dao.setTipoDocumentoConvenio(convenioSelecionado);
 
                     if (chkAjustarDigitoVerificador.isSelected()) {
                         dao.importarDigitoVerificador();
@@ -202,6 +266,14 @@ public class Linear2_5GUI extends VRInternalFrame {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
+        tabConvenio1 = new javax.swing.JPanel();
+        scrollRotativo = new javax.swing.JScrollPane();
+        tblRotativo = new vrframework.bean.table.VRTable();
+        vRLabel1 = new vr.view.components.label.VRLabel();
+        tabConvenio2 = new javax.swing.JPanel();
+        scrollRotativo1 = new javax.swing.JScrollPane();
+        tblConvenio = new vrframework.bean.table.VRTable();
+        vRLabel2 = new vr.view.components.label.VRLabel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -280,7 +352,7 @@ public class Linear2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Clientes", tabCli);
@@ -383,10 +455,92 @@ public class Linear2_5GUI extends VRInternalFrame {
                 .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(116, Short.MAX_VALUE))
         );
 
         pnlEspecial.addTab("Especial", tbProdutosEspecial);
+
+        tblRotativo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        scrollRotativo.setViewportView(tblRotativo);
+
+        vRLabel1.setText("Tipo Documento Rotativo");
+        vRLabel1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+
+        javax.swing.GroupLayout tabConvenio1Layout = new javax.swing.GroupLayout(tabConvenio1);
+        tabConvenio1.setLayout(tabConvenio1Layout);
+        tabConvenio1Layout.setHorizontalGroup(
+            tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenio1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabConvenio1Layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        tabConvenio1Layout.setVerticalGroup(
+            tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenio1Layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pnlEspecial.addTab("Receber Crédito Rotativo", tabConvenio1);
+
+        tblConvenio.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        scrollRotativo1.setViewportView(tblConvenio);
+
+        vRLabel2.setText("Tipo Documento Rotativo");
+        vRLabel2.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+
+        javax.swing.GroupLayout tabConvenio2Layout = new javax.swing.GroupLayout(tabConvenio2);
+        tabConvenio2.setLayout(tabConvenio2Layout);
+        tabConvenio2Layout.setHorizontalGroup(
+            tabConvenio2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenio2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvenio2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabConvenio2Layout.createSequentialGroup()
+                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        tabConvenio2Layout.setVerticalGroup(
+            tabConvenio2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenio2Layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollRotativo1, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pnlEspecial.addTab("Receber Convenio", tabConvenio2);
 
         tabMenu.addTab("Parâmetros", pnlEspecial);
 
@@ -407,7 +561,7 @@ public class Linear2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -491,12 +645,95 @@ public class Linear2_5GUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.panel.VRPanel pnlVendas;
     private javax.swing.JScrollPane scpClientes;
+    private javax.swing.JScrollPane scrollRotativo;
+    private javax.swing.JScrollPane scrollRotativo1;
     private javax.swing.JPanel tabCli;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
+    private javax.swing.JPanel tabConvenio1;
+    private javax.swing.JPanel tabConvenio2;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JPanel tbProdutosEspecial;
+    private vrframework.bean.table.VRTable tblConvenio;
+    private vrframework.bean.table.VRTable tblRotativo;
+    private vr.view.components.label.VRLabel vRLabel1;
+    private vr.view.components.label.VRLabel vRLabel2;
     // End of variables declaration//GEN-END:variables
+class TipoDocumentoTableModel extends AbstractTableModel {
+
+        private final List<LinearDAO.TipoTitulo> itens;
+
+        public List<LinearDAO.TipoTitulo> getItens() {
+            return itens;
+        }
+
+        public TipoDocumentoTableModel(List<LinearDAO.TipoTitulo> itens) {
+            this.itens = itens;
+        }
+
+        @Override
+        public int getRowCount() {
+            return this.itens.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 3;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            LinearDAO.TipoTitulo f = this.itens.get(rowIndex);
+            switch (columnIndex) {
+                case 0:
+                    return f.selected;
+                case 1:
+                    return f.id;
+                case 2:
+                    return f.descricao;
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 0) {
+                LinearDAO.TipoTitulo item = this.itens.get(rowIndex);
+                item.selected = (boolean) aValue;
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == 0;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return Boolean.class;
+                default:
+                    return super.getColumnClass(columnIndex);
+            }
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return "-";
+                case 1:
+                    return "Código";
+                case 2:
+                    return "Descrição";
+                default:
+                    return null;
+            }
+        }
+    }
 }

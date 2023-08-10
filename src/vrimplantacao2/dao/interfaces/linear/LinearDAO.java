@@ -60,6 +60,17 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean multiplicarQtdEmbalagemPeloVolume = false;
     private boolean filtrarProdutos = false;
 
+    private Set<Integer> TipoDocumentoRotativo;
+    private Set<Integer> TipoDocumentoConvenio;
+
+    public void setTipoDocumentoRotativo(Set<Integer> TipoDocumentoRotativo) {
+        this.TipoDocumentoRotativo = TipoDocumentoRotativo;
+    }
+    
+    public void setTipoDocumentoConvenio(Set<Integer> TipoDocumentoConvenio) {
+        this.TipoDocumentoConvenio = TipoDocumentoConvenio;
+    }
+
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
@@ -228,7 +239,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -284,7 +295,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("merc1"));
@@ -398,7 +409,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -749,6 +760,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
 
+        StringBuilder builder = new StringBuilder();
+
+        for (Iterator<Integer> iterator = this.TipoDocumentoConvenio.iterator(); iterator.hasNext();) {
+            builder.append(iterator.next());
+            if (iterator.hasNext()) {
+                builder.append(",");
+            }
+        }
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
@@ -771,7 +791,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " c.cg1_convenio <> 0 and \n"
                     + "	f.fn1_dtbaixa IS null AND\n"
                     + "	f.fn1_empresa = " + getLojaOrigem() + " AND\n"
-                    + "	f.fn1_tipo NOT IN (37, 62, 64)"
+                    + "	f.fn1_tipo IN (" + builder + ")"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -947,6 +967,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
+        StringBuilder builder = new StringBuilder();
+
+        for (Iterator<Integer> iterator = this.TipoDocumentoRotativo.iterator(); iterator.hasNext();) {
+            builder.append(iterator.next());
+            if (iterator.hasNext()) {
+                builder.append(",");
+            }
+        }
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
@@ -969,7 +998,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " c.cg1_convenio = 0 AND\n"
                     + "	f.fn1_dtbaixa IS null\n"
                     + "	AND f.fn1_empresa = " + getLojaOrigem() + "\n"
-                    + "	AND f.fn1_tipo NOT IN (2,3)"
+                    + "	AND f.fn1_tipo IN (" + builder + ")"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1308,5 +1337,36 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         } else {
             return Long.parseLong(codigo);
         }
+    }
+
+    public List<TipoTitulo> getTipoDocumentoReceber() throws Exception {
+        List<TipoTitulo> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select tab_cod CODTIPODOCUMENTO, tab_desc DESCRICAO from st_tipotitulo st"
+            )) {
+                while (rst.next()) {
+                    result.add(new TipoTitulo(
+                            rst.getInt("CODTIPODOCUMENTO"),
+                            rst.getString("CODTIPODOCUMENTO") + " - "
+                            + rst.getString("DESCRICAO")));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static class TipoTitulo {
+
+        public int id;
+        public String descricao;
+        public boolean selected = false;
+
+        public TipoTitulo(int id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+
     }
 }
