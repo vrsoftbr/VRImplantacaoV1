@@ -1,17 +1,16 @@
 package vrimplantacao.dao.cadastro;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2_5.dao.cadastro.pdv.PdvBalancaLayoutDAO;
@@ -164,9 +163,33 @@ public class LojaDAO {
             }
         }
     }
+
+    public boolean validaOferta(LojaVO i_loja) throws Exception {
+        String sql = "SELECT id FROM oferta WHERE id_loja = " + i_loja.getIdCopiarLoja();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
+        }
+    }
     
+    public boolean validaPromocao(LojaVO i_loja) throws Exception {
+        String sql = "SELECT id FROM promocao WHERE id_loja = " + i_loja.getIdCopiarLoja();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
+        }
+    }
+
     public boolean isCnpjCadastrado(LojaVO i_loja) throws Exception {
-        String sql = "SELECT id_fornecedor FROM loja WHERE id = " + i_loja.getIdFornecedor();
+        String sql = "SELECT id_fornecedor FROM loja WHERE id_fornecedor = " + i_loja.getIdFornecedor();
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -259,6 +282,21 @@ public class LojaDAO {
             stm.execute(script.copiarTipoSaidaNotaSaidaSequencia(i_loja));
             ProgressBar.setStatus("salvando loja... 60%");
 
+            if (i_loja.isCopiaOferta() == true) {
+                if (validaOferta(i_loja) == false) {
+                    JOptionPane.showMessageDialog(null, "Não existem ofertas cadastradas para a loja " + i_loja.descricao);
+                }else {
+                stm.execute(script.copiaOferta(i_loja));
+                }
+            }
+
+            if (i_loja.isCopiaPromocao() == true) {
+                if(validaPromocao(i_loja) == false){
+                    JOptionPane.showMessageDialog(null, "Não existem promoções cadastradas para a loja " + i_loja.descricao);
+                }
+                stm.execute(script.copiaPromocao(i_loja));
+                
+            }
             if (i_loja.isCopiaEcf() == true) {
                 //("Copiando ECF.");
                 try {
@@ -300,7 +338,7 @@ public class LojaDAO {
 
                 List<String> listaDeInsertsEcf = new ArrayList<>();
                 listaDeInsertsEcf = ecfDAO.carregarCopiaEcfLayout(i_loja);
-                if (listaDeInsertsEcf.isEmpty()){
+                if (listaDeInsertsEcf.isEmpty()) {
                     throw new Exception("Não foi econtrado valores para cópia de ecf Layout, confira se está copiando de uma loja válida.");
                 }
                 for (String string : listaDeInsertsEcf) {
@@ -337,6 +375,7 @@ public class LojaDAO {
             ex.printStackTrace();
             throw ex;
         }
+
     }
 
     public void atualizarLoja(LojaVO i_loja) throws Exception {

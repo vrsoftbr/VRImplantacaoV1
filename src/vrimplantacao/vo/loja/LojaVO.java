@@ -22,7 +22,9 @@ public class LojaVO {
     private boolean copiaEcf = false;
     private boolean copiaOperador = false;
     private boolean copiaUsuario = false;
-
+    private boolean copiaOferta = false;
+    private boolean copiaPromocao = false;
+    
     public int getId() {
         return id;
     }
@@ -31,6 +33,7 @@ public class LojaVO {
         this.id = id;
     }
 
+    
     public int getIdCopiarLoja() {
         return idCopiarLoja;
     }
@@ -197,7 +200,34 @@ public class LojaVO {
     public void setCopiaUsuario(boolean copiaUsuario) {
         this.copiaUsuario = copiaUsuario;
     }
-    
-    
+
+    /**
+     * @return the copiaOferta
+     */
+    public boolean isCopiaOferta() {
+        return copiaOferta;
+    }
+
+    /**
+     * @param copiaOferta the copiaOferta to set
+     */
+    public void setCopiaOferta(boolean copiaOferta) {
+        this.copiaOferta = copiaOferta;
+    }
+
+    /**
+     * @return the copiaPromocao
+     */
+    public boolean isCopiaPromocao() {
+        return copiaPromocao;
+    }
+
+    /**
+     * @param copiaPromocao the copiaPromocao to set
+     */
+    public void setCopiaPromocao(boolean copiaPromocao) {
+        this.copiaPromocao = copiaPromocao;
+    }
+
 }
 

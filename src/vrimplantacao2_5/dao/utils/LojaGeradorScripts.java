@@ -5,18 +5,30 @@
  */
 package vrimplantacao2_5.dao.utils;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Util;
 import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
  * @author Desenvolvimento
  */
 public class LojaGeradorScripts {
+
+    Date date = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     private Versao versao = null;
 
@@ -295,6 +307,68 @@ public class LojaGeradorScripts {
         sql.put("id_loja", i_loja.getId());
         sql.put("numerocontrole", 1);
         sql.put("serie", 1);
+
+        return sql;
+    }
+
+    public String copiaOferta(LojaVO i_loja) throws Exception {
+        String sql
+                = "insert into oferta (\n"
+                + "	id_loja,\n"
+                + "	id_produto,\n"
+                + "	datainicio,\n"
+                + "	datatermino,\n"
+                + "	precooferta,\n"
+                + "	preconormal,\n"
+                + "	id_situacaooferta,\n"
+                + "	id_tipooferta,\n"
+                + "	precoimediato,\n"
+                + "	ofertafamilia,\n"
+                + "	ofertaassociado,\n"
+                + "	controle,\n"
+                + "	aplicapercentualprecoassociado,\n"
+                + "	encerraoferta,\n"
+                + "	encerraofertaitens,\n"
+                + "	bloquearvenda ,\n"
+                + "	bloquearvendaitens)\n"
+                + "	select \n"
+                + "	" + i_loja.getId() + ", id_produto, datainicio, datatermino, precooferta,preconormal, id_situacaooferta ,id_tipooferta \n"
+                + "	precooferta, precoimediato , ofertafamilia , ofertaassociado, controle , aplicapercentualprecoassociado , \n"
+                + "	encerraoferta , encerraofertaitens , bloquearvenda , bloquearvendaitens \n"
+                + "	from oferta\n"
+                + "	where id_loja = " + i_loja.idCopiarLoja + "\n"
+                + "	and datatermino >= '" + sdf.format(date) + "'";
+
+        return sql;
+
+    }
+
+    public String validaOferta(LojaVO i_loja) throws Exception {
+        String sql
+                = "select * from oferta where id_loja =" + i_loja.getId();
+
+        return sql;
+    }
+
+    public String copiaPromocao(LojaVO i_loja) throws Exception {
+        String sql
+                = "insert into promocao (id,id_loja,descricao,datainicio,datatermino,pontuacao,quantidade,qtdcupom,id_situacaocadastro,id_tipopromocao,\n"
+                + "	valor,controle,id_tipopercentualvalor,id_tipoquantidade,aplicatodos,cupom,valordesconto,valorreferenteitenslista,verificaprodutosauditados,\n"
+                + "	datalimiteresgatecupom,id_tipopercentualvalordesconto,valorpaga,desconsideraritem,qtdlimite,somenteclubevantagens,diasexpiracao,\n"
+                + "	utilizaquantidadeproporcional,desconsideraprodutoemoferta) \n"
+                + "	select (select max((id)+1) from promocao), \n"
+                + "	" + i_loja.getId() + ",descricao,datainicio,datatermino,pontuacao,quantidade,qtdcupom,id_situacaocadastro,id_tipopromocao,valor,controle,id_tipopercentualvalor,\n"
+                + "	id_tipoquantidade,aplicatodos,cupom,valordesconto,valorreferenteitenslista,verificaprodutosauditados,datalimiteresgatecupom,id_tipopercentualvalordesconto,\n"
+                + "	valorpaga,desconsideraritem,qtdlimite,somenteclubevantagens,diasexpiracao,utilizaquantidadeproporcional,desconsideraprodutoemoferta\n"
+                + "	from promocao where id_loja = " + i_loja.idCopiarLoja + "\n"
+                + "	and datatermino = '" + sdf.format(date) + "'";
+
+        return sql;
+
+    }
+
+    public String validaPromocao(LojaVO i_loja) throws Exception {
+        String sql = "select * from promocao where id_loja = " + i_loja.getId();
 
         return sql;
     }
