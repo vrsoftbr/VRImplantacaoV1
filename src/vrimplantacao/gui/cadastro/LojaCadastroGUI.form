@@ -509,10 +509,6 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCopiaEcf" min="-2" max="-2" attributes="0"/>
-                      </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="193" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
@@ -523,7 +519,15 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCopiaOperador" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkCopiaEcf1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCopiaOperador" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkPromocao" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -535,10 +539,16 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                  <Component id="chkCopiaEcf" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkCopiaEcf1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkOferta" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="chkCopiaOperador" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="chkCopiaOperador" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkPromocao" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkCopiaPermissao" min="-2" max="-2" attributes="0"/>
                   <EmptySpace pref="74" max="32767" attributes="0"/>
@@ -547,12 +557,12 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JCheckBox" name="chkCopiaEcf">
+        <Component class="javax.swing.JCheckBox" name="chkOferta">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="11" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Copia ECF"/>
+            <Property name="text" type="java.lang.String" value="Copia Oferta"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="chkCopiaPermissao">
@@ -574,6 +584,22 @@
               <Font name="Tahoma" size="11" style="0"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Copia Operador"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="chkCopiaEcf1">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="11" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Copia ECF"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="chkPromocao">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="11" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="CopiaPromo&#xe7;&#xe3;o"/>
           </Properties>
         </Component>
       </SubComponents>
