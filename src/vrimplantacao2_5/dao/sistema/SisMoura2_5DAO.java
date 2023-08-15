@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import vrimplantacao.utils.Utils;
@@ -27,6 +28,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -109,12 +111,12 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
-                OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.VENCIMENTO_ROTATIVO
+                OpcaoCliente.VALOR_LIMITE
         ));
     }
 
@@ -310,7 +312,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
 
-                  //  imp.setDataCadastro(rst.getDate("datacadastro"));
+                    //  imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSituacaoCadastro(("N".equals(rst.getString("Inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setTipoEmbalagem(rst.getString("Unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
@@ -554,7 +556,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	p.Email,\n"
                     + "	p.Limite_Credito limite,\n"
                     + "	p.Fax,\n"
-                    + "	case p.Inativo when 'N' then 1 else 0 end id_situacaocadastro,\n"
+                    + "	case  when p.Inativo = 'N' then 1 else 0 end id_situacaocadastro,\n"
                     + "	p.Inativo,\n"
                     + "	p.Fone2 telefone2,\n"
                     + "	p.Observacao,\n"
@@ -584,6 +586,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setNumero(rst.getString("Numero"));
                     imp.setComplemento(rst.getString("Complemento"));
                     imp.setBairro(rst.getString("Bairro"));
+                    imp.setAtivo(rst.getBoolean("id_situacaocadastro"));
                     imp.setUf(rst.getString("uf"));
                     imp.setUfIBGE(rst.getInt("Codigo_UF_IBGE"));
                     imp.setMunicipio(rst.getString("Cidade"));
@@ -596,18 +599,6 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEmail(rst.getString("Email") == null ? "" : rst.getString("Email").toLowerCase());
                     imp.setValorLimite(rst.getDouble("limite"));
-
-                    if ((rst.getString("Inativo") != null)
-                            && (!rst.getString("Inativo").trim().isEmpty())) {
-
-                        if (!rst.getString("Inativo").contains("N")) {
-                            imp.setAtivo(true);
-                        } else {
-                            imp.setAtivo(false);
-                        }
-                    } else {
-                        imp.setAtivo(true);
-                    }
 
                     imp.setObservacao(rst.getString("Observacao"));
                     imp.setDataNascimento(rst.getDate("datanascimento"));
@@ -648,7 +639,8 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         return result;
     }
 
-    public List<CreditoRotativoIMP> getCreditoRotato() throws Exception {
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -692,6 +684,44 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	Codigo as id, \n"
+                    + "	Codigo_Fornecedor as id_fornecedor,\n"
+                    + "	N_Doc_Merc as numeroDocumento,\n"
+                    + "	Data_Emissao as dataemissao,\n"
+                    + "	Parcela ,\n"
+                    + "	Observacao as observacao,\n"
+                    + "	Data_Vencimento as vencimento,\n"
+                    + "	valor as valor\n"
+                    + "from\n"
+                    + "	contas_pagar\n"
+                    + "	where Pago = 'N'"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numeroDocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
