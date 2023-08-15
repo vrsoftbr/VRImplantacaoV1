@@ -11,6 +11,7 @@ import org.openide.util.Exceptions;
 import org.postgresql.util.PSQLException;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2_5.vo.cadastro.LogAtualizacaoVO;
 
@@ -65,7 +66,7 @@ public class LogAtualizacaoDAO {
                 sql.put("impid", logPrecoVO.getImpId());
                 sql.put("impsistema", logPrecoVO.getImpSistema());
                 sql.put("imploja", logPrecoVO.getImpLoja());
-                sql.put("descricao", logPrecoVO.getDescricao());
+                sql.put("descricao", Utils.acertarTexto(logPrecoVO.getDescricao()));
                 sql.put("codigoatual", logPrecoVO.getCoigoatual());
                 sql.put("preco", logPrecoVO.getPreco());
                 sql.put("estoque", logPrecoVO.getEstoque());
