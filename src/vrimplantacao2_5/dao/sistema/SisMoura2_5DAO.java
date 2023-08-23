@@ -207,14 +207,14 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	(\n"
                     + "	select\n"
                     + "		codigo,\n"
-                    + "		case when Balanca = 1 then Codigo else replace(codigo_barra,'C','') end ean,\n"
+                    + "		case when Balanca = 1 then cast(Codigo as varchar) else replace(codigo_barra,'C','') end ean,\n"
                     + "		p.unidade\n"
                     + "	from\n"
                     + "		produto p\n"
                     + "union\n"
                     + "	select\n"
                     + "		pb.produto codigo,\n"
-                    + "		pb.codigo_barra ean,\n"
+                    + "		cast(pb.codigo_barra as varchar) ean,\n"
                     + "		p.unidade\n"
                     + "	from\n"
                     + "		produto_barra pb\n"
@@ -313,7 +313,7 @@ public class SisMoura2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
 
                     //  imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setSituacaoCadastro(("N".equals(rst.getString("Inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setSituacaoCadastro(("S".equals(rst.getString("Inativo")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO));
                     imp.setTipoEmbalagem(rst.getString("Unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
                     imp.setValidade(rst.getInt("Validade"));

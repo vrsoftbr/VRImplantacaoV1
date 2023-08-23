@@ -309,6 +309,8 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setMargem(rst.getDouble("margem"));
 
                     imp.setCodMercadologico1(rst.getString("merc1"));

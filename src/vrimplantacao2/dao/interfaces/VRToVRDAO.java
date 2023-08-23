@@ -75,7 +75,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarRotativoBaixados = false;
     public boolean importarConveniosBaixados = false;
-    
+
     public boolean precoVendaSemOferta = false;
 
     private String complemento = "";
@@ -83,8 +83,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
-    
-    public void setPrecoVendaSemOferta(boolean precoVendaSemOferta){
+
+    public void setPrecoVendaSemOferta(boolean precoVendaSemOferta) {
         this.precoVendaSemOferta = precoVendaSemOferta;
     }
 
@@ -539,7 +539,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
-                    + ( precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n":"vend.precovenda,\n")
+                    + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
                     + " 	vend.margemmaxima,\n"
@@ -576,8 +576,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		emb.id = p.id_tipoembalagem\n"
                     + "	join produtocomplemento vend on\n"
                     + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
-                    + (precoVendaSemOferta ? 
-                       "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n":"\n")
+                    + (precoVendaSemOferta
+                            ? "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n" : "\n")
                     + "	left join cest on\n"
                     + "		cest.id = p.id_cest\n"
                     + "	left join tipopiscofins piscofcred on \n"
@@ -1383,43 +1383,43 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
 
-        try (
-                Statement st = ConexaoPostgres.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select\n"
-                        + "	t.id,\n"
-                        + "	t.id_conveniado,\n"
-                        + "	t.ecf,\n"
-                        + "	t.numerocupom,\n"
-                        + "	t.datahora,\n"
-                        + "	t.valor,\n"
-                        + "	t.id_situacaotransacaoconveniado,\n"
-                        + "	t.datamovimento,\n"
-                        + "	t.finalizado,\n"
-                        + "	t.observacao\n"
-                        + "from\n"
-                        + "	conveniadotransacao t\n"
-                        + "where\n"
-                        + "	t.id_loja = " + getLojaOrigem() + "\n"
-                        + (!importarConveniosBaixados ? "	and t.id_situacaotransacaoconveniado = 1\n" : "")
-                        + "order by\n"
-                        + "	t.id"
-                )) {
-            while (rs.next()) {
-                ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + " t.id,\n"
+                    + " t.id_conveniado,\n"
+                    + " t.ecf,\n"
+                    + " t.numerocupom,\n"
+                    + " t.datahora,\n"
+                    + " t.valor,\n"
+                    + " t.id_situacaotransacaoconveniado,\n"
+                    + " t.datamovimento,\n"
+                    + " t.finalizado,\n"
+                    + " t.observacao\n"
+                    + "from\n"
+                    + " conveniadotransacao t\n"
+                    + "where\n"
+                    + " t.id_loja = " + getLojaOrigem() + "\n"
+                    //+ (!importarConveniosBaixados ? " and t.id_situacaotransacaoconveniado = 1\n" : "")
+                    + "order by\n"
+                    + " t.id"
+            )) {
+                while (rs.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
 
-                imp.setId(rs.getString("id"));
-                imp.setIdConveniado(rs.getString("id_conveniado"));
-                imp.setEcf(rs.getString("ecf"));
-                imp.setNumeroCupom(rs.getString("numerocupom"));
-                imp.setDataHora(rs.getTimestamp("datahora"));
-                imp.setValor(rs.getDouble("valor"));
-                imp.setSituacaoTransacaoConveniado(SituacaoTransacaoConveniado.getById(rs.getInt("id_situacaotransacaoconveniado")));
-                imp.setDataMovimento(rs.getDate("datamovimento"));
-                imp.setFinalizado(rs.getBoolean("finalizado"));
-                imp.setObservacao(rs.getString("observacao"));
+                    imp.setId(rs.getString("id"));
+                    imp.setIdConveniado(rs.getString("id_conveniado"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setDataHora(rs.getTimestamp("datahora"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setSituacaoTransacaoConveniado(SituacaoTransacaoConveniado.getById(rs.getInt("id_situacaotransacaoconveniado")));
+                    imp.setDataMovimento(rs.getDate("datamovimento"));
+                    imp.setFinalizado(rs.getBoolean("finalizado"));
+                    imp.setObservacao(rs.getString("observacao"));
 
-                result.add(imp);
+                    result.add(imp);
+                }
             }
         }
 
@@ -1693,7 +1693,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRendimento(rs.getDouble("rendimento"));
                     imp.setQtdembalagemproduto(rs.getInt("qtdembalagemreceita"));
                     imp.setQtdembalagemreceita(rs.getInt("qtdembalagemproduto"));
-                   
+
                     imp.setFator(rs.getDouble("fatorconversao"));
                     imp.getProdutos().add(rs.getString("receitaitem"));
 

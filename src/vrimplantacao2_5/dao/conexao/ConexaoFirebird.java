@@ -18,7 +18,7 @@ public class ConexaoFirebird implements DriverConexao {
     private static String senha = "";
     private String strCon;
     private boolean usandoString = false; 
-    public static String encoding = "WIN1252";
+    public static String encoding = "UTF8";
 
     @Override
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
