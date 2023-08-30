@@ -26,6 +26,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -36,6 +37,7 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -123,7 +125,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.BLOQUEADO,
                 OpcaoCliente.SITUACAO_CADASTRO,
-                OpcaoCliente.CONVENIO_CONVENIADO));
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.OUTRAS_RECEITAS));
     }
 
     @Override
@@ -179,7 +183,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.NUTRICIONAL,
                     OpcaoProduto.RECEITA_BALANCA,
-                    OpcaoProduto.ASSOCIADO
+                    OpcaoProduto.ASSOCIADO,
+                    OpcaoProduto.DESCONTINUADO
                 }
         ));
     }
@@ -199,6 +204,47 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("fantasia")));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT distinct\n"
+                    + "	f.FN1_NUM id,\n"
+                    + "	f.FN1_PARC parcela,\n"
+                    + "	c.cg2_cod id_fornecedor,\n"
+                    + "	c.cg1_nome, \n"
+                    + "	f.fn1_doc documento,\n"
+                    + "	f.FN1_EMISSAO emissao,\n"
+                    + "	f.FN1_VENC vencimento,\n"
+                    + "	f.fn1_hist observacao,\n"
+                    + "	f.FN1_VALOR valor\n"
+                    + "FROM \n"
+                    + "	fn1 f\n"
+                    + " JOIN cg1 c ON c.cg1_cod = f.cg1_cod\n"
+                    + "WHERE \n"
+                    + "	f.fn1_dtbaixa IS null\n"
+                    + "	AND f.fn1_empresa = " + getLojaOrigem() + "\n"
+                    + "	AND f.fn1_tipo in (14)\n"
+                    + " AND f.cg6_cod not in (-1, 97)"
+            )) {
+                while (rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao") + " Num.Doc.= " + rs.getString("documento"));
+
+                    result.add(imp);
                 }
             }
         }
@@ -460,7 +506,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	icmsst.cst cstst,\n"
                     + "	pc.es1_umgondola tipoVolume,\n"
                     + "	pc.es1_pesol pesoliquido,\n"
-                    + "	pc.es1_pesob pesobruto \n"
+                    + "	pc.es1_pesob pesobruto,\n"
+                    + " pc.es1_suspenso descontinuado\n"
                     + "FROM\n"
                     + "	es1p pr\n"
                     + "	JOIN es1 pc ON\n"
@@ -505,6 +552,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
+                    imp.setDescontinuado(rs.getBoolean("descontinuado"));
                     if (!"0000-00-00".equals(rs.getString("cadastro"))) {
                         imp.setDataCadastro(rs.getDate("cadastro"));
                     } else {
@@ -1138,7 +1186,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE \n"
                     + "	f.fn1_dtbaixa IS null\n"
                     + "	AND f.fn1_empresa = " + getLojaOrigem() + "\n"
-                    + "	AND f.fn1_tipo in (8, 13, 30, 25, 15, 7, 10, 20, 24, 26)\n"
+                    + "	AND f.fn1_tipo in (8, 13, 30, 25, 15, 7, 10, 20, 24, 26, 27)\n"
                     + " AND f.cg6_cod not in (-1, 97)\n"
                     + "union \n"
                     + "SELECT distinct\n"
