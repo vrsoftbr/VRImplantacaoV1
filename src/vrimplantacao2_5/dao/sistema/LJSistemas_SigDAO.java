@@ -64,9 +64,12 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.TIPO_COMPRA,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -155,7 +158,7 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
                             rst.getString("descricao"),
-                            rst.getInt("cst"), 
+                            rst.getInt("cst"),
                             0,
                             rst.getDouble("reducao")
                     ));
@@ -211,13 +214,15 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.NOMEREGISTRA descricaoreduzida,\n"
                     + "	p.UNIDADE unidade,\n"
                     + "	p.EMB_QTDE qtde_embalagem,\n"
-                    + "	p.PRECOCUSTO custo,\n"
+                    + "	p.PRECOFINAL custo,\n"
+                    + "	p.PRECOCOMPRA AS custosemimposto,\n"
                     + "	p.PVENDA1 precovenda,\n"
                     + "	p.GRUPO mercid1,\n"
                     + "	p.SUBGRUPO mercid2,\n"
                     + "	CASE WHEN p.INATIVO = 'N' THEN 1 ELSE 0 END situacaocadastro,\n"
                     + "	p.DTCADASTRO datacadastro,\n"
-                    + "	e.ESTOQUE estoque,\n"
+                    + "	p.NATRECEITA AS receita,\n"
+                    + "	e.ESTLOJA estoque,\n"
                     + "	CASE WHEN p.PESADO  = 'N' THEN 1 ELSE 0 END ebalanca,\n"
                     + "	p.NCM,\n"
                     + "	p.CEST,\n"
@@ -225,8 +230,7 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.CSTCOFINS cofins,\n"
                     + "	p.CSTPIS pis\n"
                     + "FROM EST004 p\n"
-                    + "LEFT JOIN EST623 e ON p.CODPRODUTO = e.PRODUTO\n"
-                    + " AND e.DATA = (SELECT max(DATA) FROM EST623 WHERE PRODUTO = p.CODPRODUTO)"
+                    + "LEFT JOIN est630 e ON p.CODPRODUTO = e.CODPRODUTO"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -237,12 +241,13 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setImportId(rst.getString("id"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoGondola());
+                    imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("mercid1"));
                     imp.setCodMercadologico2(rst.getString("mercid2"));
                     imp.setCodMercadologico3(imp.getCodMercadologico2());
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
@@ -263,12 +268,12 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(false);
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(1);
                     }
 
                     imp.setIcmsDebitoId(rst.getString("idaliquota"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("receita"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("idaliquota"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("idaliquota"));
                     imp.setIcmsCreditoId(rst.getString("idaliquota"));
@@ -491,7 +496,7 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setIdCliente(rst.getString("clienteid"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setNumeroCupom(rst.getString("numerodocumento"));
