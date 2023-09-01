@@ -30,6 +30,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -59,6 +60,8 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
         tabagr.dbf
         tabmun.dbf
         tpiscof.dbf
+        tabgru.dbf
+        tabdep.dbf
  */
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -89,7 +92,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FABRICANTE,
@@ -257,7 +260,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		when medida = 'L' then 'LT'\n"
                     + " else 'UN'\n"
                     + "	end tipo_volume,\n"
-                    + "	m.quantidade volume \n"
+                    + "	m.quantidade volume, \n"
+                    + " s.coddepto merc1, \n"
+                    + " g.codgrupo merc2 \n"
                     + "from \n"
                     + "	cadpro p \n"
                     + "left join arqbar ean on p.codpro01 = ean.codpro\n"
@@ -266,6 +271,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pis.filial = p.codfil01\n"
                     + "left join cadforn f on substring(p.fornec01,1,15) = substring(f.nomeabr02,1,15)\n"
                     + "left join medpro m on m.filial = p.codfil01 and m.codpro = p.codpro01\n"
+                    + "left join tabgru g on g.codgrupo = p.codgrupo01\n"
+                    + "left join tabdep s on s.coddepto = g.coddepto\n"
                     + "where \n"
                     + "	p.codfil01 = " + getLojaOrigem())) {
                 while (rs.next()) {
@@ -280,6 +287,10 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(imp.getCodMercadologico2());
 
                     if (rs.getDouble("custocomimposto") < rs.getDouble("custosemimposto")) {
                         imp.setCustoComImposto(rs.getDouble("custosemimposto"));
@@ -330,6 +341,40 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct\n"
+                    + " s.coddepto merc1,\n"
+                    + " s.nomedepto desc1,\n"
+                    + " g.codgrupo merc2,\n"
+                    + " g.descgrupo desc2\n"
+                    + "from tabgru g\n"
+                    + "join tabdep s on s.coddepto = g.coddepto\n"
+                    + "order by 1,2"
+            )) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("merc1"));
+                    imp.setMerc1Descricao(rs.getString("desc1"));
+                    imp.setMerc2ID(rs.getString("merc2"));
+                    imp.setMerc2Descricao(rs.getString("desc2"));
+                    imp.setMerc3ID(imp.getMerc2ID());
+                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
