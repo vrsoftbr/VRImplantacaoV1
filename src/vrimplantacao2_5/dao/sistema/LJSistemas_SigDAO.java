@@ -206,7 +206,12 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    "WITH estoque  AS (\n"
+                    + "select PRODUTO, sum(ESTLOJA) estoque  \n"
+                    + "from EST698\n"
+                    + "GROUP BY 1\n"
+                    + ") \n"
+                    + "SELECT\n"
                     + " p.CONTAPRODUTO id,\n"
                     + "	p.CODPRODUTO,\n"
                     + "	p.REFERENCIA4 ean,\n"
@@ -220,6 +225,9 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.GRUPO mercid1,\n"
                     + "	p.SUBGRUPO mercid2,\n"
                     + "	CASE WHEN p.INATIVO = 'N' THEN 1 ELSE 0 END situacaocadastro,\n"
+                    + "	CASE \n"
+                    + "	WHEN estoque.estoque  IS NULL  THEN ESTLOJA\n"
+                    + "	ELSE (ESTLOJA + estoque.estoque) END estoque2,\n"
                     + "	p.DTCADASTRO datacadastro,\n"
                     + "	p.NATRECEITA AS receita,\n"
                     + "	e.ESTLOJA estoque,\n"
@@ -230,7 +238,8 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.CSTCOFINS cofins,\n"
                     + "	p.CSTPIS pis\n"
                     + "FROM EST004 p\n"
-                    + "LEFT JOIN est630 e ON p.CODPRODUTO = e.CODPRODUTO"
+                    + "LEFT JOIN est630 e ON p.CODPRODUTO = e.CODPRODUTO\n"
+                    + "LEFT JOIN estoque  ON estoque.PRODUTO = p.CODPRODUTO  "
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -252,7 +261,7 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque2"));
                     imp.setPiscofinsCstCredito(rst.getString("pis"));
                     imp.setPiscofinsCstDebito(rst.getString("pis"));
 
