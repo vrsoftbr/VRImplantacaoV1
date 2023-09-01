@@ -497,10 +497,9 @@ public class LJSistemas_SigDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	STATUS,\n"
                     + "	TIPOES ecf\n"
                     + "FROM CR001\n"
-                    + "WHERE\n"
-                    + "	VLRPAGO = 0\n"
-                    + "	AND \n"
-                    + "	VLRRESTANTE > 0"
+                    + "WHERE \n"
+                    + "	VLRRESTANTE > 0\n"
+                    + "	AND status NOT LIKE 'QT'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

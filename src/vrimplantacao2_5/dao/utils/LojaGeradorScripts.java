@@ -5,21 +5,14 @@
  */
 package vrimplantacao2_5.dao.utils;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Util;
 import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
-import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
