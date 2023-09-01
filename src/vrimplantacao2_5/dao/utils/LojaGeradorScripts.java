@@ -211,7 +211,7 @@ public class LojaGeradorScripts {
         String sql = "insert into pdv.aliquotalayoutretorno ( id_aliquotalayout ,id_aliquota , retorno , codigoleitura )\n"
                 + "(select (select max((id_aliquotalayout)+1) from pdv.aliquotalayoutretorno ), id_aliquota , retorno , codigoleitura \n"
                 + "from pdv.aliquotalayoutretorno ret\n"
-                + "join pdv.aliquotalayout ali on ali.id = ret.id_aliquota\n"
+                + "join pdv.aliquotalayout ali on ali.id = ret.id_aliquotalayout\n"
                 + "where ali.id_loja = " + i_loja.getId() + "\n"
                 + "group by id_aliquota, retorno, codigoleitura )";
 

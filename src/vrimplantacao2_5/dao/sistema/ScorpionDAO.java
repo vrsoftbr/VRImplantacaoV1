@@ -97,6 +97,9 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
                 OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.DADOS,
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
@@ -484,24 +487,27 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	CODIGO_FINANCEIRO_P id,\n"
-                    + "	COD_CLIENTE id_fornecedor,\n"
-                    + "	f.NRO_DOCUMENTO ||'-PARC '||fp.PARCELA documento,\n"
-                    + "	CAST (DATA_EMISSAO AS date) emissao,\n"
-                    + "	CAST (DATA_LANCAMENTO AS date) entrada,\n"
-                    + "	CAST (DATA_VENCIMENTO AS date) vencimento,\n"
-                    + "	VALOR_PARCELA valor,\n"
-                    + "	fp.OBS observacao \n"
-                    + "FROM\n"
-                    + "	TB_FINANCEIRO_P fp\n"
-                    + "	JOIN TB_FINANCEIRO f ON f.CODIGO_FINANCEIRO = fp.COD_FINANCEIRO \n"
-                    + "WHERE\n"
-                    + "	f.LOJA = " + getLojaOrigem() + "\n"
-                    + "	AND fp.COD_CLIENTE IS NOT NULL\n"
-                    + "	AND STATUS = 'A'\n"
-                    + "	AND fp.SITUACAO = 'A'\n"
-                    + "	AND DEBITO_CREDITO = 'D'"
+                    "SELECT \n"
+                    + "	f.CODIGO_FINANCEIRO || p.PARCELA  AS id, \n"
+                    + "	f.COD_CLIENTE_FORNECEDOR AS id_fornecedor ,\n"
+                    + "	tp.RAZAOSOCIAL ,\n"
+                    + "	f.NRO_DOCUMENTO AS  documento,\n"
+                    + "	p.DATA_EMISSAO AS emissao,\n"
+                    + "	p.DATA_EMISSAO AS entrada,\n"
+                    + "	p.DATA_PAGAMENTO ,\n"
+                    + "	p.DATA_VENCIMENTO AS vencimento ,\n"
+                    + "	p.DATA_PAGAMENTO ,\n"
+                    + "	p.VALOR_PARCELA AS valor,\n"
+                    + "	p.OBS AS observacao,\n"
+                    + "	p.VALOR_RECEBIDO \n"
+                    + "	FROM TB_FINANCEIRO f\n"
+                    + "	JOIN TB_FINANCEIRO_P p ON p.COD_FINANCEIRO = f.CODIGO_FINANCEIRO \n"
+                    + "	JOIN TB_PESSOA tp ON tp.CODIGO_PESSOA = f.COD_CLIENTE_FORNECEDOR \n"
+                    + "	WHERE \n"
+                    + "	p.DATA_PAGAMENTO IS NULL \n"
+                    + "	--AND f.COD_CLIENTE_FORNECEDOR IS NOT NULL \n"
+                    + "	AND p.STATUS = 'A'\n"
+                    + "	AND F.COD_VENDA IS NULL "
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -511,7 +517,11 @@ public class ScorpionDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"), rst.getString("observacao"));
+
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+
+                    System.out.println(rst.getString("id") + " " + rst.getDate("vencimento") + " " + rst.getString("id_fornecedor"));
 
                     result.add(imp);
                 }
