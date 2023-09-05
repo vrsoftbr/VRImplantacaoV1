@@ -70,6 +70,7 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -118,6 +119,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.RECEITA_BALANCA);
         result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
         result.add(OpcaoProduto.ASSOCIADO);
+        result.add(OpcaoProduto.PROMOCAO);
 
         return result;
     }
@@ -967,10 +969,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     contas.put(imp.getId(), imp);
                 }
 
-                ContaPagarVencimentoIMP parc = imp.addVencimento(linha.getData("vencimento"), linha.getDouble("valor"));
+                ContaPagarVencimentoIMP parc = imp.addVencimento(getData(linha.getString("vencimento")), linha.getDouble("valor"));
                 parc.setId(linha.getString("parcelaid"));
                 parc.setNumeroParcela(linha.getInt("numeroparcela") == 0 ? 1 : linha.getInt("numeroparcela"));
-                parc.setDataPagamento(linha.getData("pagoem"));
+                parc.setDataPagamento(getData(linha.getString("pagoem")));
                 parc.setObservacao(linha.getString("observacao"));
                 parc.setPago(linha.getBoolean("pago"));
                 if (linha.getString("tipopagamentovr") != null) {
@@ -1233,6 +1235,33 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    @Override
+    public List<PromocaoIMP> getPromocoes() throws Exception {
+        List<PromocaoIMP> Result = new ArrayList<>();
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
+        ProgressBar.setStatus("Carregando promoções...");
+        int contador = 0;
+        for (LinhaArquivo linha : produtos) {
+            PromocaoIMP imp = new PromocaoIMP();
+
+            imp.setId_promocao(linha.getString("id_promocao"));
+            imp.setDescricao(linha.getString("descricao_promocao"));
+            imp.setDataInicio(getData(linha.getString("datainicio")));
+            imp.setDataTermino(getData(linha.getString("datatermino")));
+            imp.setEan(linha.getString("ean"));
+            imp.setId_produto(linha.getString("id_produto"));
+            imp.setDescricaoCompleta(linha.getString("descricaocompleta"));
+            imp.setQuantidade(linha.getDouble("quantidade"));
+            imp.setPaga(linha.getDouble("paga"));
+
+            ProgressBar.setStatus("Carregando promoções... " + contador++);
+            
+            Result.add(imp);
+        }
+        return Result;
     }
 
     @Override
