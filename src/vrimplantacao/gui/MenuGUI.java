@@ -326,6 +326,7 @@ import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
+import vrimplantacao2_5.mercadologicopadrao.gui.MercadologicoPadraoGUI;
 import vrimplantacao2_5.nutricional.GUI.NutricionalArqGUI;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2_5.relatorios.gerador.GeradorProdutoEstoqueFiscal;
@@ -946,8 +947,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         mnuContaPagar = new javax.swing.JMenuItem();
         mnuVRPdv = new javax.swing.JMenuItem();
-        mnuSistema = new javax.swing.JMenu();
-        mnuSistemaLogin = new javax.swing.JMenuItem();
         mnuFerramentas = new javax.swing.JMenu();
         mnuEditarConexoes = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -963,14 +962,17 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem17 = new javax.swing.JMenuItem();
         jMenuItem21 = new javax.swing.JMenuItem();
         jMenuItem18 = new javax.swing.JMenuItem();
+        jMenuItem22 = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem20 = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
         mnuAjuda = new javax.swing.JMenu();
         jSeparator4 = new javax.swing.JSeparator();
         mnuAjudaSobre = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem20 = new javax.swing.JMenuItem();
+        mnuSistema = new javax.swing.JMenu();
+        mnuSistemaLogin = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("VR Implantação"); // NOI18N
@@ -3547,20 +3549,6 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuMenu.add(mnuInterface);
 
-        mnuSistema.setText("Sistema");
-
-        mnuSistemaLogin.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F12, 0));
-        mnuSistemaLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/atalho/login.png"))); // NOI18N
-        mnuSistemaLogin.setText("Login");
-        mnuSistemaLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSistemaLoginActionPerformed(evt);
-            }
-        });
-        mnuSistema.add(mnuSistemaLogin);
-
-        mnuMenu.add(mnuSistema);
-
         mnuFerramentas.setText("Ferramentas");
 
         mnuEditarConexoes.setText("Editar conexões");
@@ -3661,6 +3649,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFerramentas.add(jMenuItem18);
 
+        jMenuItem22.setText("Mercadológico Padrão");
+        jMenuItem22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem22ActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(jMenuItem22);
+
         mnuMenu.add(mnuFerramentas);
 
         mnuPlanilha.setText("Planilha");
@@ -3674,6 +3670,18 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPlanilha.add(mnuPlanilhaProduto);
 
         mnuMenu.add(mnuPlanilha);
+
+        jMenu1.setText("Ferramentas Fiscais");
+
+        jMenuItem20.setText("Particionar Relatórios");
+        jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem20ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem20);
+
+        mnuMenu.add(jMenu1);
 
         mnuJanela.setText("Janela");
         mnuMenu.add(mnuJanela);
@@ -3691,17 +3699,19 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuMenu.add(mnuAjuda);
 
-        jMenu1.setText("Ferramentas Fiscais");
+        mnuSistema.setText("Sistema");
 
-        jMenuItem20.setText("Particionar Relatórios");
-        jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
+        mnuSistemaLogin.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F12, 0));
+        mnuSistemaLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/atalho/login.png"))); // NOI18N
+        mnuSistemaLogin.setText("Login");
+        mnuSistemaLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem20ActionPerformed(evt);
+                mnuSistemaLoginActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem20);
+        mnuSistema.add(mnuSistemaLogin);
 
-        mnuMenu.add(jMenu1);
+        mnuMenu.add(mnuSistema);
 
         setJMenuBar(mnuMenu);
 
@@ -5673,6 +5683,14 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem21ActionPerformed
 
+    private void jMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem22ActionPerformed
+        try {
+            MercadologicoPadraoGUI.exibir(this);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_jMenuItem22ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5694,6 +5712,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem20;
     private javax.swing.JMenuItem jMenuItem21;
+    private javax.swing.JMenuItem jMenuItem22;
     private javax.swing.JMenuItem jMenuItem23;
     private javax.swing.JMenuItem jMenuItem24;
     private javax.swing.JMenuItem jMenuItem25;
