@@ -8,6 +8,7 @@ package vrimplantacao2_5.nutricional.DAO;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2_5.nutricional.vo.InfnutriVO;
 import vrimplantacao2_5.nutricional.vo.ItensMgvVO;
 import vrimplantacao2_5.nutricional.vo.TxtInfoVO;
+import vrimplantacao.utils.Utils;
 
 /**
  *
@@ -119,7 +121,7 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setAcucaresadicionados(rst.getString("acucares") == null ? 0 : rst.getString("acucares").equals("") ? 0 : rst.getDouble("acucares"));
                             imp.setAcucarestotais(rst.getString("acucares_total") == null ? 0 : rst.getString("acucares_total").equals("") ? 0 : rst.getDouble("acucares_total"));
                             imp.setId_tipounidadeporcao(rst.getString("Id_tipounidadeporcao") == null ? 1 : rst.getInt("Id_tipounidadeporcao"));
-                            imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : rst.getString("alergenicos"));
+                            imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : Utils.acertarTextoMultiLinha(rst.getString("alergenicos")));
                             imp.addProduto(rst.getString("id_produto") == null ? "0" : rst.getString("id_produto"));
                         } else {
                             if (isUsarContador()) {
@@ -144,7 +146,7 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
                             imp.setId_tipounidadeporcao(rst.getString("Id_tipounidadeporcao") == null ? 2 : rst.getInt("Id_tipounidadeporcao"));
                             imp.setAcucaresadicionados(rst.getString("acucares") == null ? 0 : rst.getString("acucares").equals("") ? 0 : rst.getDouble("acucares"));
                             imp.setAcucarestotais(rst.getString("acucares_total") == null ? 0 : rst.getString("acucares_total").equals("") ? 0 : rst.getDouble("acucares_total"));
-                            imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : rst.getString("alergenicos"));
+                            imp.getMensagemAlergico().add(rst.getString("alergenicos") == null ? "" : Utils.acertarTextoMultiLinha(rst.getString("alergenicos")));;
                             imp.addProduto(rst.getString("id_produto") == null ? "0" : rst.getString("id_produto"));
                         }
                         result.add(imp);
@@ -534,21 +536,21 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
             sql.put("impsistema", sistema);
             sql.put("imploja", imploja);
             sql.put("codigo", vo.getCodigo());
-            sql.put("obs", vo.getObs());
-            sql.put("linha1", vo.getLinha1());
-            sql.put("linha2", vo.getLinha2());
-            sql.put("linha3", vo.getLinha3());
-            sql.put("linha4", vo.getLinha4());
-            sql.put("linha5", vo.getLinha5());
-            sql.put("linha6", vo.getLinha6());
-            sql.put("linha7", vo.getLinha7());
-            sql.put("linha8", vo.getLinha8());
-            sql.put("linha9", vo.getLinha9());
-            sql.put("linha10", vo.getLinha10());
-            sql.put("linha11", vo.getLinha11());
-            sql.put("linha12", vo.getLinha12());
-            sql.put("linha13", vo.getLinha13());
-            sql.put("linha14e15", vo.getLinha14E15());
+            sql.put("obs", Utils.acertarTexto(vo.getObs()));
+            sql.put("linha1", Utils.acertarTexto(vo.getLinha1()));
+            sql.put("linha2", Utils.acertarTexto(vo.getLinha2()));
+            sql.put("linha3", Utils.acertarTexto(vo.getLinha3()));
+            sql.put("linha4", Utils.acertarTexto(vo.getLinha4()));
+            sql.put("linha5", Utils.acertarTexto(vo.getLinha5()));
+            sql.put("linha6", Utils.acertarTexto(vo.getLinha6()));
+            sql.put("linha7", Utils.acertarTexto(vo.getLinha7()));
+            sql.put("linha8", Utils.acertarTexto(vo.getLinha8()));
+            sql.put("linha9", Utils.acertarTexto(vo.getLinha9()));
+            sql.put("linha10", Utils.acertarTexto(vo.getLinha10()));
+            sql.put("linha11", Utils.acertarTexto(vo.getLinha11()));
+            sql.put("linha12", Utils.acertarTexto(vo.getLinha12()));
+            sql.put("linha13", Utils.acertarTexto(vo.getLinha13()));
+            sql.put("linha14e15", Utils.acertarTexto(vo.getLinha14E15()));
 
             stm.execute(sql.getInsert());
         } catch (Exception e) {
@@ -557,6 +559,15 @@ public class NutricionalToledoArquivoDAO extends InterfaceDAO {
             e.printStackTrace();
             //throw e;
         }
+    }
+
+    private String removerAcentos(String texto) {
+        texto = texto != null ? Normalizer.normalize(texto, Normalizer.Form.NFD) : "";
+        texto = texto != null ? texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") : "";
+        texto = texto != null ? texto.replaceAll("�", "C") : "";
+        texto = texto != null ? texto.replaceAll("[^\\p{ASCII}]", "") : "";
+
+        return texto;
     }
 
     public boolean confereTxtinfoPorLoja(String lojaOrigem) throws SQLException {
