@@ -124,7 +124,8 @@ public class SismasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
                 OpcaoCliente.SEXO,
                 OpcaoCliente.ESTADO_CIVIL,
-                OpcaoCliente.BLOQUEADO));
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.VALOR_LIMITE));
     }
 
     @Override

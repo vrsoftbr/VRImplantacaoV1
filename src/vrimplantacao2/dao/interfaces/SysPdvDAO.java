@@ -183,8 +183,16 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rst.getString("secdes"));
                     imp.setMerc2ID(rst.getString("grpcod"));
                     imp.setMerc2Descricao(rst.getString("grpdes"));
-                    imp.setMerc3ID(rst.getString("sgrcod"));
-                    imp.setMerc3Descricao(rst.getString("sgrdes"));
+                    
+                    if("".equals(rst.getString("sgrcod"))){
+                        imp.setMerc3ID(rst.getString("grpcod"));
+                        imp.setMerc3Descricao(rst.getString("grpdes"));
+                    }
+                    else{
+                        imp.setMerc3ID(rst.getString("sgrcod"));
+                        imp.setMerc3Descricao(rst.getString("sgrdes"));
+                    }
+                    
 
                     result.add(imp);
                 }
@@ -459,7 +467,9 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setDescricaoGondola(imp.getDescricaoCompleta());
                             imp.setCodMercadologico1(rst.getString("merc1"));
                             imp.setCodMercadologico2(rst.getString("merc2"));
-                            imp.setCodMercadologico3(rst.getString("merc3"));
+ 
+                            imp.setCodMercadologico3("".equals(rst.getString("merc3")) ?  
+                                                    rst.getString("merc2") : rst.getString("merc3"));
                                                         
                             int plu;
                             if (removerDigitoDaBalanca) {
