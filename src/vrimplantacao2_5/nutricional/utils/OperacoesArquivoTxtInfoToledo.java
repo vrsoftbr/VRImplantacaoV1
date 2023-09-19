@@ -113,11 +113,11 @@ public class OperacoesArquivoTxtInfoToledo {
                 if (!vToledo.get(i).trim().isEmpty()) {
 
                     vo.setCodigo(Integer.parseInt(vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim).equals("") ? "0" : vToledo.get(i).substring(txtInfoColuna1Inicio, txtInfoColuna1Fim)));
-                    vo.setObs(txtInfoColuna2Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna2Inicio, txtInfoColuna2Fim));
-                    vo.setLinha1(txtInfoColuna3Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna3Inicio, txtInfoColuna3Fim));
-                    vo.setLinha2(txtInfoColuna4Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna4Inicio, txtInfoColuna4Fim));
-                    vo.setLinha3(txtInfoColuna5Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna5Inicio, txtInfoColuna5Fim));
-                    vo.setLinha4(txtInfoColuna6Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna6Inicio, txtInfoColuna6Fim));
+                    vo.setObs(txtInfoColuna2Fim > txtInfoColuna16Fim ? "" : Utils.removerAcentos(vToledo.get(i).substring(txtInfoColuna2Inicio, txtInfoColuna2Fim)));
+                    vo.setLinha1(txtInfoColuna3Fim > txtInfoColuna16Fim ? "" : Utils.removerAcentos(vToledo.get(i).substring(txtInfoColuna3Inicio, txtInfoColuna3Fim)));
+                    vo.setLinha2(txtInfoColuna4Fim > txtInfoColuna16Fim ? "" : Utils.removerAcentos(vToledo.get(i).substring(txtInfoColuna4Inicio, txtInfoColuna4Fim)));
+                    vo.setLinha3(txtInfoColuna5Fim > txtInfoColuna16Fim ? "" : Utils.removerAcentos(vToledo.get(i).substring(txtInfoColuna5Inicio, txtInfoColuna5Fim)));
+                    vo.setLinha4(txtInfoColuna6Fim > txtInfoColuna16Fim ? "" : Utils.removerAcentos(vToledo.get(i).substring(txtInfoColuna6Inicio, txtInfoColuna6Fim)));
                     vo.setLinha5(txtInfoColuna7Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna7Inicio, txtInfoColuna7Fim));
                     vo.setLinha6(txtInfoColuna8Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna8Inicio, txtInfoColuna8Fim));
                     vo.setLinha7(txtInfoColuna9Fim > txtInfoColuna16Fim ? "" : vToledo.get(i).substring(txtInfoColuna9Inicio, txtInfoColuna9Fim));

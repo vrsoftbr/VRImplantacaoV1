@@ -232,6 +232,7 @@ import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GZSistemas2_5DAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.dao.sistema.Jmaster2_5DAO;
 import vrimplantacao2_5.dao.sistema.ProviderGenericoDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
 import vrimplantacao2_5.dao.sistema.LCSistemasDAO;
@@ -330,6 +331,7 @@ import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hiper2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
+import vrimplantacao2_5.gui.sistema.Jmaster2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
 import vrimplantacao2_5.gui.sistema.LCSistemas2_5GUI;
@@ -1061,10 +1063,16 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    JMASTER(88, "JMASTER", new JMasterDAO()) {
-        @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+    JMASTER(88, "JMASTER", new Jmaster2_5DAO()) {
+           @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Jmaster2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     JACSYS(89, "JACSYS", new JacsysDAO()) {

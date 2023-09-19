@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,6 +78,16 @@ public class Utils {
             return ddd + telefone;
         }
         return telefone;
+    }
+    
+    
+    public static String removerAcentos(String texto) {
+        texto = texto != null ? Normalizer.normalize(texto, Normalizer.Form.NFD) : "";
+        texto = texto != null ? texto.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "") : "";
+        //texto = texto != null ? texto.replaceAll("�", "C") : "";
+        texto = texto != null ? texto.replaceAll("[^\\p{ASCII}]", "") : "";
+
+        return texto;
     }
 
     /**
@@ -887,7 +898,7 @@ public class Utils {
      * @param texto Texto a ser ajustado.
      * @return Texto padronizado
      */
-    public static String acertarTextoCaseSensitive(String texto) {
+    ;public static String acertarTextoCaseSensitive(String texto) {
         if (texto != null && !texto.isEmpty()) {
             String vRetorno = "", textoAcertado = "",
                     strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%()-_=+[{]}.>,<'|'";

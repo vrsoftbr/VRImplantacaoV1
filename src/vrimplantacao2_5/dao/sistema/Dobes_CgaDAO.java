@@ -28,9 +28,11 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao.vo.vrimplantacao.OfertaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -39,6 +41,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
+import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 
 /**
  *
@@ -89,7 +92,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }*/
-    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -124,46 +126,59 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+ @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                new OpcaoProduto[]{
-                    OpcaoProduto.MERCADOLOGICO,
-                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.FAMILIA,
-                    OpcaoProduto.FAMILIA_PRODUTO,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                    OpcaoProduto.PRODUTOS,
-                    OpcaoProduto.EAN,
-                    OpcaoProduto.EAN_EM_BRANCO,
-                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                    OpcaoProduto.DATA_CADASTRO,
-                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
-                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-                    OpcaoProduto.PESAVEL,
-                    OpcaoProduto.VALIDADE,
-                    OpcaoProduto.DESC_COMPLETA,
-                    OpcaoProduto.DESC_GONDOLA,
-                    OpcaoProduto.DESC_REDUZIDA,
-                    OpcaoProduto.ESTOQUE_MAXIMO,
-                    OpcaoProduto.ESTOQUE_MINIMO,
-                    OpcaoProduto.PRECO,
-                    OpcaoProduto.CUSTO,
-                    OpcaoProduto.ESTOQUE,
-                    OpcaoProduto.ATIVO,
-                    OpcaoProduto.NCM,
-                    OpcaoProduto.CEST,
-                    OpcaoProduto.PIS_COFINS,
-                    OpcaoProduto.NATUREZA_RECEITA,
-                    OpcaoProduto.ICMS,
-                    OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,
-                    OpcaoProduto.FORCAR_ATUALIZACAO,
-                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
-                    OpcaoProduto.FABRICANTE}
+                OpcaoProduto.ASSOCIADO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.DESCONTINUADO,
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.TIPO_PRODUTO
         ));
     }
 
@@ -171,13 +186,15 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
                 OpcaoFornecedor.DADOS,
-                OpcaoFornecedor.RAZAO_SOCIAL,
-                OpcaoFornecedor.NOME_FANTASIA,
-                OpcaoFornecedor.CNPJ_CPF,
-                OpcaoFornecedor.INSCRICAO_ESTADUAL,
-                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.CONTATOS,
+                OpcaoFornecedor.SITUACAO_CADASTRO,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
-                OpcaoFornecedor.PAGAR_FORNECEDOR
+                OpcaoFornecedor.CONDICAO_PAGAMENTO,
+                OpcaoFornecedor.OBSERVACAO,
+                OpcaoFornecedor.PRAZO_FORNECEDOR
         ));
     }
 
@@ -185,16 +202,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
-                OpcaoCliente.CNPJ,
-                OpcaoCliente.INSCRICAO_ESTADUAL,
-                OpcaoCliente.TELEFONE,
-                OpcaoCliente.CELULAR,
-                OpcaoCliente.EMAIL,
                 OpcaoCliente.ENDERECO,
+                OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.CONTATOS,
-                OpcaoCliente.RECEBER_CHEQUE,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
-        ));
+                OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.CONVENIO_EMPRESA,
+                OpcaoCliente.CONVENIO_CONVENIADO,
+                OpcaoCliente.CONVENIO_TRANSACAO,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.OUTRAS_RECEITAS));
     }
 
     @Override
@@ -229,20 +249,22 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"SELECT\n"
-                    + "	ret018.\"SECCod\",\n"
-                    + "	ret018.\"SECDesc\",\n"
-                    + "	ret019.\"GRUCod\",\n"
-                    + "	ret019.\"GRUDesc\",\n"
-                    + "	ret020.\"SUBGCod\",\n"
-                    + "	ret020.\"SUBGDesc\"\n"
+                    "SELECT\n"
+                    + "	ret018.\"SECCod\" AS merc1,\n"
+                    + "	ret018.\"SECDesc\" AS desc1,\n"
+                    + "	ret019.\"GRUCod\" AS merc2,\n"
+                    + "	ret019.\"GRUDesc\" AS desc2,\n"
+                    + "	ret020.\"SUBGCod\" AS merc3,\n"
+                    + "	ret020.\"SUBGDesc\" AS desc3\n"
                     + "FROM\n"
                     + "	ret018\n"
-                    + "JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
-                    + "JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
+                    + "LEFT JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
+                    + "LEFT JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
                     + "ORDER BY\n"
                     + "	RET018.\"SECCod\",\n"
-                    + "	RET020.\"GRUCod\""*/
+                    + "	RET020.\"GRUCod\",\n"
+                    + "	ret020.\"SUBGCod\""
+            /*
                     "SELECT DISTINCT \n"
                     + "	ret019.\"GRUCod\" merc1,\n"
                     + "	ret019.\"GRUDesc\" desc1\n"
@@ -250,7 +272,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret018\n"
                     + "LEFT JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
                     + "LEFT JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
-                    + "ORDER BY 1"
+                    + "ORDER BY 1"*/
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -259,11 +281,11 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("desc1"));
-                    imp.setMerc2ID(imp.getMerc1ID());
-                    imp.setMerc2Descricao(imp.getMerc1Descricao());
-                    imp.setMerc3ID(imp.getMerc1ID());
-                    imp.setMerc3Descricao(imp.getMerc1Descricao());
-                    
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("desc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("desc3"));
+
                     vResult.add(imp);
                 }
             }
@@ -276,49 +298,95 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "	ret051.\"PRODCod\",\n" +
-                    "	ret051.\"PRODNome\",\n" +
-                    "	ret051.\"PRODNomeRed\",\n" +
-                    "	ret051.\"PRODEtq\",\n" +
-                    "	ret051.\"PRODCadast\",\n" +
-                    "	ret051.\"PRODCusto\",\n" +
-                    "	ret051.prodcustofinalvenda,\n" +
-                    "	ret051.\"PRODVenda\",\n" +
-                    "	ret051.\"PRODMargem\",\n" +
-                    "	ret051.prodcustofinal custocomimposto,\n" +
-                    "	ret051.\"PRODCompra\" custosemimposto,\n" +
-                    "	ret051.\"GRUCod\" merc1,\n" +
-                    "	ret051.\"GRUCod\" merc2,\n" +
-                    "	ret051.\"GRUCod\" merc3,\n" +
-                    "	ret051.prodai,\n" +
-                    "	ret051.\"PRODBARCod\" ean,\n" +
-                    "	ret041.CLASFISCDESC ncm,\n" +
-                    "	ret041.clasfisccest cest,\n" +
-                    "	ret051.natreccod,\n" +
-                    "	ret051.prodstcofinsent,\n" +
-                    "	ret051.prodstcofins,\n" +
-                    "	ret051.\"SUBCod\",\n" +
-                    "	ret051.prodsdo,\n" +
-                    "	prodqtemb,\n" +
-                    "	ret051.\"ALIQCod\" id_icms_saida,\n" +
-                    "	ret051.\"TABBCod\" cstSaida,\n" +
-                    "	al1.\"ALIQNFPerc\" aliqDebito,\n" +
-                    "	al1.\"ALIQRedNF\" redDebito,\n" +
-                    "	ret051.aliqcred,\n" +
-                    "	ret051.tabbcred cstEntrada,\n" +
-                    "	al2.\"ALIQNFPerc\" aliqCredito,\n" +
-                    "	al2.\"ALIQRedNF\" redCredito,\n" +
-                    "	ret051.\"PRODUnid\",\n" +
-                    "	ret051.\"FORCod\" idfornecedor\n" +
-                    "FROM\n" +
-                    "	RET051\n" +
-                    "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n" +
-                    "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n" +
-                    "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
-                    "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n" +
-                    "ORDER BY\n" +
-                    "	ret051.\"PRODCod\""
+//                    "SELECT\n" +
+//                    "	ret051.\"PRODCod\",\n" +
+//                    "	ret051.\"PRODNome\",\n" +
+//                    "	ret051.\"PRODNomeRed\",\n" +
+//                    "	ret051.\"PRODEtq\",\n" +
+//                    "	ret051.\"PRODCadast\",\n" +
+//                    "	ret051.\"PRODCusto\",\n" +
+//                    "	ret051.prodcustofinalvenda,\n" +
+//                    "	ret051.\"PRODVenda\",\n" +
+//                    "	ret051.\"PRODMargem\",\n" +
+//                    "	ret051.prodcustofinal custocomimposto,\n" +
+//                    "	ret051.\"PRODCompra\" custosemimposto,\n" +
+//                    "	ret051.\"GRUCod\" merc1,\n" +
+//                    "	ret051.\"GRUCod\" merc2,\n" +
+//                    "	ret051.\"GRUCod\" merc3,\n" +
+//                    "	ret051.prodai,\n" +
+//                    "	ret051.\"PRODBARCod\" ean,\n" +
+//                    "	ret041.CLASFISCDESC ncm,\n" +
+//                    "	ret041.clasfisccest cest,\n" +
+//                    "	ret051.natreccod,\n" +
+//                    "	ret051.prodstcofinsent,\n" +
+//                    "	ret051.prodstcofins,\n" +
+//                    "	ret051.\"SUBCod\",\n" +
+//                    "	ret051.prodsdo,\n" +
+//                    "	prodqtemb,\n" +
+//                    "	ret051.\"ALIQCod\" id_icms_saida,\n" +
+//                    "	ret051.\"TABBCod\" cstSaida,\n" +
+//                    "	al1.\"ALIQNFPerc\" aliqDebito,\n" +
+//                    "	al1.\"ALIQRedNF\" redDebito,\n" +
+//                    "	ret051.aliqcred,\n" +
+//                    "	ret051.tabbcred cstEntrada,\n" +
+//                    "	al2.\"ALIQNFPerc\" aliqCredito,\n" +
+//                    "	al2.\"ALIQRedNF\" redCredito,\n" +
+//                    "	ret051.\"PRODUnid\",\n" +
+//                    "	ret051.\"FORCod\" idfornecedor\n" +
+//                    "FROM\n" +
+//                    "	RET051\n" +
+//                    "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n" +
+//                    "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n" +
+//                    "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
+//                    "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n" +
+//                    "ORDER BY\n" +
+//                    "	ret051.\"PRODCod\""
+                    // SCRIPT REALIZADO DEVIDO A OUTRA VERSÃO
+                    
+                     "SELECT\n"
+                    + "	ret051.\"PRODCod\",\n"
+                    + "	ret051.\"PRODNome\",\n"
+                    + "	ret051.\"PRODNomeRed\",\n"
+                    + "	ret051.\"PRODEtq\",\n"
+                    + "	ret051.\"PRODCadast\",\n"
+                    + "	ret051.\"PRODCusto\",\n"
+                    + "	ret051.prodcustofinalvenda,\n"
+                    + "	ret051.\"PRODVenda\",\n"
+                    + "	ret051.\"PRODMargem\",\n"
+                    + "	ret051.prodcustofinal custocomimposto,\n"
+                    + "	ret051.\"PRODCompra\" custosemimposto,\n"
+                    + "	ret051.\"SECCod\" merc1,\n"
+                    + "	ret051.\"GRUCod\" merc2,\n"
+                    + "	ret051.\"SUBGCod\" merc3,\n"
+                    + "	ret051.\"SUBCod\" merc4,\n"
+                    + "	ret051.prodai,\n"
+                    + "	ret051.\"PRODBARCod\" ean,\n"
+                    + "	ret041.CLASFISCDESC ncm,\n"
+                    + "	ret041.clasfisccest cest,\n"
+                    + "	ret051.natreccod,\n"
+                    + "	ret051.prodstcofinsent,\n"
+                    + "	ret051.prodstcofins,\n"
+                    + "	ret051.\"SUBCod\",\n"
+                    + "	ret051.prodsdo,\n"
+                    + "	prodqtemb,\n"
+                    + "	ret051.\"ALIQCod\" id_icms_saida,\n"
+                    + "	ret051.\"TABBCod\" cstSaida,\n"
+                    + "	al1.\"ALIQNFPerc\" aliqDebito,\n"
+                    + "	al1.\"ALIQRedNF\" redDebito,\n"
+                    + "	ret051.aliqcred,\n"
+                    + "	ret051.tabbcred cstEntrada,\n"
+                    + "	al2.\"ALIQNFPerc\" aliqCredito,\n"
+                    + "	al2.\"ALIQRedNF\" redCredito,\n"
+                    + "	ret051.\"PRODUnid\",\n"
+                    + "	ret051.\"FORCod\" idfornecedor\n"
+                    + "FROM\n"
+                    + "	RET051\n"
+                    + "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n"
+                    + "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
+                    + "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
+                    + "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n"
+                    + "ORDER BY\n"
+                    + "	ret051.\"PRODCod\""
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -331,7 +399,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("ean"));
 
                     long codigoProduto;
-                    
+
                     codigoProduto = Long.parseLong(imp.getImportId().equals("PRICMS") ? "999999" : imp.getImportId());
                     if (codigoProduto <= Integer.MAX_VALUE) {
                         produtoBalanca = produtosBalanca.get((int) codigoProduto);
@@ -359,7 +427,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("prodsdo"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setCodMercadologico3(rst.getString("merc4"));
+                    //imp.setCodMercadologico4(rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("SUBCod"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -834,6 +903,40 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "\"CLICod\" ||''||\"RECDoc\" AS id,\n"
+                    + "\"CLICod\" AS id_fornecedor,\n"
+                    + "RECVDA AS dataemissao,\n"
+                    + "\"RECVcto\" AS vencimento,\n"
+                    + "RECVLR AS valor,\n"
+                    + "RECOBS AS observacao\n"
+                    + "FROM RET092 \n"
+                    + "WHERE \"RECDup\" = ''"
+            )) {
+                while (rst.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdClienteEventual(rst.getString("id_fornecedor"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                    System.out.println(imp.getIdFornecedor());
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

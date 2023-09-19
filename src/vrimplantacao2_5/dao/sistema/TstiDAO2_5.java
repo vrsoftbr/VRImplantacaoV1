@@ -242,7 +242,6 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setIcmsCst(rst.getInt("cst"));
 //                    imp.setIcmsAliq(rst.getDouble("aliquota"));
 //                    imp.setIcmsReducao(rst.getDouble("reducao"));
-                    
                     imp.setIcmsConsumidorId(rst.getString("descricaoICMS"));
                     imp.setIcmsDebitoId(rst.getString("descricaoICMS"));
                     imp.setIcmsCreditoId(rst.getString("descricaoICMS"));
@@ -621,7 +620,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	  0 reducao\n"
                     + " from\n"
                     + "   tslc035 i\n"
-                    + " join tslc036 c on i.SEQ036 = c.SEQ"
+                    + "left join tslc036 c on i.SEQ036 = c.SEQ"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -713,7 +712,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        if (cont == 18){
+                        if (cont == 18) {
                             cont = 1;
                         }
                         next.setEcf(Utils.stringToInt(rst.getString(cont++)));
