@@ -1,6 +1,7 @@
 package vrimplantacao.dao.cadastro;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -310,8 +311,8 @@ public class LojaDAO {
                 }
                 try {
                     stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (SQLException e) {
+                    e.getMessage();
                     throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
                 }
                 try {
