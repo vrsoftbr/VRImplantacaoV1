@@ -6,6 +6,7 @@ import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrframework.classe.Conexao;
 import vrimplantacao2_5.dao.cadastro.sistemabancodados.SistemaBancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.usuario.UsuarioDAO;
 import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
 import vrimplantacao2_5.vo.enums.ESistemaBancoDados;
@@ -124,7 +125,7 @@ public class AtualizadorDAO {
                     + "    id integer PRIMARY KEY NOT NULL,\n"
                     + "    nome character varying(30) NOT NULL,\n"
                     + "    login character varying(30) NOT NULL,\n"
-                    + "    senha character varying(30) NOT NULL,\n"
+                    + "    senha character varying(255) NOT NULL,\n"
                     + "    id_unidade integer NOT NULL,\n"
                     + "    CONSTRAINT fk_id_unidade FOREIGN KEY (id_unidade)\n"
                     + "        REFERENCES implantacao2_5.unidade (id) MATCH SIMPLE\n"
@@ -245,6 +246,7 @@ public class AtualizadorDAO {
                     + "    id_sistema int4,\n"
                     + "    script_getlojas text\n"
                     + ");"
+                    + "ALTER TABLE implantacao2_5.usuario ALTER COLUMN senha TYPE varchar(255);"
             );
         }
     }
@@ -361,24 +363,28 @@ public class AtualizadorDAO {
     }
 
     public void inserirUsuario() throws Exception {
+        /*
+        * Ao excluir um usuario, favor excluir ou alterar o mesmo no método atualizarSenhas();
+        * O método está nessa mesma classe.
+         */
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'BRUNO', 'BRUNO', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'ALAN', 'ALAN', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'WAGNER', 'WAGNER', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'MICHAEL', 'MICHAEL', 'ZIRDA123', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'RODRIGO', 'RODRIGO', 'ZIRDA123', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (6, 'IMP-BAURU', 'VRSP-BAU', 'IMPBAU35', " + EUnidade.VR_BAURU.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (7, 'IMP-BELEM', 'VRPA', 'IMP15', " + EUnidade.VR_BELEM.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (8, 'IMP-FLORIANOPOLIS', 'VRSC', 'IMP42', " + EUnidade.VR_FLORIANOPOLIS.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (9, 'IMP-FORTALEZA', 'VRCE', 'IMP23', " + EUnidade.VR_FORTALEZA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (10, 'IMP-GOIANIA', 'VRGO', 'IMP52', " + EUnidade.VR_GOIANIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (11, 'IMP-RECIFE', 'VRPE', 'IMP26', " + EUnidade.VR_RECIFE.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (12, 'IMP-RJ', 'VRRJ', 'IMP33', " + EUnidade.VR_RIO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (13, 'IMP-SALVADOR', 'VRBA', 'IMP29', " + EUnidade.VR_SALVADOR.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (14, 'IMP-SP', 'VRSP', 'IMP35', " + EUnidade.VR_SAO_PAULO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (15, 'IMP-SP_ZL', 'VRSP-ZL', 'IMPZL35', " + EUnidade.VR_SAO_PAULO_ZL.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (16, 'IMP-MG', 'VRMG', 'IMP31', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (17, 'JOSE', 'JOSE LAMONTANHA', 'VR123', " + EUnidade.VR_GOIANIA.getId() + ") ON CONFLICT (id) DO NOTHING;");
+            stm.execute("INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'BRUNO', 'BRUNO', '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'ALAN', 'ALAN', '$2a$12$lVFlwdtE6tRx98VtEc8iw.ebicubFny7agcVE0avxmv7DgPbUJ8ui', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'WAGNER', 'WAGNER', '$2a$12$.8DmNiwGEEXV/M1zxYP43uBOi2rQs3Q/7wxPe5Lbm7poAWyjnoozm', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'MICHAEL', 'MICHAEL', '$2a$12$NKdzIm0k/.QbltTcFDiyLOTxBCe9Mi01xHU/v93MdZIcvwESY404.', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'RODRIGO', 'RODRIGO', '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (6, 'IMP-BAURU', 'VRSP-BAU', '$2a$12$kKTEKlxo9Np5H1P2Vucaoe3EV6VMH8rzLmqt.XVMvnwrUL6Kl.vQm', " + EUnidade.VR_BAURU.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (7, 'IMP-BELEM', 'VRPA', '$2a$12$Et.db7kSw45KOPbZPqNhQuMFh53DRf84MJCVsvrBqIxby72EFzySy', " + EUnidade.VR_BELEM.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (8, 'IMP-FLORIANOPOLIS', 'VRSC', '$2a$12$qbyO3.wSN9b880HN21yvUelZemyWgOMhgq47rayRohuNOI82TNUqa', " + EUnidade.VR_FLORIANOPOLIS.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (9, 'IMP-FORTALEZA', 'VRCE', '$2a$12$AcCAvOts7q.tZpiKKHj/A.8Wcm3j8nVDb.SXgGWtHCOHYaSHUcnj.', " + EUnidade.VR_FORTALEZA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (10, 'IMP-GOIANIA', 'VRGO', '$2a$12$5dMabsRMCMqpusFoLlF04utvRztG68gXzME0oywJry.tW2kviKn8O', " + EUnidade.VR_GOIANIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (11, 'IMP-RECIFE', 'VRPE', '$2a$12$u9zeWz77tQf6SQv0KhZi9u6zgtb7P5Gf3URPjtrejtWhfVB2bWKFi', " + EUnidade.VR_RECIFE.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (12, 'IMP-RJ', 'VRRJ', '$2a$12$92Puj08mF7a.lgArkJjc/.WtLLjAy9csQSLexIpqckXzT5L51CPl6', " + EUnidade.VR_RIO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (13, 'IMP-SALVADOR', 'VRBA', '$2a$12$F1V/qUbIj4AyT4q5kastUur.Fv.avpXRGK7ZxEUYJzljVGYtT9wV2', " + EUnidade.VR_SALVADOR.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (14, 'IMP-SP', 'VRSP', '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.', " + EUnidade.VR_SAO_PAULO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (15, 'IMP-SP_ZL', 'VRSP-ZL', '$2a$12$mbGK2/TbDKgEU7ZRHuNzwufR7A3aPd29EPVBRrswpVLAJhfpGGQjS', " + EUnidade.VR_SAO_PAULO_ZL.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (16, 'IMP-MG', 'VRMG', '$2a$12$foWrXPAxW88wBR5zWZxMrOFph6mYDpPFWKd8bYQN1Lt48o4zNkVye', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (17, 'JOSE', 'JOSE LAMONTANHA', '$2a$12$9him78m3Re0fM2uoj8DGmeu8ebdFHc/OSQgS1ZHyb98V.73vhYqO.', " + EUnidade.VR_GOIANIA.getId() + ") ON CONFLICT (id) DO NOTHING;");
         }
     }
 
@@ -423,5 +429,37 @@ public class AtualizadorDAO {
         } else {
             return false;
         }
+    }
+
+    public void atualizarSenhas(int id) throws Exception {
+        if (!senhaCriptografada(id)) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute("do $$\n"
+                        + "begin\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 1;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$lVFlwdtE6tRx98VtEc8iw.ebicubFny7agcVE0avxmv7DgPbUJ8ui' where id = 2;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$.8DmNiwGEEXV/M1zxYP43uBOi2rQs3Q/7wxPe5Lbm7poAWyjnoozm' where id = 3;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$NKdzIm0k/.QbltTcFDiyLOTxBCe9Mi01xHU/v93MdZIcvwESY404.' where id = 4;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 5;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$kKTEKlxo9Np5H1P2Vucaoe3EV6VMH8rzLmqt.XVMvnwrUL6Kl.vQm' where id = 6;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$Et.db7kSw45KOPbZPqNhQuMFh53DRf84MJCVsvrBqIxby72EFzySy' where id = 7;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$qbyO3.wSN9b880HN21yvUelZemyWgOMhgq47rayRohuNOI82TNUqa' where id = 8;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$AcCAvOts7q.tZpiKKHj/A.8Wcm3j8nVDb.SXgGWtHCOHYaSHUcnj.' where id = 9;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$5dMabsRMCMqpusFoLlF04utvRztG68gXzME0oywJry.tW2kviKn8O' where id = 10;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$u9zeWz77tQf6SQv0KhZi9u6zgtb7P5Gf3URPjtrejtWhfVB2bWKFi' where id = 11;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$92Puj08mF7a.lgArkJjc/.WtLLjAy9csQSLexIpqckXzT5L51CPl6' where id = 12;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$F1V/qUbIj4AyT4q5kastUur.Fv.avpXRGK7ZxEUYJzljVGYtT9wV2' where id = 13;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.' where id = 14;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$mbGK2/TbDKgEU7ZRHuNzwufR7A3aPd29EPVBRrswpVLAJhfpGGQjS' where id = 15;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$foWrXPAxW88wBR5zWZxMrOFph6mYDpPFWKd8bYQN1Lt48o4zNkVye' where id = 16;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$12$9him78m3Re0fM2uoj8DGmeu8ebdFHc/OSQgS1ZHyb98V.73vhYqO.' where id = 17;\n"
+                        + "end;\n"
+                        + "$$ language plpgsql");
+            }
+        }
+    }
+
+    private boolean senhaCriptografada(int id) throws Exception {
+        return new UsuarioDAO().isSenhaCriptografada(id);
     }
 }

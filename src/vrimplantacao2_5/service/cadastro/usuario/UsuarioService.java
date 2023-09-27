@@ -1,6 +1,7 @@
 package vrimplantacao2_5.service.cadastro.usuario;
 
 import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao2_5.dao.cadastro.usuario.UsuarioDAO;
@@ -82,12 +83,20 @@ public class UsuarioService {
         List<UsuarioVO> result = null;
         
         result = usuarioDAO.autenticar(vo);
+        
+        for (UsuarioVO usuario : result) {
+            if (BCrypt.checkpw(vo.getSenha(), usuario.getSenha())){
+                return result;
+            }
+        }
 
+        result.clear();
+        
         if (result == null || result.isEmpty()) {
-            throw new VRException("Usuário não existe.");
+            throw new VRException("Usuário não existe ou senha está incorreta.");
         }
         
-        return result;
+        return null;
     }
     
     public int getProximoId() throws Exception {

@@ -53,6 +53,7 @@ public enum EScriptLojaOrigemSistema {
     CPLUS(22, 5, "SELECT e.codempresa AS id, e.nomeempresa AS descricao from empresa e"),
     CADASTRAFACIL(23, 5, "select lpad(id_empresa, 4, ''0'') as id, nome_razao AS descricao FROM empresa"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
+    EASYSAC(44, 13, "select cdloja id, fantas descricao from sac999"),
     FENIX(54, 5, "select id_empresa as id, CASE WHEN nm_fantasia IS NULL THEN NM_CONTRIBUINTE ELSE NM_FANTASIA end descricao from empresa order by 1"),
     GZSISTEMAS(66, 8, "select codigo id, nomfan descricao, cgc from mercodb.lojas order by codigo"),
     GETWAY(68, 13, "select CODLOJA id, descricao from LOJA order by id"),

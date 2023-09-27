@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 import vrframework.classe.Conexao;
 import vrimplantacao2_5.vo.cadastro.UsuarioVO;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -107,7 +108,7 @@ public class UsuarioDAO {
         sql.put("id", vo.getId());
         sql.put("nome", vo.getNome());
         sql.put("login", vo.getLogin());
-        sql.put("senha", vo.getSenha());
+        sql.put("senha", BCrypt.hashpw(vo.getSenha(), BCrypt.gensalt()));
         sql.put("id_unidade", vo.getIdUnidade());
 
         if (!sql.isEmpty()) {
@@ -125,7 +126,7 @@ public class UsuarioDAO {
 
         sql.put("nome", vo.getNome());
         sql.put("login", vo.getLogin());
-        sql.put("senha", vo.getSenha());
+        sql.put("senha", BCrypt.hashpw(vo.getSenha(), BCrypt.gensalt()));
         sql.put("id_unidade", vo.getIdUnidade());
 
         sql.setWhere("id = " + vo.getId());
@@ -159,12 +160,12 @@ public class UsuarioDAO {
                     + "	us.id,\n"
                     + "	us.nome,\n"
                     + "	us.login,\n"
-                    + " us.id_unidade, \n"
+                    + " us.id_unidade,\n"
+                    + " us.senha,\n"
                     + "	un.nome as unidade\n"
                     + "from implantacao2_5.usuario us\n"
                     + "join implantacao2_5.unidade un on un.id = us.id_unidade\n"
                     + "where us.login = '" + vo.getLogin() + "' \n"
-                    + "and us.senha = '" + vo.getSenha() + "' \n"
                     + "and us.id_unidade = " + vo.getIdUnidade()
             )) {
                 if (rst.next()) {
@@ -173,15 +174,16 @@ public class UsuarioDAO {
                     usuarioVO.setNome(rst.getString("nome"));
                     usuarioVO.setIdUnidade(rst.getInt("id_unidade"));
                     usuarioVO.setDescricaoUnidade(rst.getString("unidade"));
+                    usuarioVO.setSenha((rst.getString("senha")));
                     result.add(usuarioVO);
                 }
             }
         }
         return result;
     }
-    
+
     public int getProximoId() throws Exception {
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT COALESCE(MAX(id), 0) + 1 id FROM implantacao2_5.usuario"
@@ -193,5 +195,20 @@ public class UsuarioDAO {
         }
         return 0;
     }
-    
+
+    public boolean isSenhaCriptografada(int id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "senha \n"
+                    + "from implantacao2_5.usuario \n"
+                    + "where id = " + id
+            )) {
+                if (rst.next()) {
+                    if (rst.getString("senha").length() > 10) return true;
+                }
+            }
+        }
+        return false;
+    }
 }
