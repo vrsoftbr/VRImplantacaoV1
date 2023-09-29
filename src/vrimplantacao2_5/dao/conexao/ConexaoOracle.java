@@ -63,7 +63,13 @@ public class ConexaoOracle implements DriverConexao {
         usandoString = false;
 
         try {
-            con = DriverManager.getConnection("jdbc:oracle:thin:@" + i_ip + ":" + i_porta + ":" + i_database, i_usuario, i_senha);
+            try{
+                con = DriverManager.getConnection("jdbc:oracle:thin:@" + i_ip + ":" + i_porta + ":" + i_database, i_usuario, i_senha);
+            }
+            catch(Exception ex){
+                System.out.println(ex);
+                con = DriverManager.getConnection("jdbc:oracle:thin:@//" + i_ip + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
+            }
         } catch (Exception ex) {
             if (!ipSec.isEmpty()) {
                 con = DriverManager.getConnection("jdbc:oracle:thin:@" + i_ipSec + ":" + i_porta + ":" + i_database, i_usuario, i_senha);
