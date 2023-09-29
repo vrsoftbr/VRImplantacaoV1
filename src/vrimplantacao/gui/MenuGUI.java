@@ -327,6 +327,8 @@ import vrimplantacao2_5.gui.login.LoginGUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.mercadologicopadrao.gui.MercadologicoPadraoGUI;
+import vrimplantacao2_5.mural.gui.MemorandoGUI;
+import vrimplantacao2_5.mural.service.MemorandoService;
 import vrimplantacao2_5.nutricional.GUI.NutricionalArqGUI;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2_5.relatorios.gerador.GeradorProdutoEstoqueFiscal;
@@ -412,10 +414,12 @@ public final class MenuGUI extends VRMdiFrame {
     private LoginGUI loginFrame = null;
 
     private AtualizadorController atualizadorController = null;
+    
+    private MemorandoService memorandoService = new MemorandoService();
 
     public MenuGUI(LoginGUI i_loginFrame) throws Exception {
-        initComponents();       
-        
+        initComponents();
+
         loginFrame = i_loginFrame;
         setExtendedState(VRMdiFrame.MAXIMIZED_BOTH);
 
@@ -430,6 +434,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         if (Global.getIdUnidade() != 1) {
             mnuCadastro2_5.setVisible(false);
+        }
+
+        if (memorandoService.inicializaMemorando() != 0) {
+            try {
+                MemorandoGUI.exibir(this, memorandoService);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
 
@@ -620,6 +632,7 @@ public final class MenuGUI extends VRMdiFrame {
         tlbAtalho = new vrframework.bean.toolBar.VRToolBar();
         tlbFixo = new vrframework.bean.toolBar.VRToolBar();
         btnSair = new javax.swing.JButton();
+        btnMemo = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
         vrDesktopPane = new vrframework.bean.desktopPane.VRDesktopPane();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
@@ -1002,6 +1015,18 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         tlbFixo.add(btnSair);
+
+        btnMemo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/cupom.png"))); // NOI18N
+        btnMemo.setToolTipText("Sair (Alt + F4)");
+        btnMemo.setFocusable(false);
+        btnMemo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnMemo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnMemo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMemoActionPerformed(evt);
+            }
+        });
+        tlbFixo.add(btnMemo);
 
         tlbToolBar.add(tlbFixo);
         tlbToolBar.add(jSeparator3);
@@ -5691,7 +5716,17 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem22ActionPerformed
 
+    private void btnMemoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMemoActionPerformed
+        try {
+            memorandoService.inicializaMemorando();
+            MemorandoGUI.exibir(this, this.memorandoService);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_btnMemoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnMemo;
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;

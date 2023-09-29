@@ -19,6 +19,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -302,7 +303,7 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.GERCODREDUZ id,\n"
-                    + "	p.GERENTLIN datacadastro,\n"
+                    + "	CONVERT(DATE, CONVERT(VARCHAR, p.GERENTLIN)) datacadastro,\n"
                     + "	ean.EANCODIGO ean,\n"
                     + "	ean.EANQTDE qtdembalagem,\n"
                     + "	p.GERTIPVEN unidade,\n"
@@ -329,6 +330,8 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.LITPRCVEN1 precovenda,\n"
                     + "	p.GERTECLA teclassociada,\n"
                     + "	p.GERSAILIN saidadelinha,\n"
+//                  + "	left (p.GERNBM,8) ncm,\n"
+//                  + "	left(p.GERCEST,8) cest,\n"
                     + "	p.GERNBM ncm,\n"
                     + "	p.GERCEST cest,\n"
                     + "	p.GERTIPOPIS piscofins_saida,\n"
@@ -346,7 +349,7 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join CADEAN ean on\n"
                     + "		p.GERCODREDUZ = ean.EANCODREDUZ\n"
                     + "where\n"
-                    + "	est.LITLOJA = 1\n"
+                    + "	est.LITLOJA = " + getLojaOrigem() + "\n"
                     + "order by id, ean"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -456,7 +459,10 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.FORCEP cep,\n"
                     + "	f.FORDDD ddd,\n"
                     + "	f.FORTELEFONE telefone,\n"
-                    + "	f.FORDTCAD datacadastro,\n"
+                    + "	CASE \n"
+                    + "    WHEN f.FORDTCAD = 0 THEN null\n"
+                    + "    ELSE CAST(CONVERT(VARCHAR, f.FORDTCAD) AS DATE)\n"
+                    + "	END AS datacadastro,\n"
                     + "	f.FORENTREGA prazoentrega,\n"
                     + "	f.FORPRAZO prazopedido,\n"
                     + "	f.FORFAX fax,\n"
@@ -487,63 +493,48 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("complemento"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setIbge_municipio(rst.getInt("cidade"));
-
-//                    imp.setCob_endereco(rst.getString("cob_endereco"));
-//                    imp.setCob_numero(rst.getString("cob_numero"));
-//                    imp.setCob_bairro(rst.getString("cob_bairro"));
-//                    imp.setCob_ibge_municipio(rst.getInt("cob_id_municipio"));
-//                    imp.setCob_uf(rst.getString("cob_id_estado"));
-//                    imp.setCob_cep(rst.getString("cob_cep"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("ddd") + rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rst.getInt("prazopedido"));
                     imp.setTel_principal(rst.getString("telefone"));
 
-//                    if ((rst.getString("Fone2") != null)
-//                            && (!rst.getString("Fone2").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "1",
-//                                "TELEFONE 2",
-//                                rst.getString("Fone2"),
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                null
-//                        );
-//                    }
-//                    if ((rst.getString("fone3") != null)
-//                            && (!rst.getString("fone3").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "2",
-//                                "TELEFONE 3",
-//                                rst.getString("Fone3"),
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                null
-//                        );
-//                    }
-//                    if ((rst.getString("Fax") != null)
-//                            && (!rst.getString("Fax").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "3",
-//                                "FAX",
-//                                rst.getString("Fax"),
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                null
-//                        );
-//                    }
-//                    if ((rst.getString("email") != null)
-//                            && (!rst.getString("email").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "4",
-//                                "EMAIL",
-//                                null,
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                rst.getString("email").toLowerCase()
-//                        );
-//                    }
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("contato"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "FAX",
+                                rst.getString("Fax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
                     imp.setDatacadastro(rst.getDate("datacadastro"));
-//                    imp.setObservacao(rst.getString("Obs"));
-//                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
                 }
@@ -598,8 +589,11 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.CLIESTADO uf,\n"
                     + "	c.CLICEP cep,\n"
                     + "	c.CLIESTCIVIL estadocivil,\n"
-                    + "	c.CLIANIVERSARIO dataaniversario,\n"
-                    + "	c.CLIDTCADAS datacadastro,\n"
+                    + "	CASE \n"
+                    + "    WHEN c.CLIDTCADAS = 0 THEN CAST(CURRENT_TIMESTAMP AS DATE)\n"
+                    + "    ELSE CAST(CONVERT(VARCHAR, c.CLIDTCADAS) AS DATE)\n"
+                    + "	END AS dataaniversario,\n"
+                    + "	CONVERT(DATE, CONVERT(VARCHAR, c.CLIDTCADAS)) datacadastro,\n"
                     + "	c.CLISEXO sexo,\n"
                     + "	c.CLIEMPRESA empresa,\n"
                     + "	c.CLIDDD ddd,\n"
@@ -649,12 +643,12 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("CLIOBSERV1"));
                     imp.setCargo(rst.getString("cargo"));
 
-                    if ((rst.getString("telefone2") != null)
-                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                    if ((rst.getString("telefonecomercial") != null)
+                            && (!rst.getString("telefonecomercial").trim().isEmpty())) {
                         imp.addContato(
                                 "1",
                                 "TELEFONE 2",
-                                rst.getString("telefone2"),
+                                rst.getString("dddcomercial") + rst.getString("telefonecomercial"),
                                 null,
                                 null
                         );
@@ -682,24 +676,30 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "DTTEMISSAO, DTTVENCTO, \n"
-                    + "DTTNOTA, DTTPARCELA, \n"
-                    + "DTTCLIENTE, DTTVLRTIT,\n"
-                    + "DTTOBSERVACAO, DTTPDV \n"
-                    + "from DETTIT \n"
-                    + "where DTTVLRPAGO = 0 "
+                    "select\n"
+                    + "	CONVERT(DATE, CONVERT(VARCHAR, DTTEMISSAO)) emissao,\n"
+                    + "	CONVERT(DATE, CONVERT(VARCHAR, DTTVENCTO)) vencimento,\n"
+                    + "	DTTNOTA,\n"
+                    + "	DTTPARCELA,\n"
+                    + "	DTTCLIENTE,\n"
+                    + "	DTTVLRTIT,\n"
+                    + "	DTTOBSERVACAO,\n"
+                    + "	DTTPDV\n"
+                    + "from\n"
+                    + "	DETTIT\n"
+                    + "where\n"
+                    + "	DTTVLRPAGO = 0"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(rst.getString(rst.getString("DTTPARCELA") + getSistema() + "-" + getLojaOrigem() + "-"
-                            + rst.getString("DTTCLIENTE") + "-" + rst.getString("DTTNOTA") + "-"));
+                    imp.setId(rst.getString("DTTPARCELA") + getSistema() + "-" + getLojaOrigem() + "-"
+                            + rst.getString("DTTCLIENTE") + "-" + rst.getString("DTTNOTA"));
                     imp.setIdCliente(rst.getString("DTTCLIENTE"));
                     imp.setNumeroCupom(rst.getString("DTTNOTA"));
                     imp.setParcela(rst.getInt("DTTPARCELA"));
-                    imp.setDataEmissao(rst.getDate("DTTEMISSAO"));
-                    imp.setDataVencimento(rst.getDate("DTTVENCTO"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("DTTVLRTIT"));
                     imp.setObservacao(rst.getString("DTTOBSERVACAO"));
                     imp.setEcf(rst.getString("DTTPDV"));

@@ -126,7 +126,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
- @Override
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.ASSOCIADO,
@@ -298,52 +298,52 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-//                    "SELECT\n" +
-//                    "	ret051.\"PRODCod\",\n" +
-//                    "	ret051.\"PRODNome\",\n" +
-//                    "	ret051.\"PRODNomeRed\",\n" +
-//                    "	ret051.\"PRODEtq\",\n" +
-//                    "	ret051.\"PRODCadast\",\n" +
-//                    "	ret051.\"PRODCusto\",\n" +
-//                    "	ret051.prodcustofinalvenda,\n" +
-//                    "	ret051.\"PRODVenda\",\n" +
-//                    "	ret051.\"PRODMargem\",\n" +
-//                    "	ret051.prodcustofinal custocomimposto,\n" +
-//                    "	ret051.\"PRODCompra\" custosemimposto,\n" +
-//                    "	ret051.\"GRUCod\" merc1,\n" +
-//                    "	ret051.\"GRUCod\" merc2,\n" +
-//                    "	ret051.\"GRUCod\" merc3,\n" +
-//                    "	ret051.prodai,\n" +
-//                    "	ret051.\"PRODBARCod\" ean,\n" +
-//                    "	ret041.CLASFISCDESC ncm,\n" +
-//                    "	ret041.clasfisccest cest,\n" +
-//                    "	ret051.natreccod,\n" +
-//                    "	ret051.prodstcofinsent,\n" +
-//                    "	ret051.prodstcofins,\n" +
-//                    "	ret051.\"SUBCod\",\n" +
-//                    "	ret051.prodsdo,\n" +
-//                    "	prodqtemb,\n" +
-//                    "	ret051.\"ALIQCod\" id_icms_saida,\n" +
-//                    "	ret051.\"TABBCod\" cstSaida,\n" +
-//                    "	al1.\"ALIQNFPerc\" aliqDebito,\n" +
-//                    "	al1.\"ALIQRedNF\" redDebito,\n" +
-//                    "	ret051.aliqcred,\n" +
-//                    "	ret051.tabbcred cstEntrada,\n" +
-//                    "	al2.\"ALIQNFPerc\" aliqCredito,\n" +
-//                    "	al2.\"ALIQRedNF\" redCredito,\n" +
-//                    "	ret051.\"PRODUnid\",\n" +
-//                    "	ret051.\"FORCod\" idfornecedor\n" +
-//                    "FROM\n" +
-//                    "	RET051\n" +
-//                    "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n" +
-//                    "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n" +
-//                    "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
-//                    "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n" +
-//                    "ORDER BY\n" +
-//                    "	ret051.\"PRODCod\""
+                    //                    "SELECT\n" +
+                    //                    "	ret051.\"PRODCod\",\n" +
+                    //                    "	ret051.\"PRODNome\",\n" +
+                    //                    "	ret051.\"PRODNomeRed\",\n" +
+                    //                    "	ret051.\"PRODEtq\",\n" +
+                    //                    "	ret051.\"PRODCadast\",\n" +
+                    //                    "	ret051.\"PRODCusto\",\n" +
+                    //                    "	ret051.prodcustofinalvenda,\n" +
+                    //                    "	ret051.\"PRODVenda\",\n" +
+                    //                    "	ret051.\"PRODMargem\",\n" +
+                    //                    "	ret051.prodcustofinal custocomimposto,\n" +
+                    //                    "	ret051.\"PRODCompra\" custosemimposto,\n" +
+                    //                    "	ret051.\"GRUCod\" merc1,\n" +
+                    //                    "	ret051.\"GRUCod\" merc2,\n" +
+                    //                    "	ret051.\"GRUCod\" merc3,\n" +
+                    //                    "	ret051.prodai,\n" +
+                    //                    "	ret051.\"PRODBARCod\" ean,\n" +
+                    //                    "	ret041.CLASFISCDESC ncm,\n" +
+                    //                    "	ret041.clasfisccest cest,\n" +
+                    //                    "	ret051.natreccod,\n" +
+                    //                    "	ret051.prodstcofinsent,\n" +
+                    //                    "	ret051.prodstcofins,\n" +
+                    //                    "	ret051.\"SUBCod\",\n" +
+                    //                    "	ret051.prodsdo,\n" +
+                    //                    "	prodqtemb,\n" +
+                    //                    "	ret051.\"ALIQCod\" id_icms_saida,\n" +
+                    //                    "	ret051.\"TABBCod\" cstSaida,\n" +
+                    //                    "	al1.\"ALIQNFPerc\" aliqDebito,\n" +
+                    //                    "	al1.\"ALIQRedNF\" redDebito,\n" +
+                    //                    "	ret051.aliqcred,\n" +
+                    //                    "	ret051.tabbcred cstEntrada,\n" +
+                    //                    "	al2.\"ALIQNFPerc\" aliqCredito,\n" +
+                    //                    "	al2.\"ALIQRedNF\" redCredito,\n" +
+                    //                    "	ret051.\"PRODUnid\",\n" +
+                    //                    "	ret051.\"FORCod\" idfornecedor\n" +
+                    //                    "FROM\n" +
+                    //                    "	RET051\n" +
+                    //                    "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n" +
+                    //                    "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n" +
+                    //                    "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n" +
+                    //                    "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n" +
+                    //                    "ORDER BY\n" +
+                    //                    "	ret051.\"PRODCod\""
                     // SCRIPT REALIZADO DEVIDO A OUTRA VERSÃO
-                    
-                     "SELECT\n"
+
+                    "	SELECT\n"
                     + "	ret051.\"PRODCod\",\n"
                     + "	ret051.\"PRODNome\",\n"
                     + "	ret051.\"PRODNomeRed\",\n"
@@ -378,15 +378,13 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	al2.\"ALIQNFPerc\" aliqCredito,\n"
                     + "	al2.\"ALIQRedNF\" redCredito,\n"
                     + "	ret051.\"PRODUnid\",\n"
-                    + "	ret051.\"FORCod\" idfornecedor\n"
+                    + "	ret051.\"FORCod\"\n"
                     + "FROM\n"
                     + "	RET051\n"
                     + "LEFT JOIN ret041 ON ret041.clasfisccod = ret051.clasfisccod\n"
                     + "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
                     + "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
-                    + "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred\n"
-                    + "ORDER BY\n"
-                    + "	ret051.\"PRODCod\""
+                    + "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred"
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -435,6 +433,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
                     imp.setTipoEmbalagemCotacao(rst.getString("PRODUnid"));
+                    imp.setFornecedorFabricante(rst.getString("FORCod"));
 
                     if ((rst.getString("prodai") != null)
                             && (!rst.getString("prodai").trim().isEmpty())) {
@@ -453,7 +452,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms_saida"));
                     imp.setIcmsCreditoId(rst.getString("id_icms_saida"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_saida"));
-                    imp.setFornecedorFabricante(rst.getString("idfornecedor"));
 
                     vResult.add(imp);
                     contador++;
@@ -528,7 +526,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    "    select\n"
                     + "    ret007.\"FORCod\",\n"
                     + "    ret007.\"FORRazao\",\n"
                     + "    ret007.\"FORFant\",\n"
@@ -846,7 +844,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "    p.\"FORCod\"||' - '||p.\"PAGDoc\"||' - '||p.\"PAGParc\" id,\n"
+                    + "    p.\"FORCod\"||' - '||p.\"PAGDoc\"||' - '||p.\"PAGParc\" || '-'|| p.\"PAGDup\" id,\n"
                     + "    p.\"FORCod\",\n"
                     + "    f.\"FORRazao\", \n"
                     + "    f.forcnpj, \n"
@@ -863,10 +861,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "    RET091 p\n"
                     + "JOIN ret007 f on f.\"FORCod\" = p.\"FORCod\"\n"
-                    + "where\n"
-                    + "    p.\"PAGPgto\" is null\n"
-                    + "order by\n"
-                    + "    p.\"FORCod\"||' - '||p.\"PAGDoc\"||' - '||p.\"PAGParc\""
+                    + "WHERE\n"
+                    + "p.\"PAGPgto\" is NULL AND DATAEXCLUSAO IS NULL  "
             )) {
                 while (rst.next()) {
                     observacao = "";

@@ -311,6 +311,7 @@ import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DuplaFace_Livre2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
 import vrimplantacao2_5.gui.sistema.ETrade_VRSystem2_5GUI;
+import vrimplantacao2_5.gui.sistema.EasySac2_5GUI;
 import vrimplantacao2_5.gui.sistema.EcoCentauro2_5GUI;
 import vrimplantacao2_5.gui.sistema.FXSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Facil2_5GUI;
@@ -761,7 +762,13 @@ public enum ESistema {
     EASYSAC(44, "EASYSAC", new EasySacDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new EasySac2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+
+            return null;
         }
     },
     EMPORIO(45, "EMPORIO", new EmporioDAO()) {

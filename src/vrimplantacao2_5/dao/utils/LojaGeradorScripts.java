@@ -193,9 +193,23 @@ public class LojaGeradorScripts {
     }
 
     public String copiaAcumuladorLayoutRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.acumuladorlayoutretorno ( id_acumuladorlayout ,id_acumulador , retorno , titulo )\n"
-                + "(select (select max((id_acumuladorlayout)+1) from pdv.acumuladorlayoutretorno), id_acumulador , retorno , titulo from pdv.acumuladorlayoutretorno\n"
-                + "group by id_acumulador, retorno, titulo )";
+        String sql = "with teste as (\n"
+                + "select \n"
+                + "(select max(id) from pdv.acumuladorlayout)+ row_number()over() as id\n"
+                + "from pdv.acumuladorlayout \n"
+                + "where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                + ")\n"
+                + "select distinct \n"
+                + "teste.id,\n"
+                + "id_acumulador ,\n"
+                + "retorno,\n"
+                + "titulo\n"
+                + "from\n"
+                + "pdv.acumuladorlayoutretorno re\n"
+                + "join pdv.acumuladorlayout lt on\n"
+                + "re.id_acumuladorlayout = lt.id\n"
+                + "and lt.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                + "cross join teste";
 
         return sql;
     }
@@ -221,8 +235,8 @@ public class LojaGeradorScripts {
 
     public String copiaPdvAcumuladorLayout(LojaVO i_loja) throws Exception {
         String sql = "insert into pdv.acumuladorlayout (id,id_loja,descricao)\n"
-                + "(select (select max((id)+1) from pdv.acumuladorlayout)," + i_loja.getId() + ",descricao from pdv.acumuladorlayout where id_loja = " + i_loja.getIdCopiarLoja() + " \n"
-                + "group by id)";
+                + " select (select max(id) from pdv.acumuladorlayout) + row_number()over()," + i_loja.getId() + ",descricao \n"
+                + "from pdv.acumuladorlayout where id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }
@@ -244,15 +258,71 @@ public class LojaGeradorScripts {
     }
 
     public String copiaEcf(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.ecf (ID_LOJA,ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,numeroserie,\n"
-                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
-                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
-                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv) \n"
-                + "	select " + i_loja.getId() + " , ecf,descricao,id_tipomarca,id_tipomodelo,id_situacaocadastro,'999'||length(tipoecf||versaosb)+row_number() over(),\n"
-                + "	mfadicional,numerousuario ,tipoecf,versaosb,datahoragravacaosb,datahoracadastro,incidenciadesconto,\n"
-                + "	versaobiblioteca,geranfpaulista,id_tipoestado,versao,datamovimento,cargagdata,cargaparam,cargalayout,\n"
-                + "	cargaimagem,id_tipolayoutnotapaulista,touch,alteradopaf,horamovimento,id_tipoemissor,id_modelopdv\n"
-                + "	from pdv.ecf \n"
+        String sql = "insert into pdv.ecf (\n"
+                + "	id_loja ,\n"
+                + "	ecf ,\n"
+                + "	descricao ,\n"
+                + "	id_tipomarca ,\n"
+                + "	id_tipomodelo ,\n"
+                + "	id_situacaocadastro ,\n"
+                + "	numeroserie ,\n"
+                + "	mfadicional ,\n"
+                + "	numerousuario ,\n"
+                + "	tipoecf ,\n"
+                + "	versaosb ,\n"
+                + "	datahoragravacaosb ,\n"
+                + "	datahoracadastro ,\n"
+                + "	incidenciadesconto ,\n"
+                + "	versaobiblioteca ,\n"
+                + "	geranfpaulista ,\n"
+                + "	id_tipoestado ,\n"
+                + "	versao ,\n"
+                + "	datamovimento ,\n"
+                + "	cargagdata ,\n"
+                + "	cargaparam ,\n"
+                + "	cargalayout ,\n"
+                + "	cargaimagem ,\n"
+                + "	id_tipolayoutnotapaulista ,\n"
+                + "	touch ,\n"
+                + "	alteradopaf ,\n"
+                + "	horamovimento ,\n"
+                + "	id_tipoemissor ,\n"
+                + "	id_modelopdv ,\n"
+                + "	utilizavrconcentradorapi ,\n"
+                + "	pixclientid )\n"
+                + "	select \n"
+                + "	" + i_loja.getId() + " ,\n"
+                + "	ecf ,\n"
+                + "	descricao ,\n"
+                + "	id_tipomarca ,\n"
+                + "	id_tipomodelo ,\n"
+                + "	id_situacaocadastro ,\n"
+                + "	numeroserie ,\n"
+                + "	mfadicional ,\n"
+                + "	numerousuario ,\n"
+                + "	tipoecf ,\n"
+                + "	versaosb ,\n"
+                + "	datahoragravacaosb ,\n"
+                + "	datahoracadastro ,\n"
+                + "	incidenciadesconto ,\n"
+                + "	versaobiblioteca ,\n"
+                + "	geranfpaulista ,\n"
+                + "	id_tipoestado ,\n"
+                + "	versao ,\n"
+                + "	datamovimento ,\n"
+                + "	cargagdata ,\n"
+                + "	cargaparam ,\n"
+                + "	cargalayout ,\n"
+                + "	cargaimagem ,\n"
+                + "	id_tipolayoutnotapaulista ,\n"
+                + "	touch ,\n"
+                + "	alteradopaf ,\n"
+                + "	horamovimento ,\n"
+                + "	id_tipoemissor ,\n"
+                + "	id_modelopdv ,\n"
+                + "	utilizavrconcentradorapi ,\n"
+                + "	pixclientid \n"
+                + "     from pdv.ecf \n"
                 + "	where id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
