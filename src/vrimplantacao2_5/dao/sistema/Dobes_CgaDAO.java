@@ -145,7 +145,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                //OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
@@ -425,7 +425,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("prodsdo"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc4"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
                     //imp.setCodMercadologico4(rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("SUBCod"));
                     imp.setNcm(rst.getString("ncm"));
