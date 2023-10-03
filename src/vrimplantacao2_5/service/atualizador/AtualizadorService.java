@@ -59,15 +59,15 @@ public class AtualizadorService {
     public void criarSchema() throws Exception {
         this.atualizadorDAO.criarSchema();
     }
-    
-    public void criarCampoDataImportacao() throws Exception{
+
+    public void criarCampoDataImportacao() throws Exception {
         this.atualizadorDAO.criarCampoDataImportacao();
     }
 
     public void criarTabelas() throws Exception {
         this.atualizadorDAO.criarTabelas();
     }
-    
+
     public void atualizarTabelas() throws Exception {
         this.atualizadorDAO.alterarTabelas();
     }
@@ -122,13 +122,13 @@ public class AtualizadorService {
             this.atualizadorDAO.salvarMetodo(eMetodo);
         }
     }
-    
+
     public void salvarTipoOperacao() throws Exception {
         for (ETipoOperacao eTipoOperacao : ETipoOperacao.values()) {
             this.atualizadorDAO.salvarTipoOperacao(eTipoOperacao);
         }
     }
-    
+
     public void criarEstrutura2_5() throws Exception {
         this.criarSchema();
         this.criarTabelas();
@@ -136,12 +136,14 @@ public class AtualizadorService {
         this.criarCampoDataImportacao();
 
         int haUsuario = atualizadorDAO.verificarLogUsuario();
-        
+
         if (haUsuario == 0) {
             atualizadorDAO.inserirUnidade();
             atualizadorDAO.inserirUsuario();
-        } else {atualizadorDAO.atualizarSenhas(haUsuario);}
-        
+        }
+
+        atualizadorDAO.atualizarSenhas(haUsuario);
+
         this.atualizarTabelas();
         this.salvarBancoDados();
         this.salvarSistema();
