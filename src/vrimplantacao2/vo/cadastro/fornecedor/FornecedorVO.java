@@ -56,6 +56,7 @@ public class FornecedorVO {
     private boolean utilizaNfe = false;
     private boolean permiteNfSemPedido = false;
     private boolean utilizaiva = false;
+    private boolean revenda = false;
     
     private TipoIndicadorIE tipoIndicadorIe;
 
@@ -394,5 +395,13 @@ public class FornecedorVO {
 
     public void setUtilizaiva(boolean utilizaiva) {
         this.utilizaiva = utilizaiva;
+    }   
+    
+    public boolean getRevenda() {
+        return revenda;
+    }
+
+    public void setRevenda(boolean revenda) {
+        this.revenda = revenda;
     }    
 }

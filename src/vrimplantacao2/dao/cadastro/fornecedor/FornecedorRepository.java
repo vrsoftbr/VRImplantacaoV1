@@ -675,6 +675,7 @@ public class FornecedorRepository {
         vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
         vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
         vo.setUtilizaiva(imp.getUtilizaiva() == null ? false : !"0".equals(imp.getUtilizaiva().trim()));
+        vo.setRevenda(imp.getRevenda());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());

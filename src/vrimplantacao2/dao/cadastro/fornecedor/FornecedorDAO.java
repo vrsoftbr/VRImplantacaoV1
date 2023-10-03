@@ -168,7 +168,7 @@ public class FornecedorDAO {
                                     sql.put("id_tipoinscricao", vo.getTipoInscricao().getId());// integer NOT NULL,
                                     sql.put("inscricaoestadual", vo.getInscricaoEstadual());// character varying(20) NOT NULL,
                                     sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
-                                    sql.put("revenda", false);// boolean NOT NULL,
+                                    sql.put("revenda", vo.getRevenda());// boolean NOT NULL,
                                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
                                     sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
                                     sql.put("numerodoc", 0);// integer NOT NULL,
@@ -564,7 +564,7 @@ public class FornecedorDAO {
             sql.put("id_tipoinscricao", vo.getTipoInscricao().getId());// integer NOT NULL,
             sql.put("inscricaoestadual", vo.getInscricaoEstadual() == null ? "" : vo.getInscricaoEstadual());// character varying(20) NOT NULL,
             sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
-            sql.put("revenda", false);// boolean NOT NULL,
+            sql.put("revenda", vo.getRevenda());// boolean NOT NULL,
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
             sql.put("id_tipopagamento", vo.getTipoPagamento() == null ? Parametros.get().getTipoPagamento().getId() : vo.getTipoPagamento().getId());// integer NOT NULL,
             sql.put("numerodoc", 0);// integer NOT NULL,
@@ -674,6 +674,7 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO)) {
                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
+                    sql.put("revenda", vo.getRevenda());
                 }
                 if (opt.contains(OpcaoFornecedor.BLOQUEADO)) {
                     sql.put("bloqueado", vo.isBloqueado());

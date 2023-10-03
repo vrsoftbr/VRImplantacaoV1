@@ -71,6 +71,7 @@ public class FornecedorIMP {
     
     private TipoIndicadorIE tipoIndicadorIe;
     private String utilizaiva = "0";
+    private boolean revenda = false;
     
     public TipoIndicadorIE getTipoIndicadorIe() {
         return tipoIndicadorIe;
@@ -712,5 +713,13 @@ public class FornecedorIMP {
 
     public void setUtilizaiva(String utilizaiva) {
         this.utilizaiva = utilizaiva;
+    }    
+    
+    public boolean getRevenda() {
+        return revenda;
+    }
+
+    public void setRevenda(boolean revenda) {
+        this.revenda = revenda;
     }    
 }

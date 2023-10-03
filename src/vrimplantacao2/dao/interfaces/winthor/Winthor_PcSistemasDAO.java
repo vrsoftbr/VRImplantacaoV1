@@ -31,7 +31,9 @@ import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -44,6 +46,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -1657,7 +1660,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "    f.codfornec id,\n"
                     + "    f.fornecedor razao,\n"
                     + "    f.fantasia,\n"
@@ -1702,6 +1705,65 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "    LEFT JOIN PCPARCELASC parc ON\n"
                     + "        f.codparcela = parc.codparcela\n"
                     + "ORDER BY\n"
+                    + "    f.codfornec"*/
+                    "SELECT\n"
+                    + "    f.codfornec id,\n"
+                    + "    f.fornecedor razao,\n"
+                    + "    f.fantasia,\n"
+                    + "    f.cgc cnpj,\n"
+                    + "    f.ie ie,\n"
+                    + "    f.inscmunicip,\n"
+                    + "    f.suframa,\n"
+                    + "    CASE f.excluido WHEN 'S' THEN 0 ELSE 1 END ativo,\n"
+                    + "    f.ender endereco,\n"
+                    + "    f.numeroend numero,\n"
+                    + "    f.complementoend complemento,\n"
+                    + "    f.bairro,\n"
+                    + "    f.cidade,\n"
+                    + "    f.estado,\n"
+                    + "    f.cep,\n"
+                    + "    f.endercob cob_endereco,\n"
+                    + "    f.bairrocob cob_bairro,\n"
+                    + "    f.municob cob_cidade,\n"
+                    + "    f.estcob cob_estado,\n"
+                    + "    f.cepcob cob_cep,\n"
+                    + "    f.telefonecom telefonecomercial2,\n"
+                    + "    f.telefoneadm tel_financeiro,\n"
+                    + "    f.telrep telefonecomercial,\n"
+                    + "    f.telrep,\n"
+                    + "    f.telfab,\n"
+                    + "    f.telcob,\n"
+                    + "    f.prazomin,\n"
+                    + "    f.prazoentrega,\n"
+                    + "    f.email,\n"
+                    + "    f.emailnfe,\n"
+                    + "    CASE f.contribuinteicms WHEN 'S' THEN 1 ELSE 3 END contribuinteicms,\n"
+                    + "    f.vlminpedcompra,\n"
+                    + "    f.vlminpedreposicao,\n"
+                    + "    f.dtcadastro,\n"
+                    + "    f.obs,\n"
+                    + "    f.obs2,\n"
+                    + "    trim(f.observacao) observacao,\n"
+                    + "    f.codparcela,\n"
+                    + "    parc.descricao parcela,\n"
+                    + "    trim(f.tipofornec) tipofornec,\n"
+                    + "    f.REPRES,\n"
+                    + "    f.REP_CONTATO contatocomercial,\n"
+                    + "    f.REP_EMAIL emailcomercial,\n"
+                    + "    trim(f.REP_OBS) obscomercial,\n"
+                    + "    f.COM_EMAIL emailfinanceiro,\n"
+                    + "    f.SUP_EMAIL emailcomercial2,\n"
+                    + "    f.REVENDA\n"
+                    + "    ,TRIM(REGEXP_SUBSTR(REGEXP_REPLACE(parc.descricao,'[A-Z]',''), '[^/]+', 1, 1)) parcela1,\n"
+                    + "    TRIM(REGEXP_SUBSTR(REGEXP_REPLACE(parc.descricao,'[A-Z]',''), '[^/]+', 1, 2)) parcela2,\n"
+                    + "    TRIM(REGEXP_SUBSTR(REGEXP_REPLACE(parc.descricao,'[A-Z]',''), '[^/]+', 1, 3)) parcela3,\n"
+                    + "    TRIM(REGEXP_SUBSTR(REGEXP_REPLACE(parc.descricao,'[A-Z]',''), '[^/]+', 1, 4)) parcela4,\n"
+                    + "    TRIM(REGEXP_SUBSTR(REGEXP_REPLACE(parc.descricao,'[A-Z]',''), '[^/]+', 1, 5)) parcela5\n"
+                    + "FROM\n"
+                    + "    pcfornec f\n"
+                    + "    LEFT JOIN PCPARCELASC parc ON\n"
+                    + "        f.codparcela = parc.codparcela\n"
+                    + "ORDER BY\n"
                     + "    f.codfornec"
             )) {
                 while (rst.next()) {
@@ -1730,7 +1792,28 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setCob_cep(rst.getString("cob_cep"));
                     imp.setTel_principal(rst.getString("telrep"));
 
-                    if (Utils.stringToLong(rst.getString("telrep")) > 0) {
+                    if (rst.getString("emailnfe") != null) {
+                        imp.addEmail("E-MAIL NFE", rst.getString("emailnfe"), TipoContato.NFE);
+                    }
+                    if (rst.getString("telefonecomercial") != null) {
+                        imp.addContato(rst.getString("repres"), rst.getString("telefonecomercial"), "", TipoContato.COMERCIAL, rst.getString("emailcomercial"));
+                    }
+                    if (rst.getString("tel_financeiro") != null) {
+                        imp.addContato("FINANCEIRO", rst.getString("tel_financeiro"), "", TipoContato.FINANCEIRO, rst.getString("emailfinanceiro"));
+                    }
+                    if (rst.getString("telefonecomercial2") != null) {
+                        imp.addContato("COMERCIAL - 2", rst.getString("telefonecomercial2"), "", TipoContato.COMERCIAL, rst.getString("emailcomercial2"));
+                    }
+
+                    if ("S".equals(rst.getString("tipofornec"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    }
+
+                    if ("S".equals(rst.getString("revenda"))) {
+                        imp.setRevenda(true);
+                    }
+
+                    /*if (Utils.stringToLong(rst.getString("telrep")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
                         cont.setImportSistema(getSistema());
                         cont.setImportLoja(getLojaOrigem());
@@ -1775,15 +1858,32 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         cont.setTelefone(Utils.stringLong(rst.getString("emailnfe")));
                         cont.setTipoContato(TipoContato.NFE);
                         imp.getContatos().put(cont, "5");
+                    }*/
+                    
+                    if (rst.getString("parcela1") != null) {
+                        imp.addCondicaoPagamento(rst.getInt("parcela1"));
+                    }
+                    if (rst.getString("parcela2") != null) {
+                        imp.addCondicaoPagamento(rst.getInt("parcela2"));
+                    }
+                    if (rst.getString("parcela3") != null) {
+                        imp.addCondicaoPagamento(rst.getInt("parcela3"));
+                    }
+                    if (rst.getString("parcela4") != null) {
+                        imp.addCondicaoPagamento(rst.getInt("parcela4"));
+                    }
+                    if (rst.getString("parcela5") != null) {
+                        imp.addCondicaoPagamento(rst.getInt("parcela5"));
                     }
 
                     imp.setObservacao(
                             "PRAZO MINIMO: " + Utils.acertarTexto(rst.getString("prazomin")) + "\n"
                             + "VLR. MINIMO REPOSICAO: " + Utils.stringToDouble(rst.getString("vlminpedreposicao")) + "\n"
                             + "PARCELAMENTO: " + Utils.stringToDouble(rst.getString("parcela")) + "\n"
-                            + Utils.acertarTexto(rst.getString("obs")) + "\n"
-                            + Utils.acertarTexto(rst.getString("obs2")) + "\n"
-                            + Utils.acertarTexto(rst.getString("observacao"))
+                            + Utils.acertarTexto(rst.getString("obs") == null ? "" : rst.getString("obs")) + "\n"
+                            + Utils.acertarTexto(rst.getString("obs2") == null ? "" : rst.getString("obs2")) + "\n"
+                            + Utils.acertarTexto(rst.getString("observacao") == null ? "" : rst.getString("observacao")) + "\n"
+                            + Utils.acertarTexto(rst.getString("obscomercial") == null ? "" : rst.getString("obscomercial"))
                     );
                     imp.setValor_minimo_pedido(rst.getDouble("vlminpedcompra"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
