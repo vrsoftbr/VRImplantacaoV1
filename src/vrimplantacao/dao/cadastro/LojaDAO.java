@@ -176,7 +176,7 @@ public class LojaDAO {
             }
         }
     }
-    
+
     public boolean validaPromocao(LojaVO i_loja) throws Exception {
         String sql = "SELECT id FROM promocao WHERE id_loja = " + i_loja.getIdCopiarLoja();
 
@@ -285,26 +285,28 @@ public class LojaDAO {
 
             if (i_loja.isCopiaOferta() == true) {
                 if (validaOferta(i_loja) == false) {
-                    JOptionPane.showMessageDialog(null, 
+                    JOptionPane.showMessageDialog(null,
                             "Não existem ofertas cadastradas para a loja " + i_loja.descricao);
-                }else {
-                stm.execute(script.copiaOferta(i_loja));
+                } else {
+                    stm.execute(script.copiaOferta(i_loja));
                 }
             }
 
             if (i_loja.isCopiaPromocao() == true) {
-                if(validaPromocao(i_loja) == false){
-                    JOptionPane.showMessageDialog(null, 
+                if (validaPromocao(i_loja) == false) {
+                    JOptionPane.showMessageDialog(null,
                             "Não existem promoções cadastradas para a loja " + i_loja.descricao);
-                }else{
-                stm.execute(script.copiaPromocao(i_loja));
+                } else {
+                    stm.execute(script.copiaPromocao(i_loja));
                 }
-                
+
             }
             if (i_loja.isCopiaEcf() == true) {
                 //("Copiando ECF.");
                 try {
+
                     stm.execute(script.copiaEcf(i_loja));
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new Exception("Erro ao copiar ECF, certifique-se de que tenha ecf's na base.");
