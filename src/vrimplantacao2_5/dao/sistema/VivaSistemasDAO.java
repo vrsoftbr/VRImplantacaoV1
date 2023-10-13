@@ -259,6 +259,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + " ean.UNID_FATOR_CONVERSAO qtdembalagem\n"
                     + " FROM ESTO_PRODUTOS p\n"
                     + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN AND ean.UNID_FATOR_CONVERSAO > 1\n"
+                    + "where  p.prod_codigo_unitario NOT LIKE '%E%'\n"
                     + "  ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -339,14 +340,15 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	est.PRQT_ESTOQUE_MINIMO est_min,\n"
                     + "	est.PRQT_ESTOQUE_MAXIMO est_max,\n"
                     + "	est.PRQT_ESTOQUE_ATUAL estoque,\n"
-                    + "	p.PROD_VLR_CUSTO_FINAL precocusto,\n"
-                    + "	p.PROD_VLR_VAREJO precovenda,\n"
+                    + " v.PRVA_VLR_CUSTO_FINAL precocusto,\n"
+                    + "	v.PRVA_VLR_VAREJO precovenda,\n"
                     + "	p.TRCA_PK id_icms,\n"
                     + "	PROD_CST_PIS pis_cofins,\n"
                     + "	p.PROD_CODIGO_NATUREZA_PISCOFINS nat_rec\n"
                     + "FROM\n"
                     + "	ESTO_PRODUTOS p\n"
                     + "LEFT JOIN ESTO_PRODUTOS_QUANTIDADE est ON est.PROD_PK = p.PROD_PK AND est.EMPR_PK = " + getLojaOrigem() + "\n"
+                    + "LEFT JOIN ESTO_PRODUTOS_VALORES v ON v.PROD_PK = p.PROD_PK \n"
                     + "LEFT JOIN ESTO_NCM n ON p.ENCM_PK = n.ENCM_PK\n"
                     + "LEFT JOIN ESTO_CEST c ON p.CEST_PK = c.CEST_PK\n"
                     + "WHERE\n"
@@ -355,8 +357,10 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + " FROM ESTO_PRODUTOS p\n"
                     + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN \n"
                     + " 	AND ean.UNID_FATOR_CONVERSAO > 1\n"
+                    + " where p.prod_codigo_unitario NOT LIKE '%E%'\n"
                     + "  ORDER BY 1)\n"
                     + "  AND p.EMPR_PK = " + getLojaOrigem() + "\n"
+                    + " AND p.prod_codigo_unitario NOT LIKE '%E%'\n"
                     + "ORDER BY 1"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();

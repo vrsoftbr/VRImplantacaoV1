@@ -24,6 +24,8 @@ public class SG2_5GUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
         chekDigitoBalanca.setSelected(params.getBool(SISTEMA));
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(sgDAO.getLojaOrigem());
     }
 
     public SG2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
