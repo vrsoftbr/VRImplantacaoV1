@@ -20,10 +20,12 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -121,7 +123,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
@@ -145,6 +148,40 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        String sqlAssociado = "select distinct  \n"
+                + " a.codpro id_produtopai,\n"
+                + " p.descpro01 descricao_pai,\n"
+                + " a.codassoc id_produtofilho,\n"
+                + " p2.descpro01 descricao_filho,\n"
+                + " a.qtembassoc qtde \n"
+                + "from proass a\n"
+                + "join cadpro p on p.codpro01 = a.codpro\n"
+                + "join cadpro p2 on p2.codpro01 = a.codassoc \n"
+                + "order by 1";
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(sqlAssociado)) {
+                while (rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+
+                    imp.setId(rs.getString("id_produtopai"));
+                    imp.setDescricao(rs.getString("descricao_pai"));
+                    imp.setQtdEmbalagem(rs.getInt("qtde"));
+                    imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
+                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

@@ -28,7 +28,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 
 /**
  *
- * @author Alan 
+ * @author Alan
  */
 public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -164,7 +164,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT DISTINCT \n"
+                    /*"SELECT DISTINCT \n"
                     + "	m1.GENE_PK merc1,\n"
                     + "	m1.GENE_DESCRICAO descmerc1,\n"
                     + "	m2.EGRU_PK merc2,\n"
@@ -176,7 +176,18 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	JOIN ESTO_GENERO m1 ON p.GENE_PK = m1.GENE_PK\n"
                     + "	JOIN ESTO_GRUPO m2 ON m2.egru_pk = p.egru_pk\n"
                     + "	JOIN ESTO_SUBGRUPO m3 ON m2.EGRU_PK = m3.EGRU_PK\n"
-                    + "ORDER BY 1,3,5"
+                    + "ORDER BY 1,3,5"*/
+                    "SELECT \n"
+                    + " m1.EGRU_PK merc1,\n"
+                    + " m1.EGRU_DESCRICAO descmerc1,\n"
+                    + " m2.ESGR_PK merc2,\n"
+                    + " m2.ESGR_DESCRICAO descmerc2,\n"
+                    + " m3.ESFA_PK merc3,\n"
+                    + " m3.ESFA_DESCRICAO descmerc3\n"
+                    + "FROM ESTO_GRUPO m1\n"
+                    + "LEFT JOIN ESTO_SUBGRUPO m2 ON m1.EGRU_PK = m2.EGRU_PK \n"
+                    + "LEFT JOIN ESTO_FAMILIA m3 ON m3.ESGR_PK = m2.ESGR_PK \n"
+                    + "ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -229,7 +240,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	CASE WHEN PROD_BALANCA = 'Sim' THEN prod_codigo_unitario ELSE PROD_PK END id_produto,\n"
                     + "	prod_codigo_unitario ean,\n"
                     + "	ean.unid_fator_conversao qtdembalagem,\n"
@@ -238,7 +249,18 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	ESTO_PRODUTOS ean\n"
                     + "	JOIN esto_unidades un ON ean.UNID_PK = un.UNID_PK\n"
                     + "WHERE\n"
-                    + "	prod_codigo_unitario NOT LIKE '%E%'"
+                    + "	prod_codigo_unitario NOT LIKE '%E%'"*/
+                    "SELECT \n"
+                    + " p.PROD_PK id_produto,\n"
+                    + " ean.PROD_CODIGO_EAN ean,\n"
+                    + " CASE WHEN ean.UNID_NOME_SIGLA LIKE '%CX%' THEN 'CX'\n"
+                    + " 	  WHEN ean.UNID_NOME_SIGLA LIKE '%KG%' THEN 'KG'\n"
+                    + " 	  ELSE 'UN' END tipo_embalagem,\n"
+                    + " ean.UNID_FATOR_CONVERSAO qtdembalagem\n"
+                    + " FROM ESTO_PRODUTOS p\n"
+                    + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN AND ean.UNID_FATOR_CONVERSAO > 1\n"
+                    + "where  p.prod_codigo_unitario NOT LIKE '%E%'\n"
+                    + "  ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -262,7 +284,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	CASE WHEN p.PROD_BALANCA = 'Sim' THEN prod_codigo_unitario ELSE PROD_PK END id,\n"
                     + "	p.PROD_CODIGO_PERSONALIZADO codigo,\n"
                     + "	p.PROD_CODIGO_UNITARIO ean,\n"
@@ -296,6 +318,49 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "WHERE\n"
                     + "	EMPR_PK = " + getLojaOrigem() + "\n"
                     + "AND prod_codigo_unitario NOT LIKE '%E%'\n"
+                    + "ORDER BY 1"*/
+                    "SELECT  \n"
+                    + " p.PROD_PK id,\n"
+                    + "	p.PROD_CODIGO_EAN ean,\n"
+                    + "	CASE WHEN p.PROD_BALANCA = 'Sim' THEN 1 ELSE 0 END e_balanca,\n"
+                    + "	p.PROD_DT_CADASTRO data_cad,\n"
+                    + "	p.PROD_DT_ULT_ALTERACAO data_alt,\n"
+                    + "	PROD_DESCRICAO_COMPLETA desc_completa,\n"
+                    + "	PROD_DESCRICAO_ABREVIADA desc_reduzida,\n"
+                    + "	EGRU_PK merc1,\n"
+                    + "	ESGR_PK merc2,\n"
+                    + "	ESFA_PK merc3,\n"
+                    + "	n.ENCM_CODIGO ncm,\n"
+                    + "	c.CEST_CODIGO cest,\n"
+                    + "	prod_status_registro ativo,\n"
+                    + "	UNID_NOME_SIGLA tipo_emb,\n"
+                    + "	unid_fator_conversao qtde_emb,\n"
+                    + "	p.PROD_PESO_BRUTO peso_bruto,\n"
+                    + "	p.PROD_PESO_LIQUIDO peso_liquido,\n"
+                    + "	est.PRQT_ESTOQUE_MINIMO est_min,\n"
+                    + "	est.PRQT_ESTOQUE_MAXIMO est_max,\n"
+                    + "	est.PRQT_ESTOQUE_ATUAL estoque,\n"
+                    + " v.PRVA_VLR_CUSTO_FINAL precocusto,\n"
+                    + "	v.PRVA_VLR_VAREJO precovenda,\n"
+                    + "	p.TRCA_PK id_icms,\n"
+                    + "	PROD_CST_PIS pis_cofins,\n"
+                    + "	p.PROD_CODIGO_NATUREZA_PISCOFINS nat_rec\n"
+                    + "FROM\n"
+                    + "	ESTO_PRODUTOS p\n"
+                    + "LEFT JOIN ESTO_PRODUTOS_QUANTIDADE est ON est.PROD_PK = p.PROD_PK AND est.EMPR_PK = " + getLojaOrigem() + "\n"
+                    + "LEFT JOIN ESTO_PRODUTOS_VALORES v ON v.PROD_PK = p.PROD_PK \n"
+                    + "LEFT JOIN ESTO_NCM n ON p.ENCM_PK = n.ENCM_PK\n"
+                    + "LEFT JOIN ESTO_CEST c ON p.CEST_PK = c.CEST_PK\n"
+                    + "WHERE\n"
+                    + " p.PROD_PK NOT IN (SELECT \n"
+                    + "  ean.PROD_PK\n"
+                    + " FROM ESTO_PRODUTOS p\n"
+                    + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN \n"
+                    + " 	AND ean.UNID_FATOR_CONVERSAO > 1\n"
+                    + " where p.prod_codigo_unitario NOT LIKE '%E%'\n"
+                    + "  ORDER BY 1)\n"
+                    + "  AND p.EMPR_PK = " + getLojaOrigem() + "\n"
+                    + " AND p.prod_codigo_unitario NOT LIKE '%E%'\n"
                     + "ORDER BY 1"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -305,23 +370,35 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+                    /*ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
 
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                         imp.setEan(String.valueOf(bal.getCodigo()));
+                    }*/
+                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(rst.getBoolean("e_balanca"));
+                        imp.setTipoEmbalagem(rst.getString("tipo_emb"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("desc_completa"));
                     imp.setDescricaoReduzida(rst.getString("desc_reduzida"));
-                    imp.setDescricaoGondola(rst.getString("desc_reduzida"));
-                    imp.setTipoEmbalagem(rst.getString("tipo_emb"));
+                    imp.setDescricaoGondola(rst.getString("desc_completa"));
+
                     imp.setTipoEmbalagemCotacao(rst.getString("tipo_emb"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
 
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setCustoSemImposto(rst.getDouble("precocusto"));
