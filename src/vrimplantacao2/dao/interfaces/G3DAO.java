@@ -282,51 +282,49 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
                      + "LEFT JOIN grupocofins gcs ON gcs.id = p.id_grupo_cofins_saida\n"
                      + "LEFT JOIN grupocofins gce ON gce.id = p.id_grupo_cofins_entrada\n"
                      + "ORDER BY p.ID"*/
-                    "select \n"
-                    + "	p.idproduto AS id,\n"
-                    + "	p.descricao,\n"
-                    + "	p.descrred reduzida,\n"
-                    + "	descricaoetq gondola,\n"
-                    + "	p.idgrupo AS mercadologico1,\n"
-                    + "	p.idsubgrupo as mercadologico2,\n"
-                    + "	p.idsubgrupo1 as mercadologico3,\n"
-                    + "	pp.margem,\n"
-                    + "	pp.custo custosemimposto,\n"
-                    + "	pp.custo custocomimposto,\n"
-                    + "	pp.venda1 precovenda,\n"
-                    + "	dtcadastro datacadastro,\n"
-                    + "	coalesce(pesoproduto,0) pesobruto,\n"
-                    + "	coalesce(pesovariavel,0) pesoliquido,\n"
-                    + "	estmax estoquemaximo,\n"
-                    + "	estmin estoqueminimo,\n"
-                    + "	estoque_atual AS estoque,\n"
-                    + "	ean,\n"
-                    + "	unidsaida tipoembalagem,\n"
-                    + "	classfiscal AS ncm,\n"
-                    + "	p.cest as cest,\n"
-                    + "	case p.idsituacao when 1 then 'ATIVO' ELSE 'INATIVO' end situacaocadastro,\n"
-                    + "	concat('0', substr(p.tabIcmsProdEntrada, 1, 3)) as icms_cst_e,\n"
-                    + "	p.IcmsCompra as icms_alqt_e,\n"
-                    + "	p.RedBase as icms_rbc_e,\n"
-                    + "	concat('0', substr(p.TabIcmsProd, 1, 3)) as icms_cst_s,\n"
-                    + "	p.Icms as icms_alqt_s,\n"
-                    + "	p.RedBaseVenda as icms_rbc_s,\n"
-                    + "	substr(p.CST_PIS,1,2) as piscofins_cst_e,\n"
-                    + "	substr(p.CST_PIS_SAIDA,1,2) as piscofins_cst_s,\n"
-                    + " p.icmscompra aliquota,\n"
-                    + " p.RedBase reducao,\n"
-                    + " substring(p.tabicmsprodentrada,1,2) cst,\n"
-                    + "	coalesce(nat_receita,'') naturezareceita,\n"
-                    + " p.sittrib as icms \n"
-                    + "FROM produto p \n"
-                    + "	left join produto_estoque pe\n"
-                    + "		on pe.idproduto = p.idproduto\n"
-                    + "	left join produto_preco pp\n"
-                    + "		on pp.idproduto = p.idproduto and pe.id_loja = pp.id_loja\n"
-                    + " left join cadtributacao ct\n"
-                    + "		on p.SitTrib = ct.idCadTributacao\n"
-                    + "where pe.id_loja = " + getLojaOrigem() + " \n"
-                    + "	group by p.idProduto"
+                    "select \n" +
+"	p.idproduto AS id,\n" +
+"	p.descricao,\n" +
+"	p.descrred reduzida,\n" +
+"	descricaoetq gondola,\n" +
+"	p.idgrupo AS mercadologico1,\n" +
+"	p.idsubgrupo as mercadologico2,\n" +
+"	p.idsubgrupo1 as mercadologico3,\n" +
+"	pp.margem,\n" +
+"	pp.custo custosemimposto,\n" +
+"	pp.custo custocomimposto,\n" +
+"	pp.venda1 precovenda,\n" +
+"	dtcadastro datacadastro,\n" +
+"	coalesce(pesoproduto,0) pesobruto,\n" +
+"	coalesce(pesovariavel,0) pesoliquido,\n" +
+"	estmax estoquemaximo,\n" +
+"	estmin estoqueminimo,\n" +
+"	estoque_atual AS estoque,\n" +
+"	ean,\n" +
+"	unidsaida tipoembalagem,\n" +
+"	classfiscal AS ncm,\n" +
+"	p.cest as cest,\n" +
+"	case p.idsituacao when 1 then 'ATIVO' ELSE 'INATIVO' end situacaocadastro,\n" +
+"	concat('0', substr(p.tabIcmsProdEntrada, 1, 3)) as icms_cst_e,\n" +
+"	p.IcmsCompra as icms_alqt_e,\n" +
+"	p.RedBase as icms_rbc_e,\n" +
+"	concat('0', substr(p.TabIcmsProd, 1, 3)) as icms_cst_s,\n" +
+"	p.Icms as icms_alqt_s,\n" +
+"	p.RedBaseVenda as icms_rbc_s,\n" +
+"	substr(p.CST_PIS,1,2) as piscofins_cst_e,\n" +
+"	substr(p.CST_PIS_SAIDA,1,2) as piscofins_cst_s,\n" +
+" p.icmscompra aliquota,\n" +
+" p.RedBase reducao,\n" +
+" substring(p.tabicmsprodentrada,1,2) cst,\n" +
+"	coalesce(nat_receita,'') naturezareceita,\n" +
+" p.sittrib as icms \n" +
+"FROM produto p \n" +
+"	left join produto_estoque pe\n" +
+"		on pe.idproduto = p.idproduto\n" +
+"	left join produto_preco pp\n" +
+"		on pp.idproduto = p.idproduto and pe.id_loja = pp.id_loja\n" +
+" left join cadtributacao ct\n" +
+"		on p.SitTrib = ct.idCadTributacao"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
