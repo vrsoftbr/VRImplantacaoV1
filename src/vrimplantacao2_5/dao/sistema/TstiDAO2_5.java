@@ -91,6 +91,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESAVEL,
                 OpcaoProduto.PDV_VENDA
         ));
     }
@@ -128,6 +129,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.COMPLEMENTO,
                 OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -159,6 +161,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
+        int contador = 0;
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -167,7 +170,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.codbar,\n"
                     + "	upper(p.descpro) descricaocompleta,\n"
                     + "	upper(p.descpdv) descricaoreduzida,\n"
-                    + "	p.estoque,\n"
+                    + "	e.qtd estoque,\n"
                     + "	p.preco1,\n"
                     + "	p.preco2,\n"
                     + "	p.grupo,\n"
@@ -200,14 +203,13 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	reducao,\n"
                     + "	p.natrec,\n"
                     + "	p.estqmax,\n"
-                    + "	c.codigo cst,\n"
-                    + "	i.aliquota,\n"
-                    + " i.descricao descricaoICMS,\n"
-                    + "	reducao\n"
+                    + "	coalesce(c.codigo2, 0) cst,\n"
+                    + "	coalesce(p.aliicms, 0) aliquota,\n"
+                    + "	p.reducao\n"
                     + "from\n"
                     + "	tsl.tslc003 p\n"
-                    + "left join tslc035 i on i.SEQUENCIAL = p.CODST\n"
-                    + "left join tslc036 c on i.SEQ036 = c.SEQ"
+                    + "LEFT JOIN tslc036 c on p.cst = c.SEQ\n"
+                    + "join tslc003_es e on e.cod003 = p.codigo"
             )) {
                 while (rst.next()) {
                     Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -242,12 +244,13 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setIcmsCst(rst.getInt("cst"));
 //                    imp.setIcmsAliq(rst.getDouble("aliquota"));
 //                    imp.setIcmsReducao(rst.getDouble("reducao"));
-                    imp.setIcmsConsumidorId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsCreditoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("descricaoICMS"));
+                    String id = Utils.stringToInt(rst.getString("cst")) + "-" + rst.getInt("aliquota") + "-" + rst.getInt("reducao");
+                    imp.setIcmsConsumidorId(id);
+                    imp.setIcmsDebitoId(id);
+                    imp.setIcmsCreditoId(id);
+                    imp.setIcmsCreditoForaEstadoId(id);
+                    imp.setIcmsDebitoForaEstadoId(id);
+                    imp.setIcmsDebitoForaEstadoNfId(id);
 
                     int codigoProduto = Utils.stringToInt(rst.getString("codigo"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
@@ -265,11 +268,17 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(0);
                     }
+                    imp.setTipoEmbalagemCotacao(imp.getTipoEmbalagem());
+                    if (imp.getTipoEmbalagem().equals("UN") && rst.getString("p.bala").toUpperCase().equals("S")) {
+                        imp.seteBalanca(true);
+                        contador++;
+                    }
 
                     vResult.add(imp);
                 }
             }
         }
+        System.out.println(contador);
         return vResult;
     }
 
@@ -612,21 +621,29 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	  i.sequencial codigo,\n"
-                    + "	  i.descricao,\n"
-                    + "	  c.codigo cst,\n"
-                    + "	  i.aliquota,\n"
-                    + "	  0 reducao\n"
-                    + " from\n"
-                    + "   tslc035 i\n"
-                    + "left join tslc036 c on i.SEQ036 = c.SEQ"
+                    //                                        "select\n"
+                    //                                        + "	  i.sequencial codigo,\n"
+                    //                                        + "	  i.descricao,\n"
+                    //                                        + "	  c.codigo cst,\n"
+                    //                                        + "	  i.aliquota,\n"
+                    //                                        + "	  0 reducao\n"
+                    //                                        + " from\n"
+                    //                                        + "   tslc035 i\n"
+                    //                                        + " join tslc036 c on i.SEQ036 = c.SEQ"
+                    "select distinct \n"
+                    + " 	coalesce(c.codigo2, 0) cst,\n"
+                    + "	coalesce(p.aliicms, 0) aliquota,\n"
+                    + "	p.reducao\n"
+                    + "from\n"
+                    + "	tsl.tslc003 p\n"
+                    + "LEFT JOIN tslc036 c on p.cst = c.SEQ"
             )) {
                 while (rs.next()) {
+                    String id = Utils.stringToInt(rs.getString("cst").equals("") ? "0" : rs.getString("cst")) + "-" + rs.getInt("aliquota") + "-" + rs.getInt("reducao");
                     result.add(new MapaTributoIMP(
-                            rs.getString("codigo"),
-                            rs.getString("descricao"),
-                            Utils.stringToInt(rs.getString("cst")),
+                            id,
+                            id,
+                            Utils.stringToInt(rs.getString("cst").equals("") ? "0" : rs.getString("cst")),
                             rs.getInt("aliquota"),
                             rs.getInt("reducao")));
                 }

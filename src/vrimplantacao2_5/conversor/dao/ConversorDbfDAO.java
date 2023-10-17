@@ -107,7 +107,7 @@ public class ConversorDbfDAO {
             for (String dado : dados) {
                 if (contador < dados.size()) {
                     dado = dados.get(contador++);
-                    campos += "\"" + dado.replaceAll(regexp, "").trim().replace(",", "").toString() + "\"" + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "") + " text,\n";
+                    campos += "\"" + dado.replaceAll(regexp, "").trim().replace(",", "").toLowerCase().toString() + "\"" + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "") + " text,\n";
                     //campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
                 }
             }

@@ -193,13 +193,33 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + "	distinct \n"
-                    + "	alikicm01 || '-' || coalesce(cdsitrib01, 0) id,\n"
-                    + "	alikicm01 descricao,\n"
-                    + "	cdsitrib01 cst\n"
+                    + "	CASE \n"
+                    + "    WHEN subtri01 <> '' THEN '60'\n"
+                    + "    WHEN pbcreduz01 <> '0.000' THEN '20' \n"
+                    + "    ELSE '0' \n"
+                    + "  END || '-' || \n"
+                    + "	alikicm01 || '-' || \n"
+                    + "  CASE \n"
+                    + "    WHEN pbcreduz01 <> '' THEN pbcreduz01 \n"
+                    + "    ELSE '0' \n"
+                    + "  END AS id,\n"
+                    + "	case \n"
+                    + "		when subtri01 <> '' then subtri01 \n"
+                    + "		else alikicm01 || '-' || pbcreduz01 end descricao,\n"
+                    + "		CASE \n"
+                    + "    WHEN subtri01 <> '' THEN '60'\n"
+                    + "    WHEN pbcreduz01 <> '0.000' THEN '20' \n"
+                    + "    ELSE '0' \n"
+                    + "  end cst,\n"
+                    + "  alikicm01 alq,\n"
+                    + "  CASE \n"
+                    + "    WHEN pbcreduz01 <> '' THEN pbcreduz01 \n"
+                    + "    ELSE '0' \n"
+                    + "  end reduzido\n"
                     + "from \n"
                     + "	cadpro")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao"), rs.getInt("cst"), rs.getDouble("alq"), rs.getDouble("reduzido")));
                 }
             }
         }
@@ -255,26 +275,36 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "(p.descpro01||''||p.desccomp01) descricaocompleta,\n"
                     + "	p.descpro01 descricaogondola,\n"
                     + "	p.descabr01 descricaoreduzida,\n"
-                    + "	p.datacad01 datacadastro,\n"
+                    + "	case \n"
+                    + "		when p.datacad01 = '' then null\n"
+                    + "		else TO_DATE(p.datacad01, 'YYYY-MM-DD')\n"
+                    + "	end datacadastro,\n"
                     + "	p.unidpro01 unidade,\n"
-                    + "	p.cusreal01 custocomimposto,\n"
-                    + "	p.custfis01 custosemimposto,\n"
-                    + "	p.prevend01 precovenda,\n"
+                    + "	CASE WHEN p.cusreal01 <> '' THEN p.cusreal01 ELSE '0' end custocomimposto,\n"
+                    + "	CASE WHEN p.custfis01 <> '' THEN p.custfis01 ELSE '0' end custosemimposto,\n"
+                    + "	CASE WHEN p.prevend01 <> '' THEN p.prevend01 ELSE '0' end precovenda,\n"
                     + "	p.precopdv01 precopdv,\n"
-                    + "	p.margtra01 margem,\n"
-                    + "	p.qtdeemb01 qtdembalagem,\n"
-                    + "	p.estatu01 estoque,\n"
-                    + "	p.estmin01 estoqueminimo,\n"
-                    + "	p.estmax01 estoquemaximo,\n"
-                    + " f.codforn02 fabricante,\n"
-                    + "	p.pesopro01 pesobruto,\n"
-                    + "	p.pesoliq01 pesoliquido,\n"
+                    + "	CASE WHEN p.margtra01 <> '' THEN p.margtra01 ELSE '0' end margem,\n"
+                    + " CASE WHEN p.qtdeemb01 <> '' THEN p.qtdeemb01 ELSE '0' end qtdembalagem, \n"
+                    + "	CASE WHEN p.estatu01<> '' THEN p.estatu01 ELSE '0' end estoque,\n"
+                    + "	CASE WHEN p.estmin01 <> '' THEN p.estmin01 ELSE '0' end estoqueminimo,\n"
+                    + "	CASE WHEN p.estmax01 <> '' THEN p.estmax01 ELSE '0' end estoquemaximo,\n"
+                    + " CASE WHEN f.codforn02 <> '' THEN f.codforn02 ELSE null end fabricante,\n"
+                    + "	CASE WHEN p.pesopro01 <> '' THEN p.pesopro01 ELSE '0' end pesobruto,\n"
+                    + "	CASE WHEN p.pesoliq01 <> '' THEN p.pesoliq01 ELSE '0' end pesoliquido,\n"
                     + "	p.alikicm01 icmsaliquota,\n"
-                    + "	p.cdsitrib01 cst,\n"
+                    + "	CASE \n"
+                    + "    WHEN subtri01 <> '' THEN '60'\n"
+                    + "    WHEN pbcreduz01 <> '0.000' THEN '20' \n"
+                    + "    ELSE '0' \n"
+                    + "  END cst,\n"
                     + "	p.classfis01,\n"
-                    + "	p.pbcreduz01 icmsreducao,\n"
+                    + "	CASE \n"
+                    + "    WHEN p.pbcreduz01 <> '' THEN p.pbcreduz01 \n"
+                    + "    ELSE '0' \n"
+                    + "  END icmsreducao,\n"
                     + "	p.icmcompr01 icmsaliquotacredito,\n"
-                    + "	p.alikicm01 || '-' || coalesce(p.cdsitrib01, 0) id_aliquotadebito, \n"
+                    + "	p.alikicm01 || '-' || CASE WHEN p.cdsitrib01 <> '' THEN cdsitrib01 ELSE '0' END id_aliquotadebito, \n"
                     + "	p.cdobsicm01 idicms,\n"
                     + "	p.aicmstef01 icmstef,\n"
                     + "case when upper(p.piscofin01) = 'M' then '04'\n"
@@ -298,7 +328,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		when medida = 'L' then 'LT'\n"
                     + " else 'UN'\n"
                     + "	end tipo_volume,\n"
-                    + "	m.quantidade volume, \n"
+                    + "	CASE WHEN m.quantidade <> '' THEN  m.quantidade ELSE '0' end volume, \n"
                     + " s.coddepto merc1, \n"
                     + " g.codgrupo merc2 \n"
                     + "from \n"
@@ -312,7 +342,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tabgru g on g.codgrupo = p.codgrupo01\n"
                     + "left join tabdep s on s.coddepto = g.coddepto\n"
                     + "where \n"
-                    + "	p.codfil01 = " + getLojaOrigem())) {
+                    + "	p.codfil01 = '" + getLojaOrigem() + "' order by p.codpro01")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -352,7 +382,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagemVolume(rs.getString("tipo_volume"));
                     imp.setVolume(rs.getDouble("volume"));
 
-                    imp.setIcmsConsumidorId(rs.getString("id_aliquotadebito"));
+                    String id = rs.getString("cst") + "-" +  rs.getString("icmsaliquota") + "-" + rs.getString("icmsreducao");
+                    System.out.println(id);
+                    imp.setIcmsConsumidorId(id);
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
@@ -440,6 +472,20 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*select 
+        o.codpro produtoid,
+        TO_DATE(o.dataini, 'YYYY-MM-DD'),
+        TO_DATE(o.datafim, 'YYYY-MM-DD'),
+        o.precofer oferta,
+        p.prevend01 precovenda,
+        o.codfil loja
+       from profer o
+       join cadpro p on p.codpro01 = o.codpro 
+       where
+        TO_DATE(o.datafim, 'YYYY-MM-DD') >= now()
+        and
+        o.codfil = '1' 
+     */
     @Override
     public List<OfertaIMP> getOfertas(Date datatermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
@@ -457,7 +503,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + " o.datafim >= now()\n"
                     + " and\n"
-                    + " o.codfil = " + getLojaOrigem() + " "
+                    + " o.codfil = '" + getLojaOrigem() + "' "
             )) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
@@ -499,8 +545,14 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	m.uf,\n"
                     + "	f.numender02 numero,\n"
                     + "	f.compleme02 complemento,\n"
-                    + "	f.datacad02 cadastro,\n"
-                    + "	f.datanasc02 nascimento\n"
+                    + "	case \n"
+                    + "		when f.datacad02 = '' then null\n"
+                    + "		else TO_DATE(f.datacad02, 'YYYY-MM-DD')\n"
+                    + "	end cadastro,\n"
+                    + "	case \n"
+                    + "		when f.datanasc02 = '' then null\n"
+                    + "		else TO_DATE(f.datanasc02, 'YYYY-MM-DD')\n"
+                    + "	end nascimento\n"
                     + "from \n"
                     + "	cadforn f \n"
                     + "left join tabmun m on f.codmunic02 = m.codigo")) {
@@ -545,7 +597,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ce.cdfabric codexterno\n"
                     + "from\n"
                     + "	profor pf\n"
-                    + "join cadpro p on pf.codpro13 = p.codpro01 and p.codfil01 = " + getLojaOrigem() + "\n"
+                    + "join cadpro p on pf.codpro13 = p.codpro01 and p.codfil01 = '" + getLojaOrigem() + "'\n"
                     + "join cadforn f on pf.codforn13 = f.codforn02\n"
                     + "join arqfab ce on ce.codpro = pf.codpro13 and ce.codforn = pf.codforn13\n"
                     + "order by codforn13, codpro13")) {
@@ -625,8 +677,14 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	m.uf,\n"
                     + "	c.fonecli10 telefone,\n"
                     + "	c.celcli10 celular,\n"
-                    + "	c.datacad10 cadastro,\n"
-                    + "	c.datanasc10 nascimento,\n"
+                    + "	case \n"
+                    + "		when c.datacad10 = '' then null\n"
+                    + "		else TO_DATE(c.datacad10, 'YYYY-MM-DD')\n"
+                    + "	end cadastro,\n"
+                    + "	case \n"
+                    + "		when c.datanasc10 = '' then null\n"
+                    + "		else TO_DATE(c.datanasc10, 'YYYY-MM-DD')\n"
+                    + "	end nascimento,\n"
                     + "	c.limcompr10 valorlimite,\n"
                     + "	c.situacao10 situacao,\n"
                     + "	c.emailcli10 email\n"
@@ -672,8 +730,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " c.lanent15::varchar||ordpag15::varchar id,\n"
                     + " f.codforn02 idfornecedor,\n"
                     + " c.codfil15 loja,\n"
-                    + " c.datemis15 dtemissao,\n"
-                    + " c.datvenc15 dtvencimento,\n"
+                    + " TO_DATE(c.datemis15, 'YYYY-MM-DD') dtemissao,\n"
+                    + " TO_DATE(c.datvenc15, 'YYYY-MM-DD') dtvencimento,\n"
                     + " c.numdoc15 numerodocumento,\n"
                     + " c.valpag15 valor,\n"
                     + " c.desconto15 desconto,\n"
@@ -682,9 +740,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from contpag c\n"
                     + "join cadforn f on f.codforn02 = c.codforn15\n"
                     + "where \n"
-                    + " c.datpag15 is null \n"
+                    + " c.datpag15 = ''\n"
                     + " and\n"
-                    + " c.codfil15 = " + getLojaOrigem() + ";"
+                    + " c.codfil15 = '" + getLojaOrigem() + "';"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -696,6 +754,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("numeroDocumento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("obs"));
+                    imp.addVencimento(rst.getDate("dtvencimento"), rst.getDouble("valor"));
 
                     result.add(imp);
                 }
@@ -717,8 +776,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cp.cgccpf10 cnpj,\n"
                     + "	cp.razsoc10 razao,\n"
                     + "	c.numdoc60 documento,\n"
-                    + "	c.datemis60 emissao,\n"
-                    + "	c.datvenc60 vencimento,\n"
+                    + "	TO_DATE(c.datemis60, 'YYYY-MM-DD') emissao,\n"
+                    + "	TO_DATE(c.datvenc60, 'YYYY-MM-DD') vencimento,\n"
                     + "	c.valor60 valor,\n"
                     + "	c.valrec60 valorecebido,\n"
                     + "	c.datrec60 recebimento,\n"
@@ -729,8 +788,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	conrec c\n"
                     + "inner join cadcli cp on c.codcli60 = cp.codcli10\n"
                     + "where \n"
-                    + "	c.codfil60 = " + getLojaOrigem() + " and\n"
-                    + "   c.datrec60 is null")) {
+                    + "	c.codfil60 = '" + getLojaOrigem() + "'  and\n"
+                    + "   c.datrec60 = '' or c.datrec60 is null ")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
