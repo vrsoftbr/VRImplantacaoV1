@@ -259,7 +259,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + " ean.UNID_FATOR_CONVERSAO qtdembalagem\n"
                     + " FROM ESTO_PRODUTOS p\n"
                     + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN AND ean.UNID_FATOR_CONVERSAO > 1\n"
-                    + "where  p.prod_codigo_unitario NOT LIKE '%E%'\n"
                     + "  ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -268,7 +267,8 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportSistema(getSistema());
 
                     imp.setImportId(rst.getString("id_produto"));
-                    imp.setEan(rst.getString("ean"));
+
+                    imp.setEan(rst.getString("ean").contains("E") ? rst.getString("ean").replace("E", "") : rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
 
@@ -350,18 +350,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "LEFT JOIN ESTO_PRODUTOS_QUANTIDADE est ON est.PROD_PK = p.PROD_PK AND est.EMPR_PK = " + getLojaOrigem() + "\n"
                     + "LEFT JOIN ESTO_PRODUTOS_VALORES v ON v.PROD_PK = p.PROD_PK \n"
                     + "LEFT JOIN ESTO_NCM n ON p.ENCM_PK = n.ENCM_PK\n"
-                    + "LEFT JOIN ESTO_CEST c ON p.CEST_PK = c.CEST_PK\n"
-                    + "WHERE\n"
-                    + " p.PROD_PK NOT IN (SELECT \n"
-                    + "  ean.PROD_PK\n"
-                    + " FROM ESTO_PRODUTOS p\n"
-                    + " JOIN ESTO_PRODUTOS ean ON ean.PROD_CODIGO_UNITARIO = p.PROD_CODIGO_EAN \n"
-                    + " 	AND ean.UNID_FATOR_CONVERSAO > 1\n"
-                    + " where p.prod_codigo_unitario NOT LIKE '%E%'\n"
-                    + "  ORDER BY 1)\n"
-                    + "  AND p.EMPR_PK = " + getLojaOrigem() + "\n"
-                    + " AND p.prod_codigo_unitario NOT LIKE '%E%'\n"
-                    + "ORDER BY 1"
+                    + "LEFT JOIN ESTO_CEST c ON p.CEST_PK = c.CEST_PK"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -388,7 +377,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                         imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
-                        imp.setEan(rst.getString("ean"));
+                        imp.setEan(rst.getString("ean").contains("E") ? rst.getString("ean").replace("E", "") : rst.getString("ean"));
                         imp.seteBalanca(rst.getBoolean("e_balanca"));
                         imp.setTipoEmbalagem(rst.getString("tipo_emb"));
                         imp.setQtdEmbalagem(rst.getInt("qtde_emb"));
@@ -573,28 +562,29 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	c.CONT_pk id,\n"
-                    + "	cont_nome_razao razao,\n"
-                    + "	cont_cpf_cnpj cpf_cnpj,\n"
-                    + "	CASE WHEN cont_rg = '' THEN cont_ie END rg_ie,\n"
-                    + "	ende_nome_logradouro endereco,\n"
-                    + "	ende_complemento complemento,\n"
-                    + "	ende_numero numero,\n"
-                    + "	ende_bairro bairro,\n"
-                    + "	ende_municipio cidade,\n"
-                    + "	ende_uf uf,\n"
-                    + "	ende_cep cep,\n"
-                    + "	cont_dt_cadastro data_cad,\n"
-                    + "	cont_status_registro ativo,\n"
-                    + "	REPLACE(t.tele_numero_ddd,'0','')||t.tele_numero_telefone telefone,\n"
-                    + "	cont_observacao obs\n"
+                    "  SELECT\n"
+                    + "c.CONT_pk id,\n"
+                    + "cont_nome_razao razao,\n"
+                    + "cont_cpf_cnpj cpf_cnpj,\n"
+                    + "CASE WHEN cont_rg = '' THEN cont_ie END rg_ie,\n"
+                    + "ende_nome_logradouro endereco,\n"
+                    + "ende_complemento complemento,\n"
+                    + "ende_numero numero,\n"
+                    + "ende_bairro bairro,\n"
+                    + "ende_municipio cidade,\n"
+                    + "ende_uf uf,\n"
+                    + "ende_cep cep,\n"
+                    + "cont_dt_cadastro data_cad,\n"
+                    + "cont_status_registro ativo,\n"
+                    + "REPLACE(t.tele_numero_ddd,'0','')||t.tele_numero_telefone telefone,\n"
+                    + "cont_observacao obs\n"
                     + "FROM\n"
-                    + "	CDTR_CONTATOS c\n"
-                    + "	LEFT JOIN CDTR_ENDERECOS e ON c.cont_pk = e.cont_pk\n"
-                    + "	LEFT JOIN CDTR_TELEFONES t ON c.cont_pk = t.cont_pk\n"
+                    + "CDTR_CONTATOS c\n"
+                    + "LEFT JOIN CDTR_ENDERECOS e ON c.cont_pk = e.cont_pk\n"
+                    + "LEFT JOIN CDTR_TELEFONES t ON c.cont_pk = t.cont_pk\n"
                     + "WHERE\n"
-                    + "	cont_tipo_contato LIKE '%Cli%'"
+                    + "cont_tipo_contato LIKE '%Cli%'"
+
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -602,7 +592,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("razao"));
-                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setCnpj(rst.getString("cpf_cnpj").contains("E") ? rst.getString("cpf_cnpj").replace("E", "") : rst.getString("cpf_cnpj"));
                     imp.setInscricaoestadual(rst.getString("rg_ie"));
 
                     imp.setEndereco(rst.getString("endereco"));
@@ -614,7 +604,6 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCep(rst.getString("cep"));
 
                     imp.setDataCadastro(rst.getDate("data_cad"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setObservacao(rst.getString("obs"));
 
