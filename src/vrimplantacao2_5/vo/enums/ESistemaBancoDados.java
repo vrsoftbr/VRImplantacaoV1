@@ -117,7 +117,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_MBD(248, "MBD", 5, "FIREBIRD", "C:\\MBD\\DB\\ARCOIRIS.FDB", "sysdba", "sysdbambd", 3050, ""),
     FIREBIRD_FENIXME(249, "FENIXME", 5, "FIREBIRD", "", "SYSDBA", "23248290FENIX", 3050, ""),
     FIREBIRD_WISE(251, "WISE", 5, "FIREBIRD", "C:\\\\Dados\\\\Rede\\\\SUPERMERCADO.FDB", "sysdba", "masterkey", 3050, ""),
-    FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "postgres", "postgres", "VrPost@Server", 8745, ""),
+    FIREBIRD_GENERICO(252, "GENERICO", 5, "FIREBIRD", "", "admin", "sysdma", 3050, ""),
     FIREBIRD_CENTER_INFORMATICA(256, "CENTER_INFORMATICA", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050, ""),
     FIREBIRD_VIVASISTEMAS(258, "VIVASISTEMAS", 5, "FIREBIRD", "C:\\VIVA SOFTWARE\\appdata\\WMDADOS.EMM", "sysdba", "masterkey", 3050, ""),
     FIREBIRD_RESULTHBUSINESS(259, "RESULTHBUSINESS", 5, "FIREBIRD", "", "sysdba", "masterkey", 3050, ""),
@@ -125,6 +125,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_LJSISTEMAS_SIG(260, "LJSISTEMAS_SIG", 5, "FIREBIRD", "", "sysdba", "masterkey", 3050, ""),
 //INFORMIX
     INFORMIX_LOGUS(100, "LOGUS", 7, "INFORMIX", "bd_nomecliente_m", "informix", "loooge", 9088, "Senha no arquivo password.txt no dir C:\\logus"),
+    INFORMIX_GENERICO(252, "GENERICO", 7, "INFORMIX", "bd_nomecliente_m", "informix", "loooge", 9088, ""),
 //MYSQL
     MYSQL_AVANCE(15, "AVANCE", 8, "MYSQL", "", "root", "infor", 3006, ""),
     MYSQL_CLICK(29, "CLICK", 8, "MYSQL", "", "", "", 3006, ""),
@@ -161,6 +162,7 @@ public enum ESistemaBancoDados {
     MYSQL_ARIUSWEB(241, "ARIUSWEB", 8, "MYSQL", "retag", "consulta", "123456", 3306, ""),
     MYSQL_PALLAS(244, "PALLAS", 8, "MYSQL", "", "", "", 3306, ""),
     MYSQL_ALCANCE(245, "ALCANCE", 8, "MYSQL", "pprt", "root", "alcan2143", 3306, ""),
+    MYSQL_GENERICO(252, "GENERICO", 8, "MYSQL", "", "root", "root", 3306, ""),
     MYSQL_SISMASTER(253, "SISMASTER", 8, "MYSQL", "sismaster", "suporte", "sismaster123", 3306, ""),
     MYSQL_STI3(255, "STI3", 8, "MYSQL", "sti3database", "root", "", 3306, ""),
 //ORACLE
@@ -181,6 +183,7 @@ public enum ESistemaBancoDados {
     ORACLE_ARIUS(197, "ARIUS", 9, "ORACLE", "", "PROREG", "automa", 1521, ""),
     ORACLE_CONSINCO(209, "CONSINCO", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_WINTHOR(236, "WINTHOR", 9, "ORACLE", "", "", "", 1521, ""),
+    ORACLE_GENERICO(252, "GENERICO", 9, "ORACLE", "", "", "", 1521, ""),
 //POSTGRESQL
     POSTGRESQL_ATHOS(9, "ATHOS", 11, "POSTGRESQL", "", "athos", "j2mhw82dyu1kn5g4", 5432, ""),
     POSTGRESQL_AUTOSYSTEM(12, "AUTOSYSTEM", 11, "POSTGRESQL", "", "", "", 5432, ""),
@@ -273,6 +276,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433, ""),
     SQLSERVER_BRDATA(240, "BRDATA", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433, ""),
+    SQLSERVER_GENERICO(252, "GENERICO", 13, "SQLSERVER", "", "sa", "", 1433, ""),
     SQLSERVER_ARGO(257, "ARGO", 13, "SQLSERVER", "argo", "sa", "1BC27CA04E2C2C1204", 1433, ""),
     SQLSERVER_SAURUSPDV(261, "SAURUSPDV", 13, "SQLSERVER", "", "sa", "", 1433, "");
 

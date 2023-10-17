@@ -505,9 +505,11 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                         DBFRow linha;
                         String insert = "";
                         while ((linha = reader.nextRow()) != null) {
+                            Date dataDaLinha = linha.getObject(5) == null ? DATE_FORMAT.parse("2020-01-01") : (Date) linha.getObject(5);                            
+                            if (DATE_FORMAT.format(dataDaLinha).compareTo("2021-01-01") > 0) {
                             insert = "insert into " + tabela + " values (";
                             for (int i = 0; i < dadosCabecalho.size(); i++) {
-                                String cabecalhoBase = dadosCabecalho.get(i).replaceAll(regexp, "").trim().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
+                                String cabecalhoBase = dadosCabecalho.get(i).replaceAll(regexp, "").trim().toLowerCase().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
                                 //sql.put(cabecalhoBase, linha.getString(cabecalhoBase));
                                 insert += "'";
                                 insert += linha.getObject(cabecalhoBase) instanceof Date ? DATE_FORMAT.format(linha.getObject(cabecalhoBase)) : null == linha.getObject(cabecalhoBase) ? "" : Utils.acertarTexto(linha.getString(cabecalhoBase)).toString();
@@ -516,6 +518,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
                             insert = insert.substring(0, insert.length() - 2) + ");";
                             inserts.add(insert);
                             insert = "";
+                        }
                             ProgressBar.next();
                         }
                         System.gc();

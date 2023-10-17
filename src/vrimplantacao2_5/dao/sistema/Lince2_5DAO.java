@@ -95,6 +95,7 @@ public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA,
                 OpcaoProduto.PDV_VENDA
         ));
     }
@@ -110,6 +111,7 @@ public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.OUTRAS_RECEITAS,
                 OpcaoFornecedor.TELEFONE
         ));
     }
@@ -232,7 +234,7 @@ public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.QTDE_ESTOQUE_MAXIMO estoque_maximo,\n"
                     + "	p.QTDE_ESTOQUE_LOJA estoque,\n"
                     + "	p.perc_margem margem,\n"
-                    + "	p.vlr_custo_receita custo,\n"
+                    + "	p.VLR_ULTIMO_CUSTO custo,\n"
                     + "	p.VLR_PRECO preco,\n"
                     + "	case when p.CHK_ATIVO = 'T' then 1 else 0 end ativo,\n"
                     + "	p.COD_NCM ncm,\n"
@@ -633,20 +635,54 @@ public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
+        int contador = 0;
         List<ContaPagarIMP> result = new ArrayList<>();
-
+        String sql = "";
         JXDatePicker dataInserida = new org.jdesktop.swingx.JXDatePicker();
-        //JOptionPane.showOptionDialog(null, dataInserida, "Escolha a data inicial", 0, 0, null, null, dataInserida);
-        int resposta = JOptionPane.showConfirmDialog(null, dataInserida, "Selecione o tipo de conta", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if (resposta != JOptionPane.YES_OPTION){
-            dataInserida = null;
-        }
-        System.out.println(dataInserida.getDate() == null ? "" : new SimpleDateFormat("yyyy-MM-dd").format(dataInserida.getDate()));
+        int resposta = JOptionPane.showConfirmDialog(null, dataInserida, "Deseja adicionar uma data inicial?", JOptionPane.OK_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-        
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+        if (resposta == -1) {
+            throw new Exception("Migração de contas abortada");
+        }
+
+        if (resposta != JOptionPane.YES_OPTION) {
+            dataInserida = null;
+            sql = "SELECT  \n"
+                    + "	l.UNICOD id,\n"
+                    + "    case\n"
+                    + "		when l.COD_FORN is null\n"
+                    + "		then 2\n"
+                    + "		else l.COD_FORN\n"
+                    + "	end COD_FORN,\n"
+                    + "    l.DESCRICAO,\n"
+                    + "    l.data AS entrada,\n"
+                    + "    l.data AS emissao,\n"
+                    + "    l.VENCIMENTO,\n"
+                    + "    case\n"
+                    + "		when l.DOCUMENTO is null\n"
+                    + "		then CAST(l.UNICOD AS varchar)\n"
+                    + "		else l.DOCUMENTO\n"
+                    + "	end DOCUMENTO,\n"
+                    + "    l.ORIGEM,\n"
+                    + "    SUM(l.VLR_VALOR) AS valor,\n"
+                    + "    l.UNICOD \n"
+                    + "FROM\n"
+                    + "    FIN_LANCAMENTO l\n"
+                    + "LEFT JOIN\n"
+                    + "    fin_tipo_doc doc ON l.COD_TIPO_DOC = doc.COD_TIPO_DOC AND l.cod_loja = doc.cod_loja\n"
+                    + "WHERE\n"
+                    + "    l.cod_loja = " + getLojaOrigem() + " and\n"
+                    + "	l.pagamento is null and l.COD_FORN is not null \n"
+                    + "GROUP BY\n"
+                    + "	l.UNICOD,\n"
+                    + "    l.COD_FORN,\n"
+                    + "    l.DESCRICAO,\n"
+                    + "    l.data,\n"
+                    + "    l.VENCIMENTO,\n"
+                    + "    l.ORIGEM,\n"
+                    + "    l.DOCUMENTO";
+        } else {
+            sql = "select\n"
                     + "	l.lancamento,\n"
                     + "	l.cod_forn,\n"
                     + "	coalesce(l.documento, l.origem) documento,\n"
@@ -663,27 +699,33 @@ public class Lince2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		l.cod_loja = doc.cod_loja\n"
                     + "where\n"
                     + "	l.cod_loja = " + getLojaOrigem() + " and\n"
-                    + (dataInserida.getDate() == null ? "" : " l.vencimento >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataInserida.getDate()) + "' and\n")
+                    + (dataInserida.getDate() == null ? "" : " l.vencimento >= CAST('" + new SimpleDateFormat("yyyy-MM-dd").format(dataInserida.getDate()) + "'AS DATE) and\n")
                     + "	l.pagamento is null\n"
                     + "order by\n"
-                    + "	l.data"
+                    + "	l.data";
+        }
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
-                    imp.setId(rst.getString("lancamento"));
+                    imp.setId(rst.getString("id") + contador++);
                     imp.setIdFornecedor(rst.getString("cod_forn"));
-                    imp.setDataEntrada(rst.getDate("data"));
-                    imp.setDataEmissao(rst.getDate("data"));
-                    imp.setDataHoraAlteracao(rst.getTimestamp("data"));
-                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("emissao"));
+                    imp.setNumeroDocumento(rst.getString("DOCUMENTO") + contador++);
                     imp.setValor(rst.getDouble("valor"));
+                    imp.setVencimento(rst.getDate("VENCIMENTO"));
                     imp.setObservacao(
-                            "DESCRICAO: " + rst.getString("descricao")
-                            + "   OBSERVACAO: " + rst.getString("observacao")
+                            "DESCRICAO: " + rst.getString("DESCRICAO")
+                            + "   OBSERVACAO: " + rst.getString("ORIGEM")
                     //                            + "   TIPO DOC.: " + rst.getString("tipo_doc")
                     );
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    imp.addVencimento(rst.getDate("VENCIMENTO"), rst.getDouble("valor"));
 
                     result.add(imp);
                 }

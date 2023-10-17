@@ -330,6 +330,7 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.LITPRCVEN1 precovenda,\n"
                     + "	p.GERTECLA teclassociada,\n"
                     + "	p.GERSAILIN saidadelinha,\n"
+                    + " est.LITCUSMED customedio, \n"
 //                  + "	left (p.GERNBM,8) ncm,\n"
 //                  + "	left(p.GERCEST,8) cest,\n"
                     + "	p.GERNBM ncm,\n"
@@ -369,6 +370,8 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
                     imp.setCustoSemImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoComImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoMedioComImposto(rst.getDouble("customedio"));
+                    imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
