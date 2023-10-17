@@ -26,6 +26,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -563,6 +564,44 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm =  ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "row_number ()over() as id,\n"
+                    + "ch.codagen28 as agencia,\n"
+                    + "ch.numcont28 as conta,\n"
+                    + "ch.numcheq28  as numerocheque,\n"
+                    + "ch.valor28 as valor,\n"
+                    + "c.nomefan10 as nome,\n"
+                    + "ch.codban28 as banco,\n"
+                    + "c.fonecli10  as telefone,\n"
+                    + "ch.datemis28 as emissao,\n"
+                    + "ch.datemis28 as deposito\n"
+                    + "from chedev ch\n"
+                    + "join cadcli c on c.cgccpf10 = cgccpf10 "
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setBanco(Integer.parseInt(Utils.formataNumero(rst.getString("banco"))));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDate(rst.getDate("emissao"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
     }
 
     @Override
