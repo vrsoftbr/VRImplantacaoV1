@@ -61,6 +61,7 @@ public class ClientePreferencialDAO {
             sql.put("observacao2", cliente.getObservacao2());
             sql.put("permiteCreditoRotativo", cliente.isPermiteCreditoRotativo());
             sql.put("permiteCheque", cliente.isPermiteCheque());
+            sql.put("permiteChequeVista", cliente.isPermiteChequeAVista());
             sql.put("nomeMae", cliente.getNomeMae());
             sql.put("nomePai", cliente.getNomePai());
             sql.put("dataRestricao", cliente.getDataRestricao());
@@ -280,6 +281,7 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
                     sql.put("permitecreditorotativo", vo.isPermiteCreditoRotativo());
                     sql.put("permitecheque", vo.isPermiteCheque());
+                    sql.put("permitechequevista", vo.isPermiteChequeAVista());
                     sql.put("bloqueado", vo.isBloqueado());
                     sql.put("id_situacaocadastro", vo.getSituacaocadastro().getId());
                 }

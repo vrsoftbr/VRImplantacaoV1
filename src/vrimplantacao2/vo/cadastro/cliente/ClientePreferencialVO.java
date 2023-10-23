@@ -64,6 +64,7 @@ public class ClientePreferencialVO {
     private String observacao2 = "";// character varying(2500) NOT NULL,
     private boolean permiteCreditoRotativo = true;// boolean NOT NULL,
     private boolean permiteCheque = true;// boolean NOT NULL,
+    private boolean permiteChequeAVista = true;
     private String nomeMae;// character varying(40) NOT NULL,
     private String nomePai;// character varying(40) NOT NULL,
     private Date dataRestricao;// date,
@@ -222,6 +223,8 @@ public class ClientePreferencialVO {
     public String getNomeMae() {
         return nomeMae;
     }
+    
+    
 
     public String getNomePai() {
         return nomePai;
@@ -458,5 +461,19 @@ public class ClientePreferencialVO {
 
     public void setCpfConjuge(String cpfConjuge) {
         this.cpfConjuge = Utils.stringToInt(cpfConjuge);
+    }
+
+    /**
+     * @return the permiteChequeAVista
+     */
+    public boolean isPermiteChequeAVista() {
+        return permiteChequeAVista;
+    }
+
+    /**
+     * @param permiteChequeAVista the permiteChequeAVista to set
+     */
+    public void setPermiteChequeAVista(boolean permiteChequeAVista) {
+        this.permiteChequeAVista = permiteChequeAVista;
     }
 }

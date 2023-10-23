@@ -723,6 +723,7 @@ public class ClienteRepository {
         vo.setVencimentoCreditoRotativo(imp.getDiaVencimento());
         vo.setPermiteCreditoRotativo(imp.isPermiteCreditoRotativo());
         vo.setPermiteCheque(imp.isPermiteCheque());
+        vo.setPermiteChequeAVista(imp.isPermiteChequeAVista());
         vo.setTelefone(imp.getTelefone());
         vo.setCelular(imp.getCelular());
         vo.setEmail(imp.getEmail());

@@ -80,6 +80,7 @@ public class ClienteIMP {
     private int diaVencimento;
     private boolean permiteCreditoRotativo;
     private boolean permiteCheque;
+    private boolean permiteChequeAVista =  false;
     private int senha;
     private double ponto;
 
@@ -162,6 +163,7 @@ public class ClienteIMP {
     public String getRazao() {
         return razao;
     }
+    
 
     public void setRazao(String razao) {
         this.razao = razao;
@@ -777,6 +779,20 @@ public class ClienteIMP {
 
     public void setPonto(double ponto) {
         this.ponto = ponto;
+    }
+
+    /**
+     * @return the permiteChequeAVista
+     */
+    public boolean isPermiteChequeAVista() {
+        return permiteChequeAVista;
+    }
+
+    /**
+     * @param permiteChequeAVista the permiteChequeAVista to set
+     */
+    public void setPermiteChequeAVista(boolean permiteChequeAVista) {
+        this.permiteChequeAVista = permiteChequeAVista;
     }
     
 }

@@ -239,7 +239,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("cst"));
+                    imp.setPiscofinsCstDebito(rst.getInt("icms_alqt_s"));
                     imp.setPiscofinsCstCredito(rst.getInt("cst"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("naturezareceita"));
 
@@ -426,7 +426,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + " rg,\n"
                     + "	nome razao,\n"
                     + "	nome fantasia,\n"
-                    + "	status_cadastro ativo,\n"
+                    + "	status_cliente ativo,\n"
                     + "	endereco,\n"
                     + "	numero,\n"
                     + "	complemento,\n"
@@ -436,6 +436,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	cUf ufIBGE,\n"
                     + "	uf estado,\n"
                     + "	cep,\n"
+                    + "	tipo,\n"
                     + "	dt_nasc dataNascimento,\n"
                     + "	dtabertura dataCadastro,\n"
                     + "	coalesce(empresa,'') empresa,\n"
@@ -455,12 +456,13 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	cidadecob cobrancaMunicipio,\n"
                     + "	ufcob cobrancaUf,\n"
                     + "	cepcob cobrancaCep\n"
-                    + "from cliente c"
+                    + "from cliente c  "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setRazao(Utils.acertarTexto(rst.getString("razao")));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setFantasia(Utils.acertarTexto(rst.getString("fantasia")));
                     imp.setEndereco(Utils.acertarTexto(rst.getString("endereco")));
                     imp.setBairro(Utils.acertarTexto(rst.getString("bairro")));
@@ -469,6 +471,25 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep"));
                     imp.setCnpj(rst.getString("cpf"));
 
+                    if (rst.getString("tipo")== null) {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    } 
+                     else if (rst.getString("tipo").equals("TT")) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                     }else if (rst.getString("tipo").equals("CH")) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteChequeAVista(true);
+                        imp.setPermiteCreditoRotativo(false);
+                    } else if (rst.getString("tipo").equals("CR")) {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(true);
+                    } else if (rst.getString("tipo") == null) {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    } 
+                    
                     imp.setTelefone(Utils.formataNumero(rst.getString("telefone")));
                     imp.setCelular(Utils.formataNumero(rst.getString("celular")));
                     if ((rst.getString("email") != null)
