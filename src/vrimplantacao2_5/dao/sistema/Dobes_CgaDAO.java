@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +39,12 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
@@ -242,6 +245,39 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ret051.\"PRODCod\",\n"
+                    + "	ret051.\"PRODVendaPR\",\n"
+                    + "	ret051.\"PRODVenda\",\n"
+                    + "	ret051.\"PRODPromoIN\",\n"
+                    + "	ret051.\"PRODPromoFM\"\n"
+                    + "FROM\n"
+                    + "	ret051\n"
+                    + "WHERE\n"
+                    + "	ret051.\"PRODPromoFM\" >= current_date")) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rs.getString("PRODCod"));
+                    imp.setDataInicio(rs.getDate("PRODPromoIN"));
+                    imp.setDataFim(rs.getDate("PRODPromoFM"));
+                    imp.setPrecoNormal(rs.getDouble("PRODVenda"));
+                    imp.setPrecoOferta(rs.getDouble("PRODVendaPR"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
