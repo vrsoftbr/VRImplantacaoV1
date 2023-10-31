@@ -111,6 +111,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Par&#xe2;metro Loja"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnParametroActionPerformed"/>
+      </Events>
     </Component>
     <Component class="vrframework.bean.button.VRButton" name="btnSalvar">
       <Properties>

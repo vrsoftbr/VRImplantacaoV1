@@ -54,8 +54,7 @@ public class MapaLojaService {
         if (configuracaoBancoVO.getConfiguracaoBancoLoja().getId() == 0) {
 
             configuracaoBancoVO.getConfiguracaoBancoLoja().setDataCadastro(Utils.getDataAtual());
-            configuracaoBancoVO.
-                getConfiguracaoBancoLoja().
+            configuracaoBancoVO.getConfiguracaoBancoLoja().
                     setSituacaoMigracao(ESituacaoMigracao.CONFIGURANDO);
 
             configuracaoDAO.inserirLoja(configuracaoBancoVO);
@@ -124,7 +123,7 @@ public class MapaLojaService {
     }
 
     public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
-      
+
         verificaSituacaoLoja(configuracaoBancoLojaVO);
 
         configuracaoDAO.excluirLojaMapeada(configuracaoBancoLojaVO);
@@ -135,13 +134,13 @@ public class MapaLojaService {
      * para não excluir a loja com a importação em andamento
      * @param configuracaoBancoLojaVO
      * @throws vrframework.classe.VRException
-    */
+     */
     public void verificaSituacaoLoja(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws VRException {
         if (configuracaoBancoLojaVO.getSituacaoMigracao() != ESituacaoMigracao.CONFIGURANDO) {
             throw new VRException("Processo de migração iniciado, não é possível excluir a loja mapeada!");
         }
     }
-    
+
     public void alterarSituacaoMigracao(String idLojaOrigem, int idLojaVR, int situacaoMigracao) throws Exception {
         configuracaoDAO.alterarSituacaoMigracao(idLojaOrigem, idLojaVR, situacaoMigracao);
     }

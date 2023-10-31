@@ -280,6 +280,7 @@ import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LBSoftwareV2GUI;
 import vrimplantacao2.gui.interfaces.LCSistemaGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MRC6GUI;
@@ -1239,7 +1240,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImpSistema.setText("Importação");
 
         mnuDatabase.setText("Sistemas");
-        mnuDatabase.setEnabled(false);
 
         mnuAccess.setText("Access");
 
@@ -5376,7 +5376,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAtmaFirebirdActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        LBSoftwareGUI.exibir(this);
+       // LBSoftwareGUI.exibir(this);
+       LBSoftwareV2GUI.exibir(this);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItemCupermaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCupermaxActionPerformed

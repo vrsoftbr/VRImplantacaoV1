@@ -15,6 +15,7 @@ public enum ESistemaBancoDados {
     ACCESS_BASE(17, "BASE", 1, "ACCESS", "", "", "", 0, ""),
     ACCESS_ORYON(116, "ORYON", 1, "ACCESS", "", "", "paralelo", 0, ""),
     ACCESS_W2A(187, "W2A", 1, "ACCESS", "", "", "banco820318", 0, ""),
+    ACCESS_LBSOFTWARE(93, "LBSOFTWARE",1,"ACCESS","","","",0,""),
 //DB2/DBF    
     DB2_CISS(28, "CISS", 6, "DB2", "", "", "", 0, ""),
     DBF_DJSYSTEM(35, "DJSYSTEM", 4, "DBF", "", "", "", 0, ""),

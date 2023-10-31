@@ -348,7 +348,7 @@ public class ProdutoRepository {
 
             int idConexao = produtoService.existeConexaoMigrada(this.provider.getIdConexao(), getSistema()),
                     registros = produtoService.verificaRegistro();
-
+ 
             String impSistema = produtoService.getImpSistemaInicial().trim();
 
             if (!produtoService.isLojaMatrizMigracao(this.provider.getIdConexao(), getLoja())

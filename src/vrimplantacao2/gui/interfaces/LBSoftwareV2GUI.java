@@ -1,10 +1,14 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import org.joda.time.LocalDate;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -25,18 +29,25 @@ import vrimplantacao2.dao.interfaces.LBSoftwareV2DAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.controller.cadastro.configuracao.ConfiguracaoBaseDadosController;
+import vrimplantacao2_5.controller.cadastro.configuracao.ConsultaConfiguracaoBaseDadosController;
+import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
-import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
+import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+import vrimplantacao2_5.vo.cadastro.SistemaVO;
+import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 
 public class LBSoftwareV2GUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "LB Software";
     private static final String SERVIDOR_SQL = "Access";
     private static LBSoftwareV2GUI instance;
-    private MapaLojaGUI mapa;
-    
+
+
     private ConfiguracaoBaseDadosGUI base;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -48,7 +59,7 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtEmpresa.getArquivo(), SISTEMA, "DATABASE");
@@ -66,25 +77,25 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private LBSoftwareV2DAO dao = new LBSoftwareV2DAO();
     private ConexaoAccessTeste connAccess = new ConexaoAccessTeste();
-    
+
     private LBSoftwareV2GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
-        initComponents();   
-        
+        initComponents();
+
         tabProdutos.setOpcoesDisponiveis(dao);
-        
+
         this.title = "Importação " + SISTEMA;
-                
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
-        
+
         centralizarForm();
         this.setMaximum(false);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
@@ -107,59 +118,59 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
     }
 
     public void validarDadosAcesso() throws Exception {
         if (txtEmpresa.getArquivo().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
-        }        
+        }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            if(!txtEmpresa.getArquivo().isEmpty()) {
-                dao.setEmpresa(ConexaoAccessTeste.newConnection(txtEmpresa.getArquivo(), 
-                        txtUsuario.getText(), 
+            if (!txtEmpresa.getArquivo().isEmpty()) {
+                dao.setEmpresa(ConexaoAccessTeste.newConnection(txtEmpresa.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
-            
-            if(!txtMercadologico.getArquivo().isEmpty()) {
-                dao.setMercadologico(ConexaoAccessTeste.newConnection(txtMercadologico.getArquivo(), 
-                        txtUsuario.getText(), 
+
+            if (!txtMercadologico.getArquivo().isEmpty()) {
+                dao.setMercadologico(ConexaoAccessTeste.newConnection(txtMercadologico.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
-            
-            if(!txtProduto.getArquivo().isEmpty()) {
-                dao.setProduto(ConexaoAccessTeste.newConnection(txtProduto.getArquivo(), 
-                        txtUsuario.getText(), 
+
+            if (!txtProduto.getArquivo().isEmpty()) {
+                dao.setProduto(ConexaoAccessTeste.newConnection(txtProduto.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
-            
-            if(!txtForn.getArquivo().isEmpty()) {
-                dao.setFornecedor(ConexaoAccessTeste.newConnection(txtForn.getArquivo(), 
-                        txtUsuario.getText(), 
+
+            if (!txtForn.getArquivo().isEmpty()) {
+                dao.setFornecedor(ConexaoAccessTeste.newConnection(txtForn.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
-            
-            if(!txtCliente.getArquivo().isEmpty()) {
-                dao.setCliente(ConexaoAccessTeste.newConnection(txtCliente.getArquivo(), 
-                        txtUsuario.getText(), 
+
+            if (!txtCliente.getArquivo().isEmpty()) {
+                dao.setCliente(ConexaoAccessTeste.newConnection(txtCliente.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
-            
-            if(!txtRotativo.getArquivo().isEmpty()) {
-                dao.setRotativo(ConexaoAccessTeste.newConnection(txtRotativo.getArquivo(), 
-                        txtUsuario.getText(), 
+
+            if (!txtRotativo.getArquivo().isEmpty()) {
+                dao.setRotativo(ConexaoAccessTeste.newConnection(txtRotativo.getArquivo(),
+                        txtUsuario.getText(),
                         txtSenha.getText()));
             }
         }
-        
+
         gravarParametros();
-        
+
         carregarLojaVR();
         carregarLojaCliente();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -173,12 +184,12 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojaCliente()) {
+        for (Estabelecimento loja : dao.getLojaCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -187,10 +198,10 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new LBSoftwareV2GUI(i_mdiFrame);
             }
@@ -207,23 +218,26 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
-                    
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);     
-                    
+                    importador.setLojaVR(idLojaVR);
+                    importador.setIdConexao(idLojaVR);
+
                     tabProdutos.setImportador(importador);
 
                     if (tabs.getSelectedIndex() == 1) {
-                    
+
                         tabProdutos.executarImportacao();
 
                         if (chkFornecedor.isSelected()) {
@@ -233,32 +247,32 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         if (chkContaPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
                         }
-                        
+
                         if (chkFCondicaoPagamento.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
                         }
-                        
+
                         if (chkFPrazoFornecedor.isSelected()) {
                             opcoes.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
                         }
-                        
+
                         if (chkRazaoSocial.isSelected()) {
                             opcoes.add(OpcaoFornecedor.RAZAO_SOCIAL);
                         }
-                        
+
                         if (chkNomeFantasia.isSelected()) {
                             opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
                         }
-                        
+
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
@@ -266,12 +280,12 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
-                        
+
                         List<OpcaoCliente> opt = new ArrayList<>();
                         if (chkNomeCliente.isSelected()) {
                             opt.add(OpcaoCliente.RAZAO);
                         }
-                        
+
                         if (!opt.isEmpty()) {
                             importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                         }
@@ -279,15 +293,15 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        
+
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        
+
                     } else if (tabs.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -297,19 +311,19 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         connAccess.fecharConexao();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -321,6 +335,98 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         };
 
         thread.start();
+    }
+
+    public void gravarDados() throws Exception {
+
+        ConfiguracaoBaseDadosController contr = new ConfiguracaoBaseDadosController();
+        ConfiguracaoBaseDadosVO conf = new ConfiguracaoBaseDadosVO();
+        BancoDadosVO bancoDadosVO = new BancoDadosVO();
+        bancoDadosVO.setId(1);
+
+        SistemaVO sistemaVO = new SistemaVO();
+        sistemaVO.setId(93);
+
+        conf.setDescricao(SISTEMA);
+        conf.setBancoDados(bancoDadosVO);
+        conf.setSistema(sistemaVO);
+        conf.setHost("localhost");
+        conf.setPorta(800);
+        conf.setSchema(SISTEMA);
+        conf.setUsuario(txtUsuario.getText());
+        conf.setSenha(txtSenha.getText());
+
+        contr.salvar(conf);
+        
+        MapaLojaController mapa = new MapaLojaController();
+        
+        ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = new ConfiguracaoBancoLojaVO();
+        
+        configuracaoBancoLojaVO.setIdLojaOrigem(vLojaCliente);
+                
+        //não pode ser hardcode
+        configuracaoBancoLojaVO.setIdLojaVR(1);
+        configuracaoBancoLojaVO.setLojaMatriz(true ? vLojaCliente.contains("1") : false);
+        configuracaoBancoLojaVO.setDescricaoLojaOrigem(cmbLojaOrigem.getSelectedItem().toString());
+        conf.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);        
+
+        mapa.salvarAccess(conf);
+
+        if (configuracaoBancoLojaVO.getId() != 0) {
+            try {
+                mapa.consultaLojaMapeada(conf.getId());
+
+                Util.exibirMensagem("Loja Mapeada com sucesso!", getTitle());
+                this.setVisible(false);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Exceptions.printStackTrace(ex);
+            }
+        }
+
+        /*
+        ConfiguracaoBaseDadosVO conf = new ConfiguracaoBaseDadosVO();
+        //conf.setId(1);
+        conf.setDescricao(SISTEMA);
+        conf.setHost("localhost");
+        conf.setPorta(800);
+        conf.setSchema(SISTEMA);
+        conf.setUsuario(txtUsuario.getText());
+        conf.setSenha(txtSenha.getText());
+
+        
+        ConfiguracaoBancoLojaVO loja = new ConfiguracaoBancoLojaVO();
+        Date input = new Date();
+
+        loja.setId(1);
+        loja.setIdLojaOrigem(vLojaCliente);
+        loja.setDescricaoLojaOrigem(SISTEMA);
+        loja.setIdLojaVR(vLojaVR);
+        loja.setDescricaoVR(SISTEMA + "LOJA_VR");
+        loja.setDataCadastro(input);
+        loja.setSituacaoMigracao(ESituacaoMigracao.CONFIGURANDO);
+        loja.setLojaMatriz(true ? vLojaCliente.contains("1") : false);
+        loja.setIdConexao(6);
+
+        conf.setConfiguracaoBancoLoja(loja);
+
+        BancoDadosVO banco = new BancoDadosVO();
+        banco.setId(1);
+        banco.setNome(conf.getDescricao());
+        banco.setPorta(conf.getPorta());
+        banco.setSchema(conf.getSchema());
+        banco.setSenha(conf.getSenha());
+        banco.setUsuario(conf.getUsuario());
+
+        conf.setBancoDados(banco);
+
+        SistemaVO sistema = new SistemaVO();
+        sistema.setId(93);
+        sistema.setNome("LBSOFTWARE");
+
+        conf.setSistema(sistema);
+         */
+        //contr.salvarAccess(conf);
     }
 
     @SuppressWarnings("unchecked")
@@ -532,6 +638,11 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         lblLojaOrigem.setText("Loja Origem");
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlDadosConexaoLayout = new javax.swing.GroupLayout(pnlDadosConexao);
         pnlDadosConexao.setLayout(pnlDadosConexaoLayout);
@@ -562,18 +673,20 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
         pnlDadosConexaoLayout.setVerticalGroup(
             pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
-                .addComponent(tabsConn, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 258, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblLojaOrigem))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConectar)
-                    .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
+                        .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblLojaOrigem))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnConectar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -583,7 +696,7 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlDadosConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                .addComponent(pnlDadosConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
                 .addContainerGap())
         );
         pnlConexaoLayout.setVerticalGroup(
@@ -812,8 +925,9 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
             }
 
             validarDadosAcesso();
+            gravarDados();
+
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
-            
 
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
@@ -822,6 +936,10 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_btnConectarActionPerformed
+
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
@@ -878,7 +996,5 @@ public class LBSoftwareV2GUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

@@ -138,6 +138,11 @@ public class MapaLojaGUI extends VRDialog {
 
         btnParametro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/parametrizar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnParametro, "Parâmetro Loja");
+        btnParametro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnParametroActionPerformed(evt);
+            }
+        });
 
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnSalvar, "Salvar");
@@ -240,6 +245,10 @@ public class MapaLojaGUI extends VRDialog {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_btnDicaActionPerformed
+
+    private void btnParametroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnParametroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnParametroActionPerformed
 
     /**
      * @param args the command line arguments
