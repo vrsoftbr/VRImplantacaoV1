@@ -127,6 +127,9 @@
           </Properties>
         </Component>
         <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbLojaVR">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaVRActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

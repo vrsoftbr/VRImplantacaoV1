@@ -1,5 +1,7 @@
 package vrimplantacao2_5.dao.sistema;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -58,6 +60,8 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
         conrec.dbf
         contpag.dbf
         medpro.dbf
+        predat.dbf
+        proass.dbf
         profer.dbf
         profor.dbf
         tabagr.dbf
@@ -148,6 +152,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
 
@@ -235,8 +240,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + " codpro produtoid,\n"
                     + " codbarra codigobarras,\n"
-                    + " qtdeembal embalagem,\n"
-                    + " case when qtdeembal > 1 then 'CX'\n"
+                    + " qtdeembal::double precision embalagem,\n"
+                    + " case when qtdeembal::double precision > 1 then 'CX'\n"
                     + " else 'UN' end as unidade\n"
                     + "from arqbar;"
             )) {
@@ -382,7 +387,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagemVolume(rs.getString("tipo_volume"));
                     imp.setVolume(rs.getDouble("volume"));
 
-                    String id = rs.getString("cst") + "-" +  rs.getString("icmsaliquota") + "-" + rs.getString("icmsreducao");
+                    String id = rs.getString("cst") + "-" + rs.getString("icmsaliquota") + "-" + rs.getString("icmsreducao");
                     System.out.println(id);
                     imp.setIcmsConsumidorId(id);
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
@@ -594,12 +599,14 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	codforn13 id_fornecedor,\n"
                     + "	codpro13 id_produto,\n"
                     + "	p.unidpro01 unidade,\n"
-                    + "	ce.cdfabric codexterno\n"
+                    + "	case \n"
+                    + "		when ce.cdfabric <> '' then ce.cdfabric else codpro13\n"
+                    + "	end codexterno\n"
                     + "from\n"
                     + "	profor pf\n"
                     + "join cadpro p on pf.codpro13 = p.codpro01 and p.codfil01 = '" + getLojaOrigem() + "'\n"
                     + "join cadforn f on pf.codforn13 = f.codforn02\n"
-                    + "join arqfab ce on ce.codpro = pf.codpro13 and ce.codforn = pf.codforn13\n"
+                    + "left join arqfab ce on ce.codpro = pf.codpro13 and ce.codforn = pf.codforn13\n"
                     + "order by codforn13, codpro13")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -621,21 +628,22 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
-        try (Statement stm =  ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "row_number ()over() as id,\n"
-                    + "ch.codagen28 as agencia,\n"
-                    + "ch.numcont28 as conta,\n"
-                    + "ch.numcheq28  as numerocheque,\n"
-                    + "ch.valor28 as valor,\n"
-                    + "c.nomefan10 as nome,\n"
-                    + "ch.codban28 as banco,\n"
+                    "select distinct\n"
+                    + "row_number ()over() || ch.datemis22 || '" + getLojaOrigem() + "'  as id,\n"
+                    + "ch.codagen22 as agencia,\n"
+                    + "ch.numcont22 as conta,\n"
+                    + "ch.numcheq22  as numerocheque,\n"
+                    + "ch.valor22 as valor,\n"
+                    + "c.razsoc10 as nome,\n"
+                    + "ch.codban22 as banco,\n"
                     + "c.fonecli10  as telefone,\n"
-                    + "ch.datemis28 as emissao,\n"
-                    + "ch.datemis28 as deposito\n"
-                    + "from chedev ch\n"
-                    + "join cadcli c on c.cgccpf10 = cgccpf10 "
+                    + "TO_DATE(ch.datemis22, 'YYYY-MM-DD') as emissao,\n"
+                    + "TO_DATE(ch.datemis22, 'YYYY-MM-DD') as deposito\n"
+                    + "from predat ch\n"
+                    + "join cadcli c on c.cgccpf10 = cgccpf22 \n"
+                    + "where datbaixa22 = '' and ch.codfil22 = '" + getLojaOrigem() + "'"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -648,7 +656,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBanco(Integer.parseInt(Utils.formataNumero(rst.getString("banco"))));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setDate(rst.getDate("emissao"));
-                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setDataDeposito(rst.getDate("deposito"));
                     vResult.add(imp);
                 }
             }
@@ -871,7 +879,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        BigDecimal bd = new BigDecimal(rst.getDouble("valor"));
+                        BigDecimal numeroArredondado = bd.setScale(2, RoundingMode.HALF_UP);
+                        next.setSubTotalImpressora(numeroArredondado.doubleValue());
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -883,7 +893,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql
                     = "select\n"
-                    + "	FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL id_venda,\n"
+                    + "	filial || numeropdv || v.operador ||COO || to_date(v.data, 'YYYY-MM-DD') ||HORAFINAL id_venda,\n"
                     + "	coo cupom,\n"
                     + "	NUMEROPDV ecf,\n"
                     + "	v.DATA datavenda,\n"
@@ -892,7 +902,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cupom v\n"
                     + "	join lp" + tabelaVenda + " vi on v.coo = vi.ncupom and v.data = vi.data and v.numeropdv = vi.numecr \n"
                     + "where\n"
-                    + "	FILIAL = " + idLojaCliente + "\n"
+                    + "	FILIAL = '" + idLojaCliente + "'\n"
                     + "group by 1,2,3,4,5\n"
                     + "order by v.data, v.coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -940,8 +950,12 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        BigDecimal bd = new BigDecimal(rst.getDouble("precovenda"));
+                        BigDecimal precovenda = bd.setScale(2, RoundingMode.HALF_UP);
+                        next.setPrecoVenda(precovenda.doubleValue());
+                        bd = new BigDecimal(rst.getDouble("total"));
+                        BigDecimal total = bd.setScale(2, RoundingMode.HALF_UP);
+                        next.setTotalBruto(total.doubleValue());
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
@@ -955,24 +969,24 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql
                     = "select\n"
-                    + "	FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL id_venda,\n"
-                    + " FILIAL::varchar || numeropdv || v.operador ||COO || v.data ||HORAFINAL || ordem::varchar || codpro || qtdevend || codbarra || ncupom || horario id_item,\n"
+                    + "	FILIAL || numeropdv || v.operador ||COO || to_date(v.data, 'YYYY-MM-DD') ||HORAFINAL id_venda,\n"
+                    + " 	FILIAL || numeropdv || v.operador ||COO || to_date(v.data, 'YYYY-MM-DD') ||HORAFINAL || ordem || codpro || qtdevend || codbarra || ncupom || horario id_item,\n"
                     + "	ORDEM sequencial,\n"
                     + "	CODPRO id_produto,\n"
                     + "	p.descpro01 produto,\n"
                     + "	p.UNIDPRO01 unidade,\n"
                     + "	CODBARRA ean,\n"
-                    + "	QTDEVEND quantidade,\n"
-                    + "	round(PREVEND,2) precovenda,\n"
-                    + "	round(QTDEVEND * PREVEND,2) total,\n"
-                    + " desconto,\n"
-                    + " case when cancelado = '' then 0 else 1 end cancelado\n"
+                    + "	CAST(QTDEVEND AS double precision) AS quantidade,\n"
+                    + "    CAST(PREVEND AS double precision) AS precovenda,\n"
+                    + "    CAST(QTDEVEND AS double precision) * CAST(PREVEND AS double precision) AS total,\n"
+                    + "    CAST(desconto AS double precision) AS desconto,\n"
+                    + " 	case when cancelado = '' then 0 else 1 end cancelado\n"
                     + "from\n"
                     + "	lp" + tabelaVenda + " vi\n"
                     + "	join cupom v on v.coo = vi.ncupom and v.numeropdv = vi.numecr and v.filial = vi.codfil\n"
                     + "	join cadpro p on vi.CODPRO = p.CODPRO01 and vi.codfil = p.codfil01 \n"
                     + "where\n"
-                    + "	vi.codfil = " + idLojaCliente + "\n"
+                    + "	vi.codfil = '" + idLojaCliente + "'\n"
                     + "order by\n"
                     + "	v.data, v.coo, vi.ORDEM";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

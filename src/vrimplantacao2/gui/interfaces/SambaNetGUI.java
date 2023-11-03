@@ -399,6 +399,12 @@ public class SambaNetGUI extends VRInternalFrame {
 
         jLabel1.setText("Loja:");
 
+        cmbLojaVR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaVRActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
@@ -759,6 +765,10 @@ public class SambaNetGUI extends VRInternalFrame {
     private void txtLojaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLojaKeyReleased
         dao.setLojaOrigem(txtLoja.getText());
     }//GEN-LAST:event_txtLojaKeyReleased
+
+    private void cmbLojaVRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaVRActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbLojaVRActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;

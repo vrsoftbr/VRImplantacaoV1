@@ -15,6 +15,7 @@ import org.postgresql.util.PSQLException;
 import vr.core.collection.Properties;
 import vr.implantacao.main.App;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
@@ -151,7 +152,7 @@ public class ConversorDAO {
         for (LinhaArquivo linha : arq) {
             for (int i = 0; i < cabecalho.size(); i++) {
                 String cabecalhoBase = cabecalho.get(i).replaceAll(regexp, "").trim().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
-                sql.put(cabecalhoBase, linha.getString(cabecalho.get(i)));
+                sql.put(cabecalhoBase, Utils.removerAcentos(linha.getString(cabecalho.get(i))));
             }
             try {
                 stm.execute(sql.getInsert());

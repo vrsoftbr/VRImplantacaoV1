@@ -5,23 +5,15 @@
  */
 package vrimplantacao2_5.conversor;
 
-import com.linuxense.javadbf.DBFReader;
-import com.linuxense.javadbf.DBFRow;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.postgresql.util.PSQLException;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2_5.conversor.dao.ConversorDbfDAO;
+import vrimplantacao2_5.conversor.services.BancoDeDadosService;
 
 /**
  *
@@ -29,28 +21,28 @@ import vrimplantacao2_5.conversor.dao.ConversorDbfDAO;
  */
 public class ConversorDbfGUI extends javax.swing.JFrame {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private String regexp = "([\\W])";
     File[] filesDBF = null;
     File[] filesMemo = null;
-    ConversorDbfDAO dao;
+    BancoDeDadosService service;
     boolean haMemoFiles = false;
 
     /**
      * Creates new form ConversorDbfGUI
      */
     public ConversorDbfGUI() {
-        this.dao = new ConversorDbfDAO();
+        
+        this.service = new BancoDeDadosService();
         try {
-            dao.criarControleDeDadosConvertidos();
+            service.criarControleDeDadosConvertidos();
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+            System.out.println(ex.getMessage());
         }
         initComponents();
         setLocationRelativeTo(null);
         jFileChooserDBF.setPreferredSize(new Dimension(528, 326));
         lblLogo.setText("");
-        lblLogo.setSize(800, 800);        
+        lblLogo.setSize(800, 800);
         setExtendedState(MAXIMIZED_BOTH);
         jFileChooserDBF.setMultiSelectionEnabled(true);
         jPanel5.setVisible(true);
@@ -316,7 +308,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (validaNomeBanco()) {
-            dao.setNomeBanco(jTextNomeBanco.getText());
+            service.setNomeBanco(jTextNomeBanco.getText());
             Thread thread = new Thread() {
                 @Override
                 public void run() {
@@ -354,7 +346,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
         if (filesDBF != null) {
             salvar();
         } else {
-            JOptionPane.showMessageDialog(null, "Você esqueceu de selecionar os arquivos DBF", "ops!",  1);
+            JOptionPane.showMessageDialog(null, "Você esqueceu de selecionar os arquivos DBF", "ops!", 1);
         };
     }//GEN-LAST:event_jButtonConverterActionPerformed
 
@@ -375,7 +367,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtoncarregarMemoActionPerformed
 
     private void btnReabriDBFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReabriDBFActionPerformed
-        jFileChooserDBF.setVisible(true);        
+        jFileChooserDBF.setVisible(true);
         this.filesDBF = null;
         jFileChooserDBF.setSelectedFiles(filesDBF);
         btnReabriDBF.setVisible(false);
@@ -443,8 +435,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
 
     public void criarBanco() {
         try {
-            dao.criarBanco();
-            dao.criarControleDeDadosConvertidos();
+            BancoDeDadosService.criarBanco();
             ProgressBar.dispose();
             labelResultado.setText("<html> <font size=\"2\" color=blue >Banco de Dados criado com sucesso</font></html>");
             labelResultado.setVisible(true);
@@ -473,93 +464,7 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
     }
 
     private void salvar() {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    ProgressBar.show();
-                    ProgressBar.setCancel(false);
-                    for (File file : filesDBF) {
-                        String tabela = file.getName().substring(0, file.getName().lastIndexOf("."));
-                        dao.setNomeDaTabela(tabela);
-                        ProgressBar.setStatus("Criando tabela: " + tabela + ", por favor aguarde.");
-                        DBFReader reader = new DBFReader(new FileInputStream(file));
-                        if (haMemoFiles) {
-                            File memoFile = inserirMemoFileEquivaentNoReader(filesMemo, tabela);
-                            reader.setMemoFile(memoFile);
-                        }
-                        List<String> dadosCabecalho = new ArrayList<>();
-                        for (int i = 0; i < reader.getFieldCount(); i++) {
-                            dadosCabecalho.add(reader.getField(i).getName());
-                        }
-
-                        dao.criarTabelas(dadosCabecalho);
-
-                        dao.insereDeDadosConvertidos(jTextNomeBanco.getText(), tabela);
-
-                        List<String> inserts = new ArrayList<>();
-
-                        ProgressBar.setStatus("Preparando dados da tabela: " + tabela + ", por favor aguarde.");
-                        ProgressBar.setMaximum(reader.getRecordCount());
-
-                        DBFRow linha;
-                        String insert = "";
-                        while ((linha = reader.nextRow()) != null) {
-                            Date dataDaLinha = linha.getObject(5) == null ? DATE_FORMAT.parse("2020-01-01") : (Date) linha.getObject(5);                            
-                            if (DATE_FORMAT.format(dataDaLinha).compareTo("2021-01-01") > 0) {
-                            insert = "insert into " + tabela + " values (";
-                            for (int i = 0; i < dadosCabecalho.size(); i++) {
-                                String cabecalhoBase = dadosCabecalho.get(i).replaceAll(regexp, "").trim().toLowerCase().replace(",", "_");//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_");
-                                //sql.put(cabecalhoBase, linha.getString(cabecalhoBase));
-                                insert += "'";
-                                insert += linha.getObject(cabecalhoBase) instanceof Date ? DATE_FORMAT.format(linha.getObject(cabecalhoBase)) : null == linha.getObject(cabecalhoBase) ? "" : Utils.acertarTexto(linha.getString(cabecalhoBase)).toString();
-                                insert += "' ,";
-                            }
-                            insert = insert.substring(0, insert.length() - 2) + ");";
-                            inserts.add(insert);
-                            insert = "";
-                        }
-                            ProgressBar.next();
-                        }
-                        System.gc();
-
-                        ProgressBar.setStatus("Salvando dados da tabela: " + tabela + ", por favor aguarde.");
-                        ProgressBar.setMaximum(reader.getRecordCount());
-
-                        dao.conferePopularTabelas();
-                        dao.abrirConexao();
-                        for (String insertFinal : inserts) {
-                            dao.popularTabelasDbf(insertFinal);
-                            ProgressBar.next();
-                        }
-                        dao.fecharConexao();
-                        dao.atualizaDeDadosConvertidos(jTextNomeBanco.getText(), tabela);
-                        inserts.clear();
-                        System.gc();
-                    }
-                    JOptionPane.showMessageDialog(null, "Base " + jTextNomeBanco.getText() + " criada com sucesso! \n");
-                    ProgressBar.dispose();
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                    ProgressBar.dispose();
-                    JOptionPane.showMessageDialog(null, "Erro ao criar ou popular a tabela: " + dao.getNomeDaTabela() + "\n\nErro: " + ex);
-                    Exceptions.printStackTrace(ex);
-                    ProgressBar.dispose();
-                }
-            }
-
-            //Filtra memo file de acordo com a tabela
-            private File inserirMemoFileEquivaentNoReader(File[] filesMemo, String tabela) {
-                for (File memo : filesMemo) {
-                    String tabelaMemo = memo.getName().substring(0, memo.getName().lastIndexOf("."));
-                    if (tabelaMemo.toUpperCase().trim().equals(tabela.toUpperCase().trim())) {
-                        return memo;
-                    }
-                }
-                return null;
-            }
-        };
-        thread.start();
+        BancoDeDadosService.salvar(filesDBF, filesMemo, haMemoFiles);
     }
 
     private void carregarArquivosDBF() {
@@ -568,41 +473,41 @@ public class ConversorDbfGUI extends javax.swing.JFrame {
 
     private void piscarBotao() {
         Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Color corOriginal = jButtonConverter.getBackground();
-                        Color corOriginalF = jButtonConverter.getForeground();
-                        Thread.sleep(300);
-                        jButtonConverter.setForeground(new Color(255, 103, 0));
-                        jButtonConverter.setBackground(Color.BLACK);
-                        Thread.sleep(300);
-                        jButtonConverter.setBackground(corOriginal);
-                        jButtonConverter.setForeground(corOriginalF);
-                        Thread.sleep(300);
-                        jButtonConverter.setForeground(new Color(255, 103, 0));
-                        jButtonConverter.setBackground(Color.BLACK);
-                        Thread.sleep(300);
-                        jButtonConverter.setBackground(corOriginal);
-                        jButtonConverter.setForeground(corOriginalF);
-                        Thread.sleep(300);
-                        jButtonConverter.setForeground(new Color(255, 103, 0));
-                        jButtonConverter.setBackground(Color.BLACK);
-                        Thread.sleep(300);
-                        jButtonConverter.setBackground(corOriginal);
-                        jButtonConverter.setForeground(corOriginalF);
-                        Thread.sleep(300);
-                        jButtonConverter.setForeground(new Color(255, 103, 0));
-                        jButtonConverter.setBackground(Color.BLACK);
-                        Thread.sleep(300);
-                        jButtonConverter.setBackground(corOriginal);
-                        jButtonConverter.setForeground(corOriginalF);
-                        
-                    } catch (Exception ex) {
-                        System.out.println(ex.getMessage());
-                    }
+            @Override
+            public void run() {
+                try {
+                    Color corOriginal = jButtonConverter.getBackground();
+                    Color corOriginalF = jButtonConverter.getForeground();
+                    Thread.sleep(300);
+                    jButtonConverter.setForeground(new Color(255, 103, 0));
+                    jButtonConverter.setBackground(Color.BLACK);
+                    Thread.sleep(300);
+                    jButtonConverter.setBackground(corOriginal);
+                    jButtonConverter.setForeground(corOriginalF);
+                    Thread.sleep(300);
+                    jButtonConverter.setForeground(new Color(255, 103, 0));
+                    jButtonConverter.setBackground(Color.BLACK);
+                    Thread.sleep(300);
+                    jButtonConverter.setBackground(corOriginal);
+                    jButtonConverter.setForeground(corOriginalF);
+                    Thread.sleep(300);
+                    jButtonConverter.setForeground(new Color(255, 103, 0));
+                    jButtonConverter.setBackground(Color.BLACK);
+                    Thread.sleep(300);
+                    jButtonConverter.setBackground(corOriginal);
+                    jButtonConverter.setForeground(corOriginalF);
+                    Thread.sleep(300);
+                    jButtonConverter.setForeground(new Color(255, 103, 0));
+                    jButtonConverter.setBackground(Color.BLACK);
+                    Thread.sleep(300);
+                    jButtonConverter.setBackground(corOriginal);
+                    jButtonConverter.setForeground(corOriginalF);
+
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
                 }
-            };
-            thread.start();
+            }
+        };
+        thread.start();
     }
 }
