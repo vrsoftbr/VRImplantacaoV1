@@ -92,29 +92,16 @@ public class ConversorDbfDAO {
         }
     }
 
-    public void criarTabelas(List<String> dados) throws Exception {
+    public void criarTabelas(String dados) throws Exception {
         List<ControleDadosConvertidosVO> dadosCOnvertidos = captaDadosConvertidos(getNomeBanco(), getNomeDaTabela());
         for (ControleDadosConvertidosVO dado : dadosCOnvertidos) {
             if (dado.getNomeTabela().trim().equals(getNomeDaTabela().trim())) {
                 throw new Exception("A tabela já foi criada");
             }
         };
-        String campos = "(\n";
         abrirConexao();
-        try (Statement stm = con.getConexao().createStatement()) {
-            String sql = "CREATE TABLE IF NOT EXISTS " + getNomeDaTabela() + "\n";
-            int contador = 0;
-            for (String dado : dados) {
-                if (contador < dados.size()) {
-                    dado = dados.get(contador++);
-                    campos += "\"" + dado.replaceAll(regexp, "").trim().replace(",", "").toString() + "\"" + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "") + " text,\n";
-                    //campos += dado.replaceAll(regexp, "").trim().replace(",", "_") + " text,\n";//.replace("-", "").replace(" ", "").replace("\\", "").replace("/", "").replace(".", "").replace(",", "_") + " text,\n";
-                }
-            }
-            System.out.println(sql + campos.substring(0, campos.length() - 2) + "\n);");
-            stm.execute(
-                    sql + campos.substring(0, campos.length() - 2) + "\n);"
-            );
+        try (Statement stm = con.getConexao().createStatement()) {            
+            stm.execute(dados);
         } catch (PSQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Erro ao Criar tabela: " + getNomeDaTabela() + "\n\nErro: " + e);
@@ -216,20 +203,47 @@ public class ConversorDbfDAO {
         return result;
     }
 
-    public void popularTabelasDbf(String insert) throws Exception {
+    public void popularTabelasDbf(List<String> inserts) throws Exception {
         Statement stm = con.getConexao().createStatement();
         try {
-            stm.execute(insert);
+            con.begin();
+            for (String insert : inserts) {
+            stm.addBatch(insert.toString());                
+            }
+            stm.executeBatch();
+            con.commit();
         } catch (PSQLException e) {
-            System.out.println(insert);
             JOptionPane.showMessageDialog(null, "Erro ao popular tabela: " + getNomeDaTabela() + "\n\nErro: " + e);
             System.out.println("PLSQLexception = " + e.getMessage());
             e.printStackTrace();
             fecharConexao();
             throw e;
         } catch (Exception e) {
-            System.out.println(insert);
             JOptionPane.showMessageDialog(null, "Erro ao popular tabela: " + getNomeDaTabela() + "\n\nErro: " + e);
+            System.out.println("exception = " + e.getMessage());
+            e.printStackTrace();
+            fecharConexao();
+            throw e;
+        }
+    }
+    
+    public void popularTabelasDbfEmLote(List<String> inserts) throws Exception {
+        Statement stm = con.getConexao().createStatement();
+        try {
+            con.begin();
+            for (String insert : inserts) {
+            stm.addBatch(insert.toString());                
+            }
+            stm.executeBatch();
+            con.commit();
+        } catch (PSQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao popular tabela em lote: " + getNomeDaTabela() + "\n\nErro: " + e);
+            System.out.println("PLSQLexception = " + e.getMessage());
+            e.printStackTrace();
+            fecharConexao();
+            throw e;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao popular tabela em lote: " + getNomeDaTabela() + "\n\nErro: " + e);
             System.out.println("exception = " + e.getMessage());
             e.printStackTrace();
             fecharConexao();
