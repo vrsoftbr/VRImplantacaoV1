@@ -110,10 +110,12 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
                 OpcaoCliente.ENDERECO,
+                OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.TELEFONE,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
                 OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.EMPRESA,
                 OpcaoCliente.SALARIO,
@@ -222,7 +224,12 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     //                  imp.seteBalanca("1".equals(rst.getString("PesoVariavel")));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("reduzida"));
-                    imp.setDescricaoGondola(rst.getString("gondola") == null ? rst.getString("reduzida") : rst.getString("gondola"));
+                    if (rst.getString("gondola") == null || rst.getString("gondola").isEmpty()) {
+                        imp.setDescricaoGondola("reduzida");
+                    } else {
+                        imp.setDescricaoGondola("gondola");
+                    }
+                    //imp.setDescricaoGondola(rst.getString("gondola") == null ? rst.getString("reduzida") : rst.getString("gondola"));
                     imp.setSituacaoCadastro(rst.getInt("idsituacao") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setTipoEmbalagem(Utils.acertarTexto(rst.getString("tipoembalagem")));
 //                    imp.setValidade(rst.getInt("dias"));
@@ -239,8 +246,8 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("icms_alqt_s"));
-                    imp.setPiscofinsCstCredito(rst.getInt("cst"));
+                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_cst_s"));
+                    imp.setPiscofinsCstCredito(rst.getInt("piscofins_cst_e"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("naturezareceita"));
 
 //                    imp.setIcmsCst(rst.getInt("cst"));
@@ -275,6 +282,34 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "idProduto as id_produto,\n"
+                    + "CodigoEan as ean,\n"
+                    + "qtde_emb as emb \n"
+                    + "from produto_ean "
+            )) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setImportId(rs.getString("id_produto"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("emb"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -341,7 +376,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
 
-                    imp.setTel_principal(rst.getString("contato"));
+                    imp.setTel_principal(rst.getString("telefone"));
                     imp.setObservacao(rst.getString("obs"));
 
                     if ((rst.getString("fax") != null)
@@ -469,16 +504,19 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(Utils.acertarTexto(rst.getString("cidade")));
                     imp.setUf(Utils.acertarTexto(rst.getString("estado")));
                     imp.setCep(rst.getString("cep"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setDataNascimento(rst.getDate("dataNascimento"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
                     imp.setCnpj(rst.getString("cpf"));
 
-                    if (rst.getString("tipo")== null) {
+                    if (rst.getString("tipo") == null) {
                         imp.setPermiteCheque(false);
                         imp.setPermiteCreditoRotativo(false);
-                    } 
-                     else if (rst.getString("tipo").equals("TT")) {
+                    } else if (rst.getString("tipo").equals("TT")) {
                         imp.setPermiteCheque(true);
                         imp.setPermiteCreditoRotativo(true);
-                     }else if (rst.getString("tipo").equals("CH")) {
+                    } else if (rst.getString("tipo").equals("CH")) {
                         imp.setPermiteCheque(true);
                         imp.setPermiteChequeAVista(true);
                         imp.setPermiteCreditoRotativo(false);
@@ -488,8 +526,8 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     } else if (rst.getString("tipo") == null) {
                         imp.setPermiteCheque(false);
                         imp.setPermiteCreditoRotativo(false);
-                    } 
-                    
+                    }
+
                     imp.setTelefone(Utils.formataNumero(rst.getString("telefone")));
                     imp.setCelular(Utils.formataNumero(rst.getString("celular")));
                     if ((rst.getString("email") != null)
@@ -523,30 +561,32 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	iddebito id,\n"
+                    + "	r.iddebito id,\n"
                     + "	dt_venda dataEmissao,\n"
                     + "	nr_venda numeroCupom,\n"
                     + "	ecf,\n"
                     + "	vl_vista valor,\n"
+                    + "	dr.Vl_Recebido ,\n"
+                    + "	coalesce ((Vl_Vista - dr.Vl_Recebido),Vl_Vista)as total,\n"
                     + "	observacao,\n"
                     + "	r.idCliente,\n"
                     + "	cpf cnpjCliente,\n"
                     + "	dt_venc dataVencimento\n"
                     + "from debito r \n"
-                    + "	left join cliente c\n"
-                    + "		on r.IDCLIENTE = c.idCliente \n"
+                    + "left join cliente c on r.IDCLIENTE = c.idCliente \n"
+                    + "left join debito_recebido dr on r.IDDebito = dr.IDDebito \n"
                     + "where SITUACAO != 'P'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setIdCliente(rst.getString("idCliente"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
 
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("total"));
                     //                   imp.setParcela(rst.getInt("recparc"));
                     imp.setObservacao(rst.getString("observacao"));
                     vResult.add(imp);
@@ -601,6 +641,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	emissao,\n"
                     + "	dt_baixa datadeposito,\n"
                     + "	cupom numerocupom,\n"
+                    + "	Venc as vencimento, \n"
                     + "	ecf,\n"
                     + "	valor,\n"
                     + "	c.rg,\n"
@@ -627,7 +668,7 @@ public class G3DAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCpf(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setDate(rst.getDate("emissao"));
-                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setDataDeposito(rst.getDate("vencimento"));
                     vResult.add(imp);
                 }
             }
