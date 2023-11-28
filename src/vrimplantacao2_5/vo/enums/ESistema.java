@@ -282,6 +282,7 @@ import vrimplantacao2_5.gui.sistema.Arauto2_5GUI;
 import vrimplantacao2_5.gui.sistema.Argo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Arius2_5GUI;
 import vrimplantacao2_5.gui.sistema.AriusWeb2_5GUI;
+import vrimplantacao2_5.gui.sistema.Arpa2_5GUI;
 import vrimplantacao2_5.gui.sistema.ArtSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Asefe2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
@@ -2582,6 +2583,18 @@ public enum ESistema {
         ) {
             try {
                 return new SaurusPDV2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ARPA(262, "ARPA", new SaurusPDVDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new Arpa2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

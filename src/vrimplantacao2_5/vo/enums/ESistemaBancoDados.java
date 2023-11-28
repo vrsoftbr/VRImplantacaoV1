@@ -218,6 +218,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_SINC(233, "SINC", 11, "POSTGRESQL", "sincprod", "postgres", "postgres", 5432, ""),
     POSTGRESQL_PRIME(243, "PRIME", 11, "POSTGRESQL", "", "postgres", "post", 5432, ""),
     POSTGRESQL_GENERICO(252, "GENERICO", 11, "POSTGRESQL", "postgres", "postgres", "VrPost@Server", 8745, ""),
+    POSTGRESQL_ARPA(262,"ARPA",11, "POSTGRESQL", "postgres","postgres","postgres",5432,""),
     POSTGRESQL_ALTERDATAWSHOP(254, "ALTERDATAWSHOP", 11, "POSTGRESQL", "ALTERDATA_SHOP", "postgres", "#abc123#", 5432, ""),
 //SQLSERVER
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "sa", "@66E$Y$", 1433, ""),
