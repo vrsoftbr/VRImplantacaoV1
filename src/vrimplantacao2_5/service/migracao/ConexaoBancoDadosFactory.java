@@ -2,8 +2,9 @@ package vrimplantacao2_5.service.migracao;
 
 import java.sql.Connection;
 import vrimplantacao.classe.ConexaoDB2;
+import vrimplantacao.classe.ConexaoInformix;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
-import vrimplantacao2_5.dao.conexao.ConexaoInformix;
+//import vrimplantacao2_5.dao.conexao.ConexaoInformix;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;

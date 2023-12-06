@@ -15,10 +15,10 @@ public enum EScriptLojaOrigemSistema {
     ASEFE(7, 13, null),
     ATENAS(8, 5, "select codigo AS id , fantasia AS descricao from c999999"),
     ATHOS(9, 11, null),
-    ATMA(10, 13,"select ID_EMP as id,FANTASIA as descricao from dbo.CG_EMP order by ID_EMP"),
-    AUTOADM(11, 5,"SELECT l.nr_loja as id, p.nm_fantasia as descricao from tb_loja l join tb_pessoa p on p.cd_pessoa = l.cd_pessoa_loja order by l.nr_loja"),
+    ATMA(10, 13, "select ID_EMP as id,FANTASIA as descricao from dbo.CG_EMP order by ID_EMP"),
+    AUTOADM(11, 5, "SELECT l.nr_loja as id, p.nm_fantasia as descricao from tb_loja l join tb_pessoa p on p.cd_pessoa = l.cd_pessoa_loja order by l.nr_loja"),
     AUTOSYSTEM(12, 11, null),
-    AUTOCOM(13, 5,"select codigo AS id, nome AS descricao from empresa order by 1"),
+    AUTOCOM(13, 5, "select codigo AS id, nome AS descricao from empresa order by 1"),
     AVANCE(15, 8, "SELECT distinct id_loja id, fantasia descricao FROM adm_empresas_estab ORDER BY 1"),
     AVISTARE(16, 13, "select distinct\n"
             + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
@@ -58,10 +58,15 @@ public enum EScriptLojaOrigemSistema {
     GZSISTEMAS(66, 8, "select codigo id, nomfan descricao, cgc from mercodb.lojas order by codigo"),
     GETWAY(68, 13, "select CODLOJA id, descricao from LOJA order by id"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
-    HIPCOM(74, 8, "select lojcod as id, concat(lojcod,'' - '', lojfantas) descricao, lojcnpj from hiploj order by 1"),    
+    HIPCOM(74, 8, "select lojcod as id, concat(lojcod,'' - '', lojfantas) descricao, lojcnpj from hiploj order by 1"),
     HIPER(75, 13, "select id_filial id, razao_social descricao from filial order by id_filial"),
     ISERVER(78, 8, "select Codigo id, NomeFantasia descricao from tbl_loja"),
     INOVA(81, 11, "select empresaid id, empresanomefantasia descricao from empresa"),
+    INTERAGE(85, 5, "SELECT \n"
+                        + "f.CODFIL id, \n"
+                        + "COALESCE(f.CNPJFIL, 0) || '' - '' || f.NOMFIL descricao \n"
+                        + "FROM TABFIL f \n"
+                        + "ORDER BY f.CODFIL"),
     KCMS(92, 13, "select codloja id, fantasia descricao from empresa"),
     LINCE(95, 13, "select cod_loja id , concat(cnpj, '' - '', nome_reduzido) descricao from loja order by 1"),
     LOGUS(100, 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),
@@ -78,12 +83,12 @@ public enum EScriptLojaOrigemSistema {
     SISMOURA(154, 13, "select Codigo id, (Fantasia + '' - '' + CNPJ) descricao from Empresa order by Codigo"),
     SYSPDV(170, 5, "SELECT prpcod id, prpfan descricao FROM PROPRIO"),
     TOPSYSTEM(176, 8, "SELECT empresa id, Razao_Social descricao FROM cad_filial ORDER BY 1"),
-    TSTI(178,8,"select empcod id, concat(empcnpj, '' '', empnom) descricao from tsl.tsc008a"),
+    TSTI(178, 8, "select empcod id, concat(empcnpj, '' '', empnom) descricao from tsl.tsc008a"),
     UNIPLUS(179, 11, "select id, nome || '' - '' || cnpj as descricao from filial"),
     VRMASTER(182, 11, "select l.id, l.descricao from loja l join fornecedor f on l.id_fornecedor = f.id where l.id_situacaocadastro = 1 order by l.id"),
     VISUALMIX(186, 13, "select codigo as id,	descricao from dbo.Lojas order by 1"),
     WEBSAQ(188, 11, "select codestabelec id, razaosocial descricao from estabelecimento order by codestabelec"),
-    ECO_CENTAURO(193,5,"SELECT codigo AS id, NOMEFANTASIA AS descricao FROM TGEREMPRESA t"),
+    ECO_CENTAURO(193, 5, "SELECT codigo AS id, NOMEFANTASIA AS descricao FROM TGEREMPRESA t"),
     LINEAR(196, 8, "SELECT emp_codigo AS id, concat(emp_cgc, '' - '', emp_fantasia) AS descricao FROM empresa ORDER BY 1"),
     ARIUS(197, 9, "SELECT id ,id || '' - '' || descritivo || '' - '' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5, "SELECT l.COD_EMPRESA AS id, (l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao FROM EMITENTE l ORDER BY 1"),
@@ -150,12 +155,8 @@ public enum EScriptLojaOrigemSistema {
     RESULTHBUSINESS(259, 5, "SELECT 1 as id , empresa AS descricao FROM EMPRESA e "),
     LJSISTEMAS_SIG(260, 5, "SELECT EMPCONTADOR id, DESCEMPRESA descricao  FROM EMP001"),
     JMASTER(88, 13, "select LOJCODIGO as id, LOJRAZAO as descricao from dbo.CADLOJ "),
-    G3(60,8, "select idempresa id,RazaoSocial descricao from  empresa e "),
-    ARPA(262,11, "select 1 id, ''Loja 01'' descricao"),
+    G3(60, 8, "select idempresa id,RazaoSocial descricao from  empresa e "),
     SAURUSPDV(261, 13, "select loj_idLoja id, loj_fant descricao  from tbLojaDados");
-
-    
-    
 
     private int idSistema;
     private int idBancoDados;

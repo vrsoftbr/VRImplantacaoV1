@@ -50,6 +50,7 @@ import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
+import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
@@ -637,6 +638,10 @@ public abstract class InterfaceDAO {
      * @throws Exception
      */
     public List<DesmembramentoIMP> getDesmembramentos() throws Exception {
+        return new ArrayList<>();
+    }
+
+    public List<PessoaImp> getPessoaImp() throws Exception  {
         return new ArrayList<>();
     }
 

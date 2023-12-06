@@ -177,9 +177,11 @@
                                   <Component id="chkIE" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkTipoInscricao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkPessoaImpM5_0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="309" max="32767" attributes="0"/>
+                          <EmptySpace pref="195" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -195,6 +197,7 @@
                               <Component id="chkIE" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTipoInscricao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPessoaImpM5_0" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="16" max="32767" attributes="0"/>
                       </Group>
@@ -244,6 +247,11 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Inscri&#xe7;&#xe3;o"/>
                     <Property name="toolTipText" type="java.lang.String" value="Corrige o relacionamento entre o produto e a fam&#xed;lia."/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkPessoaImpM5_0">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pessoa M5.0"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -514,7 +522,7 @@
                                   <Component id="chkVencimento" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="117" max="32767" attributes="0"/>
+                          <EmptySpace pref="122" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
