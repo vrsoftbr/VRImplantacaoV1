@@ -126,7 +126,6 @@ public class App {
         try {
 
             SplashScreen.show();
-            SplashScreen.setSobre("VR Implantação 2.5", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             SplashScreen.setStatus("Inicializando sistema...");
 
             Global.idLoja = properties.getInt("system.numeroloja");

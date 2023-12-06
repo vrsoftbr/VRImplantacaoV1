@@ -17,6 +17,9 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -91,6 +94,8 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoFornecedor.CONTATOS,
                 OpcaoFornecedor.ENDERECO,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO));
     }
@@ -99,7 +104,11 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.DADOS,
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.OBSERVACOES2,
+                OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
@@ -113,14 +122,24 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "		select \n"
-                    + "		ff.codigo as id, \n"
-                    + "		f.nome as descricao,\n"
-                    + "		cst ,\n"
-                    + "		aliquota as aliq ,\n"
-                    + "		reducao \n"
-                    + "		from itens_class_fiscal ff\n"
-                    + "		join class_fiscal f on f.codigo = ff.tabela ")) {
+                    "select\n"
+                    + "    ff.tabela::varchar as id,\n"
+                    + "    f.nome as descricao,\n"
+                    + "    cst ,\n"
+                    + "    aliquota as aliq ,\n"
+                    + "    reducao\n"
+                    + "from\n"
+                    + "    itens_class_fiscal ff\n"
+                    + "join class_fiscal f on f.codigo = ff.tabela\n"
+                    + "union\n"
+                    + "select distinct\n"
+                    + " icms||situacaotributaria id,\n"
+                    + " icms||' - '||situacaotributaria descricao,\n"
+                    + " situacaotributaria cst,\n"
+                    + " icms aliq,\n"
+                    + " 0 reducao\n"
+                    + "from produtos\n"
+                    + "where class_fiscal is null")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
@@ -208,7 +227,14 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "	select distinct \n"
+                    "with margem as (\n"
+                    + "select \n"
+                    + " p.codigo, \n"
+                    + " case when p.precovenda = 0 then 0.1 else p.precovenda end precovenda,\n"
+                    + " case when p.precocusto = 0 then 0.1 else p.precocusto end precocusto \n"
+                    + "from produtos p\n"
+                    + ")"
+                    + "select distinct\n"
                     + "p.codigo as id_produto,\n"
                     + "descricao as descricaocompleta,\n"
                     + "departamento as merc1,\n"
@@ -223,21 +249,26 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "when subgrupo is null and grupo  notnull then grupo \n"
                     + "else subgrupo end as merc3,\n"
                     + "unidade ,\n"
-                    + "precovenda ,\n"
-                    + "precocusto ,\n"
-                    + "estoq_inicial ,\n"
+                    + "p.precovenda ,\n"
+                    + "precocontabil ,\n"
+                    + "situacaotributaria ,\n"
+                    + "p.precocusto ,\n"
+                    + "quantidade as estoq_inicial ,\n"
                     + "cod_ncm ,\n"
                     + "cest ,\n"
                     + "pc3.codigo_receita as natreceita,\n"
                     + "pc.cst_pis_entrada,\n"
-                    + "pc.cst_cofins \n"
+                    + "pc.cst_cofins,\n"
+                    + "((m.precovenda - m.precocusto)/m.precocusto * 100)::numeric(10,2) margem,\n"
+                    + "case when p.class_fiscal is null then icms||situacaotributaria\n"
+                    + "else p.class_fiscal::varchar end icms\n"
                     + "from produtos p \n"
-                    + "join pis_cofins pc on pc.produto = p.codigo \n"
-                    + "join produtos_codbarra pc2 ON pc2.produto  = p.codigo \n"
-                    + "join pis_cofins pc3 ON pc3.produto = p.codigo \n"
-                    + "where departamento notnull "
+                    + "left join pis_cofins pc on pc.produto = p.codigo \n"
+                    + "left join produtos_codbarra pc2 ON pc2.produto  = p.codigo \n"
+                    + "left join margem m on m.codigo = p.codigo \n "
+                    + "left join pis_cofins pc3 ON pc3.produto = p.codigo"
             )) {
-                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -245,24 +276,30 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
                     imp.setImportId(rst.getString("id_produto"));
 
-                    imp.setEan(rst.getString("codbarra"));
+                    int codigoProduto = Utils.stringToInt(rst.getString("id_produto"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("codbarra"), -2));
-
-                    if (bal != null) {
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("codbarra"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(1);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
 
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setNcm(rst.getString("cod_ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setSituacaoCadastro(rst.getInt("ativo"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo") == 0 ? 1 : 0);
 
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
@@ -272,12 +309,17 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
 
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
+                    imp.setCustoSemImposto(rst.getDouble("precocusto"));
+                    imp.setCustoMedioComImposto(rst.getDouble("precocontabil"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setMargem(rst.getDouble("margem"));
+                   
+                   
 
-                    String idIcms;
-
-                    idIcms = rst.getString("cst_pis_entrada");
+                    String idIcms = rst.getString("icms");
 
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
@@ -286,8 +328,8 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
-                    imp.setPiscofinsCstDebito(rst.getString("cst_pis_entrada"));
-                    imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                    imp.setPiscofinsCstDebito(rst.getString("cst_cofins"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
 
                     result.add(imp);
@@ -338,8 +380,10 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "produto as id_produto, \n"
-                    + "codbarra as ean \n"
-                    + "from produtos_codbarra"
+                    + "c.codbarra as ean,\n"
+                    + "p.unidade \n"
+                    + "from produtos_codbarra c\n"
+                    + "join produtos p on c.codigo  = p.codigo "
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -348,6 +392,7 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
                     imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
 
                     result.add(imp);
                 }
@@ -366,7 +411,10 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "codigo as id_fornecedor,\n"
                     + "nome as razao, \n"
                     + "fantasia as fantasia,\n"
-                    + "cnpj ,\n"
+                    + "case \n"
+                    + "when f.cnpj = '' then  codigo::text \n"
+                    + "when f.cnpj is null then   codigo::text\n"
+                    + "else cnpj end,\n"
                     + "inscricaoest as ie,\n"
                     + "endereco as endereco,\n"
                     + "numero ,\n"
@@ -378,12 +426,15 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "datacad as data_cadastro,\n"
                     + "observacoes ,\n"
                     + "fone,\n"
+                    + "ativo,\n"
                     + "ramal ,\n"
+                    + "simples ,\n"
+                    + "produtorrural ,\n"
                     + "fax,\n"
                     + "email \n"
                     + "from\n"
                     + "fornecedores f\n"
-                    + "join  cidades c on f.cep = c.cep "
+                    + "left join  cidades c on f.cep = c.cep"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -399,6 +450,13 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    if (rst.getBoolean("simples") == true) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    }
+                    if (rst.getBoolean("produtorrural") == true) {
+                        imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                    }
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -454,21 +512,33 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	codigo as id, \n"
-                    + "	nome as razao, \n"
-                    + "	fantasia as fantasia,\n"
-                    + "	numero as numero, \n"
-                    + "	endereco ,\n"
-                    + "	bairro,\n"
-                    + "	c.cep ,\n"
-                    + "	c2.cidade ,\n"
-                    + "	c2.uf ,\n"
-                    + "	c.contato ,\n"
-                    + "	c.email \n"
-                    + "from\n"
-                    + "	clientes c \n"
-                    + "join cidades c2 on c2.cep = c.cep "
+                    "select \n"
+                    + "codigo as id,  \n"
+                    + "nome as razao,  \n"
+                    + "fantasia as fantasia, \n"
+                    + "numero as numero,  \n"
+                    + "endereco , \n"
+                    + "cpf_cnpj , \n"
+                    + "inscricaoest , \n"
+                    + "case  \n"
+                    + "when status  = 'I' then '0' \n"
+                    + "else '1' end as status , \n"
+                    + "bairro, \n"
+                    + "c.cep , \n"
+                    + "c2.cidade , \n"
+                    + "c2.uf , \n"
+                    + "complemento , \n"
+                    + "fone, \n"
+                    + "fone2 , \n"
+                    + "fone_tipo , \n"
+                    + "fone2_tipo , \n"
+                    + "c.contato , \n"
+                    + "cr.orgao_emissor , \n"
+                    + "c.email  \n"
+                    + "from \n"
+                    + "clientes c  \n"
+                    + "left join cidades c2 on c2.cep = c.cep  \n"
+                    + "left join clientes_rg cr on cr.cliente  = c.codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -480,9 +550,20 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
                     imp.setMunicipio(rst.getString("cidade"));
+                    imp.setAtivo(rst.getBoolean("status"));
+                    imp.setObservacao(rst.getString("contato"));
+
                     imp.setUf(rst.getString("uf"));
-                    imp.setTelefone(rst.getString("contato"));
                     imp.setEmail(rst.getString("email"));
+                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoest"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setComplemento(rst.getString("complemento"));
+
+                    if (rst.getInt("orgao_emissor") == 0) {
+                        imp.setOrgaoemissor("SSP");
+                    }
+                    imp.setCelular(rst.getString("fone2"));
 
                     result.add(imp);
                 }
@@ -497,25 +578,18 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "	select\n"
-                    + "	pc.codigo_id ,\n"
-                    + "	pc.cliente as id_cliente, \n"
-                    + "	p.vencimento as vencimento,\n"
-                    + "	p.\"data\" as emissao,\n"
-                    + "	p.parcela ,\n"
-                    + "	p.valor as valor\n"
-                    + "from\n"
-                    + "	parcelas_clientes pc \n"
-                    + "	join parcelas p on p.parcela = pc.parcela "
+                    "select * from contas_a_receber_recebidas(0,'2000-01-01','9999-12-31','P','P',CURRENT_DATE) p\n"
+                    + " where quite = 'N'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("codigo_id"));
-                    imp.setIdCliente(rst.getString("id_cliente"));
-                    imp.setParcela(rst.getInt("parcela"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setId(rst.getString("codigo"));
+                    imp.setIdCliente(rst.getString("cliente"));
+                    imp.setNumeroCupom(rst.getString("nota"));
+                    imp.setParcela(rst.getInt("parcela") == 0 ? 1 : rst.getInt("parcela"));
+                    imp.setDataEmissao(rst.getDate("data_venda"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("valor_original"));
 
                     result.add(imp);
                 }
