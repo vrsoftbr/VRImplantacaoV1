@@ -1,30 +1,30 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import vrframework.bean.internalFrame.VRInternalFrame;
-import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrframework.classe.ProgressBar;
+import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
-import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.LogusDAO;
-import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2_5.dao.sistema.Interage2_5DAO;
 
-public class Logus2_5GUI extends VRInternalFrame {
+public class Interage2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = ESistema.LOGUS.getNome();
-    private static Logus2_5GUI instance;
+    private static final String SISTEMA = ESistema.INTERAGE.getNome();
+    private static Interage2_5GUI instance;
 
-    private final LogusDAO dao = new LogusDAO();
+    private final Interage2_5DAO dao = new Interage2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public Logus2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Interage2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -59,7 +59,7 @@ public class Logus2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.LOGUS);
+        pnlConn.setSistema(ESistema.INTERAGE);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -92,6 +92,8 @@ public class Logus2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
+                    dao.setConexao(" - " + pnlConn.idConexao);
+
                     idLojaVR = pnlConn.getLojaVR();
                     idLojaCliente = pnlConn.getLojaOrigem();
 
@@ -104,12 +106,16 @@ public class Logus2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-                    
+
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
                         dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
                         dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
+                    }
+
+                    if (chkAjustarDigitoVerificador.isSelected()) {
+                        dao.importarDigitoVerificador();
                     }
 
                     if (tabMenu.getSelectedIndex() == 0) {
@@ -123,7 +129,11 @@ public class Logus2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
-                            default: break;
+                            /*case 3:
+                                break;*/
+                            default:
+                                break;
+
                         }
                     }
 
@@ -148,7 +158,7 @@ public class Logus2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Logus2_5GUI(i_mdiFrame);
+                instance = new Interage2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -173,6 +183,9 @@ public class Logus2_5GUI extends VRInternalFrame {
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
+        tabParametro = new javax.swing.JPanel();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -180,22 +193,22 @@ public class Logus2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Logus (Informix)");
+        setTitle("Modelo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -210,7 +223,6 @@ public class Logus2_5GUI extends VRInternalFrame {
             }
         });
 
-        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
         jBLimpar.setText("Limpar");
         jBLimpar.setToolTipText("Limpa todos os itens selecionados");
@@ -252,10 +264,48 @@ public class Logus2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Clientes", tabCli);
+
+        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(339, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(228, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
+        tabParametro.setLayout(tabParametroLayout);
+        tabParametroLayout.setHorizontalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabParametroLayout.setVerticalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tabImportacao.addTab("Ajuste", tabParametro);
 
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);
@@ -267,7 +317,7 @@ public class Logus2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
+                    .addComponent(tabMenu, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 603, Short.MAX_VALUE)
                     .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -277,7 +327,7 @@ public class Logus2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -311,6 +361,7 @@ public class Logus2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private javax.swing.JButton jBLimpar;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
@@ -321,6 +372,8 @@ public class Logus2_5GUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabMenu;
+    private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 }

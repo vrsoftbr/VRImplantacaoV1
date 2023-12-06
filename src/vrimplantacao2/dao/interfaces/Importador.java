@@ -28,6 +28,7 @@ import vrimplantacao2.dao.cadastro.cheque.ChequeRepositoryProvider;
 import vrimplantacao2.dao.cadastro.cliente.ClienteRepository;
 import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.cliente.PessoaImpRepository;
 import vrimplantacao2.dao.cadastro.comprador.CompradorRepository;
 import vrimplantacao2.dao.cadastro.comprador.CompradorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.convenio.OpcaoConvenio;
@@ -129,6 +130,7 @@ import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
+import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
@@ -1317,5 +1319,12 @@ public class Importador {
         );
         DesmembramentoRepository rep = new DesmembramentoRepository(provider);
         rep.importarDesmembramento(desmembramentos);
+    }
+    
+    public void importarPessoaImp() throws Exception {
+        ProgressBar.setStatus("Carregando clientes Master 5.0...");
+        List<PessoaImp> clientes = getInterfaceDAO().getPessoaImp();
+        PessoaImpRepository rep = new PessoaImpRepository();
+        rep.salvarPessoaImp(clientes);
     }
 }

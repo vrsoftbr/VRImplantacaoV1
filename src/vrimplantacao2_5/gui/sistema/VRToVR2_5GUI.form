@@ -285,11 +285,16 @@
                                           <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="chkCDataNascimento" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <Component id="chkCDataNascimento" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="chkPessoaImpM5_0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -300,7 +305,7 @@
                                   <Component id="chkCvEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCvConveniado" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="83" max="32767" attributes="0"/>
+                              <EmptySpace pref="128" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -315,7 +320,10 @@
                                   <Component id="chkBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPessoaImpM5_0" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCreditoRotativoBaixados" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -455,6 +463,11 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkCvTransacaoBaixadosActionPerformed"/>
                       </Events>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkPessoaImpM5_0">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Pessoa M5.0"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>

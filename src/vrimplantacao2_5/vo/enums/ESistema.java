@@ -335,6 +335,7 @@ import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hiper2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
+import vrimplantacao2_5.gui.sistema.Interage2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jmaster2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jnp_MSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.KCMS2_5GUI;
@@ -620,7 +621,7 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new CPlus2_5GUI(frame);
-            }catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -631,7 +632,7 @@ public enum ESistema {
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new CadastraFacil2_5GUI(frame);
-            }catch (Exception ex) {
+            } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
             return null;
@@ -1063,7 +1064,12 @@ public enum ESistema {
     INTERAGE(85, "INTERAGE", new InterageDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Interage2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     INVENTER(86, "INVENTER", new InventerDAO()) {
@@ -1079,7 +1085,7 @@ public enum ESistema {
         }
     },
     JMASTER(88, "JMASTER", new Jmaster2_5DAO()) {
-           @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
@@ -1823,7 +1829,7 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    ECO_CENTAURO(193, "ECO_CENTAURO", new EcoCentauro2_5DAO ()) {
+    ECO_CENTAURO(193, "ECO_CENTAURO", new EcoCentauro2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {

@@ -56,6 +56,7 @@ import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
+import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
@@ -1704,6 +1705,247 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    @Override
+    public List<PessoaImp> getPessoaImp() throws Exception {
+        List<PessoaImp> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "with forn as (select cnpj from fornecedor),\n"
+                    + "	 convenio as (select id from conveniado)\n"
+                    + "select\n"
+                    + getLojaOrigem() + " cnpj_loja_mercado,\n"
+                    + "	c.id impid,\n"
+                    + "	c.cnpj,\n"
+                    + "	c.inscricaoestadual,\n"
+                    + "	c.orgaoemissor,\n"
+                    + "	c.nome razao,\n"
+                    + "	c.nome fantasia,\n"
+                    + "	CASE c.id_situacaocadastro WHEN 1 THEN 'S' ELSE 'N' END ativo,\n"
+                    + "	CASE WHEN c.bloqueado THEN 'S' ELSE 'N' END bloqueado,\n"
+                    + "	to_char(c.datarestricao, 'DD/MM/YYYY') databloqueio,\n"
+                    + "	c.endereco,\n"
+                    + "	c.numero,\n"
+                    + "	c.complemento,\n"
+                    + "	c.bairro,\n"
+                    + "	c.id_municipio municipioIBGE,\n"
+                    + "	mun.descricao municipio,\n"
+                    + "	c.id_estado ufIBGE,\n"
+                    + "	est.sigla uf,\n"
+                    + "	c.cep,\n"
+                    + "	COALESCE(SUBSTRING(civil.descricao,1,3), 'NAO') estadocivil,\n"
+                    + "	to_char(c.datanascimento, 'DD/MM/YYYY') datanascimento,\n"
+                    + "	to_char(c.datacadastro, 'DD/MM/YYYY') datacadastro,\n"
+                    + "	CASE c.sexo WHEN 0 THEN 'F' ELSE 'M' END sexo,\n"
+                    + "	c.empresa,\n"
+                    + "	c.enderecoempresa empresaendereco,\n"
+                    + "	c.numeroempresa empresanumero,\n"
+                    + "	c.complementoempresa empresacomplemento,\n"
+                    + "	c.bairroempresa empresabairro,\n"
+                    + "	c.id_municipioempresa empresamunicipioIBGE,\n"
+                    + "	mun_emp.descricao empresamunicipio,\n"
+                    + "	c.id_estadoempresa empresaufIBGE,\n"
+                    + "	est_emp.sigla empresauf,\n"
+                    + "	c.cepempresa empresacep,\n"
+                    + "	c.telefoneempresa empresatelefone,\n"
+                    + "	to_char(c.dataadmissao, 'DD/MM/YYYY') dataadmissao,\n"
+                    + "	c.cargo,\n"
+                    + "	to_char(c.salario, '999999990D00') salario,\n"
+                    + "	to_char(c.valorlimite, '999999990D00') valorlimite,\n"
+                    + "	c.nomeconjuge,\n"
+                    + "	c.nomepai,\n"
+                    + "	c.nomemae,\n"
+                    + "	regexp_replace(c.observacao2,'[\\\\n\\\\r]+',' ','g') observacao,\n"
+                    + "	c.vencimentocreditorotativo diavencimento,\n"
+                    + "	CASE WHEN c.permitecreditorotativo THEN 'S' ELSE 'N' END permitecreditorotativo,\n"
+                    + "	CASE WHEN c.permitecheque THEN 'S' ELSE 'N' END permitecheque,	\n"
+                    + "	c.telefone,\n"
+                    + "	c.celular,\n"
+                    + "	c.email,\n"
+                    + "	NULL fax,\n"
+                    + "	c.telefone cobrancaTelefone,\n"
+                    + "	0 prazopagamento,\n"
+                    + "	c.endereco cobrancaendereco,\n"
+                    + "	c.numero cobrancanumero,\n"
+                    + "	c.complemento cobrancacomplemento,\n"
+                    + "	c.bairro cobrancabairro,\n"
+                    + "	c.id_municipio cobrancamunicipioibge,\n"
+                    + "	mun.descricao cobrancamunicipio,\n"
+                    + "	c.id_estado cobrancaufibge,\n"
+                    + "	est.sigla cobrancauf,\n"
+                    + "	c.cep cobrancacep,\n"
+                    + "	'NENHUM'::VARCHAR tipoorgaopublico,\n"
+                    + "	0 limitecompra,\n"
+                    + "	''::VARCHAR inscricaomunicipal,\n"
+                    + "	'NAO CONTRIBUINTE'::VARCHAR tipoindicadorie,\n"
+                    + "	case when isforn.cnpj = c.cnpj then true else false end fornecedor,\n"
+                    + "	case when conv.id = c.id then true else false end conveniado\n"
+                    + "FROM \n"
+                    + "	clientepreferencial c\n"
+                    + "	LEFT JOIN municipio mun ON\n"
+                    + "		c.id_municipio = mun.id\n"
+                    + "	LEFT JOIN estado est ON\n"
+                    + "		c.id_estado = est.id\n"
+                    + "	LEFT JOIN municipio mun_emp ON\n"
+                    + "		c.id_municipioempresa = mun_emp.id\n"
+                    + "	LEFT JOIN estado est_emp ON\n"
+                    + "		c.id_estadoempresa = est_emp.id\n"
+                    + "	LEFT JOIN tipoestadocivil civil ON\n"
+                    + "		c.id_tipoestadocivil = civil.id\n"
+                    + "	left join forn isforn on c.cnpj = isforn.cnpj\n"
+                    + "	left join convenio conv on c.id = conv.id\n"
+                    + "union \n"
+                    + "select\n"
+                    + getLojaOrigem() + " cnpj_loja_mercado,\n"
+                    + "	f.id impid,\n"
+                    + "	f.cnpj,\n"
+                    + "	f.inscricaoestadual,\n"
+                    + "	null orgaoemissor,\n"
+                    + "	f.razaosocial razao,\n"
+                    + "	f.nomefantasia fantasia,\n"
+                    + "	CASE f.id_situacaocadastro WHEN 1 THEN 'S' ELSE 'N' END ativo,\n"
+                    + "	CASE WHEN f.bloqueado THEN 'S' ELSE 'N' END bloqueado,\n"
+                    + "	null databloqueio,\n"
+                    + "	f.endereco,\n"
+                    + "	f.numero,\n"
+                    + "	f.complemento,\n"
+                    + "	f.bairro,\n"
+                    + "	f.id_municipio municipioIBGE,\n"
+                    + "	m.descricao municipio,\n"
+                    + "	f.id_estado ufIBGE,\n"
+                    + "	est.sigla uf,\n"
+                    + "	f.cep,\n"
+                    + "	'NÂO' estadocivil,\n"
+                    + "	to_char(f.datacadastro, 'DD/MM/YYYY') datanascimento,\n"
+                    + "	to_char(f.datacadastro, 'DD/MM/YYYY') datacadastro,\n"
+                    + "	null sexo,\n"
+                    + "	f.razaosocial empresa,\n"
+                    + "	f.endereco empresaendereco,\n"
+                    + "	f.numero empresanumero,\n"
+                    + "	f.complemento empresacomplemento,\n"
+                    + "	f.bairro empresabairro,\n"
+                    + "	f.id_municipio empresamunicipioIBGE,\n"
+                    + "	m.descricao empresamunicipio,\n"
+                    + "	f.id_estado empresaufIBGE,\n"
+                    + "	est.sigla empresauf,\n"
+                    + "	f.cep empresacep,\n"
+                    + "	f.telefone empresatelefone,\n"
+                    + "	to_char(f.datasintegra, 'DD/MM/YYYY') dataadmissao,\n"
+                    + "	null cargo,\n"
+                    + "	null salario,\n"
+                    + "	null valorlimite,\n"
+                    + "	null nomeconjuge,\n"
+                    + "	null nomepai,\n"
+                    + "	null nomemae,\n"
+                    + "	regexp_replace(f.observacao,'[\\\\n\\\\r]+',' ','g') observacao,\n"
+                    + "	f.tiporegravencimento diavencimento,\n"
+                    + "	null permitecreditorotativo,\n"
+                    + "	null permitecheque,	\n"
+                    + "	f.telefone,\n"
+                    + "	null celular,\n"
+                    + "	null email,\n"
+                    + "	NULL fax,\n"
+                    + "	f.telefone cobrancaTelefone,\n"
+                    + "	0 prazopagamento,\n"
+                    + "	f.endereco cobrancaendereco,\n"
+                    + "	f.numero cobrancanumero,\n"
+                    + "	f.complemento cobrancacomplemento,\n"
+                    + "	f.bairro cobrancabairro,\n"
+                    + "	f.id_municipio cobrancamunicipioibge,\n"
+                    + "	m.descricao cobrancamunicipio,\n"
+                    + "	f.id_estado cobrancaufibge,\n"
+                    + "	est.sigla cobrancauf,\n"
+                    + "	f.cep cobrancacep,\n"
+                    + "	'NENHUM'::VARCHAR tipoorgaopublico,\n"
+                    + "	0 limitecompra,\n"
+                    + "	''::VARCHAR inscricaomunicipal,\n"
+                    + "	'NAO CONTRIBUINTE'::VARCHAR tipoindicadorie,\n"
+                    + "	true fornecedor,\n"
+                    + "	case when conv.id is not null then true else false end conveniado\n"
+                    + "FROM \n"
+                    + "	fornecedor f\n"
+                    + "	LEFT JOIN municipio m ON f.id_municipio = m.id\n"
+                    + "	LEFT JOIN estado est ON f.id_estado = est.id\n"
+                    + "	LEFT JOIN municipio cm ON f.id_municipiocobranca = cm.id\n"
+                    + "	LEFT JOIN estado ce ON f.id_estadocobranca = ce.id\n"
+                    + "	left join convenio conv on f.id = conv.id")) {
+                while (rs.next()) {
+                    PessoaImp imp = new PessoaImp();
+
+                    imp.setCnpjLojaMercado(rs.getString("cnpj_loja_mercado"));
+                    imp.setImpid(rs.getInt("impid"));
+                    imp.setCnpj(rs.getLong("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getString("ativo"));
+                    imp.setBloqueado(rs.getString("bloqueado"));
+                    imp.setDatabloqueio(rs.getDate("databloqueio"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioibge(rs.getString("municipioibge"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUfibge(rs.getString("ufibge"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEstadocivil(rs.getString("estadocivil"));
+                    imp.setDatanascimento(rs.getString("datanascimento"));
+                    imp.setDatacadastro(rs.getString("datacadastro"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaendereco(rs.getString("empresaendereco"));
+                    imp.setEmpresanumero(rs.getString("empresanumero"));
+                    imp.setEmpresacomplemento(rs.getString("empresacomplemento"));
+                    imp.setEmpresabairro(rs.getString("empresabairro"));
+                    imp.setEmpresamunicipioibge(rs.getInt("empresamunicipioibge"));
+                    imp.setEmpresamunicipio(rs.getString("empresamunicipio"));
+                    imp.setEmpresaufibge(rs.getInt("empresaufibge"));
+                    imp.setEmpresauf(rs.getString("empresauf"));
+                    imp.setEmpresacep(rs.getString("empresacep"));
+                    imp.setEmpresatelefone(rs.getString("empresatelefone"));
+                    imp.setDataadmissao(rs.getString("dataadmissao"));
+                    imp.setCargo(rs.getString("cargo"));
+                    imp.setSalario(rs.getString("salario"));
+                    imp.setValorlimite(rs.getString("valorlimite"));
+                    imp.setNomeconjuge(rs.getString("nomeconjuge"));
+                    imp.setNomepai(rs.getString("nomepai"));
+                    imp.setNomemae(rs.getString("nomemae"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setDiavencimento(rs.getInt("diavencimento"));
+                    imp.setPermitecreditorotativo(rs.getString("permitecreditorotativo"));
+                    imp.setPermitecheque(rs.getString("permitecheque"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setFax(rs.getString("fax"));
+                    imp.setCobrancatelefone(rs.getString("cobrancatelefone"));
+                    imp.setPrazopagamento(rs.getInt("prazopagamento"));
+                    imp.setCobrancaendereco(rs.getString("cobrancaendereco"));
+                    imp.setCobrancanumero(rs.getString("cobrancanumero"));
+                    imp.setCobrancacomplemento(rs.getString("cobrancacomplemento"));
+                    imp.setCobrancabairro(rs.getString("cobrancabairro"));
+                    imp.setCobrancamunicipioibge(rs.getInt("cobrancamunicipioibge"));
+                    imp.setCobrancamunicipio(rs.getString("cobrancamunicipio"));
+                    imp.setCobrancaufibge(rs.getInt("cobrancaufibge"));
+                    imp.setCobrancauf(rs.getString("cobrancauf"));
+                    imp.setCobrancacep(rs.getString("cobrancacep"));
+                    imp.setTipoorgaopublico(rs.getString("tipoorgaopublico"));
+                    imp.setLimitecompra(rs.getInt("limitecompra"));
+                    imp.setInscricaomunicipal(rs.getString("inscricaomunicipal"));
+                    imp.setTipoindicadorie(rs.getString("tipoindicadorie"));
+                    imp.setFornecedor(rs.getBoolean("fornecedor"));
+                    imp.setConveniado(rs.getBoolean("conveniado"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
@@ -1975,4 +2217,5 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " and id_loja = " + idLoja);
         }
     }
+    
 }
