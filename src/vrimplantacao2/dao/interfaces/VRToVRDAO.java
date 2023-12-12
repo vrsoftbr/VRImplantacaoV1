@@ -1651,7 +1651,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId_tipounidadeporcao(rst.getInt("Id_tipounidadeporcao"));
 
                     imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
-                    imp.addProduto(rst.getString("id"));
+                    imp.addProduto(rst.getString("id_produto"));
                     result.add(imp);
                 }
             }

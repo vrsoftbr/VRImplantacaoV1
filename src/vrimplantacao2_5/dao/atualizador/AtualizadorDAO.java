@@ -362,14 +362,14 @@ public class AtualizadorDAO {
         }
     }
 
-    public void inserirUsuario() throws Exception {
+public void inserirUsuario() throws Exception {
         /*
         * Ao excluir um usuario, favor excluir ou alterar o mesmo no método atualizarSenhas();
         * O método está nessa mesma classe.
          */
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (1, 'BRUNO', 'BRUNO', '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'ALAN', 'ALAN', '$2a$12$lVFlwdtE6tRx98VtEc8iw.ebicubFny7agcVE0avxmv7DgPbUJ8ui', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (2, 'GUSTAVO', 'GUSTAVO', '$2a$10$0fk.SW3xFIEFbZcBg6/UX.pWFKuEL5emRX9Um0pxrcXO7WyZeUmWy', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (3, 'WAGNER', 'WAGNER', '$2a$12$.8DmNiwGEEXV/M1zxYP43uBOi2rQs3Q/7wxPe5Lbm7poAWyjnoozm', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (4, 'MICHAEL', 'MICHAEL', '$2a$12$NKdzIm0k/.QbltTcFDiyLOTxBCe9Mi01xHU/v93MdZIcvwESY404.', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (5, 'RODRIGO', 'RODRIGO', '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
@@ -437,7 +437,7 @@ public class AtualizadorDAO {
                 stm.execute("do $$\n"
                         + "begin\n"
                         + "   update implantacao2_5.usuario set senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 1;\n"
-                        + "   update implantacao2_5.usuario set senha = '$2a$12$lVFlwdtE6tRx98VtEc8iw.ebicubFny7agcVE0avxmv7DgPbUJ8ui' where id = 2;\n"
+                        + "   update implantacao2_5.usuario set senha = '$2a$10$0fk.SW3xFIEFbZcBg6/UX.pWFKuEL5emRX9Um0pxrcXO7WyZeUmWy' where id = 2;\n"
                         + "   update implantacao2_5.usuario set senha = '$2a$12$.8DmNiwGEEXV/M1zxYP43uBOi2rQs3Q/7wxPe5Lbm7poAWyjnoozm' where id = 3;\n"
                         + "   update implantacao2_5.usuario set senha = '$2a$12$NKdzIm0k/.QbltTcFDiyLOTxBCe9Mi01xHU/v93MdZIcvwESY404.' where id = 4;\n"
                         + "   update implantacao2_5.usuario set senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 5;\n"
