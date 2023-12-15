@@ -28,6 +28,7 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
@@ -59,6 +60,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -152,6 +154,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.NUTRICIONAL,
                     OpcaoProduto.VENDA_PDV,
                     OpcaoProduto.PDV_VENDA,
+                    OpcaoProduto.RECEITA_BALANCA,
                     OpcaoProduto.RECEITA
                 }
         ));
@@ -522,7 +525,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ean.qtdembalagem,\n"
                     + "	ean_un.descricao unidade,\n"
                     + "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n"
-                    + "	p.validade,\n"
                     + "	p.descricaocompleta,\n"
                     + "	p.descricaoreduzida,\n"
                     + "	p.descricaogondola,\n"
@@ -540,6 +542,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
+                    + (versao.menorQue(4, 1, 1) ? " p.validade " : " vend.validade ,\n")
                     + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
@@ -613,7 +616,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setTipoEmbalagemCotacao(rs.getString("embalagemcotacao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
-                    imp.setValidade(rs.getInt("validade"));
+                    if (versao.menorQue(4, 1, 1)) {
+                        imp.setValidade(rs.getInt("validade"));
+                    }
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
@@ -1194,40 +1199,39 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ChequeIMP> result = new ArrayList<>();
 
         try (
-                Statement st = ConexaoPostgres.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select\n"
-                        + "	c.id,\n"
-                        + "	c.cpf,\n"
-                        + "	c.numerocheque,\n"
-                        + "	c.id_banco,\n"
-                        + "	c.agencia,\n"
-                        + "	c.conta,\n"
-                        + "	c.data,\n"
-                        + "	c.datadeposito,\n"
-                        + "	c.numerocupom,\n"
-                        + "	c.ecf,\n"
-                        + "	c.valor,\n"
-                        + "	c.rg,\n"
-                        + "	c.telefone,\n"
-                        + "	c.nome,\n"
-                        + "	c.observacao,\n"
-                        + "	c.id_situacaorecebercheque,\n"
-                        + "	c.cmc7,\n"
-                        + "	c.id_tipoalinea,\n"
-                        + "	c.valorjuros,\n"
-                        + "	c.valoracrescimo,\n"
-                        + "	c.id_tipolocalcobranca,\n"
-                        + "	c.datahoraalteracao,\n"
-                        + "	c.id_tipovistaprazo\n"
-                        + "from\n"
-                        + "	recebercheque c\n"
-                        + "where\n"
-                        + "	c.id_loja = " + getLojaOrigem() + "\n"
-                        + "	and c.id_situacaorecebercheque = 0\n"
-                        + "order by\n"
-                        + "	c.id"
-                )) {
+                Statement st = ConexaoPostgres.getConexao().createStatement(); ResultSet rs = st.executeQuery(
+                "select\n"
+                + "	c.id,\n"
+                + "	c.cpf,\n"
+                + "	c.numerocheque,\n"
+                + "	c.id_banco,\n"
+                + "	c.agencia,\n"
+                + "	c.conta,\n"
+                + "	c.data,\n"
+                + "	c.datadeposito,\n"
+                + "	c.numerocupom,\n"
+                + "	c.ecf,\n"
+                + "	c.valor,\n"
+                + "	c.rg,\n"
+                + "	c.telefone,\n"
+                + "	c.nome,\n"
+                + "	c.observacao,\n"
+                + "	c.id_situacaorecebercheque,\n"
+                + "	c.cmc7,\n"
+                + "	c.id_tipoalinea,\n"
+                + "	c.valorjuros,\n"
+                + "	c.valoracrescimo,\n"
+                + "	c.id_tipolocalcobranca,\n"
+                + "	c.datahoraalteracao,\n"
+                + "	c.id_tipovistaprazo\n"
+                + "from\n"
+                + "	recebercheque c\n"
+                + "where\n"
+                + "	c.id_loja = " + getLojaOrigem() + "\n"
+                + "	and c.id_situacaorecebercheque = 0\n"
+                + "order by\n"
+                + "	c.id"
+        )) {
             while (rs.next()) {
                 ChequeIMP imp = new ChequeIMP();
 
@@ -1267,36 +1271,35 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
 
         try (
-                Statement st = ConexaoPostgres.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select\n"
-                        + "	e.id,\n"
-                        + "	e.razaosocial,\n"
-                        + "	e.cnpj,\n"
-                        + "	e.inscricaoestadual,\n"
-                        + "	e.endereco,\n"
-                        + "	e.numero,\n"
-                        + "	e.complemento,\n"
-                        + "	e.bairro,\n"
-                        + "	e.id_municipio,\n"
-                        + "	e.cep,\n"
-                        + "	e.telefone,\n"
-                        + "	e.datainicio,\n"
-                        + "	e.datatermino,\n"
-                        + "	e.id_situacaocadastro,\n"
-                        + "	e.percentualdesconto,\n"
-                        + "	e.renovacaoautomatica,\n"
-                        + "	e.diapagamento,\n"
-                        + "	e.bloqueado,\n"
-                        + "	e.databloqueio,\n"
-                        + "	e.diainiciorenovacao,\n"
-                        + "	e.diaterminorenovacao,\n"
-                        + "	e.observacao\n"
-                        + "from\n"
-                        + "	empresa e\n"
-                        + "order by\n"
-                        + "	e.id"
-                )) {
+                Statement st = ConexaoPostgres.getConexao().createStatement(); ResultSet rs = st.executeQuery(
+                "select\n"
+                + "	e.id,\n"
+                + "	e.razaosocial,\n"
+                + "	e.cnpj,\n"
+                + "	e.inscricaoestadual,\n"
+                + "	e.endereco,\n"
+                + "	e.numero,\n"
+                + "	e.complemento,\n"
+                + "	e.bairro,\n"
+                + "	e.id_municipio,\n"
+                + "	e.cep,\n"
+                + "	e.telefone,\n"
+                + "	e.datainicio,\n"
+                + "	e.datatermino,\n"
+                + "	e.id_situacaocadastro,\n"
+                + "	e.percentualdesconto,\n"
+                + "	e.renovacaoautomatica,\n"
+                + "	e.diapagamento,\n"
+                + "	e.bloqueado,\n"
+                + "	e.databloqueio,\n"
+                + "	e.diainiciorenovacao,\n"
+                + "	e.diaterminorenovacao,\n"
+                + "	e.observacao\n"
+                + "from\n"
+                + "	empresa e\n"
+                + "order by\n"
+                + "	e.id"
+        )) {
             while (rs.next()) {
                 ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
 
@@ -1335,27 +1338,26 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ConveniadoIMP> result = new ArrayList<>();
 
         try (
-                Statement st = ConexaoPostgres.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select\n"
-                        + "	c.id,\n"
-                        + "	c.nome,\n"
-                        + "	c.id_empresa,\n"
-                        + "	c.bloqueado,\n"
-                        + "	c.id_situacaocadastro,\n"
-                        + "	c.senha,\n"
-                        + "	c.cnpj,\n"
-                        + "	c.observacao,\n"
-                        + "	c.datavalidadecartao,\n"
-                        + "	c.datadesbloqueio,\n"
-                        + "	c.visualizasaldo,\n"
-                        + "	c.databloqueio,\n"
-                        + "	c.id_loja\n"
-                        + "from\n"
-                        + "	conveniado c\n"
-                        + "order by\n"
-                        + "	c.id"
-                )) {
+                Statement st = ConexaoPostgres.getConexao().createStatement(); ResultSet rs = st.executeQuery(
+                "select\n"
+                + "	c.id,\n"
+                + "	c.nome,\n"
+                + "	c.id_empresa,\n"
+                + "	c.bloqueado,\n"
+                + "	c.id_situacaocadastro,\n"
+                + "	c.senha,\n"
+                + "	c.cnpj,\n"
+                + "	c.observacao,\n"
+                + "	c.datavalidadecartao,\n"
+                + "	c.datadesbloqueio,\n"
+                + "	c.visualizasaldo,\n"
+                + "	c.databloqueio,\n"
+                + "	c.id_loja\n"
+                + "from\n"
+                + "	conveniado c\n"
+                + "order by\n"
+                + "	c.id"
+        )) {
             while (rs.next()) {
                 ConveniadoIMP imp = new ConveniadoIMP();
 
@@ -1610,6 +1612,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " n.percentualGordura,\n"
                     + " n.percentualGorduraSaturada,\n"
                     + " n.percentualFibra,\n"
+                    + " n.quantidade,\n"
                     + " n.percentualCalcio,\n"
                     + " n.percentualFerro,\n"
                     + " n.percentualSodio,\n"
@@ -1631,6 +1634,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCaloria(rst.getInt("caloria"));
                     imp.setCarboidrato(rst.getDouble("carboidrato"));
                     imp.setProteina(rst.getDouble("proteina"));
+                    imp.setQuantidade(rst.getInt("quantidade"));
                     imp.setGordura(rst.getDouble("gordura"));
                     imp.setFibra(rst.getDouble("fibra"));
                     imp.setCalcio(rst.getDouble("calcio"));
@@ -1705,7 +1709,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<PessoaImp> getPessoaImp() throws Exception {
         List<PessoaImp> result = new ArrayList<>();
@@ -2217,5 +2221,5 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " and id_loja = " + idLoja);
         }
     }
-    
+
 }

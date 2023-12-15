@@ -176,6 +176,7 @@ public class NutricionalRepository {
         nut.setPercentualferro(imp.getPercentualFerro());
         nut.setPercentualsodio(imp.getPercentualSodio());
         nut.setPorcao(imp.getPorcao());
+        nut.setQuantidade(imp.getQuantidade());
         
         StringBuilder string = new StringBuilder();
         for (String linha: imp.getMensagemAlergico()) {

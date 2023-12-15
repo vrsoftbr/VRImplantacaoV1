@@ -39,6 +39,7 @@ public class NutricionalFilizolaVO {
     private int percentualcalcio = 0;
     private int percentualferro = 0;
     private int percentualsodio = 0;
+    private int quantidade = 0;
     private String porcao = "";
     private String mensagemAlergico = "";
     public List<NutricionalFilizolaItemVO> vNutricionalFilizolaItem = new ArrayList<>();
@@ -436,6 +437,20 @@ public class NutricionalFilizolaVO {
 
     public void setMensagemAlergico(String mensagemAlergico) {
         this.mensagemAlergico = Utils.acertarTexto(mensagemAlergico, 168);
+    }
+
+    /**
+     * @return the quantidade
+     */
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    /**
+     * @param quantidade the quantidade to set
+     */
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
     }
     
 }

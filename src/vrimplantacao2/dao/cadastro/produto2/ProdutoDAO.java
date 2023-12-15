@@ -120,7 +120,9 @@ public class ProdutoDAO {
             sql.put("descricaoreduzida", vo.getDescricaoReduzida());
             sql.put("pesoliquido", vo.getPesoLiquido());
             sql.put("datacadastro", vo.getDatacadastro());
-            sql.put("validade", vo.getValidade());
+            if (versao.menorQue(4, 1)) {
+                sql.put("validade", vo.getValidade());
+            }
             sql.put("pesobruto", vo.getPesoBruto());
             sql.put("comprimentoembalagem", 0);
             sql.put("larguraembalagem", 0);
@@ -190,9 +192,11 @@ public class ProdutoDAO {
             sql.put("utilizatabelasubstituicaotributaria", false);
             sql.put("id_tipolocaltroca", 0);
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
-            if (vo.getQtdDiasMinimoValidade() > 0 ){
-            sql.put("utilizavalidadeentrada", true);                
-            } else sql.put("utilizavalidadeentrada", false);
+            if (vo.getQtdDiasMinimoValidade() > 0) {
+                sql.put("utilizavalidadeentrada", true);
+            } else {
+                sql.put("utilizavalidadeentrada", false);
+            }
             sql.put("impostomedioestadual", 0);
             sql.put("id_tipocompra", vo.getTipoCompra().getId());
             sql.put("numeroparcela", vo.getNumeroparcela());
@@ -343,9 +347,11 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("validade", vo.getValidade());
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
-            if (vo.getQtdDiasMinimoValidade() > 0 ){
-            sql.put("utilizavalidadeentrada", true);                
-            } else sql.put("utilizavalidadeentrada", false);
+            if (vo.getQtdDiasMinimoValidade() > 0) {
+                sql.put("utilizavalidadeentrada", true);
+            } else {
+                sql.put("utilizavalidadeentrada", false);
+            }
         }
         if (opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO)) {
             sql.put("id_tipoembalagem", vo.getTipoEmbalagem().getId());
@@ -427,7 +433,7 @@ public class ProdutoDAO {
             sql.put("percentualperda", 0.0);
             sql.put("perda", vo.getPercentualPerda() != 0 ? vo.getPercentualPerda() : 0);
         }
-        if(opt.contains(OpcaoProduto.TIPO_COMPRA)){
+        if (opt.contains(OpcaoProduto.TIPO_COMPRA)) {
             sql.put("id_tipocompra", vo.getTipoCompra().getId());
         }
 

@@ -47,6 +47,7 @@ public class NutricionalIMP {
     private double acucarestotais = 0;
     private final List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
     private final Set<String> produtos = new HashSet<>();
+    private int quantidade = 0;
     
     /**
      * Executa um cálculo para definir as porcentagens do nutricional.
@@ -348,5 +349,20 @@ public class NutricionalIMP {
     public void setAcucarestotais(double acucarestotais) {
         this.acucarestotais = acucarestotais;
     }
+
+    /**
+     * @return the quantidade
+     */
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    /**
+     * @param quantidade the quantidade to set
+     */
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+    
     
 }
