@@ -70,7 +70,7 @@ public class LojaGeradorScripts {
                 + " " + (i_loja.isCopiaCusto() ? "custocomimposto" : "0") + ", 0, 0, " + (i_loja.isCopiaPrecoVenda() ? "precovenda" : "0") + ","
                 + "  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,"
                 + " null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,"
-                + " valoricmssubstituicao, null, cestabasica, 0, 3";
+                + " valoricmssubstituicao, null, 0, 0, 3";
 
         if (versao.igualOuMaiorQue(3, 17, 10)) {
             sql = sql + ", 0, false";
