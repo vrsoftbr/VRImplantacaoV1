@@ -269,10 +269,18 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "        tributacao_pdv \n"
                     + "order by descritivo")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"),
-                            rs.getString("descritivo")
-                            + "(ALI: " + rs.getString("icms_venda")
-                            + " RED: " + rs.getString("reducao_venda") + ")"));
+//                    result.add(new MapaTributoIMP(rs.getString("id"),
+//                            rs.getString("descritivo")
+//                            + "(ALI: " + rs.getString("icms_venda")
+//                            + " RED: " + rs.getString("reducao_venda") + ")"));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descritivo")+ "(ALI: " + rs.getString("icms_venda")+ " RED: " + rs.getString("reducao_venda") + ")", 
+                            "R".equals(rs.getString("tributacao_venda")) ? 20 : 0 , 
+                            rs.getDouble("icms_venda"),
+                            rs.getDouble("reducao_venda"))
+                    );
+                              
                 }
             }
         }
@@ -489,7 +497,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	left join produtos_ean ean on ean.produto = a.id\n"
                 + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
                 + "	left join familias fam on a.familia = fam.id\n"
-              //+ "WHERE TO_CHAR(a.DATAHORA_CADASTRO, 'yyyy-MM-dd') <= '2022-03-22'\n"
+                //+ "WHERE TO_CHAR(a.DATAHORA_CADASTRO, 'yyyy-MM-dd') <= '2022-03-22'\n"
                 + "order by\n"
                 + "    a.id";
 
@@ -1011,10 +1019,10 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  n.sodio,\n"
                     + "  n.quantidade porcao,\n"
                     + "  n.obs mensagemalergico\n,"
-                    + "  p.receita as mensagemalergico2\n"
+                    + "  SUBSTR(p.receita, 1 , 840) as mensagemalergico2\n"
                     + "from\n"
                     + "  nutricional n\n"
-                    + "left join produtos p on p.id = n.id\n"
+                    + "join produtos p on p.id = n.id\n"
                     + "order by\n"
                     + "  n.id"
             )) {
@@ -1037,7 +1045,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFerro(rst.getDouble("ferro"));
                     imp.setSodio(rst.getDouble("sodio"));
                     imp.setPorcao(rst.getString("porcao"));
-                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico2"));
+                    imp.getMensagemAlergico().add(Utils.acertarTexto(rst.getString("mensagemalergico2")));
                     imp.addProduto(rst.getString("id"));
 
                     result.add(imp);
@@ -1865,7 +1873,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCobrancaUf(rst.getString("estado_c"));
                         imp.setCobrancaCep(rst.getString("cep_c"));
                         imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
-                        imp.setGrupo(rst.getInt("empresa_convenio"));
+                        //imp.setGrupo(rst.getInt("empresa_convenio"));
                         imp.setEstadoCivil(rst.getString("estadocivil"));
 
                         result.add(imp);
@@ -2599,8 +2607,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and not tipo_cadastro is null\n"
                     + " and cl.id is not null\n"
                     + (naoUtilizaPlanoConta == true ? "\n" : " and plano_conta in (" + getPlanosContaStr() + ")\n")
-                    + "order by id"*/ 
-                    "SELECT\n"
+                    + "order by id"*/ "SELECT\n"
                     + "	 c.id,\n"
                     + "	 to_char(c.emissao,'dd/MM/yyyy') emissao,\n"
                     + "	 c.nf,\n"
