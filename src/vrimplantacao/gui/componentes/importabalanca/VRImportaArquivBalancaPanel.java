@@ -5,6 +5,11 @@
  */
 package vrimplantacao.gui.componentes.importabalanca;
 
+import java.awt.Dimension;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.panel.VRPanel;
 import vrframework.classe.ProgressBar;
@@ -22,8 +27,9 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
     private String sistema;
     private String loja;
-    private CondicaoToledo condicaoToledo;    
+    private CondicaoToledo condicaoToledo;
     private ToledoService servico = new ToledoService();
+    private File[] filesMemo;
 
     public String getSistema() {
         return sistema;
@@ -40,8 +46,9 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     }
 
     public String getLoja() {
-        if (loja.equals(""))
+        if (loja.equals("")) {
             loja = "1";
+        }
         return loja;
     }
 
@@ -54,15 +61,13 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             tabsOpcoes.remove(tabNutricional);
         }
     }
-    
-    
-    
+
     /**
      * Creates new form ArquivoDeBalanca
      */
     public VRImportaArquivBalancaPanel() {
         initComponents();
-        
+
         rdbCodigoInterno.setSelected(true);
     }
 
@@ -83,11 +88,12 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         rdbTxtItens = new vrframework.bean.radioButton.VRRadioButton();
         rdbItensMgv = new vrframework.bean.radioButton.VRRadioButton();
         rdbPlanilha = new vrframework.bean.radioButton.VRRadioButton();
-        txtArquivoBalanca = new vrframework.bean.fileChooser.VRFileChooser();
         btnImportarBalanca = new vrframework.bean.button.VRButton();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        btnAbrir = new vrframework.bean.button.VRButton();
+        txtArquivoBalanca = new vrframework.bean.textField.VRTextField();
         tabNutricional = new javax.swing.JPanel();
         rdbFilizolaRdc360 = new javax.swing.JRadioButton();
-        txtNutricional = new vrframework.bean.fileChooser.VRFileChooser();
         btnImportarNutricional = new vrframework.bean.button.VRButton();
         rdbToledo = new javax.swing.JRadioButton();
         rdbToledoProduto = new javax.swing.JRadioButton();
@@ -95,6 +101,9 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         rdbCodigoInterno = new vrframework.bean.radioButton.VRRadioButton();
         rdbCodigoBarras = new vrframework.bean.radioButton.VRRadioButton();
         chkIgnorarUltimoDigito = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        btnAbrirNutri = new vrframework.bean.button.VRButton();
+        txtNutricional = new vrframework.bean.textField.VRTextField();
 
         setBorder(null);
 
@@ -118,18 +127,47 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             }
         });
 
+        vRPanel1.setBorder(null);
+        vRPanel1.setPreferredSize(new java.awt.Dimension(285, 21));
+
+        btnAbrir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/bean/fileChooser/abrir.png"))); // NOI18N
+        btnAbrir.setToolTipText("Abrir (F9)");
+        btnAbrir.setFocusable(false);
+        btnAbrir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbrirActionPerformed(evt);
+            }
+        });
+
+        txtArquivoBalanca.setCaixaAlta(false);
+        txtArquivoBalanca.setMascara("");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
+                .addComponent(txtArquivoBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAbrir, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txtArquivoBalanca, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAbrir, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout tabPesaveisLayout = new javax.swing.GroupLayout(tabPesaveis);
         tabPesaveis.setLayout(tabPesaveisLayout);
         tabPesaveisLayout.setHorizontalGroup(
             tabPesaveisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabPesaveisLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(tabPesaveisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabPesaveisLayout.createSequentialGroup()
-                        .addComponent(txtArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnImportarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tabPesaveisLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addComponent(rdbCadTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(rdbTxtItens, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -137,7 +175,11 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         .addComponent(rdbItensMgv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(rdbPlanilha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 92, Short.MAX_VALUE))
+                    .addGroup(tabPesaveisLayout.createSequentialGroup()
+                        .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnImportarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         tabPesaveisLayout.setVerticalGroup(
@@ -150,10 +192,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                     .addComponent(rdbItensMgv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(rdbPlanilha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabPesaveisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnImportarBalanca, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtArquivoBalanca, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(tabPesaveisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnImportarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
 
         tabsOpcoes.addTab("Pesáveis", tabPesaveis);
@@ -198,6 +240,39 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
         chkIgnorarUltimoDigito.setText("Ignorar Último Dígito");
 
+        vRPanel2.setBorder(null);
+        vRPanel2.setPreferredSize(new java.awt.Dimension(285, 21));
+
+        btnAbrirNutri.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/bean/fileChooser/abrir.png"))); // NOI18N
+        btnAbrirNutri.setToolTipText("Abrir (F9)");
+        btnAbrirNutri.setFocusable(false);
+        btnAbrirNutri.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbrirNutriActionPerformed(evt);
+            }
+        });
+
+        txtNutricional.setCaixaAlta(false);
+        txtNutricional.setMascara("");
+
+        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel2Layout.createSequentialGroup()
+                .addComponent(txtNutricional, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAbrirNutri, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        vRPanel2Layout.setVerticalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txtNutricional, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAbrirNutri, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout tabNutricionalLayout = new javax.swing.GroupLayout(tabNutricional);
         tabNutricional.setLayout(tabNutricionalLayout);
         tabNutricionalLayout.setHorizontalGroup(
@@ -206,8 +281,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addContainerGap()
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
-                        .addComponent(txtNutricional, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnImportarNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
                         .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,7 +296,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                                 .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(rdbFilizolaRdc360)
                             .addComponent(rdbToledo))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 59, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabNutricionalLayout.setVerticalGroup(
@@ -241,9 +316,9 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rdbToledoProduto)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnImportarNutricional, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNutricional, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnImportarNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -258,7 +333,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabsOpcoes, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                .addComponent(tabsOpcoes)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -273,7 +348,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     private void btnImportarBalancaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarBalancaActionPerformed
         VRInternalFrame parent = null;
         if (getParent() instanceof VRInternalFrame) {
-            parent = (VRInternalFrame)getParent();
+            parent = (VRInternalFrame) getParent();
         }
         try {
             if (parent != null) {
@@ -294,57 +369,56 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     private void btnImportarNutricionalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarNutricionalActionPerformed
         Thread thread;
         thread = new Thread() {
-            
+
             int opcao;
-            
+
             @Override
             public void run() {
-                
+
                 VRInternalFrame parent = null;
                 if (getParent() instanceof VRInternalFrame) {
-                    parent = (VRInternalFrame)getParent();
+                    parent = (VRInternalFrame) getParent();
                 }
-                
+
                 try {
-                    
+
                     ProgressBar.show();
                     ProgressBar.setCancel(false);
-                    
-                    if (!txtNutricional.getArquivo().isEmpty()) {
+
+                    if (!txtNutricional.getText().isEmpty()) {
                         servico.setSistema(getSistema());
                         servico.setLoja(getLoja());
                         FilizolaSalvarArquivos operacoesSalvar = new FilizolaSalvarArquivos();
-                        
+
                         if (rdbFilizolaRdc360.isSelected()) {
                             //operacoesSalvar.salvarArquivoRdc360(txtNutricional.getArquivo(), sistema, loja);
-                            operacoesSalvar.salvarArquivo(txtNutricional.getArquivo(), sistema, loja);
+                            operacoesSalvar.salvarArquivo(txtNutricional.getText(), sistema, loja);
                         }
-                        if(rdbToledo.isSelected()) {
-                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INTENSMGV);
+                        if (rdbToledo.isSelected()) {
+                            servico.direcionaImportacao(txtNutricional.getText(), condicaoToledo.INTENSMGV);
                             //NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
                         }
-                        if(rdbToledoProduto.isSelected()) {
+                        if (rdbToledoProduto.isSelected()) {
                             servico.setIgnorarUltimoDigito(chkIgnorarUltimoDigito.isSelected());
                             servico.setOpcaoCodigo(rdbCodigoInterno.isSelected() ? 2 : 1);
-                            servico.direcionaImportacao(txtNutricional.getArquivo(), condicaoToledo.INFNUTRI);
-                           //NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo(), rdbCodigoInterno.isSelected() ? 1 : 2, chkIgnorarUltimoDigito.isSelected());
+                            servico.direcionaImportacao(txtNutricional.getText(), condicaoToledo.INFNUTRI);
+                            //NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo(), rdbCodigoInterno.isSelected() ? 1 : 2, chkIgnorarUltimoDigito.isSelected());
                         }
-                    }                   
-                    
+                    }
+
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação de balança realizada com sucesso!", parent != null ? parent.getTitle() : null);
-                    
-                } catch(Exception ex) {
-                    
+
+                } catch (Exception ex) {
+
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, parent != null ? parent.getTitle() : null);
                 }
             }
-            
-            
+
         };
-                
+
         thread.start();
     }//GEN-LAST:event_btnImportarNutricionalActionPerformed
 
@@ -354,7 +428,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
     private void rdbCodigoInternoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbCodigoInternoActionPerformed
         // TODO add your handling code here:
-        
+
         if (rdbCodigoInterno.isSelected()) {
             rdbCodigoInterno.setSelected(true);
             rdbCodigoBarras.setSelected(false);
@@ -369,8 +443,51 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         }
     }//GEN-LAST:event_rdbCodigoBarrasActionPerformed
 
+    private void btnAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirActionPerformed
+        try {
+            JFileChooser jFileChooserBalanca = new JFileChooser();
+            jFileChooserBalanca.setDialogTitle("Carregar arquivo de Balança");
+            jFileChooserBalanca.setPreferredSize(new Dimension(528, 326));
+            jFileChooserBalanca.setMultiSelectionEnabled(true);
+
+            int resultado = jFileChooserBalanca.showOpenDialog(this);
+            if (resultado == JFileChooser.CANCEL_OPTION) {
+                jFileChooserBalanca.setVisible(false);
+                txtArquivoBalanca = null;
+            } else {
+                txtArquivoBalanca.setText(jFileChooserBalanca.getSelectedFile().getPath());
+                jFileChooserBalanca.setVisible(false);
+            }
+
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Atenção");
+        }
+    }//GEN-LAST:event_btnAbrirActionPerformed
+
+    private void btnAbrirNutriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirNutriActionPerformed
+        try {
+            JFileChooser jFileChooserNutri = new JFileChooser();
+            jFileChooserNutri.setDialogTitle("Carregar arquivo Nutricional");
+            jFileChooserNutri.setPreferredSize(new Dimension(528, 326));
+            jFileChooserNutri.setMultiSelectionEnabled(true);
+            int resultado = jFileChooserNutri.showOpenDialog(this);
+            if (resultado == JFileChooser.CANCEL_OPTION) {
+                jFileChooserNutri.setVisible(false);
+                txtNutricional = null;
+            } else {
+                txtNutricional.setText(jFileChooserNutri.getSelectedFile().getPath());
+                jFileChooserNutri.setVisible(false);
+            }
+
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Atenção");
+        }
+    }//GEN-LAST:event_btnAbrirNutriActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnAbrir;
+    private vrframework.bean.button.VRButton btnAbrirNutri;
     private vrframework.bean.button.VRButton btnImportarBalanca;
     private vrframework.bean.button.VRButton btnImportarNutricional;
     private vrframework.bean.checkBox.VRCheckBox chkIgnorarUltimoDigito;
@@ -388,33 +505,35 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     private javax.swing.JPanel tabNutricional;
     private javax.swing.JPanel tabPesaveis;
     private javax.swing.JTabbedPane tabsOpcoes;
-    private vrframework.bean.fileChooser.VRFileChooser txtArquivoBalanca;
-    private vrframework.bean.fileChooser.VRFileChooser txtNutricional;
+    private vrframework.bean.textField.VRTextField txtArquivoBalanca;
+    private vrframework.bean.textField.VRTextField txtNutricional;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.panel.VRPanel vRPanel1;
+    private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 
     private void importarProdutosBalanca() {
-        
+
         Thread thread;
         thread = new Thread() {
-            
+
             int opcao;
-            
+
             @Override
             public void run() {
-                
+
                 VRInternalFrame parent = null;
                 if (getParent() instanceof VRInternalFrame) {
-                    parent = (VRInternalFrame)getParent();
+                    parent = (VRInternalFrame) getParent();
                 }
-                
+
                 try {
-                    
+
                     ProgressBar.show();
                     ProgressBar.setCancel(false);
-                    
-                    if (!txtArquivoBalanca.getArquivo().isEmpty()) {
-                        
+
+                    if (!txtArquivoBalanca.getText().isEmpty()) {
+
                         if (rdbCadTxt.isSelected()) {
                             opcao = 1;
                         } else if (rdbTxtItens.isSelected()) {
@@ -424,25 +543,23 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         } else if (rdbPlanilha.isSelected()) {
                             opcao = 4;
                         }
-                        
-                        ProdutoBalancaDAO.importarProdutoBalanca(txtArquivoBalanca.getArquivo(), opcao);
+
+                        ProdutoBalancaDAO.importarProdutoBalanca(txtArquivoBalanca.getText(), opcao);
                     }
-                    
-                    
+
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação de balança realizada com sucesso!", parent != null ? parent.getTitle() : null);
-                    
-                } catch(Exception ex) {
-                    
+
+                } catch (Exception ex) {
+
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, parent != null ? parent.getTitle() : null);
                 }
             }
-            
-            
+
         };
-                
+
         thread.start();
     }
 }
