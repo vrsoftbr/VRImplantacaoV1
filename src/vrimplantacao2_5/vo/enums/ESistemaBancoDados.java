@@ -163,6 +163,7 @@ public enum ESistemaBancoDados {
     MYSQL_ALCANCE(245, "ALCANCE", 8, "MYSQL", "pprt", "root", "alcan2143", 3306, ""),
     MYSQL_SISMASTER(253, "SISMASTER", 8, "MYSQL", "sismaster", "suporte", "sismaster123", 3306, ""),
     MYSQL_STI3(255, "STI3", 8, "MYSQL", "sti3database", "root", "", 3306, ""),
+    MYSQL_EMPRESOFT(263,"EMPRESOFT",8,"MYSQL","empresoft","root","575757",3306,""),
 //ORACLE
     ORACLE_APOLLO(5, "APOLLO", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_CEFAS(24, "CEFAS", 9, "ORACLE", "ORCL", "rb", "avemaria", 1521, ""),

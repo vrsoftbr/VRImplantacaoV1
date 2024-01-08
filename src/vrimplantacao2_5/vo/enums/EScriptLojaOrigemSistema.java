@@ -156,7 +156,8 @@ public enum EScriptLojaOrigemSistema {
     LJSISTEMAS_SIG(260, 5, "SELECT EMPCONTADOR id, DESCEMPRESA descricao  FROM EMP001"),
     JMASTER(88, 13, "select LOJCODIGO as id, LOJRAZAO as descricao from dbo.CADLOJ "),
     G3(60, 8, "select idempresa id,RazaoSocial descricao from  empresa e "),
-    SAURUSPDV(261, 13, "select loj_idLoja id, loj_fant descricao  from tbLojaDados");
+    SAURUSPDV(261, 13, "select loj_idLoja id, loj_fant descricao  from tbLojaDados"),
+    EMPRESOFT(263, 8, "select  codigo as id, fantasia  as descricao from empresa ");
 
     private int idSistema;
     private int idBancoDados;

@@ -120,9 +120,9 @@ public class ProdutoDAO {
             sql.put("descricaoreduzida", vo.getDescricaoReduzida());
             sql.put("pesoliquido", vo.getPesoLiquido());
             sql.put("datacadastro", vo.getDatacadastro());
-            if (versao.menorQue(4, 1)) {
+            if (versao.menorQue(4, 2,0)) {
                 sql.put("validade", vo.getValidade());
-            }
+                }
             sql.put("pesobruto", vo.getPesoBruto());
             sql.put("comprimentoembalagem", 0);
             sql.put("larguraembalagem", 0);

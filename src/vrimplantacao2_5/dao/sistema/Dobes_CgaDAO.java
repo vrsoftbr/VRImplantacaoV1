@@ -181,6 +181,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.RECEITA_BALANCA,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.TIPO_PRODUTO
         ));
     }
@@ -452,7 +453,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("PRODNome")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("PRODNomeRed")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rst.getString("PRODEtq")));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDataCadastro(rst.getDate("PRODCadast"));
                     imp.setMargem(rst.getDouble("PRODMargem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));

@@ -121,20 +121,20 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	DISTINCT \n"
-                    + "	CAST (CODTRIBUT00 AS integer) || '-' || round(ALIQICMSREG00, 2) || '-' || round(baseicmsreg00, 2) AS id,\n"
-                    + "	'CST ' || CODTRIBUT00 || ' ALIQ ' || CAST(ALIQICMSREG00 AS char(5)) || ' RED ' || CAST(baseicmsreg00 AS char(7)) AS descricao,\n"
-                    + "	CODTRIBUT00 AS cst,\n"
-                    + "	ALIQICMSREG00 AS aliq,\n"
-                    + "	baseicmsreg00 AS red\n"
+                    + "DISTINCT\n"
+                    + "CODTRIBUT00 || '-' || CAST (ALIQICMSREG00 AS varchar(10))|| '-' || CAST(baseicmsreg00 AS varchar(10)) AS id ,\n"
+                    + "'CST ' || CODTRIBUT00 || ' ALIQ ' || CAST(ALIQICMSREG00 AS varchar(10)) || ' RED ' || CAST(baseicmsreg00 AS varchar(10)) AS descricao,\n"
+                    + "COALESCE(NULLIF(CODTRIBUT00, ''), '0') AS cst,\n"
+                    + "ALIQICMSREG00 AS aliq,\n"
+                    + "baseicmsreg00 AS red\n"
                     + "FROM\n"
-                    + "	produto"
+                    + "produto"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
                             rs.getString("descricao"),
-                            rs.getInt("cst"),
+                            Integer.parseInt(rs.getString("cst")),
                             rs.getDouble("aliq"),
                             rs.getDouble("red"))
                     );
@@ -305,6 +305,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setEstoqueMinimo(rst.getDouble("est_min"));
                     imp.setEstoqueMaximo(rst.getDouble("est_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setValidade(0);
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
 
                     imp.setNcm(rst.getString("ncm"));
@@ -468,7 +469,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
                     + "FROM\n"
                     + "	CLIENTE c\n"
                     + "	JOIN CIDADES c2 ON c.CODCIDADE = c2.CODCIDADE \n"
-                    //        + "WHERE CODCLIENTE = '00000016'"
+            //        + "WHERE CODCLIENTE = '00000016'"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
