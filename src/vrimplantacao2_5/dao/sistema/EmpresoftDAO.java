@@ -296,7 +296,6 @@ public class EmpresoftDAO extends InterfaceDAO implements MapaTributoProvider {
 //        }
 //        return result;
 //    }
-
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -404,16 +403,17 @@ public class EmpresoftDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "pedido,\n"
-                    + "cliente,\n"
-                    + "emissao,\n"
-                    + "vencto,\n"
-                    + "valor,\n"
-                    + "pago\n"
-                    + "from\n"
-                    + "parcela\n"
-                    + "where pagto is null and valor >0\n"
-                    + "order by 2"
+                    + " pedido,\n"
+                    + " cliente,\n"
+                    + " emissao,\n"
+                    + " vencto,\n"
+                    + " valor,\n"
+                    + " pago\n"
+                    + " from\n"
+                    + " parcela\n"
+                    + "where pago = 0\n"
+                    + "and maq_b = ''\n"
+                    + " order by 2"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
