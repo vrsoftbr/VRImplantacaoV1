@@ -43,8 +43,6 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
-import vrimplantacao2_5.dao.conexao.ConexaoOracle;
-import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 
 /**
  *
