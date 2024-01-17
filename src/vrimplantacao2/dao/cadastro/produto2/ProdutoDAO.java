@@ -524,13 +524,14 @@ public class ProdutoDAO {
             sql.put("descricao", vo.getDescricaoCompleta());
             sql.put("id_tipoorigemimagem", 1);
 
-            if (versao.maiorQue(3, 21)) {
+            if (versao.maiorQue(3, 21) && versao.menorQue(4,2)) {
                 sql.put("codigobarras", ean);
             }
 
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
+                System.out.println(sql.getInsert());
                 throw e;
             }
         }

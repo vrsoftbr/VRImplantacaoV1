@@ -199,7 +199,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " pro.PESO as pesobruto,\n"
                     + " pro.PESO_L peseoliquido,\n"
                     + " pro.DT_CAD as datacadastro,\n"
-                    + " pre.PER_LUCRO_EFETIVO as margem,\n"
+                    + " pre.per_lucro_projetado as margem,\n"
                     + " pre.VR_CUSTO_REPOSICAO as custocomimposto,\n"
                     + " pre.VR_CUSTO_AQUISICAO as custosemimposto,\n"
                     + " pre.VR_VENDA_ATUAL as precovenda,\n"
