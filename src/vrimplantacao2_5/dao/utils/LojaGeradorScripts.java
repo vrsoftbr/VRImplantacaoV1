@@ -475,7 +475,7 @@ public class LojaGeradorScripts {
                 + "	bloquearvenda ,\n"
                 + "	bloquearvendaitens)\n"
                 + "	select \n"
-                + "	" + i_loja.getId() + ", id_produto, datainicio, datatermino, precooferta,preconormal, id_situacaooferta ,id_tipooferta \n"
+                + "	" + i_loja.getId() + ", id_produto, datainicio, datatermino, precooferta,preconormal, id_situacaooferta ,id_tipooferta, \n"
                 + "	precoimediato , ofertafamilia , ofertaassociado, controle , aplicapercentualprecoassociado , \n"
                 + "	encerraoferta , encerraofertaitens , bloquearvenda , bloquearvendaitens \n"
                 + "	from oferta\n"
