@@ -233,7 +233,7 @@ import vrimplantacao2_5.dao.sistema.GEPDAO;
 import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GZSistemas2_5DAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
-import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO;
+import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO2_5;
 import vrimplantacao2_5.dao.sistema.Jmaster2_5DAO;
 import vrimplantacao2_5.dao.sistema.ProviderGenericoDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
@@ -329,7 +329,9 @@ import vrimplantacao2_5.gui.sistema.GSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
-import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI;
+//import vrimplantacao2_5.gui.sistema.GatewaySistemasGUI;
+import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI_old;
+import vrimplantacao2_5.gui.sistema.GatewaySistemasGUI;
 import vrimplantacao2_5.gui.sistema.Generico2_5GUI;
 import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
@@ -1877,11 +1879,11 @@ public enum ESistema {
             return null;
         }
     },
-    GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO()) {
+    GATEWAYSISTEMAS(198, "GATEWAY SISTEMAS", new GatewaySistemasDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new GatewaySistemas2_5GUI(frame);
+                return new GatewaySistemasGUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

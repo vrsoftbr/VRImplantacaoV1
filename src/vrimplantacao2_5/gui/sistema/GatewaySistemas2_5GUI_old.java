@@ -17,10 +17,10 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2_5.vo.sistema.GatewaySistemasVO;
 
-public class GatewaySistemas2_5GUI extends VRInternalFrame {
+public class GatewaySistemas2_5GUI_old extends VRInternalFrame {
 
     private static final String SISTEMA = ESistema.GATEWAYSISTEMAS.getNome();
-    private static GatewaySistemas2_5GUI instance;
+    private static GatewaySistemas2_5GUI_old instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GatewaySistemasDAO dao = null;
@@ -62,7 +62,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         return vo;        
     }
     
-    public GatewaySistemas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public GatewaySistemas2_5GUI_old(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -120,7 +120,7 @@ public class GatewaySistemas2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new GatewaySistemas2_5GUI(i_mdiFrame);
+                instance = new GatewaySistemas2_5GUI_old(i_mdiFrame);
             }
 
             instance.setVisible(true);

@@ -542,7 +542,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
-                    + (versao.menorQue(4, 1, 1) ? " p.validade " : " vend.validade ,\n")
+                    + (versao.menorQue(4, 1, 1) ? " vend.validade" : " p.validade  ,\n")
                     + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
