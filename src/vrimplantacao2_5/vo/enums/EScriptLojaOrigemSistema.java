@@ -157,7 +157,8 @@ public enum EScriptLojaOrigemSistema {
     JMASTER(88, 13, "select LOJCODIGO as id, LOJRAZAO as descricao from dbo.CADLOJ "),
     G3(60, 8, "select idempresa id,RazaoSocial descricao from  empresa e "),
     SAURUSPDV(261, 13, "select loj_idLoja id, loj_fant descricao  from tbLojaDados"),
-    EMPRESOFT(263, 8, "select  codigo as id, fantasia  as descricao from empresa ");
+    EMPRESOFT(263, 8, "select  codigo as id, fantasia  as descricao from empresa "),
+    CONNEXONE(264, 8, "select codigo id, nomeFantasia descricao from registroempresa ");
 
     private int idSistema;
     private int idBancoDados;
