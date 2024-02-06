@@ -122,7 +122,7 @@ public class ResulthBusinessDAO extends InterfaceDAO implements MapaTributoProvi
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
                     + "DISTINCT\n"
-                    + "CODTRIBUT00 || '-' || CAST (ALIQICMSREG00 AS varchar(10))|| '-' || CAST(baseicmsreg00 AS varchar(10)) AS id ,\n"
+                    + "CAST (CODTRIBUT00 AS integer) || '-' || round(ALIQICMSREG00,2)|| '-' || round(baseicmsreg00,2) AS id ,\n"
                     + "'CST ' || CODTRIBUT00 || ' ALIQ ' || CAST(ALIQICMSREG00 AS varchar(10)) || ' RED ' || CAST(baseicmsreg00 AS varchar(10)) AS descricao,\n"
                     + "COALESCE(NULLIF(CODTRIBUT00, ''), '0') AS cst,\n"
                     + "ALIQICMSREG00 AS aliq,\n"

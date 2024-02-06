@@ -23,6 +23,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -107,6 +108,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.CLIENTE_EVENTUAL));
     }
 
@@ -219,12 +221,10 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "	produto.id_prod idproduto,\n"
-//                  + "	ean.ean13 ean,\n
                     + " case when balanca = 'SIM' then produto.cd_auxiliar else ean.ean13 end ean,\n"
                     + "	produto.descricao desc_completa,\n"
                     + "	descricaor desc_reduzida,\n"
                     + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
-//                  + "	coalesce(f.fator, 1) qtde_emb,\n"
                     + "	uv.sigla emb_venda,\n"
                     + "	uc.sigla emb_compra,\n"
                     + "	ncm.codigo ncm,\n"
@@ -236,9 +236,9 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	estoque.qtde estoque,\n"
                     + "	estoque.qtde_minima est_min,\n"
                     + "	estoque.qtde_maxima est_max,\n"
-                    + " round(preco.vr_custo_efetivo,3) custosemimposto,\n"
+                    + " round(preco.vr_custo_aquisicao,3) custosemimposto,\n"
                     + "	round(preco.vr_custo_reposicao,3) custocomimposto,\n"
-                    + " preco.per_lucro_efetivo_r margem,\n"
+                    + " preco.per_lucro_projetado margem,\n"
                     + "	round(preco.vr_venda_atual,3) precovenda,\n"
                     + " simbol.id_simbologia id_icms,\n"
                     + " pc.codigo piscofins\n"
@@ -246,18 +246,60 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	eq_prod produto\n"
                     + "	left join eq_prod_com preco on produto.id_prod = preco.id_prod \n"
                     + "	left join eq_prod_ean ean on produto.id_prod = ean.id_prod\n"
-                    + "	left join eq_prod_qtde estoque on produto.id_prod = estoque.id_prod and estoque.id_emp = 1\n"
+                    + "	left join eq_prod_qtde estoque on produto.id_prod = estoque.id_prod and estoque.id_emp = " + getLojaOrigem() + " and estoque.id_tipo_estoque = 1\n"
+                    + "	left join fs_grade_trib_aliq aliq on aliq.id_grade_trib = preco.id_grade_trib\n"
+                    + " join fs_grade_trib_dcto dcto on dcto.id_grade_trib_aliq = aliq.id_grade_trib_aliq and dcto.id_tipo_dcto = 59\n"
+                    + " left join tb_cst pc on aliq.id_cst_pis = pc.id_cst and pc.tipo_imposto = 'PIS'\n"
+                    + "	left join tb_cst cst on aliq.id_cst = cst.id_cst\n"
+                    + "	left join tb_simbologia simbol on aliq.id_simbologia = simbol.id_simbologia\n"
+                    + "	left join tb_unid uv on produto.id_unid_v = uv.id_unid\n"
+                    + "	left join tb_unid uc on produto.id_unid_c = uc.id_unid\n"
+                    + "	left join tb_ncm ncm on produto.id_ncm = ncm.id_ncm\n"
+                    + "	left join tb_cest cest on ncm.id_cest = cest.id_cest\n"
+                    + "where preco.id_emp = " + getLojaOrigem()
+            /*
+                    "select distinct\n"
+                    + "	produto.id_prod idproduto,\n"
+                    //                  + "	ean.ean13 ean,\n
+                    + " case when balanca = 'SIM' then produto.cd_auxiliar else ean.ean13 end ean,\n"
+                    + "	produto.descricao desc_completa,\n"
+                    + "	descricaor desc_reduzida,\n"
+                    + "	case when balanca = 'SIM' then 1 else 0 end e_balanca,\n"
+                    //                  + "	coalesce(f.fator, 1) qtde_emb,\n"
+                    + "	uv.sigla emb_venda,\n"
+                    + "	uc.sigla emb_compra,\n"
+                    + "	ncm.codigo ncm,\n"
+                    + "	cest.cd_cest cest,\n"
+                    + "	dt_cad data_cadastro,\n"
+                    + "	peso pesobruto,\n"
+                    + "	peso_l pesoliquido,\n"
+                    + " produto.id_tipo_prod tipoproduto,\n"
+                    + "	estoque.qtde estoque,\n"
+                    + "	estoque.qtde_minima est_min,\n"
+                    + "	estoque.qtde_maxima est_max,\n"
+                    + " round(preco.vr_custo_aquisicao,3) custosemimposto,\n"
+                    + "	round(preco.vr_custo_reposicao,3) custocomimposto,\n"
+                    + " preco.per_lucro_projetado margem,\n"
+                    + "	round(preco.vr_venda_atual,3) precovenda,\n"
+                    + " simbol.id_simbologia id_icms,\n"
+                    + " pc.codigo piscofins\n"
+                    + "from\n"
+                    + "	eq_prod produto\n"
+                    + "	left join eq_prod_com preco on produto.id_prod = preco.id_prod \n"
+                    + "	left join eq_prod_ean ean on produto.id_prod = ean.id_prod\n"
+                    + "	left join eq_prod_qtde estoque on produto.id_prod = estoque.id_prod and estoque.id_emp = " + getLojaOrigem() + "\n"
                     + "	left join fs_grade_trib_aliq aliq on aliq.id_grade_trib = preco.id_grade_trib\n"
                     + " join fs_grade_trib_dcto dcto on dcto.id_grade_trib_aliq = aliq.id_grade_trib_aliq and dcto.id_tipo_dcto = 59"
                     + " left join tb_cst pc on aliq.id_cst_pis = pc.id_cst and pc.tipo_imposto = 'PIS'\n"
                     + "	left join tb_cst cst on aliq.id_cst = cst.id_cst\n"
                     + "	left join tb_simbologia simbol on aliq.id_simbologia = simbol.id_simbologia\n"
-//                  + "	join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
+                    //                  + "	join tb_fatorcx f on f.id_fatorcx = ean.id_fatorcx\n"
                     + "	left join tb_unid uv on produto.id_unid_v = uv.id_unid\n"
                     + "	left join tb_unid uc on produto.id_unid_c = uc.id_unid\n"
                     + "	left join tb_ncm ncm on produto.id_ncm = ncm.id_ncm\n"
                     + "	left join tb_cest cest on ncm.id_cest = cest.id_cest\n"
                     + "order by 1"
+             */
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -348,7 +390,7 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstCredito(rst.getString("piscofins"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -543,6 +585,49 @@ public class NereusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setObservacao(rs.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    /*  id_tipo_situacao = 1 - em aberto
+                        id_cxa_cta = 3  - venda a prazo
+                     */
+                    "select\n"
+                    + "	id_titulo as id,\n"
+                    + "	id_pes as idCliente,\n"
+                    + "	id_pdv as ecf,\n"
+                    + "	nro_dcto as numerocupom,\n"
+                    + "	dt_emissao as dataemissao,\n"
+                    + "	vr_titulo as valor,\n"
+                    + "	dt_vencimento as datavencimento\n"
+                    + "from\n"
+                    + "	fn_titulo ft\n"
+                    + "where\n"
+                    + "	 id_emp = " + getLojaOrigem() + "\n"
+                    + "	and id_tipo_situacao = 1\n"
+                    + "	and id_cxa_cta = 3")) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("IdCliente"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("NumeroCupom"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setValor(rs.getDouble("VALOR"));
+
+                    imp.setDataVencimento(rs.getDate("datavencimento"));
 
                     result.add(imp);
                 }
