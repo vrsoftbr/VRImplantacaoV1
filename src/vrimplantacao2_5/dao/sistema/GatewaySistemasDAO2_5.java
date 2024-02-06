@@ -254,6 +254,34 @@ public class GatewaySistemasDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
+                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
+                    vrimplantacao2.vo.cadastro.ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("tipoembalagemcotacao"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(0);
+                    }
+
+                    if (rst.getString("ean") != null && !rst.getString("ean").trim().isEmpty()) {
+
+                        if (rst.getString("ean").trim().length() <= 6 && rst.getString("ean").startsWith("20")) {
+                            
+                            Integer codigoAtual = Integer.parseInt(rst.getString("ean").trim().replace("20", ""));
+                            imp.setEan(codigoAtual.toString());
+                        } else {
+                            imp.setEan(rst.getString("ean"));
+                        }
+                    }
+
                     imp.setImportId(rst.getString("id"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
@@ -271,23 +299,6 @@ public class GatewaySistemasDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPiscofinsCstCredito(rst.getString("icms"));
                     imp.setPiscofinsCstDebito(rst.getString("cstcofins"));
-
-                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
-                    vrimplantacao2.vo.cadastro.ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
-
-                    if (produtoBalanca != null) {
-                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
-                        imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
-                        imp.setValidade(produtoBalanca.getValidade());
-                        imp.setQtdEmbalagem(1);
-                    } else {
-                        imp.setEan(rst.getString("ean"));
-                        imp.seteBalanca(false);
-                        imp.setTipoEmbalagem(rst.getString("tipoembalagemcotacao"));
-                        imp.setValidade(0);
-                        imp.setQtdEmbalagem(0);
-                    }
 
                     imp.setIcmsDebitoId(rst.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("idicms"));
