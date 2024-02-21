@@ -100,6 +100,7 @@ public class ProdutoComplementoVO {
     private double margemminima;
     private double margemmaxima;
     private int operacional = 0;
+    private int validade = 0;
 
     public void setId(int id) {
         this.id = id;
@@ -333,4 +334,11 @@ public class ProdutoComplementoVO {
         this.operacional = operacional;
     }
     
+    public int getValidade() {
+        return validade;
+    }
+    
+    public void setValidade(int validade) {
+        this.validade = validade > 0 ? validade : 0;
+    }
 }

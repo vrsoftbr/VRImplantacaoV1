@@ -344,7 +344,7 @@ public class ProdutoDAO {
                 sql.put("margem", vo.getMargem());
             }
         }
-        if (opt.contains(OpcaoProduto.VALIDADE)) {
+        if (opt.contains(OpcaoProduto.VALIDADE) && versao.menorQue(4,2,0)) {
             sql.put("validade", vo.getValidade());
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
             if (vo.getQtdDiasMinimoValidade() > 0) {

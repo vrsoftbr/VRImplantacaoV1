@@ -112,6 +112,9 @@ public class ProdutoComplementoDAO {
                     sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                 }
                 sql.put("id_normareposicao", vo.getNormaReposicao().getId());
+                if(versao.igualOuMaiorQue(4, 2,0)){
+                    sql.put("validade", vo.getValidade());
+                }
                 sql.getReturning().add("id");
 
                 try (ResultSet rst = stm.executeQuery(
@@ -319,6 +322,9 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.TECLA_ASSOCIADA)) {
                 sql.put("teclaassociada", complemento.getTeclaassociada());
+            }
+            if(opt.contains(OpcaoProduto.VALIDADE) && versao.igualOuMaiorQue(4,2,2)){
+                sql.put("validade", complemento.getValidade());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
                     || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))

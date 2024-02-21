@@ -542,7 +542,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
-                    + (versao.menorQue(4, 1, 1) ? " vend.validade" : " p.validade  ,\n")
+                    + (versao.menorQue(4, 2, 0) ? " p.validade " : " vend.validade  ,\n")
                     + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
@@ -616,9 +616,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setTipoEmbalagemCotacao(rs.getString("embalagemcotacao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
-                    if (versao.menorQue(4, 1, 1)) {
-                        imp.setValidade(rs.getInt("validade"));
-                    }
+                    imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
