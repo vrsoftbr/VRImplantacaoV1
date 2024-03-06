@@ -64,6 +64,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.CODIGO_BENEFICIO,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
@@ -197,6 +198,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -270,7 +272,8 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     + "    t.perbasered redicms,\n"
                     + "    e.qtest estoque,\n"
                     + "    e.qtestmin estoqueminimo,\n"
-                    + "    dtexclusao excluido, --campo null nao excluido, campo not null excluido\n"
+                    + "    dtexclusao excluido, --campo null nao excluido, campo not null excluido,\n"
+                    + "     t.CBENEF, \n"
                     + "    p.codfornecprinc fornprincipal\n"
                     + "from\n"
                     + "    produto p \n"
@@ -337,6 +340,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pissaida"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setBeneficio(rs.getString("CBENEF"));
 
                     imp.setIcmsDebitoId(rs.getString("idaliquota"));
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
