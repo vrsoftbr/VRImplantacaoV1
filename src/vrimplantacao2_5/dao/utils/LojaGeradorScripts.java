@@ -499,7 +499,7 @@ public class LojaGeradorScripts {
                 + "	valor,controle,id_tipopercentualvalor,id_tipoquantidade,aplicatodos,cupom,valordesconto,valorreferenteitenslista,verificaprodutosauditados,\n"
                 + "	datalimiteresgatecupom,id_tipopercentualvalordesconto,valorpaga,desconsideraritem,qtdlimite,somenteclubevantagens,diasexpiracao,\n"
                 + "	utilizaquantidadeproporcional,desconsideraprodutoemoferta) \n"
-                + "	select (select max((id)+1) from promocao), \n"
+                + "	select (select max(id) from promocao) + row_number() over(), \n"
                 + "	" + i_loja.getId() + ",descricao,datainicio,datatermino,pontuacao,quantidade,qtdcupom,id_situacaocadastro,id_tipopromocao,valor,controle,id_tipopercentualvalor,\n"
                 + "	id_tipoquantidade,aplicatodos,cupom,valordesconto,valorreferenteitenslista,verificaprodutosauditados,datalimiteresgatecupom,id_tipopercentualvalordesconto,\n"
                 + "	valorpaga,desconsideraritem,qtdlimite,somenteclubevantagens,diasexpiracao,utilizaquantidadeproporcional,desconsideraprodutoemoferta\n"
