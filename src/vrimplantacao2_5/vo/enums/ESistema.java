@@ -212,6 +212,7 @@ import vrimplantacao2_5.dao.sistema.CFSoftSiaECF2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CPlus2_5DAO;
 import vrimplantacao2_5.dao.sistema.CadastraFacil2_5DAO;
+import vrimplantacao2_5.dao.sistema.CefasConcretizeDAO2_5;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConnexOneDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
@@ -304,6 +305,7 @@ import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
 import vrimplantacao2_5.gui.sistema.CadastraFacil2_5GUI;
+import vrimplantacao2_5.gui.sistema.CefasConcretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.ConnexOne2_5GUI;
@@ -645,11 +647,11 @@ public enum ESistema {
             return null;
         }
     },
-    CEFAS(24, "CEFAS", new CefasDAO()) {
+    CEFAS(24, "CEFAS", new CefasConcretizeDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new Cefas_Concretize2_5GUI(frame);
+                return new CefasConcretize2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
