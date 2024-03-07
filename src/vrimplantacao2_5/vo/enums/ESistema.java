@@ -271,6 +271,7 @@ import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.TstiDAO2_5;
+import vrimplantacao2_5.dao.sistema.VisualComercio2_5DAO;
 import vrimplantacao2_5.dao.sistema.VivaSistemasDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
@@ -395,6 +396,7 @@ import vrimplantacao2_5.gui.sistema.Tsti2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.VisualComercio2_5GUI;
 import vrimplantacao2_5.gui.sistema.VivaSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.VisualMix2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
@@ -1780,10 +1782,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercioDAO()) {
-        @Override
+    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercio2_5DAO()) {
+         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new VisualComercio2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     VISUALMIX(186, "VISUALMIX", new VisualMixDAO()) {

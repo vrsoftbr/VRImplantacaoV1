@@ -56,42 +56,57 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.PESAVEL,
                 OpcaoProduto.VALIDADE,
                 OpcaoProduto.DESC_COMPLETA,
-                OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
-                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
-                OpcaoProduto.QTD_EMBALAGEM_EAN,
-                OpcaoProduto.ATIVO,
+                OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
-                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
-                OpcaoProduto.PDV_VENDA,
-                OpcaoProduto.VENDA_PDV,
-                OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
-                OpcaoProduto.CUSTO_COM_IMPOSTO,
-                OpcaoProduto.CUSTO_SEM_IMPOSTO,
-                OpcaoProduto.NCM,
-                OpcaoProduto.EXCECAO,
-                OpcaoProduto.CEST,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
                 OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.PDV_VENDA
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.SUGESTAO_COTACAO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.VENDA_CONTROLADA,
+                OpcaoProduto.NORMA_REPOSICAO,
+                OpcaoProduto.TIPO_PRODUTO,
+                OpcaoProduto.FABRICACAO_PROPRIA,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
@@ -203,6 +218,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.codigo cst,\n"
                     + "	i.aliquota,\n"
                     + " i.descricao descricaoICMS,\n"
+                    + "	i.`SEQUENCIAL` as id_aliq,\n"
                     + "	reducao\n"
                     + "from\n"
                     + "	tsl.tslc003 p\n"
@@ -214,6 +230,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("codigo"));
                     imp.setEan(rst.getString("codbar"));
                     imp.seteBalanca("S".equals(rst.getString("bala")));
@@ -229,25 +246,26 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("lucro"));
                     imp.setPrecovenda(rst.getDouble("preco1"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoSemImposto());
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("min"));
                     imp.setEstoqueMaximo(rst.getDouble("estqmax"));
+
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("tppis"));
-                    imp.setPiscofinsCstCredito(rst.getInt("tppise"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("natrec"));
 
-//                    imp.setIcmsCst(rst.getInt("cst"));
-//                    imp.setIcmsAliq(rst.getDouble("aliquota"));
-//                    imp.setIcmsReducao(rst.getDouble("reducao"));
-                    imp.setIcmsConsumidorId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsCreditoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("descricaoICMS"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("descricaoICMS"));
+                    imp.setIcmsDebitoId(rst.getString("id_aliq"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_aliq"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_aliq"));
+                    imp.setIcmsConsumidorId(rst.getString("id_aliq"));
+                    imp.setIcmsCreditoId(rst.getString("id_aliq"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliq"));
+
+                    imp.setPiscofinsCstDebito(rst.getInt("tpcofinss"));
+                    imp.setPiscofinsCstCredito(rst.getInt("tppis"));
+                    imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("natrec"))));
+
+                    
 
                     int codigoProduto = Utils.stringToInt(rst.getString("codigo"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
