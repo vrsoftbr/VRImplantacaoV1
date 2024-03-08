@@ -221,6 +221,7 @@ import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
 import vrimplantacao2_5.dao.sistema.DevSisDAO;
+import vrimplantacao2_5.dao.sistema.Director2_5DAO;
 import vrimplantacao2_5.dao.sistema.DuplaFace_LivreDAO;
 import vrimplantacao2_5.dao.sistema.DxDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
@@ -315,6 +316,7 @@ import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
 import vrimplantacao2_5.gui.sistema.DevSis2_5GUI;
+import vrimplantacao2_5.gui.sistema.Director2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DuplaFace_Livre2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
@@ -762,10 +764,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    DIRECTOR(42, "DIRECTOR", new DirectorDAO()) {
+    DIRECTOR(42, "DIRECTOR", new Director2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Director2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     DTCOM(43, "DTCOM", new DtComDAO()) {
