@@ -134,15 +134,10 @@ public class AtualizadorService {
         this.criarTabelas();
         this.criarConstraint();
         this.criarCampoDataImportacao();
-
-        int haUsuario = atualizadorDAO.verificarLogUsuario();
-
-        if (haUsuario == 0) {
-            atualizadorDAO.inserirUnidade();
-            atualizadorDAO.inserirUsuario();
-        }
-
-        atualizadorDAO.atualizarSenhas(haUsuario);
+        
+        atualizadorDAO.inserirUnidade();
+        atualizadorDAO.inserirUsuario();
+        atualizadorDAO.atualizarSenhas();
 
         this.atualizarTabelas();
         this.salvarBancoDados();
