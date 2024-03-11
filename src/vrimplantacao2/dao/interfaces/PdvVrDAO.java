@@ -17,6 +17,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -255,6 +256,36 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdLimite(rst.getInt("qtdlimite"));
                     imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
                     imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + " CASE WHEN ID_CLIENTEPREFERENCIAL IS NULL THEN CPFCRM\n"
+                    + "   ELSE ID_CLIENTEPREFERENCIAL END id,\n"
+                    + " CASE WHEN NOMECLIENTE = '' THEN 'CADASTRO INCOMPLETO'\n"
+                    + "   ELSE NOMECLIENTE END nome,\n"
+                    + " CPFCRM cpf\n"
+                    + "FROM VENDA\n"
+                    + "WHERE ID_CLIENTEPREFERENCIAL IS NOT NULL\n"
+                    + "OR NOMECLIENTE <> ''\n"
+                    + "OR CPFCRM <> 0"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cpf"));
+
                     result.add(imp);
                 }
             }
