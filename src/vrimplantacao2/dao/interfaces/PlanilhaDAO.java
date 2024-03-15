@@ -383,7 +383,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPrecovenda(linha.getDouble("precovenda"));
                 produto.setVendaPdv(linha.getBoolean("vendapdv"));
                 produto.setEmiteEtiqueta(linha.getBoolean("emiteetiqueta"));
-                produto.setSituacaoCadastro(!linha.getBoolean("ativo") ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                produto.setSituacaoCadastro(linha.getBoolean("ativo") ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                 produto.setDescontinuado(linha.getBoolean("descontinuado"));
                 produto.setNcm(linha.getString("ncm"));
                 produto.setCest(linha.getString("cest"));

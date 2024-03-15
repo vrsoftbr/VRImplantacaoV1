@@ -261,6 +261,7 @@ import vrimplantacao2_5.dao.sistema.PallasDAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
 import vrimplantacao2_5.dao.sistema.ResulthBusinessDAO;
 import vrimplantacao2_5.dao.sistema.STI32_5DAO;
+import vrimplantacao2_5.dao.sistema.SantSystemDAO;
 import vrimplantacao2_5.dao.sistema.SaurusPDVDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
@@ -373,6 +374,7 @@ import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.ResulthBusiness2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.STI32_5GUI;
+import vrimplantacao2_5.gui.sistema.SantSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Shi2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.SaurusPDV2_5GUI;
@@ -2632,6 +2634,18 @@ public enum ESistema {
         ) {
             try {
                 return new ConnexOne2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SANTSYSTEM(265, "SANTSYSTEM", new SantSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new SantSystem2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

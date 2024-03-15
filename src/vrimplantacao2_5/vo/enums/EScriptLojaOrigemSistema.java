@@ -158,7 +158,8 @@ public enum EScriptLojaOrigemSistema {
     G3(60, 8, "select idempresa id,RazaoSocial descricao from  empresa e "),
     SAURUSPDV(261, 13, "select loj_idLoja id, loj_fant descricao  from tbLojaDados"),
     EMPRESOFT(263, 8, "select  codigo as id, fantasia  as descricao from empresa "),
-    CONNEXONE(264, 8, "select codigo id, nomeFantasia descricao from registroempresa ");
+    CONNEXONE(264, 8, "select codigo id, nomeFantasia descricao from registroempresa "),
+    SANTSYSTEM(265, 13, "select IdEmpresa as id, RSocial as descricao from Empresa");
 
     private int idSistema;
     private int idBancoDados;

@@ -440,7 +440,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
 
-                    imp.setEstoque(rst.getDouble("estoque") == 0
+                    /*imp.setEstoque(rst.getDouble("estoque") == 0
                             ? rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
 
                     imp.setTroca(rst.getDouble("estoquetroca"));
@@ -452,7 +452,14 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                             ? rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
 
                     imp.setPrecovenda(rst.getDouble("precovenda") == 0
-                            ? rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
+                            ? rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));*/
+                    
+                    imp.setTroca(rst.getDouble("estoquetroca"));
+                    
+                    imp.setEstoque(rst.getDouble("estoque_produto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda_produto"));
+                    imp.setCustoComImposto(rst.getDouble("custo_produto"));
+                    imp.setCustoSemImposto(rst.getDouble("custo_produto"));
 
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
@@ -564,6 +571,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     } else {
                         imp.seteBalanca((rst.getInt("balanca") == 1));
                         imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
                         imp.setValidade(rst.getInt("VALIDADE"));
                         if (imp.isBalanca()) {
                             qtdBalanca++;
