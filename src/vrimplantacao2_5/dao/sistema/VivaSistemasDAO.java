@@ -79,7 +79,8 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                 OpcaoProduto.TROCA,
                 OpcaoProduto.VALIDADE,
                 OpcaoProduto.VENDA_PDV,
-                OpcaoProduto.VOLUME_QTD
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.CODIGO_BENEFICIO
         ));
     }
 
@@ -344,7 +345,8 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     + "	v.PRVA_VLR_VAREJO precovenda,\n"
                     + "	p.TRCA_PK id_icms,\n"
                     + "	PROD_CST_PIS pis_cofins,\n"
-                    + "	p.PROD_CODIGO_NATUREZA_PISCOFINS nat_rec\n"
+                    + "	p.PROD_CODIGO_NATUREZA_PISCOFINS nat_rec,\n"
+                    + " p.PROD_CODIGO_BENEFICIO beneficio"
                     + "FROM\n"
                     + "	ESTO_PRODUTOS p\n"
                     + "LEFT JOIN ESTO_PRODUTOS_QUANTIDADE est ON est.PROD_PK = p.PROD_PK AND est.EMPR_PK = " + getLojaOrigem() + "\n"
@@ -405,6 +407,7 @@ public class VivaSistemasDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
+                    imp.setBeneficio(rst.getString("beneficio"));
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));

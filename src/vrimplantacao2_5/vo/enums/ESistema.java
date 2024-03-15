@@ -212,6 +212,7 @@ import vrimplantacao2_5.dao.sistema.CFSoftSiaECF2_5DAO;
 import vrimplantacao2_5.dao.sistema.CMMDAO;
 import vrimplantacao2_5.dao.sistema.CPlus2_5DAO;
 import vrimplantacao2_5.dao.sistema.CadastraFacil2_5DAO;
+import vrimplantacao2_5.dao.sistema.CefasConcretizeDAO2_5;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConnexOneDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
@@ -220,6 +221,7 @@ import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
 import vrimplantacao2_5.dao.sistema.Dellasta_PrismaFlexDAO;
 import vrimplantacao2_5.dao.sistema.DevSisDAO;
+import vrimplantacao2_5.dao.sistema.Director2_5DAO;
 import vrimplantacao2_5.dao.sistema.DuplaFace_LivreDAO;
 import vrimplantacao2_5.dao.sistema.DxDAO;
 import vrimplantacao2_5.dao.sistema.ETradeDAO;
@@ -271,6 +273,7 @@ import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.TstiDAO2_5;
+import vrimplantacao2_5.dao.sistema.VisualComercio2_5DAO;
 import vrimplantacao2_5.dao.sistema.VivaSistemasDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
 import vrimplantacao2_5.dao.sistema.WiseDAO;
@@ -305,6 +308,7 @@ import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
 import vrimplantacao2_5.gui.sistema.CadastraFacil2_5GUI;
+import vrimplantacao2_5.gui.sistema.CefasConcretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.ConnexOne2_5GUI;
@@ -313,6 +317,7 @@ import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
 import vrimplantacao2_5.gui.sistema.DevSis2_5GUI;
+import vrimplantacao2_5.gui.sistema.Director2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dobes_Cga2_5GUI;
 import vrimplantacao2_5.gui.sistema.DuplaFace_Livre2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dx2_5GUI;
@@ -395,6 +400,7 @@ import vrimplantacao2_5.gui.sistema.Tsti2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
+import vrimplantacao2_5.gui.sistema.VisualComercio2_5GUI;
 import vrimplantacao2_5.gui.sistema.VivaSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.VisualMix2_5GUI;
 import vrimplantacao2_5.gui.sistema.WBA2_5GUI;
@@ -647,11 +653,11 @@ public enum ESistema {
             return null;
         }
     },
-    CEFAS(24, "CEFAS", new CefasDAO()) {
+    CEFAS(24, "CEFAS", new CefasConcretizeDAO2_5()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new Cefas_Concretize2_5GUI(frame);
+                return new CefasConcretize2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
@@ -760,10 +766,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    DIRECTOR(42, "DIRECTOR", new DirectorDAO()) {
+    DIRECTOR(42, "DIRECTOR", new Director2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Director2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     DTCOM(43, "DTCOM", new DtComDAO()) {
@@ -1780,10 +1791,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercioDAO()) {
-        @Override
+    VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercio2_5DAO()) {
+         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new VisualComercio2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     VISUALMIX(186, "VISUALMIX", new VisualMixDAO()) {
