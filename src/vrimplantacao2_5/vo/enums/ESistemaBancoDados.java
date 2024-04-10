@@ -227,6 +227,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_ARTSYSTEM(6, "ARTSYSTEM", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_ASEFE(7, "ASEFE", 13, "SQLSERVER", "", "", "", 1433, ""),
+    SQLSERVER_ATHOS(266, "ATHOS_SQLSERVER",13,"SQLSERVER","adm","","",1433,""),
     SQLSERVER_ATMA(10, "ATMA", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_AVISTARE(16, "AVISTARE", 13, "SQLSERVER", "Avistare", "sa", "@vs2008", 1433, ""),
     SQLSERVER_CONTROLX(32, "CONTROLX", 13, "SQLSERVER", "", "", "", 1433, ""),

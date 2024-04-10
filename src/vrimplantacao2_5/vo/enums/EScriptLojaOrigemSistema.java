@@ -161,7 +161,8 @@ public enum EScriptLojaOrigemSistema {
     CONNEXONE(264, 8, "select codigo id, nomeFantasia descricao from registroempresa "),
     SANTSYSTEM(265, 13, "select IdEmpresa as id, RSocial as descricao from Empresa"),
     VISUALCOMERCIO(185, 13, "select PA_CODIGO as id, PA_EMPRESA as descricao from parametros"),
-    DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa");
+    DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa"),
+    ATHOS_SQLSERVER(266, 13, "select 1 id, ''Loja Validar'' descricao");
 
     private int idSistema;
     private int idBancoDados;
