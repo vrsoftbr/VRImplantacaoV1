@@ -163,11 +163,8 @@ public enum EScriptLojaOrigemSistema {
     SANTSYSTEM(265, 13, "select IdEmpresa as id, RSocial as descricao from Empresa"),
     VISUALCOMERCIO(185, 13, "select PA_CODIGO as id, PA_EMPRESA as descricao from parametros"),
     DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa"),
-<<<<<<< HEAD
-    ARPA(262, 11, "select 1 as id, razao as descricao from registro r ");
-=======
+    ARPA(262, 11, "select 1 as id, razao as descricao from registro r "),
     ATHOS_SQLSERVER(266, 13, "select 1 id, ''Loja Validar'' descricao");
->>>>>>> e54a7d269ec528ccf9bfc168b3e1b44d46b5e6c2
 
     private int idSistema;
     private int idBancoDados;
