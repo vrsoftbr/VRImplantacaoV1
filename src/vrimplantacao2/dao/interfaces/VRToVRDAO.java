@@ -542,7 +542,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.troca,\n"
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
+<<<<<<< HEAD
                     + (versao.menorQue(4, 2, 0) ? " p.validade, \n" : " vend.validade  ,\n")
+=======
+                    + (versao.menorQue(4, 2, 0) ? " p.validade,\n " : " vend.validade  ,\n")
+>>>>>>> e54a7d269ec528ccf9bfc168b3e1b44d46b5e6c2
                     + (precoVendaSemOferta ? "coalesce(o.preconormal, vend.precovenda) precovenda,\n" : "vend.precovenda,\n")
                     + (versao.igualOuMaiorQue(4)
                     ? " 	vend.margem,\n"
@@ -623,8 +627,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
-                    imp.setCodMercadologico5(rs.getString("mercadologico5"));
+                    //imp.setCodMercadologico4(rs.getString("mercadologico4"));
+                    //imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));

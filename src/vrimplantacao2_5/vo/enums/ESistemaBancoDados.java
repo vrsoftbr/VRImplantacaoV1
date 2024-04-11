@@ -278,7 +278,8 @@ public enum ESistemaBancoDados {
     SQLSERVER_BRDATA(240, "BRDATA", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_TARGET_G3(250, "TARGET-G3", 13, "SQLSERVER", "MOINHO", "sa", "BqMQPcI2IHkyaVt9Arvd", 1433, ""),
     SQLSERVER_ARGO(257, "ARGO", 13, "SQLSERVER", "argo", "sa", "1BC27CA04E2C2C1204", 1433, ""),
-    SQLSERVER_SAURUSPDV(261, "SAURUSPDV", 13, "SQLSERVER", "", "sa", "", 1433, "");
+    SQLSERVER_SAURUSPDV(261, "SAURUSPDV", 13, "SQLSERVER", "", "sa", "", 1433, ""),
+    SQLSERVER_SANTSYSTEM(265, "SANTSYSTEM", 13, "SQLSERVER", "dadosretorno", "sa", "sant", 1433, "");
 
     private int idSistema;
     private String nomeSistema;

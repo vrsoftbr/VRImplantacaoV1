@@ -196,6 +196,7 @@ import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
 import vrimplantacao2_5.dao.sistema.Athos2_5DAO;
+import vrimplantacao2_5.dao.sistema.AthosSQLServerDAO;
 import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
@@ -257,6 +258,7 @@ import vrimplantacao2_5.dao.sistema.PallasDAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
 import vrimplantacao2_5.dao.sistema.ResulthBusinessDAO;
 import vrimplantacao2_5.dao.sistema.STI32_5DAO;
+import vrimplantacao2_5.dao.sistema.SantSystemDAO;
 import vrimplantacao2_5.dao.sistema.SaurusPDVDAO;
 import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
@@ -287,6 +289,7 @@ import vrimplantacao2_5.gui.sistema.Asefe2_5GUI;
 import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atenas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
+import vrimplantacao2_5.gui.sistema.AthosSQLServer2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoAdm2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoSystem2_5GUI;
@@ -370,6 +373,7 @@ import vrimplantacao2_5.gui.sistema.RPInfo2_5GUI;
 import vrimplantacao2_5.gui.sistema.ResulthBusiness2_5GUI;
 import vrimplantacao2_5.gui.sistema.SG2_5GUI;
 import vrimplantacao2_5.gui.sistema.STI32_5GUI;
+import vrimplantacao2_5.gui.sistema.SantSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Shi2_5GUI;
 import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.SaurusPDV2_5GUI;
@@ -2640,6 +2644,30 @@ public enum ESistema {
         ) {
             try {
                 return new ConnexOne2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    SANTSYSTEM(265, "SANTSYSTEM", new SantSystemDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new SantSystem2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    ATHOS_SQLSERVER(266, "ATHOS_SQLSERVER", new AthosSQLServerDAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new AthosSQLServer2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
