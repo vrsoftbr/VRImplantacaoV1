@@ -443,17 +443,17 @@ public class AtualizadorDAO {
                     + "   update implantacao2_5.usuario set login = 'WAGNER', senha = '$2a$12$.8DmNiwGEEXV/M1zxYP43uBOi2rQs3Q/7wxPe5Lbm7poAWyjnoozm' where id = 3;\n"
                     + "   update implantacao2_5.usuario set login = 'MICHAEL', senha = '$2a$12$NKdzIm0k/.QbltTcFDiyLOTxBCe9Mi01xHU/v93MdZIcvwESY404.' where id = 4;\n"
                     + "   update implantacao2_5.usuario set login = 'RODRIGO', senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 5;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-BAURU', senha = '$2a$12$kKTEKlxo9Np5H1P2Vucaoe3EV6VMH8rzLmqt.XVMvnwrUL6Kl.vQm' where id = 6;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-BELEM', senha = '$2a$12$Et.db7kSw45KOPbZPqNhQuMFh53DRf84MJCVsvrBqIxby72EFzySy' where id = 7;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-FLORIANOPOLIS', senha = '$2a$12$qbyO3.wSN9b880HN21yvUelZemyWgOMhgq47rayRohuNOI82TNUqa' where id = 8;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-FORTALEZA', senha = '$2a$12$AcCAvOts7q.tZpiKKHj/A.8Wcm3j8nVDb.SXgGWtHCOHYaSHUcnj.' where id = 9;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-GOIANIA', senha = '$2a$12$5dMabsRMCMqpusFoLlF04utvRztG68gXzME0oywJry.tW2kviKn8O' where id = 10;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-RECIFE', senha = '$2a$12$u9zeWz77tQf6SQv0KhZi9u6zgtb7P5Gf3URPjtrejtWhfVB2bWKFi' where id = 11;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-RJ', senha = '$2a$12$92Puj08mF7a.lgArkJjc/.WtLLjAy9csQSLexIpqckXzT5L51CPl6' where id = 12;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-SALVADOR', senha = '$2a$12$F1V/qUbIj4AyT4q5kastUur.Fv.avpXRGK7ZxEUYJzljVGYtT9wV2' where id = 13;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-SP', senha = '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.' where id = 14;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-SP_ZL', senha = '$2a$12$mbGK2/TbDKgEU7ZRHuNzwufR7A3aPd29EPVBRrswpVLAJhfpGGQjS' where id = 15;\n"
-                    + "   update implantacao2_5.usuario set login = 'IMP-MG', senha = '$2a$12$foWrXPAxW88wBR5zWZxMrOFph6mYDpPFWKd8bYQN1Lt48o4zNkVye' where id = 16;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRSP-BAU', senha = '$2a$12$kKTEKlxo9Np5H1P2Vucaoe3EV6VMH8rzLmqt.XVMvnwrUL6Kl.vQm' where id = 6;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRPA', senha = '$2a$12$Et.db7kSw45KOPbZPqNhQuMFh53DRf84MJCVsvrBqIxby72EFzySy' where id = 7;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRSC', senha = '$2a$12$qbyO3.wSN9b880HN21yvUelZemyWgOMhgq47rayRohuNOI82TNUqa' where id = 8;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRCE', senha = '$2a$12$AcCAvOts7q.tZpiKKHj/A.8Wcm3j8nVDb.SXgGWtHCOHYaSHUcnj.' where id = 9;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRGO', senha = '$2a$12$5dMabsRMCMqpusFoLlF04utvRztG68gXzME0oywJry.tW2kviKn8O' where id = 10;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRPE', senha = '$2a$12$u9zeWz77tQf6SQv0KhZi9u6zgtb7P5Gf3URPjtrejtWhfVB2bWKFi' where id = 11;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRRJ', senha = '$2a$12$92Puj08mF7a.lgArkJjc/.WtLLjAy9csQSLexIpqckXzT5L51CPl6' where id = 12;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRBA', senha = '$2a$12$F1V/qUbIj4AyT4q5kastUur.Fv.avpXRGK7ZxEUYJzljVGYtT9wV2' where id = 13;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRSP', senha = '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.' where id = 14;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRSP-ZL', senha = '$2a$12$mbGK2/TbDKgEU7ZRHuNzwufR7A3aPd29EPVBRrswpVLAJhfpGGQjS' where id = 15;\n"
+                    + "   update implantacao2_5.usuario set login = 'VRMG', senha = '$2a$12$foWrXPAxW88wBR5zWZxMrOFph6mYDpPFWKd8bYQN1Lt48o4zNkVye' where id = 16;\n"
                     + "   update implantacao2_5.usuario set login = 'JOSE LAMONTANHA', senha = '$2a$12$9him78m3Re0fM2uoj8DGmeu8ebdFHc/OSQgS1ZHyb98V.73vhYqO.' where id = 17;\n"
                     + "   update implantacao2_5.usuario set login = 'MARCIO', senha = '$2a$12$Tc2AnzRpK30ahUI290AuHu3bhmQLuzR9Yby3jV5.89rBD3sYLwBFm' where id = 18;\n"
                     + "   update implantacao2_5.usuario set login = 'SUPORTE', senha = '$2a$12$Y7xCtYzd82dRkDzVl72MS.wH5.KqyBDkjJc57wUTFcyKGdEgVHjGS' where id = 19;\n"
@@ -461,5 +461,4 @@ public class AtualizadorDAO {
                     + "$$ language plpgsql");
         }
     }
-
 }

@@ -25,7 +25,7 @@ public enum EScriptLojaOrigemSistema {
             + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
             + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
             + "from dbo.TB_CONFIG"),
-    BRAJANGESTORES(19, 11, null),
+    BRAJANGESTORES(19, 11, "select cod_filial as id, fantasia as descricao  from cad_filiais"),
     CFSOFTSIAECF(20, 5, null),
     CPGESTOR(21, 9, "SELECT \n"
             + "	LJ_ASSOCIACAO id,\n"
@@ -99,7 +99,8 @@ public enum EScriptLojaOrigemSistema {
     BOMSOFT(203, 5, "SELECT ID_CFG id, FANTASIA_CFG descricao FROM CONFIG ORDER BY 1"),
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
     DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
-    DOBESCGA(206, 5, "select ret000.\"Codigo\" as id, ret000.\"Fantasia\" as descricao, ret000.\"CNPJ\" from ret000 order by ret000.\"Codigo\""),
+    DOBESCGA(206,5,"  SELECT COD_EMPRESA AS id, RAZAO AS descricao  FROM EMPRESA e WHERE COD_FILIAL =1"),
+    // atualizado acima, mas este é antigo DOBESCGA(206, 5, "select ret000.\"Codigo\" as id, ret000.\"Fantasia\" as descricao, ret000.\"CNPJ\" from ret000 order by ret000.\"Codigo\""),
     TENTACULO(207, 5, "SELECT EMP_CODIGO id, EMP_FANTASIA descricao FROM EMPRESAS ORDER BY 1"),
     FXSISTEMAS(208, 5, "SELECT e.ID, e.RAZAO_SOCIAL descricao FROM EMPRESA e"),
     CONSINCO(209, 9, "SELECT nroempresa id, nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao FROM consinco.ge_empresa WHERE status = ''A''"),
@@ -160,7 +161,8 @@ public enum EScriptLojaOrigemSistema {
     EMPRESOFT(263, 8, "select  codigo as id, fantasia  as descricao from empresa "),
     CONNEXONE(264, 8, "select codigo id, nomeFantasia descricao from registroempresa "),
     VISUALCOMERCIO(185, 13, "select PA_CODIGO as id, PA_EMPRESA as descricao from parametros"),
-    DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa");
+    DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa"),
+    ARPA(262, 11, "select 1 as id, razao as descricao from registro r ");
 
     private int idSistema;
     private int idBancoDados;

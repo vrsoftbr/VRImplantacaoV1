@@ -1,21 +1,22 @@
 package vrimplantacao2_5.gui.sistema;
 
 import java.awt.Frame;
-import vrframework.bean.internalFrame.VRInternalFrame;
-import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrframework.classe.ProgressBar;
+import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
-import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.dao.sistema.CefasConcretizeDAO2_5;
-import vrimplantacao2_5.vo.enums.ESistema;
 
-public class CefasConcretize2_5GUI extends VRInternalFrame {
+
+public class Cefas2_5GUI extends VRInternalFrame {
 
     private static final String SISTEMA = ESistema.CEFAS.getNome();
-    private static CefasConcretize2_5GUI instance;
+    private static Cefas2_5GUI instance;
 
     private final CefasConcretizeDAO2_5 dao = new CefasConcretizeDAO2_5();
 
@@ -24,7 +25,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
         tabProdutos.carregarParametros(params, SISTEMA);
     }
 
-    public CefasConcretize2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public Cefas2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -104,13 +105,6 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
                     tabFornecedores.setImportador(importador);
                     tabClientes.setImportador(importador);
-//
-//                    if (tabProdutos.edtDtVendaIni.getDate() != null) {
-//                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
-//                    }
-//                    if (tabProdutos.edtDtVendaFim.getDate() != null) {
-//                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
-//                    }
 
                     if (tabMenu.getSelectedIndex() == 0) {
                         switch (tabImportacao.getSelectedIndex()) {
@@ -123,8 +117,11 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
                             case 2:
                                 tabClientes.executarImportacao();
                                 break;
+                            /*case 3:
+                                break;*/
                             default:
                                 break;
+
                         }
                     }
 
@@ -149,7 +146,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new CefasConcretize2_5GUI(i_mdiFrame);
+                instance = new Cefas2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -181,7 +178,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("DataByte");
+        setTitle("Modelo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -211,7 +208,6 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
             }
         });
 
-        jBLimpar.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
         jBLimpar.setText("Limpar");
         jBLimpar.setToolTipText("Limpa todos os itens selecionados");
@@ -253,7 +249,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Clientes", tabCli);
@@ -278,7 +274,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                .addComponent(tabMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -307,7 +303,7 @@ public class CefasConcretize2_5GUI extends VRInternalFrame {
     private void jBLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLimparActionPerformed
         tabProdutos.limparProduto();
         tabClientes.limparCliente();
-        tabFornecedores.limparFornecedor();        
+        tabFornecedores.limparFornecedor();
     }//GEN-LAST:event_jBLimparActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

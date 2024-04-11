@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
@@ -38,7 +39,7 @@ public class VisualComercio2_5DAO extends InterfaceDAO implements MapaTributoPro
 
     @Override
     public String getSistema() {
-        return "SisMoura";
+        return "VisualComercio";
     }
 
     public boolean apenasProdutoAtivo = false;
@@ -233,7 +234,9 @@ public class VisualComercio2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	nullif(p.pr_familia, 0) id_familia,\n"
                     + "	p.pr_minimo estoqueminimo,\n"
                     + "	p.pr_maximo estoquemaximo,\n"
-                    + "	p.pr_atual estoque,\n"
+                    + " p.pr_atual /1000 as estoque,\n"
+                    + " p.pr_atual estoquesemcalculo,"
+    //                + "	FORMAT(CAST(p.pr_atual AS NUMERIC(18,2))/1000, 'N3') estoque,\n"
                     + "	p.pr_margem margem,\n"
                     + "	p.pr_custo custo,\n"
                     + "	p.pr_venda precovenda,\n"
@@ -256,7 +259,7 @@ public class VisualComercio2_5DAO extends InterfaceDAO implements MapaTributoPro
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
+                    
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca((rst.getInt("e_balanca") == 1));
@@ -271,7 +274,7 @@ public class VisualComercio2_5DAO extends InterfaceDAO implements MapaTributoPro
 
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setTipoEmbalagem(rst.getString("unidade")); 
 
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -289,7 +292,14 @@ public class VisualComercio2_5DAO extends InterfaceDAO implements MapaTributoPro
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+
+                    if(imp.getTipoEmbalagem().equalsIgnoreCase("KG")){
+                        imp.setEstoque(rst.getDouble("estoque"));
+                    }
+                    else{
+                    imp.setEstoque(rst.getDouble("estoquesemcalculo"));
+                    }
+                    
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));

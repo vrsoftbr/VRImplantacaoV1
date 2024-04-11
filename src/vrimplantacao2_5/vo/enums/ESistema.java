@@ -20,7 +20,6 @@ import vrimplantacao2.dao.interfaces.BaseDAO;
 import vrimplantacao2.dao.interfaces.BrainSoftDAO;
 import vrimplantacao2.dao.interfaces.CgaDAO;
 import vrimplantacao2.dao.interfaces.CPGestorDAO;
-import vrimplantacao2.dao.interfaces.CefasDAO;
 import vrimplantacao2.dao.interfaces.CerebroDAO;
 import vrimplantacao2.dao.interfaces.CervantesDAO;
 import vrimplantacao2.dao.interfaces.CissDAO;
@@ -37,7 +36,6 @@ import vrimplantacao2.dao.interfaces.DataSyncDAO;
 import vrimplantacao2.dao.interfaces.DelfiDAO;
 import vrimplantacao2.dao.interfaces.DestroDAO;
 import vrimplantacao2.dao.interfaces.DevMasterDAO;
-import vrimplantacao2.dao.interfaces.DirectorDAO;
 import vrimplantacao2.dao.interfaces.DtComDAO;
 import vrimplantacao2.dao.interfaces.EasySacDAO;
 import vrimplantacao2.dao.interfaces.EmporioDAO;
@@ -55,7 +53,6 @@ import vrimplantacao2.dao.interfaces.FlatanDAO;
 import vrimplantacao2.dao.interfaces.FortDAO;
 import vrimplantacao2.dao.interfaces.FuturaDAO;
 import vrimplantacao2.dao.interfaces.G10DAO;
-import vrimplantacao2.dao.interfaces.G3DAO;
 import vrimplantacao2.dao.interfaces.GComDAO;
 import vrimplantacao2.dao.interfaces.GDIDAO;
 import vrimplantacao2.dao.interfaces.GDoorDAO;
@@ -84,7 +81,6 @@ import vrimplantacao2.dao.interfaces.InterageDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.dao.interfaces.InventerDAO;
 import vrimplantacao2.dao.interfaces.JM2OnlineDAO;
-import vrimplantacao2.dao.interfaces.JMasterDAO;
 import vrimplantacao2.dao.interfaces.JacsysDAO;
 import vrimplantacao2.dao.interfaces.JrfDAO;
 import vrimplantacao2.dao.interfaces.KairosDAO;
@@ -101,7 +97,6 @@ import vrimplantacao2.dao.interfaces.MSIInforDAO;
 import vrimplantacao2.dao.interfaces.MarketDAO;
 import vrimplantacao2.dao.interfaces.MasterDAO;
 import vrimplantacao2.dao.interfaces.MercaLiteDAO;
-import vrimplantacao2.dao.interfaces.MilenioDAO;
 import vrimplantacao2.dao.interfaces.MobilityDAO;
 import vrimplantacao2.dao.interfaces.MobnePdvDAO;
 import vrimplantacao2.dao.interfaces.MrsDAO;
@@ -148,7 +143,6 @@ import vrimplantacao2.dao.interfaces.SigmaDAO;
 import vrimplantacao2.dao.interfaces.SiitDAO;
 import vrimplantacao2.dao.interfaces.SincDAO;
 import vrimplantacao2.dao.interfaces.SircomDAO;
-import vrimplantacao2.dao.interfaces.SisMouraDAO;
 import vrimplantacao2.dao.interfaces.SnSistemaDAO;
 import vrimplantacao2.dao.interfaces.SoftcomDAO;
 import vrimplantacao2.dao.interfaces.SofttechDAO;
@@ -177,7 +171,6 @@ import vrimplantacao2.dao.interfaces.VCashDAO;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
 import vrimplantacao2.dao.interfaces.ViaSoftDAO;
 import vrimplantacao2.dao.interfaces.ViggoDAO;
-import vrimplantacao2.dao.interfaces.VisualComercioDAO;
 import vrimplantacao2_5.dao.sistema.VisualMixDAO;
 import vrimplantacao2.dao.interfaces.W2ADAO;
 import vrimplantacao2.dao.interfaces.WebSacDAO;
@@ -197,6 +190,7 @@ import vrimplantacao2_5.dao.sistema.AlphaSys2_5DAO;
 import vrimplantacao2_5.dao.sistema.Apollo2_5DAO;
 import vrimplantacao2_5.dao.sistema.ArautoDAO;
 import vrimplantacao2_5.dao.sistema.AriusWebDAO;
+import vrimplantacao2_5.dao.sistema.Arpa_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.ArtSystem2_5DAO;
 import vrimplantacao2_5.dao.sistema.BomSoftDAO;
 import vrimplantacao2_5.dao.sistema.AssistDAO;
@@ -307,8 +301,7 @@ import vrimplantacao2_5.gui.sistema.CMM2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPGestorByView2_5GUI;
 import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
 import vrimplantacao2_5.gui.sistema.CadastraFacil2_5GUI;
-import vrimplantacao2_5.gui.sistema.CefasConcretize2_5GUI;
-import vrimplantacao2_5.gui.sistema.Cefas_Concretize2_5GUI;
+import vrimplantacao2_5.gui.sistema.Cefas2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.ConnexOne2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
@@ -337,7 +330,6 @@ import vrimplantacao2_5.gui.sistema.GZProdados2_5GUI;
 import vrimplantacao2_5.gui.sistema.GZSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Ganso2_5GUI;
 //import vrimplantacao2_5.gui.sistema.GatewaySistemasGUI;
-import vrimplantacao2_5.gui.sistema.GatewaySistemas2_5GUI_old;
 import vrimplantacao2_5.gui.sistema.GatewaySistemasGUI;
 import vrimplantacao2_5.gui.sistema.Generico2_5GUI;
 import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
@@ -655,7 +647,7 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
-                return new CefasConcretize2_5GUI(frame);
+                return new Cefas2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
@@ -2618,7 +2610,7 @@ public enum ESistema {
             return null;
         }
     },
-    ARPA(262, "ARPA", new SaurusPDVDAO()) {
+    ARPA(262, "ARPA", new Arpa_PostgresDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {

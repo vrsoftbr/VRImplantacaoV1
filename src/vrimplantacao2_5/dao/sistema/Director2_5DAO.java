@@ -39,7 +39,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
  * @author Bruno
  */
 public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     public int codigoDocumentoRotativo;
 
     @Override
@@ -336,9 +336,9 @@ public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "left join \n"
                     + "	TBitem_estoque_empresa pe on p.DFcod_item_estoque = pe.DFcod_item_estoque\n"
                     + "left join\n"
-                    + "	TBempresa em on pe.DFcod_empresa = em.DFcod_empresa and em.DFcod_empresa = " + getLojaOrigem() + "\n"
+                    + "	TBempresa em on pe.DFcod_empresa = em.DFcod_empresa and em.DFcod_empresa = 1\n"
                     + "left join \n"
-                    + "	TBunidade_item_estoque pu on p.DFcod_item_estoque = pu.DFcod_item_estoque\n"
+                    + "	TBunidade_item_estoque pu on p.DFcod_item_estoque = pu.DFcod_item_estoque and pu.DFfator_conversao = 1\n"
                     + "left join \n"
                     + "	TBitem_estoque_atacado_varejo pa on p.DFcod_item_estoque = pa.DFcod_item_estoque_atacado_varejo\n"
                     + "left join \n"
@@ -352,7 +352,7 @@ public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	es.DFid_tipo_estoque = (select DFvalor from TBopcoes WITH (NOLOCK) where DFcodigo = 553)\n"
                     + "left join \n"
                     + "	TBunidade_item_estoque_preco pr on pr.DFid_unidade_item_estoque = pu.DFid_unidade_item_estoque and\n"
-                    + "	pr.DFcod_empresa = pe.DFcod_empresa and pr.DFcod_empresa = " + getLojaOrigem() + " \n"
+                    + "	pr.DFcod_empresa = pe.DFcod_empresa and pr.DFcod_empresa = 1\n"
                     + "left join \n"
                     + "	TBcodigo_barra cb on pu.DFid_unidade_item_estoque = cb.DFid_unidade_item_estoque\n"
                     + "left join\n"
@@ -391,8 +391,8 @@ public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "		TBdepartamento_item s on d.DFid_departamento_item = s.DFid_departamento_item_pai\n"
                     + "	join\n"
                     + "		TBdepartamento_item g on s.DFid_departamento_item = g.DFid_departamento_item_pai) merc on p.DFid_departamento_item = merc.merc3\n"
-                    + "where em.DFcod_empresa = " + getLojaOrigem() + "\n"
-                    + "order by\n"
+                    + "where em.DFcod_empresa = 1  And cst.DFcod_tributacao_cst is not null and pa.DFcod_cst_pis  is not null\n"
+                    + "order by\n"
                     + "	1"
             /*"select \n"
                     + "	 p.DFcod_item_estoque id,\n"
@@ -508,15 +508,18 @@ public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setCustoMedioSemImposto(rs.getDouble("custocontabil"));
+                    imp.setCustoMedioComImposto(rs.getDouble("custoreal"));
+                    imp.setCustoSemImposto(rs.getDouble("custocontabil"));
+                    imp.setCustoComImposto(rs.getDouble("DFcusto_real_ce"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIdFamiliaProduto(rs.getString("familia") == null ? rs.getString("id") : rs.getString("familia"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.seteBalanca(rs.getInt("pesavel") == 1);
 
@@ -524,14 +527,11 @@ public class Director2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setEan(imp.getImportId());
                     }
 
-                    imp.setValidade(rs.getInt("validade"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setCustoSemImposto(rs.getDouble("custoreal"));
-                    imp.setCustoComImposto(rs.getDouble("DFcusto_real_ce"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsCstDebito(rs.getString("cofins_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("cofins_entrada"));

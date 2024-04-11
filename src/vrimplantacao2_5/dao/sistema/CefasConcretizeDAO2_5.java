@@ -23,8 +23,8 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -67,7 +67,6 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.CODIGO_BENEFICIO,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
@@ -198,7 +197,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -211,28 +210,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     result.add(imp);
                 }
             }
-            return result;
         }
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    ""
-            )) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString(""));
-                    imp.setDescricao(rs.getString(""));
-                    result.add(imp);
-                }
-            }
-        }
-
         return result;
     }
 
@@ -259,6 +237,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     + "    p.clafiscal ncm,\n"
                     + "    p.prazovalid validade,\n"
                     + "    e.custoreal custo,\n"
+                    + "    e.PTABELAULTENT custocomimposto,\n"
                     + "    em.margem,\n"
                     + "    pre.pvenda venda,\n"
                     + "    em.PVENDA precovenda,\n"
@@ -332,7 +311,7 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     imp.setPesoLiquido(rs.getDouble("peso"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -404,6 +383,47 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "	SELECT\n"
+                    + "	NUMLANC AS id,\n"
+                    + "	CODFORNEC AS id_fornecedor,\n"
+                    + "	NUMNOTA AS numerodocumento,\n"
+                    + "	DTEMISSAO AS dataemissao,\n"
+                    + "	DTLANC AS dataentrada,\n"
+                    + "	DTULTALTER AS dataalteracao,\n"
+                    + "	VALOR AS valor,\n"
+                    + "	OBS AS observacao,\n"
+                    + "	DTVENC AS vencimento,\n"
+                    + "	PREST AS parcela\n"
+                    + "FROM\n"
+                    + "	CPAGAR\n"
+                    + "WHERE DTPAGO IS NULL"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -550,39 +570,12 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	distinct\n"
-                    + "	pf.CODPROD idproduto,\n"
-                    + "	pf.CODFORNEC idfornecedor,\n"
-                    + "	pf.CODPRODFOR codigoexterno,\n"
-                    + "	ent.unidade,\n"
-                    + "	COALESCE(ent.qtd, 0) AS qtd\n"
-                    + "from \n"
-                    + "	prodfornec pf\n"
-                    + "LEFT JOIN \n"
-                    + "	(SELECT \n"
-                    + "itemxml.QTUNITCX qtd,\n"
-                    + "nfent.CODFORNEC,\n"
-                    + "itemxml.CODPROD,\n"
-                    + "itemxml.UNIDADE,\n"
-                    + "itemxml.CODPRODFOR,\n"
-                    + "itemxml.DTMOV\n"
-                    + "	FROM \n"
-                    + "itemxml\n"
-                    + "	JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n"
-                    + "	WHERE nfent.CODFILIAL = '') ent ON pf.CODPROD = ent.codprod AND \n"
-                    + "pf.CODFORNEC = ent.codfornec AND \n"
-                    + "ent.codprodfor = pf.CODPRODFOR\n"
-                    + "where\n"
-                    + "	pf.codprod != 0 AND \n"
-                    + "	to_date(ent.dtmov, 'dd/MM/yyyy') = (SELECT \n"
-                    + "max(to_date(ent.dtmov, 'dd/MM/yyyy'))\n"
-                    + "FROM \n"
-                    + "itemxml JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n"
-                    + "WHERE ent.codprod = itemxml.codprod AND \n"
-                    + "ent.codfornec = NFENT.codfornec AND \n"
-                    + "ent.codprodfor = itemxml.CODPRODFOR)\n"
-                    + "order by\n"
-                    + "	pf.codfornec, pf.codprod"
+                    + "	CODFORNEC AS idfornecedor,\n"
+                    + "	CODPROD AS idproduto,	\n"
+                    + "	CODPRODFOR AS codigoexterno,\n"
+                    + "	QTUNITCX AS qtd\n"
+                    +   "FROM\n"
+                    + "	PRODFORNEC p"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();

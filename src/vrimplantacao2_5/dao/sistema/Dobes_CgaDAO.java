@@ -6,14 +6,20 @@
 package vrimplantacao2_5.dao.sistema;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.OfertaDAO;
 import vrimplantacao.utils.Utils;
@@ -42,6 +48,8 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoFirebird;
 
 /**
@@ -98,9 +106,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	ret016.\"ALIQCod\" id,\n"
-                    + "	ret016.\"ALIQDesc\" descricao,\n"
+                    + "	ret016.\"AL IQDesc\" descricao,\n"
                     + "	CASE \n"
                     + "	  WHEN ret016.\"ALIQDesc\" LIKE '%RED%' THEN 20\n"
                     + "	  WHEN ret016.\"ALIQDesc\" LIKE '%SUBST%' THEN 60\n"
@@ -110,7 +118,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret016.\"ALIQNFPerc\" aliquota_saida,\n"
                     + "	ret016.\"ALIQRedNF\" reducao_saida\n"
                     + "FROM ret016\n"
-                    + "ORDER BY ret016.\"ALIQCod\" ASC"
+                    + "ORDER BY ret016.\"ALIQCod\" ASC"*/
+                    "SELECT DISTINCT \n"
+                    + "	SITUACAO_TRIBUTARIA AS id,\n"
+                    + "	CASE\n"
+                    + "		WHEN pt.situacao_tributaria = 102 THEN 'tributado'\n"
+                    + "		ELSE 'substituido'\n"
+                    + "	END descricao ,\n"
+                    + "	SITUACAO_TRIBUTARIA AS cst_saida,\n"
+                    + "	MODALIDADE_BC_ICMS AS aliquota_saida,\n"
+                    + "	MODALIDADE_BC_ICMS_ST AS aliquota_saida_st,\n"
+                    + "	REDUCAO_BC_ICMS AS reducao_saida\n"
+                    + "FROM\n"
+                    + "	PRODUTO_TRIBUTACAO pt"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -224,11 +244,14 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
+                    /*
                     "SELECT\n"
                     + "	ret011.\"SUBCod\",\n"
                     + "	ret011.\"SUBDesc\"\n"
                     + "FROM\n"
                     + "	ret011"
+                     */
+                    ""
             )) {
                 while (rst.next()) {
                     if ((rst.getString("SUBDesc") != null)
@@ -252,6 +275,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
+                    /*
                     "SELECT\n"
                     + "	ret051.\"PRODCod\",\n"
                     + "	ret051.\"PRODVendaPR\",\n"
@@ -261,7 +285,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ret051\n"
                     + "WHERE\n"
-                    + "	ret051.\"PRODPromoFM\" >= current_date")) {
+                    + "	ret051.\"PRODPromoFM\" >= current_date"
+                     */
+                    "")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
 
@@ -284,6 +310,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
+                    /*
                     "SELECT\n"
                     + "	ret018.\"SECCod\" AS merc1,\n"
                     + "	ret018.\"SECDesc\" AS desc1,\n"
@@ -299,7 +326,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	RET018.\"SECCod\",\n"
                     + "	RET020.\"GRUCod\",\n"
                     + "	ret020.\"SUBGCod\""
-            /*
+                    
+                     */
+                    /*
                     "SELECT DISTINCT \n"
                     + "	ret019.\"GRUCod\" merc1,\n"
                     + "	ret019.\"GRUDesc\" desc1\n"
@@ -308,6 +337,14 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
                     + "LEFT JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
                     + "ORDER BY 1"*/
+                    "SELECT\n"
+                    + "COD_GRUPO AS merc1,\n"
+                    + "NOME AS desc1,\n"
+                    + "COD_GRUPO AS merc2,\n"
+                    + "nome AS desc2,\n"
+                    + "COD_GRUPO AS merc3,\n"
+                    + "NOME AS desc3\n"
+                    + "FROM GRUPO"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -378,6 +415,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     //                    "	ret051.\"PRODCod\""
                     // SCRIPT REALIZADO DEVIDO A OUTRA VERSÃO
 
+                    /*
                     "	SELECT\n"
                     + "	ret051.\"PRODCod\",\n"
                     + "	ret051.\"PRODNome\",\n"
@@ -420,6 +458,36 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
                     + "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred"
+                     */
+                    "SELECT\n"
+                    + "p.COD_PRODUTO AS PRODCod,\n"
+                    + "pf.COD_FORNECEDOR ,\n"
+                    + "p.COD_BARRAS AS ean,\n"
+                    + "PRODUTO_BALANCA AS prodbalanca,\n"
+                    + "p.nome AS PRODNome,\n"
+                    + "DT_CADASTRO AS PRODCadast,\n"
+                    + "pc.PRECO_COMPRA AS  custocomimposto,\n"
+                    + "pc.PRECO_VENDA  AS PRODVenda,\n"
+                    + "pa.ENTRADA AS prodsdo,\n"
+                    + "p.COD_GRUPO AS merc1,\n"
+                    + "p.COD_GRUPO AS merc2,\n"
+                    + "p.COD_GRUPO AS merc3,\n"
+                    + "gn.NCM AS ncm,\n"
+                    + "gc.CEST AS cest ,\n"
+                    + "p.COD_UNIDADE_SAIDA AS PRODUnid,\n"
+                    + "CASE\n"
+                    + "	WHEN p.SITUACAO = 1 THEN 'A'\n"
+                    + "END AS prodai,\n"
+                    + "pt.ALIQUOTA_PIS AS  prodstcofins,\n"
+                    + "pt.SITUACAO_TRIBUTARIA AS  id_icms_saida	\n"
+                    + "FROM\n"
+                    + "PRODUTO p\n"
+                    + "LEFT join PRODUTO_COMPLEMENTO pc ON pc.COD_PRODUTO = p.COD_PRODUTO \n"
+                    + "LEFT JOIN PRODUTO_ALMOXARIFADO pa ON pa.COD_PRODUTO = p.COD_PRODUTO \n"
+                    + "LEFT JOIN GRUPO_NCM gn ON gn.COD_GRUPO_NCM = p.COD_GRUPO_NCM \n"
+                    + "LEFT JOIN GRUPO_CEST gc ON gc.COD_GRUPO_CEST = p.COD_GRUPO_CEST \n"
+                    + "LEFT JOIN PRODUTO_TRIBUTACAO pt ON pt.COD_PRODUTO = p.COD_PRODUTO \n"
+                    + "LEFT JOIN PRODUTO_FORNECEDOR pf ON p.COD_PRODUTO = pf.COD_PRODUTO "
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -450,25 +518,25 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("PRODNome")));
-                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("PRODNomeRed")));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDataCadastro(rst.getDate("PRODCadast"));
-                    imp.setMargem(rst.getDouble("PRODMargem"));
+                    //imp.setMargem(rst.getDouble("PRODMargem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("PRODVenda"));
                     imp.setEstoque(rst.getDouble("prodsdo"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     //imp.setCodMercadologico4(rst.getString("merc4"));
-                    imp.setIdFamiliaProduto(rst.getString("SUBCod"));
+                    //imp.setIdFamiliaProduto(rst.getString("SUBCod"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
+                    //imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
                     imp.setTipoEmbalagemCotacao(rst.getString("PRODUnid"));
-                    imp.setFornecedorFabricante(rst.getString("FORCod"));
+                    imp.setFornecedorFabricante(rst.getString("COD_FORNECEDOR"));
 
                     if ((rst.getString("prodai") != null)
                             && (!rst.getString("prodai").trim().isEmpty())) {
@@ -477,17 +545,26 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     }
 
+                    String idIcmsDebito = rst.getString("id_icms_saida");
+
+                    imp.setIcmsDebitoId(idIcmsDebito);
+                    imp.setIcmsConsumidorId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
+
+                    imp.setIcmsCreditoId(idIcmsDebito);
+                    imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
+
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofins"))));
-                    imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofinsent"))));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
+                    imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofins"))));
+                    //imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
 
-                    imp.setIcmsDebitoId(rst.getString("id_icms_saida"));
-                    imp.setIcmsConsumidorId(rst.getString("id_icms_saida"));
-                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms_saida"));
-                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms_saida"));
-                    imp.setIcmsCreditoId(rst.getString("id_icms_saida"));
-                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_saida"));
-
+//                    imp.setIcmsDebitoId(rst.getString("id_icms_saida"));
+//                    imp.setIcmsConsumidorId(rst.getString("id_icms_saida"));
+//                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms_saida"));
+//                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms_saida"));
+//                    imp.setIcmsCreditoId(rst.getString("id_icms_saida"));
+//                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_saida"));
                     vResult.add(imp);
                     contador++;
                     ProgressBar.setStatus("Carregando dados..." + contador);
@@ -502,14 +579,21 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	ret052.\"BARCod\",\n"
                     + "	ret052.\"PRODCod\",\n"
                     + "	ret052.barunbxa,\n"
                     + "	ret051.\"PRODUnid\"\n"
                     + "FROM\n"
                     + "	RET052\n"
-                    + "JOIN ret051 ON ret051.\"PRODCod\" = ret052.\"PRODCod\""
+                    + "JOIN ret051 ON ret051.\"PRODCod\" = ret052.\"PRODCod\""*/
+                    "SELECT\n"
+                    + "	COD_PRODUTO AS PRODCod,\n"
+                    + "	COD_BARRAS AS BARCod,\n"
+                    + "	CONVERSAO AS barunbxa,\n"
+                    + "	COD_UNIDADE_ENTRADA AS PRODUnid\n"
+                    + "FROM\n"
+                    + "	PRODUTO p"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -517,7 +601,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("PRODCod"));
                     imp.setEan(rst.getString("BARCod"));
-                    imp.setQtdEmbalagem(rst.getInt("barunbxa"));
+                    imp.setQtdEmbalagem(1);
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
                     vResult.add(imp);
                 }
@@ -531,13 +615,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	ret154.forcod,\n"
                     + "	ret154.prodcod,\n"
                     + "	ret154.prodbarcod,\n"
                     + "	ret154.codfabricante\n"
                     + "FROM\n"
-                    + "	RET154"
+                    + "	RET154"*/
+                    "SELECT\n"
+                    + "	COD_FORNECEDOR AS forcod,\n"
+                    + "	COD_PRODUTO AS prodcod,\n"
+                    + "	CODIGO AS codfrabicante\n"
+                    + "FROM\n"
+                    + "	PRODUTO_FORNECEDOR pf"
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -546,7 +636,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("forcod"));
                     imp.setIdProduto(rst.getString("prodcod"));
-                    imp.setCodigoExterno(rst.getString("codfabricante"));
+                    imp.setCodigoExterno(rst.getString("codfabricante") == null ? "0" : rst.getString("codfabricante"));
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados..." + contador);
                     contador++;
@@ -561,7 +651,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "    select\n"
+                    //script antigo
+                    /*"    select\n"
                     + "    ret007.\"FORCod\",\n"
                     + "    ret007.\"FORRazao\",\n"
                     + "    ret007.\"FORFant\",\n"
@@ -595,61 +686,85 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    ret007\n"
                     + "    left join ret501 on ret501.\"CIDCod\" = ret007.\"CIDCod\""
+                    "
+                     */
+                    " SELECT\n"
+                    + "	f.COD_FORNECEDOR ,\n"
+                    + "	c.COD_COLABORADOR AS idFornecedor ,\n"
+                    + "	c.NOME AS razao,\n"
+                    + "	c.FANTASIA AS fantasia,\n"
+                    + "	l.NOME AS endereco ,\n"
+                    + "	l.NOME AS bairro ,\n"
+                    + "	c.CEP AS cep,\n"
+                    + "	c.NUMERO ,\n"
+                    + "	c.COMPLEMENTO ,\n"
+                    + "	c.COD_ESTADO ,\n"
+                    + "	c.COD_MUNICIPIO ,\n"
+                    + "	c.CGC AS cnpj,\n"
+                    + "	c.IES AS ie ,\n"
+                    + "	f.SITUACAO AS ativo,\n"
+                    + "	c.fone AS telefone,\n"
+                    + "	c.DT_CADASTRO AS datacadastro\n"
+                    + "FROM\n"
+                    + "FORNECEDOR f\n"
+                    + "JOIN COLABORADOR c ON f.COD_FORNECEDOR = COD_COLABORADOR\n"
+                    + "JOIN LOGRADOURO l ON  c.COD_LOGRADOURO = l.COD_LOGRADOURO\n"
+                    + "JOIN BAIRRO b ON c.COD_BAIRRO = b.COD_BAIRRO"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("FORCod"));
-                    imp.setRazao(rst.getString("FORRazao"));
-                    imp.setFantasia(rst.getString("FORFant"));
-                    imp.setEndereco(rst.getString("FOREnd"));
-                    imp.setBairro(rst.getString("FORBairro"));
-                    imp.setCep(rst.getString("FORCep"));
-                    imp.setMunicipio(rst.getString("CIDNome"));
-                    imp.setIbge_municipio(rst.getInt("cidibge"));
-                    imp.setUf(rst.getString("ciduf"));
-                    imp.setNumero(rst.getString("fornumero"));
-                    imp.setComplemento(rst.getString("forcomplemento"));
-                    imp.setCnpj_cpf(rst.getString("forcnpjcpf"));
-                    imp.setIe_rg(rst.getString("forie"));
+                    imp.setImportId(rst.getString("idFornecedor"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    //imp.setMunicipio(rst.getString("CIDNome"));
+                    //imp.setIbge_municipio(rst.getInt("cidibge"));
+                    imp.setUf(rst.getString("cod_estado"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
                     imp.setAtivo(true);
-                    imp.setTel_principal(rst.getString("FORFone1"));
-                    imp.setDatacadastro(rst.getDate("forinclusao"));
-                    imp.setObservacao(rst.getString("forobsmemo"));
-                    if ((rst.getString("FORFone2") != null)
-                            && (!rst.getString("FORFone2").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "TELEFONE 2",
-                                rst.getString("FORFone2"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("FORFax") != null)
-                            && (!rst.getString("FORFax").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "FAX",
-                                rst.getString("FORFax"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("FOREmail") != null)
-                            && (!rst.getString("FOREmail").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "EMAIL",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("FOREmail")
-                        );
-                    }
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    //imp.setObservacao(rst.getString("forobsmemo"));
+//                    if ((rst.getString("FORFone2") != null)
+//                            && (!rst.getString("FORFone2").trim().isEmpty())) {
+//                        imp.addContato(
+//                                "1",
+//                                "TELEFONE 2",
+//                                rst.getString("FORFone2"),
+//                                null,
+//                                TipoContato.COMERCIAL,
+//                                null
+//                        );
+//                    }
+//                    if ((rst.getString("FORFax") != null)
+//                            && (!rst.getString("FORFax").trim().isEmpty())) {
+//                        imp.addContato(
+//                                "1",
+//                                "FAX",
+//                                rst.getString("FORFax"),
+//                                null,
+//                                TipoContato.COMERCIAL,
+//                                null
+//                        );
+//                    }
+//                    if ((rst.getString("FOREmail") != null)
+//                            && (!rst.getString("FOREmail").trim().isEmpty())) {
+//                        imp.addContato(
+//                                "1",
+//                                "EMAIL",
+//                                null,
+//                                null,
+//                                TipoContato.COMERCIAL,
+//                                rst.getString("FOREmail")
+//                        );
+//                    }
                     vResult.add(imp);
                 }
             }
@@ -662,6 +777,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
+                    /* script antigo versão anterior
                     "SELECT\n"
                     + "	ret028.\"CLICod\",\n"
                     + "	ret028.\"CLINome\",\n"
@@ -709,6 +825,26 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ret028\n"
                     + "LEFT JOIN RET501 ON	RET501.\"CIDCod\" = ret028.\"CIDCod\""
+                     */
+                    "SELECT \n"
+                    + "  c.COD_CLIENTE AS CLICod,\n"
+                    + "  c2.NOME AS CLINome,\n"
+                    + "  c2.FANTASIA AS CLIFantasia  ,\n"
+                    + "  b.NOME AS CLIBairro,\n"
+                    + "  c2.CEP AS CLICep,\n"
+                    + "  m.NOME  AS CIDNome,\n"
+                    + "  c2.COD_ESTADO AS ciduf,\n"
+                    + "  c2.NUMERO AS clinumero,\n"
+                    + "  c2.COMPLEMENTO AS clicomplemento,\n"
+                    + "  c.LIMITE_CREDITO AS CLILIMCred,\n"
+                    + "  c2.DT_CADASTRO AS CLICadastro,\n"
+                    + "  c2.DT_NASCIMENTO_FUNDACAO AS CLINasc,\n"
+                    + "  c2.FONE AS CLIFone1,\n"
+                    + "  c2.CGC AS clicpf\n"
+                    + "  FROM CLIENTE c \n"
+                    + "  JOIN COLABORADOR c2 ON c2.COD_COLABORADOR = c.COD_CLIENTE \n"
+                    + "  JOIN BAIRRO b ON b.COD_BAIRRO = c2.COD_BAIRRO \n"
+                    + "  JOIN MUNICIPIO m ON m.COD_MUNICIPIO = c2.COD_MUNICIPIO "
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -716,19 +852,22 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("CLICod"));
                     imp.setRazao(rst.getString("CLINome"));
                     imp.setFantasia(rst.getString("CLIFantasia"));
-                    imp.setEndereco(rst.getString("CLIEnd"));
+                    //imp.setEndereco(rst.getString("CLIEnd"));
                     imp.setBairro(rst.getString("CLIBairro"));
                     imp.setCep(rst.getString("CLICep"));
-                    imp.setMunicipioIBGE(rst.getInt("cidibge"));
+                    // imp.setMunicipioIBGE(rst.getInt("cidibge"));
                     imp.setMunicipio(rst.getString("CIDNome"));
                     imp.setUf(rst.getString("ciduf"));
                     imp.setNumero(rst.getString("clinumero"));
                     imp.setComplemento(rst.getString("clicomplemento"));
-                    imp.setValorLimite(rst.getDouble("CLILIMCred") > 0 ? rst.getDouble("CLILIMCred") : rst.getDouble("clilimcc"));
+                    imp.setValorLimite(rst.getDouble("CLILIMCred") > 1000000.00 ? 10000.00 : rst.getDouble("CLILIMCred"));
                     imp.setDataCadastro(rst.getDate("CLICadastro"));
                     imp.setDataNascimento(rst.getDate("CLINasc"));
                     imp.setTelefone(rst.getString("CLIFone1"));
-                    imp.setFax(rst.getString("CLIFax"));
+                    //imp.setFax(rst.getString("CLIFax"));
+                    imp.setCnpj(rst.getString("clicpf"));
+
+                    /*
                     if ((rst.getString("clicpf") != null)
                             && (!rst.getString("clicpf").trim().isEmpty())) {
                         imp.setCnpj(rst.getString("clicpf"));
@@ -738,6 +877,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setCnpj("");
                     }
+                     */
+
+ /*
                     if ((rst.getString("clirg") != null)
                             && (!rst.getString("clirg").trim().isEmpty())) {
                         imp.setInscricaoestadual(rst.getString("clirg"));
@@ -747,6 +889,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setInscricaoestadual("ISENTO");
                     }
+                    
+                    
                     if ((rst.getString("CLIEstCIV") != null)
                             && (!rst.getString("CLIEstCIV").trim().isEmpty())) {
                         if (null != rst.getString("CLIEstCIV").trim()) {
@@ -784,6 +928,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setSexo(TipoSexo.MASCULINO);
                     }
+                    
 
                     if ((rst.getString("cliativo") != null)
                             && (!rst.getString("cliativo").trim().isEmpty())) {
@@ -808,6 +953,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPermiteCreditoRotativo(false);
                         imp.setPermiteCheque(false);
                     }
+
                     imp.setNomePai(rst.getString("CLIPai"));
                     imp.setNomeMae(rst.getString("CLIMae"));
                     imp.setNomeConjuge(rst.getString("clicj"));
@@ -826,6 +972,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
+                     */
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados..." + contador);
                     contador++;
@@ -841,6 +988,20 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
+                    + "	COD_CONTAS_RECEBER AS CCTCod,\n"
+                    + "	COD_COLABORADOR AS CLICod,\n"
+                    + "	NUMERO ,\n"
+                    + "	DT_VENCIMENTO AS cctvcto,\n"
+                    + "	COD_VENDA  ,\n"
+                    + "	DT_EMISSAO AS CCTData ,\n"
+                    + "	VL_TOTAL AS CCTDebito,\n"
+                    + "	OBSERVACAO AS cctobs,\n"
+                    + "	COD_CUPOM AS CCTCupom ,\n"
+                    + "	COD_CAIXA AS cctecf\n"
+                    + "FROM\n"
+                    + "	CONTAS_RECEBER cr\n"
+                    + "	WHERE COD_EMPRESA_PAGAMENTO IS null"
+            /*"SELECT\n"
                     + "	ret010.\"CLICod\",\n"
                     + "	ret010.\"CCTCupom\",\n"
                     + "	ret010.cctecf,\n"
@@ -853,7 +1014,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ret010\n"
                     + "WHERE\n"
-                    + "	ret010.\"CCTPG\" = 'N'"
+                    + "	ret010.\"CCTPG\" = 'N'"*/
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1051,5 +1212,183 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return ofertas;
+    }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new Dobes_CgaDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new Dobes_CgaDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+    }
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id_venda");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("total"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            this.sql
+                    = "  SELECT\n"
+                    + "  COD_VENDA AS id_venda,\n"
+                    + "  COO AS numerocupom,\n"
+                    + "  COD_CAIXA  AS ecf,\n"
+                    + "  DT_EMISSAO AS DATA,\n"
+                    + "  VL_TOTAL AS total\n"
+                    + "FROM\n"
+                    + "	VENDA v \n"
+                    + "	WHERE DT_EMISSAO BETWEEN  '" + strDataInicio + "' AND '" + strDataTermino + "'";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
+                        next.setSequencia(rst.getInt("nroitem"));
+                        next.setProduto(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n"
+                    + "	COD_VENDA id_venda,\n"
+                    + "	CODIGO_VENDAITEM id_item,\n"
+                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
+                    + "	COD_PRODUTO produto,\n"
+                    + "	p.UNIDADE_REFERENCIA unidade,\n"
+                    + "	COD_BARRA codigobarras,\n"
+                    + "	p.DESCRICAO_PDV descricao,\n"
+                    + "	QUANTIDADE,\n"
+                    + "	VALOR_UNITARIO precovenda,\n"
+                    + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
+                    + "	CASE\n"
+                    + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
+                    + "	  END CANCELADO\n"
+                    + "FROM\n"
+                    + "	TB_VENDA_ITEM vi\n"
+                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
+                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
+                    + "WHERE\n"
+                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
+                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	ORDER BY 1,3";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }
