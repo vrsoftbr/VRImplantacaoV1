@@ -106,9 +106,9 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"SELECT\n"
+                    "SELECT\n"
                     + "	ret016.\"ALIQCod\" id,\n"
-                    + "	ret016.\"AL IQDesc\" descricao,\n"
+                    + "	ret016.\"ALIQDesc\" descricao,\n"
                     + "	CASE \n"
                     + "	  WHEN ret016.\"ALIQDesc\" LIKE '%RED%' THEN 20\n"
                     + "	  WHEN ret016.\"ALIQDesc\" LIKE '%SUBST%' THEN 60\n"
@@ -118,19 +118,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret016.\"ALIQNFPerc\" aliquota_saida,\n"
                     + "	ret016.\"ALIQRedNF\" reducao_saida\n"
                     + "FROM ret016\n"
-                    + "ORDER BY ret016.\"ALIQCod\" ASC"*/
-                    "SELECT DISTINCT \n"
-                    + "	SITUACAO_TRIBUTARIA AS id,\n"
-                    + "	CASE\n"
-                    + "		WHEN pt.situacao_tributaria = 102 THEN 'tributado'\n"
-                    + "		ELSE 'substituido'\n"
-                    + "	END descricao ,\n"
-                    + "	SITUACAO_TRIBUTARIA AS cst_saida,\n"
-                    + "	MODALIDADE_BC_ICMS AS aliquota_saida,\n"
-                    + "	MODALIDADE_BC_ICMS_ST AS aliquota_saida_st,\n"
-                    + "	REDUCAO_BC_ICMS AS reducao_saida\n"
-                    + "FROM\n"
-                    + "	PRODUTO_TRIBUTACAO pt"
+                    + "ORDER BY ret016.\"ALIQCod\" ASC"
+            //                    "SELECT DISTINCT \n"
+            //                    + "	SITUACAO_TRIBUTARIA AS id,\n"
+            //                    + "	CASE\n"
+            //                    + "		WHEN pt.situacao_tributaria = 102 THEN 'tributado'\n"
+            //                    + "		ELSE 'substituido'\n"
+            //                    + "	END descricao ,\n"
+            //                    + "	SITUACAO_TRIBUTARIA AS cst_saida,\n"
+            //                    + "	MODALIDADE_BC_ICMS AS aliquota_saida,\n"
+            //                    + "	MODALIDADE_BC_ICMS_ST AS aliquota_saida_st,\n"
+            //                    + "	REDUCAO_BC_ICMS AS reducao_saida\n"
+            //                    + "FROM\n"
+            //                    + "	PRODUTO_TRIBUTACAO pt"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -244,14 +244,11 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*
                     "SELECT\n"
                     + "	ret011.\"SUBCod\",\n"
                     + "	ret011.\"SUBDesc\"\n"
                     + "FROM\n"
                     + "	ret011"
-                     */
-                    ""
             )) {
                 while (rst.next()) {
                     if ((rst.getString("SUBDesc") != null)
@@ -275,7 +272,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*
                     "SELECT\n"
                     + "	ret051.\"PRODCod\",\n"
                     + "	ret051.\"PRODVendaPR\",\n"
@@ -286,8 +282,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret051\n"
                     + "WHERE\n"
                     + "	ret051.\"PRODPromoFM\" >= current_date"
-                     */
-                    "")) {
+            )) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
 
@@ -310,7 +305,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*
                     "SELECT\n"
                     + "	ret018.\"SECCod\" AS merc1,\n"
                     + "	ret018.\"SECDesc\" AS desc1,\n"
@@ -326,9 +320,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	RET018.\"SECCod\",\n"
                     + "	RET020.\"GRUCod\",\n"
                     + "	ret020.\"SUBGCod\""
-                    
-                     */
-                    /*
+            /*
                     "SELECT DISTINCT \n"
                     + "	ret019.\"GRUCod\" merc1,\n"
                     + "	ret019.\"GRUDesc\" desc1\n"
@@ -337,14 +329,14 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN RET019 ON RET018.\"SECCod\" = RET019.\"SECCod\"\n"
                     + "LEFT JOIN ret020 ON RET020.\"GRUCod\" = RET019.\"GRUCod\"\n"
                     + "ORDER BY 1"*/
-                    "SELECT\n"
-                    + "COD_GRUPO AS merc1,\n"
-                    + "NOME AS desc1,\n"
-                    + "COD_GRUPO AS merc2,\n"
-                    + "nome AS desc2,\n"
-                    + "COD_GRUPO AS merc3,\n"
-                    + "NOME AS desc3\n"
-                    + "FROM GRUPO"
+            //                    "SELECT\n"
+            //                    + "COD_GRUPO AS merc1,\n"
+            //                    + "NOME AS desc1,\n"
+            //                    + "COD_GRUPO AS merc2,\n"
+            //                    + "nome AS desc2,\n"
+            //                    + "COD_GRUPO AS merc3,\n"
+            //                    + "NOME AS desc3\n"
+            //                    + "FROM GRUPO"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -415,7 +407,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     //                    "	ret051.\"PRODCod\""
                     // SCRIPT REALIZADO DEVIDO A OUTRA VERSÃO
 
-                    /*
                     "	SELECT\n"
                     + "	ret051.\"PRODCod\",\n"
                     + "	ret051.\"PRODNome\",\n"
@@ -458,36 +449,35 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN RET053 ON RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
                     + "LEFT JOIN ret016 al1 ON al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "LEFT JOIN ret016 al2 ON al2.\"ALIQCod\" = ret051.aliqcred"
-                     */
-                    "SELECT\n"
-                    + "p.COD_PRODUTO AS PRODCod,\n"
-                    + "pf.COD_FORNECEDOR ,\n"
-                    + "p.COD_BARRAS AS ean,\n"
-                    + "PRODUTO_BALANCA AS prodbalanca,\n"
-                    + "p.nome AS PRODNome,\n"
-                    + "DT_CADASTRO AS PRODCadast,\n"
-                    + "pc.PRECO_COMPRA AS  custocomimposto,\n"
-                    + "pc.PRECO_VENDA  AS PRODVenda,\n"
-                    + "pa.ENTRADA AS prodsdo,\n"
-                    + "p.COD_GRUPO AS merc1,\n"
-                    + "p.COD_GRUPO AS merc2,\n"
-                    + "p.COD_GRUPO AS merc3,\n"
-                    + "gn.NCM AS ncm,\n"
-                    + "gc.CEST AS cest ,\n"
-                    + "p.COD_UNIDADE_SAIDA AS PRODUnid,\n"
-                    + "CASE\n"
-                    + "	WHEN p.SITUACAO = 1 THEN 'A'\n"
-                    + "END AS prodai,\n"
-                    + "pt.ALIQUOTA_PIS AS  prodstcofins,\n"
-                    + "pt.SITUACAO_TRIBUTARIA AS  id_icms_saida	\n"
-                    + "FROM\n"
-                    + "PRODUTO p\n"
-                    + "LEFT join PRODUTO_COMPLEMENTO pc ON pc.COD_PRODUTO = p.COD_PRODUTO \n"
-                    + "LEFT JOIN PRODUTO_ALMOXARIFADO pa ON pa.COD_PRODUTO = p.COD_PRODUTO \n"
-                    + "LEFT JOIN GRUPO_NCM gn ON gn.COD_GRUPO_NCM = p.COD_GRUPO_NCM \n"
-                    + "LEFT JOIN GRUPO_CEST gc ON gc.COD_GRUPO_CEST = p.COD_GRUPO_CEST \n"
-                    + "LEFT JOIN PRODUTO_TRIBUTACAO pt ON pt.COD_PRODUTO = p.COD_PRODUTO \n"
-                    + "LEFT JOIN PRODUTO_FORNECEDOR pf ON p.COD_PRODUTO = pf.COD_PRODUTO "
+            //                    "SELECT\n"
+            //                    + "p.COD_PRODUTO AS PRODCod,\n"
+            //                    + "pf.COD_FORNECEDOR ,\n"
+            //                    + "p.COD_BARRAS AS ean,\n"
+            //                    + "PRODUTO_BALANCA AS prodbalanca,\n"
+            //                    + "p.nome AS PRODNome,\n"
+            //                    + "DT_CADASTRO AS PRODCadast,\n"
+            //                    + "pc.PRECO_COMPRA AS  custocomimposto,\n"
+            //                    + "pc.PRECO_VENDA  AS PRODVenda,\n"
+            //                    + "pa.ENTRADA AS prodsdo,\n"
+            //                    + "p.COD_GRUPO AS merc1,\n"
+            //                    + "p.COD_GRUPO AS merc2,\n"
+            //                    + "p.COD_GRUPO AS merc3,\n"
+            //                    + "gn.NCM AS ncm,\n"
+            //                    + "gc.CEST AS cest ,\n"
+            //                    + "p.COD_UNIDADE_SAIDA AS PRODUnid,\n"
+            //                    + "CASE\n"
+            //                    + "	WHEN p.SITUACAO = 1 THEN 'A'\n"
+            //                    + "END AS prodai,\n"
+            //                    + "pt.ALIQUOTA_PIS AS  prodstcofins,\n"
+            //                    + "pt.SITUACAO_TRIBUTARIA AS  id_icms_saida	\n"
+            //                    + "FROM\n"
+            //                    + "PRODUTO p\n"
+            //                    + "LEFT join PRODUTO_COMPLEMENTO pc ON pc.COD_PRODUTO = p.COD_PRODUTO \n"
+            //                    + "LEFT JOIN PRODUTO_ALMOXARIFADO pa ON pa.COD_PRODUTO = p.COD_PRODUTO \n"
+            //                    + "LEFT JOIN GRUPO_NCM gn ON gn.COD_GRUPO_NCM = p.COD_GRUPO_NCM \n"
+            //                    + "LEFT JOIN GRUPO_CEST gc ON gc.COD_GRUPO_CEST = p.COD_GRUPO_CEST \n"
+            //                    + "LEFT JOIN PRODUTO_TRIBUTACAO pt ON pt.COD_PRODUTO = p.COD_PRODUTO \n"
+            //                    + "LEFT JOIN PRODUTO_FORNECEDOR pf ON p.COD_PRODUTO = pf.COD_PRODUTO "
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -536,7 +526,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
                     imp.setTipoEmbalagemCotacao(rst.getString("PRODUnid"));
-                    imp.setFornecedorFabricante(rst.getString("COD_FORNECEDOR"));
+                    imp.setFornecedorFabricante(rst.getString("FORCod"));
 
                     if ((rst.getString("prodai") != null)
                             && (!rst.getString("prodai").trim().isEmpty())) {
@@ -579,21 +569,21 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"SELECT\n"
+                    "SELECT\n"
                     + "	ret052.\"BARCod\",\n"
                     + "	ret052.\"PRODCod\",\n"
                     + "	ret052.barunbxa,\n"
                     + "	ret051.\"PRODUnid\"\n"
                     + "FROM\n"
                     + "	RET052\n"
-                    + "JOIN ret051 ON ret051.\"PRODCod\" = ret052.\"PRODCod\""*/
-                    "SELECT\n"
-                    + "	COD_PRODUTO AS PRODCod,\n"
-                    + "	COD_BARRAS AS BARCod,\n"
-                    + "	CONVERSAO AS barunbxa,\n"
-                    + "	COD_UNIDADE_ENTRADA AS PRODUnid\n"
-                    + "FROM\n"
-                    + "	PRODUTO p"
+                    + "JOIN ret051 ON ret051.\"PRODCod\" = ret052.\"PRODCod\""
+            //                    "SELECT\n"
+            //                    + "	COD_PRODUTO AS PRODCod,\n"
+            //                    + "	COD_BARRAS AS BARCod,\n"
+            //                    + "	CONVERSAO AS barunbxa,\n"
+            //                    + "	COD_UNIDADE_ENTRADA AS PRODUnid\n"
+            //                    + "FROM\n"
+            //                    + "	PRODUTO p"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -615,19 +605,19 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"SELECT\n"
+                    "SELECT\n"
                     + "	ret154.forcod,\n"
                     + "	ret154.prodcod,\n"
                     + "	ret154.prodbarcod,\n"
                     + "	ret154.codfabricante\n"
                     + "FROM\n"
-                    + "	RET154"*/
-                    "SELECT\n"
-                    + "	COD_FORNECEDOR AS forcod,\n"
-                    + "	COD_PRODUTO AS prodcod,\n"
-                    + "	CODIGO AS codfrabicante\n"
-                    + "FROM\n"
-                    + "	PRODUTO_FORNECEDOR pf"
+                    + "	RET154"
+            //                    "SELECT\n"
+            //                    + "	COD_FORNECEDOR AS forcod,\n"
+            //                    + "	COD_PRODUTO AS prodcod,\n"
+            //                    + "	CODIGO AS codfrabicante\n"
+            //                    + "FROM\n"
+            //                    + "	PRODUTO_FORNECEDOR pf"
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -652,7 +642,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     //script antigo
-                    /*"    select\n"
+                    "    select\n"
                     + "    ret007.\"FORCod\",\n"
                     + "    ret007.\"FORRazao\",\n"
                     + "    ret007.\"FORFant\",\n"
@@ -686,85 +676,83 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    ret007\n"
                     + "    left join ret501 on ret501.\"CIDCod\" = ret007.\"CIDCod\""
-                    "
-                     */
-                    " SELECT\n"
-                    + "	f.COD_FORNECEDOR ,\n"
-                    + "	c.COD_COLABORADOR AS idFornecedor ,\n"
-                    + "	c.NOME AS razao,\n"
-                    + "	c.FANTASIA AS fantasia,\n"
-                    + "	l.NOME AS endereco ,\n"
-                    + "	l.NOME AS bairro ,\n"
-                    + "	c.CEP AS cep,\n"
-                    + "	c.NUMERO ,\n"
-                    + "	c.COMPLEMENTO ,\n"
-                    + "	c.COD_ESTADO ,\n"
-                    + "	c.COD_MUNICIPIO ,\n"
-                    + "	c.CGC AS cnpj,\n"
-                    + "	c.IES AS ie ,\n"
-                    + "	f.SITUACAO AS ativo,\n"
-                    + "	c.fone AS telefone,\n"
-                    + "	c.DT_CADASTRO AS datacadastro\n"
-                    + "FROM\n"
-                    + "FORNECEDOR f\n"
-                    + "JOIN COLABORADOR c ON f.COD_FORNECEDOR = COD_COLABORADOR\n"
-                    + "JOIN LOGRADOURO l ON  c.COD_LOGRADOURO = l.COD_LOGRADOURO\n"
-                    + "JOIN BAIRRO b ON c.COD_BAIRRO = b.COD_BAIRRO"
+            //                    " SELECT\n"
+            //                    + "	f.COD_FORNECEDOR ,\n"
+            //                    + "	c.COD_COLABORADOR AS idFornecedor ,\n"
+            //                    + "	c.NOME AS razao,\n"
+            //                    + "	c.FANTASIA AS fantasia,\n"
+            //                    + "	l.NOME AS endereco ,\n"
+            //                    + "	l.NOME AS bairro ,\n"
+            //                    + "	c.CEP AS cep,\n"
+            //                    + "	c.NUMERO ,\n"
+            //                    + "	c.COMPLEMENTO ,\n"
+            //                    + "	c.COD_ESTADO ,\n"
+            //                    + "	c.COD_MUNICIPIO ,\n"
+            //                    + "	c.CGC AS cnpj,\n"
+            //                    + "	c.IES AS ie ,\n"
+            //                    + "	f.SITUACAO AS ativo,\n"
+            //                    + "	c.fone AS telefone,\n"
+            //                    + "	c.DT_CADASTRO AS datacadastro\n"
+            //                    + "FROM\n"
+            //                    + "FORNECEDOR f\n"
+            //                    + "JOIN COLABORADOR c ON f.COD_FORNECEDOR = COD_COLABORADOR\n"
+            //                    + "JOIN LOGRADOURO l ON  c.COD_LOGRADOURO = l.COD_LOGRADOURO\n"
+            //                    + "JOIN BAIRRO b ON c.COD_BAIRRO = b.COD_BAIRRO"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("idFornecedor"));
-                    imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(rst.getString("fantasia"));
-                    imp.setEndereco(rst.getString("endereco"));
-                    imp.setBairro(rst.getString("bairro"));
-                    imp.setCep(rst.getString("cep"));
+                    imp.setImportId(rst.getString("FORCod"));
+                    imp.setRazao(rst.getString("FORRazao"));
+                    imp.setFantasia(rst.getString("FORFant"));
+                    imp.setEndereco(rst.getString("FOREnd"));
+                    imp.setBairro(rst.getString("FORBairro"));
+                    imp.setCep(rst.getString("FORCep"));
                     //imp.setMunicipio(rst.getString("CIDNome"));
                     //imp.setIbge_municipio(rst.getInt("cidibge"));
-                    imp.setUf(rst.getString("cod_estado"));
-                    imp.setNumero(rst.getString("numero"));
-                    imp.setComplemento(rst.getString("complemento"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
-                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setUf(rst.getString("ciduf"));
+                    imp.setNumero(rst.getString("fornumero"));
+                    imp.setComplemento(rst.getString("forcomplemento"));
+                    imp.setCnpj_cpf(rst.getString("forcnpjcpf"));
+                    imp.setIe_rg(rst.getString("forie"));
                     imp.setAtivo(true);
-                    imp.setTel_principal(rst.getString("telefone"));
-                    imp.setDatacadastro(rst.getDate("datacadastro"));
-                    //imp.setObservacao(rst.getString("forobsmemo"));
-//                    if ((rst.getString("FORFone2") != null)
-//                            && (!rst.getString("FORFone2").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "1",
-//                                "TELEFONE 2",
-//                                rst.getString("FORFone2"),
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                null
-//                        );
-//                    }
-//                    if ((rst.getString("FORFax") != null)
-//                            && (!rst.getString("FORFax").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "1",
-//                                "FAX",
-//                                rst.getString("FORFax"),
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                null
-//                        );
-//                    }
-//                    if ((rst.getString("FOREmail") != null)
-//                            && (!rst.getString("FOREmail").trim().isEmpty())) {
-//                        imp.addContato(
-//                                "1",
-//                                "EMAIL",
-//                                null,
-//                                null,
-//                                TipoContato.COMERCIAL,
-//                                rst.getString("FOREmail")
-//                        );
-//                    }
+                    imp.setTel_principal(rst.getString("FORFone1"));
+                    //imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("forobsmemo"));
+                    if ((rst.getString("FORFone2") != null)
+                            && (!rst.getString("FORFone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("FORFone2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("FORFax") != null)
+                            && (!rst.getString("FORFax").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "FAX",
+                                rst.getString("FORFax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("FOREmail") != null)
+                            && (!rst.getString("FOREmail").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("FOREmail")
+                        );
+                    }
                     vResult.add(imp);
                 }
             }
@@ -777,7 +765,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /* script antigo versão anterior
                     "SELECT\n"
                     + "	ret028.\"CLICod\",\n"
                     + "	ret028.\"CLINome\",\n"
@@ -825,26 +812,25 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ret028\n"
                     + "LEFT JOIN RET501 ON	RET501.\"CIDCod\" = ret028.\"CIDCod\""
-                     */
-                    "SELECT \n"
-                    + "  c.COD_CLIENTE AS CLICod,\n"
-                    + "  c2.NOME AS CLINome,\n"
-                    + "  c2.FANTASIA AS CLIFantasia  ,\n"
-                    + "  b.NOME AS CLIBairro,\n"
-                    + "  c2.CEP AS CLICep,\n"
-                    + "  m.NOME  AS CIDNome,\n"
-                    + "  c2.COD_ESTADO AS ciduf,\n"
-                    + "  c2.NUMERO AS clinumero,\n"
-                    + "  c2.COMPLEMENTO AS clicomplemento,\n"
-                    + "  c.LIMITE_CREDITO AS CLILIMCred,\n"
-                    + "  c2.DT_CADASTRO AS CLICadastro,\n"
-                    + "  c2.DT_NASCIMENTO_FUNDACAO AS CLINasc,\n"
-                    + "  c2.FONE AS CLIFone1,\n"
-                    + "  c2.CGC AS clicpf\n"
-                    + "  FROM CLIENTE c \n"
-                    + "  JOIN COLABORADOR c2 ON c2.COD_COLABORADOR = c.COD_CLIENTE \n"
-                    + "  JOIN BAIRRO b ON b.COD_BAIRRO = c2.COD_BAIRRO \n"
-                    + "  JOIN MUNICIPIO m ON m.COD_MUNICIPIO = c2.COD_MUNICIPIO "
+            //                    "SELECT \n"
+            //                    + "  c.COD_CLIENTE AS CLICod,\n"
+            //                    + "  c2.NOME AS CLINome,\n"
+            //                    + "  c2.FANTASIA AS CLIFantasia  ,\n"
+            //                    + "  b.NOME AS CLIBairro,\n"
+            //                    + "  c2.CEP AS CLICep,\n"
+            //                    + "  m.NOME  AS CIDNome,\n"
+            //                    + "  c2.COD_ESTADO AS ciduf,\n"
+            //                    + "  c2.NUMERO AS clinumero,\n"
+            //                    + "  c2.COMPLEMENTO AS clicomplemento,\n"
+            //                    + "  c.LIMITE_CREDITO AS CLILIMCred,\n"
+            //                    + "  c2.DT_CADASTRO AS CLICadastro,\n"
+            //                    + "  c2.DT_NASCIMENTO_FUNDACAO AS CLINasc,\n"
+            //                    + "  c2.FONE AS CLIFone1,\n"
+            //                    + "  c2.CGC AS clicpf\n"
+            //                    + "  FROM CLIENTE c \n"
+            //                    + "  JOIN COLABORADOR c2 ON c2.COD_COLABORADOR = c.COD_CLIENTE \n"
+            //                    + "  JOIN BAIRRO b ON b.COD_BAIRRO = c2.COD_BAIRRO \n"
+            //                    + "  JOIN MUNICIPIO m ON m.COD_MUNICIPIO = c2.COD_MUNICIPIO "
             )) {
                 int contador = 1;
                 while (rst.next()) {
@@ -867,7 +853,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setFax(rst.getString("CLIFax"));
                     imp.setCnpj(rst.getString("clicpf"));
 
-                    /*
                     if ((rst.getString("clicpf") != null)
                             && (!rst.getString("clicpf").trim().isEmpty())) {
                         imp.setCnpj(rst.getString("clicpf"));
@@ -877,9 +862,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setCnpj("");
                     }
-                     */
 
- /*
                     if ((rst.getString("clirg") != null)
                             && (!rst.getString("clirg").trim().isEmpty())) {
                         imp.setInscricaoestadual(rst.getString("clirg"));
@@ -889,8 +872,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setInscricaoestadual("ISENTO");
                     }
-                    
-                    
+
                     if ((rst.getString("CLIEstCIV") != null)
                             && (!rst.getString("CLIEstCIV").trim().isEmpty())) {
                         if (null != rst.getString("CLIEstCIV").trim()) {
@@ -928,7 +910,6 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setSexo(TipoSexo.MASCULINO);
                     }
-                    
 
                     if ((rst.getString("cliativo") != null)
                             && (!rst.getString("cliativo").trim().isEmpty())) {
@@ -972,7 +953,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
-                     */
+
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados..." + contador);
                     contador++;
@@ -987,21 +968,21 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	COD_CONTAS_RECEBER AS CCTCod,\n"
-                    + "	COD_COLABORADOR AS CLICod,\n"
-                    + "	NUMERO ,\n"
-                    + "	DT_VENCIMENTO AS cctvcto,\n"
-                    + "	COD_VENDA  ,\n"
-                    + "	DT_EMISSAO AS CCTData ,\n"
-                    + "	VL_TOTAL AS CCTDebito,\n"
-                    + "	OBSERVACAO AS cctobs,\n"
-                    + "	COD_CUPOM AS CCTCupom ,\n"
-                    + "	COD_CAIXA AS cctecf\n"
-                    + "FROM\n"
-                    + "	CONTAS_RECEBER cr\n"
-                    + "	WHERE COD_EMPRESA_PAGAMENTO IS null"
-            /*"SELECT\n"
+//                    "SELECT\n"
+//                    + "	COD_CONTAS_RECEBER AS CCTCod,\n"
+//                    + "	COD_COLABORADOR AS CLICod,\n"
+//                    + "	NUMERO ,\n"
+//                    + "	DT_VENCIMENTO AS cctvcto,\n"
+//                    + "	COD_VENDA  ,\n"
+//                    + "	DT_EMISSAO AS CCTData ,\n"
+//                    + "	VL_TOTAL AS CCTDebito,\n"
+//                    + "	OBSERVACAO AS cctobs,\n"
+//                    + "	COD_CUPOM AS CCTCupom ,\n"
+//                    + "	COD_CAIXA AS cctecf\n"
+//                    + "FROM\n"
+//                    + "	CONTAS_RECEBER cr\n"
+//                    + "	WHERE COD_EMPRESA_PAGAMENTO IS null"
+            "SELECT\n"
                     + "	ret010.\"CLICod\",\n"
                     + "	ret010.\"CCTCupom\",\n"
                     + "	ret010.cctecf,\n"
@@ -1014,7 +995,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM\n"
                     + "	ret010\n"
                     + "WHERE\n"
-                    + "	ret010.\"CCTPG\" = 'N'"*/
+                    + "	ret010.\"CCTPG\" = 'N'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
