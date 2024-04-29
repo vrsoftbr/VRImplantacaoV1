@@ -232,6 +232,7 @@ import vrimplantacao2_5.dao.sistema.GZProdadosDAO;
 import vrimplantacao2_5.dao.sistema.GZSistemas2_5DAO;
 import vrimplantacao2_5.dao.sistema.GansoDAO;
 import vrimplantacao2_5.dao.sistema.GatewaySistemasDAO2_5;
+import vrimplantacao2_5.dao.sistema.IdealSoft2_5DAO;
 import vrimplantacao2_5.dao.sistema.Jmaster2_5DAO;
 import vrimplantacao2_5.dao.sistema.ProviderGenericoDAO;
 import vrimplantacao2_5.dao.sistema.Jnp_MSuperDAO;
@@ -341,6 +342,7 @@ import vrimplantacao2_5.gui.sistema.GuiaSistemas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hiper2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
+import vrimplantacao2_5.gui.sistema.IdealSoft2_5GUI;
 import vrimplantacao2_5.gui.sistema.Inova2_5GUI;
 import vrimplantacao2_5.gui.sistema.Interage2_5GUI;
 import vrimplantacao2_5.gui.sistema.Jmaster2_5GUI;
@@ -2668,6 +2670,18 @@ public enum ESistema {
         ) {
             try {
                 return new AthosSQLServer2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    IDEALSOFT(267, "IDEALSOFT", new IdealSoft2_5DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new IdealSoft2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

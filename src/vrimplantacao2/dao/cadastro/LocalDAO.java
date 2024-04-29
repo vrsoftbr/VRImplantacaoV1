@@ -16,7 +16,7 @@ public class LocalDAO {
 
     public List<EstadoVO> getEstados() throws Exception {
         List<EstadoVO> result = new ArrayList<>();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id, sigla, descricao from estado order by sigla"
@@ -26,7 +26,7 @@ public class LocalDAO {
                     vo.setId(rst.getInt("id"));
                     vo.setDescricao(rst.getString("descricao"));
                     vo.setSigla(rst.getString("sigla"));
-                    
+
                     try (Statement stm2 = Conexao.createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select id, descricao from municipio where id_estado = " + vo.getId() + " order by descricao"
@@ -36,15 +36,15 @@ public class LocalDAO {
                             }
                         }
                     }
-                    
+
                     result.add(vo);
-                }            
+                }
             }
         }
-        
+
         return result;
     }
-    
+
     public EstadoVO getEstado(int id, boolean comCidades) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -55,7 +55,7 @@ public class LocalDAO {
                     vo.setId(rst.getInt("id"));
                     vo.setDescricao(rst.getString("descricao"));
                     vo.setSigla(rst.getString("sigla"));
-                    
+
                     if (comCidades) {
                         try (Statement stm2 = Conexao.createStatement()) {
                             try (ResultSet rst2 = stm2.executeQuery(
@@ -67,14 +67,14 @@ public class LocalDAO {
                             }
                         }
                     }
-                    
+
                     return vo;
-                }            
+                }
             }
         }
         return null;
     }
-    
+
     public MunicipioVO getMunicipio(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -84,9 +84,9 @@ public class LocalDAO {
                     MunicipioVO vo = new MunicipioVO();
                     vo.setId(rst.getInt("id"));
                     vo.setIdEstado(rst.getInt("id_estado"));
-                    vo.setDescricao(rst.getString("descricao"));                    
+                    vo.setDescricao(rst.getString("descricao"));
                     return vo;
-                }            
+                }
             }
         }
         return null;
@@ -96,19 +96,19 @@ public class LocalDAO {
         List<vrimplantacao2.vo.cadastro.local.MunicipioVO> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	mun.id_estado,\n" +
-                    "	est.sigla,\n" +
-                    "	est.descricao estado,\n" +
-                    "	mun.id id_municipio,\n" +
-                    "	mun.descricao municipio	\n" +
-                    "from \n" +
-                    "	municipio mun\n" +
-                    "	join estado est on\n" +
-                    "		mun.id_estado = est.id\n" +
-                    "order by\n" +
-                    "	mun.id_estado,\n" +
-                    "	mun.id"
+                    "select\n"
+                    + "	mun.id_estado,\n"
+                    + "	est.sigla,\n"
+                    + "	est.descricao estado,\n"
+                    + "	mun.id id_municipio,\n"
+                    + "	mun.descricao municipio	\n"
+                    + "from \n"
+                    + "	municipio mun\n"
+                    + "	join estado est on\n"
+                    + "		mun.id_estado = est.id\n"
+                    + "order by\n"
+                    + "	mun.id_estado,\n"
+                    + "	mun.id"
             )) {
                 while (rst.next()) {
                     vrimplantacao2.vo.cadastro.local.MunicipioVO mun = new vrimplantacao2.vo.cadastro.local.MunicipioVO();
@@ -119,12 +119,26 @@ public class LocalDAO {
                     uf.setDescricao(rst.getString("estado"));
                     uf.setSigla(rst.getString("sigla"));
                     mun.setEstado(uf);
-                    
+
                     result.add(mun);
                 }
             }
         }
         return result;
     }
-    
+
+    public List<String> getSiglas() throws Exception {
+        List<String> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, sigla, descricao from estado order by sigla"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getString("sigla"));
+                }
+            }
+        }
+        return result;
+    }
 }

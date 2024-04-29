@@ -165,7 +165,8 @@ public enum EScriptLojaOrigemSistema {
     VISUALCOMERCIO(185, 13, "select PA_CODIGO as id, PA_EMPRESA as descricao from parametros"),
     DIRECTOR(42, 13, "select DFcod_empresa as id, DFnome_fantasia  as descricao from TBempresa"),
     ARPA(262, 11, "select 1 as id, razao as descricao from registro r "),
-    ATHOS_SQLSERVER(266, 13, "select 1 id, ''Loja Validar'' descricao");
+    ATHOS_SQLSERVER(266, 13, "select 1 id, ''Loja Validar'' descricao"),
+    IDEALSOFT(267, 13, "SELECT Ordem id, Razao_Social descricao from Filiais f ");
 
     private int idSistema;
     private int idBancoDados;
