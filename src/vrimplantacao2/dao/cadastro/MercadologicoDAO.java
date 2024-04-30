@@ -267,7 +267,7 @@ public class MercadologicoDAO {
                                     + "merc3 = " + vo.getMercadologico3() + ","
                                     + "merc4 = " + vo.getMercadologico4() + ","
                                     + "merc5 = " + vo.getMercadologico5()
-                                    + "where "
+                                    + " where "
                                     + "imp_sistema = " + Utils.quoteSQL(getSistema()) + " and "
                                     + "imp_loja = " + Utils.quoteSQL(chave[1]) + " and "
                                     + "ant_merc1 = " + Utils.quoteSQL(chave[2]) + " and "

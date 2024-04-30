@@ -58,15 +58,22 @@ public enum EScriptLojaOrigemSistema {
     GZSISTEMAS(66, 8, "select codigo id, nomfan descricao, cgc from mercodb.lojas order by codigo"),
     GETWAY(68, 13, "select CODLOJA id, descricao from LOJA order by id"),
     GUIASISTEMAS(71, 13, "select vfd_CodFilial id, vfd_Descricao descricao from tab_filial order by vfd_CodFilial"),
+    HRTECH(72, 13, "select\n"
+            + "    codigoenti id,\n"
+            + "    apeltarefa descricao\n"
+            + "from\n"
+            + "    fl060loj\n"
+            + "order by\n"
+            + "    1"),
     HIPCOM(74, 8, "select lojcod as id, concat(lojcod,'' - '', lojfantas) descricao, lojcnpj from hiploj order by 1"),
     HIPER(75, 13, "select id_filial id, razao_social descricao from filial order by id_filial"),
     ISERVER(78, 8, "select Codigo id, NomeFantasia descricao from tbl_loja"),
     INOVA(81, 11, "select empresaid id, empresanomefantasia descricao from empresa"),
     INTERAGE(85, 5, "SELECT \n"
-                        + "f.CODFIL id, \n"
-                        + "COALESCE(f.CNPJFIL, 0) || '' - '' || f.NOMFIL descricao \n"
-                        + "FROM TABFIL f \n"
-                        + "ORDER BY f.CODFIL"),
+            + "f.CODFIL id, \n"
+            + "COALESCE(f.CNPJFIL, 0) || '' - '' || f.NOMFIL descricao \n"
+            + "FROM TABFIL f \n"
+            + "ORDER BY f.CODFIL"),
     KCMS(92, 13, "select codloja id, fantasia descricao from empresa"),
     LINCE(95, 13, "select cod_loja id , concat(cnpj, '' - '', nome_reduzido) descricao from loja order by 1"),
     LOGUS(100, 7, "select cdg_filial id, dcr_fantasia descricao from cadfil"),

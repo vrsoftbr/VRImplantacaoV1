@@ -136,7 +136,7 @@ public class LojaGeradorScripts {
     public String copiarPdvParametroValor(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO pdv.parametrovalor (id_loja,id_parametro,valor)\n"
                 + "(SELECT " + i_loja.getId() + ",id_parametro,valor FROM pdv.parametrovalor WHERE id_loja = " + i_loja.getIdCopiarLoja() + ""
-                + "AND id_parametro not in (67, 97))";
+                + " AND id_parametro not in (67, 97))";
 
         return sql;
     }

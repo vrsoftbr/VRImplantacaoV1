@@ -339,6 +339,7 @@ import vrimplantacao2_5.gui.sistema.Generico2_5GUI;
 import vrimplantacao2_5.gui.sistema.Gestora2_5GUI;
 import vrimplantacao2_5.gui.sistema.GetWay_Profit2_5GUI;
 import vrimplantacao2_5.gui.sistema.GuiaSistemas2_5GUI;
+import vrimplantacao2_5.gui.sistema.HRTech2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hipcom2_5GUI;
 import vrimplantacao2_5.gui.sistema.Hiper2_5GUI;
 import vrimplantacao2_5.gui.sistema.IServer2_5GUI;
@@ -982,7 +983,12 @@ public enum ESistema {
     HRTECH(72, "HRTECH", new HRTechDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+        try {
+                return new HRTech2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     HERCULESINTCASH(73, "HERCULESINTCASH", new HerculesIntCashDAO()) {
