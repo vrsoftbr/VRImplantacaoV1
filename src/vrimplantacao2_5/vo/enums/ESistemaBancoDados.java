@@ -177,6 +177,7 @@ public enum ESistemaBancoDados {
     ORACLE_RMS(129, "RMS", 9, "ORACLE", "", "rms", "rmsprd", 1521, ""),
     ORACLE_SIAC(149, "SIAC", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_SOLIDUS(159, "SOLIDUS", 9, "ORACLE", "", "", "", 1521, ""),
+    ORACLE_SOLIDUSORACLE(268, "SOLIDUS-ORACLE", 9, "ORACLE", "", "", "", 1521, "Aparentemente eles criptografam a senha transformando no código númerico do charset utilizado, incrementando 1 e gravando a letra de volta. C:\\GSGroup\\ETL\\PDI\\simple-jndi\\jdbc.propertie Local com a senha do banco"),
     ORACLE_SUPERUS(166, "SUPERUS", 9, "ORACLE", "", "xe", "smart", 1521, ""),
     ORACLE_VIASOFT(183, "VIASOFT", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_WMSI(192, "WMSI", 9, "ORACLE", "", "", "", 1521, ""),
