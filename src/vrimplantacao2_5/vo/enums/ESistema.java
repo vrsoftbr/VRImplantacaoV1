@@ -1614,12 +1614,12 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
-        @Override
-        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-    },
+//    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
+//        @Override
+//        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+//            throw new UnsupportedOperationException("Not supported yet.");
+//        }
+//    },
     SOLUTIONSUPERA(160, "SOLUTIONSUPERA", new SolutionSuperaDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {

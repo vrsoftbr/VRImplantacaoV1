@@ -67,6 +67,17 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
           <SubComponents>
+            <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProdutos">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="&lt;SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle&gt;">
+                    <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    </Property>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+            </Component>
             <Component class="vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI" name="tabFornecedores">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -116,17 +127,6 @@
                 </Container>
               </SubComponents>
             </Container>
-            <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProdutos">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="&lt;SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle&gt;">
-                    <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                    </Property>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-            </Component>
           </SubComponents>
         </Container>
         <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">

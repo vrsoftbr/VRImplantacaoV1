@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import static vr.core.utils.StringUtils.LOG;
+import vrframework.classe.Util;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.LocalDAO;
@@ -91,7 +92,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public String getSistema() {
         return "SOLIDUS-ORACLE";
     }
-    
+
     public void setSiglaEstadoPauta(String siglaEstadoPauta) {
         this.siglaEstadoPauta = siglaEstadoPauta == null ? "" : siglaEstadoPauta;
     }
@@ -119,7 +120,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public void setEntidadesConvenio(List<Entidade> entidadesConvenio) {
         this.entidadesConvenio = entidadesConvenio;
     }
-    
+
     public void setEntidadesCheques(List<Entidade> entidadesCheques) {
         this.entidadesCheques = entidadesCheques;
     }
@@ -127,7 +128,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public void setEntidadesCreditoRotativo(List<Entidade> entidadesCreditoRotativo) {
         this.entidadesCreditoRotativo = entidadesCreditoRotativo;
     }
-    
+
     public void setNotasDataInicio(Date notasDataInicio) {
         this.notasDataInicio = notasDataInicio;
     }
@@ -135,7 +136,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public void setNotasDataTermino(Date notasDataTermino) {
         this.notasDataTermino = notasDataTermino;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -179,14 +180,14 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.TROCA,
                 OpcaoProduto.VALIDADE,
-                OpcaoProduto.VENDA_PDV,     // Libera produto para Venda no PDV
+                OpcaoProduto.VENDA_PDV, // Libera produto para Venda no PDV
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.RECEITA,
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.PDV_VENDA      // Habilita importacão de Vendas
+                OpcaoProduto.PDV_VENDA // Habilita importacão de Vendas
         ));
     }
 
@@ -225,9 +226,6 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        String tab_tributacao = "intersolid.tab_tributacao",
-            tab_produto_loja = "intersolid.tab_produto_loja",
-            tab_ncm_uf = "intersolid.tab_ncm_uf";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -238,12 +236,12 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    t.val_icms aliquota,\n"
                     + "    t.val_reducao_base_calculo reducao\n"
                     + "from\n"
-                    + "    " + tab_tributacao + " t\n"
-                    + "    left join (select distinct cod_tributacao from " + tab_produto_loja + ") pl on\n"
+                    + "    intersolid.tab_tributacao t\n"
+                    + "    left join (select distinct cod_tributacao from intersolid.tab_tributacao) pl on\n"
                     + "        pl.cod_tributacao = t.cod_tributacao\n"
-                    + "    left join (select distinct cod_tributacao from " + tab_ncm_uf + ") nuf on\n"
+                    + "    left join (select distinct cod_tributacao from intersolid.tab_ncm_uf) nuf on\n"
                     + "        nuf.cod_tributacao = t.cod_tributacao\n"
-                    + "    left join (select distinct cod_trib_entrada from " + tab_ncm_uf + ") nuf2 on\n"
+                    + "    left join (select distinct cod_trib_entrada from intersolid.tab_ncm_uf) nuf2 on\n"
                     + "        nuf2.cod_trib_entrada = t.cod_tributacao\n"
                     + "where\n"
                     + "    not pl.cod_tributacao is null or\n"
@@ -264,17 +262,16 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     ));
                 }
             }
-        }
-
+        } 
+        
         return result;
     }
-    
+
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        String 
-            tab_cliente = "intersolid.tab_cliente",
-            tab_cidade = "intersolid.tab_cidade";
+        String tab_cliente = "intersolid.tab_cliente",
+                tab_cidade = "intersolid.tab_cidade";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -336,14 +333,14 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
         String tab_cliente = "intersolid.tab_cliente",
-            tab_cidade = "intersolid.tab_cidade",
-            tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv",
-            tab_loja_cliente = "intersolid.tab_loja_cliente";
+                tab_cidade = "intersolid.tab_cidade",
+                tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv",
+                tab_loja_cliente = "intersolid.tab_loja_cliente";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -401,12 +398,12 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
         String tab_fluxo = "intersolid.tab_fluxo",
-            tab_entidade = "intersolid.tab_entidade";
+                tab_entidade = "intersolid.tab_entidade";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -462,7 +459,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -487,13 +484,13 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         String tab_secao = "intersolid.tab_secao",
-            tab_grupo = "intersolid.tab_grupo",
-            tab_subgrupo = "intersolid.tab_subgrupo";
+                tab_grupo = "intersolid.tab_grupo",
+                tab_subgrupo = "intersolid.tab_subgrupo";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -530,19 +527,19 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         String tab_produto_fornecedor = "intersolid.tab_produto_fornecedor",
-            tab_produto = "intersolid.tab_produto",
-            tab_loja = "intersolid.tab_loja",
-            tab_codigo_barra = "intersolid.tab_codigo_barra",
-            tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor",
-            tab_produto_loja = "intersolid.tab_produto_loja",
-            tab_ncm = "intersolid.tab_ncm",
-            tab_cest = "intersolid.tab_cest",
-            tab_tributacao = "intersolid.tab_tributacao";
+                tab_produto = "intersolid.tab_produto",
+                tab_loja = "intersolid.tab_loja",
+                tab_codigo_barra = "intersolid.tab_codigo_barra",
+                tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor",
+                tab_produto_loja = "intersolid.tab_produto_loja",
+                tab_ncm = "intersolid.tab_ncm",
+                tab_cest = "intersolid.tab_cest",
+                tab_tributacao = "intersolid.tab_tributacao";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -721,7 +718,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     imp.setIcmsCstConsumidor(rst.getInt("icms_saida_cst"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("icms_saida_aliq"));
                     imp.setIcmsReducaoConsumidor(rst.getDouble("icms_saida_reducao"));
-                    
+
                     imp.setPautaFiscalId(rst.getString("ncm"));
                     imp.setDivisao(rst.getString("divisao"));
 
@@ -732,14 +729,14 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         String tab_fornecedor = "intersolid.tab_fornecedor",
-            tab_cidade = "intersolid.tab_cidade",
-            tab_fornecedor_bloqueio = "intersolid.tab_fornecedor_bloqueio",
-            tab_loja_fornecedor = "intersolid.tab_loja_fornecedor";
+                tab_cidade = "intersolid.tab_cidade",
+                tab_fornecedor_bloqueio = "intersolid.tab_fornecedor_bloqueio",
+                tab_loja_fornecedor = "intersolid.tab_loja_fornecedor";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -868,12 +865,12 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
         String tab_produto_historico = "intersolid.tab_produto_historico",
-            tab_produto_loja = "intersolid.tab_produto_loja";
+                tab_produto_loja = "intersolid.tab_produto_loja";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -914,7 +911,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         String tab_produto_fornecedor = "intersolid.tab_produto_fornecedor",
-            tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor";
+                tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -963,9 +960,9 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         String tab_cliente = "intersolid.tab_cliente",
-            tab_cidade = "intersolid.tab_cidade",
-            tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv",
-            tab_loja_cliente = "intersolid.tab_loja_cliente";
+                tab_cidade = "intersolid.tab_cidade",
+                tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv",
+                tab_loja_cliente = "intersolid.tab_loja_cliente";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1074,12 +1071,12 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         String tab_fluxo = "intersolid.tab_fluxo",
-            tab_entidade = "intersolid.tab_entidade";
+                tab_entidade = "intersolid.tab_entidade";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1147,8 +1144,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
         String tab_fluxo = "intersolid.tab_fluxo",
-            tab_entidade = "intersolid.tab_entidade",
-            tab_cliente = "intersolid.tab_cliente";
+                tab_entidade = "intersolid.tab_entidade",
+                tab_cliente = "intersolid.tab_cliente";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1204,7 +1201,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
         String tab_fluxo = "intersolid.tab_fluxo",
-            tab_entidade = "intersolid.tab_entidade";
+                tab_entidade = "intersolid.tab_entidade";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1336,7 +1333,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-    
+
     public List<Entidade> getEntidades() throws SQLException {
         List<Entidade> result = new ArrayList<>();
         String tabela = "intersolid.tab_entidade";
@@ -1357,7 +1354,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return result;
     }
-        
+
     private String implodeList(List<Entidade> entidades) {
         StringBuilder builder = new StringBuilder();
 
@@ -1370,11 +1367,11 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         return builder.toString();
     }
-    
+
     public String exibirMensagemComComboBox(String titulo, boolean isEstado) throws Exception {
         JComboBox comboBox = new JComboBox<>();
         comboBox.setModel(new DefaultComboBoxModel<>());
-        
+
         List<String> dados = new LocalDAO().getSiglas();
 
         dados.forEach(dado -> comboBox.addItem(dado));
@@ -1401,26 +1398,26 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         if (result == JOptionPane.OK_OPTION) {
             String escolha = (String) comboBox.getSelectedItem();
-            String[] primeiraString= escolha.split(" ");
+            String[] primeiraString = escolha.split(" ");
             return primeiraString[0];
         } else {
             throw new Exception("É obrigatório escolher um item!");
         }
     }
-    
+
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yyyy");
     private String dataInicioVenda;
     private String dataTerminoVenda;
-    
+
     public void setDataVendaInicio(Date dataVendaIncio) {
         this.dataInicioVenda = DATE_FORMAT_ORACLE.format(dataVendaIncio);
     }
-    
+
     public void setDataVendaTermino(Date dataVendaTermino) {
         this.dataTerminoVenda = DATE_FORMAT_ORACLE.format(dataVendaTermino);
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
@@ -1430,7 +1427,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private Statement stm;
@@ -1508,11 +1505,10 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
             try {
                 if (next == null) {
                     if (rst.next()) {
-                        
+
                         String horaInicio = rst.getString("data") + " " + rst.getString("horaInicio");
                         String horaTermino = rst.getString("data") + " " + rst.getString("horaTermino");
-                        
-                        
+
                         next = new VendaIMP();
 
                         next.setId(rst.getInt("ecf") + "-" + rst.getString("id"));
@@ -1677,11 +1673,11 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         exibirMensagemComComboBox("Escolha o estado", true);
-        
+
         List<PautaFiscalIMP> result = new ArrayList<>();
         String tab_ncm_uf = "intersolid.tab_ncm_uf",
-            tab_loja = "intersolid.tab_loja",
-            tab_ncm = "intersolid.tab_ncm";
+                tab_loja = "intersolid.tab_loja",
+                tab_ncm = "intersolid.tab_ncm";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -2146,7 +2142,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
         String tab_produto_producao = "intersolid.tab_produto_producao",
-            tab_produto = "intersolid.tab_produto";
+                tab_produto = "intersolid.tab_produto";
 
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(

@@ -52,13 +52,22 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents2();
         
-        this.title = "Importação " + SISTEMA;      
+        this.title = "Importação " + SISTEMA;   
         
+        pnlConn.setOnConectar(() -> {
+            tabProdutos.btnMapaTribut.setEnabled(true);
+            carregarEntidades();
+            gravarParametros();
+        });
+        
+        carregarParametros();
 
         tabProdutos.setOpcoesDisponiveis(dao);
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.setEnabled(false);
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(dao.getLojaOrigem());
 
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -93,15 +102,9 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
         listEntidadesCheque.addListSelectionListener(listSelectionListenerCheque);
         
         listEntidadesConvenio.setModel(new DefaultListModel());
-        listEntidadesConvenio.addListSelectionListener(listSelectionListenerConvenio);
+        listEntidadesConvenio.addListSelectionListener(listSelectionListenerConvenio);        
         
-        pnlConn.setOnConectar(() -> {
-            tabProdutos.btnMapaTribut.setEnabled(true);
-            carregarEntidades();
-            gravarParametros();
-        });
-
-        pnlConn.setSistema(ESistema.MODELO);
+        pnlConn.setSistema(ESistema.SOLIDUSORACLE);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -209,6 +212,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
                         switch (tabImportacao.getSelectedIndex()) {
                             case 0:
                                 dao.setRemoverDigitoProdutoBalanca(chkEliminarDigito.isSelected());
+                                System.out.println("To no importador");
                                 tabProdutos.executarImportacao();
                                 break;
                             case 1:
@@ -268,11 +272,11 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
 
         tabMenu = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
         tabCli = new javax.swing.JPanel();
         scpClientes = new javax.swing.JScrollPane();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
-        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabParametro = new javax.swing.JTabbedPane();
         tabClienteRotativo = new vrframework.bean.panel.VRPanel();
@@ -293,6 +297,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
 
         setPreferredSize(new java.awt.Dimension(1200, 700));
 
+        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
         tabImportacao.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabFornecedores.TabConstraints.tabTitle"), tabFornecedores); // NOI18N
 
         scpClientes.setViewportView(tabClientes);
@@ -308,11 +313,10 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
         );
         tabCliLayout.setVerticalGroup(
             tabCliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+            .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 727, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabCli.TabConstraints.tabTitle"), tabCli); // NOI18N
-        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
 
         tabMenu.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabImportacao.TabConstraints.tabTitle"), tabImportacao); // NOI18N
         tabMenu.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.pnlBalanca.TabConstraints.tabTitle"), pnlBalanca); // NOI18N
@@ -337,7 +341,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
             tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteRotativoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -363,7 +367,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -397,7 +401,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 691, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -420,7 +424,7 @@ public class SolidusOracle2_5GUI extends VRInternalFrame {
             .addGroup(tabProdutoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(526, Short.MAX_VALUE))
+                .addContainerGap(702, Short.MAX_VALUE))
         );
 
         tabParametro.addTab(org.openide.util.NbBundle.getMessage(SolidusOracle2_5GUI.class, "SolidusOracle2_5GUI.tabProduto.TabConstraints.tabTitle"), tabProduto); // NOI18N
