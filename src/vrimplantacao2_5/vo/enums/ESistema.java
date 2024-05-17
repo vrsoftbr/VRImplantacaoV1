@@ -1564,7 +1564,7 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             throw new UnsupportedOperationException("Not supported yet.");
-        }
+            }
     },
     SIIT(152, "SIIT", new SiitDAO()) {
         @Override

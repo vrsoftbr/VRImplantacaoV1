@@ -9,7 +9,7 @@ public enum EScriptLojaOrigemSistema {
     ASOFT(1, 5, null),
     ACCESYS(2, 13, null),
     ACOM(3, 13, "select Fil_cod id,Fil_nome descricao from filiais order by Fil_cod"),
-    ALPHASYS(4, 5, "select cod_empresa id, cod_empresa||'' - ''||razao descricao from empresa order by 1"),
+    ALPHASYS(4, 5, "SELECT COD_EMPRESA AS id, RAZAO AS descricao  FROM EMPRESA e WHERE COD_FILIAL =1"),
     APOLLO(5, 9, "SELECT codempresa as id, fantasia as descricao FROM empresas order by codempresa"),
     ARTSYSTEM(6, 13, "select LOJCCODLOJ as id, LOJCEMLASU as descricao from dbo.ASENTLOJ"),
     ASEFE(7, 13, null),
@@ -106,8 +106,6 @@ public enum EScriptLojaOrigemSistema {
     BOMSOFT(203, 5, "SELECT ID_CFG id, FANTASIA_CFG descricao FROM CONFIG ORDER BY 1"),
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
     DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
-    ///DOBESCGA(206,5,"  SELECT COD_EMPRESA AS id, RAZAO AS descricao  FROM EMPRESA e WHERE COD_FILIAL =1"),
-    // atualizado acima, mas este é antigo 
     DOBESCGA(206, 5, "select ret000.\"Codigo\" as id, ret000.\"Fantasia\" as descricao, ret000.\"CNPJ\" from ret000 order by ret000.\"Codigo\""),
     TENTACULO(207, 5, "SELECT EMP_CODIGO id, EMP_FANTASIA descricao FROM EMPRESAS ORDER BY 1"),
     FXSISTEMAS(208, 5, "SELECT e.ID, e.RAZAO_SOCIAL descricao FROM EMPRESA e"),

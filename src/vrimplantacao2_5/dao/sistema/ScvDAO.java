@@ -500,7 +500,7 @@ public class ScvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	DATA_NASCIMENTO AS data_nasc,\n"
                     + "	TELEFONE2 AS celular,\n"
                     + "	LIMITE_CREDITO AS limite,\n"
-                    + "	STATUS AS ativo\n"
+                    + "	CASE WHEN STATUS = 'A' THEN TRUE ELSE FALSE END AS ativo\n"
                     + "FROM\n"
                     + "	CLIENTES c \n"
                     + "	JOIN CIDADES c2 ON c2.ID = c.RESIDENCIA_CLIENTE_ID_CIDADE "

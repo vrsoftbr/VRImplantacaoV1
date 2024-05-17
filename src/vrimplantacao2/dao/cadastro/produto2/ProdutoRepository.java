@@ -665,7 +665,7 @@ public class ProdutoRepository {
                             sdf.format(new Date()),
                             provider.getLojaVR());
                 }
-                
+
                 if (optSimples.contains(OpcaoProduto.PRECO) || 
                     optSimples.contains(OpcaoProduto.CUSTO) || 
                     optSimples.contains(OpcaoProduto.ESTOQUE)) {
@@ -1107,7 +1107,9 @@ public class ProdutoRepository {
                     complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                     provider.salvar(codigoAtual);
-                    provider.salvarProdutoPisCofins(codigoAtual);
+                    if (versao.igualOuMaiorQue(4, 1)) {
+                        provider.salvarProdutoPisCofins(codigoAtual);
+                    }
                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                     //provider.anterior().salvar(anterior);
                     double estoque = complemento.getEstoque();

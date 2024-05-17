@@ -298,6 +298,10 @@ public class LojaDAO {
                             "Não existem promoções cadastradas para a loja " + i_loja.descricao);
                 } else {
                     stm.execute(script.copiaPromocao(i_loja));
+                    stm.execute(script.copiaPromocaoItem(i_loja));
+                    stm.execute(script.copiaPromocaoFinalizadora(i_loja));
+                    stm.execute(script.copiaPromocaoDesconto(i_loja));
+                           
                 }
 
             }

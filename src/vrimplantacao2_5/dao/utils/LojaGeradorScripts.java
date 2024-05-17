@@ -296,7 +296,7 @@ public class LojaGeradorScripts {
         } else {
             sql = sql + ")";
         }
-            sql = sql
+        sql = sql
                 + "	select \n"
                 + "	" + i_loja.getId() + " ,\n"
                 + "     ecf,\n"
@@ -504,10 +504,55 @@ public class LojaGeradorScripts {
                 + "	id_tipoquantidade,aplicatodos,cupom,valordesconto,valorreferenteitenslista,verificaprodutosauditados,datalimiteresgatecupom,id_tipopercentualvalordesconto,\n"
                 + "	valorpaga,desconsideraritem,qtdlimite,somenteclubevantagens,diasexpiracao,utilizaquantidadeproporcional,desconsideraprodutoemoferta\n"
                 + "	from promocao where id_loja = " + i_loja.idCopiarLoja + "\n"
-                + "	and datatermino = '" + sdf.format(date) + "'";
-
+                + "	and datatermino >= '" + sdf.format(date) + "'";
         return sql;
+    }
 
+    public String copiaPromocaoItem(LojaVO i_loja) throws Exception {
+        String sql
+                = "insert into promocaoitem (id_promocao, id_produto, precovenda) \n"
+                + " select \n"
+                + " p2.id,\n"
+                + " pi.id_produto,\n"
+                + " pi.precovenda \n"
+                + " from promocao p\n"
+                + " join promocaoitem pi on p.id = pi.id_promocao \n"
+                + " join promocao p2 on p.descricao = p2.descricao and p2.id_loja = " + i_loja.getId() + " \n"
+                + " where \n"
+                + " p.id_loja = " + i_loja.idCopiarLoja + "\n"
+                + " and p.datatermino >= '" + sdf.format(date) + "'";
+        return sql;
+    }
+
+    public String copiaPromocaoFinalizadora(LojaVO i_loja) throws Exception {
+        String sql
+                = "insert into promocaofinalizadora (id_promocao, id_finalizadora)\n"
+                + "select\n"
+                + "p3.id ,\n"
+                + "p2.id_finalizadora \n"
+                + "from promocao p \n"
+                + "join promocaofinalizadora p2 on p2.id_promocao = p.id \n"
+                + "join promocao p3 on p3.descricao = p.descricao and p3.id_loja = " + i_loja.getId() + "\n"
+                + "where p.id_loja = " + i_loja.idCopiarLoja + "\n"
+                + "and p.datatermino >= '" + sdf.format(date) + "'";
+        return sql;
+    }
+
+    public String copiaPromocaoDesconto(LojaVO i_loja) throws Exception {
+        String sql
+                = "insert into promocaodesconto  (id_promocao, id_produto, desconto,qtdelimite) \n"
+                + " select \n"
+                + " p2.id,\n"
+                + " pd.id_produto,\n"
+                + " pd.desconto,\n"
+                + " pd.qtdelimite\n"
+                + " from promocao p\n"
+                + " join promocaodesconto pd on p.id = pd.id_promocao \n"
+                + " join promocao p2 on p.descricao = p2.descricao and p2.id_loja =  " + i_loja.getId() + "\n"
+                + " where \n"
+                + " p.id_loja = " + i_loja.idCopiarLoja + "\n"
+                + " and p.datatermino >= '" + sdf.format(date) + "'";
+        return sql;
     }
 
     public String validaPromocao(LojaVO i_loja) throws Exception {

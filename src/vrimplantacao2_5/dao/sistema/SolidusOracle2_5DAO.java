@@ -262,8 +262,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     ));
                 }
             }
-        } 
-        
+        }
+
         return result;
     }
 
@@ -572,8 +572,9 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    pl.qtd_est_atual estoque,\n"
                     + "    pl.qtd_est_minimo estoqueminimo,\n"
                     + "    pl.val_margem margem,\n"
-                    + "    case when pl.val_custo_tabela = 0 then pl.val_custo_cheio else pl.val_custo_tabela end custosemimposto,\n"
-                    + "    case when pl.val_custo_cheio = 0 then pl.val_custo_tabela else pl.val_custo_cheio end custocomimposto,\n"
+                    + "    round(pl.val_custo_cheio,2) custo,\n"
+                    //+ "    case when pl.val_custo_tabela = 0 then pl.val_custo_cheio else pl.val_custo_tabela end custosemimposto,\n"
+                    //+ "    case when pl.val_custo_cheio = 0 then pl.val_custo_tabela else pl.val_custo_cheio end custocomimposto,\n"
                     + "    pl.val_venda precovenda,\n"
                     + "    case when pl.inativo = 'S' then 0 else 1 end as situacaocadastro,\n"
                     + "    ncmcest.ncm,\n"
@@ -685,8 +686,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
                     imp.setNcm(rst.getString("ncm"));
@@ -780,6 +781,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    left join " + tab_loja_fornecedor + " lf on\n"
                     + "        lf.cod_fornecedor = f.cod_fornecedor and\n"
                     + "        lf.cod_loja = " + getLojaOrigem() + "\n"
+                    + " WHERE lf.inativo IS NOT NULL \n"
                     + "order by\n"
                     + "    id"
             )) {
@@ -806,7 +808,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoSeguranca(rst.getInt("prazoseguranca"));
-                    imp.setAtivo("S".equals(rst.getString("ativo")));
+                    imp.setAtivo(rst.getString("ativo").equals("S") ? false : true);
 
                     imp.setObservacao(
                             new StringBuilder()
@@ -1106,7 +1108,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    and tipo_parceiro = 0\n"
                     + "    and f.flg_quitado = 'N'\n"
                     + "    and not f.num_docto is null\n"
-                    + "    and f.cod_entidade in (" + implodeList(entidadesCreditoRotativo) + ")\n\n"
+  //                  + "    and f.cod_entidade in (" + implodeList(entidadesCreditoRotativo) + ")\n"
                     + "order by\n"
                     + "    1, 2, 3, 4, 5"
             )) {

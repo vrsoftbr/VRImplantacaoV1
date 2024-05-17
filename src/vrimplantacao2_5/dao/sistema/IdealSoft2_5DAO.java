@@ -48,7 +48,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  * @author Alan
  */
 public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private String estado = null;
     private String operacao = "7";
 
@@ -275,8 +275,8 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
                     "select \n"
                     + "	p.Ordem id,\n"
                     + "	p.Codigo codigointerno,	\n"
-                    + "	p.Nome_Nota descricaocompleta,\n"
-                    + "	p.Nome descricaoreduzida,\n"
+                    + "	p.Nome_Nota descricaoreduzida,\n"
+                    + "	p.Nome descricaocompleta,\n"
                     + "	p.Nome descricaogondula,\n"
                     + "	p.Ordem_Classe merc1,\n"
                     + "	p.Ordem_Subclasse merc2,\n"
@@ -365,6 +365,7 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondula"));
                     imp.setTipoEmbalagem(rst.getString("Unidade"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("Unidade"));
                     imp.setQtdEmbalagem(1);
                     imp.seteBalanca("0".equals(rst.getString("balanca").trim()));
 
@@ -376,7 +377,7 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
 
-                    imp.setSituacaoCadastro(rst.getInt("Inativo"));
+                    imp.setSituacaoCadastro(rst.getInt("Inativo") == 0 ? 1 : 0);
                     imp.setDataCadastro(rst.getDate("Data_Cadastro"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPesoBruto(rst.getDouble("Peso_Bruto"));
@@ -444,7 +445,7 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    " select f.Ordem, f.Ordem_Cidade, f.Ordem_Pais, f.Tipo, f.Fisica_Juridica, \n"
+                    "  select f.Codigo as ordem, f.Ordem_Cidade, f.Ordem_Pais, f.Tipo, f.Fisica_Juridica, \n"
                     + "       f.Nome, f.Fantasia, f.Endereco, f.Numero, f.Complemento, f.Bairro, \n"
                     + "       f.Cidade, f.Estado, f.CEP, f.CPF, f.CNPJ, f.RG_IE, f.Inscricao_Estadual_PF,\n"
                     + "       f.Inscricao_Municipal, f.Fone_1, f.Fone_2, f.Fax, f.Bloqueado, f.Data_Cadastro,\n"
@@ -569,7 +570,7 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	c.Ordem,\n"
+                    + "	c.codigo as ordem,\n"
                     + "	c.Ordem_Cidade,\n"
                     + "	c.Ordem_Pais,\n"
                     + "	c.Tipo,\n"
@@ -705,11 +706,11 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
         }
         return result;
     }
-    
+
     public String exibirMensagemComComboBox(String titulo, boolean isEstado) throws Exception {
         JComboBox comboBox = new JComboBox<>();
         comboBox.setModel(new DefaultComboBoxModel<>());
-        
+
         List<String> dados = carregarDadosOperacoes(isEstado);
 
         dados.forEach(dado -> comboBox.addItem(dado));
@@ -737,7 +738,7 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
 
         if (result == JOptionPane.OK_OPTION) {
             String escolha = (String) comboBox.getSelectedItem();
-            String[] primeiraString= escolha.split(" ");
+            String[] primeiraString = escolha.split(" ");
             return primeiraString[0];
         } else {
             throw new Exception("É obrigatório escolher um item!");
@@ -765,12 +766,12 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
-    private List<String> carregarDadosOperacoes(boolean isEstado) throws Exception {     
-        
+    private List<String> carregarDadosOperacoes(boolean isEstado) throws Exception {
+
         if (isEstado) {
             return new LocalDAO().getSiglas();
         }
-        
+
         List<String> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
