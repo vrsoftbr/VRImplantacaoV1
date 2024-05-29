@@ -257,6 +257,7 @@ import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.PallasDAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
+import vrimplantacao2_5.dao.sistema.ProSuper2_5DAO;
 import vrimplantacao2_5.dao.sistema.ResulthBusinessDAO;
 import vrimplantacao2_5.dao.sistema.STI32_5DAO;
 import vrimplantacao2_5.dao.sistema.SantSystemDAO;
@@ -370,6 +371,7 @@ import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Pallas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Plenus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Prime2_5GUI;
+import vrimplantacao2_5.gui.sistema.ProSuper2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scorpion2_5GUI;
 import vrimplantacao2_5.gui.sistema.Provenco_Tentaculo2_5GUI;
 import vrimplantacao2_5.gui.sistema.RMS2_5GUI;
@@ -2702,6 +2704,18 @@ public enum ESistema {
         ) {
             try {
                 return new SolidusOracle2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    PROSUPER(269, "PROSUPER", new ProSuper2_5DAO()){
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new ProSuper2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

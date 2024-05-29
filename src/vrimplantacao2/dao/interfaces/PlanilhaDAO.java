@@ -1258,7 +1258,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setPaga(linha.getDouble("paga"));
 
             ProgressBar.setStatus("Carregando promoções... " + contador++);
-            
+
             Result.add(imp);
         }
         return Result;
@@ -1336,12 +1336,16 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (format.contains("/")) {
 
                     String[] dataAjustada = format.split("/");
-                    String ano = dataAjustada[0];
-                    int anoConvert = Integer.parseInt(ano);
+                    if (dataAjustada.length == 3) {
+                        String ano = dataAjustada[0];
+                        if (ano.length() == 4) {
+                            int anoConvert = Integer.parseInt(ano);
 
-                    if (anoConvert > 1000) {
-                        SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
-                        return ajustarAno.parse(format);
+                            if (anoConvert > 1000) {
+                                SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
+                                return ajustarAno.parse(format);
+                            }
+                        }
                     }
 
                     SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
@@ -1351,24 +1355,27 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 } else if (format.contains("-")) {
 
                     String[] dataAjustada = format.split("-");
-                    String ano = dataAjustada[0];
-                    int anoConvert = Integer.parseInt(ano);
+                    if (dataAjustada.length == 3) {
+                        String ano = dataAjustada[0];
+                        if (ano.length() == 4) {
+                            int anoConvert = Integer.parseInt(ano);
 
-                    if (anoConvert > 1000) {
-
-                        SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy/MM/dd");
-                        return ajustarAno.parse(format);
+                            if (anoConvert > 1000) {
+                                SimpleDateFormat ajustarAno = new SimpleDateFormat("yyyy-MM-dd");
+                                return ajustarAno.parse(format);
+                            }
+                        }
                     }
 
-                    SimpleDateFormat ajusteData = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat ajusteData = new SimpleDateFormat("dd-MM-yyyy");
                     SimpleDateFormat converteData = new SimpleDateFormat("yyyy/MM/dd");
                     return converteData.parse(converteData.format(ajusteData.parse(format.replace("-", "/"))));
                 }
-                return format == null ? null : formatData.parse(format);
+                return null;
 
-            } catch (ParseException ex) {
-                System.out.println(ex.getMessage());
-                Exceptions.printStackTrace(ex);
+            } catch (ParseException | NumberFormatException ex) {
+                System.out.println("Erro ao analisar a data: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
         return null;

@@ -240,21 +240,28 @@ public class IdealSoft2_5DAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	p.Ordem id,\n"
-                    + "	p.Codigo codigointerno,\n"
-                    + "	p.Codigo_Barras ean,\n"
+                    + "	p1.Codigo as id_produto,\n"
+                    + "	p1.Codigo_Barras as ean,\n"
                     + "	u.Nome unidade\n"
-                    + "from\n"
-                    + "	dbo.Prod_Serv p\n"
-                    + "left join dbo.Unidades_Venda u on\n"
-                    + "	u.Ordem = p.Ordem_Unidade_Venda"
+                    + "	from\n"
+                    + "	Prod_Serv p1\n"
+                    + "	left join dbo.Unidades_Venda u on\n"
+                    + "	u.Ordem = p1.Ordem_Unidade_Venda\n"
+                    + "	union all\n"
+                    + "	select \n"
+                    + "	p2.codigo as id_produto,\n"
+                    + "	p2.codigo_adicional2 as ean,\n"
+                    + "	u.Nome unidade\n"
+                    + "	from Prod_Serv p2\n"
+                    + "		left join dbo.Unidades_Venda u on\n"
+                    + "	u.Ordem = p2.Ordem_Unidade_Venda"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("codigointerno"));
+                    imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(1);
                     imp.setTipoEmbalagem(rst.getString("unidade"));

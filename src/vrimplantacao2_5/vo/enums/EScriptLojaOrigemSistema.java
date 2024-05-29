@@ -172,7 +172,8 @@ public enum EScriptLojaOrigemSistema {
     ARPA(262, 11, "select 1 as id, razao as descricao from registro r "),
     ATHOS_SQLSERVER(266, 13, "select 1 id, ''Loja Validar'' descricao"),
     IDEALSOFT(267, 13, "SELECT Ordem id, Razao_Social descricao from Filiais f "),
-    SOLIDUSORACLE(268, 9, "select l.cod_loja id, l.cod_loja || '' - '' || l.des_fantasia descricao, num_cgc from intersolid.tab_loja l where flg_desativada = ''N'' order by 1");
+    SOLIDUSORACLE(268, 9, "select l.cod_loja id, l.cod_loja || '' - '' || l.des_fantasia descricao, num_cgc from intersolid.tab_loja l where flg_desativada = ''N'' order by 1"),
+    PROSUPER(269, 11, "select emcodigo as id, emnome as descricao from empresa ");
 
     private int idSistema;
     private int idBancoDados;

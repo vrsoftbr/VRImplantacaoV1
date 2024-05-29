@@ -223,6 +223,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_GENERICO(252, "GENERICO", 11, "POSTGRESQL", "postgres", "postgres", "VrPost@Server", 8745, ""),
     POSTGRESQL_ARPA(262,"ARPA",11, "POSTGRESQL", "postgres","postgres","postgres",5432,""),
     POSTGRESQL_ALTERDATAWSHOP(254, "ALTERDATAWSHOP", 11, "POSTGRESQL", "ALTERDATA_SHOP", "postgres", "#abc123#", 5432, ""),
+    POSTGRESQL_PROSUPER(254, "PROSUPER", 11, "POSTGRESQL", "", "postgres", "", 8746, ""),
 //SQLSERVER
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "sa", "@66E$Y$", 1433, ""),
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433, ""),

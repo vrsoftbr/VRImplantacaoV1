@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.joda.time.LocalDate;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
@@ -66,7 +67,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setTipoDocumentoRotativo(Set<Integer> TipoDocumentoRotativo) {
         this.TipoDocumentoRotativo = TipoDocumentoRotativo;
     }
-    
+
     public void setTipoDocumentoConvenio(Set<Integer> TipoDocumentoConvenio) {
         this.TipoDocumentoConvenio = TipoDocumentoConvenio;
     }
@@ -485,21 +486,20 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
         try (
-                Statement st = ConexaoMySQL.getConexao().createStatement();
-                ResultSet rs = st.executeQuery(
-                        "select distinct\n"
-                        + "	pc.es1_ncm ncm,\n"
-                        + "	st.tab_valor iva,\n"
-                        + "	pc.es1_icmsent idicmspauta\n"
-                        + "FROM\n"
-                        + "	es1p pr\n"
-                        + "	JOIN es1 pc ON\n"
-                        + "		pr.es1_cod = pc.ES1_COD\n"
-                        + "	join st_margemst st on\n"
-                        + "		pc.es1_margemst = st.tab_cod\n"
-                        + "	join (select * from icms where cst = '060') icms on\n"
-                        + "		icms.codigo = pc.ES1_TRIBUTACAO"
-                )) {
+                Statement st = ConexaoMySQL.getConexao().createStatement(); ResultSet rs = st.executeQuery(
+                "select distinct\n"
+                + "	pc.es1_ncm ncm,\n"
+                + "	st.tab_valor iva,\n"
+                + "	pc.es1_icmsent idicmspauta\n"
+                + "FROM\n"
+                + "	es1p pr\n"
+                + "	JOIN es1 pc ON\n"
+                + "		pr.es1_cod = pc.ES1_COD\n"
+                + "	join st_margemst st on\n"
+                + "		pc.es1_margemst = st.tab_cod\n"
+                + "	join (select * from icms where cst = '060') icms on\n"
+                + "		icms.codigo = pc.ES1_TRIBUTACAO"
+        )) {
             while (rs.next()) {
                 PautaFiscalIMP imp = new PautaFiscalIMP();
 
@@ -768,7 +768,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 builder.append(",");
             }
         }
-        
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
@@ -824,7 +824,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + "	c.cg1_cod id,\n"
-                    + "	c.cg1_dtcad cadastro,\n"
+                    + "	case when c.cg1_dtcad = '0000-00-00'\n"
+                    + "	then substring(NOW(),1,10) ELSE c.cg1_dtcad  END AS cadastro,\n"
                     //  + "	c.cg1_cgc cnpj,\n"
                     //  + "	c.cg1_cpf cpf,\n"
                     //  + "	c.cg1_rg rg,\n"

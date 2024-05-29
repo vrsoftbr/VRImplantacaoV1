@@ -1108,7 +1108,7 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    and tipo_parceiro = 0\n"
                     + "    and f.flg_quitado = 'N'\n"
                     + "    and not f.num_docto is null\n"
-  //                  + "    and f.cod_entidade in (" + implodeList(entidadesCreditoRotativo) + ")\n"
+                    + "    and f.cod_entidade in (" + implodeList(entidadesCreditoRotativo) + ")\n"
                     + "order by\n"
                     + "    1, 2, 3, 4, 5"
             )) {
