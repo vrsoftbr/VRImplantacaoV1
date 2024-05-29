@@ -37,7 +37,7 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "SisMoura";
+        return "JMASTER";
     }
 
     public boolean apenasProdutoAtivo = false;
@@ -303,7 +303,7 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.GERCODREDUZ id,\n"
-                    + "	CONVERT(DATE, CONVERT(VARCHAR, p.GERENTLIN)) datacadastro,\n"
+                    //+ "	CONVERT(DATE, CONVERT(VARCHAR, p.GERENTLIN)) datacadastro,\n"
                     + "	ean.EANCODIGO ean,\n"
                     + "	ean.EANQTDE qtdembalagem,\n"
                     + "	p.GERTIPVEN unidade,\n"
@@ -331,8 +331,8 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.GERTECLA teclassociada,\n"
                     + "	p.GERSAILIN saidadelinha,\n"
                     + " est.LITCUSMED customedio, \n"
-//                  + "	left (p.GERNBM,8) ncm,\n"
-//                  + "	left(p.GERCEST,8) cest,\n"
+                    + "	left (p.GERNBM,8) ncmtratado,\n"
+                    + "	left(p.GERCEST,8) cesttratado,\n"
                     + "	p.GERNBM ncm,\n"
                     + "	p.GERCEST cest,\n"
                     + "	p.GERTIPOPIS piscofins_saida,\n"
@@ -375,6 +375,10 @@ public class Jmaster2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    if (rst.getString("ncm").length() > 8){
+                        imp.setNcm(rst.getString("ncmtratado"));
+                        imp.setCest(rst.getString("cesttratado"));
+                    }
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsCstDebito(rst.getString("id_icms_saida"));

@@ -243,9 +243,9 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "pc.PRECO_COMPRA AS  custocomimposto,\n"
                     + "pc.PRECO_VENDA  AS PRODVenda,\n"
                     + "pa.ENTRADA AS prodsdo,\n"
-                    + "p.COD_GRUPO AS merc1,\n"
-                    + "p.COD_GRUPO AS merc2,\n"
-                    + "p.COD_GRUPO AS merc3,\n"
+                    + "G.COD_GRUPO AS merc1,\n"
+                    + "S.COD_GRUPO AS merc2,\n"
+                    + "S.COD_GRUPO AS merc3,\n"
                     + "gn.NCM AS ncm,\n"
                     + "gc.CEST AS cest ,\n"
                     + "p.COD_UNIDADE_SAIDA AS PRODUnid,\n"
@@ -260,7 +260,10 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN PRODUTO_ALMOXARIFADO pa ON pa.COD_PRODUTO = p.COD_PRODUTO \n"
                     + "LEFT JOIN GRUPO_NCM gn ON gn.COD_GRUPO_NCM = p.COD_GRUPO_NCM \n"
                     + "LEFT JOIN GRUPO_CEST gc ON gc.COD_GRUPO_CEST = p.COD_GRUPO_CEST \n"
-                    + "LEFT JOIN PRODUTO_TRIBUTACAO pt ON pt.COD_PRODUTO = p.COD_PRODUTO "
+                    + "LEFT JOIN PRODUTO_TRIBUTACAO pt ON pt.COD_PRODUTO = p.COD_PRODUTO \n"
+                    + "LEFT JOIN GRUPO S ON S.COD_GRUPO = P.COD_GRUPO\n"
+                    + "LEFT JOIN GRUPO G ON G.COD_GRUPO = S.COD_JUNCAO\n"
+                    + "LEFT JOIN GRUPO SE ON SE.COD_GRUPO = G.COD_JUNCAO"
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -272,22 +275,20 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportSistema(getSistema());
                     imp.setEan(rst.getString("ean"));
 
-                    long codigoProduto;
-
-                    codigoProduto = Long.parseLong(imp.getImportId().equals("PRICMS") ? "999999" : imp.getImportId());
-                    if (codigoProduto <= Integer.MAX_VALUE) {
-                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                    } else {
-                        produtoBalanca = null;
-                    }
-
-                    if (produtoBalanca != null) {
+                    //long codigoProduto;
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean")));
+                    if (bal != null) {
+                        imp.setEan(bal.getCodigo() + "");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(bal.getValidade());
                         imp.seteBalanca(true);
-                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                        imp.setEan(imp.getImportId());
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                     } else {
-                        imp.setValidade(0);
-                        imp.seteBalanca(false);
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(1);
+                        imp.seteBalanca("TRUE".equals(rst.getString("prodbalanca")));
+                        imp.setTipoEmbalagem(rst.getString("PRODUnid"));
                     }
 
                     imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("PRODNome")));
@@ -555,7 +556,7 @@ public class AlphaSys2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	COD_CAIXA AS cctecf\n"
                     + "FROM\n"
                     + "	CONTAS_RECEBER cr\n"
-                    + "	WHERE COD_EMPRESA_PAGAMENTO IS null"
+                    + "	WHERE COD_EMPRESA_PAGAMENTO IS null AND SITUACAO = 1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

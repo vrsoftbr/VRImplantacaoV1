@@ -780,10 +780,6 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rs.getString("codtribent"));
                     imp.setIcmsDebitoForaEstadoId(rs.getString("codtribent"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("codtribent"));
-                    if ("052573".equals(id)) {
-                        System.out.println("para");
-                        imp.setIcmsConsumidorId(rs.getString("codtribsai"));
-                    }
                     imp.setIcmsConsumidorId(rs.getString("codtribsai"));
                     imp.setIcmsCreditoId(rs.getString("codtribent"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("codtribent"));
@@ -1500,23 +1496,33 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    "with div as (\n"
+                    + "	select\n"
+                    + "		distinct CODIGOPLU,\n"
+                    + "		CODIGOENTI,\n"
+                    + "		CODIGOENTI + '-' + NUMCGC_CPF id_divisao\n"
+                    + "	from\n"
+                    + "		fl300div div\n"
+                    + "	where\n"
+                    + "		ltrim(rtrim(NUMCGC_CPF)) != ''\n"
+                    + ")\n"
+                    + "select \n"
                     + "	f.codigoenti id_fornecedor,\n"
                     + "	f.codigoplu id_produto,\n"
-                    + "	coalesce(f.dataaltera, '') dataalteracao,\n"
-                    + "	coalesce(f.qtd_emb_co, 1) qtdcotacao,\n"
-                    + "	coalesce(f.referencia, '') referencia,\n"
-                    + "	div.id_divisao,\n"
                     + "	case  \n"
                     + "		when p.estc13codi = '' then p.codigoplu  \n"
                     + "		else p.estc13codi \n"
-                    + "	end ean\n"
+                    + "	end ean,\n"
+                    + "	coalesce(f.dataaltera, '') dataalteracao,\n"
+                    + "	coalesce(f.qtd_emb_co, 1) qtdcotacao,\n"
+                    + "	coalesce(f.referencia, '') referencia,\n"
+                    + "	div.id_divisao\n"
                     + "from \n"
                     + "	FL324FOR f\n"
+                    + "	join fl300est p on f.codigoplu = p.CODIGOPLU  \n"
                     + "	left join div on\n"
                     + "		f.CODIGOENTI = div.codigoenti and\n"
                     + "		f.CODIGOPLU = div.codigoplu\n"
-                    + "	left join fl300est p on f.CODIGOPLU = p.CODIGOPLU \n"
                     + "where\n"
                     + "	f.codigoenti != '' and\n"
                     + "	f.codigoenti not in ('000001') and\n"
@@ -2025,16 +2031,17 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setId(rst.getString("id"));
                         next.setVenda(rst.getString("id_venda"));
+                        String id = rst.getString("id_produto");
                         next.setCancelado(rst.getInt("cancelado") == 1);
                         //id = id.substring(0, id.length() - 1);
-
-                        if (rst.getString("id_produto").trim().equals(rst.getString("codigobarras").trim()) && rst.getString("codigobarras").trim().length() < 7) {
-                            String id = next.getProduto().substring(0, next.getProduto().length() - 1);
-                            next.setCodigoBarras(id);
-                            next.setProduto(id);
+                        next.setProduto(id);
+                        if (rst.getString("id_produto").trim().equals(rst.getString("codigobarras").trim())) {
+                            if (rst.getString("codigobarras").trim().length() < 7) {
+                                next.setProduto(id.substring(0, id.length() - 1));
+                            }
+                            next.setCodigoBarras(next.getProduto());
                         } else {
                             next.setCodigoBarras(rst.getString("codigobarras"));
-                            next.setProduto(rst.getString("id_produto"));
                         }
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
