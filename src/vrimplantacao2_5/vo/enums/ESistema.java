@@ -271,6 +271,7 @@ import vrimplantacao2_5.dao.sistema.SolidusOracle2_5DAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
 import vrimplantacao2_5.dao.sistema.TstiDAO2_5;
+import vrimplantacao2_5.dao.sistema.UPSoftware2_5DAO;
 import vrimplantacao2_5.dao.sistema.VisualComercio2_5DAO;
 import vrimplantacao2_5.dao.sistema.VivaSistemasDAO;
 import vrimplantacao2_5.dao.sistema.WLSDAO;
@@ -398,6 +399,7 @@ import vrimplantacao2_5.gui.sistema.Target_G32_5GUI;
 import vrimplantacao2_5.gui.sistema.TopSystem2_5GUI;
 import vrimplantacao2_5.gui.sistema.Tsl2_5GUI;
 import vrimplantacao2_5.gui.sistema.Tsti2_5GUI;
+import vrimplantacao2_5.gui.sistema.UPSoftware2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.sistema.VRToVR2_5GUI;
 import vrimplantacao2_5.gui.sistema.Versatil2_5GUI;
@@ -2716,6 +2718,18 @@ public enum ESistema {
         ) {
             try {
                 return new ProSuper2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    UPSOFTWARE(270, "UPSOFTWARE", new UPSoftware2_5DAO()){
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new UPSoftware2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
