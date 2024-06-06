@@ -195,8 +195,8 @@ public class GestoraV2GUI extends VRInternalFrame implements ConexaoEvent {
                                         && edtDtVendaIni.getDate() != null
                                         && edtDtVendaFim.getDate() != null) {
                                     
-                                    dao.setVendaDataIni(edtDtVendaIni.getDate());
-                                    dao.setVendaDataFim(edtDtVendaFim.getDate());                            
+                                    dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                                    dao.setDataTerminoVenda(edtDtVendaFim.getDate());                            
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                                 } else {
                                     throw new Exception("Preencha todos os campos para migrar as vendas.");

@@ -274,7 +274,7 @@ public enum ESistemaBancoDados {
     SQLSERVER_MRC6(202, "MRC6", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_CMM(216, "CMM", 13, "SQLSERVER", "", "", "", 1433, ""),
     SQLSERVER_ETRADE(220, "ETRADE", 13, "SQLSERVER", "ETrade", "dba", "master1", 1433, ""),
-    SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "", "", 1433, ""),
+    SQLSERVER_GESTORA(223, "GESTORA", 13, "SQLSERVER", "", "sa", "infodmce", 1433, ""),
     SQLSERVER_SUPERCONTROLE(229, "SUPERCONTROLE", 13, "SQLSERVER", "sc2010", "sc2010", "P0sa4P0s0", 1433, ""),
     SQLSERVER_GSOFT(238, "GSOFT", 13, "SQLSERVER", "GCOM", "sa", "@Gsbrasil", 1433, ""),
     SQLSERVER_BRDATA(240, "BRDATA", 13, "SQLSERVER", "", "", "", 1433, ""),

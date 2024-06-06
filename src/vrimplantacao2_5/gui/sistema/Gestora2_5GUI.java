@@ -106,10 +106,10 @@ public class Gestora2_5GUI extends VRInternalFrame {
                     tabClientes.setImportador(importador);
                     
                     if (tabProdutos.edtDtVendaIni.getDate() != null) {
-                        dao.setVendaDataIni(tabProdutos.edtDtVendaIni.getDate());
+                        dao.setDataInicioVenda(tabProdutos.edtDtVendaIni.getDate());
                     }
                     if (tabProdutos.edtDtVendaFim.getDate() != null) {
-                        dao.setVendaDataFim(tabProdutos.edtDtVendaFim.getDate());
+                        dao.setDataTerminoVenda(tabProdutos.edtDtVendaFim.getDate());
                     }
 
                     if (tabMenu.getSelectedIndex() == 0) {

@@ -310,8 +310,8 @@ public class GestoraGUI extends VRInternalFrame {
                         importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                     }
                     if (chkPdvVendas.isSelected()) {
-                        gestoraDAO.setVendaDataIni(edtDtVendaIni.getDate());
-                        gestoraDAO.setVendaDataFim(edtDtVendaFim.getDate());
+                        gestoraDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                        gestoraDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                         importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                     }
                     ProgressBar.dispose();
