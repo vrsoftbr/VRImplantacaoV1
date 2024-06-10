@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
@@ -80,6 +81,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean importarConveniosBaixados = false;
 
     public boolean precoVendaSemOferta = false;
+    private int contador = 1;
 
     private String complemento = "";
 
@@ -661,9 +663,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -756,9 +761,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     getDivisaoFornecedor(imp);
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -1059,9 +1067,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     getContatoCliente(imp);
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
