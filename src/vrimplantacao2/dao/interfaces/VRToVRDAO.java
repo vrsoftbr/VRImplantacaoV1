@@ -61,6 +61,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -157,7 +158,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.VENDA_PDV,
                     OpcaoProduto.PDV_VENDA,
                     OpcaoProduto.RECEITA_BALANCA,
-                    OpcaoProduto.RECEITA
+                    OpcaoProduto.RECEITA,
+                    OpcaoProduto.PROMOCAO
                 }
         ));
     }
@@ -202,9 +204,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAplicaPreco(rs.getBoolean("aplicapreco"));
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -332,9 +337,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -864,9 +872,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -1197,9 +1208,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -1385,9 +1399,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setLojaCadastro(rs.getInt("id_loja"));
 
                 result.add(imp);
+                contador++;
+                ProgressBar.setStatus("Carregando dados..." + contador);
             }
         }
-
+        contador = 1;
         return result;
     }
 
@@ -1431,10 +1447,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
-
+        contador = 1;
         return result;
     }
 
@@ -1475,9 +1493,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     incluirVencimentos(imp);
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -1553,9 +1574,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoOferta(rs.getInt("id_situacaooferta") == 1 ? SituacaoOferta.ATIVO : SituacaoOferta.CANCELADO);
 
                     result.add(imp);
+                    contador++;
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
+        contador = 1;
         return result;
     }
 
@@ -1953,6 +1977,48 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFornecedor(rs.getBoolean("fornecedor"));
                     imp.setConveniado(rs.getBoolean("conveniado"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<PromocaoIMP> getPromocoes() throws SQLException {
+        List<PromocaoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	p.id id_promocao,\n"
+                    + "	p.descricao descricao,\n"
+                    + "	p.datainicio inicio,\n"
+                    + "	p.datatermino termino,\n"
+                    + "	e.codigobarras ean,\n"
+                    + "	i.id_produto id_produto,\n"
+                    + "	pr.descricaocompleta descricaocompleta,\n"
+                    + "	p.quantidade quantidade,\n"
+                    + "	p.valorpaga paga\n"
+                    + "from\n"
+                    + "	promocao p\n"
+                    + "join promocaoitem i on i.id_promocao = p.id \n"
+                    + "join produtoautomacao e on e.id_produto = i.id_produto \n"
+                    + "join produto pr on i.id_produto = pr.id \n"
+                    + "where p.id_loja = " + getLojaOrigem())) {
+                while (rs.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+
+                    imp.setId_promocao(rs.getString("id_promocao"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setDataInicio(rs.getDate("inicio"));
+                    imp.setDataTermino(rs.getDate("termino"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setId_produto(rs.getString("id_produto"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setQuantidade(rs.getDouble("quantidade"));
+                    imp.setPaga(rs.getDouble("paga"));
+                    
                     result.add(imp);
                 }
             }

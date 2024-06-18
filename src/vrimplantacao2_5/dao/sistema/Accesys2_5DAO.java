@@ -32,9 +32,8 @@ import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
  * @author Bruno
  */
 public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
-    
-    // SISTEMA REFATORADO DA 2.0 E NÃO VALIDADO, FAVOR REVER TODOS OS CAMPOS INCLUSIVE ESCRIPTLOJAORIGEM -- SELECT LOJA.
 
+    // SISTEMA REFATORADO DA 2.0 E NÃO VALIDADO, FAVOR REVER TODOS OS CAMPOS INCLUSIVE ESCRIPTLOJAORIGEM -- SELECT LOJA.
     @Override
     public String getSistema() {
         return "Accesys";
@@ -132,14 +131,52 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	COD_EMPRESA id,\n"
-                    + "	NOMEFANTASIA fantasia\n"
-                    + "from\n"
-                    + "	CONTROLE_CLIENTES.dbo.CC_EMPRESA"
+                    "SELECT DISTINCT\n"
+                    + "    case when p.STICMSEntrada is null or TRIM(p.STICMSEntrada) = '' then '00' else p.STICMSEntrada end cst,\n"
+                    + "    ISNULL(p.MixAliquotaICMSEntrada, 0) AS icms,\n"
+                    + "    ISNULL(red_e.VALORREDUCAO, 0) AS reducao,\n"
+                    + "    CONCAT(\n"
+                    + "        CASE \n"
+                    + "            WHEN p.STICMSEntrada IS NULL OR TRIM(p.STICMSEntrada) = '' THEN '00E' \n"
+                    + "            ELSE CONCAT(p.STICMSEntrada, 'E') \n"
+                    + "        END,\n"
+                    + "        '_',\n"
+                    + "        ISNULL(red_e.VALORREDUCAO, 0),\n"
+                    + "        '_',\n"
+                    + "        ISNULL(p.MixAliquotaICMSEntrada, 0)\n"
+                    + "    ) AS id\n"
+                    + "FROM\n"
+                    + "    ce_produtos p\n"
+                    + "INNER JOIN ProdutosEmpresa pe ON p.CODBARRA_PRODUTOS = pe.Barras\n"
+                    + "LEFT OUTER JOIN CE_REDUCAOICMS red_e ON p.ReducaoEntrada = red_e.CODIGO\n"
+                    + "LEFT OUTER JOIN CE_REDUCAOICMS red_s ON p.REDUCAO = red_s.CODIGO\n"
+                    + "WHERE\n"
+                    + "    pe.CodEmpresa = 1\n"
+                    + "UNION\n"
+                    + "SELECT DISTINCT\n"
+                    + "    case when p.STICMS is null or TRIM(p.STICMS) = '' then '00' else p.STICMS end cst,\n"
+                    + "    ISNULL(p.MixAliquotaICMSSaida, 0) AS icms,\n"
+                    + "    ISNULL(red_s.VALORREDUCAO, 0) AS reducao,\n"
+                    + "    CONCAT(\n"
+                    + "        CASE \n"
+                    + "            WHEN p.STICMS IS NULL OR TRIM(p.STICMS) = '' THEN '00S' \n"
+                    + "            ELSE CONCAT(p.STICMS, 'S') \n"
+                    + "        END,\n"
+                    + "        '_',\n"
+                    + "        ISNULL(p.MixAliquotaICMSSaida, 0),\n"
+                    + "        '_',\n"
+                    + "        ISNULL(red_s.VALORREDUCAO, 0)\n"
+                    + "    ) AS id\n"
+                    + "FROM\n"
+                    + "    ce_produtos p\n"
+                    + "INNER JOIN ProdutosEmpresa pe ON p.CODBARRA_PRODUTOS = pe.Barras\n"
+                    + "LEFT OUTER JOIN CE_REDUCAOICMS red_e ON p.ReducaoEntrada = red_e.CODIGO\n"
+                    + "LEFT OUTER JOIN CE_REDUCAOICMS red_s ON p.REDUCAO = red_s.CODIGO\n"
+                    + "WHERE\n"
+                    + "    pe.CodEmpresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
-                    String id = rst.getString("cst") + "-" + rst.getString("icms") + "-" + rst.getString("reducao");
+                    String id = rst.getString("id");
                     result.add(new MapaTributoIMP(
                             id,
                             id,
@@ -194,7 +231,7 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = vrimplantacao.classe.ConexaoSqlServer.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + "	Codigo,\n"
@@ -220,7 +257,7 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
 
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = vrimplantacao.classe.ConexaoSqlServer.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	p.CODPROD_PRODUTOS id,\n"
@@ -246,12 +283,26 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.Nat_Rec_Cofins naturezareceita,\n"
                     + "	p.DataCadastro,\n"
                     + "	p.CEST,\n"
-                    + "	p.STICMSEntrada icms_cst_e,\n"
-                    + "	red_e.VALORREDUCAO icms_rbc_e,\n"
-                    + "	p.MixAliquotaICMSEntrada icms_alqt_e,\n"
-                    + "	p.STICMS icms_cst_s,\n"
-                    + "	p.MixAliquotaICMSSaida icms_alqt_s,\n"
-                    + "	red_s.VALORREDUCAO icms_rbc_s,\n"
+                    + "	CONCAT(\n"
+                    + "        CASE \n"
+                    + "            WHEN p.STICMSEntrada IS NULL OR TRIM(p.STICMSEntrada) = '' THEN '00E' \n"
+                    + "            ELSE CONCAT(p.STICMSEntrada, 'E') \n"
+                    + "        END,\n"
+                    + "        '_',\n"
+                    + "        ISNULL(red_e.VALORREDUCAO, 0),\n"
+                    + "        '_',\n"
+                    + "        ISNULL(p.MixAliquotaICMSEntrada, 0)\n"
+                    + "    ) AS idEntrada,\n"
+                    + "	CONCAT(\n"
+                    + "        CASE \n"
+                    + "            WHEN p.STICMS IS NULL OR TRIM(p.STICMS) = '' THEN '00S' \n"
+                    + "            ELSE CONCAT(p.STICMS, 'S') \n"
+                    + "        END,\n"
+                    + "        '_',\n"
+                    + "        ISNULL(p.MixAliquotaICMSSaida, 0),\n"
+                    + "        '_',\n"
+                    + "        ISNULL(red_s.VALORREDUCAO, 0)\n"
+                    + "    ) AS idSaida,\n"
                     + "	p.IVA,\n"
                     + "	p.TipoIVA tipo_iva,\n"
                     + "	p.Inutilizado desativado\n"
@@ -261,7 +312,7 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left outer join CE_REDUCAOICMS red_e on p.ReducaoEntrada = red_e.CODIGO\n"
                     + "left outer join CE_REDUCAOICMS red_s on p.REDUCAO = red_s.CODIGO\n"
                     + "where\n"
-                    + "	pe.CodEmpresa = " + getLojaOrigem() + "\n"
+                    + "	pe.CodEmpresa = " + getLojaOrigem() + " \n"
                     + "order by\n"
                     + "	p.CODPROD_PRODUTOS")) {
                 while (rs.next()) {
@@ -298,15 +349,12 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setCest(rs.getString("cest"));
 
-                    //Aliquota Credito
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_alqt_e"));
-                    imp.setIcmsCstEntrada(Utils.stringToInt(rs.getString("icms_cst_e")));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_rbc_e"));
-
-                    //Aliquota Debito
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_alqt_s"));
-                    imp.setIcmsCstSaida(Utils.stringToInt(rs.getString("icms_cst_s")));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_rbc_s"));
+                    imp.setIcmsDebitoId(rs.getString("idSaida"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(rs.getString("idEntrada"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
 
                     imp.setSituacaoCadastro(rs.getInt("desativado") == 1
                             ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);

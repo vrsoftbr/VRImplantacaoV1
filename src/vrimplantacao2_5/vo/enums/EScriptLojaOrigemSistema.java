@@ -7,7 +7,11 @@ package vrimplantacao2_5.vo.enums;
 public enum EScriptLojaOrigemSistema {
 
     ASOFT(1, 5, null),
-    ACCESYS(2, 13, null),
+    ACCESYS(2, 13, "select\n" +
+                    "	COD_EMPRESA id,\n" +
+                    "	NOMEFANTASIA descricao\n" +
+                    "from\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_EMPRESA"),
     ACOM(3, 13, "select Fil_cod id,Fil_nome descricao from filiais order by Fil_cod"),
     ALPHASYS(4, 5, "SELECT COD_EMPRESA AS id, RAZAO AS descricao  FROM EMPRESA e WHERE COD_FILIAL =1"),
     APOLLO(5, 9, "SELECT codempresa as id, fantasia as descricao FROM empresas order by codempresa"),
