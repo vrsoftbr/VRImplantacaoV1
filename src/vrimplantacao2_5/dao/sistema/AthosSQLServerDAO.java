@@ -131,7 +131,8 @@ public class AthosSQLServerDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.COMPLEMENTO,
                 OpcaoCliente.SITUACAO_CADASTRO,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO));
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
+                OpcaoCliente.VALOR_LIMITE));
     }
 
     @Override
@@ -217,7 +218,9 @@ public class AthosSQLServerDAO extends InterfaceDAO implements MapaTributoProvid
                     + " p.aliqCofins,\n"
                     + " p.balanca ebalanca,\n"
                     + " p.MarcasCod,\n"
-                    + " pe.movimento estoque\n"
+                    + " pe.movimento estoque\n,"
+                    + " p.tipoLeitura tipoleitura\n,"
+                    + " p.Validade validade\n"
                     + "from Produtos p\n"
                     + "join dataestoqueatual e on e.barras = p.CodigoBarras\n"
                     + "join Produtos_Estoque pe \n"
@@ -262,8 +265,12 @@ public class AthosSQLServerDAO extends InterfaceDAO implements MapaTributoProvid
                     } else {
                         imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(rst.getBoolean("ebalanca"));
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.setValidade(0);
+                        if (rst.getBoolean("ebalanca") == true && rst.getInt("tipoleitura") == 0) {
+                            imp.setTipoEmbalagem("KG");
+                        } else {
+                            imp.setTipoEmbalagem(rst.getString("unidade"));
+                        }
+                        imp.setValidade(rst.getInt("validade"));
                         imp.setQtdEmbalagem(0);
                     }
 
@@ -340,15 +347,21 @@ public class AthosSQLServerDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + " Codigo idproduto,\n"
+                    + " FornecedorCod fornecedorid\n"
+                    + "from Produtos  \n"
+                    + "where \n"
+                    + " FornecedorCod is not null\n"
+                    + " and \n"
+                    + " FornecedorCod <> ''"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("fornecedorid"));
-                    imp.setIdProduto(rst.getString("produtoid"));
-                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setIdProduto(rst.getString("idproduto"));
 
                     result.add(imp);
                 }
@@ -439,7 +452,13 @@ public class AthosSQLServerDAO extends InterfaceDAO implements MapaTributoProvid
                     }
 
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
-                    imp.setAtivo(rst.getBoolean("Inativo"));
+                    if("1".equals(rst.getString("Inativo"))){
+                        imp.setAtivo(false);
+                    }
+                    else{
+                        imp.setAtivo(true);
+                    }
+                    imp.setValorLimite(rst.getDouble("Limite"));
 
                     result.add(imp);
 

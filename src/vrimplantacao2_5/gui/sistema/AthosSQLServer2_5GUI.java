@@ -27,6 +27,8 @@ public class AthosSQLServer2_5GUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(dao.getLojaOrigem());
     }
 
     public AthosSQLServer2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
