@@ -433,7 +433,7 @@ public class ProSuper2_5GUI extends VRInternalFrame {
                         .addGap(0, 169, Short.MAX_VALUE)
         );
 
-        tabImportacao.addTab("Ajuste", tabParametro);
+        //tabImportacao.addTab("Ajuste", tabParametro);
 
         tabMenu.addTab("Importação", tabImportacao);
         tabMenu.addTab("Balança", pnlBalanca);

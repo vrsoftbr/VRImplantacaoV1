@@ -16,7 +16,6 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -45,9 +44,10 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
     Mercadologicos = esclassi,
     Produto e afins = estoque,
     Fornecedor = focadfor,
-    Script Loja origem = ccconfig,
+    Script Loja origem = ccconfig,empresa
     Cliente = ccclient,
     CredRotativo = cocadrec
+    ProdutoFornecedor = prorelac
     
      */
     @Override
@@ -130,14 +130,52 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                     "select distinct \n"
-                    + "tqaliicm||tqtribut||tqsubsti as id,\n"
-                    + "tqtribut||tqaliicm as descricao,\n"
+                    "select distinct \n"
+                    + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar||tqtribut as id,\n"
+                    + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
+                    + "else tqaliicm::int||'%' end as descricao,\n"
                     + "tqaliicm  as aliq,\n"
-                    + "tqsubsti as reducao, \n"
-                    + "tqtribut as cst \n"
+                    + "tqsubsti as reducao,\n"
+                    + "tqtribut::int  as cst \n"
+                    + "from \n"
+                    + "estoque \n"
+                    + "union \n"
+                    + "select distinct \n"
+                    + "'c-'||tqalipdv id,\n"
+                    + "'consumidor-'||tqalipdv descricao,\n"
+                    + "tqalipdv  as aliq,\n"
+                    + "0 as reducao,\n"
+                    + "0  as cst \n"
                     + "from \n"
                     + "estoque "
+            //                                        "select distinct \n"
+            //                                        + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar as id,\n"
+            //                                        + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
+            //                                        + "else tqaliicm::int||'%' end as descricao,\n"
+            //                                        + "tqaliicm  as aliq,\n"
+            //                                        + "tqsubsti as reducao,\n"
+            //                                        + "tqalipdv  as cst \n"
+            //                                        + "from \n"
+            //                                        + "estoque "
+            //            
+            //                                        "select distinct \n"
+            //                                        + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar as id,\n"
+            //                                        + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
+            //                                        + "else tqaliicm::int||'%' end as descricao,\n"
+            //                                        + "tqaliicm  as aliq,\n"
+            //                                        + "tqsubsti as reducao,\n"
+            //                                        + "tqalipdv  as cst \n"
+            //                                        + "from \n"
+            //                                        + "estoque "
+            //                    " select distinct on (tqaliicm ||'-'|| tqsubsti::varchar)\n"
+            //                    + "tqaliicm ||'-'|| tqsubsti::varchar as id,\n"
+            //                    + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
+            //                    + "else tqaliicm::int||'%' end as descricao,\n"
+            //                    + "tqaliicm  as aliq,\n"
+            //                    + "tqsubsti as reducao,\n"
+            //                    + "tqalipdv as cst \n"
+            //                    + "from \n"
+            //                    + "estoque"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -181,17 +219,52 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "distinct \n"
-                    + "m.elcodigo as merc1,\n"
-                    + "tqgrupo as desc1 ,\n"
-                    + "m1.elcodigo as merc2 ,\n"
-                    + "tqsgrupo as desc2 \n"
-                    + "from\n"
-                    + "estoque e\n"
-                    + "join esclassi m on m.eldescri = e.tqgrupo \n"
-                    + "join esclassi m1 on m1.eldescri = e.tqsgrupo\n"
-                    + "order by 1"
+                    "with mercadologico1 as(\n"
+                    + "select '1' merc1, 'GERAL' descricao, 0\n"
+                    + "union\n"
+                    + "select \n"
+                    + " split_part(elcodigo,'.',1) merc1,\n"
+                    + " eldescri descricao,\n"
+                    + " length(replace(elcodigo,' ',''))\n"
+                    + "from esclassi \n"
+                    + "where \n"
+                    + " length(replace(elcodigo,' ','')) between 3 and 4\n"
+                    + " ) \n"
+                    + ", mercadologico2 as(\n"
+                    + "select '1' merc1, '001' merc2, 'GERAL' descricao, 0\n"
+                    + "union\n"
+                    + "select \n"
+                    + " split_part(elcodigo,'.',1) merc1,\n"
+                    + " split_part(elcodigo,'.',2) merc2,\n"
+                    + " eldescri descricao,\n"
+                    + " length(replace(elcodigo,' ',''))\n"
+                    + "from esclassi \n"
+                    + "where \n"
+                    + " length(replace(elcodigo,' ','')) between 6 and 7 \n"
+                    + " )\n"
+                    + " , mercadologico3 as(\n"
+                    + " select \n"
+                    + " split_part(elcodigo,'.',1) merc1,\n"
+                    + " split_part(elcodigo,'.',2) merc2,\n"
+                    + " split_part(elcodigo,'.',3) merc3,\n"
+                    + " eldescri descricao,\n"
+                    + " length(replace(elcodigo,' ',''))\n"
+                    + "from esclassi \n"
+                    + "where \n"
+                    + " length(replace(elcodigo,' ','')) > 7 \n"
+                    + " )\n"
+                    + "  select \n"
+                    + "  m1.merc1,\n"
+                    + "  m1.descricao as descricao1,\n"
+                    + "  m2.merc2,\n"
+                    + "  m2.descricao as descricao2,\n"
+                    + "  m3.merc3,\n"
+                    + "  m3.descricao as descricao3\n"
+                    + " from mercadologico3 m3\n"
+                    + " left join mercadologico2 m2 on m3.merc1 = m2.merc1 and m3.merc2 = m2.merc2\n"
+                    + " left join mercadologico1 m1 on m2.merc1 = m1.merc1\n"
+                    + "where m1.merc1 is not null \n"
+                    + "  order by 1"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -199,11 +272,11 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportSistema(getSistema());
 
                     imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("desc1"));
+                    imp.setMerc1Descricao(rst.getString("descricao1"));
                     imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(rst.getString("desc2"));
+                    imp.setMerc2Descricao(rst.getString("descricao2"));
                     imp.setMerc3ID(rst.getString("merc2"));
-                    imp.setMerc3Descricao(rst.getString("desc2"));
+                    imp.setMerc3Descricao(rst.getString("descricao3"));
 
                     result.add(imp);
                 }
@@ -218,12 +291,14 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	distinct \n"
-                    + "	tqid as id_produto,\n"
-                    + "	e.tqobserv as descricaocompleta,\n"
-                    + "	tqdescri as descricaoreduzida,\n"
+                    /*"select\n"
+                    + "	distinct on (e.tqid) \n"
+                    + "	e.tqcodigo as id_produto,\n"
+                    + "	case when e.tqobserv = ''\n"
+                    + "	then tqdescri else e.tqobserv end as descricaoreduzida,\n"
+                    + "	tqdescri ||'-'||tqgrade as descricaocompleta,\n"
                     + "	e.tqncm as cod_ncm,\n"
+                    + "	barra.cbcodbar as ean,\n"
                     + "	tqcest as cest,\n"
                     + "	case \n"
                     + "		when tqativo = 'S' then 1\n"
@@ -233,19 +308,62 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	tqqtdmax as estoquemaximo,\n"
                     + "	tqqtdmin as estoqueminimo,\n"
                     + "	tqsaldo as estoque,\n"
-                    + "	m.elcodigo as merc1,\n"
-                    + "	m.elcodigo as merc2 ,\n"
+                    + "	split_part(m.elcodigo,'.',1) as merc1,\n"
+                    + "	split_part(m.elcodigo,'.',2) as merc2,\n"
+                    + "	split_part(m.elcodigo,'.',3) as merc3,\n"
                     + "	tqpreven as preco,\n"
                     + "	tqprecus as custo,\n"
                     + "	tqlucro as margem,\n"
                     + "	tqnatise as nat_receita,\n"
-                    + "	tqaliicm||tqtribut||tqsubsti as icms,\n"
+                    + "	tqaliicm||tqsubsti::varchar||tqalipdv::varchar as icms,\n"
                     + "	tqcstcof as cst_cofins,\n"
-                    + "	tqcstpie as cst_pis_entrada\n"
+                    + " e.tqalipdv as pdv, \n"
+                    + "	tqcstpie as cst_pis_entrada,\n"
+                    + "e.tqid as id \n"
                     + "from\n"
                     + "	estoque e\n"
-                    + "left join escodbar barra on barra.cbcodigo = e.tqcodigo\n"
-                    + "left join esclassi m on m.eldescri = e.tqgrupo"
+                    + "left join escodbar barra on barra.cbcodigo = e.tqcodigo and e.tqgrade = barra.cbgrade\n"
+                    + "left join esclassi m on e.tqclassi = m.elcodigo "*/
+                    "with icms as(select distinct on (tqcodigo) \n"
+                    + "tqid,\n"
+                    + "tqcodigo,\n"
+                    + "tqalipdv as cst \n"
+                    + "from \n"
+                    + "estoque )\n"
+                    + "select\n"
+                    + "	distinct on (e.tqid) \n"
+                    + "	e.tqcodigo as id_produto,\n"
+                    + "	case when e.tqobserv = ''\n"
+                    + "	then tqdescri else e.tqobserv end as descricaoreduzida,\n"
+                    + "	tqdescri ||'-'||tqgrade as descricaocompleta,\n"
+                    + "	e.tqncm as cod_ncm,\n"
+                    + "	barra.cbcodbar as ean,\n"
+                    + "	tqcest as cest,\n"
+                    + "	case \n"
+                    + "		when tqativo = 'S' then 1\n"
+                    + "		when tqativo = 'N' then 0\n"
+                    + "		else 1\n"
+                    + "	end as ativo,\n"
+                    + "	tqqtdmax as estoquemaximo,\n"
+                    + "	tqqtdmin as estoqueminimo,\n"
+                    + "	tqsaldo as estoque,\n"
+                    + "	split_part(m.elcodigo,'.',1) as merc1,\n"
+                    + "	split_part(m.elcodigo,'.',2) as merc2,\n"
+                    + "	split_part(m.elcodigo,'.',3) as merc3,\n"
+                    + "	tqpreven as preco,\n"
+                    + "	tqprecus as custo,\n"
+                    + "	tqlucro as margem,\n"
+                    + "	tqnatise as nat_receita,\n"
+                    + "	tqaliicm||tqsubsti::varchar||tqalipdv::varchar||tqtribut as icms,\n"
+                    + "	'c-'||tqalipdv as pdv,\n"
+                    + "	tqcstcof as cst_cofins,\n"
+                    + "	tqcstpie as cst_pis_entrada,\n"
+                    + "e.tqid as id \n"
+                    + "from\n"
+                    + "	estoque e\n"
+                    + "left join escodbar barra on barra.cbcodigo = e.tqcodigo and e.tqgrade = barra.cbgrade\n"
+                    + "left join esclassi m on e.tqclassi = m.elcodigo \n"
+                    + "join icms i on i.tqcodigo = e.tqcodigo"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -253,9 +371,9 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("id_produto"));
+                    imp.setImportId(rst.getString("id"));
 
-                    int codigoProduto = Utils.stringToInt(rst.getString("id_produto"), -2);
+                    int codigoProduto = Utils.stringToInt(rst.getString("ean"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
                     if (produtoBalanca != null) {
@@ -266,7 +384,6 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.seteBalanca(false);
-                        //imp.setTipoEmbalagem(rst.getString("UN"));
                         imp.setValidade(0);
                         imp.setQtdEmbalagem(1);
                     }
@@ -287,7 +404,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(imp.getCodMercadologico2());
+                    imp.setCodMercadologico3(rst.getString("merc3"));
 
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));
@@ -299,7 +416,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
-                    imp.setIcmsConsumidorId(idIcms);
+                    imp.setIcmsConsumidorId(rst.getString("pdv"));
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
@@ -321,7 +438,13 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + "	distinct \n"
+                    + "	e.tqid as id_produto,\n"
+                    + "	p.spcodfor  as id_fornecedor, \n"
+                    + "	p.spcodxml as codigoexterno\n"
+                    + "	from prorelac p\n"
+                    + "	left join estoque e on e.tqcodigo = p.spcodigo "
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -331,7 +454,6 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
 
                     result.add(imp);
                 }
@@ -348,11 +470,14 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	cbcodigo as id_produto,\n"
+                    + "  	e.tqcodigo ,\n"
+                    + "  	e.tqdescri,\n"
+                    + "  	e.tqgrade ,\n"
+                    + "	e.tqid as id_produto,\n"
                     + "	cbcodbar as ean\n"
-                    + "from\n"
-                    + "	escodbar\n"
-                    + "	order by 1"
+                    + "	from\n"
+                    + "	escodbar b\n"
+                    + "	join estoque e on e.tqcodigo = b.cbcodigo and e.tqgrade = b.cbgrade"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -408,7 +533,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setAtivo(true);
 
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
@@ -479,7 +604,8 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	cltel1 as contato,\n"
                     + "	clestado as uf,\n"
                     + "	clobs1 as email,\n"
-                    + "	clcpf as cpf_cnpj,\n"
+                    + "clcredito as limite,\n"
+                    + "	case when clcpf  = '' then clcgc else clcpf end as cpf_cnpj,\n"
                     + "	cltel1 as fone,\n"
                     + "	clinsest as inscricaoest\n"
                     + "	from\n"
@@ -495,8 +621,9 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setBairro(rst.getString("bairro"));
                     imp.setCep(rst.getString("cep"));
                     imp.setMunicipio(rst.getString("cidade"));
-                    imp.setAtivo(rst.getBoolean("status"));
+                    imp.setAtivo(true);
                     imp.setObservacao(rst.getString("contato"));
+                    imp.setValorLimite(rst.getDouble("limite"));
 
                     imp.setUf(rst.getString("uf"));
                     imp.setEmail(rst.getString("email"));
