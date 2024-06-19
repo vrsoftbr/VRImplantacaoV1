@@ -283,7 +283,8 @@ public enum ESistemaBancoDados {
     SQLSERVER_SAURUSPDV(261, "SAURUSPDV", 13, "SQLSERVER", "", "sa", "", 1433, ""),
     SQLSERVER_SANTSYSTEM(265, "SANTSYSTEM", 13, "SQLSERVER", "dadosretorno", "sa", "sant", 1433, ""),
     SQLSERVER_IDEALSOFT(267, "IDEALSOFT", 13, "SQLSERVER", "S9_Real", "sa", "Servidor123", 3414, ""),
-    SQLSERVER_UPSOFTWARE(270, "UPSOFTWARE", 13, "SQLSERVER", "", "06549656", "95MaXXAwylxRHsA88YEV", 1433, "");
+    SQLSERVER_UPSOFTWARE(270, "UPSOFTWARE", 13, "SQLSERVER", "", "06549656", "95MaXXAwylxRHsA88YEV", 1433, ""),
+    SQLSERVER_SERVSIC(271, "SERVSIC", 13, "SQLSERVER", "", "serv", "$ervsic30", 1433, "");
 
     private int idSistema;
     private String nomeSistema;
