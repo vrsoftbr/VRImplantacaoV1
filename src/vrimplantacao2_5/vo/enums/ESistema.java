@@ -25,7 +25,6 @@ import vrimplantacao2.dao.interfaces.CervantesDAO;
 import vrimplantacao2.dao.interfaces.CissDAO;
 import vrimplantacao2.dao.interfaces.ClickDAO;
 import vrimplantacao2.dao.interfaces.ContechDAO;
-import vrimplantacao2.dao.interfaces.ControlWareDAO;
 import vrimplantacao2.dao.interfaces.ControlXDAO;
 import vrimplantacao2.dao.interfaces.Cronos20DAO;
 import vrimplantacao2.dao.interfaces.CupermaxDAO;
@@ -136,7 +135,6 @@ import vrimplantacao2.dao.interfaces.SambaNetV2DAO;
 import vrimplantacao2.dao.interfaces.SatecfeDAO;
 import vrimplantacao2.dao.interfaces.SavDAO;
 import vrimplantacao2.dao.interfaces.ScefDAO;
-import vrimplantacao2.dao.interfaces.SiaCriareMySqlDAO;
 import vrimplantacao2.dao.interfaces.SiacDAO;
 import vrimplantacao2.dao.interfaces.SifatDAO;
 import vrimplantacao2.dao.interfaces.SigmaDAO;
@@ -147,7 +145,6 @@ import vrimplantacao2.dao.interfaces.SnSistemaDAO;
 import vrimplantacao2.dao.interfaces.SoftcomDAO;
 import vrimplantacao2.dao.interfaces.SofttechDAO;
 import vrimplantacao2.dao.interfaces.SolidoDAO;
-import vrimplantacao2.dao.interfaces.SolidusDAO;
 import vrimplantacao2.dao.interfaces.SolutionSuperaDAO;
 import vrimplantacao2.dao.interfaces.SophyxDAO;
 import vrimplantacao2.dao.interfaces.SriDAO;
@@ -211,6 +208,7 @@ import vrimplantacao2_5.dao.sistema.CefasConcretizeDAO2_5;
 import vrimplantacao2_5.dao.sistema.CenterInformaticaDAO2_5;
 import vrimplantacao2_5.dao.sistema.ConnexOneDAO;
 import vrimplantacao2_5.dao.sistema.ConsincoDAO;
+import vrimplantacao2_5.dao.sistema.ControlWare2_5DAO;
 import vrimplantacao2_5.dao.sistema.DSICDAO;
 import vrimplantacao2_5.dao.sistema.Dobes_CgaDAO;
 import vrimplantacao2_5.dao.sistema.DataByteDAO;
@@ -314,6 +312,7 @@ import vrimplantacao2_5.gui.sistema.Cefas2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
 import vrimplantacao2_5.gui.sistema.ConnexOne2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
+import vrimplantacao2_5.gui.sistema.ControlWare2_5GUI;
 import vrimplantacao2_5.gui.sistema.DSIC2_5GUI;
 import vrimplantacao2_5.gui.sistema.DataByte2_5GUI;
 import vrimplantacao2_5.gui.sistema.Dellasta_PrismaFlex2_5GUI;
@@ -707,10 +706,16 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    CONTROLWARE(31, "CONTROLWARE", new ControlWareDAO()) {
+    CONTROLWARE(31, "CONTROLWARE", new ControlWare2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new ControlWare2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+
+            return null;
         }
     },
     CONTROLX(32, "CONTROLX", new ControlXDAO()) {
