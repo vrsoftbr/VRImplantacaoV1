@@ -266,6 +266,7 @@ import vrimplantacao2_5.dao.sistema.ScorpionDAO;
 import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.ServSic2_5DAO;
 import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
+import vrimplantacao2_5.dao.sistema.SiaCriare2_5DAO;
 import vrimplantacao2_5.dao.sistema.SisMoura2_5DAO;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.SolidusOracle2_5DAO;
@@ -387,6 +388,7 @@ import vrimplantacao2_5.gui.sistema.SatFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.SaurusPDV2_5GUI;
 import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.ServSic2_5GUI;
+import vrimplantacao2_5.gui.sistema.SiaCriareMySql2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
 import vrimplantacao2_5.gui.sistema.SisMoura2_5GUI;
@@ -1543,10 +1545,15 @@ public enum ESistema {
             return null;
         }
     },
-    SIACRIARE(148, "SIACRIARE", new SiaCriareMySqlDAO()) {
+    SIACRIARE(148, "SIACRIARE", new SiaCriare2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new SiaCriareMySql2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     SIAC(149, "SIAC", new SiacDAO()) {
