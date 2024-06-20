@@ -180,7 +180,8 @@ public enum EScriptLojaOrigemSistema {
     SOLIDUSORACLE(268, 9, "select l.cod_loja id, l.cod_loja || '' - '' || l.des_fantasia descricao, num_cgc from intersolid.tab_loja l where flg_desativada = ''N'' order by 1"),
     PROSUPER(269, 11, "select emcodigo as id, emnome as descricao from empresa "),
     UPSOFTWARE(270, 13, "select cod_emp id, fantasia descricao from Tempresa t "),
-    SERVSIC(271, 13, "select IdEmpre id, Empresa descricao from TabEmpre");
+    SERVSIC(271, 13, "select IdEmpre id, Empresa descricao from TabEmpre"),
+    SIACRIARE(148,8,"select codigo_n id, descricao razao from empresas");
 
     private int idSistema;
     private int idBancoDados;
