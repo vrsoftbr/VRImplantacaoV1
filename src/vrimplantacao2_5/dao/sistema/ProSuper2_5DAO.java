@@ -41,7 +41,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
     /*
     Arquivos utilizados: 
     EAN = escodbar,
-    Mercadologicos = esclassi,
+    Mercadologicos = esclassi,o
     Produto e afins = estoque,
     Fornecedor = focadfor,
     Script Loja origem = ccconfig,empresa
@@ -117,6 +117,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoCliente.OBSERVACOES,
                 OpcaoCliente.OBSERVACOES2,
                 OpcaoCliente.ESTADO_CIVIL,
+                OpcaoCliente.EMAIL,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
@@ -129,7 +130,25 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         List<MapaTributoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery( //                    "select distinct \n"
+                    //                    + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar||tqtribut as id,\n"
+                    //                    + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
+                    //                    + "else tqaliicm::int||'%' end as descricao,\n"
+                    //                    + "tqaliicm  as aliq,\n"
+                    //                    + "tqsubsti as reducao,\n"
+                    //                    + "tqtribut::int  as cst \n"
+                    //                    + "from \n"
+                    //                    + "estoque \n"
+                    //                    + "union \n"
+                    //                    + "select distinct \n"
+                    //                    + "'c-'||tqalipdv id,\n"
+                    //                    + "'consumidor-'||tqalipdv descricao,\n"
+                    //                    + "tqalipdv  as aliq,\n"
+                    //                    + "0 as reducao,\n"
+                    //                    + "0  as cst \n"
+                    //                    + "from \n"
+                    //                    + "estoque "
+
                     "select distinct \n"
                     + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar||tqtribut as id,\n"
                     + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
@@ -138,25 +157,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "tqsubsti as reducao,\n"
                     + "tqtribut::int  as cst \n"
                     + "from \n"
-                    + "estoque \n"
-                    + "union \n"
-                    + "select distinct \n"
-                    + "'c-'||tqalipdv id,\n"
-                    + "'consumidor-'||tqalipdv descricao,\n"
-                    + "tqalipdv  as aliq,\n"
-                    + "0 as reducao,\n"
-                    + "0  as cst \n"
-                    + "from \n"
                     + "estoque "
-            //                                        "select distinct \n"
-            //                                        + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar as id,\n"
-            //                                        + "case when tqsubsti <> 0 then tqaliicm::int||'% RDZ '||tqsubsti\n"
-            //                                        + "else tqaliicm::int||'%' end as descricao,\n"
-            //                                        + "tqaliicm  as aliq,\n"
-            //                                        + "tqsubsti as reducao,\n"
-            //                                        + "tqalipdv  as cst \n"
-            //                                        + "from \n"
-            //                                        + "estoque "
             //            
             //                                        "select distinct \n"
             //                                        + "tqaliicm||tqsubsti::varchar||tqalipdv::varchar as id,\n"
@@ -416,7 +417,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
-                    imp.setIcmsConsumidorId(rst.getString("pdv"));
+                    imp.setIcmsConsumidorId(idIcms);
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
 
@@ -603,7 +604,7 @@ public class ProSuper2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	clativo as status,\n"
                     + "	cltel1 as contato,\n"
                     + "	clestado as uf,\n"
-                    + "	clobs1 as email,\n"
+                    + "	clobs3 as email,\n"
                     + "clcredito as limite,\n"
                     + "	case when clcpf  = '' then clcgc else clcpf end as cpf_cnpj,\n"
                     + "	cltel1 as fone,\n"
