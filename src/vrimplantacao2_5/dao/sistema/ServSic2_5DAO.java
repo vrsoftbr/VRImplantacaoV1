@@ -24,6 +24,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -66,10 +67,12 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                //OpcaoProduto.EAN,
-                //OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.TIPO_ATACADO,
+                OpcaoProduto.ATACADO,
                 OpcaoProduto.PESAVEL,
                 OpcaoProduto.VALIDADE,
                 OpcaoProduto.DESC_COMPLETA,
@@ -130,6 +133,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.OBSERVACOES,
                 OpcaoCliente.NUMERO,
                 OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.VALOR_LIMITE,
                 OpcaoCliente.SITUACAO_CADASTRO,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO));
     }
@@ -253,10 +257,11 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(imp.getCodMercadologico1());
                     imp.setCodMercadologico3(imp.getCodMercadologico1());
 
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem") == null ? "UN" : rst.getString("tipoembalagem"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setAtacadoPreco(rst.getDouble("PrAtacado1Un"));
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -293,6 +298,67 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "Codigo id,\n"
+                        + "CodInterno ean,\n"
+                        + "QtdEmbalagem as qtd,\n"
+                        + "PrecoVenda as precovenda,\n"
+                        + "PrAtacado1Un  as precoatacado,\n"
+                        + "Unidade\n"
+                        + "from TABEST1 \n"
+                        + "where \n"
+                        + "QtdAtacado is not null \n"
+                        + "and QtdEmbalagem is not null\n"
+                        + "and CodInterno is not null\n"
+                        + "union all\n"
+                        + "select \n"
+                        + "Codigo id,\n"
+                        + "concat(codigo, cast(Controle as varchar))  ean,\n"
+                        + "QtdMinPrAtacado  as qtd,\n"
+                        + "PrecoVenda as precovenda,\n"
+                        + "PrAtacado1Un  as precoatacado,\n"
+                        + "UnAtacado \n"
+                        + "from TABEST1 \n"
+                        + "where \n"
+                        + "QtdAtacado is not null \n"
+                        + "and QtdEmbalagem is not null\n"
+                        + "and CodInterno is not null"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+
+                        String ean = rst.getString("ean");
+
+                        imp.setEan(ean);
+                        if (ean != null && !"".equals(ean) && ean.length() < 7) {
+                            imp.setEan("99999" + ean);
+                        }
+
+                        imp.setQtdEmbalagem(rst.getInt("qtd"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
     }
 
     @Override
@@ -373,15 +439,37 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + "Codigo id,\n"
+                    + "CodInterno ean,\n"
+                    + "QtdEmbalagem as qtd,\n"
+                    + "Unidade\n"
+                    + "from TABEST1 \n"
+                    + "where \n"
+                    + "QtdAtacado is not null \n"
+                    + "and QtdEmbalagem is not null\n"
+                    + "and CodInterno is not null\n"
+                    + "union all\n"
+                    + "select \n"
+                    + "Codigo id,\n"
+                    + "concat(codigo, cast(Controle as varchar))  ean,\n"
+                    + "QtdMinPrAtacado  as qtd,\n"
+                    + "UnAtacado \n"
+                    + "from TABEST1 \n"
+                    + "where \n"
+                    + "QtdAtacado is not null \n"
+                    + "and QtdEmbalagem is not null\n"
+                    + "and CodInterno is not null"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("produtoid"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd"));
+                    imp.setTipoEmbalagem(rst.getString("Unidade"));
 
                     result.add(imp);
                 }
@@ -408,8 +496,11 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + " Celular,\n"
                     + " LimiteCred,\n"
                     + " Cpf cpfcnpj,\n"
-                    + " Inativo \n"
-                    + "from TABCLI"
+                    + " Inativo ,\n"
+                    + " case when limite.SaldoLimite  > 0\n"
+                    + " then round(limite.saldolimite,2) else 0 end as limite\n"
+                    + "from TABCLI c\n"
+                    + "left join TabCli02 limite on limite.LkCliente  = c.Codigo "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -434,7 +525,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setCelular(rst.getString("celular"));
 
-                    imp.setValorLimite(rst.getDouble("LimiteCred"));
+                    imp.setValorLimite(rst.getDouble("limite") > 99999999.99 ? 99999.99 : rst.getDouble("limite"));
                     //imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
@@ -451,7 +542,15 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	Controle as id, \n"
+                    + "	LkCliente  as idcliente,\n"
+                    + "	[DATA] as dataemissao,\n"
+                    + "	Vencimento as datavencimento,\n"
+                    + "	NUMDOC as numerodocumento,\n"
+                    + "	Valor as valor \n"
+                    + "from\n"
+                    + "	TabCr1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
