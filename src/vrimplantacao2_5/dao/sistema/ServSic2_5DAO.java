@@ -25,6 +25,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -97,7 +98,8 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.PDV_VENDA
+                OpcaoProduto.PDV_VENDA,
+                OpcaoProduto.PISCOFINS_LOJA
         ));
     }
 
@@ -146,6 +148,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + " cast(coalesce(Trb_ICMS_CST,0) as varchar)+'.'+cast(coalesce(Trb_PICMS,0) as varchar)+'.'+cast(COALESCE(Trb_PReducao,0) as varchar) id,\n"
+                    + " concat(coalesce(Trb_ICMS_CST,0), ' %  RDZ ' , COALESCE(Trb_PReducao,0)) AS descricao, \n"
                     + " coalesce(Trb_ICMS_CST,0) cst,\n"
                     + " coalesce(Trb_PICMS,0) aliquota,\n"
                     + " COALESCE(Trb_PReducao,0) reducao\n"
@@ -154,7 +157,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("id"),
-                            rst.getString("id"),
+                            rst.getString("descricao"),
                             rst.getInt("cst"),
                             rst.getInt("aliquota"),
                             rst.getInt("reducao")
@@ -266,6 +269,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setEstoque(rst.getDouble("estoque"));
+
                     imp.setPiscofinsCstCredito(rst.getString("piscofins"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins"));
 
@@ -356,8 +360,8 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             return vResult;
-        }
 
+        }
         return null;
     }
 
@@ -485,7 +489,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + " Codigo id,\n"
+                    + " cast(Codigo as int)id,\n"
                     + " Nome nome,\n"
                     + " Endereco,\n"
                     + " Bairro,\n"
@@ -497,8 +501,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + " LimiteCred,\n"
                     + " Cpf cpfcnpj,\n"
                     + " Inativo ,\n"
-                    + " case when limite.SaldoLimite  > 0\n"
-                    + " then round(limite.saldolimite,2) else 0 end as limite\n"
+                    + " limite.Limite  as limite\n"
                     + "from TABCLI c\n"
                     + "left join TabCli02 limite on limite.LkCliente  = c.Codigo "
             )) {
@@ -614,6 +617,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new ServSic2_5DAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {

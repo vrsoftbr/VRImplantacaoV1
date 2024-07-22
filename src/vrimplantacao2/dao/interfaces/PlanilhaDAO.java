@@ -1567,6 +1567,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setConvenioLimite(linha.getDouble("conveniolimite"));
             imp.setConvenioDesconto(linha.getDouble("conveniodesconto"));
             imp.setLojaCadastro(Utils.stringToInt(linha.getString("lojacadastro")));
+            imp.setIdentificacaoCartao(linha.getInt("identificacaocartao"));
 
             result.add(imp);
         }

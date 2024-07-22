@@ -24,6 +24,7 @@ public class ConveniadoIMP {
     private double convenioLimite = 0;
     private double convenioDesconto = 0;
     private int lojaCadastro = -1;
+    private int identificacaoCartao = 0;
 
     public void setId(String id) {
         this.id = id;
@@ -140,9 +141,17 @@ public class ConveniadoIMP {
     public double getConvenioDesconto() {
         return convenioDesconto;
     }
-
     public int getLojaCadastro() {
         return lojaCadastro;
     }    
+
+    public int getIdentificacaoCartao() {
+        return identificacaoCartao;
+    }
+
+    public void setIdentificacaoCartao(int identificacaoCartao) {
+        this.identificacaoCartao = identificacaoCartao;
+    }
+    
     
 }

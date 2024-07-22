@@ -26,10 +26,21 @@ public class ConveniadoVO {
     private boolean visualizaSaldo = true;// boolean NOT NULL,
     private Date dataBloqueio;// date
     private int senha = 0;
+    private int identificacaoCartao = 0;
     
     public void setId(int id) {
-        this.id = id;
+        this.id = id; 
     }
+
+    public int getIdentificacaoCartao() {
+        return identificacaoCartao;
+    }
+
+    public void setIdentificacaoCartao(int identificacaoCartao) {
+        this.identificacaoCartao = identificacaoCartao;
+    }
+    
+    
 
     public void setNome(String nome) {
         this.nome = Utils.acertarTexto(nome, 40, "SEM NOME");
