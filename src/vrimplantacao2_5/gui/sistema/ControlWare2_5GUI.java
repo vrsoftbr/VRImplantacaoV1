@@ -31,7 +31,9 @@ public class ControlWare2_5GUI extends VRInternalFrame {
 
         this.title = "Importação " + SISTEMA;
 
-        carregarParametros();
+        carregarParametros();        
+        carregaEspecieReceber();
+        carregaEspeciePagar();
         tabProdutos.setOpcoesDisponiveis(dao);
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);

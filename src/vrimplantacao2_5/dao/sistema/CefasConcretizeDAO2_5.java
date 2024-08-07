@@ -418,6 +418,8 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
                     imp.setValor(rst.getDouble("valor"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
                     imp.setObservacao(rst.getString("observacao"));
+                    
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
 
                     result.add(imp);
                 }

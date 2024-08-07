@@ -316,8 +316,12 @@
                                           </Group>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkClienteTipoInscricao" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkCIE" min="-2" max="-2" attributes="0"/>
+                                              <Group type="102" alignment="0" attributes="0">
+                                                  <Component id="chkClienteTipoInscricao" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                  <Component id="chkClienteContatos" min="-2" max="-2" attributes="0"/>
+                                              </Group>
                                           </Group>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
@@ -347,6 +351,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClienteTipoInscricao" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteContatos" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -361,7 +366,7 @@
                               <Component id="chkConveniado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTransacaoConvenio" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="82" max="32767" attributes="0"/>
+                          <EmptySpace pref="78" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -398,7 +403,7 @@
                                       <Component id="jLabel2" pref="155" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="txtRotDtIni" alignment="0" pref="225" max="32767" attributes="0"/>
+                                  <Component id="txtRotDtIni" alignment="0" pref="230" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -406,7 +411,7 @@
                                       <Component id="jLabel3" pref="167" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="txtRotDtFim" alignment="0" pref="225" max="32767" attributes="0"/>
+                                  <Component id="txtRotDtFim" alignment="0" pref="231" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           </Group>
@@ -486,6 +491,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativoBaixado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo Baixado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteContatos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contatos"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -573,17 +583,17 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkVendaUtilizaDigito" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="txtDtVendaIni" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtDtVendaFim" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="rdbVendasV1" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="chkVendaUtilizaDigito" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtDtVendaFim" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="rdbVendasV1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="rdbVendasV2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
