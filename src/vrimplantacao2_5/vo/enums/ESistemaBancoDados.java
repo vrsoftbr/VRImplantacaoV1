@@ -74,6 +74,7 @@ public enum ESistemaBancoDados {
     FIREBIRD_SIGMA(151, "SIGMA", 5, "FIREBIRD", "", "", "", 3050, ""),
     FIREBIRD_SIRCOM(153, "SIRCOM", 5, "FIREBIRD", "", "SYSDBA", "masterkey", 3050, ""),
     //FIREBIRD_SOLIDUS(159, "SOLIDUS", 5, "FIREBIRD", "", "", "", 3050, ""),
+    FIREBIRD_SOLIDO(158, "SOLIDO", 5, "FIREBIRD", "", "SYSDBA", "MASTERKEY", 3050, ""),
     FIREBIRD_SOLUTIONSUPERA(160, "SOLUTIONSUPERA", 5, "FIREBIRD", "", "SYSDBA", "online", 3050, ""),
     FIREBIRD_SOPHYX(161, "SOPHYX", 5, "FIREBIRD", "", "", "", 3050, ""),
     FIREBIRD_SRI(162, "SRI", 5, "FIREBIRD", "", "", "", 3050, ""),

@@ -268,6 +268,7 @@ import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.SiaCriare2_5DAO;
 import vrimplantacao2_5.dao.sistema.SisMoura2_5DAO;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
+import vrimplantacao2_5.dao.sistema.Solido2_5DAO;
 import vrimplantacao2_5.dao.sistema.SolidusOracle2_5DAO;
 import vrimplantacao2_5.dao.sistema.Target_G3DAO;
 import vrimplantacao2_5.dao.sistema.TopSystemDAO;
@@ -395,6 +396,7 @@ import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
 import vrimplantacao2_5.gui.sistema.SisMoura2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sismaster2_5GUI;
 import vrimplantacao2_5.gui.sistema.SoftLog2_5GUI;
+import vrimplantacao2_5.gui.sistema.Solido2_5GUI;
 import vrimplantacao2_5.gui.sistema.SolidusOracle2_5GUI;
 import vrimplantacao2_5.gui.sistema.Stock_Postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.SuperControle_SuperServer2_5GUI;
@@ -1628,10 +1630,15 @@ public enum ESistema {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     },
-    SOLIDO(158, "SOLIDO", new SolidoDAO()) {
+    SOLIDO(158, "SOLIDO", new Solido2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Solido2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
 //    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
