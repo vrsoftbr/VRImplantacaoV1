@@ -53,6 +53,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 
 /**
  *
@@ -870,6 +871,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	ch.CHE_REGISTRO id,\n"
+                    + "ch.CHE_VECTO as vecto,\n "
                     + "	ch.CHE_DATA dataemissao,\n"
                     + "	ch.CHE_DATA datadeposito,\n"
                     + "	ch.COM_REGISTRO numerocupom,\n"
@@ -889,14 +891,15 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	CHEQUE_REC ch\n"
                     + "join CLIENTES c on\n"
-                    + "	ch.CLI_CODIGO = c.CLI_CODIGO"
+                    + "	ch.CLI_CODIGO = c.CLI_CODIGO \n"
+                    + "where coalesce(ch.CHE_STATUS, '') = 'A' "
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
 
                     imp.setId(rst.getString("id"));
                     imp.setDate(rst.getDate("dataemissao"));
-                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setDataDeposito(rst.getDate("vecto"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setNumeroCheque(rst.getString("numerocheque"));
                     imp.setAgencia(rst.getString("agencia"));
@@ -908,6 +911,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("valorjuros"));
+                    //imp.setSituacaoCheque(SituacaoCheque.ABERTO);
 
                     if (rst.getString("id_banco") != null && !rst.getString("id_banco").trim().isEmpty()) {
                         imp.setBanco(Integer.parseInt(rst.getString("id_banco").trim()));
@@ -1204,31 +1208,31 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    CLI_NOME as nomecliente,\n"
                     + "    MOTIVO_CANCELAMENTO as cancelado\n"
                     + "FROM\n"
-                    + "    vendasCab_2023\n"
+                    + "    CP_08_2023\n"
                     + "WHERE\n"
                     + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + strDataInicio + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + strDataTermino + "'\n"
-                    + "and COM_TOTAL > 0 \n"
-                    + "UNION\n"
-                    + "SELECT\n"
-                    + "    DISTINCT \n"
-                    + "    COM_REGISTRO as id_venda,\n"
-                    + "    CASE \n"
-                    + "        WHEN COM_NCUPOM = 0 THEN COM_REGISTRO \n"
-                    + "        ELSE COM_NCUPOM \n"
-                    + "    END as numerocupom,\n"
-                    + "    ECF_GT as ecf,\n"
-                    + "    DATA_PROCESSO as data,\n"
-                    + "    COM_HORA as hora,\n"
-                    + "    COM_TOTAL as valor,\n"
-                    + "    CLI_CODIGO as id_cliente,\n"
-                    + "    CLI_CPFCGC as cpf,\n"
-                    + "    CLI_NOME as nomecliente,\n"
-                    + "    MOTIVO_CANCELAMENTO as cancelado\n"
-                    + "FROM\n"
-                    + "    vendasCab_2024\n"
-                    + "WHERE\n"
-                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + strDataInicio + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + strDataTermino + "'"
-                    + "and COM_TOTAL > 0";
+                    + "and COM_TOTAL > 0 \n";
+//                    + "UNION\n"
+//                    + "SELECT\n"
+//                    + "    DISTINCT \n"
+//                    + "    COM_REGISTRO as id_venda,\n"
+//                    + "    CASE \n"
+//                    + "        WHEN COM_NCUPOM = 0 THEN COM_REGISTRO \n"
+//                    + "        ELSE COM_NCUPOM \n"
+//                    + "    END as numerocupom,\n"
+//                    + "    ECF_GT as ecf,\n"
+//                    + "    DATA_PROCESSO as data,\n"
+//                    + "    COM_HORA as hora,\n"
+//                    + "    COM_TOTAL as valor,\n"
+//                    + "    CLI_CODIGO as id_cliente,\n"
+//                    + "    CLI_CPFCGC as cpf,\n"
+//                    + "    CLI_NOME as nomecliente,\n"
+//                    + "    MOTIVO_CANCELAMENTO as cancelado\n"
+//                    + "FROM\n"
+//                    + "    CP_08_2023\n"
+//                    + "WHERE\n"
+//                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + strDataInicio + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + strDataTermino + "'"
+//                    + "and COM_TOTAL > 0";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1290,7 +1294,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "DISTINCT \n"
                     + "    COM_REGISTRO as id_venda,\n"
                     + "    PRO_CODIGO as id_produto,\n"
-                    + "    concat(COM_REGISTRO,PRO_CODIGO,SAI_REGISTRO) as id,\n"
+                    + "    concat(COM_REGISTRO,PRO_CODIGO, ROW_NUMBER() OVER(order by COM_REGISTRO )) as id,\n"
                     + "    SAI_REGISTRO as nritem,\n"
                     + "    pro_unidade as unidade,\n"
                     + "    pro_descricao as descricao,\n"
@@ -1298,26 +1302,26 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    SAI_TOTAL as valor,\n"
                     + "    SAI_DESCONTO_ITEM as desconto\n"
                     + "FROM\n"
-                    + "    vendasItens_2023\n"
+                    + "    SP_08_2023\n"
                     + "WHERE\n"
-                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "UNION\n"
-                    + "\n"
-                    + "SELECT\n"
-                    + "DISTINCT \n"
-                    + "    COM_REGISTRO as id_venda,\n"
-                    + "    PRO_CODIGO as id_produto,\n"
-                    + "    concat(COM_REGISTRO,PRO_CODIGO,SAI_REGISTRO) as id,\n"
-                    + "    SAI_REGISTRO as nritem,\n"
-                    + "    pro_unidade as unidade,\n"
-                    + "    pro_descricao as descricao,\n"
-                    + "    SAI_QTDE as quantidade,\n"
-                    + "    SAI_TOTAL as valor,\n"
-                    + "    SAI_DESCONTO_ITEM as desconto\n"
-                    + "FROM\n"
-                    + "    vendasItens_2024\n"
-                    + "WHERE\n"
-                    + "   TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+//                    + "UNION\n"
+//                    + "\n"
+//                    + "SELECT\n"
+//                    + "DISTINCT \n"
+//                    + "    COM_REGISTRO as id_venda,\n"
+//                    + "    PRO_CODIGO as id_produto,\n"
+//                    + "    concat(COM_REGISTRO,PRO_CODIGO,SAI_REGISTRO) as id,\n"
+//                    + "    SAI_REGISTRO as nritem,\n"
+//                    + "    pro_unidade as unidade,\n"
+//                    + "    pro_descricao as descricao,\n"
+//                    + "    SAI_QTDE as quantidade,\n"
+//                    + "    SAI_TOTAL as valor,\n"
+//                    + "    SAI_DESCONTO_ITEM as desconto\n"
+//                    + "FROM\n"
+//                    + "    SP_08_2023\n"
+//                    + "WHERE\n"
+//                    + "   TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

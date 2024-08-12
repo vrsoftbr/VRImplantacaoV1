@@ -104,7 +104,7 @@ public enum EScriptLojaOrigemSistema {
     LINEAR(196, 8, "SELECT emp_codigo AS id, concat(emp_cgc, '' - '', emp_fantasia) AS descricao FROM empresa ORDER BY 1"),
     ARIUS(197, 9, "SELECT id ,id || '' - '' || descritivo || '' - '' || cnpj_cpf descricao FROM empresas ORDER BY id"),
     GATEWAYSISTEMAS(198, 5, "SELECT l.COD_EMPRESA AS id, (l.COD_EMPRESA||'' - ''|| l.FANTASIA||'' - ''||l.CNPJ) AS descricao FROM EMITENTE l ORDER BY 1"),
-    SG(199, 11, "select codfil99 id, cgcfil99 || '' - '' || apelido99 descricao from cadfil"),
+    SG(199, 11, "select codfil99::int id, apelido99 descricao from cadfil"),
     SYGMA(200, 5, "select 1 as id, val_parametro descricao from tparametro t where ordem_parametro = 1002"),
     MICROTAB(201, 5, "SELECT 1 as id, ''Loja_01'' descricao FROM CONFIG"),
     MRC6(202, 13, "select codigo as id, nome as descricao, cnpj from entidades"),

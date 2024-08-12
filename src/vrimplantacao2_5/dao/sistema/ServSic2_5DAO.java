@@ -529,7 +529,7 @@ public class ServSic2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rst.getString("celular"));
 
                     imp.setValorLimite(rst.getDouble("limite") > 99999999.99 ? 99999.99 : rst.getDouble("limite"));
-                    //imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
 
                     result.add(imp);
 

@@ -189,6 +189,28 @@ public class LojaDAO {
         }
     }
 
+    public boolean validaReceita(LojaVO i_loja) throws Exception {
+        String sql = "SELECT id FROM receitaloja WHERE id_loja = " + i_loja.getIdCopiarLoja();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
+        }
+    }
+
+    public boolean validaReceitaToledo(LojaVO i_loja) throws Exception {
+        String sql = "SELECT id FROM receitatoledoloja WHERE id_loja = " + i_loja.getIdCopiarLoja();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                return rst.next();
+            }
+        }
+    }
+
     public boolean isCnpjCadastrado(LojaVO i_loja) throws Exception {
         String sql = "SELECT id_fornecedor FROM loja WHERE id_fornecedor = " + i_loja.getIdFornecedor();
 
@@ -301,7 +323,7 @@ public class LojaDAO {
                     stm.execute(script.copiaPromocaoItem(i_loja));
                     stm.execute(script.copiaPromocaoFinalizadora(i_loja));
                     stm.execute(script.copiaPromocaoDesconto(i_loja));
-                           
+
                 }
 
             }
@@ -372,6 +394,16 @@ public class LojaDAO {
             if (versao.igualOuMaiorQue(4, 1, 39)) {
                 //("Copiando parametroagendarecebimento.");
                 stm.execute(script.copiarParametroAgendaecebimento(i_loja));
+            }
+
+            if (validaReceita(i_loja) == true) {
+                if (JOptionPane.showConfirmDialog(null, "Existem receitas na loja anterior deseja copiar ?", "Copia de Loja",
+                        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    stm.execute(script.copiaReceitaLoja(i_loja));
+                }
+                if (validaReceitaToledo(i_loja)) {
+                    stm.execute(script.copiaReceitaToledoLoja(i_loja));
+                }
             }
             //  stm.execute(copiaEcf(i_loja));
 

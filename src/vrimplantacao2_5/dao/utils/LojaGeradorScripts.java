@@ -63,6 +63,9 @@ public class LojaGeradorScripts {
         if (versao.igualOuMaiorQue(4)) {
             sql = sql + ", margem, margemminima, margemmaxima ";
         }
+        if (versao.igualOuMaiorQue(4, 2, 0)) {
+            sql = sql + ", validade";
+        }
 
         sql = sql + ")";
 
@@ -82,6 +85,9 @@ public class LojaGeradorScripts {
             sql = sql + (i_loja.isCopiaMargem() ? ", margem" : ", 0");
             sql = sql + (i_loja.isCopiaMargem() ? ", margemminima" : ", 0");
             sql = sql + (i_loja.isCopiaMargem() ? ", margemmaxima" : ", 0");
+        }
+        if (versao.igualOuMaiorQue(4, 2, 0)) {
+            sql = sql + ", validade";
         }
 
         sql = sql + " from produtocomplemento where id_loja = " + i_loja.getIdCopiarLoja() + ")";
@@ -255,6 +261,19 @@ public class LojaGeradorScripts {
                 + "select (select max((id)+1) from pdv.aliquotalayout)," + i_loja.getId() + ", descricao from pdv.aliquotalayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
                 + "group by id";
 
+        return sql;
+    }
+
+    public String copiaReceitaLoja(LojaVO i_loja) throws Exception {
+        String sql = "insert into receitaloja (id, id_receita, id_loja)\n"
+                + "select nextval('receitaloja_id_seq'),id_receita ," + i_loja.getId() + " from receitaloja where id_loja = " + i_loja.getIdCopiarLoja();
+
+        return sql;
+    }
+
+    public String copiaReceitaToledoLoja(LojaVO i_loja) throws Exception {
+        String sql = "insert into receitatoledoloja (id, id_receitatoledo, id_loja)\n"
+                + "select nextval('receitatoledoloja_id_seq') , id_receitatoledo ," + i_loja.getId() + " from receitatoledoloja where id_loja =  " + i_loja.getIdCopiarLoja();
         return sql;
     }
 

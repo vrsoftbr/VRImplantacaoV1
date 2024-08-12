@@ -734,7 +734,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
             this.sql
                     =  "select\n"
                     + "distinct \n"
-                    + "	concat(i.cupom,i.ecf,i.hora_cupom) as idvenda,\n"
+                    + "	REPLACE(concat(i.cupom,i.ecf,i.hora_cupom),':','') as idvenda,\n"
                     + "	i.cupom as numeroCupom,\n"
                     + "	i.ecf ,\n"
                     + "	i.datamov as data,\n"
@@ -748,7 +748,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	left join cliente c on c.idCliente = i.idcliente \n"
                     + "	left join itensvenda i2 on i.iditensvenda = i2.idItensVenda \n"
                     + "	where i.datamov between '" + strDataInicio + "' and '"  + strDataTermino + "' \n"
-                    + "	group by i.cupom " ;
+                    + "	group by REPLACE(concat(i.cupom,i.ecf,i.hora_cupom),':','')" ;
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -796,7 +796,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCancelado(rst.getBoolean("ativo"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
 
@@ -811,19 +811,21 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "	concat(i.cupom,i.ecf,i.hora_cupom) as idvenda,\n"
+                    + "	REPLACE(concat(i.cupom,i.ecf,i.hora_cupom),':','') as idvenda,\n"
                     + "	idItensVenda as id_item,\n"
                     + "	i.idProduto as produto,\n"
                     + "	codigoEan as ean,\n"
                     + "	p.Descricao ,\n"
                     + "	i.quantidade ,\n"
-                    + "	round(i.valor/quantidade,3) ,\n"
+                    + "	round(i.valor/quantidade,3) as valor,\n"
                     + "	i.acrescimoItem as acrescimo,\n"
-                    + "	i.descontoItem as desconto\n"
+                    + "	i.descontoItem as desconto,\n"
+                    + " case when i.situacao = 'C' then 1 else 0 end as ativo \n"
                     + "	from\n"
                     + "	itensvenda i\n"
                     + "	left join produto p on p.idProduto = i.idProduto \n"
-                    + "	where i.datamov between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
+                    + "	where i.datamov"
+                    + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
                     + "and i.idproduto != 471"
                     + "	order by datamov , hora_cupom , cupom ";
 

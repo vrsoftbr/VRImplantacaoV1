@@ -24,7 +24,8 @@ public class LojaVO {
     private boolean copiaUsuario = false;
     private boolean copiaOferta = false;
     private boolean copiaPromocao = false;
-    
+    private boolean copiaReceita = false;
+
     public int getId() {
         return id;
     }
@@ -33,7 +34,6 @@ public class LojaVO {
         this.id = id;
     }
 
-    
     public int getIdCopiarLoja() {
         return idCopiarLoja;
     }
@@ -137,20 +137,20 @@ public class LojaVO {
     public void setCopiaTecladoLayout(boolean copiaTecladoLayout) {
         this.copiaTecladoLayout = copiaTecladoLayout;
     }
-    
+
     @Override
     public String toString() {
         return descricao;
     }
-    
+
     public boolean isCopiaMargem() {
         return this.copiaMargem;
     }
-    
+
     public void setCopiaMargem(boolean copiaMargem) {
         this.copiaMargem = copiaMargem;
     }
-       
+
     public String gettxtCnpj() {
         return txtCnpj;
     }
@@ -229,5 +229,12 @@ public class LojaVO {
         this.copiaPromocao = copiaPromocao;
     }
 
-}
+    public boolean isCopiaReceita() {
+        return copiaReceita;
+    }
 
+    public void setCopiaReceita(boolean copiaReceita) {
+        this.copiaReceita = copiaReceita;
+    }
+
+}

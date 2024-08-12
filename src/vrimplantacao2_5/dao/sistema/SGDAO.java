@@ -25,6 +25,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -346,7 +347,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setIdFamiliaProduto(rs.getString("familia_id"));
-                    imp.setSituacaoCadastro(rs.getInt("situacao"));
+                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setFornecedorFabricante(rs.getString("fabricante"));
                     imp.setTipoEmbalagemVolume(rs.getString("tipo_volume"));
                     imp.setVolume(rs.getDouble("volume"));
