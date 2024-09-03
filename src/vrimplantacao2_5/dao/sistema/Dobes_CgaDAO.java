@@ -224,6 +224,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
+                OpcaoCliente.ENDERECO_COMPLETO,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.ESTADO_CIVIL,
                 OpcaoCliente.CONTATOS,

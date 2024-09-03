@@ -167,6 +167,7 @@ public enum ESistemaBancoDados {
     MYSQL_EMPRESOFT(263,"EMPRESOFT",8,"MYSQL","empresoft","root","575757",3306,""),
     MYSQL_CONNEXONE(264,"CONNEXONE",8,"MYSQL","connexone","root","",3306,""),
     MYSQL_IMPERIUMMARKET(272,"IMPERIUMMARKET",8,"MYSQL","db_imperium","root","S@2291755",3306,""),
+    MYSQL_SIMPLESOLUTION(273,"SIMPLESOLUTION",8,"MYSQL","simplesolution","root","",3306,""),
 //ORACLE
     ORACLE_APOLLO(5, "APOLLO", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_CEFAS(24, "CEFAS", 9, "ORACLE", "ORCL", "rb", "avemaria", 1521, ""),
@@ -226,6 +227,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_ARPA(262,"ARPA",11, "POSTGRESQL", "postgres","postgres","postgres",5432,""),
     POSTGRESQL_ALTERDATAWSHOP(254, "ALTERDATAWSHOP", 11, "POSTGRESQL", "ALTERDATA_SHOP", "postgres", "#abc123#", 5432, ""),
     POSTGRESQL_PROSUPER(254, "PROSUPER", 11, "POSTGRESQL", "", "postgres", "", 8746, ""),
+    POSTGRESQL_ATIVO(274, "ATIVO", 11, "POSTGRESQL", "", "postgres", "", 8746, ""),
 //SQLSERVER
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "sa", "@66E$Y$", 1433, ""),
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433, ""),

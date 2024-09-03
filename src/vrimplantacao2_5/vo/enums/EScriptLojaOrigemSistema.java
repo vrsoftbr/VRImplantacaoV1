@@ -184,7 +184,9 @@ public enum EScriptLojaOrigemSistema {
     SERVSIC(271, 13, "select IdEmpre id, Empresa descricao from TabEmpre"),
     SIACRIARE(148,8,"select codigo_n id, descricao razao from empresas"),
     CONTROLWARE(31, 11, "select codestabelec id, razaosocial descricao from estabelecimento order by id"),
-    IMPERIUMMARKET(272, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa e ");
+    IMPERIUMMARKET(272, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa e "),
+    SIMPLESOLUTION(273, 8, "select emp_ID as id, emp_RAZAOSOCIAL as descricao from empresa_cad"),
+    ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e ");
 
     private int idSistema;
     private int idBancoDados;

@@ -534,11 +534,13 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "fone2_tipo , \n"
                     + "c.contato , \n"
                     + "cr.orgao_emissor , \n"
+                    + "cc.credito , \n"
                     + "c.email  \n"
                     + "from \n"
                     + "clientes c  \n"
                     + "left join cidades c2 on c2.cep = c.cep  \n"
-                    + "left join clientes_rg cr on cr.cliente  = c.codigo"
+                    + "left join clientes_rg cr on cr.cliente  = c.codigo \n"
+                    + "left join dados_financeiros_cliente cc on cc.cliente = c.codigo "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -552,6 +554,7 @@ public class Arpa_PostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setAtivo(rst.getBoolean("status"));
                     imp.setObservacao(rst.getString("contato"));
+                    imp.setValorLimite(rst.getDouble("credito"));
 
                     imp.setUf(rst.getString("uf"));
                     imp.setEmail(rst.getString("email"));

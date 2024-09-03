@@ -266,6 +266,7 @@ import vrimplantacao2_5.dao.sistema.ScvDAO;
 import vrimplantacao2_5.dao.sistema.ServSic2_5DAO;
 import vrimplantacao2_5.dao.sistema.ShiDAO2_5;
 import vrimplantacao2_5.dao.sistema.SiaCriare2_5DAO;
+import vrimplantacao2_5.dao.sistema.SimpleSolution2_5DAO;
 import vrimplantacao2_5.dao.sistema.SisMoura2_5DAO;
 import vrimplantacao2_5.dao.sistema.SoftLogDAO;
 import vrimplantacao2_5.dao.sistema.Solido2_5DAO;
@@ -392,6 +393,7 @@ import vrimplantacao2_5.gui.sistema.Scv2_5GUI;
 import vrimplantacao2_5.gui.sistema.ServSic2_5GUI;
 import vrimplantacao2_5.gui.sistema.SiaCriareMySql2_5GUI;
 import vrimplantacao2_5.gui.sistema.Siac2_5GUI;
+import vrimplantacao2_5.gui.sistema.SimpleSolution2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sinc2_5GUI;
 import vrimplantacao2_5.gui.sistema.SisMoura2_5GUI;
 import vrimplantacao2_5.gui.sistema.Sismaster2_5GUI;
@@ -2777,6 +2779,30 @@ public enum ESistema {
         ) {
             try {
                 return new ImperiumMarket2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+       SIMPLESOLUTION(273, "SIMPLESOLUTION", new SimpleSolution2_5DAO()){
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new SimpleSolution2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+        ATIVO(274, "ATIVO", new SimpleSolution2_5DAO()){
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame
+        ) {
+            try {
+                return new SimpleSolution2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }
