@@ -601,4 +601,11 @@ public class LojaGeradorScripts {
 
         return sql;
     }
+
+    public String insereLojaPdvHistoricoVenda(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO vrhistoricovenda.configuracaoloja(id_loja, novaconsulta, ultimaconsulta)"
+                + " VALUES (" + i_loja.getId() + " , true, NULL);";
+
+        return sql;
+    }
 }

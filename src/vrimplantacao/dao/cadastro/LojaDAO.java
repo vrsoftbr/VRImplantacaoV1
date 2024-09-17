@@ -410,6 +410,10 @@ public class LojaDAO {
             /* inserir loja na tabela contabilidade.grupoeconomicoloja. */
             //("Adicionando loja no grupoeconomico.");
             stm.execute(script.inserirGrupoEconomicoLoja(i_loja));
+            
+            if(isSchemaVrHistoricoVendaExiste()){
+                stm.execute(script.insereLojaPdvHistoricoVenda(i_loja));
+            }
             ProgressBar.setStatus("salvando loja... 100%");
 
         } catch (Exception ex) {
@@ -556,6 +560,20 @@ public class LojaDAO {
             }
         }
         return result;
+    }
+
+    public boolean isSchemaVrHistoricoVendaExiste() throws Exception {
+        String sql = "select * \n"
+                + "from information_schema.tables\n"
+                + "where table_schema = 'vrhistoricovenda'";
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
+        }
     }
 
     //<editor-fold defaultstate="collapsed" desc="Metodo deletar loja">
