@@ -113,7 +113,8 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.VENCIMENTO_ROTATIVO
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
@@ -218,6 +219,7 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "prod_ID as id_produto,\n"
+                    + "prod_REFERENCIA as referencia,\n"
                     + "prod_BALANCACODIGO as codigobalanca,\n"
                     + "p.prod_CODBARRAS as ean,\n"
                     + "prod_DESCRICAO as descricao,\n"
@@ -237,16 +239,17 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "p.prod_ESTOQUEREAL as estoque,\n"
                     + "p.prod_PESOBRUTO as pesobruto,\n"
                     + "p.prod_PESOLIQUIDO as pesoliquido,\n"
-                    + "ncm.prodNCM_CODIGO as ncm,\n"
+                    + "ncm.prodNCM_NCM as ncm,\n"
                     + "ncm.prodNCM_CEST as cest,\n"
                     + "pp.prodPr_VALOR as preco\n,"
-                    + "6 as cofins \n"
+                    + "49 as cofins \n"
                     + "from\n"
                     + "	produto_cad p \n"
                     + "left join medida_cad m on p.prod_UNIDADECOMPRAID  = m.med_ID \n"
                     + "left join produto_ncm ncm on p.prod_NCM = ncm.prodNCM_ID \n"
                     + "left join produto_preco pp on pp.prodPr_PRODUTO = p.prod_ID \n"
-                    + "left join secao_cad mm on mm.sec_ID = p.prod_SECAOID "
+                    + "left join secao_cad mm on mm.sec_ID = p.prod_SECAOID\n"
+                    + "where prod_REFERENCIA is not null;"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -254,7 +257,7 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString("id_produto"));
+                    imp.setImportId(rst.getString("referencia"));
                     imp.setEan(rst.getString("ean"));
 
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("codigobalanca"), -2));
@@ -269,6 +272,7 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("embalagem"));
                     //imp.seteBalanca(rst.getBoolean(""));
 
@@ -398,6 +402,30 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
     }
 
     @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+
+                    imp.setId(rst.getString(""));
+                    imp.setIdFornecedor(rst.getString(""));
+                    imp.setDataEmissao(rst.getDate(""));
+                    imp.setDataVencimento(rst.getDate(""));
+                    imp.setValor(rst.getDouble(""));
+                    imp.setObservacao(rst.getString(""));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -420,8 +448,8 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	c.cli_OBS as obs\n"
                     + "from\n"
                     + "	cliente_cad c\n"
-                    + "	join cidade_cad cad on c.cli_CIDADE_ID = cad.cid_ID \n"
-                    + "	join estado_cad es on cad.cid_ESTADO_ID  = es.est_ID "
+                    + "	left join cidade_cad cad on c.cli_CIDADE_ID = cad.cid_ID \n"
+                    + "	left join estado_cad es on cad.cid_ESTADO_ID  = es.est_ID "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -452,24 +480,32 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
         return result;
     }
 
-    public List<CreditoRotativoIMP> getCreditoRotato() throws Exception {
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL .getConexao().createStatement()) {
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + " parc_ID id,\n"
+                    + " parc_CODIGO numdoc,\n"
+                    + " parc_ORIGEM,\n"
+                    + " parc_EMPRESA loja,\n"
+                    + " parc_SACADO clienteid,\n"
+                    + " parc_VRTITULO valor,\n"
+                    + " parc_TOTALPARCELAS totalparcelas, \n"
+                    + " parc_DTVCTO vencimento, \n"
+                    + " parc_EMISSAO emissao\n"
+                    + "from parcela_cad \n"
+                    + "where parc_DTPGTO is null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(rst.getString(""));
-                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("")));
-                    imp.setIdCliente(rst.getString(""));
-                    imp.setCnpjCliente(rst.getString(""));
-                    imp.setEcf(rst.getString(""));
-                    imp.setValor(rst.getDouble(""));
-                    imp.setDataEmissao(rst.getDate(""));
-                    imp.setDataVencimento(rst.getDate(""));
-                    imp.setObservacao(rst.getString(""));
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("numdoc")));
+                    imp.setIdCliente(rst.getString("clienteid"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
 
                     result.add(imp);
                 }
