@@ -194,6 +194,7 @@ import vrimplantacao2_5.dao.sistema.AssistDAO;
 import vrimplantacao2_5.dao.sistema.Atenas2_5DAO;
 import vrimplantacao2_5.dao.sistema.Athos2_5DAO;
 import vrimplantacao2_5.dao.sistema.AthosSQLServerDAO;
+import vrimplantacao2_5.dao.sistema.Ativo2_5DAO;
 import vrimplantacao2_5.dao.sistema.Atma2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoAdm2_5DAO;
 import vrimplantacao2_5.dao.sistema.AutoSystem2_5DAO;
@@ -297,6 +298,7 @@ import vrimplantacao2_5.gui.sistema.Assist2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atenas2_5GUI;
 import vrimplantacao2_5.gui.sistema.Athos2_5GUI;
 import vrimplantacao2_5.gui.sistema.AthosSQLServer2_5GUI;
+import vrimplantacao2_5.gui.sistema.Ativo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Atma2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoAdm2_5GUI;
 import vrimplantacao2_5.gui.sistema.AutoSystem2_5GUI;
@@ -2797,12 +2799,12 @@ public enum ESistema {
             return null;
         }
     },
-        ATIVO(274, "ATIVO", new SimpleSolution2_5DAO()){
+        ATIVO(274, "ATIVO", new Ativo2_5DAO()){
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
-                return new SimpleSolution2_5GUI(frame);
+                return new Ativo2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

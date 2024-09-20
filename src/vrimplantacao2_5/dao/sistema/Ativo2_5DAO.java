@@ -1,6 +1,5 @@
 package vrimplantacao2_5.dao.sistema;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
@@ -15,14 +14,11 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -110,6 +106,7 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CONTATOS,
                 OpcaoCliente.CLIENTE_EVENTUAL,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
@@ -123,7 +120,29 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	codigo as id,\n"
+                    + "	situacao as descricao,\n"
+                    + "	case \n"
+                    + "	when codigo  = '06' then 40\n"
+                    + "	when codigo = '03' then 0\n"
+                    + "	when codigo = '15' then 40\n"
+                    + "	when codigo = '20' then 60\n"
+                    + "	when codigo = '21' then 60\n"
+                    + "	when codigo = '01' then 0\n"
+                    + "	end as cst,\n"
+                    + "	case\n"
+                    + "	when codigo  = '06' then 0\n"
+                    + "	when codigo = '03' then 7\n"
+                    + "	when codigo = '15' then 0\n"
+                    + "	when codigo = '20' then 0\n"
+                    + "	when codigo = '21' then 0\n"
+                    + "	when codigo = '01' then 12	\n"
+                    + "	end as aliq	,\n"
+                    + "	0 as red\n"
+                    + "from\n"
+                    + "	tribut t \n"
+                    + "	where codigo in ('06','03','15','20','21','01')"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -223,55 +242,74 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "p.codigo as id,\n"
+                    + "p.descricao  as descricao,\n"
+                    + "case when u.unidade = 'KG' then p.codigo else p2.codbarras end as ean,\n"
+                    + "u.unidade tipoembalagem,\n"
+                    + "p2.unidade as qtdembalagem,\n"
+                    + "p3.custocom as custocomimposto,\n"
+                    + "p3.custoant as custo,\n"
+                    + "p4.preminimo as precovenda,\n"
+                    + "case when p.situacao = 'A' then 1 else 0 end as ativo,\n"
+                    + "p.estminimo as estoque,\n"
+                    + "p.peso as pesobruto,\n"
+                    + "p.pesoliq  as pesoliquido,\n"
+                    + "p3.codfiscal as ncm,\n"
+                    + "cest as cest,\n"
+                    + "p.sittrib as idicms,\n"
+                    + "p.cstpise as piscred ,\n"
+                    + "p.cstpiss as pisdeb \n"
+                    + "from\n"
+                    + "	produtos p \n"
+                    + "left join produtosbarras p2 on p.codigo = p2.produto \n"
+                    + "left join produtoslinha p3 on p.codigo = p3.codigo \n"
+                    + "left join produtospreco p4 on p.codigo = p4.produto \n"
+                    + "left join unidades u on u.codigo = p.unidpadrao"
             )) {
-                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                //Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString(""));
-                    imp.setEan(rst.getString(""));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
-
-                    if (bal != null) {
+                    //ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+//                    if (bal != null) {
+//                        imp.seteBalanca(true);
+//                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+//                        imp.setEan(String.valueOf(bal.getCodigo()));
+//                    }
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(rst.getString("descricao"));
+                    imp.setDescricaoGondola(rst.getString("descricao"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    if (rst.getString("tipoembalagem").equalsIgnoreCase("KG")) {
                         imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        imp.setEan(String.valueOf(bal.getCodigo()));
                     }
 
-                    imp.setDescricaoCompleta(rst.getString(""));
-                    imp.setDescricaoReduzida(rst.getString(""));
-                    imp.setDescricaoGondola(rst.getString(""));
-                    imp.setTipoEmbalagem(rst.getString(""));
-                    imp.setQtdEmbalagem(rst.getInt(""));
-                    imp.seteBalanca(rst.getBoolean(""));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
 
-                    imp.setCustoComImposto(rst.getDouble(""));
-                    imp.setCustoSemImposto(rst.getDouble(""));
-                    imp.setPrecovenda(rst.getDouble(""));
+                    imp.setCodMercadologico1(rst.getString("id"));
+                    imp.setCodMercadologico2(rst.getString("id"));
+                    imp.setCodMercadologico3(rst.getString("id"));
+                    imp.setCodMercadologico4(rst.getString("id"));
+                    imp.setCodMercadologico5(rst.getString("id"));
 
-                    imp.setCodMercadologico1(rst.getString(""));
-                    imp.setCodMercadologico2(rst.getString(""));
-                    imp.setCodMercadologico3(rst.getString(""));
-                    imp.setCodMercadologico4(rst.getString(""));
-                    imp.setCodMercadologico5(rst.getString(""));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
 
-                    imp.setSituacaoCadastro(rst.getInt(""));
-                    imp.setDataCadastro(rst.getDate(""));
-                    imp.setDataAlteracao(rst.getDate(""));
-                    imp.setEstoqueMinimo(rst.getDouble(""));
-                    imp.setEstoqueMaximo(rst.getDouble(""));
-                    imp.setEstoque(rst.getDouble(""));
-                    imp.setPesoBruto(rst.getDouble(""));
-                    imp.setPesoLiquido(rst.getDouble(""));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
 
-                    imp.setNcm(rst.getString(""));
-                    imp.setCest(rst.getString(""));
-
-                    String idIcmsDebito = rst.getString("");
+                    String idIcmsDebito = rst.getString("idicms");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
@@ -281,9 +319,9 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcmsDebito);
                     imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
 
-                    imp.setPiscofinsCstDebito(rst.getString(""));
-                    imp.setPiscofinsCstCredito(rst.getString(""));
-                    imp.setPiscofinsNaturezaReceita(rst.getString(""));
+                    imp.setPiscofinsCstDebito(rst.getString("piscred"));
+                    imp.setPiscofinsCstCredito(rst.getString("pisdeb"));
+                    //imp.setPiscofinsNaturezaReceita(rst.getString(""));
 
                     result.add(imp);
                 }
@@ -399,42 +437,43 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-   
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	codigo as id, \n"
-                    + "	nome as razao,\n"
-                    + "	nomefanta as fantasia,\n"
-                    + "	nroinsc as cnpj,\n"
-                    + "	nroinsc as rg,\n"
+                    + "	c.codigo as id,\n"
+                    + "	c.nome as razao,\n"
+                    + "	nomefant as fantasia,\n"
+                    + "	nroinsc as cpf,\n"
+                    + "	inscest as rg,\n"
                     + "	endereco as endereco,\n"
-                    + "	nroend as numero,\n"
-                    + "	bairro ,\n"
-                    + "	cidade as municipio,\n"
-                    + "	estado as uf,\n"
-                    + "	cep as cep	\n"
+                    + "	numero as numero,\n"
+                    + "	bairro as bairro,\n"
+                    + "	codcidade ,\n"
+                    + "	cc.nome as cidade,\n"
+                    + "	c.estado as uf,\n"
+                    + "	cep \n"
                     + "from\n"
-                    + "	fornecedores f"
+                    + "	clientes c\n"
+                    + "	join cidades cc on cc.codigo = c.codcidade "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rst.getString(""));
-                    imp.setRazao(rst.getString(""));
-                    imp.setFantasia(rst.getString(""));
-                    imp.setCnpj(rst.getString(""));
-                    imp.setInscricaoestadual(rst.getString(""));
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
 
-                    imp.setEndereco(rst.getString(""));
-                    imp.setNumero(rst.getString(""));
-                    imp.setBairro(rst.getString(""));
-                    imp.setMunicipio(rst.getString(""));
-                    imp.setUf(rst.getString(""));
-                    imp.setCep(rst.getString(""));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
 
                     result.add(imp);
                 }
@@ -448,49 +487,31 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select \n"
+                    + "docpag as id,\n"
+                    + "nroref as cupom,\n"
+                    + "c.codigo as id_cliente,\n"
+                    + "nroinsc as cpf,\n"
+                    + "split_part(c.dataemi,'/',3)||'-'||split_part(c.dataemi,'/',1)||'-'||split_part(c.dataemi,'/',2) as emuissao,\n"
+                    + "split_part(c.dataven,'/',3)||'-'||split_part(c.dataven,'/',1)||'-'||split_part(c.dataven,'/',2)  as vencimento,\n"
+                    + "replace(valpre,',','.') as valor \n,"
+                    + "c.observacao \n"
+                    + "from contasareceber c \n"
+                    + "join clientes c2 on c.codigo = c2.codigo \n"
+                    + "where tipodoc = '05'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(rst.getString(""));
-                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("")));
-                    imp.setIdCliente(rst.getString(""));
-                    imp.setCnpjCliente(rst.getString(""));
-                    imp.setEcf(rst.getString(""));
-                    imp.setValor(rst.getDouble(""));
-                    imp.setDataEmissao(rst.getDate(""));
-                    imp.setDataVencimento(rst.getDate(""));
-                    imp.setObservacao(rst.getString(""));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    ChequeIMP imp = new ChequeIMP();
-
-                    imp.setId(rst.getString(""));
-                    imp.setDataDeposito(rst.getDate(""));
-                    imp.setNumeroCheque(rst.getString(""));
-                    imp.setDate(rst.getDate(""));
-                    imp.setBanco(rst.getInt(""));
-                    imp.setAgencia(rst.getString(""));
-                    imp.setConta(rst.getString(""));
-                    imp.setNome(rst.getString(""));
-                    imp.setTelefone(rst.getString(""));
-                    imp.setValor(rst.getDouble(""));
-                    imp.setNumeroCupom(rst.getString(""));
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("cupom")));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setCnpjCliente(rst.getString("cpf"));
+                    //imp.setEcf(rst.getString(""));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataEmissao(rst.getDate("emuissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setObservacao(rst.getString("observacao"));
 
                     result.add(imp);
                 }

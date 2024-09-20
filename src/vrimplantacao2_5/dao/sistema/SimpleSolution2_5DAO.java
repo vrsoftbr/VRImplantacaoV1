@@ -398,30 +398,6 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
     }
 
     @Override
-    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
-        List<ContaReceberIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    ContaReceberIMP imp = new ContaReceberIMP();
-
-                    imp.setId(rst.getString(""));
-                    imp.setIdFornecedor(rst.getString(""));
-                    imp.setDataEmissao(rst.getDate(""));
-                    imp.setDataVencimento(rst.getDate(""));
-                    imp.setValor(rst.getDouble(""));
-                    imp.setObservacao(rst.getString(""));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
