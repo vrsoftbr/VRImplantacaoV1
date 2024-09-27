@@ -276,6 +276,18 @@ public class LojaGeradorScripts {
                 + "select nextval('receitatoledoloja_id_seq') , id_receitatoledo ," + i_loja.getId() + " from receitatoledoloja where id_loja =  " + i_loja.getIdCopiarLoja();
         return sql;
     }
+    
+    public String copiarPagarFornecedorLoja(LojaVO i_loja) throws Exception {
+        String sql = "insert into pagarfornecedor "
+                + "(id_loja, id_fornecedor, id_tipoentrada, numerodocumento, dataentrada, "
+                + "dataemissao, valor, id_notadespesa, id_notaentrada, id_transferenciaentrada, "
+                + "id_pagaroutrasdespesas, id_geracaoretencaotributo, id_escritasaldo)\n"
+                + "select " + i_loja.getId() + ", id_fornecedor, id_tipoentrada, numerodocumento, dataentrada, "
+                + "dataemissao, valor, id_notadespesa, id_notaentrada, id_transferenciaentrada, "
+                + "id_pagaroutrasdespesas, id_geracaoretencaotributo, id_escritasaldo\n"
+                + "from pagarfornecedor where id_loja = " + i_loja.getIdCopiarLoja();
+        return sql;
+    }
 
     //validar versao
     public String copiaEcf(LojaVO i_loja) throws Exception {

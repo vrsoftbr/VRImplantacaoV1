@@ -405,13 +405,18 @@ public class LojaDAO {
                     stm.execute(script.copiaReceitaToledoLoja(i_loja));
                 }
             }
+
+            if (i_loja.isCopiaContasAPagar() == true) {
+                stm.execute(script.copiarPagarFornecedorLoja(i_loja));
+            }
+
             //  stm.execute(copiaEcf(i_loja));
 
             /* inserir loja na tabela contabilidade.grupoeconomicoloja. */
             //("Adicionando loja no grupoeconomico.");
             stm.execute(script.inserirGrupoEconomicoLoja(i_loja));
-            
-            if(isSchemaVrHistoricoVendaExiste()){
+
+            if (isSchemaVrHistoricoVendaExiste()) {
                 stm.execute(script.insereLojaPdvHistoricoVenda(i_loja));
             }
             ProgressBar.setStatus("salvando loja... 100%");
