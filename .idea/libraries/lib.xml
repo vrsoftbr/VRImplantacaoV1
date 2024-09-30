@@ -1,0 +1,74 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-ooxml-schemas-3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jcalendar-1.3.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/beansbinding-1.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jfreechart-1.0.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/sqlite-jdbc-3.16.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ojdbc7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ucanaccess-5.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/postgresql-42.7.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/org.json-20120521.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jtds-1.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jasperreports-3.7.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/slf4j-api-1.7.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/db2jcc4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jackcess-3.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-ooxml-3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jasperreports-fonts-3.7.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/vr-fonts-courier.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/vr-fonts.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/commons-lang3-3.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jxl-2.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/mssql-jdbc-9.2.0.jre8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jasperreports-chart-themes-3.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ormlite-core-5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/small-apps-core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/activation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/bson-3.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/spring.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jcommon-1.0.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jfreechart-1.0.14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/mysql-connector-j-8.4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/AbsoluteLayout.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/joda-time-2.9.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jsoup-1.9.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/mysql-connector-java-5.1.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/poi-scratchpad-3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/org-openide-awt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jbcrypt-0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/slf4j-jdk14-1.7.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/small-apps-view.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ormlite-jdbc-5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/javadbf-1.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/tools.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jcommon-1.0.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/hsqldb-2.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/RXTXcomm.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/rsyntaxtextarea-2.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/swing-layout-1.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/swingx-beaninfo-1.6.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/RXTXcommOLD.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/db2jcc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/hunspell-win32-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jdbc-4.50.2.fix-1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/DBF_JDBC30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/org-openide-util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/jaybird-full-4.0.0.java8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/balloontip-1.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/paradoxdriver-1.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/hunspell.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/swingx-all-1.6.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/VRFramework.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/slf4j-api-2.0.0-alpha2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/ifxjdbc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/flatlaf-0.38.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

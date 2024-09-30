@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="VRImplantacao">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/VRImplantacao.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

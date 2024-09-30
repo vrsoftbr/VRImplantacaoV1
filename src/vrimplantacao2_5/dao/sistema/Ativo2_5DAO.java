@@ -215,11 +215,12 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                     "select \n"
                     + "produto as id_produto,\n"
                     + "codbarras as ean,\n"
-                    + "unidade as qtdembalagem\n"
-                    + "from produtosbarras p "
+                    + "p2.quantcx as qtdembalagem\n"
+                    + "from produtosbarras p \n"
+                    + "left join produtos p2 on p.produto  = p2.codigo"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
