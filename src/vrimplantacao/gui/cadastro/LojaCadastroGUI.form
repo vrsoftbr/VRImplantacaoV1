@@ -535,12 +535,13 @@
                           </Group>
                           <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkPromocao" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="chkContasAPagar" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="chkPromocao" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOferta" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkContasAPagar" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOutrasDespesas" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -563,6 +564,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="chkCopiaOperador" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="chkPromocao" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkOutrasDespesas" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="104" max="32767" attributes="0"/>
               </Group>
@@ -614,6 +616,21 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Copia Contas a Pagar"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="chkOutrasDespesas">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Tahoma" size="11" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Copia Outras Despesas"/>
+            <Property name="actionCommand" type="java.lang.String" value="Copia Outras Despesas"/>
+          </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Copia Outras Despesas"/>
+          </AccessibilityProperties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkOutrasDespesasActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

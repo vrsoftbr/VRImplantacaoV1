@@ -409,6 +409,10 @@ public class LojaDAO {
             if (i_loja.isCopiaContasAPagar() == true) {
                 stm.execute(script.copiarPagarFornecedorLoja(i_loja));
             }
+            
+            if (i_loja.isCopiaOutrasDespesas() == true) {
+                stm.execute(script.copiarOutrasDespesas (i_loja));
+            }
 
             //  stm.execute(copiaEcf(i_loja));
 
