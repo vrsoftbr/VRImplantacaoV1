@@ -25,6 +25,8 @@ public class LojaVO {
     private boolean copiaOferta = false;
     private boolean copiaPromocao = false;
     private boolean copiaReceita = false;
+    private boolean copiarContasAPagar = false;
+    private boolean copiarOutrasDespesas = false;
 
     public int getId() {
         return id;
@@ -237,4 +239,19 @@ public class LojaVO {
         this.copiaReceita = copiaReceita;
     }
 
+    public boolean isCopiaContasAPagar() {
+        return copiarContasAPagar;
+    }
+
+    public void setCopiaContasAPagar(boolean contasAPagar) {
+        this.copiarContasAPagar = contasAPagar;
+    }
+
+    public boolean isCopiaOutrasDespesas() {
+        return copiarContasAPagar;
+    }
+    
+    public void setCopiaOutrasDespesas(boolean outrasDespesas) {
+        this.copiarOutrasDespesas = outrasDespesas;
+    }
 }
