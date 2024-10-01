@@ -248,7 +248,7 @@ public class LojaVO {
     }
 
     public boolean isCopiaOutrasDespesas() {
-        return copiarContasAPagar;
+        return copiarOutrasDespesas;
     }
     
     public void setCopiaOutrasDespesas(boolean outrasDespesas) {
