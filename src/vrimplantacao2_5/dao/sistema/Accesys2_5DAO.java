@@ -344,6 +344,8 @@ public class Accesys2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDescricaoReduzida(imp.getDescricaoGondola());
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("embalagem"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("embalagem"));
                     imp.setCustoComImposto(rs.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rs.getDouble("venda"));
