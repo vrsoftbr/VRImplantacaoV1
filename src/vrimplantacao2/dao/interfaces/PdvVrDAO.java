@@ -5,6 +5,7 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,6 +18,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -28,6 +30,26 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
  */
 public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    
+    private Connection bancovr;
+    private Connection bancopdv;
+
+    public Connection getBancoPdv() {
+        return bancopdv;
+    }
+
+    public void setBancoPdv(Connection bancopdv) {
+        this.bancopdv = bancopdv;
+    }
+
+    public Connection getBancoVr() {
+        return bancovr;
+    }
+
+    public void setBancoVr(Connection bancovr) {
+        this.bancovr = bancovr;
+    }
+    
     @Override
     public String getSistema() {
         return "PdvVr";
@@ -36,7 +58,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "id_loja, "
@@ -55,7 +77,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "id,\n"
@@ -84,7 +106,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
 
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -145,7 +167,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<EcfPdvVO> getECF() throws SQLException {
         List<EcfPdvVO> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	e.id,\n"
@@ -170,7 +192,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OperadorIMP> getOperadores() throws Exception {
         List<OperadorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "matricula,\n"
@@ -200,35 +222,41 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<PromocaoIMP> getPromocoes() throws Exception {
         List<PromocaoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bancovr.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "id,\n"
-                    + "descricao,\n"
-                    + "datainicio,\n"
-                    + "datatermino,\n"
-                    + "pontuacao,\n"
-                    + "quantidade,\n"
-                    + "qtdcupom,\n"
-                    + "id_situacaocadastro,\n"
-                    + "verificaprodutosauditados,\n"
-                    + "id_tipopromocao,\n"
-                    + "valor,\n"
-                    + "controle,\n"
-                    + "id_tipopercentualvalor,\n"
-                    + "id_tipoquantidade,\n"
-                    + "aplicatodos,\n"
-                    + "valorreferenteitenslista,\n"
-                    + "valordesconto,\n"
-                    + "codigoscanntech,\n"
-                    + "valorpaga,\n"
-                    + "id_tipopercentualvalordesconto,\n"
-                    + "desconsideraritem,\n"
-                    + "qtdlimite,\n"
-                    + "somenteclubevantagens,\n"
-                    + "diasexpiracao\n"
-                    + "from promocao\n"
-                    + "order by id"
+                    "SELECT \n"
+                    + "p.id,\n"
+                    + "p.descricao,\n"
+                    + "p.datainicio,\n"
+                    + "p.datatermino,\n"
+                    + "p.pontuacao,\n"
+                    + "p.quantidade,\n"
+                    + "p.qtdcupom,\n"
+                    + "p.id_situacaocadastro,\n"
+                    + "p.verificaprodutosauditados,\n"
+                    + "p.id_tipopromocao,\n"
+                    + "p.valor,\n"
+                    + "p.controle,\n"
+                    + "p.id_tipopercentualvalor,\n"
+                    + "p.id_tipoquantidade,\n"
+                    + "p.aplicatodos,\n"
+                    + "p.valorreferenteitenslista,\n"
+                    + "p.valordesconto,\n"
+                    + "p.codigoscanntech,\n"
+                    + "p.valorpaga,\n"
+                    + "p.id_tipopercentualvalordesconto,\n"
+                    + "p.desconsideraritem,\n"
+                    + "p.qtdlimite,\n"
+                    + "p.somenteclubevantagens,\n"
+                    + "p.diasexpiracao,\n"
+                    + "i.ID_PRODUTO,\n"
+                    + "i.PRECOVENDA, \n"
+                    + "p2.DESCRICAOCOMPLETA,\n"
+                    + "p3.CODIGOBARRAS \n"
+                    + "from promocao p\n"
+                    + "LEFT JOIN PROMOCAOITEM i ON p.ID = i.ID_PROMOCAO\n"
+                    + "LEFT JOIN PRODUTO p2 ON i.ID_PRODUTO = p2.ID \n"
+                    + "LEFT JOIN PRODUTOAUTOMACAO p3 ON i.ID_PRODUTO = p3.ID_PRODUTO "
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
@@ -255,6 +283,39 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdLimite(rst.getInt("qtdlimite"));
                     imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
                     imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
+                    imp.setId_produto(rst.getString("ID_PRODUTO"));
+                    imp.setId_promocao(rst.getString("id"));
+                    imp.setId_finalizadora(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = bancopdv.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + " CASE WHEN ID_CLIENTEPREFERENCIAL IS NULL THEN CPFCRM\n"
+                    + "   ELSE ID_CLIENTEPREFERENCIAL END id,\n"
+                    + " CASE WHEN NOMECLIENTE = '' THEN 'CADASTRO INCOMPLETO'\n"
+                    + "   ELSE NOMECLIENTE END nome,\n"
+                    + " CPFCRM cpf\n"
+                    + "FROM VENDA\n"
+                    + "WHERE ID_CLIENTEPREFERENCIAL IS NOT NULL\n"
+                    + "OR NOMECLIENTE <> ''\n"
+                    + "OR CPFCRM <> 0"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cpf"));
+
                     result.add(imp);
                 }
             }
