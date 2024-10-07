@@ -373,7 +373,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setMargemMinima(linha.getDouble("margemminima"));
                 produto.setEstoqueMaximo(linha.getDouble("estoquemaximo"));
                 produto.setEstoqueMinimo(linha.getDouble("estoqueminimo"));
-                produto.setEstoque(linha.getDouble("estoque"));
+                produto.setEstoque(linha.getDouble("estoque")); 
                 produto.setCustoAnteriorComImposto(linha.getDouble("custocomimpostoanterior"));
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
                 produto.setCustoAnteriorSemImposto(linha.getDouble("custosemimpostoanterior"));
