@@ -354,7 +354,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         produto.setValidade(bal.getValidade());
                     }
                 }
-                produto.setDescricaoCompleta(linha.getString("descricaocompleta"));
+                produto.setDescricaoCompleta("diversos");
                 produto.setDescricaoReduzida(linha.getString("descricaoreduzida"));
                 produto.setDescricaoGondola(linha.getString("descricaogondola"));
                 produto.setCodMercadologico1(linha.getString("cod_mercadologico1"));
@@ -374,7 +374,6 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setEstoqueMaximo(linha.getDouble("estoquemaximo"));
                 produto.setEstoqueMinimo(linha.getDouble("estoqueminimo"));
                 produto.setEstoque(linha.getDouble("estoque"));
-                produto.setCustoComImposto(linha.getDouble("custocomimposto"));
                 produto.setCustoAnteriorComImposto(linha.getDouble("custocomimpostoanterior"));
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
                 produto.setCustoAnteriorSemImposto(linha.getDouble("custosemimpostoanterior"));
@@ -576,8 +575,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setImportId(id);
 
                 forn.setRazao(linha.getString("razao"));
-                forn.setFantasia(linha.getString("fantasia"));
-                forn.setCnpj_cpf(linha.getString("cnpj_cpf"));
+                forn.setFantasia("Teste");
+                forn.setCnpj_cpf("55555");
                 forn.setIe_rg(linha.getString("ie_rg"));
                 forn.setInsc_municipal(linha.getString("insc_municipal"));
                 forn.setSuframa(linha.getString("suframa"));
@@ -589,7 +588,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setComplemento(linha.getString("complemento"));
                 forn.setBairro(linha.getString("bairro"));
                 forn.setIbge_municipio(linha.getInt("ibge_municipio"));
-                forn.setMunicipio(linha.getString("municipio"));
+                forn.setMunicipio("Limeira");
                 forn.setIbge_uf(linha.getInt("ibge_uf"));
                 forn.setUf(linha.getString("uf"));
                 forn.setCep(linha.getString("cep"));
