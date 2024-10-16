@@ -401,17 +401,19 @@ public class LojaDAO {
                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     stm.execute(script.copiaReceitaLoja(i_loja));
                 }
-                if (validaReceitaToledo(i_loja)) {
-                    stm.execute(script.copiaReceitaToledoLoja(i_loja));
+                if (versao.maiorQue(4,2)) {
+                    if (validaReceitaToledo(i_loja)) {
+                        stm.execute(script.copiaReceitaToledoLoja(i_loja));
+                    }
                 }
             }
 
             if (i_loja.isCopiaContasAPagar() == true) {
                 stm.execute(script.copiarPagarFornecedorLoja(i_loja));
             }
-            
+
             if (i_loja.isCopiaOutrasDespesas() == true) {
-                stm.execute(script.copiarOutrasDespesas (i_loja));
+                stm.execute(script.copiarOutrasDespesas(i_loja));
             }
 
             //  stm.execute(copiaEcf(i_loja));
