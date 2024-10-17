@@ -388,7 +388,8 @@ public class AtualizadorDAO {
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (16, 'IMP-MG', 'VRMG', '$2a$12$foWrXPAxW88wBR5zWZxMrOFph6mYDpPFWKd8bYQN1Lt48o4zNkVye', " + EUnidade.VR_UBERLANDIA.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (18, 'MARCIO JORDAO', 'MARCIO', '$2a$12$Tc2AnzRpK30ahUI290AuHu3bhmQLuzR9Yby3jV5.89rBD3sYLwBFm', " + EUnidade.VR_RIBEIRAPRETO.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
                     + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (19, 'SUPORTE', 'SUPORTE', '$2a$12$Y7xCtYzd82dRkDzVl72MS.wH5.KqyBDkjJc57wUTFcyKGdEgVHjGS', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
-                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (20, 'IMP-SP_OE', 'VRSP-OE', '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.', " + EUnidade.VR_SAO_PAULO_OESTE.getId() + ") ON CONFLICT (id) DO NOTHING;");
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (20, 'IMP-SP_OE', 'VRSP-OE', '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.', " + EUnidade.VR_SAO_PAULO_OESTE.getId() + ") ON CONFLICT (id) DO NOTHING;\n"
+                    + "INSERT INTO implantacao2_5.usuario(id, nome, login, senha, id_unidade) VALUES (21, 'WESLEY', 'WESLEY', '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa', " + EUnidade.VR_MATRIZ.getId() + ") ON CONFLICT (id) DO NOTHING;");
         }
     }
 
@@ -458,6 +459,7 @@ public class AtualizadorDAO {
                     + "   update implantacao2_5.usuario set login = 'MARCIO', senha = '$2a$12$Tc2AnzRpK30ahUI290AuHu3bhmQLuzR9Yby3jV5.89rBD3sYLwBFm' where id = 18;\n"
                     + "   update implantacao2_5.usuario set login = 'SUPORTE', senha = '$2a$12$Y7xCtYzd82dRkDzVl72MS.wH5.KqyBDkjJc57wUTFcyKGdEgVHjGS' where id = 19;\n"
                     + "   update implantacao2_5.usuario set login = 'VRSP-OE', senha = '$2a$12$0jkS4F7B8fORQN1Z6fZuduReaqrI3Z5dIy7hf8.17ow5Eq3nPbZw.' where id = 20;\n"
+                    + "   update implantacao2_5.usuario set login = 'WESLEY', senha = '$2a$12$JWSRLo/HDhp2CrdL02xH8uZifJ7xZ.ZO/gRATwrukosu0Y58.OhVa' where id = 21;\n"
                     + "end;\n"
                     + "$$ language plpgsql");
         }
