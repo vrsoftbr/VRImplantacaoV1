@@ -83,6 +83,7 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.ASSOCIADO,
                 OpcaoProduto.RECEITA,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.PDV_VENDA // Habilita importacão de Vendas
         ));
     }
@@ -129,11 +130,11 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	when codigo = '15' then 40\n"
                     + "	when codigo = '20' then 60\n"
                     + "	when codigo = '21' then 60\n"
-                    + "	when codigo = '01' then 0\n"
+                    + "	when codigo = '01' then 60\n"
                     + "	end as cst,\n"
                     + "	case\n"
                     + "	when codigo  = '06' then 0\n"
-                    + "	when codigo = '03' then 7\n"
+                    + "	when codigo = '03' then 20\n"
                     + "	when codigo = '15' then 0\n"
                     + "	when codigo = '20' then 0\n"
                     + "	when codigo = '21' then 0\n"
@@ -141,7 +142,7 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	end as aliq	,\n"
                     + "	0 as red\n"
                     + "from\n"
-                    + "	tribut t \n"
+                    + "	situacaotrib t \n"
                     + "	where codigo in ('06','03','15','20','21','01')"
             )) {
                 while (rst.next()) {
@@ -163,25 +164,28 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "    g.item,\n"
+                    + "    g.nome\n"
+                    + "FROM\n"
+                    + "    grupos g\n"
+                    + "WHERE\n"
+                    + "    g.nome != ''"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
 
-                    imp.setMerc1ID(rst.getString(""));
-                    imp.setMerc1Descricao(rst.getString(""));
-                    imp.setMerc2ID(rst.getString(""));
-                    imp.setMerc2Descricao(rst.getString(""));
-                    imp.setMerc3ID(rst.getString(""));
-                    imp.setMerc3Descricao(rst.getString(""));
-                    imp.setMerc4ID(rst.getString(""));
-                    imp.setMerc4Descricao(rst.getString(""));
-                    imp.setMerc5ID(rst.getString(""));
-                    imp.setMerc5Descricao(rst.getString(""));
+                    imp.setMerc1ID(rst.getString("item"));
+                    imp.setMerc1Descricao(rst.getString("nome"));
+                    imp.setMerc2ID(rst.getString("item"));
+                    imp.setMerc2Descricao(rst.getString("nome"));
+                    imp.setMerc3ID(rst.getString("item"));
+                    imp.setMerc3Descricao(rst.getString("nome"));
 
                     result.add(imp);
+
                 }
             }
         }
@@ -193,7 +197,11 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "    codigo AS id,\n"
+                    + "    descricao\n"
+                    + "FROM\n"
+                    + "    familiaproduto"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -215,12 +223,13 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                     "select \n"
+                    "select \n"
                     + "produto as id_produto,\n"
                     + "codbarras as ean,\n"
                     + "p2.quantcx as qtdembalagem\n"
                     + "from produtosbarras p \n"
-                    + "left join produtos p2 on p.produto  = p2.codigo"
+                    + "left join produtos p2 on p.produto  = p2.codigo\n"
+                    + "where p.tipovenda = '01'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -229,7 +238,7 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(1);
 
                     result.add(imp);
                 }
@@ -243,30 +252,60 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    "select \n"
                     + "p.codigo as id,\n"
                     + "p.descricao  as descricao,\n"
                     + "case when u.unidade = 'KG' then p.codigo else p2.codbarras end as ean,\n"
                     + "u.unidade tipoembalagem,\n"
-                    + "p2.unidade as qtdembalagem,\n"
-                    + "p3.custocom as custocomimposto,\n"
-                    + "p3.custoant as custo,\n"
-                    + "p4.preminimo as precovenda,\n"
-                    + "case when p.situacao = 'A' then 1 else 0 end as ativo,\n"
+                    + "case when u.unidade = 'KG' then '1' else p2.unidade end as qtdembalagem,\n"
+                    + "case when p5.custoaqui = '0' then \n"
+                    + "replace(p5.custopre,',','.')::numeric \n"
+                    + "else replace(p5.custoaqui ,',','.')::numeric  end as custosemimposto,\n"
+                    + "replace(p5.custopre ,',','.')::numeric as custocomimposto,\n"
+                    + "p4.premaximo as precovenda,\n"
+                    + "p.grupo::int mercadologico1,\n"
+                    + "p.familia AS familiaproduto,\n"
+                    + "case when p.situacao = 'D' then 0 else 1 end as ativo,\n"
                     + "p.estminimo as estoque,\n"
                     + "p.peso as pesobruto,\n"
                     + "p.pesoliq  as pesoliquido,\n"
-                    + "p3.codfiscal as ncm,\n"
+                    + "p. codfiscal as ncm,\n"
                     + "cest as cest,\n"
                     + "p.sittrib as idicms,\n"
                     + "p.cstpise as piscred ,\n"
                     + "p.cstpiss as pisdeb \n"
                     + "from\n"
-                    + "	produtos p \n"
-                    + "left join produtosbarras p2 on p.codigo = p2.produto \n"
-                    + "left join produtoslinha p3 on p.codigo = p3.codigo \n"
-                    + "left join produtospreco p4 on p.codigo = p4.produto \n"
-                    + "left join unidades u on u.codigo = p.unidpadrao"
+                    + "    produtos p \n"
+                    + "left join produtosbarras p2 on p.codigo = p2.produto and p2.tipovenda = '01'\n"
+                    + "left join produtoslinha p3 on p.linha = p3.codigo \n"
+                    + "left join  produtocusto p5 on p.codigo = p5.codigo and tabpreco = '01'\n"
+                    + "left join produtospreco p4 on p.codigo = p4.produto  and p4.tipovenda = '01' and p4.unidade = '04' \n"
+                    + "left join unidades u on u.codigo = p.unidpadrao "
+            //                    "select\n"
+            //                    + "p.codigo as id,\n"
+            //                    + "p.descricao  as descricao,\n"
+            //                    + "case when u.unidade = 'KG' then p.codigo else p2.codbarras end as ean,\n"
+            //                    + "u.unidade tipoembalagem,\n"
+            //                    + "p2.unidade as qtdembalagem,\n"
+            //                    + "replace(p5.custoaqui,',','.')::numeric as custo,\n"
+            //                    + "p4.preminimo as precovenda,\n"
+            //                    + "case when p.situacao = 'A' then 1 else 0 end as ativo,\n"
+            //                    + "p.estminimo as estoque,\n"
+            //                    + "p.peso as pesobruto,\n"
+            //                    + "p.pesoliq  as pesoliquido,\n"
+            //                    + "p3.codfiscal as ncm,\n"
+            //                    + "cest as cest,\n"
+            //                    + "p.sittrib as idicms,\n"
+            //                    + "p.cstpise as piscred ,\n"
+            //                    + "p.cstpiss as pisdeb \n"
+            //                    + "from\n"
+            //                    + "	produtos p \n"
+            //                    + "left join produtosbarras p2 on p.codigo = p2.produto and p2.tipovenda = '01'\n"
+            //                    + "left join produtoslinha p3 on p.linha = p3.codigo \n"
+            //                    + "left join  produtocusto p5 on p.codigo = p5.codigo and tabpreco = '01'\n"
+            //                    + "left join produtospreco p4 on p.codigo = p4.produto \n"
+            //                    + "and p4.unidade = '04' and p4.fator = 1 \n"
+            //                    + "left join unidades u on u.codigo = p.unidpadrao"
             )) {
                 //Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -287,20 +326,19 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(1);
                     if (rst.getString("tipoembalagem").equalsIgnoreCase("KG")) {
                         imp.seteBalanca(true);
                     }
 
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
 
-                    imp.setCodMercadologico1(rst.getString("id"));
-                    imp.setCodMercadologico2(rst.getString("id"));
-                    imp.setCodMercadologico3(rst.getString("id"));
-                    imp.setCodMercadologico4(rst.getString("id"));
-                    imp.setCodMercadologico5(rst.getString("id"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico1"));
+                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
 
                     imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -320,8 +358,8 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(idIcmsDebito);
                     imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
 
-                    imp.setPiscofinsCstDebito(rst.getString("piscred"));
-                    imp.setPiscofinsCstCredito(rst.getString("pisdeb"));
+                    imp.setPiscofinsCstDebito(rst.getString("pisdeb"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscred"));
                     //imp.setPiscofinsNaturezaReceita(rst.getString(""));
 
                     result.add(imp);
@@ -389,12 +427,14 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	fornecedor as id_fornecedor,\n"
-                    + "	produto as id_produto,\n"
-                    + "	codfor as codigoexterno,\n"
-                    + "	unidade as qtdembalagem\n"
+                    + "    fornecedor as id_fornecedor,\n"
+                    + "    produto as id_produto,\n"
+                    + "    codfor as codigoexterno,\n"
+                    + "    CASE \n"
+                    + "    WHEN unidade = '' THEN '1' ELSE fator END\n"
+                    + "    as qtdembalagem\n"
                     + "from\n"
-                    + "	produtosfornecedor p"
+                    + "    produtosfornecedor p"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -404,7 +444,7 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rst.getDouble("qtdemblagem"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
 
                     result.add(imp);
                 }

@@ -108,6 +108,7 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
                 OpcaoCliente.CONTATOS,
+                OpcaoCliente.CNPJ,
                 OpcaoCliente.CLIENTE_EVENTUAL,
                 OpcaoCliente.DATA_CADASTRO,
                 OpcaoCliente.DATA_NASCIMENTO,
@@ -430,26 +431,47 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	cli_ID as id,\n"
-                    + "	cli_NOMERAZAO as razao,\n"
-                    + "	cli_CPFCNPJ as cpf,\n"
-                    + "	cli_RGIE  as rg,\n"
-                    + "	cli_LOGRADOURO as endereco,\n"
-                    + "	cli_nro as numero,\n"
-                    + "	cli_COMPLEMENTO as complemento,\n"
-                    + "	cli_BAIRRO as bairro,\n"
-                    + "	cad.cid_NOME as municipio,\n"
-                    + "	es.est_SIGLA as uf,\n"
-                    + "	cli_cep as cep,\n"
-                    + "	cli_DTCAD as data_cadastro,\n"
-                    + "	case when cli_ATIVO = 'S' then 1 else 0 end ativo,\n"
-                    + "	cli_celular1 as contato,\n"
-                    + "	c.cli_OBS as obs\n"
-                    + "from\n"
-                    + "	cliente_cad c\n"
-                    + "	left join cidade_cad cad on c.cli_CIDADE_ID = cad.cid_ID \n"
-                    + "	left join estado_cad es on cad.cid_ESTADO_ID  = es.est_ID "
+                    //                    "select\n"
+                    //                    + "	cli_ID as id,\n"
+                    //                    + "	cli_NOMERAZAO as razao,\n"
+                    //                    + "	cli_CPFCNPJ as cpf,\n"
+                    //                    + "	cli_RGIE  as rg,\n"
+                    //                    + "	cli_LOGRADOURO as endereco,\n"
+                    //                    + "	cli_nro as numero,\n"
+                    //                    + "	cli_COMPLEMENTO as complemento,\n"
+                    //                    + "	cli_BAIRRO as bairro,\n"
+                    //                    + "	cad.cid_NOME as municipio,\n"
+                    //                    + "	es.est_SIGLA as uf,\n"
+                    //                    + "	cli_cep as cep,\n"
+                    //                    + "	cli_DTCAD as data_cadastro,\n"
+                    //                    + "	case when cli_ATIVO = 'S' then 1 else 0 end ativo,\n"
+                    //                    + "	cli_celular1 as contato,\n"
+                    //                    + "	c.cli_OBS as obs\n"
+                    //                    + "from\n"
+                    //                    + "	cliente_cad c\n"
+                    //                    + "	left join cidade_cad cad on c.cli_CIDADE_ID = cad.cid_ID \n"
+                    //                    + "	left join estado_cad es on cad.cid_ESTADO_ID  = es.est_ID "
+
+                    "SELECT\n"
+                    + "    cli_ID AS id,\n"
+                    + "    cli_NOMERAZAO AS razao,\n"
+                    + "    IFNULL(cli_CPFCNPJ, LPAD(FLOOR(RAND() * 99999999999), 11, '0')) AS cpf,\n"
+                    + "    cli_RGIE AS rg,\n"
+                    + "    cli_LOGRADOURO AS endereco,\n"
+                    + "    cli_nro AS numero,\n"
+                    + "    cli_COMPLEMENTO AS complemento,\n"
+                    + "    cli_BAIRRO AS bairro,\n"
+                    + "    cad.cid_NOME AS municipio,\n"
+                    + "    es.est_SIGLA AS uf,\n"
+                    + "    cli_cep AS cep,\n"
+                    + "    cli_DTCAD AS data_cadastro,\n"
+                    + "    CASE WHEN cli_ATIVO = 'S' THEN 1 ELSE 0 END ativo,\n"
+                    + "    cli_celular1 AS contato,\n"
+                    + "    c.cli_OBS AS obs\n"
+                    + "FROM\n"
+                    + "    cliente_cad c\n"
+                    + "    LEFT JOIN cidade_cad cad ON c.cli_CIDADE_ID = cad.cid_ID \n"
+                    + "    LEFT JOIN estado_cad es ON cad.cid_ESTADO_ID = es.est_ID;"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -457,7 +479,10 @@ public class SimpleSolution2_5DAO extends InterfaceDAO implements MapaTributoPro
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("razao"));
-                    imp.setCnpj(rst.getString("cpf"));
+
+                    String cpf = rst.getString("cpf");
+                    imp.setCnpj(cpf == null ? "9999999" + cpf : cpf);
+
                     imp.setInscricaoestadual(rst.getString("rg"));
 
                     imp.setEndereco(rst.getString("endereco"));

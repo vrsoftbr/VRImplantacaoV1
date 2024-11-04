@@ -216,7 +216,7 @@ public class NutricionalRepository {
         nut.setPercentualcalcio(imp.getPercentualCalcio());
         nut.setPercentualferro(imp.getPercentualFerro());
         nut.setPercentualsodio(imp.getPercentualSodio());
-        nut.setQuantidade(Utils.stringToInt(imp.getPorcao()));
+        nut.setQuantidade(imp.getQuantidade());
         nut.setId_tipomedidadecimal(imp.getId_tipomedidadecimal());
         nut.setId_tipounidadeporcao(imp.getId_tipounidadeporcao());
         nut.setAcucaresAdicionados(imp.getAcucaresadicionados());

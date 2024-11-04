@@ -484,7 +484,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     //imp.setCodMercadologico4(rst.getString("merc4"));
-                    //imp.setIdFamiliaProduto(rst.getString("SUBCod"));
+                    imp.setIdFamiliaProduto(rst.getString("SUBCod"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     //imp.setQtdEmbalagemCotacao(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));

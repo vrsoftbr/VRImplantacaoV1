@@ -38,6 +38,7 @@ public class ConversorDAO {
     private String ip = prop.get("database.ip");
     private String bancoProperties = prop.get("database.nome");
     private int porta = Integer.parseInt(prop.get("database.porta"));
+    private String password = prop.get("database.senha");
     private String regexp = "([\\W])";
 
     public ConversorDAO() {
@@ -243,7 +244,7 @@ public class ConversorDAO {
     }
 
     public void abrirConexao() throws Exception {
-        con.abrirConexao(ip, porta, getNomeBanco(), "postgres", "VrPost@Server");
+        con.abrirConexao(ip, porta, getNomeBanco(), "postgres", password);
     }
 
     public void fecharConexao() throws Exception {
@@ -251,7 +252,7 @@ public class ConversorDAO {
     }
 
     public void criarControleDeDadosConvertidosProperties() throws Exception {
-        con.abrirConexao(ip, porta, bancoProperties, "postgres", "VrPost@Server");
+        con.abrirConexao(ip, porta, bancoProperties, "postgres", password);
         try (Statement stm = con.getConexao().createStatement();) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS conversao");
             String sql = "CREATE TABLE IF NOT EXISTS conversao.dados(\n"
