@@ -259,7 +259,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select distinct\n"
                     + "	p.idProduto as id, \n"
                     + "	PesoVariavel as ebalanca,\n"
                     + "	p.Ean,\n"

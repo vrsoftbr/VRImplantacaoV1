@@ -7,11 +7,11 @@ package vrimplantacao2_5.vo.enums;
 public enum EScriptLojaOrigemSistema {
 
     ASOFT(1, 5, null),
-    ACCESYS(2, 13, "select\n" +
-                    "	COD_EMPRESA id,\n" +
-                    "	NOMEFANTASIA descricao\n" +
-                    "from\n" +
-                    "	CONTROLE_CLIENTES.dbo.CC_EMPRESA"),
+    ACCESYS(2, 13, "select\n"
+            + "	COD_EMPRESA id,\n"
+            + "	NOMEFANTASIA descricao\n"
+            + "from\n"
+            + "	CONTROLE_CLIENTES.dbo.CC_EMPRESA"),
     ACOM(3, 13, "select Fil_cod id,Fil_nome descricao from filiais order by Fil_cod"),
     ALPHASYS(4, 5, "SELECT COD_EMPRESA AS id, RAZAO AS descricao  FROM EMPRESA e WHERE COD_FILIAL =1"),
     APOLLO(5, 9, "SELECT codempresa as id, fantasia as descricao FROM empresas order by codempresa"),
@@ -24,12 +24,9 @@ public enum EScriptLojaOrigemSistema {
     AUTOSYSTEM(12, 11, null),
     AUTOCOM(13, 5, "select codigo AS id, nome AS descricao from empresa order by 1"),
     AVANCE(15, 8, "SELECT distinct id_loja id, fantasia descricao FROM adm_empresas_estab ORDER BY 1"),
-    AVISTARE(16, 13, "select distinct\n"
-            + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'') as id,\n"
-            + " ((select CfgValue from dbo.TB_CONFIG where CfgChave = ''EmpresaRegistro'') + '' - '' + "
-            + "(select CfgValue from dbo.TB_CONFIG where CfgChave = ''CNPJ'')) as descricao\n"
-            + "from dbo.TB_CONFIG"),
-    BRAJANGESTORES(19, 11, "select cod_filial as id, fantasia as descricao  from cad_filiais"),
+    AVISTARE(16, 13, "select CfgID as id, CfgValue as descricao from dbo.TB_CONFIG tc WHERE CfgChave = ''EmpresaRegistro''"),
+    BRAJANGESTORES(
+            19, 11, "select cod_filial as id, fantasia as descricao  from cad_filiais"),
     CFSOFTSIAECF(20, 5, null),
     CPGESTOR(21, 9, "SELECT \n"
             + "	LJ_ASSOCIACAO id,\n"
@@ -182,13 +179,15 @@ public enum EScriptLojaOrigemSistema {
     PROSUPER(269, 11, "select emcodigo as id, emnome as descricao from empresa "),
     UPSOFTWARE(270, 13, "select cod_emp id, fantasia descricao from Tempresa t "),
     SERVSIC(271, 13, "select IdEmpre id, Empresa descricao from TabEmpre"),
-    SIACRIARE(148,8,"select codigo_n id, descricao razao from empresas"),
+    SIACRIARE(148, 8, "select codigo_n id, descricao razao from empresas"),
     CONTROLWARE(31, 11, "select codestabelec id, razaosocial descricao from estabelecimento order by id"),
     IMPERIUMMARKET(272, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa e "),
     SIMPLESOLUTION(273, 8, "select emp_ID as id, emp_RAZAOSOCIAL as descricao from empresa_cad"),
-    ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e ");
+    ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e "),
+    PARAGUAI(275, 9, "SELECT EMPR_CODIGO id, EMPR_RAZON_SOCIAL descricao FROM ADCS.GEN_EMPRESA");
 
     private int idSistema;
+
     private int idBancoDados;
     private String scriptGetLojaOrigem;
 

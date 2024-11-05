@@ -208,8 +208,8 @@ public class Ativo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rst.getString(""));
-                    imp.setDescricao(rst.getString(""));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
 
                     result.add(imp);
                 }
