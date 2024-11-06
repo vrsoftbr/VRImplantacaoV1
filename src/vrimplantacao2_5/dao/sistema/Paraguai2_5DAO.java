@@ -337,7 +337,6 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoque(rst.getDouble("estoque_atual"));
 
 //                    imp.setNcm(rst.getString(""));
-
                     String idIcmsDebito = rst.getString("icms");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
