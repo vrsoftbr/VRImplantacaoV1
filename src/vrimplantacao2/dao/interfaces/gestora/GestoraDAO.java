@@ -1208,10 +1208,10 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    CLI_NOME as nomecliente,\n"
                     + "    MOTIVO_CANCELAMENTO as cancelado\n"
                     + "FROM\n"
-                    + "    CP_07_2024\n"
+                    + "    CP_11_2023\n"
                     + "WHERE\n"
                     + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + strDataInicio + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + strDataTermino + "'\n"
-                    + "and COM_TOTAL > 0 \n";
+                    + "and COM_TOTAL > 0  AND COM_REGISTRO != 1405612\n";
 //                    + "UNION\n"
 //                    + "SELECT\n"
 //                    + "    DISTINCT \n"
@@ -1302,9 +1302,10 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    (cast(SAI_TOTAL as float)/SAI_QTDE) as valor,\n"
                     + "    SAI_DESCONTO_ITEM as desconto\n"
                     + "FROM\n"
-                    + "    SP_07_2024\n"
+                    + "    SP_11_2023\n"
                     + "WHERE\n"
-                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+                    + "    TRY_CONVERT(DATE, DATA_PROCESSO) >= '" + VendaIterator.FORMAT.format(dataInicio) + "' AND TRY_CONVERT(DATE, DATA_PROCESSO) <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "AND COM_REGISTRO != 1405612";
 //                    + "UNION\n"
 //                    + "\n"
 //                    + "SELECT\n"
