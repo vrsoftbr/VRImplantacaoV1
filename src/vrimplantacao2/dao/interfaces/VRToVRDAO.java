@@ -671,8 +671,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }

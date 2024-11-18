@@ -1138,14 +1138,14 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
+//                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+//                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+//                        next.setHoraInicio(timestamp.parse(horaInicio));
+//                        next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("total"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -1156,15 +1156,36 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "  SELECT\n"
-                    + "  COD_VENDA AS id_venda,\n"
-                    + "  COO AS numerocupom,\n"
-                    + "  COD_CAIXA  AS ecf,\n"
-                    + "  DT_EMISSAO AS DATA,\n"
-                    + "  VL_TOTAL AS total\n"
+                    = "SELECT \n"
+                    + "	v.\"SAICupom\" || '-' || v.\"SAIECF\" || '-' || v.SAIHORA AS id_venda,\n"
+                    + "	v.\"SAICupom\" AS numerocupom,\n"
+                    + "	v.\"SAIECF\" AS ecf,\n"
+                    + "	v.\"SAIData\" AS DATA,\n"
+                    + "	SUM(v.\"SAITOTAL\") AS total\n"
                     + "FROM\n"
-                    + "	VENDA v \n"
-                    + "	WHERE DT_EMISSAO BETWEEN  '" + strDataInicio + "' AND '" + strDataTermino + "'";
+                    + "	RET081 v\n"
+                    + "LEFT JOIN ret003 l ON\n"
+                    + "	l.LOJA = v.SAILOJA\n"
+                    + "WHERE\n"
+                    + "v.SAILOJA = " + idLojaCliente + "\n"
+                    + "AND v.\"SAIData\" BETWEEN '" + strDataInicio + "' AND '" + strDataTermino + "'\n"
+                    + "AND v.\"SAICupom\" != 0 \n"
+                    + "GROUP BY\n"
+                    + "	v.\"SAICupom\",\n"
+                    + "	v.\"SAIECF\",\n"
+                    + "	v.\"SAIData\",\n"
+                    + "	v.SAIHORA";                    
+
+            
+//                    = "  SELECT\n"
+//                    + "  COD_VENDA AS id_venda,\n"
+//                    + "  COO AS numerocupom,\n"
+//                    + "  COD_CAIXA  AS ecf,\n"
+//                    + "  DT_EMISSAO AS DATA,\n"
+//                    + "  VL_TOTAL AS total\n"
+//                    + "FROM\n"
+//                    + "	VENDA v \n"
+//                    + "	WHERE DT_EMISSAO BETWEEN  '" + strDataInicio + "' AND '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1224,27 +1245,47 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	COD_VENDA id_venda,\n"
-                    + "	CODIGO_VENDAITEM id_item,\n"
-                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
-                    + "	COD_PRODUTO produto,\n"
-                    + "	p.UNIDADE_REFERENCIA unidade,\n"
-                    + "	COD_BARRA codigobarras,\n"
-                    + "	p.DESCRICAO_PDV descricao,\n"
-                    + "	QUANTIDADE,\n"
-                    + "	VALOR_UNITARIO precovenda,\n"
-                    + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
-                    + "	CASE\n"
-                    + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
-                    + "	  END CANCELADO\n"
-                    + "FROM\n"
-                    + "	TB_VENDA_ITEM vi\n"
-                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
-                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
-                    + "WHERE\n"
-                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
-                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + "	ORDER BY 1,3";
+                    + "v.\"SAICupom\" || '-' || v.\"SAIECF\" || '-' || v.SAIHORA AS id_venda,\n"
+                    + "v.\"SAICod\" AS id_item,\n"
+                    + "v.\"SAICupom\" AS nroitem,\n"
+                    + "p.\"PRODCod\" AS produto,\n"
+                    + "p.\"PRODUnid\" AS unidade,\n"
+                    + "p.\"PRODBARCod\" AS codigobarras,\n"
+                    + "p.\"PRODNomeRed\" descricao,\n"
+                    + "v.\"SAIQtde\" quantidade,\n"
+                    + "v.SAIVDA AS precovenda,\n"
+                    + "v.SAITOTAL AS total,\n"
+                    + "CASE WHEN v.\"SAIEXCLUIDO\" = 'S' THEN 1 ELSE 0 END AS cancelado\n"
+                    + "FROM RET081 v\n"
+                    + "LEFT JOIN ret051 p ON p.\"PRODCod\" = v.\"PRODCod\"\n"
+                    + "LEFT JOIN ret003 l ON l.LOJA = v.SAILOJA\n"
+                    + "WHERE l.LOJA = " + idLojaCliente + "\n"
+                    + "AND v.\"SAICupom\" != 0 \n"
+                    + "AND v.\"SAIData\" BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n";
+            
+            
+//                    = "SELECT\n"
+//                    + "	COD_VENDA id_venda,\n"
+//                    + "	CODIGO_VENDAITEM id_item,\n"
+//                    + "	SEQUENCIAL_ITEM_CUPOM nroitem,\n"
+//                    + "	COD_PRODUTO produto,\n"
+//                    + "	p.UNIDADE_REFERENCIA unidade,\n"
+//                    + "	COD_BARRA codigobarras,\n"
+//                    + "	p.DESCRICAO_PDV descricao,\n"
+//                    + "	QUANTIDADE,\n"
+//                    + "	VALOR_UNITARIO precovenda,\n"
+//                    + " (vi.valor_total + vi.valor_rat_acrescimo + vi.valor_acrescimo) - (vi.valor_rat_desconto + vi.valor_desconto) AS total,\n"
+//                    + "	CASE\n"
+//                    + "	  WHEN CANCELADO != 'N' THEN 1 ELSE 0\n"
+//                    + "	  END CANCELADO\n"
+//                    + "FROM\n"
+//                    + "	TB_VENDA_ITEM vi\n"
+//                    + "	JOIN TB_VENDA v ON v.CODIGO_VENDA = vi.COD_VENDA\n"
+//                    + "	JOIN TB_PRODUTOS p ON p.CODIGO_PRODUTO = vi.COD_PRODUTO \n"
+//                    + "WHERE\n"
+//                    + "	v.NUMERO_LOJA = " + idLojaCliente + "\n"
+//                    + "	AND CAST(DATA_VENDA AS DATE) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+//                    + "	ORDER BY 1,3";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

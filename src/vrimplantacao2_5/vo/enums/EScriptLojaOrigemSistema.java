@@ -109,7 +109,7 @@ public enum EScriptLojaOrigemSistema {
     BOMSOFT(203, 5, "SELECT ID_CFG id, FANTASIA_CFG descricao FROM CONFIG ORDER BY 1"),
     ASSIST(204, 11, "select 1 id, ''LOJA 01'' descricao"),
     DATABYTE(205, 5, "SELECT codigo AS id, nome AS descricao FROM FILIAL"),
-    DOBESCGA(206, 5, "select ret000.\"Codigo\" as id, ret000.\"Fantasia\" as descricao, ret000.\"CNPJ\" from ret000 order by ret000.\"Codigo\""),
+    DOBESCGA(206, 5, "SELECT r.LOJA AS id, r.LOJANOME AS descricao, r.CNPJ FROM RET003 r"),
     TENTACULO(207, 5, "SELECT EMP_CODIGO id, EMP_FANTASIA descricao FROM EMPRESAS ORDER BY 1"),
     FXSISTEMAS(208, 5, "SELECT e.ID, e.RAZAO_SOCIAL descricao FROM EMPRESA e"),
     CONSINCO(209, 9, "SELECT nroempresa id, nomereduzido  || '' - '' || nrocgc || '''' || digcgc descricao FROM consinco.ge_empresa WHERE status = ''A''"),
@@ -181,7 +181,7 @@ public enum EScriptLojaOrigemSistema {
     SERVSIC(271, 13, "select IdEmpre id, Empresa descricao from TabEmpre"),
     SIACRIARE(148, 8, "select codigo_n id, descricao razao from empresas"),
     CONTROLWARE(31, 11, "select codestabelec id, razaosocial descricao from estabelecimento order by id"),
-    IMPERIUMMARKET(272, 8, "select IdEmpresa as id, RazaoSocial as descricao from empresa e "),
+    IMPERIUMMARKET(272, 8, "select IdEmpresa as id, concat(CGC_CPF,'' - '',RazaoSocial) as descricao from empresa e"),
     SIMPLESOLUTION(273, 8, "select emp_ID as id, emp_RAZAOSOCIAL as descricao from empresa_cad"),
     ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e "),
     PARAGUAI(275, 9, "SELECT EMPR_CODIGO id, EMPR_RAZON_SOCIAL descricao FROM ADCS.GEN_EMPRESA");
