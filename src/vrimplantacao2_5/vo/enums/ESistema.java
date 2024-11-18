@@ -256,6 +256,7 @@ import vrimplantacao2_5.dao.sistema.Modelo2_5DAO;
 import vrimplantacao2_5.dao.sistema.Orion_PostgresDAO;
 import vrimplantacao2_5.dao.sistema.NereusDAO;
 import vrimplantacao2_5.dao.sistema.PallasDAO;
+import vrimplantacao2_5.dao.sistema.Paraguai2_5DAO;
 import vrimplantacao2_5.dao.sistema.PrimeDAO;
 import vrimplantacao2_5.dao.sistema.ProSuper2_5DAO;
 import vrimplantacao2_5.dao.sistema.ResulthBusinessDAO;
@@ -377,6 +378,7 @@ import vrimplantacao2_5.gui.sistema.Modelo2_5GUI;
 import vrimplantacao2_5.gui.sistema.Orion_postgres2_5GUI;
 import vrimplantacao2_5.gui.sistema.Nereus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Pallas2_5GUI;
+import vrimplantacao2_5.gui.sistema.Paraguai2_5GUI;
 import vrimplantacao2_5.gui.sistema.Plenus2_5GUI;
 import vrimplantacao2_5.gui.sistema.Prime2_5GUI;
 import vrimplantacao2_5.gui.sistema.ProSuper2_5GUI;
@@ -1006,7 +1008,7 @@ public enum ESistema {
     HRTECH(72, "HRTECH", new HRTechDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-        try {
+            try {
                 return new HRTech2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
@@ -1590,7 +1592,7 @@ public enum ESistema {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             throw new UnsupportedOperationException("Not supported yet.");
-            }
+        }
     },
     SIIT(152, "SIIT", new SiitDAO()) {
         @Override
@@ -1645,12 +1647,12 @@ public enum ESistema {
             return null;
         }
     },
-//    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
-//        @Override
-//        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-//            throw new UnsupportedOperationException("Not supported yet.");
-//        }
-//    },
+    //    SOLIDUS(159, "SOLIDUS", new SolidusDAO()) {
+    //        @Override
+    //        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+    //            throw new UnsupportedOperationException("Not supported yet.");
+    //        }
+    //    },
     SOLUTIONSUPERA(160, "SOLUTIONSUPERA", new SolutionSuperaDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
@@ -1827,7 +1829,7 @@ public enum ESistema {
         }
     },
     VISUALCOMERCIO(185, "VISUALCOMERCIO", new VisualComercio2_5DAO()) {
-         @Override
+        @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
             try {
                 return new VisualComercio2_5GUI(frame);
@@ -2739,7 +2741,7 @@ public enum ESistema {
             return null;
         }
     },
-    PROSUPER(269, "PROSUPER", new ProSuper2_5DAO()){
+    PROSUPER(269, "PROSUPER", new ProSuper2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
@@ -2751,7 +2753,7 @@ public enum ESistema {
             return null;
         }
     },
-    UPSOFTWARE(270, "UPSOFTWARE", new UPSoftware2_5DAO()){
+    UPSOFTWARE(270, "UPSOFTWARE", new UPSoftware2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
@@ -2763,7 +2765,7 @@ public enum ESistema {
             return null;
         }
     },
-    SERVSIC(271, "SERVSIC", new ServSic2_5DAO()){
+    SERVSIC(271, "SERVSIC", new ServSic2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
@@ -2775,7 +2777,7 @@ public enum ESistema {
             return null;
         }
     },
-     IMPERIUMMARKET(272, "IMPERIUMMARKET", new ImperiumMarket2_5DAO()){
+    IMPERIUMMARKET(272, "IMPERIUMMARKET", new ImperiumMarket2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
@@ -2787,7 +2789,7 @@ public enum ESistema {
             return null;
         }
     },
-       SIMPLESOLUTION(273, "SIMPLESOLUTION", new SimpleSolution2_5DAO()){
+    SIMPLESOLUTION(273, "SIMPLESOLUTION", new SimpleSolution2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
@@ -2799,12 +2801,23 @@ public enum ESistema {
             return null;
         }
     },
-        ATIVO(274, "ATIVO", new Ativo2_5DAO()){
+    ATIVO(274, "ATIVO", new Ativo2_5DAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame
         ) {
             try {
                 return new Ativo2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
+        }
+    },
+    PARAGUAI(275, "PARAGUAI", new Paraguai2_5DAO()) {
+        @Override
+        public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
+            try {
+                return new Paraguai2_5GUI(frame);
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, "");
             }

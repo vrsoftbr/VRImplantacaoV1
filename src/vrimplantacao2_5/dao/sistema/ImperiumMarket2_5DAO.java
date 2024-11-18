@@ -155,14 +155,14 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     //                    + "	from produto_tributacao pt "
 
                     "select  \n"
-                    + "	concat(icmscompra,'-',substring(tabicmsprodentrada ,1,3),'-',redbase)as id,\n"
+                    + "	concat(icmscompra,'-',substring(tabicmsprod  ,1,3),'-',redbase)as id,\n"
                     + "	concat(icmscompra, ' %', ' RDZ ', redbase)as descricao,\n"
                     + "	icmscompra as icmsSaida,\n"
                     + "	redbase as reducaovenda,\n"
-                    + "	case when substring(tabicmsprodentrada ,1,3) = 51 then '40'\n"
-                    + "	when substring(tabicmsprodentrada ,1,3) = 70 then '20'\n"
-                    + "	when substring(tabicmsprodentrada ,1,3) = 41 then '40'\n"
-                    + "	else substring(tabicmsprodentrada ,1,3) end as cst\n"
+                    + "	case when substring(tabicmsprod  ,1,3) = 51 then '40'\n"
+                    + "	when substring(tabicmsprod  ,1,3) = 70 then '20'\n"
+                    + "	when substring(tabicmsprod  ,1,3) = 41 then '40'\n"
+                    + "	else substring(tabicmsprod  ,1,3) end as cst\n"
                     + "	from produto_tributacao pt "
             )) {
                 while (rs.next()) {
@@ -259,7 +259,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select distinct\n"
                     + "	p.idProduto as id, \n"
                     + "	PesoVariavel as ebalanca,\n"
                     + "	p.Ean,\n"
@@ -281,7 +281,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	validade,\n"
                     + "	pp.VENDA1 as precovenda,\n"
                     + " p.idFamilia as idfamilia, \n"
-                    + " concat(icmscompra,'-',substring(tabicmsprodentrada ,1,3),'-',redbase) as idicms,\n"
+                    + " concat(icmscompra,'-',substring(tabicmsprod ,1,3),'-',redbase) as idicms,\n"
                     + " pt.icmscompra as aliqEntrada, \n"
                     + " pt.redbase as redEntrada, \n"
                     + " pt.icms as aliqEntrada,\n"
