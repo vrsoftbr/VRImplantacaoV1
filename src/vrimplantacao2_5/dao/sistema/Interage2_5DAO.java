@@ -236,6 +236,7 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro and i.codfil = " + getLojaOrigem() + "\n"
                     + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
+                    + "WHERE  p.stprod = 'A'"
                     + "union all \n"
                     + "select\n"
                     + "distinct p.codpro as id,\n"
@@ -281,7 +282,8 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "from tabpro p\n"
                     + "join tabprocod ean on ean.codpro = p.codpro \n"
                     + "left join tabproimp i on i.codpro = p.codpro and i.codfil = " + getLojaOrigem() + " \n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem()
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
+                    + "where p.stprod = 'A'"
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -372,7 +374,9 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "p.codpro id_produto,\n"
                     + "p.codigo codigobarras,\n"
                     + "p.qtdun qtdembalagem\n"
-                    + "from tabprocod p"
+                    + "from tabprocod p \n"
+                    + "JOIN TABPRO t ON p.CODPRO = t.CODPRO \n"
+                    + "WHERE t.STPROD != 'I'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -538,7 +542,7 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-/*
+            /*
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    fun.CODCLI as id,\n"
@@ -596,7 +600,7 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     result.add(imp);
                 }
             }
-*/
+             */
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    c.codcli id,\n"
