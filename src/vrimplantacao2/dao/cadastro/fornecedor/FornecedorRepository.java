@@ -676,6 +676,7 @@ public class FornecedorRepository {
         vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
         vo.setUtilizaiva(imp.getUtilizaiva() == null ? false : !"0".equals(imp.getUtilizaiva().trim()));
         vo.setRevenda(imp.getRevenda());
+        vo.setIdPais(imp.getIdPais());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
