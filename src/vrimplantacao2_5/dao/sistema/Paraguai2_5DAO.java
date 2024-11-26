@@ -56,7 +56,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
     @Override
     public String getSistema() {
-        return "Sistema-Modelo";
+        return "Sistema-Paraguai";
     }
 
     @Override

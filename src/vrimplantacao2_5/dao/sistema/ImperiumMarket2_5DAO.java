@@ -261,7 +261,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select distinct\n"
+                    "select \n"
                     + "	p.idProduto as id, \n"
                     + "	PesoVariavel as ebalanca,\n"
                     + "	p.Ean,\n"
@@ -291,10 +291,11 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + " pt.nat_receita \n"
                     + "from\n"
                     + "	produto p \n"
-                    + "join produto_tributacao pt on p.idProduto = pt.idproduto and pt.id_loja  = 1\n"
-                    + "join produto_estoque e on e.idProduto  = p.idProduto and e.ID_LOJa = 1\n"
-                    + "join produto_preco pp on pp.IDPRODUTO = p.idProduto and pp.ID_LOJA  = 1\n"
-            )) {
+                    + "left join produto_tributacao pt on p.idProduto = pt.idproduto and pt.id_loja  = " + getLojaOrigem()  +"\n"
+                    + "left join produto_estoque e on e.idProduto  = p.idProduto and e.ID_LOJa = " + getLojaOrigem()  +"\n"
+                    + "left join produto_preco pp on pp.IDPRODUTO = p.idProduto and pp.ID_LOJA  = " + getLojaOrigem()  +"\n"      
+            ))
+                {
 
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -786,7 +787,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	itensvenda i\n"
                     + "	left join cliente c on c.idCliente = i.idcliente \n"
                     + "	left join itensvenda i2 on i.iditensvenda = i2.idItensVenda \n"
-                    + "	where i.datamov between '" + strDataInicio + "' and '" + strDataTermino + "' \n"
+                    + "	where i.datamov between '" + strDataInicio + "' and '" + strDataTermino + "'  and i.situacao = 'A'\n"
                     + "	group by REPLACE(concat(i.cupom,i.ecf,i.hora_cupom),':','')";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -865,7 +866,6 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     + "	left join produto p on p.idProduto = i.idProduto \n"
                     + "	where i.datamov"
                     + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' \n"
-                    + "and i.idproduto != 471"
                     + "	order by datamov , hora_cupom , cupom ";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
