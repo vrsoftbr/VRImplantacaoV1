@@ -667,8 +667,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
             return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.avistareVO.getDataInicioVenda(), this.avistareVO.getDataTerminoVenda());
         }    
     
-    
-
+        
+        
     public static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");

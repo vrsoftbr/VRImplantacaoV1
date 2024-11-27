@@ -184,7 +184,7 @@ public enum EScriptLojaOrigemSistema {
     IMPERIUMMARKET(272, 8, "select IdEmpresa as id, concat(CGC_CPF,'' - '',RazaoSocial) as descricao from empresa e"),
     SIMPLESOLUTION(273, 8, "select emp_ID as id, emp_RAZAOSOCIAL as descricao from empresa_cad"),
     ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e "),
-    PARAGUAI(275, 9, "SELECT EMPR_CODIGO id, EMPR_RAZON_SOCIAL descricao FROM ADCS.GEN_EMPRESA");
+    PARAGUAI(275, 9, "SELECT SUC_EMPR id, SUC_DESC descricao FROM ADCS.GEN_SUCURSAL");
 
     private int idSistema;
 

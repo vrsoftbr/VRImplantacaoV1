@@ -50,7 +50,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarSomenteBalanca = false;
-    
+
     @Override
     public String getSistema() {
         return "Mobility";
@@ -265,7 +265,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
-                    
+
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
@@ -334,8 +334,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -347,11 +347,43 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
+                    //                    "select\n"
+                    //                    + "    i_numero id,\n"
+                    //                    + "    ativo,\n"
+                    //                    + "    razao_social,\n"
+                    //                    + "    nome_fantasia,\n"
+                    //                    + "    cpf,\n"
+                    //                    + "    cnpj,\n"
+                    //                    + "    insc_estadual ie,\n"
+                    //                    + "    endereco,\n"
+                    //                    + "    complemento,\n"
+                    //                    + "    bairro,\n"
+                    //                    + "    codigo_cidade,\n"
+                    //                    + "    end_num numero,\n"
+                    //                    + "    cidade,\n"
+                    //                    + "    uf,\n"
+                    //                    + "    cep,\n"
+                    //                    + "    ddd,\n"
+                    //                    + "    ddd2,\n"
+                    //                    + "    ddd_cel,\n"
+                    //                    + "    ddd || '' || telefone1 as telprincipal,\n"
+                    //                    + "    ddd2 || '' || telefone2 as telefone2,\n"
+                    //                    + "    fax,\n"
+                    //                    + "    celular,\n"
+                    //                    + "    contato,\n"
+                    //                    + "    site,\n"
+                    //                    + "    observacoes,\n"
+                    //                    + "    prazo_entrega,\n"
+                    //                    + "    condicao_pagto,\n"
+                    //                    + "    data_cadastro,\n"
+                    //                    + "    email\n"
+                    //                    + "from\n"
+                    //                    + "    fornecedores"
                     "select\n"
                     + "    i_numero id,\n"
                     + "    ativo,\n"
-                    + "    razao_social,\n"
-                    + "    nome_fantasia,\n"
+                    + "    substring(razao_social FROM 1 FOR 30) razao_social,\n"
+                    + "    substring(nome_fantasia FROM 1 FOR 20) nome_fantasia,\n"
                     + "    cpf,\n"
                     + "    cnpj,\n"
                     + "    insc_estadual ie,\n"
@@ -388,7 +420,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao_social"));
                     imp.setAtivo(rs.getInt("ativo") == 1);
-                    imp.setFantasia(rs.getString("nome_fantasia"));
+                    imp.setFantasia(rs.getString("razao_social"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
                     if (imp.getCnpj_cpf() == null) {
                         imp.setCnpj_cpf(rs.getString("cpf"));
@@ -467,7 +499,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -509,7 +541,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -661,7 +693,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-     @Override
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -727,7 +759,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setInscricaoestadual(rs.getString("rg"));
                     }
-                    
+
                     imp.setTelefone(rs.getString("ddd") + rs.getString("telefone"));
                     imp.setCelular(rs.getString("ddd") + rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
@@ -849,7 +881,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataTermino(Date vendaDataTermino) {
         this.dataTerminoVenda = vendaDataTermino;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);

@@ -337,8 +337,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -769,8 +769,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     getDivisaoFornecedor(imp);
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -872,8 +872,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -1078,8 +1078,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     getContatoCliente(imp);
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -1208,8 +1208,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -1399,8 +1399,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setLojaCadastro(rs.getInt("id_loja"));
 
                 result.add(imp);
-                contador++;
-                ProgressBar.setStatus("Carregando dados..." + contador);
+//                contador++;
+//                ProgressBar.setStatus("Carregando dados..." + contador);
             }
         }
         contador = 1;
@@ -1447,8 +1447,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -1493,8 +1493,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     incluirVencimentos(imp);
 
                     result.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
