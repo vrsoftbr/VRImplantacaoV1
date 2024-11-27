@@ -72,6 +72,7 @@ public class FornecedorIMP {
     private TipoIndicadorIE tipoIndicadorIe;
     private String utilizaiva = "0";
     private boolean revenda = false;
+    private Integer idPais;
     
     public TipoIndicadorIE getTipoIndicadorIe() {
         return tipoIndicadorIe;
@@ -722,4 +723,14 @@ public class FornecedorIMP {
     public void setRevenda(boolean revenda) {
         this.revenda = revenda;
     }    
+
+    public Integer getIdPais() {
+        return idPais;
+    }
+
+    public void setIdPais(Integer idPais) {
+        this.idPais = idPais;
+    }
+    
+    
 }

@@ -58,6 +58,8 @@ public class FornecedorVO {
     private boolean utilizaiva = false;
     private boolean revenda = false;
     
+    private Integer idPais = 1058;
+    
     private TipoIndicadorIE tipoIndicadorIe;
 
     public TipoIndicadorIE getTipoIndicadorIe() {
@@ -404,4 +406,14 @@ public class FornecedorVO {
     public void setRevenda(boolean revenda) {
         this.revenda = revenda;
     }    
+
+    public Integer getIdPais() {
+        return idPais;
+    }
+
+    public void setIdPais(Integer idPais) {
+        this.idPais = idPais;
+    }
+    
+    
 }
