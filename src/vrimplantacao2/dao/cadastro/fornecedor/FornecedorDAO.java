@@ -608,7 +608,7 @@ public class FornecedorDAO {
             sql.put("utilizacrossdocking", false);// boolean NOT NULL DEFAULT false,
             sql.putNull("id_lojacrossdocking");// integer,
             sql.put("observacao", "IMPORTADO VR " + vo.getObservacao() == null ? "" : vo.getObservacao());// character varying(2500) NOT NULL DEFAULT '::character varying'::character varying,
-            sql.put("id_pais", 1058);// integer NOT NULL,
+            sql.put("id_pais", vo.getIdPais() == null ? 1058 : vo.getIdPais());// integer NOT NULL,
             sql.put("inscricaomunicipal", vo.getInscricaoMunicipal());// character varying(20) DEFAULT ''::character varying,
             sql.putNull("id_contacontabilfiscalpassivo");// bigint,
             sql.put("numerocobranca", vo.getNumeroCobranca());// character varying(6) NOT NULL DEFAULT '0'::character varying,

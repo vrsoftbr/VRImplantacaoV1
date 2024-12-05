@@ -67,7 +67,7 @@ public class FornecedorVO {
     public boolean utilizacrossdocking = false;
     public int id_lojacrossdocking;
     public String observacao = "";
-    public int id_pais = 1058;
+    public int id_pais;
     public String inscricaomunicipal = "";
     public int id_contacontabilfiscalpassivo;
     public String numerocobranca = "";

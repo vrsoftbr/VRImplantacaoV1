@@ -69,14 +69,21 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT DISTINCT\n"
+                    /*"SELECT DISTINCT\n"
                     + "    COALESCE(p.ICMSCST, 0) icms_cst,\n"
                     + "    COALESCE(p.ICMSPICMS, 0) icms_aliquota,\n"
                     + "    COALESCE(p.ICMSPREDBC, 0) icms_reduzido\n"
-                    + "from tabproimp p"
+                    + "from tabproimp p"*/
+                    "SELECT DISTINCT \n"
+                    + "    ICMSCST || CAST(ICMSPICMS AS varchar(5)) || CAST(ICMSPREDBC AS varchar(5)) id,\n"
+                    + "    CAST(ICMSPICMS AS varchar(5)) ||  ' RDZ ' || CAST(ICMSPREDBC AS varchar(5)) descricao,\n"
+                    + "	ICMSCST cst, \n"
+                    + "	ICMSPICMS aliquota, \n"
+                    + "	ICMSPREDBC reducao\n"
+                    + "FROM DETENTNFE c"
             )) {
                 while (rst.next()) {
-                    String id = getAliquotaKey(
+                    /*String id = getAliquotaKey(
                             "".equals(rst.getString("icms_cst")) ? "0" : rst.getString("icms_cst"),
                             rst.getDouble("icms_aliquota"),
                             rst.getDouble("icms_reduzido")
@@ -88,7 +95,12 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                             "".equals(rst.getString("icms_cst").trim()) ? 0 : rst.getInt("icms_cst"),
                             rst.getDouble("icms_aliquota"),
                             rst.getDouble("icms_reduzido")
-                    ));
+                    ));*/
+                    result.add(new MapaTributoIMP(rst.getString("id"), 
+                            rst.getString("descricao"), 
+                            rst.getInt("cst"), 
+                            rst.getDouble("aliquota"), 
+                            rst.getDouble("reducao")));
                 }
             }
         }
@@ -192,7 +204,14 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    "WITH filtro AS (\n"
+                    + "SELECT \n"
+                    + " CODPRO,\n"
+                    + " max(KEYNFE) key\n"
+                    + "FROM DETENTNFE \n"
+                    + "GROUP BY 1\n"
+                    + ")\n"
+                    + "select\n"
                     + "distinct p.codpro as id,\n"
                     + "p.codbarun as ean,\n"
                     + "1 as qtdembalagem,\n"
@@ -232,8 +251,11 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "'' as piscofins_natureza_receita,\n"
                     + "COALESCE(i.ICMSCST, 0) as icms_cst,\n"
                     + "COALESCE(i.ICMSPICMS, 0) as icms_aliquota,\n"
-                    + "COALESCE(i.ICMSPREDBC, 0) as icms_reduzido\n"
+                    + "COALESCE(i.ICMSPREDBC, 0) as icms_reduzido,\n"
+                    + "c.ICMSCST || CAST(c.ICMSPICMS AS varchar(5)) || CAST(c.ICMSPREDBC AS varchar(5)) id_aliquota\n"
                     + "from tabpro p\n"
+                    + "JOIN DETENTNFE c on c.CODPRO = p.codpro\n"
+                    + "JOIN filtro fi ON fi.KEY = c.KEYNFE AND fi.codpro = c.CODPRO\n"
                     + "left join tabproimp i on i.codpro = p.codpro and i.codfil = " + getLojaOrigem() + "\n"
                     + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
                     + "WHERE  p.stprod = 'A'"
@@ -278,9 +300,12 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "'' as piscofins_natureza_receita,\n"
                     + "COALESCE(i.ICMSCST, 0) as icms_cst,\n"
                     + "COALESCE(i.ICMSPICMS, 0) as icms_aliquota,\n"
-                    + "COALESCE(i.ICMSPREDBC, 0) as icms_reduzido\n"
+                    + "COALESCE(i.ICMSPREDBC, 0) as icms_reduzido,\n"
+                    + "c.ICMSCST || CAST(c.ICMSPICMS AS varchar(5)) || CAST(c.ICMSPREDBC AS varchar(5)) id_aliquota\n"
                     + "from tabpro p\n"
                     + "join tabprocod ean on ean.codpro = p.codpro \n"
+                    + "JOIN DETENTNFE c on c.CODPRO = p.codpro\n"
+                    + "JOIN filtro fi ON fi.KEY = c.KEYNFE AND fi.codpro = c.CODPRO\n"
                     + "left join tabproimp i on i.codpro = p.codpro and i.codfil = " + getLojaOrigem() + " \n"
                     + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
                     + "where p.stprod = 'A'"
@@ -344,17 +369,16 @@ public class Interage2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custosemimposto"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
 
-                    String aliqIcmsId = getAliquotaKey(
+                    /*String aliqIcmsId = getAliquotaKey(
                             rst.getString("icms_cst"),
                             rst.getDouble("icms_aliquota"),
-                            rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsDebitoId(aliqIcmsId);
-                    imp.setIcmsDebitoForaEstadoId(aliqIcmsId);
-                    imp.setIcmsDebitoForaEstadoNfId(aliqIcmsId);
-                    imp.setIcmsCreditoId(aliqIcmsId);
-                    imp.setIcmsCreditoForaEstadoId(aliqIcmsId);
-                    imp.setIcmsConsumidorId(aliqIcmsId);
+                            rst.getDouble("icms_reduzido"));*/
+                    imp.setIcmsDebitoId(rst.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
 
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados...Produtos..." + contador);

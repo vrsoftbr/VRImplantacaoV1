@@ -119,7 +119,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.TIPO_EMPRESA
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.MUNICIPIO
         ));
     }
 
@@ -133,7 +134,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.VENCIMENTO_ROTATIVO
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
@@ -283,7 +285,10 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " sb.SUGR_CODIGO merc4,\n"
                     + " sb.SUGR_DESC desc_merc4,\n"
                     + " p.ART_IMPU,\n"
-                    + " p.ART_IVA_PORCENTAJE,\n"
+                    + " CASE WHEN p.ART_IVA_PORCENTAJE = 0 THEN 1 \n"
+                    + " WHEN p.ART_IVA_PORCENTAJE = 10 THEN 2 \n"
+                    + " WHEN p.ART_IVA_PORCENTAJE = 5 THEN 3 \n"
+                    + " ELSE 1 END AS iva,\n"
                     + " CASE WHEN p.ART_EST = 'A' THEN 1 ELSE 0 END situacao_cadastro,\n"
                     + " p.FEC_INSERCION data_cadastro,\n"
                     + " p.FEC_MODIFICACION data_alteracao,\n"
@@ -316,8 +321,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricao"));
-                    imp.setDescricaoReduzida(rst.getString("descricao_red"));
-                    imp.setDescricaoGondola(rst.getString("descricao_red"));
+                    imp.setDescricaoReduzida(rst.getString("descricao"));
+                    imp.setDescricaoGondola(rst.getString("descricao"));
                     imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
                     imp.setQtdEmbalagem(1);
                     imp.seteBalanca(rst.getBoolean("produto_balanca"));
@@ -337,7 +342,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoque(rst.getDouble("estoque_atual"));
 
 //                    imp.setNcm(rst.getString(""));
-                    String idIcmsDebito = rst.getString("icms");
+                    String idIcmsDebito = rst.getString("iva");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
@@ -447,19 +452,40 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " f.PROV_RAZON_SOCIAL razao,\n"
                     + " f.PROV_DIR endereco,\n"
                     + " f.PROV_TEL telefone,\n"
+                    + "CASE \n"
+                    + "        WHEN gp.PAIS_CODIGO = 1 THEN 5860 \n"
+                    + "        WHEN gp.PAIS_CODIGO = 2 THEN 1058 \n"
+                    + "        ELSE gp.PAIS_CODIGO \n"
+                    + "    END AS pais,\n"
                     + " f.PROV_RUC,\n"
                     + " CASE WHEN  f.PROV_EST_PROV = 'A' THEN 1 ELSE 0 END AS ativo,\n"
                     + " f.PROV_EMAIL,\n"
                     + " f.PROV_CELULAR,\n"
                     + " gc.CIUD_DESC municipio,\n"
-                    + " ged.ESTD_DESC uf,\n"
+                    + "CASE \n"
+                    + " WHEN gc.CIUD_DESC= 'Ponta Porã' THEN 5006606 \n"
+                    + " WHEN gc.CIUD_DESC= 'Asunción' THEN 9999991 \n"
+                    + " WHEN gc.CIUD_DESC= 'Pedro Juan Caballero' THEN 9999992 \n"
+                    + " WHEN gc.CIUD_DESC= 'Concepción' THEN 9999993 \n"
+                    + " WHEN gc.CIUD_DESC= 'Ciudad del Este' THEN 9999994\n"
+                    + " WHEN gc.CIUD_DESC= 'Dourados' THEN 5003702\n"
+                    + " ELSE 9999992 END AS municipioibge,\n"
+                    + "   CASE \n"
+                    + " WHEN gc.CIUD_DESC= 'Ponta Porã' THEN 'MS' \n"
+                    + " WHEN gc.CIUD_DESC= 'Asunción' THEN 'EX'\n"
+                    + " WHEN gc.CIUD_DESC= 'Pedro Juan Caballero' THEN 'EX'\n"
+                    + " WHEN gc.CIUD_DESC= 'Concepción' THEN 'EX' \n"
+                    + " WHEN gc.CIUD_DESC= 'Ciudad del Este' THEN 'EX'\n"
+                    + " WHEN gc.CIUD_DESC= 'Dourados' THEN 'MS'\n"
+                    + " ELSE 'EX'END AS uf,"
                     + " f.PROV_NOMBRE_2,\n"
                     + " f.PROV_CNPJ cnpj,\n"
                     + " f.PROV_INSC_ESTADUAL inscricao_estadual,\n"
                     + " f.PROV_OBS obs\n"
                     + "FROM ADCS.FIN_PROVEEDOR f\n"
                     + "LEFT JOIN ADCS.GEN_CIUDAD gc ON gc.CIUD_CODIGO = f.PROV_CIUDAD\n"
-                    + "LEFT JOIN ADCS.GEN_ESTADO_DEP ged ON ged.ESTD_CODIGO = f.PROV_ESTADO_DEP "
+                    + "LEFT JOIN ADCS.GEN_ESTADO_DEP ged ON ged.ESTD_CODIGO = f.PROV_ESTADO_DEP \n"
+                    + "LEFT JOIN ADCS.GEN_PAIS gp ON gp.PAIS_CODIGO = f.PROV_PAIS"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -470,9 +496,11 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setRazao(rst.getString("razao"));
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("inscricao_estadual"));
+                    imp.setIdPais(rst.getInt("pais"));
 
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipio(Utils.acertarTexto(rst.getString("municipio")));
+                    imp.setCob_ibge_municipio(rst.getInt("municipioibge"));
                     imp.setUf(rst.getString("uf"));
 
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -574,10 +602,12 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	CLI_NOM AS razao,\n"
                     + "	CLI_NOM_FANTASIA AS fantasia,\n"
                     + "	CLI_DOC_IDENT_PROPIETARIO AS identidade,\n"
+                    + "	CLI_RUC cnpj,\n"
                     + "	CLI_DIR AS endereco,\n"
                     + "	CLI_BARRIO AS bairro,\n"
                     + "	fz.ZONA_DESC AS municipio,\n"
                     + "	CLI_FEC_INGRESO AS data_cadastro,\n"
+                    + " CLI_IMP_LIM_CR limite,\n"
                     + "	CASE WHEN CLI_EST_CLI = 'A' THEN 1 ELSE 0 END AS status,	\n"
                     + "	CLI_TEL AS telefone,\n"
                     + "	CLI_OBS AS observacao\n"
@@ -592,10 +622,13 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setInscricaoestadual(rst.getString("identidade"));
+                    imp.setCnpj(rst.getString("cnpj"));
 
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
+
+                    imp.setLimiteCompra(rst.getDouble("limite"));
 
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setAtivo(rst.getBoolean("status"));
@@ -609,7 +642,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         return result;
     }
 
-    public List<CreditoRotativoIMP> getCreditoRotato() throws Exception {
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -623,7 +657,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN ADCS.FIN_CUOTA f2 ON f2.CUO_CLAVE_DOC = fd.DOC_CLAVE\n"
                     + "LEFT JOIN ADCS.FIN_PAGO fp ON fp.PAG_CLAVE_DOC = fd.DOC_CLAVE\n"
                     + "LEFT JOIN ADCS.FIN_CLIENTE fc ON fc.CLI_CODIGO = fd.DOC_CLI \n"
-                    + "WHERE fd.DOC_CLI IS NOT NULL AND f2.CUO_CLAVE_DOC IS NULL AND fd.DOC_SALDO_INI_MON IS not null"
+                    + "WHERE fd.DOC_CLI IS NOT NULL \n"
+                    + "AND fd.DOC_SALDO_INI_MON IS not null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
