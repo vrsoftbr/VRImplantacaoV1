@@ -299,8 +299,9 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " else 'UN'\n"
                     + "	end tipo_volume,\n"
                     + "	m.quantidade volume, \n"
-                    + " s.coddepto merc1, \n"
-                    + " g.codgrupo merc2 \n"
+                    + "t.coddepto merc1, \n"
+                    + "g.codgrupo merc2, \n"
+                    + "c.codgss00 merc3\n"
                     + "from \n"
                     + "	cadpro p \n"
                     + "left join arqbar ean on p.codpro01 = ean.codpro\n"
@@ -309,10 +310,12 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pis.filial = p.codfil01\n"
                     + "left join cadforn f on substring(p.fornec01,1,15) = substring(f.nomeabr02,1,15)\n"
                     + "left join medpro m on m.filial = p.codfil01 and m.codpro = p.codpro01\n"
-                    + "left join tabgru g on g.codgrupo = p.codgrupo01\n"
-                    + "left join tabdep s on s.coddepto = g.coddepto\n"
+                    + "left join cadgss c  on c.codgss00 = p.codgss01\n"
+                    + "left join tabgru g on c.codgrupo00 = g.codgrupo \n"
+                    + "join tabdep t  on g.coddepto = t.coddepto \n "
                     + "where \n"
-                    + "	p.codfil01 = " + getLojaOrigem())) {
+                    + "	p.codfil01 = " + getLojaOrigem()
+            )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -328,7 +331,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(imp.getCodMercadologico2());
+                    imp.setCodMercadologico3(rs.getString("merc3"));
 
                     if (rs.getDouble("custocomimposto") < rs.getDouble("custosemimposto")) {
                         imp.setCustoComImposto(rs.getDouble("custosemimposto"));
@@ -388,14 +391,25 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select distinct\n"
-                    + " s.coddepto merc1,\n"
-                    + " s.nomedepto desc1,\n"
-                    + " g.codgrupo merc2,\n"
-                    + " g.descgrupo desc2\n"
-                    + "from tabgru g\n"
-                    + "join tabdep s on s.coddepto = g.coddepto\n"
-                    + "order by 1,2"
+                    //                    "select distinct\n"
+                    //                    + " s.coddepto merc1,\n"
+                    //                    + " s.nomedepto desc1,\n"
+                    //                    + " g.codgrupo merc2,\n"
+                    //                    + " g.descgrupo desc2\n"
+                    //                    + "from tabgru g\n"
+                    //                    + "join tabdep s on s.coddepto = g.coddepto\n"
+                    //                    + "order by 1,2"
+                    "   select distinct\n"
+                    + "                      s.coddepto merc1,\n"
+                    + "                      s.nomedepto desc1,\n"
+                    + "                      g.codgrupo merc2,\n"
+                    + "                      g.descgrupo desc2,\n"
+                    + "                      c.codgss00 as merc3,\n"
+                    + "                      c.descgss00  desc3\n"
+                    + "                     from tabgru g\n"
+                    + "                     join tabdep s on s.coddepto = g.coddepto\n"
+                    + "                     join cadgss c  on c.codgrupo00 = g.codgrupo \n"
+                    + "                     order by 1,2"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -406,8 +420,8 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rs.getString("desc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("desc2"));
-                    imp.setMerc3ID(imp.getMerc2ID());
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    imp.setMerc3ID(rs.getString("merc3"));
+                    imp.setMerc3Descricao(rs.getString("desc3"));
 
                     result.add(imp);
                 }
