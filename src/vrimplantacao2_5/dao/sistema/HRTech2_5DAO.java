@@ -139,7 +139,10 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PDV_VENDA,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.ASSOCIADO
+                OpcaoProduto.ASSOCIADO,
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                OpcaoProduto.ICMS_CONSUMIDOR
         ));
     }
 
@@ -233,46 +236,119 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	m1.codmerc1,\n"
-                    + "	m1.descmerc1,\n"
-                    + "	m2.codmerc2,\n"
-                    + "	m2.descmerc2,\n"
-                    + "	m3.codmerc3,\n"
-                    + "	m3.descmerc3 \n"
+                    + "    m1.codmerc1,\n"
+                    + "    m1.descmerc1,\n"
+                    + "    m2.codmerc2,\n"
+                    + "    m2.descmerc2,\n"
+                    + "    m3.codmerc3,\n"
+                    + "    m3.descmerc3,\n"
+                    + "    m4.codmerc4,\n"
+                    + "    m4.descmerc4,\n"
+                    + "    m5.codmerc5,\n"
+                    + "    m5.descmerc5\n"
                     + "from\n"
-                    + "	(\n"
-                    + "		select\n"
-                    + "			gruc03seto codmerc1,\n"
-                    + "			gruc35desc descmerc1\n"
-                    + "		from\n"
-                    + "			fl100dpt s\n"
-                    + "		where\n"
-                    + "			gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
-                    + "	) m1\n"
-                    + "	join (\n"
-                    + "		select\n"
-                    + "			gruc03seto codmerc1,\n"
-                    + "			gruc03grup codmerc2,\n"
-                    + "			gruc35desc descmerc2\n"
-                    + "		from\n"
-                    + "			fl100dpt s\n"
-                    + "		where\n"
-                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
-                    + "	) m2 on\n"
-                    + "		m1.codmerc1 = m2.codmerc1\n"
-                    + "join (\n"
-                    + "			select\n"
-                    + "			gruc03seto codmerc1,\n"
-                    + "			gruc03grup codmerc2,\n"
-                    + "			gruc03subg codmerc3,\n"
-                    + "			gruc35desc descmerc3\n"
-                    + "		from\n"
-                    + "			fl100dpt s\n"
-                    + "		where\n"
-                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
-                    + "	) m3 on\n"
-                    + "		m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
-                    + "	order by 1,3")) {
+                    + "    (\n"
+                    + "        select\n"
+                    + "            gruc03seto codmerc1,\n"
+                    + "            gruc35desc descmerc1\n"
+                    + "        from\n"
+                    + "            fl100dpt s\n"
+                    + "        where\n"
+                    + "            gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "    ) m1\n"
+                    + "    join (\n"
+                    + "        select\n"
+                    + "            gruc03seto codmerc1,\n"
+                    + "            gruc03grup codmerc2,\n"
+                    + "            gruc35desc descmerc2\n"
+                    + "        from\n"
+                    + "            fl100dpt s\n"
+                    + "        where\n"
+                    + "            gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "    ) m2 on\n"
+                    + "        m1.codmerc1 = m2.codmerc1\n"
+                    + "    join (\n"
+                    + "        select\n"
+                    + "            gruc03seto codmerc1,\n"
+                    + "            gruc03grup codmerc2,\n"
+                    + "            gruc03subg codmerc3,\n"
+                    + "            gruc35desc descmerc3\n"
+                    + "        from\n"
+                    + "            fl100dpt s\n"
+                    + "        where\n"
+                    + "            gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "    ) m3 on\n"
+                    + "        m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
+                    + "    join (\n"
+                    + "        select\n"
+                    + "            gruc03seto codmerc1,\n"
+                    + "            gruc03grup codmerc2,\n"
+                    + "            gruc03subg codmerc3,\n"
+                    + "            gruc03fami codmerc4,\n"
+                    + "            gruc35desc descmerc4\n"
+                    + "        from\n"
+                    + "            fl100dpt s\n"
+                    + "        where\n"
+                    + "            gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami != '' and gruc03subf = ''\n"
+                    + "    ) m4 on\n"
+                    + "        m3.codmerc1 = m4.codmerc1 and m3.codmerc2 = m4.codmerc2 and m3.codmerc3 = m4.codmerc3\n"
+                    + "    join (\n"
+                    + "        select\n"
+                    + "            gruc03seto codmerc1,\n"
+                    + "            gruc03grup codmerc2,\n"
+                    + "            gruc03subg codmerc3,\n"
+                    + "            gruc03fami codmerc4,\n"
+                    + "            gruc03subf codmerc5,\n"
+                    + "            gruc35desc descmerc5\n"
+                    + "        from\n"
+                    + "            fl100dpt s\n"
+                    + "        where\n"
+                    + "            gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami != '' and gruc03subf != ''\n"
+                    + "    ) m5 on\n"
+                    + "        m4.codmerc1 = m5.codmerc1 and m4.codmerc2 = m5.codmerc2 and m4.codmerc3 = m5.codmerc3 and m4.codmerc4 = m5.codmerc4\n"
+                    + "order by 1,3,5,7,9"
+            //                    "select\n"
+            //                    + "	m1.codmerc1,\n"
+            //                    + "	m1.descmerc1,\n"
+            //                    + "	m2.codmerc2,\n"
+            //                    + "	m2.descmerc2,\n"
+            //                    + "	m3.codmerc3,\n"
+            //                    + "	m3.descmerc3 \n"
+            //                    + "from\n"
+            //                    + "	(\n"
+            //                    + "		select\n"
+            //                    + "			gruc03seto codmerc1,\n"
+            //                    + "			gruc35desc descmerc1\n"
+            //                    + "		from\n"
+            //                    + "			fl100dpt s\n"
+            //                    + "		where\n"
+            //                    + "			gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+            //                    + "	) m1\n"
+            //                    + "	join (\n"
+            //                    + "		select\n"
+            //                    + "			gruc03seto codmerc1,\n"
+            //                    + "			gruc03grup codmerc2,\n"
+            //                    + "			gruc35desc descmerc2\n"
+            //                    + "		from\n"
+            //                    + "			fl100dpt s\n"
+            //                    + "		where\n"
+            //                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+            //                    + "	) m2 on\n"
+            //                    + "		m1.codmerc1 = m2.codmerc1\n"
+            //                    + "join (\n"
+            //                    + "			select\n"
+            //                    + "			gruc03seto codmerc1,\n"
+            //                    + "			gruc03grup codmerc2,\n"
+            //                    + "			gruc03subg codmerc3,\n"
+            //                    + "			gruc35desc descmerc3\n"
+            //                    + "		from\n"
+            //                    + "			fl100dpt s\n"
+            //                    + "		where\n"
+            //                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
+            //                    + "	) m3 on\n"
+            //                    + "		m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
+            //                    + "	order by 1,3"
+            )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -283,6 +359,10 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
                     imp.setMerc3ID(rs.getString("codmerc3"));
                     imp.setMerc3Descricao(rs.getString("descmerc3"));
+                    imp.setMerc4ID(rs.getString("codmerc4"));
+                    imp.setMerc4Descricao(rs.getString("descmerc4"));
+                    imp.setMerc5ID(rs.getString("codmerc5"));
+                    imp.setMerc5Descricao(rs.getString("descmerc5"));
 
                     result.add(imp);
                 }
@@ -471,7 +551,7 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ts.CODIGOTRIB id,\n"
                     + "	ts.DESCRICAO,\n"
                     + "	ts.situatribu icms_cst,\n"
-                    + "	ts.VALORICM icms_aliq,\n"
+                    + "	ts.aliquotapdv icms_aliq,\n"
                     + "	ts.mrger icms_red\n"
                     + "from\n"
                     + "	fl301est est\n"
@@ -483,13 +563,36 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	te.CODIGOTRIB id,\n"
                     + "	te.descricao,\n"
                     + "	te.situatribu icms_cst,\n"
-                    + "	te.VALORICM icms_aliq,\n"
+                    + "	te.aliquotapdv icms_aliq,\n"
                     + "	te.mrger icms_red\n"
                     + "from\n"
                     + "	fl301est est\n"
                     + "	join fltribut te on \n"
                     + "		est.codtribent = te.codigotrib and\n"
                     + "		te.codigoloja = " + getLojaOrigem()
+            //                    "select distinct\n"
+            //                    + "	ts.CODIGOTRIB id,\n"
+            //                    + "	ts.DESCRICAO,\n"
+            //                    + "	ts.situatribu icms_cst,\n"
+            //                    + "	ts.VALORICM icms_aliq,\n"
+            //                    + "	ts.mrger icms_red\n"
+            //                    + "from\n"
+            //                    + "	fl301est est\n"
+            //                    + "	join fltribut ts on \n"
+            //                    + "		est.codtribsai = ts.codigotrib and\n"
+            //                    + "		ts.codigoloja = " + getLojaOrigem() + "\n"
+            //                    + "union\n"
+            //                    + "select distinct\n"
+            //                    + "	te.CODIGOTRIB id,\n"
+            //                    + "	te.descricao,\n"
+            //                    + "	te.situatribu icms_cst,\n"
+            //                    + "	te.VALORICM icms_aliq,\n"
+            //                    + "	te.mrger icms_red\n"
+            //                    + "from\n"
+            //                    + "	fl301est est\n"
+            //                    + "	join fltribut te on \n"
+            //                    + "		est.codtribent = te.codigotrib and\n"
+            //                    + "		te.codigoloja = " + getLojaOrigem()
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -655,7 +758,9 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.estc03grup merc2, \n"
                     + "	p.estc03subg merc3, \n"
                     + "	p.estc03fami merc4, \n"
-                    + "	p.estc03subf merc5,\n"
+                    + "	p.estc03subf merc5,"
+                    + " emb.qtd_eti_vda as volume, "
+                    + " emb.emb_eti_vda as volume_tipo,\n"
                     + "	est.estn05mrge margem,\n"
                     + "	est.qtd_emb_co qtdembalagemcotacao,\n"
                     + "	est.qtd_emb_vd qtdembalagem,\n"
@@ -763,11 +868,15 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ativo")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
+                    imp.setVolume(rs.getDouble("volume"));
+                    imp.setPesoBruto(rs.getDouble("volume"));
+                    imp.setPesoLiquido(rs.getDouble("volume"));
+                    imp.setTipoEmbalagemVolume(rs.getString("volume_tipo"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    //imp.setCodMercadologico4(rs.getString("merc4"));
-                    //poimp.setCodMercadologico5(rs.getString("merc5"));
+                    imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setMargem(rs.getDouble("margem"));
@@ -1954,8 +2063,11 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	FL305CUP c\n"
                     + "left join flcgccpf cpf on \n"
-                    + "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n"
-                    + "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n"
+                    + "    (case when (try_cast(c.numcgc_cpf as bigint)) = 0 then 1 \n"
+                    + "     else (try_cast(c.numcgc_cpf as bigint)) end = try_cast(cpf.numcgc_cpf as bigint))"
+                    //                    + "left join flcgccpf cpf on \n"
+                    //                    + "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n"
+                    //                    + "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n"
                     + "left join FL400CLI cl on (cl.id_entidade = cpf.id_entidade)\n"
                     + "left join fl423cep cep on (cl.id_cliente = cep.id_cliente) and\n"
                     + "	cep.codigocep = cpf.codcepcobr and\n"
