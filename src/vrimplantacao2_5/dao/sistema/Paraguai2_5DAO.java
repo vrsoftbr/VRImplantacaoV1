@@ -210,10 +210,14 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + " LIN_CODIGO id,\n"
-                    + " LIN_DESC descricao\n"
-                    + "FROM ADCS.STK_LINEA"
+                    //                    "SELECT \n"
+                    //                    + " LIN_CODIGO id,\n"
+                    //                    + " LIN_DESC descricao\n"
+                    //                    + "FROM ADCS.STK_LINEA"
+                    "SELECT\n"
+                    + "	m.MARC_CODIGO id,\n"
+                    + "	m.MARC_DESC descricao\n"
+                    + "FROM ADCS.STK_MARCA m "
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -284,6 +288,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " g.GRUP_DESC desc_merc3,\n"
                     + " sb.SUGR_CODIGO merc4,\n"
                     + " sb.SUGR_DESC desc_merc4,\n"
+                    + " p.ART_MARCA familia_produto,\n"
                     + " p.ART_IMPU,\n"
                     + " CASE WHEN p.ART_IVA_PORCENTAJE = 0 THEN 1 \n"
                     + " WHEN p.ART_IVA_PORCENTAJE = 10 THEN 2 \n"
@@ -335,6 +340,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setCodMercadologico4(rst.getString("merc4"));
+                    imp.setIdFamiliaProduto(rst.getString("familia_produto"));
 
                     imp.setSituacaoCadastro(rst.getInt("situacao_cadastro"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
@@ -452,12 +458,13 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " f.PROV_RAZON_SOCIAL razao,\n"
                     + " f.PROV_DIR endereco,\n"
                     + " f.PROV_TEL telefone,\n"
+                    + " f.PROV_CELULAR celular,\n"
                     + "CASE \n"
                     + "        WHEN gp.PAIS_CODIGO = 1 THEN 5860 \n"
                     + "        WHEN gp.PAIS_CODIGO = 2 THEN 1058 \n"
                     + "        ELSE gp.PAIS_CODIGO \n"
                     + "    END AS pais,\n"
-                    + " f.PROV_RUC,\n"
+                    + " f.PROV_RUC ruc,\n"
                     + " CASE WHEN  f.PROV_EST_PROV = 'A' THEN 1 ELSE 0 END AS ativo,\n"
                     + " f.PROV_EMAIL,\n"
                     + " f.PROV_CELULAR,\n"
@@ -494,7 +501,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setCnpj_cpf(rst.getString("cnpj") == null ? rst.getString("ruc") : rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("inscricao_estadual"));
                     imp.setIdPais(rst.getInt("pais"));
 
@@ -506,6 +513,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setObservacao(rst.getString("obs"));
                     imp.setTel_principal(rst.getString("telefone"));
+                    imp.addCelular(rst.getString("razao"), rst.getString("celular"));
 
                     result.add(imp);
                 }
@@ -607,13 +615,14 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	CLI_BARRIO AS bairro,\n"
                     + "	fz.ZONA_DESC AS municipio,\n"
                     + "	CLI_FEC_INGRESO AS data_cadastro,\n"
-                    + " CLI_IMP_LIM_CR limite,\n"
-                    + "	CASE WHEN CLI_EST_CLI = 'A' THEN 1 ELSE 0 END AS status,	\n"
+                    + " CAST(CLI_IMP_LIM_CR AS varchar(50)) limite,\n"
+                    + "	CASE WHEN CLI_EST_CLI = 'A' THEN 1 ELSE 0 END AS status,\n"
                     + "	CLI_TEL AS telefone,\n"
                     + "	CLI_OBS AS observacao\n"
                     + "FROM\n"
                     + "	ADCS.FIN_CLIENTE\n"
-                    + "	LEFT JOIN ADCS.FAC_ZONA fz ON CLI_ZONA = fz.ZONA_CODIGO "
+                    + "	LEFT JOIN ADCS.FAC_ZONA fz ON CLI_ZONA = fz.ZONA_CODIGO\n"
+                            + "Order by 10 desc "
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -629,6 +638,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setMunicipio(rst.getString("municipio"));
 
                     imp.setLimiteCompra(rst.getDouble("limite"));
+                    imp.setValorLimite(rst.getDouble("limite"));
 
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setAtivo(rst.getBoolean("status"));
