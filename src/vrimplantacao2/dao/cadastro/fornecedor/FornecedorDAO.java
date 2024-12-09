@@ -115,17 +115,6 @@ public class FornecedorDAO {
                     if (!anteriorDAO.getAnteriores().containsKey(chave)) {
                         if (opt.contains(OpcaoFornecedor.DADOS)) {
 
-                            boolean cnpjInvalido = String.valueOf(vo.getCnpj()).length() < 8;
-                            if (cnpjInvalido) {
-                                vo.setCnpj(-1);
-                            }
-
-                            if (opt.contains(OpcaoFornecedor.UNIFICACAO)) {
-                                if (cnpjInvalido) {
-                                    gravar = false;
-                                }
-                            }
-
                             if (gravar) {
 
                                 //<editor-fold defaultstate="collapsed" desc="GERAR IDs">
@@ -212,7 +201,7 @@ public class FornecedorDAO {
                                     sql.put("utilizacrossdocking", false);// boolean NOT NULL DEFAULT false,
                                     sql.putNull("id_lojacrossdocking");// integer,
                                     sql.put("observacao", "IMPORTADO VR " + vo.getObservacao());// character varying(2500) NOT NULL DEFAULT '::character varying'::character varying,
-                                    sql.put("id_pais", vo.getIdPais() == null ? 1058  : vo.getIdPais());// integer NOT NULL,
+                                    sql.put("id_pais", vo.getIdPais() == null ? 1058 : vo.getIdPais());// integer NOT NULL,
                                     sql.put("inscricaomunicipal", vo.getInscricaoMunicipal());// character varying(20) DEFAULT ''::character varying,
                                     sql.putNull("id_contacontabilfiscalpassivo");// bigint,
                                     sql.put("numerocobranca", vo.getNumeroCobranca());// character varying(6) NOT NULL DEFAULT '0'::character varying,
@@ -287,7 +276,7 @@ public class FornecedorDAO {
                         }
                     }
 
-                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                    for (Integer condicao : imp.getCondicoesPagamentos()) {
                         pagamentoDAO.salvar(vo.getId(), condicao);
                     }
 
@@ -661,7 +650,7 @@ public class FornecedorDAO {
                     sql.put("bairrocobranca", vo.getBairroCobranca());
                     sql.put("cepcobranca", vo.getCepCobranca());
                     sql.put("id_municipiocobranca", vo.getMunicipioCobranca().getId());
-                    sql.put("id_estadocobranca", vo.getEstadoCobranca()== null ? Parametros.get().getUfPadrao().getId() : vo.getEstadoCobranca().getId());
+                    sql.put("id_estadocobranca", vo.getEstadoCobranca() == null ? Parametros.get().getUfPadrao().getId() : vo.getEstadoCobranca().getId());
                 }
                 if (opt.contains(OpcaoFornecedor.COMPLEMENTO)) {
                     sql.put("complemento", vo.getComplemento());
@@ -710,7 +699,7 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.BANCO_PADRAO)) {
                     sql.put("id_banco", vo.getIdBanco());
                 }
-                if(opt.contains(OpcaoFornecedor.CEP)) {
+                if (opt.contains(OpcaoFornecedor.CEP)) {
                     sql.put("cep", vo.getCep());
                 }
                 if (opt.contains(OpcaoFornecedor.EMITE_NFE)) {
@@ -722,14 +711,14 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)) {
                     incluirTipoIndicadorIE(vo, sql);
                 }
-                if (opt.contains(OpcaoFornecedor.UTILIZAIVA)){
-                  sql.put("utilizaiva", vo.isUtilizaiva());  
+                if (opt.contains(OpcaoFornecedor.UTILIZAIVA)) {
+                    sql.put("utilizaiva", vo.isUtilizaiva());
                 }
                 if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)) {
                     sql.put("datacadastro", vo.getDataCadastro());
                 }
                 sql.setWhere("id = " + vo.getId());
-                
+
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
                 }
