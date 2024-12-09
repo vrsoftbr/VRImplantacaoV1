@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import vrimplantacao2.utils.Factory;
+import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 
 /**
  * Mapa multi níveis.
@@ -221,6 +222,14 @@ public class MultiMap<K extends Comparable, T> {
         } else {
             throw new RuntimeException("Não foi definida nenhuma factory para o MultiMap");
         }
+    }
+
+    public void put(FornecedorVO vo, String cnpj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public FornecedorVO get(String cnpj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     private static class MultiMapEntry<K extends Comparable,T> {

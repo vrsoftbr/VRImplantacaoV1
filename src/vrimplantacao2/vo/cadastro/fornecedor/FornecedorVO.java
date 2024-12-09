@@ -19,7 +19,7 @@ public class FornecedorVO {
     private String razaoSocial = "SEM NOME";
     private String nomeFantasia = "SEM FANTASIA";
     private TipoInscricao tipoInscricao = TipoInscricao.JURIDICA;
-    private long cnpj = -1;
+    private String cnpj ="";
     private String inscricaoEstadual = "ISENTO";
     private String inscricaoSuframa = "0";
     private String inscricaoMunicipal = "";
@@ -110,7 +110,7 @@ public class FornecedorVO {
         return tipoInscricao;
     }
 
-    public long getCnpj() {
+    public String getCnpj() {
         return cnpj;
     }
 
@@ -233,12 +233,12 @@ public class FornecedorVO {
         this.tipoInscricao = tipoInscricao;
     }
 
-    public void setCnpj(long cnpj) {
-        if (cnpj > 99999999999999L) {
-            cnpj = this.id;
-        }
-        this.cnpj = cnpj;
-    }
+//    public void setCnpj(long cnpj) {
+//        if (cnpj > 99999999999999L) {
+//            cnpj = this.id;
+//        }
+//        this.cnpj = cnpj;
+//    }
 
     public void setInscricaoEstadual(String inscricaoEstadual) {
         this.inscricaoEstadual = Utils.acertarTexto(inscricaoEstadual, 20, "ISENTO");
@@ -413,6 +413,10 @@ public class FornecedorVO {
 
     public void setIdPais(Integer idPais) {
         this.idPais = idPais;
+    }
+
+    public void setCnpj(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

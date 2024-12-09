@@ -63,7 +63,7 @@ public class FornecedorDAO {
                 while (rst.next()) {
                     FornecedorVO vo = new FornecedorVO();
                     vo.setId(rst.getInt("id"));
-                    vo.setCnpj(rst.getLong("cnpj"));
+                    vo.setCnpj(rst.getString("cnpj"));
                     vo.setRazaoSocial(rst.getString("razaosocial"));
                     vo.setNomeFantasia(rst.getString("nomefantasia"));
                     cnpjExistentes.put(vo, vo.getCnpj());
@@ -136,9 +136,7 @@ public class FornecedorDAO {
                                 }
                                 //</editor-fold>
 
-                                if (vo.getCnpj() <= 0) {
-                                    vo.setCnpj(vo.getId());
-                                }
+
 
                                 FornecedorVO cnpjExiste = getCnpjExistente().get(vo.getCnpj());
                                 if (cnpjExiste == null) {
@@ -303,7 +301,7 @@ public class FornecedorDAO {
 
         vo.setRazaoSocial(imp.getRazao());
         vo.setNomeFantasia(imp.getFantasia());
-        vo.setCnpj(Utils.stringToLong(imp.getCnpj_cpf(), -1));
+        vo.setCnpj(imp.getCnpj_cpf());
         vo.setInscricaoEstadual(imp.getIe_rg());
         vo.setInscricaoMunicipal(imp.getInsc_municipal());
         vo.setInscricaoSuframa(imp.getSuframa());
@@ -313,7 +311,7 @@ public class FornecedorDAO {
         vo.setPedidoMinimoValor(imp.getValor_minimo_pedido());
         vo.setDataCadastro(imp.getDatacadastro() != null ? imp.getDatacadastro() : new Date());
         vo.setObservacao(imp.getObservacao());
-        vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
+      //  vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj().+));
 
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
@@ -391,7 +389,7 @@ public class FornecedorDAO {
                     vo.setId(rst.getInt("id"));
                     vo.setRazaoSocial(rst.getString("razaosocial"));
                     vo.setNomeFantasia(rst.getString("nomefantasia"));
-                    vo.setCnpj(rst.getLong("cnpj"));
+                    vo.setCnpj(rst.getString("cnpj"));
                     existentes.put(vo, vo.getId());
                 }
             }
@@ -507,8 +505,8 @@ public class FornecedorDAO {
         }
     }
 
-    public Map<Long, FornecedorVO> getCnpjExistentes() throws Exception {
-        Map<Long, FornecedorVO> result = new LinkedHashMap<>();
+    public Map<String, FornecedorVO> getCnpjExistentes() throws Exception {
+        Map<String, FornecedorVO> result = new LinkedHashMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -525,7 +523,7 @@ public class FornecedorDAO {
                     FornecedorVO forn = new FornecedorVO();
 
                     forn.setId(rst.getInt("id"));
-                    forn.setCnpj(rst.getLong("cnpj"));
+                    forn.setCnpj(rst.getString("cnpj"));
                     forn.setRazaoSocial(rst.getString("razaosocial"));
                     forn.setNomeFantasia(rst.getString("nomefantasia"));
 

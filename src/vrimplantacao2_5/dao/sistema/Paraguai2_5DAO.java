@@ -31,6 +31,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
@@ -457,7 +458,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "        WHEN gp.PAIS_CODIGO = 2 THEN 1058 \n"
                     + "        ELSE gp.PAIS_CODIGO \n"
                     + "    END AS pais,\n"
-                    + " f.PROV_RUC,\n"
+                    + " f.PROV_RUC AS ruc,\n"
                     + " CASE WHEN  f.PROV_EST_PROV = 'A' THEN 1 ELSE 0 END AS ativo,\n"
                     + " f.PROV_EMAIL,\n"
                     + " f.PROV_CELULAR,\n"
@@ -477,9 +478,9 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " WHEN gc.CIUD_DESC= 'Concepción' THEN 'EX' \n"
                     + " WHEN gc.CIUD_DESC= 'Ciudad del Este' THEN 'EX'\n"
                     + " WHEN gc.CIUD_DESC= 'Dourados' THEN 'MS'\n"
-                    + " ELSE 'EX'END AS uf,"
+                    + " ELSE 'EX'END AS uf,\n"
                     + " f.PROV_NOMBRE_2,\n"
-                    + " f.PROV_CNPJ cnpj,\n"
+                    + " f.PROV_CNPJ AS cnpj ,\n"
                     + " f.PROV_INSC_ESTADUAL inscricao_estadual,\n"
                     + " f.PROV_OBS obs\n"
                     + "FROM ADCS.FIN_PROVEEDOR f\n"
@@ -494,7 +495,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setCnpj_cpf(rst.getString("cnpj") == null ? rst.getString("ruc") : rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("inscricao_estadual"));
                     imp.setIdPais(rst.getInt("pais"));
 
@@ -506,6 +507,8 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setObservacao(rst.getString("obs"));
                     imp.setTel_principal(rst.getString("telefone"));
+                    imp.addCelular(rst.getString("razao"), rst.getString("prov_celular"));
+                    imp.addContato(rst.getString("razao"), rst.getString("telefone"), rst.getString("prov_celular"), TipoContato.NFE, rst.getString("prov_email"));
 
                     result.add(imp);
                 }
@@ -607,6 +610,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	CLI_BARRIO AS bairro,\n"
                     + "	fz.ZONA_DESC AS municipio,\n"
                     + "	CLI_FEC_INGRESO AS data_cadastro,\n"
+                    + " CASE WHEN CLI_IND_PAGO_CON_CHEQUE = 'S' THEN TRUE ELSE FALSE END AS cheque"
                     + " CLI_IMP_LIM_CR limite,\n"
                     + "	CASE WHEN CLI_EST_CLI = 'A' THEN 1 ELSE 0 END AS status,	\n"
                     + "	CLI_TEL AS telefone,\n"
@@ -629,6 +633,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setMunicipio(rst.getString("municipio"));
 
                     imp.setLimiteCompra(rst.getDouble("limite"));
+                    imp.setPermiteCheque(rst.getBoolean("cheque"));
 
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setAtivo(rst.getBoolean("status"));
