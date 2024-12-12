@@ -31,6 +31,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
@@ -243,8 +244,9 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " COBA_ART AS import_id,\n"
                     + " COBA_CODIGO_BARRA AS ean,\n"
                     + " COBA_TIPO AS qtd_embalagem,\n"
-                    + " COBA_DESC AS tipo_embalagem \n"
-                    + "FROM ADCS.STK_ART_COD_BARRA"
+                    + " 'UN' AS tipo_embalagem  \n"
+                    + "FROM ADCS.STK_ART_COD_BARRA\n"
+                    + "WHERE COBA_DESC != 'PESABLE' AND COBA_DESC != 'UNITARIO'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -272,9 +274,11 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " p.ART_CODIGO id,\n"
                     + " p.ART_DESC descricao,\n"
                     + " p.ART_DESC_ABREV descricao_red,\n"
-                    + " p.ART_UNID_MED tipo_embalagem,\n"
+                    + " CASE WHEN p.ART_UNID_MED = 'KG' THEN 'KG' ELSE 'UN' END tipo_embalagem,\n"
+                    + " p.ART_CONTENIDO qtd_minima,\n"
                     + " CASE WHEN p.ART_TIPO = 7 THEN 1 ELSE 0 END AS produto_balanca,\n"
                     + " pr.AREM_PRECIO_VTA preco_venda,\n"
+                    + " pr.AREM_PRECIO_VTA_CAJA preco_comum,\n"
                     + " pr.AREM_COSTO_BRUTO custo_com_imposto,\n"
                     + " pr.AREM_COSTO_NETO custo_sem_imposto,\n"
                     + " pr.AREM_EXIST_MIN,\n"
@@ -300,13 +304,13 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " e.ARDE_CANT_ACT estoque_atual, -- (entrada - saida) + inicial\n"
                     + " p.ART_IMPU icms\n"
                     + "FROM ADCS.STK_ARTICULO p\n"
-                    + "LEFT JOIN ADCS.STK_ART_COD_BARRA b ON b.COBA_ART = p.ART_CODIGO\n"
+                    + "LEFT JOIN ADCS.STK_ART_COD_BARRA b ON b.COBA_ART = p.ART_CODIGO AND b.COBA_DESC != 'PESABLE' AND b.COBA_DESC != 'UNITARIO'\n"
                     + "LEFT JOIN ADCS.STK_CLAS_SUBGRUPO sb ON sb.SUGR_CODIGO = p.ART_CLAS_SUBGRUPO\n"
                     + "LEFT JOIN ADCS.STK_CLAS_GRUPO g ON g.GRUP_CODIGO = sb.SUGR_CODIGO\n"
                     + "LEFT JOIN ADCS.STK_CLAS_FAMILIA f ON f.FLIA_CODIGO = g.GRUP_FAMILIA\n"
                     + "LEFT JOIN ADCS.STK_CLAS_SECCION s ON s.SECC_CODIGO = f.FLIA_SECCION\n"
                     + "LEFT JOIN ADCS.STK_ARTICULO_DEPOSITO e ON e.ARDE_ART = p.ART_CODIGO\n"
-                    + "LEFT JOIN ADCS.STK_ARTICULO_EMPRESA pr ON pr.AREM_ART = p.ART_CODIGO "
+                    + "LEFT JOIN ADCS.STK_ARTICULO_EMPRESA pr ON pr.AREM_ART = p.ART_CODIGO"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -317,7 +321,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("id"), -2));
 
                     if (bal != null) {
                         imp.seteBalanca(true);
@@ -325,13 +329,16 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setEan(String.valueOf(bal.getCodigo()));
                     }
 
+                    imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
+                    
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
-                    imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
-                    imp.setQtdEmbalagem(1);
-                    imp.seteBalanca(rst.getBoolean("produto_balanca"));
 
+                    imp.setPrateleira(rst.getString("qtd_minima"));//QUANTIDADE MÍNIMA
+                    imp.setCustoAnteriorComImposto(rst.getDouble("preco_comum"));//PREÇO COMUM
+
+//                    imp.seteBalanca(rst.getBoolean("produto_balanca"));
                     imp.setCustoComImposto(rst.getDouble("custo_com_imposto"));
                     imp.setCustoSemImposto(rst.getDouble("custo_sem_imposto"));
                     imp.setPrecovenda(rst.getDouble("preco_venda"));
@@ -501,7 +508,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setCnpj_cpf(rst.getString("cnpj") == null ? rst.getString("ruc") : rst.getString("cnpj"));
+                    imp.setCnpj_cpf(rst.getString("ruc"));
                     imp.setIe_rg(rst.getString("inscricao_estadual"));
                     imp.setIdPais(rst.getInt("pais"));
 
@@ -511,9 +518,14 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setUf(rst.getString("uf"));
 
                     imp.setAtivo(rst.getBoolean("ativo"));
-                    imp.setObservacao(rst.getString("obs"));
+                    imp.setObservacao(rst.getString("cnpj") == null ? rst.getString("ruc") : rst.getString("cnpj"));
                     imp.setTel_principal(rst.getString("telefone"));
                     imp.addCelular(rst.getString("razao"), rst.getString("celular"));
+
+                    imp.addContato(rst.getString("razao"),
+                            rst.getString("telefone"),
+                            rst.getString("celular"),
+                            TipoContato.COMERCIAL, "");
 
                     result.add(imp);
                 }
@@ -610,6 +622,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	CLI_NOM AS razao,\n"
                     + "	CLI_NOM_FANTASIA AS fantasia,\n"
                     + "	CLI_DOC_IDENT_PROPIETARIO AS identidade,\n"
+                    + "CASE WHEN CLI_IND_PAGO_CON_CHEQUE = 'S' THEN 1 ELSE 0 END AS cheque,"
                     + "	CLI_RUC cnpj,\n"
                     + "	CLI_DIR AS endereco,\n"
                     + "	CLI_BARRIO AS bairro,\n"
@@ -618,11 +631,11 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " CAST(CLI_IMP_LIM_CR AS varchar(50)) limite,\n"
                     + "	CASE WHEN CLI_EST_CLI = 'A' THEN 1 ELSE 0 END AS status,\n"
                     + "	CLI_TEL AS telefone,\n"
+                    + "CLI_TEL_PARTICULAR AS telefone2,\n"
                     + "	CLI_OBS AS observacao\n"
                     + "FROM\n"
                     + "	ADCS.FIN_CLIENTE\n"
-                    + "	LEFT JOIN ADCS.FAC_ZONA fz ON CLI_ZONA = fz.ZONA_CODIGO\n"
-                            + "Order by 10 desc "
+                    + "	LEFT JOIN ADCS.FAC_ZONA fz ON CLI_ZONA = fz.ZONA_CODIGO"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -643,7 +656,10 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
                     imp.setAtivo(rst.getBoolean("status"));
                     imp.setTelefone(rst.getString("telefone"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao(rst.getString("cnpj"));
+                    imp.setCelular(rst.getString("telefone2"));
+                    imp.setPermiteCheque(rst.getBoolean("cheque"));
+                    imp.setPermiteCreditoRotativo(true);
 
                     result.add(imp);
                 }

@@ -120,6 +120,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
         result.add(OpcaoProduto.ASSOCIADO);
         result.add(OpcaoProduto.PROMOCAO);
+        result.add(OpcaoProduto.PESO_BRUTO);
+        result.add(OpcaoProduto.PESO_LIQUIDO);
 
         return result;
     }
