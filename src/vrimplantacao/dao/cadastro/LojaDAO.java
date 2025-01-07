@@ -288,6 +288,47 @@ public class LojaDAO {
             //("Copiando pdv.finalizadoraconfiguracao.");
             stm.execute(script.copiarPdvFinalizadoraConfiguracao(i_loja));
 
+//            try {
+//                stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
+//            } catch (SQLException e) {
+//                e.getMessage();
+//                throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
+//            }
+//            try {
+//                stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
+//            }
+
+//            try {
+//                stm.execute(script.copiaPdvAliquotaLayout(i_loja));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+//            }
+//
+//            try {
+//                stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+//            }
+//
+//            try {
+//                stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
+//            }
+//
+//            try {
+//                stm.execute(script.copiaFinalizadoraRetorno(i_loja));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.");
+//            }
+
             //("Copiando dataprocessamento.");
             stm.execute(script.inserirDataProcessamento(i_loja).getInsert());
 
@@ -296,14 +337,14 @@ public class LojaDAO {
 
             //("Copiando pdv.operador.");
             stm.execute(script.copiarPdvOperador(i_loja));
-            ProgressBar.setStatus("salvando loja... 50%");
+            ProgressBar.setStatus("salvando loja... 60%");
 
             //("Copiando notasaidasequencia.");
             stm.execute(script.inserirNotaSaidaSequencia(i_loja).getInsert());
 
             //("Copiando tiposaidanotasaidasequencia.");
             stm.execute(script.copiarTipoSaidaNotaSaidaSequencia(i_loja));
-            ProgressBar.setStatus("salvando loja... 60%");
+            ProgressBar.setStatus("salvando loja... 70%");
 
             if (i_loja.isCopiaOferta() == true) {
                 if (validaOferta(i_loja) == false) {
@@ -337,36 +378,36 @@ public class LojaDAO {
                     e.printStackTrace();
                     throw new Exception("Erro ao copiar ECF, certifique-se de que tenha ecf's na base.");
                 }
-                try {
-                    stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
-                } catch (SQLException e) {
-                    e.getMessage();
-                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
-                }
-                try {
-                    stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
-                }
-                try {
-                    stm.execute(script.copiaPdvAliquotaLayout(i_loja));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new Exception("Erro ao copiar PdvAliquotaLayout.");
-                }
-                try {
-                    stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
-                }
-                try {
-                    stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
-                }
+//                try {
+//                    stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
+//                } catch (SQLException e) {
+//                    e.getMessage();
+//                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
+//                }
+//                try {
+//                    stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
+//                }
+//                try {
+//                    stm.execute(script.copiaPdvAliquotaLayout(i_loja));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+//                }
+//                try {
+//                    stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+//                }
+//                try {
+//                    stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
+//                }
 
                 List<String> listaDeInsertsEcf = new ArrayList<>();
                 listaDeInsertsEcf = ecfDAO.carregarCopiaEcfLayout(i_loja);
@@ -401,7 +442,7 @@ public class LojaDAO {
                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                     stm.execute(script.copiaReceitaLoja(i_loja));
                 }
-                if (versao.maiorQue(4,2)) {
+                if (versao.maiorQue(4, 2)) {
                     if (validaReceitaToledo(i_loja)) {
                         stm.execute(script.copiaReceitaToledoLoja(i_loja));
                     }

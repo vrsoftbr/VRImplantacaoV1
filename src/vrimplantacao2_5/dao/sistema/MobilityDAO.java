@@ -92,7 +92,12 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.VOLUME_QTD,
                 OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.PESAVEL
         ));
     }
 
@@ -195,7 +200,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                      "join produtos p on c.id_produto = p.id"*/
                     " select\n"
                     + "     codigo_interno id,\n"
-                    + "     codigo_barras ean\n"
+                    + "     CAST (codigo_barras AS bigint) ean\n"
                     + " from produtos\n"
                     + "     order by 1"
             )) {
@@ -239,7 +244,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "   p.preco_compra custosemimposto,\n"
                     + "   p.preco_custo custocomimposto,\n"
                     + "   p.preco_venda1 precovenda,\n"
-                    + "   p.pesado,\n"
+                    + "   p.alt_balanca AS pesado,\n"
                     + "   p.validade,\n"
                     + "   p.estoque_max,\n"
                     + "   p.estoque_min,\n"
@@ -273,27 +278,42 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("codigo_interno"));
 
                     imp.setEan(rs.getString("ean"));
-                    int eanBalanca = Utils.stringToInt(imp.getEan().substring(0, imp.getEan().length() - 1), -2);
-                    ProdutoBalancaVO balanca = produtosBalanca.get(eanBalanca);
-                    if (balanca != null) {
-                        imp.setEan(String.valueOf(eanBalanca));
+                    
+                    int codigoProduto = Utils.stringToInt(rs.getString("ean"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
+
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("U".equals(balanca.getPesavel()) ? "UN" : "KG");
-                        imp.setValidade(balanca.getValidade());
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
-                        if (this.importarSomenteBalanca) {
-                            continue;
-                        }
-                        imp.seteBalanca(rs.getInt("pesado") == 1);
                         imp.setEan(rs.getString("ean"));
                         imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.seteBalanca(rs.getBoolean("pesado"));
                         imp.setValidade(rs.getInt("validade"));
-                        imp.setQtdEmbalagem(1);
-                        long ean = Utils.stringToLong(rs.getString("ean"), -2);
-                        imp.setManterEAN(ean > 0 && ean <= 999999 && !imp.isBalanca());
                     }
+//                    if (balanca != null) {
+//                        imp.setEan(String.valueOf(eanBalanca));
+//                        imp.seteBalanca(true);
+//                        imp.setTipoEmbalagem("U".equals(balanca.getPesavel()) ? "UN" : "KG");
+//                        imp.setValidade(balanca.getValidade());
+//                        imp.setQtdEmbalagem(1);
+//                    } else {
+//                        if (this.importarSomenteBalanca) {
+//                            continue;
+//                        }
+//                        imp.seteBalanca(rs.getInt("pesado") == 1);
+//                        imp.setEan(rs.getString("ean"));
+//                        imp.setTipoEmbalagem(rs.getString("unidade"));
+//                        imp.setValidade(rs.getInt("validade"));
+//                        imp.setQtdEmbalagem(1);
+//                        long ean = Utils.stringToLong(rs.getString("ean"), -2);
+//                        imp.setManterEAN(ean > 0 && ean <= 999999 && !imp.isBalanca());
+//                    }
 
+                    imp.seteBalanca(rs.getBoolean("pesado"));
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -301,6 +321,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("unidade"));
                     imp.setIdFamiliaProduto(rs.getString("familia"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoAnteriorComImposto(rs.getDouble("custoanterior"));
@@ -830,7 +852,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             StringBuilder builder = new StringBuilder();
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + " cv.id AS id,\n"
                     + " cl.id AS clienteid,\n"
@@ -852,16 +874,16 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "AND \n"
                     + "cv.f_debito > cv.f_val_pago_ref"
             )) {
-                while (rst.next()) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(rst.getString("id"));
-                    imp.setNumeroCupom(rst.getString("numerocupom"));
-                    imp.setIdCliente(rst.getString("clienteid"));
-                    imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataVencimento(rst.getDate("datavencimento"));
-                    imp.setValor(rst.getDouble("valortotal"));
-                    imp.setObservacao(rst.getString("obs"));
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setIdCliente(rs.getString("clienteid"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataVencimento(rs.getDate("datavencimento"));
+                    imp.setValor(rs.getDouble("valortotal"));
+                    imp.setObservacao(rs.getString("obs"));
 
                     result.add(imp);
                 }
@@ -895,7 +917,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private Statement stm;
-        private ResultSet rst;
+        private ResultSet rs;
         private final String sql;
 
         public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
@@ -903,13 +925,13 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "";
             this.stm.setFetchSize(10000);
-            this.rst = stm.executeQuery(sql);
+            this.rs = stm.executeQuery(sql);
         }
 
         @Override
         public boolean hasNext() {
             try {
-                return !rst.isClosed() && !rst.isLast();
+                return !rs.isClosed() && !rs.isLast();
             } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
                 throw new RuntimeException(ex);
@@ -919,27 +941,27 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         @Override
         public VendaIMP next() {
             try {
-                if (rst.next()) {
+                if (rs.next()) {
                     VendaIMP imp = new VendaIMP();
-                    imp.setId(rst.getString("id"));
-                    imp.setNumeroCupom(rst.getInt("numerocupom"));
-                    imp.setEcf(rst.getInt("ecf"));
-                    imp.setData(rst.getDate("data"));
-                    imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
-                    imp.setHoraInicio(rst.getDate("data"));
-                    imp.setHoraTermino(rst.getDate("data"));
-                    imp.setCancelado(rst.getBoolean("cancelado"));
-                    imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                    imp.setCpf(rst.getString("cpf"));
-                    imp.setNumeroSerie(rst.getString("numeroserie"));
-                    imp.setModeloImpressora(rst.getString("modeloimpressora"));
-                    imp.setNomeCliente(rst.getString("nomecliente"));
-                    imp.setEnderecoCliente(rst.getString("enderecocliente"));
-                    imp.setChaveNfCe(rst.getString("chavenfce"));
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCupom(rs.getInt("numerocupom"));
+                    imp.setEcf(rs.getInt("ecf"));
+                    imp.setData(rs.getDate("data"));
+                    imp.setIdClientePreferencial(rs.getString("idclientepreferencial"));
+                    imp.setHoraInicio(rs.getDate("data"));
+                    imp.setHoraTermino(rs.getDate("data"));
+                    imp.setCancelado(rs.getBoolean("cancelado"));
+                    imp.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setNumeroSerie(rs.getString("numeroserie"));
+                    imp.setModeloImpressora(rs.getString("modeloimpressora"));
+                    imp.setNomeCliente(rs.getString("nomecliente"));
+                    imp.setEnderecoCliente(rs.getString("enderecocliente"));
+                    imp.setChaveNfCe(rs.getString("chavenfce"));
 
                     return imp;
                 } else {
-                    rst.close();
+                    rs.close();
                     stm.close();
                     return null;
                 }
@@ -960,7 +982,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm;
-        private ResultSet rst;
+        private ResultSet rs;
         private String sql;
 
         public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
@@ -968,13 +990,13 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "";
             this.stm.setFetchSize(10000);
-            this.rst = stm.executeQuery(sql);
+            this.rs = stm.executeQuery(sql);
         }
 
         @Override
         public boolean hasNext() {
             try {
-                return !rst.isClosed() && !rst.isLast();
+                return !rs.isClosed() && !rs.isLast();
             } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
                 throw new RuntimeException(ex);
@@ -984,26 +1006,26 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         @Override
         public VendaItemIMP next() {
             try {
-                if (rst.next()) {
+                if (rs.next()) {
                     VendaItemIMP imp = new VendaItemIMP();
 
-                    imp.setId(rst.getString("id"));
-                    imp.setSequencia(rst.getInt("sequencia"));
-                    imp.setVenda(rst.getString("venda"));
-                    imp.setProduto(rst.getString("produto"));
-                    imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
-                    imp.setQuantidade(rst.getDouble("qtde"));
-                    imp.setPrecoVenda(rst.getDouble("valor"));
-                    imp.setValorDesconto(rst.getDouble("desconto"));
-                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
-                    imp.setCodigoBarras(rst.getString("ean"));
-                    imp.setUnidadeMedida(rst.getString("unidade"));
-                    imp.setIcmsCst(rst.getInt("cst"));
-                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+                    imp.setId(rs.getString("id"));
+                    imp.setSequencia(rs.getInt("sequencia"));
+                    imp.setVenda(rs.getString("venda"));
+                    imp.setProduto(rs.getString("produto"));
+                    imp.setDescricaoReduzida(rs.getString("descritivo_pdv"));
+                    imp.setQuantidade(rs.getDouble("qtde"));
+                    imp.setPrecoVenda(rs.getDouble("valor"));
+                    imp.setValorDesconto(rs.getDouble("desconto"));
+                    imp.setValorAcrescimo(rs.getDouble("acrescimo"));
+                    imp.setCodigoBarras(rs.getString("ean"));
+                    imp.setUnidadeMedida(rs.getString("unidade"));
+                    imp.setIcmsCst(rs.getInt("cst"));
+                    imp.setIcmsAliq(rs.getDouble("aliquota"));
 
                     return imp;
                 } else {
-                    rst.close();
+                    rs.close();
                     stm.close();
                     return null;
                 }

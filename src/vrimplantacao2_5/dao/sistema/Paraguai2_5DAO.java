@@ -244,9 +244,11 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " COBA_ART AS import_id,\n"
                     + " COBA_CODIGO_BARRA AS ean,\n"
                     + " COBA_TIPO AS qtd_embalagem,\n"
-                    + " 'UN' AS tipo_embalagem  \n"
-                    + "FROM ADCS.STK_ART_COD_BARRA\n"
-                    + "WHERE COBA_DESC != 'PESABLE' AND COBA_DESC != 'UNITARIO'"
+                    + " sa.ART_UNID_MED tipo_embalagem,\n"
+                    + " sa.ART_DESC \n"
+                    + "FROM ADCS.STK_ART_COD_BARRA c\n"
+                    + "LEFT JOIN ADCS.STK_ARTICULO sa ON sa.ART_CODIGO = c.COBA_ART \n"
+                    + "WHERE ART_UNID_MED <> 'KG'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -317,20 +319,27 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
 
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("id"), -2));
+                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);
 
-                    if (bal != null) {
+                    if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
-                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca(false);
+                        imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagemCotacao(rst.getString("tipo_embalagem"));
+
                     }
 
-                    imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
-                    
+//                    imp.setTipoEmbalagem(rst.getString("tipo_embalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
@@ -468,8 +477,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                     + " f.PROV_CELULAR celular,\n"
                     + "CASE \n"
                     + "        WHEN gp.PAIS_CODIGO = 1 THEN 5860 \n"
-                    + "        WHEN gp.PAIS_CODIGO = 2 THEN 1058 \n"
-                    + "        ELSE gp.PAIS_CODIGO \n"
+                    + "        ELSE 1058 \n"
                     + "    END AS pais,\n"
                     + " f.PROV_RUC ruc,\n"
                     + " CASE WHEN  f.PROV_EST_PROV = 'A' THEN 1 ELSE 0 END AS ativo,\n"
@@ -845,11 +853,11 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private Statement stm = ConexaoOracle.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -857,8 +865,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -867,29 +874,43 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("")));
-                        next.setEcf(Utils.stringToInt(rst.getString("")));
+                        next.setNumeroCupom(rst.getInt("id_venda"));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble(""));
+//                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+//                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(rst.getDate("dataInicio"));
+                        next.setHoraTermino(rst.getDate("dataTermino"));
+                        next.setSubTotalImpressora(rst.getDouble("subtotal"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
         }
 
+        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
 
-            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
-            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            String strDataInicio = new SimpleDateFormat("DD/MM/YYYY").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("DD/MM/YYYY").format(dataTermino);
             this.sql
-                    = "";
+                    = "SELECT \n"
+                    + "TICK_CLAVE AS id_venda,\n"
+                    + "TICK_CLAVE || TICK_CLAVE_Y AS numero_cupom,\n"
+                    + "TICK_NRO_TICK ecf,\n"
+                    + "TICK_FEC_EMIS AS \"data\",\n"
+                    + "TICK_FEC_HORA_INI AS dataInicio,\n"
+                    + "TICK_FEC_HORA_FIN AS dataTermino,\n"
+                    + "TICK_IMP AS subtotal,\n"
+                    + "CASE WHEN TICK_ESTADO = 'A' THEN 1 ELSE 0 END cancelado\n"
+                    + "FROM POS.POS_TICKET_HIST\n"
+                    + "WHERE TICK_FEC_EMIS >= '" + DATE_FORMAT.format(dataInicio) + "' AND \n"
+                    + "TICK_FEC_EMIS <= '" + DATE_FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -916,7 +937,7 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private Statement stm = ConexaoOracle.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -928,16 +949,16 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
                         next = new VendaItemIMP();
 
                         next.setVenda(rst.getString("id_venda"));
-                        next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt(""));
-                        next.setProduto(rst.getString(""));
-                        next.setUnidadeMedida(rst.getString(""));
-                        next.setCodigoBarras(rst.getString(""));
-                        next.setDescricaoReduzida(rst.getString(""));
-                        next.setQuantidade(rst.getDouble(""));
-                        next.setPrecoVenda(rst.getDouble(""));
-                        next.setTotalBruto(rst.getDouble(""));
-                        next.setCancelado(rst.getBoolean(""));
+                        next.setId(rst.getString("id_item_venda"));
+//                        next.setSequencia(rst.getInt(""));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setCodigoBarras(rst.getString("codigo_barra"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("preco_venda"));
+//                        next.setTotalBruto(rst.getDouble(""));
+//                        next.setCancelado(rst.getBoolean(""));
                     }
                 }
             } catch (Exception ex) {
@@ -948,7 +969,20 @@ public class Paraguai2_5DAO extends InterfaceDAO implements MapaTributoProvider 
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = "SELECT \n"
+                    + "DETT_CLAVE_TICK||DETT_ITEM id_item_venda,\n"
+                    + "DETT_CLAVE_TICK id_venda,\n"
+                    + "pa.ART_CODIGO id_produto,\n"
+                    + "CASE WHEN DETT_PRECIO_TIPO = 'U' THEN 'UN' ELSE 'KG' END AS unidade,\n"
+                    + "DETT_ART_COD_BARRA codigo_barra,\n"
+                    + "pa.ART_DESC descricao,\n"
+                    + "DETT_CANT quantidade,\n"
+                    + "DETT_PRECIO_VENTA preco_venda\n"
+                    + "FROM POS.POS_TICKET_DET_HIST v\n"
+                    + "LEFT JOIN POS.POS_TICKET_HIST vi ON vi.TICK_CLAVE = v.DETT_CLAVE_TICK \n"
+                    + "LEFT JOIN POS.POS_ARTICULO pa ON pa.ART_COD_BARRA = v.DETT_ART_COD_BARRA\n"
+                    + "WHERE vi.TICK_FEC_EMIS >= '" + DATE_FORMAT.format(dataInicio) + "' AND \n"
+                    + "vi.TICK_FEC_EMIS <= '" + DATE_FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

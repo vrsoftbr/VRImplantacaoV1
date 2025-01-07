@@ -1530,7 +1530,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         importador.importarProdutoFornecedor();
                                     }
                                     if(chkContaPagar.isSelected()) {
-                                        dao.getOpcoes().put("dateformat", txtFormatoData.getText());
+                                        //dao.getOpcoes().put("dateformat", txtFormatoData.getText());
                                         importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                                     }
                                 } else if (tabsForn.getSelectedIndex() == 1) {

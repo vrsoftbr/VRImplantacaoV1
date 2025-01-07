@@ -199,42 +199,46 @@ public class LojaGeradorScripts {
     }
 
     public String copiaAcumuladorLayoutRetorno(LojaVO i_loja) throws Exception {
-        String sql = "with teste as (\n"
-                + "select \n"
-                + "(select max(id) from pdv.acumuladorlayout)+ row_number()over() as id\n"
-                + "from pdv.acumuladorlayout \n"
-                + "where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                + ")\n"
-                + "select distinct \n"
-                + "teste.id,\n"
-                + "id_acumulador ,\n"
-                + "retorno,\n"
+        String sql = "INSERT INTO pdv.acumuladorlayoutretorno (id_acumuladorlayout, id_acumulador, retorno, titulo )\n"
+                + "SELECT\n"
+                + "(SELECT id FROM pdv.acumuladorlayout WHERE id_loja = " + i_loja.getId() + ") AS id_acumuladorlayout,\n"
+                + "id_acumulador, \n"
+                + "retorno, \n"
                 + "titulo\n"
-                + "from\n"
-                + "pdv.acumuladorlayoutretorno re\n"
-                + "join pdv.acumuladorlayout lt on\n"
-                + "re.id_acumuladorlayout = lt.id\n"
-                + "and lt.id_loja = " + i_loja.getIdCopiarLoja() + "\n"
-                + "cross join teste";
+                + "FROM pdv.acumuladorlayoutretorno a \n"
+                + "LEFT JOIN pdv.acumuladorlayout al ON al.id = a.id_acumuladorlayout \n"
+                + "WHERE al.id_loja = " + i_loja.getIdCopiarLoja() + ";";
 
         return sql;
     }
 
     public String copiaAliquotaLayoutRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.aliquotalayoutretorno ( id_aliquotalayout ,id_aliquota , retorno , codigoleitura )\n"
-                + "(select (select max((id_aliquotalayout)+1) from pdv.aliquotalayoutretorno ), id_aliquota , retorno , codigoleitura \n"
-                + "from pdv.aliquotalayoutretorno ret\n"
-                + "join pdv.aliquotalayout ali on ali.id = ret.id_aliquotalayout\n"
-                + "where ali.id_loja = " + i_loja.getId() + "\n"
-                + "group by id_aliquota, retorno, codigoleitura )";
+        String sql = "INSERT INTO pdv.aliquotalayoutretorno (id_aliquotalayout, id_aliquota, retorno, codigoleitura)\n"
+                + "SELECT \n"
+                + "    (SELECT id FROM pdv.aliquotalayout WHERE id_loja  = " + i_loja.getId() + ") AS id_aliquotalayout,\n"
+                + "    id_aliquota,\n"
+                + "    retorno,\n"
+                + "    codigoleitura\n"
+                + "FROM \n"
+                + "    pdv.aliquotalayoutretorno a\n"
+                + "    LEFT JOIN pdv.aliquotalayout al ON al.id = a.id_aliquotalayout \n"
+                + "WHERE \n"
+                + "    al.id_loja = " + i_loja.getIdCopiarLoja() + ";";
 
         return sql;
     }
 
     public String copiaFinalizadoraRetorno(LojaVO i_loja) throws Exception {
-        String sql = "insert into pdv.finalizadoralayoutretorno ( id_finalizadoralayout ,id_finalizadora , retorno , utilizado )\n"
-                + "(select max((id_finalizadoralayout)+1) , id_finalizadora , retorno , utilizado from pdv.finalizadoralayoutretorno\n"
-                + "group by id_finalizadora, retorno, utilizado )";
+        String sql = "INSERT INTO pdv.finalizadoralayoutretorno ( id_finalizadoralayout ,id_finalizadora , retorno , utilizado )\n"
+                + "SELECT \n"
+                + "(SELECT id FROM pdv.finalizadoralayout f\n"
+                + "WHERE id_loja = " + i_loja.getId() + ") AS id_finalizadoralayout, \n"
+                + "id_finalizadora, \n"
+                + "retorno, \n"
+                + "utilizado \n"
+                + "FROM pdv.finalizadoralayoutretorno f\n"
+                + " LEFT JOIN pdv.finalizadoralayout fl ON fl.id = f.id_finalizadoralayout \n"
+                + "WHERE fl.id_loja = " + i_loja.getIdCopiarLoja() + ";";
 
         return sql;
     }
