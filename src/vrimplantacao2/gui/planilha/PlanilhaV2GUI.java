@@ -121,7 +121,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtVendaHistFile = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel11 = new vrframework.bean.label.VRLabel();
         txtVendaItemFile = new vrframework.bean.fileChooser.VRFileChooser();
-        chkHistVenda = new vrframework.bean.checkBox.VRCheckBox();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel12 = new vrframework.bean.label.VRLabel();
         vRLabel13 = new vrframework.bean.label.VRLabel();
@@ -573,8 +572,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel11, "Arquivo com os itens da venda (pdv.vendaitem)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkHistVenda, "Histórico de Vendas");
-
         org.openide.awt.Mnemonics.setLocalizedText(chkPdvVendas, "PDV Vendas");
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel12, "Delimitador");
@@ -607,14 +604,12 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                             .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(tabVendaLayout.createSequentialGroup()
-                                .addGroup(tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkHistVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(52, 52, 52)
                                 .addGroup(tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chkEANAtual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPorEanHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 255, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabVendaLayout.setVerticalGroup(
@@ -636,13 +631,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(txtVendaItemFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkHistVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkPorEanHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkPorEanHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkEANAtual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(276, Short.MAX_VALUE))
+                .addComponent(chkEANAtual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(286, Short.MAX_VALUE))
         );
 
         tabModel.addTab("Vendas", tabVenda);
@@ -1377,7 +1370,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornSpec;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
-    private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
     private javax.swing.JCheckBox chkLimiteRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkNaoUsaMapaTributacao;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
@@ -1549,9 +1541,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 dao.setArquivoVendasItens(txtVendaItemFile.getArquivo());
                                 dao.getOpcoes().put("delimiter", txtVendaDelimitador.getText());
                                 dao.getOpcoes().put("quote", txtVendaStrQuote.getText());
-                                if (chkHistVenda.isSelected()) {
-                                    importador.importarHistoricoVendas(chkPorEanHistorico.isSelected());
-                                }
+//                                if (chkHistVenda.isSelected()) {
+//                                    importador.importarHistoricoVendas(chkPorEanHistorico.isSelected());
+//                                }
                                 if (chkPdvVendas.isSelected()) {
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                                 }
