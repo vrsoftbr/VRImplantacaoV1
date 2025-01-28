@@ -2394,6 +2394,14 @@
                     </MenuItem>
                   </SubComponents>
                 </Menu>
+                <MenuItem class="javax.swing.JMenuItem" name="mnuPlanilhaV2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Planilha (2.0)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlanilhaV2ActionPerformed"/>
+                  </Events>
+                </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuLogVenda">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Log Venda"/>
@@ -2416,14 +2424,6 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCodigoBarrasAtacadoActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="mnuPlanilhaV2">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Planilha (2.0)"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlanilhaV2ActionPerformed"/>
                   </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuSambanet">
@@ -2497,6 +2497,21 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuContaPagarActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <Menu class="javax.swing.JMenu" name="jMenu4">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Copia entre Lojas"/>
+                  </Properties>
+                  <SubComponents>
+                    <MenuItem class="javax.swing.JMenuItem" name="copiaEntreLojas">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Copiar Info de Produtos"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copiaEntreLojasActionPerformed"/>
+                      </Events>
+                    </MenuItem>
+                  </SubComponents>
+                </Menu>
               </SubComponents>
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="mnuVRPdv">
@@ -2580,14 +2595,6 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="mnuRelatorios">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Relat&#xf3;rios e Sped"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRelatoriosActionPerformed"/>
-              </Events>
-            </MenuItem>
             <Menu class="javax.swing.JMenu" name="jMenu2">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Conversores"/>
@@ -2611,6 +2618,14 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuRelatorios">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Relat&#xf3;rios e Sped"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRelatoriosActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem18">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Nutricional Arquivo"/>
@@ -2625,6 +2640,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem22ActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="gerarCodant">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cria&#xe7;&#xe3;o de Codant"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gerarCodantActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

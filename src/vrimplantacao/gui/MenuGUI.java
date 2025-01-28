@@ -89,9 +89,11 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2_5.dao.copias.GerarCodantDAO;
 import vrimplantacao2.gui.SuperControle_PostgresGUI;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
+import vrimplantacao2_5.gui.copias.CopiaEntreLojasGUI;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AccesysGUI;
 import vrimplantacao2.gui.interfaces.AcomGUI;
@@ -414,7 +416,7 @@ public final class MenuGUI extends VRMdiFrame {
     private LoginGUI loginFrame = null;
 
     private AtualizadorController atualizadorController = null;
-    
+
     private MemorandoService memorandoService = new MemorandoService();
 
     public MenuGUI(LoginGUI i_loginFrame) throws Exception {
@@ -946,10 +948,10 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSiaCriareByFile = new javax.swing.JMenuItem();
         mnuAlteracaoID = new javax.swing.JMenu();
         jMenuItem29 = new javax.swing.JMenuItem();
+        mnuPlanilhaV2 = new javax.swing.JMenuItem();
         mnuLogVenda = new javax.swing.JMenuItem();
         mnuNFe = new javax.swing.JMenuItem();
         mnuCodigoBarrasAtacado = new javax.swing.JMenuItem();
-        mnuPlanilhaV2 = new javax.swing.JMenuItem();
         mnuSambanet = new javax.swing.JMenuItem();
         mnuImportarNfce = new javax.swing.JMenuItem();
         mnuEspeciais = new javax.swing.JMenu();
@@ -959,6 +961,8 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem12 = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         mnuContaPagar = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        copiaEntreLojas = new javax.swing.JMenuItem();
         mnuVRPdv = new javax.swing.JMenuItem();
         mnuFerramentas = new javax.swing.JMenu();
         mnuEditarConexoes = new javax.swing.JMenuItem();
@@ -970,12 +974,13 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDelRegistro = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
         mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
-        mnuRelatorios = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem17 = new javax.swing.JMenuItem();
         jMenuItem21 = new javax.swing.JMenuItem();
+        mnuRelatorios = new javax.swing.JMenuItem();
         jMenuItem18 = new javax.swing.JMenuItem();
         jMenuItem22 = new javax.swing.JMenuItem();
+        gerarCodant = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
@@ -3462,6 +3467,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuImpSistema.add(mnuAlteracaoID);
 
+        mnuPlanilhaV2.setText("Planilha (2.0)");
+        mnuPlanilhaV2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlanilhaV2ActionPerformed(evt);
+            }
+        });
+        mnuImpSistema.add(mnuPlanilhaV2);
+
         mnuLogVenda.setText("Log Venda");
         mnuLogVenda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3485,14 +3498,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuImpSistema.add(mnuCodigoBarrasAtacado);
-
-        mnuPlanilhaV2.setText("Planilha (2.0)");
-        mnuPlanilhaV2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuPlanilhaV2ActionPerformed(evt);
-            }
-        });
-        mnuImpSistema.add(mnuPlanilhaV2);
 
         mnuSambanet.setText("Sambanet");
         mnuSambanet.addActionListener(new java.awt.event.ActionListener() {
@@ -3561,6 +3566,18 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuImpSistema.add(mnuContaPagar);
+
+        jMenu4.setText("Copia entre Lojas");
+
+        copiaEntreLojas.setText("Copiar Info de Produtos");
+        copiaEntreLojas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copiaEntreLojasActionPerformed(evt);
+            }
+        });
+        jMenu4.add(copiaEntreLojas);
+
+        mnuImpSistema.add(jMenu4);
 
         mnuInterface.add(mnuImpSistema);
 
@@ -3638,14 +3655,6 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuFerramentas.add(mnuAvancadas);
 
-        mnuRelatorios.setText("Relatórios e Sped");
-        mnuRelatorios.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRelatoriosActionPerformed(evt);
-            }
-        });
-        mnuFerramentas.add(mnuRelatorios);
-
         jMenu2.setText("Conversores");
 
         jMenuItem17.setText("Conversor");
@@ -3666,6 +3675,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuFerramentas.add(jMenu2);
 
+        mnuRelatorios.setText("Relatórios e Sped");
+        mnuRelatorios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRelatoriosActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(mnuRelatorios);
+
         jMenuItem18.setText("Nutricional Arquivo");
         jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3681,6 +3698,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFerramentas.add(jMenuItem22);
+
+        gerarCodant.setText("Criação de Codant");
+        gerarCodant.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gerarCodantActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(gerarCodant);
 
         mnuMenu.add(mnuFerramentas);
 
@@ -5725,14 +5750,36 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_btnMemoActionPerformed
 
+    private void copiaEntreLojasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copiaEntreLojasActionPerformed
+
+        try {
+            CopiaEntreLojasGUI.Exibir(this);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_copiaEntreLojasActionPerformed
+
+    private void gerarCodantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerarCodantActionPerformed
+
+        try {
+            GerarCodantDAO codant = new GerarCodantDAO();
+            codant.gerarCodant();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_gerarCodantActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnMemo;
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
+    private javax.swing.JMenuItem copiaEntreLojas;
+    private javax.swing.JMenuItem gerarCodant;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
