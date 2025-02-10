@@ -2510,6 +2510,14 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copiaEntreLojasActionPerformed"/>
                       </Events>
                     </MenuItem>
+                    <MenuItem class="javax.swing.JMenuItem" name="copiarPromocoes">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Copiar Promo&#xe7;&#xf5;es"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="copiarPromocoesActionPerformed"/>
+                      </Events>
+                    </MenuItem>
                   </SubComponents>
                 </Menu>
               </SubComponents>
@@ -2648,6 +2656,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gerarCodantActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="gerarBackup">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Gerar Backup de Tabelas"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gerarBackupActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

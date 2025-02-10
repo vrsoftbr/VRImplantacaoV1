@@ -323,6 +323,8 @@ import vrimplantacao2_5.gui.cadastro.sistemabancodados.ConsultaSistemaBancoDados
 import vrimplantacao2_5.gui.cadastro.unidade.ConsultaUnidadeGUI;
 import vrimplantacao2_5.gui.cadastro.usuario.ConsultaUsuarioGUI;
 import vrimplantacao2_5.conversor.ConversorGUI;
+import vrimplantacao2_5.gui.copias.CopiarPromocoesGUI;
+import vrimplantacao2_5.gui.copias.GeradorDeBackupGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
@@ -963,6 +965,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuContaPagar = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         copiaEntreLojas = new javax.swing.JMenuItem();
+        copiarPromocoes = new javax.swing.JMenuItem();
         mnuVRPdv = new javax.swing.JMenuItem();
         mnuFerramentas = new javax.swing.JMenu();
         mnuEditarConexoes = new javax.swing.JMenuItem();
@@ -981,6 +984,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem18 = new javax.swing.JMenuItem();
         jMenuItem22 = new javax.swing.JMenuItem();
         gerarCodant = new javax.swing.JMenuItem();
+        gerarBackup = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
@@ -3577,6 +3581,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu4.add(copiaEntreLojas);
 
+        copiarPromocoes.setText("Copiar Promoções");
+        copiarPromocoes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copiarPromocoesActionPerformed(evt);
+            }
+        });
+        jMenu4.add(copiarPromocoes);
+
         mnuImpSistema.add(jMenu4);
 
         mnuInterface.add(mnuImpSistema);
@@ -3706,6 +3718,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFerramentas.add(gerarCodant);
+
+        gerarBackup.setText("Gerar Backup de Tabelas");
+        gerarBackup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gerarBackupActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(gerarBackup);
 
         mnuMenu.add(mnuFerramentas);
 
@@ -5769,6 +5789,24 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_gerarCodantActionPerformed
 
+    private void copiarPromocoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copiarPromocoesActionPerformed
+
+        try {
+            CopiarPromocoesGUI.Exibir(this);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_copiarPromocoesActionPerformed
+
+    private void gerarBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerarBackupActionPerformed
+        
+        try {
+            GeradorDeBackupGUI.Exibir(this);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_gerarBackupActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnMemo;
     private javax.swing.JButton btnSair;
@@ -5776,6 +5814,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem copiaEntreLojas;
+    private javax.swing.JMenuItem copiarPromocoes;
+    private javax.swing.JMenuItem gerarBackup;
     private javax.swing.JMenuItem gerarCodant;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
