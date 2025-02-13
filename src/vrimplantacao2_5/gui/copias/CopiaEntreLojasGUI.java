@@ -61,6 +61,9 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
         Custos = new javax.swing.JCheckBox();
         SituacaoCadastro = new javax.swing.JCheckBox();
         Margem = new javax.swing.JCheckBox();
+        estoque = new javax.swing.JCheckBox();
+        estoqueMaximo = new javax.swing.JCheckBox();
+        estoqueMinimo = new javax.swing.JCheckBox();
         pnlDados2 = new vrframework.bean.panel.VRPanel();
         btnCopiar = new vrframework.bean.button.VRButton();
 
@@ -136,6 +139,16 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(Margem, "Margem");
 
+        org.openide.awt.Mnemonics.setLocalizedText(estoque, "Estoque");
+        estoque.setToolTipText("");
+        estoque.setActionCommand("Estoque");
+
+        org.openide.awt.Mnemonics.setLocalizedText(estoqueMaximo, "Estoque Máximo");
+        estoqueMaximo.setToolTipText("");
+
+        org.openide.awt.Mnemonics.setLocalizedText(estoqueMinimo, "Estoque Mínimo");
+        estoqueMinimo.setToolTipText("");
+
         javax.swing.GroupLayout pnlDados1Layout = new javax.swing.GroupLayout(pnlDados1);
         pnlDados1.setLayout(pnlDados1Layout);
         pnlDados1Layout.setHorizontalGroup(
@@ -144,15 +157,20 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
                 .addGap(30, 30, 30)
                 .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(SituacaoCadastro)
-                    .addComponent(PrecoVenda))
+                    .addComponent(PrecoVenda)
+                    .addComponent(estoque))
                 .addGap(35, 35, 35)
                 .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Margem)
                     .addGroup(pnlDados1Layout.createSequentialGroup()
-                        .addComponent(PrecoDiaSeguinte)
+                        .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(PrecoDiaSeguinte)
+                            .addComponent(estoqueMaximo))
                         .addGap(35, 35, 35)
-                        .addComponent(Custos))
-                    .addComponent(Margem))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(estoqueMinimo)
+                            .addComponent(Custos))))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         pnlDados1Layout.setVerticalGroup(
             pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,7 +184,12 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
                 .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(SituacaoCadastro)
                     .addComponent(Margem))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(pnlDados1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(estoque)
+                    .addComponent(estoqueMaximo)
+                    .addComponent(estoqueMinimo))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         btnCopiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
@@ -255,6 +278,9 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnCopiar;
     private javax.swing.JComboBox clb1;
     private javax.swing.JComboBox clb2;
+    private javax.swing.JCheckBox estoque;
+    private javax.swing.JCheckBox estoqueMaximo;
+    private javax.swing.JCheckBox estoqueMinimo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private vrframework.bean.panel.VRPanel pnlDados;
@@ -294,6 +320,18 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
 
         if (SituacaoCadastro.isSelected()) {
             listaDeOpcoes.add(" id_situacaocadastro = b.id_situacaocadastro");
+        }
+
+        if (estoque.isSelected()) {
+            listaDeOpcoes.add(" estoque = b.estoque");
+        }
+        
+        if (estoqueMaximo.isSelected()) {
+            listaDeOpcoes.add(" estoquemaximo = b.estoquemaximo");
+        }
+        
+        if (estoqueMinimo.isSelected()) {
+            listaDeOpcoes.add(" estoqueminimo = b.estoqueminimo");
         }
 
         if (!listaDeOpcoes.isEmpty()) {

@@ -144,17 +144,24 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="SituacaoCadastro" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="PrecoVenda" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="estoque" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="PrecoDiaSeguinte" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                          <Component id="Custos" min="-2" max="-2" attributes="0"/>
-                      </Group>
                       <Component id="Margem" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="PrecoDiaSeguinte" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="estoqueMaximo" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="estoqueMinimo" min="-2" max="-2" attributes="0"/>
+                              <Component id="Custos" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="30" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -172,7 +179,13 @@
                       <Component id="SituacaoCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="Margem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="estoque" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="estoqueMaximo" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="estoqueMinimo" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -201,6 +214,25 @@
         <Component class="javax.swing.JCheckBox" name="Margem">
           <Properties>
             <Property name="text" type="java.lang.String" value="Margem"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="estoque">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Estoque"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="actionCommand" type="java.lang.String" value="Estoque"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="estoqueMaximo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Estoque M&#xe1;ximo"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="estoqueMinimo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Estoque M&#xed;nimo"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
         </Component>
       </SubComponents>

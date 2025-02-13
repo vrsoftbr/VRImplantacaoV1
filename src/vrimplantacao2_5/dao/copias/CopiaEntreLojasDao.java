@@ -17,7 +17,7 @@ public class CopiaEntreLojasDao {
 
         StringBuilder sql = new StringBuilder("UPDATE produtocomplemento a SET ");
         sql.append(String.join(", ", listaDeOpcoes));
-        sql.append(" FROM (SELECT id_produto, precovenda, precodiaseguinte, custocomimposto, custosemimposto, margem, margemminima, margemmaxima, id_situacaocadastro FROM produtocomplemento WHERE id_loja = ?) b ");
+        sql.append(" FROM (SELECT id_produto, precovenda, precodiaseguinte, custocomimposto, custosemimposto, margem, margemminima, margemmaxima, id_situacaocadastro, estoque, estoquemaximo, estoqueminimo  FROM produtocomplemento WHERE id_loja = ?) b ");
         sql.append("WHERE a.id_produto = b.id_produto AND a.id_loja = ?");
 
         try (PreparedStatement pst = Conexao.prepareStatement(sql.toString())) {
