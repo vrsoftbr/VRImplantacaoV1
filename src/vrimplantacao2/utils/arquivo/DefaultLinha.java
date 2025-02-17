@@ -165,5 +165,10 @@ public class DefaultLinha implements LinhaArquivo {
 
         return false; 
     }
+
+    @Override
+    public Object get(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
