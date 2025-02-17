@@ -92,7 +92,8 @@ public enum OpcaoCliente {
     CONVENIO_EMPRESA,
     CONVENIO_CONVENIADO,
     CONVENIO_TRANSACAO,
-    OUTRAS_RECEITAS;
+    OUTRAS_RECEITAS,
+    DEPENDENTES;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

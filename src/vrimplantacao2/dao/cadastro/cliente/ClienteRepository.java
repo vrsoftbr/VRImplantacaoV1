@@ -22,6 +22,7 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
+import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialDependenteVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
@@ -32,6 +33,7 @@ import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
+import vrimplantacao2.vo.importacao.ClienteDependenteIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.migracao.LogController;
@@ -57,7 +59,7 @@ public class ClienteRepository {
         this.provider = provider;
         this.logController = new LogController();
     }
-    
+
     public String getLoja() {
         return provider.getLojaOrigem();
     }
@@ -68,7 +70,7 @@ public class ClienteRepository {
 
         int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = clienteService.verificaRegistro();
-        
+
         String impSistema = clienteService.getImpSistemaInicial();
 
         if (this.forcarUnificacao) {
@@ -81,10 +83,10 @@ public class ClienteRepository {
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
 
                 String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-                
+
                 if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
-                    
-                    this.provider.setNotificacao("Cliente Preferencial - Copiando código anterior Cliente...", clientes.size());                    
+
+                    this.provider.setNotificacao("Cliente Preferencial - Copiando código anterior Cliente...", clientes.size());
                     clienteService.copiarCodantClientePreferencial(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
 
@@ -92,16 +94,16 @@ public class ClienteRepository {
             }
         }
     }
-    
+
     public void salvarClienteEventual2_5(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
         ClienteEventualService clienteService = new ClienteEventualService();
         this.forcarUnificacao = opt.contains(OpcaoCliente.FORCAR_UNIFICACAO);
-        
+
         int idConexao = clienteService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = clienteService.verificaRegistro();
-        
+
         String impSistema = clienteService.getImpSistemaInicial();
-        
+
         if (this.forcarUnificacao) {
             unificarClienteEventual(clientes, opt);
         } else {
@@ -113,9 +115,9 @@ public class ClienteRepository {
                         verificaMigracaoMultiloja(this.provider.getLojaOrigem(), this.provider.getSistema(), this.provider.getIdConexao());
 
                 String lojaModelo = clienteService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-                
+
                 if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
-                    
+
                     this.provider.setNotificacao("Cliente Eventual - Copiando código anterior Cliente...", clientes.size());
                     clienteService.copiarCodantClienteEventual(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
@@ -124,7 +126,7 @@ public class ClienteRepository {
             }
         }
     }
-    
+
     public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
 
         int iniciarEm = 1;
@@ -153,8 +155,9 @@ public class ClienteRepository {
                 Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
                 MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
                 MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
-                //</editor-fold>
+                MultiMap<String, Void> dependentes = provider.preferencial().getContatosExistentes();
 
+                //</editor-fold>
                 provider.setNotificacao("Gravando cliente preferêncial...", clientes.size());
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
@@ -212,6 +215,10 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CONTATOS)) {
                         importarContatoPreferencial(cliente, imp, contatos);
                     }
+
+                    if (opt.contains(OpcaoCliente.DEPENDENTES)) {
+                        importarDependenteClientePreferencial(cliente, imp, dependentes);
+                    }
                     provider.notificar();
                 }
 
@@ -244,6 +251,7 @@ public class ClienteRepository {
             if (opt.isEmpty()) {
                 opt.add(OpcaoCliente.DADOS);
                 opt.add(OpcaoCliente.CONTATOS);
+                opt.add(OpcaoCliente.DEPENDENTES);
                 opt.add(OpcaoCliente.OBSERVACOES2);
                 opt.add(OpcaoCliente.ENDERECO_COMPLETO);
             }
@@ -414,6 +422,34 @@ public class ClienteRepository {
         }
     }
 
+    private void importarDependenteClientePreferencial(ClientePreferencialVO cliente, ClienteIMP imp, MultiMap<String, Void> dependentes) throws Exception {
+        //Gravando os depententes se o código atual estiver preenchido.
+        if (cliente != null) {
+            for (ClienteDependenteIMP impDep : imp.getDependentes()) {
+                //Converte o IMP em VO
+                ClientePreferencialDependenteVO dependente = converterDependentePreferencial(impDep);
+                dependente.setIdClientePreferencial(cliente.getId());
+                //Se houver algum contato cadastrado com essa assinatura,
+                //Não executa a rotina
+                if (!dependentes.containsKey(
+                        String.valueOf(dependente.getIdClientePreferencial()),
+                        String.valueOf(dependente.getCpf())
+                )) {
+                    gravarClientePreferencialDependente(dependente);
+                    dependentes.put(
+                            null,
+                            String.valueOf(cliente.getId()),
+                            dependente.getNome(),
+                            String.valueOf(dependente.getCpf()),
+                            dependente.getTipoDependente()
+                    );
+                } else {
+                    atualizaClientePreferencialDependente(dependente);
+                }
+            }
+        }
+    }
+
     public void importarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
 
         int iniciarEm = 1;
@@ -553,12 +589,12 @@ public class ClienteRepository {
         List<ClienteIMP> result = new ArrayList<>();
         Map<String, ClienteIMP> validos = new LinkedHashMap<>();
         Map<String, ClienteIMP> invalidos = new LinkedHashMap<>();
-        
+
         boolean importarSomenteAtivos = opt.contains(OpcaoCliente.IMPORTAR_SOMENTE_ATIVO);
 
         clientes.forEach((imp) -> {
             //Verifica se o ID é válido para organizar a listagem;
-            
+
             if (importarSomenteAtivos) { // Verificar se será migado somente clientes ativos
                 if (imp.isAtivo()) {
                     try {
@@ -603,7 +639,7 @@ public class ClienteRepository {
 
         return result;
     }
-    
+
     public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes) {
 
         LOG.fine("Organizando a listagem dos clientes");
@@ -742,7 +778,7 @@ public class ClienteRepository {
         vo.setIe(imp.getInscricaoestadual());
         vo.setNome(imp.getRazao());
         vo.setIdConexao(provider.getIdConexao());
-        
+
         return vo;
     }
 
@@ -885,6 +921,7 @@ public class ClienteRepository {
                 Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
                 MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
                 MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
+                MultiMap<String, Void> dependentes = provider.preferencial().getDependentesExistentes();
                 //</editor-fold>
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
@@ -922,6 +959,7 @@ public class ClienteRepository {
                             anterior.setCodigoAtual(cliente);
                             gravarClientePreferencialAnterior(anterior);
                             importarContatoPreferencial(anterior.getCodigoAtual(), imp, contatos);
+                            importarDependenteClientePreferencial(anterior.getCodigoAtual(), imp, dependentes);
                             continue;
                         }
 
@@ -962,6 +1000,7 @@ public class ClienteRepository {
                     } else {
                         if (anterior.getCodigoAtual() != null) {
                             importarContatoPreferencial(anterior.getCodigoAtual(), imp, contatos);
+                            importarDependenteClientePreferencial(anterior.getCodigoAtual(), imp, dependentes);
                         }
                     }
 
@@ -992,7 +1031,6 @@ public class ClienteRepository {
      * @param opt
      * @throws Exception
      */
-    
     public void unificarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
 
         int iniciarEm = 1;
@@ -1122,6 +1160,14 @@ public class ClienteRepository {
         return cont;
     }
 
+    public ClientePreferencialDependenteVO converterDependentePreferencial(ClienteDependenteIMP impDep) {
+        ClientePreferencialDependenteVO dep = new ClientePreferencialDependenteVO();
+        dep.setNome(impDep.getNome());
+        dep.setCpf(impDep.getCpf());
+        dep.setTipoDependente(impDep.getTipodependente());
+        return dep;
+    }
+
     public ClienteEventualContatoVO converterContatoEventual(ClienteContatoIMP impCont) {
         ClienteEventualContatoVO cont = new ClienteEventualContatoVO();
 
@@ -1148,6 +1194,14 @@ public class ClienteRepository {
 
     public void gravarClientePreferencialContato(ClientePreferencialContatoVO contato) throws Exception {
         provider.preferencial().salvar(contato);
+    }
+
+    public void gravarClientePreferencialDependente(ClientePreferencialDependenteVO dependente) throws Exception {
+        provider.preferencial().salvar(dependente);
+    }
+
+    public void atualizaClientePreferencialDependente(ClientePreferencialDependenteVO dependente) throws Exception {
+        provider.preferencial().atualizar(dependente);
     }
 
     public void gravarClienteEventualContato(ClienteEventualContatoVO contato) throws Exception {

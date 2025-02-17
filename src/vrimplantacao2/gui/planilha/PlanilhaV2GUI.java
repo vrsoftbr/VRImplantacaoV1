@@ -152,6 +152,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliTelefone = new vr.view.components.checkbox.VRCheckBox();
         chkCliDtCadastro = new vr.view.components.checkbox.VRCheckBox();
         chkPontuacao = new vr.view.components.checkbox.VRCheckBox();
+        chkCliPrefDependentes = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -684,6 +685,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkPontuacao, "Pontuação");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCliPrefDependentes, "Dependentes");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -724,7 +727,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkPontuacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(chkPontuacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(chkCliPrefDependentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -754,7 +758,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                             .addComponent(chkCliTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkCliDtCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkPontuacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCliPrefDependentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente Eventual"));
@@ -801,11 +807,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addGroup(pnlClienteNormalLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(chkCliEspec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(160, Short.MAX_VALUE))
+                .addContainerGap(132, Short.MAX_VALUE))
         );
 
         tabsCliente.addTab("Importação", pnlClienteNormal);
@@ -1352,6 +1358,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vr.view.components.checkbox.VRCheckBox chkCliMunicipio;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefDados;
+    private vrframework.bean.checkBox.VRCheckBox chkCliPrefDependentes;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefInscricaoEstadual;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefRotativoBaixas;
@@ -1459,7 +1466,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 public void run() {
                     try {
                         Importador importador = new Importador(dao);
-                        
+
                         importador.importarPorPlanilha = true;
                         dao.setSistema(txtSistema.getText());
                         dao.setLojaOrigem(txtCodLojaOrigem.getText());
@@ -1515,13 +1522,13 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     if (!opcoes.isEmpty()) {
                                         importador.importarFornecedor();
                                     }
-                                    if(chkTipoForn.isSelected()) {
+                                    if (chkTipoForn.isSelected()) {
                                         importador.atualizarFornecedor(OpcaoFornecedor.TIPO_EMPRESA);
                                     }
                                     if (chkFornProdutoFornecedor.isSelected()) {
                                         importador.importarProdutoFornecedor();
                                     }
-                                    if(chkContaPagar.isSelected()) {
+                                    if (chkContaPagar.isSelected()) {
                                         //dao.getOpcoes().put("dateformat", txtFormatoData.getText());
                                         importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                                     }
@@ -1547,9 +1554,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 if (chkPdvVendas.isSelected()) {
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                                 }
-                                if(chkEANAtual.isSelected()) {
+                                if (chkEANAtual.isSelected()) {
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL);
-                                }  
+                                }
                             }
                             break;
                             case 3: {
@@ -1563,11 +1570,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         if (chkCliPrefContatos.isSelected()) {
                                             opcoes.add(OpcaoCliente.CONTATOS);
                                         }
+                                        if (chkCliPrefDependentes.isSelected()) {
+                                            opcoes.add(OpcaoCliente.DEPENDENTES);
+                                        }
                                         importador.importarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                                     }
-                                    
+
                                     {
-                                        List<OpcaoCliente> opcoes = new ArrayList<>();                                        
+                                        List<OpcaoCliente> opcoes = new ArrayList<>();
                                         if (chkCliPrefInscricaoEstadual.isSelected()) {
                                             opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                                         }
@@ -1603,17 +1613,17 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                             ));
                                         }
                                         if (!opcoes.isEmpty()) {
-                                            importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));                                        
+                                            importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                                         }
                                     }
-                                
+
                                     if (chkCliPrefRotativo.isSelected()) {
                                         importador.importarCreditoRotativo();
                                     }
                                     if (chkCliPrefRotativoBaixas.isSelected()) {
                                         importador.importarCreditoRotativoBaixasAgrupadas();
                                     }
-                                    if(chkCliCheques.isSelected()) {
+                                    if (chkCliCheques.isSelected()) {
                                         importador.importarCheque();
                                     }
                                     if (chkCliContaReceber.isSelected()) {
@@ -1622,7 +1632,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     if (chkPontuacao.isSelected()) {
                                         importador.importarClientePontuacao();
                                     }
-                                    if(chkCNPJCli.isSelected()) {
+                                    if (chkCNPJCli.isSelected()) {
                                         importador.atualizarClientePreferencial(OpcaoCliente.CNPJ);
                                     }
                                     if (chkCliEvenDados.isSelected()) {
@@ -1649,7 +1659,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 dao.setArquivoConvenioTransacoes(txtConvTransacoes.getArquivo());
                                 dao.getOpcoes().put("delimiter", txtConvDelimitador.getText());
                                 dao.getOpcoes().put("quote", txtConvQuote.getText());
-                                
+
                                 if (chkConvEmpresas.isSelected()) {
                                     importador.importarConvenioEmpresa();
                                 }
@@ -1816,8 +1826,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtConvEmpresas.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_EMPRESAS"));
         txtConvConveniados.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_CONVENIADOS"));
         txtConvTransacoes.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_TRANSACOES"));
-        txtConvDelimitador.setText(parametros.getWithNull("^","IMPORTACAO", "PLANILHA", "CONVENIO_DELIMITADOR"));
-        txtConvQuote.setText(parametros.getWithNull("\"","IMPORTACAO", "PLANILHA", "CONVENIO_QUOTE"));
+        txtConvDelimitador.setText(parametros.getWithNull("^", "IMPORTACAO", "PLANILHA", "CONVENIO_DELIMITADOR"));
+        txtConvQuote.setText(parametros.getWithNull("\"", "IMPORTACAO", "PLANILHA", "CONVENIO_QUOTE"));
 
     }
 

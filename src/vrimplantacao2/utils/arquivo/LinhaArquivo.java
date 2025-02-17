@@ -97,5 +97,7 @@ public interface LinhaArquivo {
      * @return Valor encontrado. 
      */
     public boolean getBoolean(String campo);
+
+    public Object get(String string);
     
 }

@@ -849,6 +849,28 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         break;
                     }
                 }
+
+                i = 1;
+                while (true) {
+                    String prefixo = "dep" + i + "_";
+                    if (linha.existsColumn(prefixo + "nome")) {
+                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
+                        {
+                            String cpf = linha.getString(prefixo + "cpf");
+                            String tipoDependente = linha.getString(prefixo + "tipodependente");
+                            String nome = linha.getString(prefixo + "nome");
+                            if (!"".equals(nome)
+                                    || !"".equals(cpf)
+                                    || !"".equals(tipoDependente)) {
+                                imp.addDependente(String.valueOf(i), nome, cpf, tipoDependente);
+                            }
+                        }
+
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 throw e;
             }
@@ -1081,6 +1103,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return new VendaItemIterator(new ArquivoCSV2(arquivoVendasItens, delimiter.charAt(0), stringQuote));
+
     }
 
     private class VendaIterator implements Iterator<VendaIMP> {

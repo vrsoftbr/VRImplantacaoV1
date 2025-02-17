@@ -15,6 +15,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 
 /**
  * Classe utilizada para importar clientes
+ *
  * @author Leandro
  */
 public class ClienteIMP {
@@ -76,11 +77,11 @@ public class ClienteIMP {
     private String nomePai;
     private String nomeMae;
     private String observacao;
-    private String observacao2; 
+    private String observacao2;
     private int diaVencimento;
     private boolean permiteCreditoRotativo;
     private boolean permiteCheque;
-    private boolean permiteChequeAVista =  false;
+    private boolean permiteChequeAVista = false;
     private int senha;
     private double ponto;
 
@@ -105,9 +106,9 @@ public class ClienteIMP {
     private String inscricaoMunicipal;
     private TipoIndicadorIE tipoIndicadorIe = TipoIndicadorIE.NAO_CONTRIBUINTE;
     private int grupo;
-    
+
     private List<ClienteContatoIMP> contatos = new ArrayList<>();
-    
+    private List<ClienteDependenteIMP> dependentes = new ArrayList<>();
 
     public ClienteIMP() {
     }
@@ -119,7 +120,7 @@ public class ClienteIMP {
         this.razao = razao;
         this.fantasia = fantasia;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -163,7 +164,6 @@ public class ClienteIMP {
     public String getRazao() {
         return razao;
     }
-    
 
     public void setRazao(String razao) {
         this.razao = razao;
@@ -240,7 +240,7 @@ public class ClienteIMP {
     public void setMunicipioIBGE(int municipioIBGE) {
         this.municipioIBGE = municipioIBGE;
     }
-    
+
     public void setMunicipioIBGE(String municipioIBGE) {
         this.municipioIBGE = Utils.stringToInt(municipioIBGE);
     }
@@ -284,12 +284,12 @@ public class ClienteIMP {
     public void setEstadoCivil(TipoEstadoCivil estadoCivil) {
         this.estadoCivil = estadoCivil;
     }
-    
+
     public void setEstadoCivil(int estadoCivil) {
         setEstadoCivil(TipoEstadoCivil.getById(estadoCivil));
     }
-    
-    public void setEstadoCivil(String estadoCivil) {        
+
+    public void setEstadoCivil(String estadoCivil) {
         setEstadoCivil(TipoEstadoCivil.getByString(estadoCivil));
     }
 
@@ -316,7 +316,7 @@ public class ClienteIMP {
     public void setSexo(TipoSexo sexo) {
         this.sexo = sexo;
     }
-    
+
     public void setSexo(String sexo) {
         if (sexo == null || sexo.trim().equals("")) {
             this.sexo = TipoSexo.MASCULINO;
@@ -532,13 +532,13 @@ public class ClienteIMP {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public void addEmail(String descricao, String email, TipoContato tipo) {
         if (email != null && !"".equals(email.trim())) {
             addContato(null, descricao, "", "", email);
         }
     }
-    
+
     public void addEmail(String email, TipoContato tipo) {
         addEmail(tipo.getDescricao(), email, tipo);
     }
@@ -675,6 +675,10 @@ public class ClienteIMP {
         return contatos;
     }
 
+    public List<ClienteDependenteIMP> getDependentes() {
+        return dependentes;
+    }
+
     public int getSenha() {
         return senha;
     }
@@ -682,14 +686,15 @@ public class ClienteIMP {
     public void setSenha(int senha) {
         this.senha = senha;
     }
-    
+
     /**
      * Inclui um contato.
+     *
      * @param id Código do contato.
      * @param nome Nome do contato.
      * @param telefone Telefone do contato.
      * @param celular Celular do contato.
-     * @param email  E-mail do contato. (Eventual)
+     * @param email E-mail do contato. (Eventual)
      */
     public void addContato(String id, String nome, String telefone, String celular, String email) {
         if (nome != null && !"".equals(nome.trim())) {
@@ -697,7 +702,7 @@ public class ClienteIMP {
 
             if (id == null) {
                 Set<String> ids = new HashSet<>();
-                for (ClienteContatoIMP cont: contatos) {
+                for (ClienteContatoIMP cont : contatos) {
                     ids.add(cont.getId());
                 }
                 int cont = 1;
@@ -716,7 +721,32 @@ public class ClienteIMP {
             contatos.add(contato);
         }
     }
-    
+
+    public void addDependente(String id, String nome, String cpf, String tipoDependente) {
+        if (nome != null && !"".equals(nome.trim())) {
+            ClienteDependenteIMP dependente = new ClienteDependenteIMP();
+
+            if (id == null) {
+                Set<String> ids = new HashSet<>();
+                for (ClienteDependenteIMP dep : dependentes) {
+                    ids.add(dep.getId());
+                }
+                int cont = 1;
+                while (ids.contains("DEPENDETE " + cont)) {
+                    cont++;
+                }
+                id = "DEPENDENTE " + cont;
+            }
+
+            dependente.setId(id);
+            dependente.setCliente(this);
+            dependente.setNome(nome);
+            dependente.setCpf(Long.valueOf(cpf));
+            dependente.setTipodependente(tipoDependente);
+            dependentes.add(dependente);
+        }
+    }
+
     public void addTelefone(String descricao, String numero) {
         descricao = Utils.acertarTexto(descricao);
         numero = Utils.stringLong(numero);
@@ -724,7 +754,7 @@ public class ClienteIMP {
             addContato(descricao, descricao, numero, "", "");
         }
     }
-    
+
     public void addCelular(String descricao, String numero) {
         descricao = Utils.acertarTexto(descricao);
         numero = Utils.stringLong(numero);
@@ -744,7 +774,7 @@ public class ClienteIMP {
         this.empresaUfIBGE = this.ufIBGE;
         this.empresaCep = this.cep;
     }
-    
+
     public void copiarEnderecoParaCobranca() {
         this.cobrancaEndereco = this.endereco;
         this.cobrancaNumero = this.numero;
@@ -794,5 +824,5 @@ public class ClienteIMP {
     public void setPermiteChequeAVista(boolean permiteChequeAVista) {
         this.permiteChequeAVista = permiteChequeAVista;
     }
-    
+
 }

@@ -1,7 +1,5 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +10,6 @@ import vrimplantacao2.dao.cadastro.LocalDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodAnteriorDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodTelefoneDAO;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.collection.IDStack;
@@ -22,6 +19,7 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
+import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialDependenteVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
@@ -32,7 +30,7 @@ import vrimplantacao2.vo.cadastro.local.MunicipioVO;
  * @author Leandro
  */
 public class ClienteRepositoryProvider {
-    
+
     private int idConexao;
     private String sistema;
     private String lojaOrigem;
@@ -53,7 +51,7 @@ public class ClienteRepositoryProvider {
         this.food = new OrgClienteFood();
         this.clientePreferencialDAO = new ClientePreferencialDAO();
     }
-    
+
     public void setNotificacao(String mensagem, int qtd) throws Exception {
         if (!desativarNotificacao) {
             ProgressBar.setStatus(mensagem);
@@ -66,11 +64,11 @@ public class ClienteRepositoryProvider {
             ProgressBar.next();
         }
     }
-    
-    public void carregarMunicipios() throws Exception {        
+
+    public void carregarMunicipios() throws Exception {
         municipioByID = new LinkedHashMap<>();
         municipioByDesc = new MultiMap<>();
-        for (MunicipioVO municipio: new LocalDAO().getMunicipios()) {
+        for (MunicipioVO municipio : new LocalDAO().getMunicipios()) {
             municipioByID.put(municipio.getId(), municipio);
             municipioByDesc.put(municipio, municipio.getEstado().getSigla(), municipio.getDescricao());
         }
@@ -79,11 +77,11 @@ public class ClienteRepositoryProvider {
     public int getIdConexao() {
         return this.idConexao;
     }
-    
+
     public void setIdConexao(int idConexao) {
         this.idConexao = idConexao;
     }
-    
+
     public void setSistema(String sistema) {
         this.sistema = sistema;
     }
@@ -107,25 +105,25 @@ public class ClienteRepositoryProvider {
     public int getLojaVR() {
         return lojaVR;
     }
-    
+
     //<editor-fold defaultstate="collapsed" desc="Operação de banco">
     public void begin() throws Exception {
         Conexao.begin();
     }
-    
+
     public void commit() throws Exception {
         Conexao.commit();
     }
-    
+
     public void rollback() throws Exception {
         Conexao.rollback();
     }
     //</editor-fold>
 
-    public ClientePreferencialIDStack getClientePreferencialIDStack(int iniciarEm) {        
+    public ClientePreferencialIDStack getClientePreferencialIDStack(int iniciarEm) {
         return new ClientePreferencialIDStack(iniciarEm);
     }
-    
+
     public ClienteEventualIDStack getClienteEventualIDStack(int iniciarEm) {
         return new ClienteEventualIDStack(iniciarEm);
     }
@@ -149,17 +147,19 @@ public class ClienteRepositoryProvider {
     }
 
     private OrgPreferencial pref;
+
     public OrgPreferencial preferencial() {
         return pref;
     }
-    
+
     private OrgEventual evt;
+
     public OrgEventual eventual() {
         return evt;
     }
 
     int getProduto() throws Exception {
-       return produtoDAO.getProduto();
+        return produtoDAO.getProduto();
     }
 
     long getEan() throws Exception {
@@ -167,12 +167,14 @@ public class ClienteRepositoryProvider {
     }
 
     public static class OrgPreferencial {
-        
+
         ClienteRepositoryProvider provider;
+
         public OrgPreferencial(ClienteRepositoryProvider prov) throws Exception {
             this.anteriorDAO = new ClientePreferencialAnteriorDAO();
             this.preferencialDAO = new ClientePreferencialDAO();
             this.preferencialContatoDAO = new ClientePreferencialContatoDAO();
+            this.preferencialDependenteDAO = new ClientePreferencialDependenteDAO();
             this.anteriorDAO.createTable();
             this.provider = prov;
         }
@@ -184,17 +186,26 @@ public class ClienteRepositoryProvider {
         private final ClientePreferencialDAO preferencialDAO;
         private final ClientePreferencialAnteriorDAO anteriorDAO;
         private final ClientePreferencialContatoDAO preferencialContatoDAO;
-        
+        private final ClientePreferencialDependenteDAO preferencialDependenteDAO;
+
         public void salvar(ClientePreferencialVO cliente) throws Exception {
             preferencialDAO.salvar(cliente);
         }
 
         public void salvar(ClientePreferencialAnteriorVO anterior) throws Exception {
             anteriorDAO.salvar(anterior);
-        }        
-        
+        }
+
         public void salvar(ClientePreferencialContatoVO contato) throws Exception {
             preferencialContatoDAO.salvar(contato);
+        }
+
+        public void salvar(ClientePreferencialDependenteVO dependente) throws Exception {
+            preferencialDependenteDAO.salvar(dependente);
+        }
+
+        public void atualizar(ClientePreferencialDependenteVO dependente) throws Exception {
+            preferencialDependenteDAO.atualizar(dependente);
         }
 
         public Map<Long, Integer> getCnpjCadastrados() throws Exception {
@@ -203,16 +214,21 @@ public class ClienteRepositoryProvider {
 
         public MultiMap<String, ClientePreferencialAnteriorVO> getAnteriores() throws Exception {
             return anteriorDAO.getAnteriores(provider.getSistema(), provider.getLojaOrigem());
-        }        
+        }
 
         public MultiMap<String, Void> getContatosExistentes() throws Exception {
             return preferencialContatoDAO.getContatosExistentes();
         }
+
+        public MultiMap<String, Void> getDependentesExistentes() throws Exception {
+            return preferencialDependenteDAO.getDependentesExistentes();
+        }
     }
-    
+
     public static class OrgEventual {
-        
+
         ClienteRepositoryProvider prov;
+
         public OrgEventual(ClienteRepositoryProvider prov) throws Exception {
             this.anteriorDAO = new ClienteEventualAnteriorDAO();
             this.eventualDAO = new ClienteEventualDAO();
@@ -220,30 +236,30 @@ public class ClienteRepositoryProvider {
             this.anteriorDAO.createTable();
             this.prov = prov;
         }
-        
+
         private final ClienteEventualDAO eventualDAO;
         private final ClienteEventualAnteriorDAO anteriorDAO;
         private final ClienteEventualContatoDAO eventualContatoDAO;
-        
+
         public void salvar(ClienteEventualVO cliente) throws Exception {
             eventualDAO.salvar(cliente);
         }
 
         public void salvar(ClienteEventualAnteriorVO anterior) throws Exception {
             anteriorDAO.salvar(anterior);
-        }  
-        
+        }
+
         public void salvar(ClienteEventualContatoVO contato) throws Exception {
             eventualContatoDAO.salvar(contato);
         }
-        
+
         public Map<Long, Integer> getCnpjCadastrados() throws Exception {
             return eventualDAO.getCnpjCadastrados();
         }
-        
+
         public MultiMap<String, ClienteEventualAnteriorVO> getAnteriores() throws Exception {
             return anteriorDAO.getAnteriores(prov.getSistema(), prov.getLojaOrigem());
-        }       
+        }
 
         public MultiMap<String, Void> getContatosExistentes() throws Exception {
             return eventualContatoDAO.getContatosExistentes();
@@ -253,19 +269,19 @@ public class ClienteRepositoryProvider {
             return prov;
         }
     }
-    
+
     public void atualizarClientePreferencial(ClientePreferencialVO vo, Set<OpcaoCliente> opt) throws Exception {
         clientePreferencialDAO.atualizarClientePreferencial(vo, opt);
     }
-    
+
     private OrgClienteFood food;
 
     public OrgClienteFood food() {
         return food;
     }
-    
+
     public class OrgClienteFood {
-        
+
         private ClienteFoodAnteriorDAO anteriorDao;
         private ClienteFoodTelefoneDAO clienteFoodTelefoneDao;
         private ClienteFoodDAO clienteFoodDao;
@@ -306,6 +322,6 @@ public class ClienteRepositoryProvider {
 
         public void incluirTelefoneFood(int id, Long telefone) throws Exception {
             clienteFoodTelefoneDao.incluirTelefone(id, telefone);
-        }        
+        }
     }
 }

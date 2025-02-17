@@ -938,11 +938,11 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel2" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="chkCliEspec" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="160" max="32767" attributes="0"/>
+                              <EmptySpace pref="132" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1003,6 +1003,7 @@
                                               </Group>
                                           </Group>
                                       </Group>
+                                      <Component id="chkCliPrefDependentes" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -1041,7 +1042,9 @@
                                           </Group>
                                       </Group>
                                   </Group>
-                                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliPrefDependentes" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -1125,6 +1128,11 @@
                         <Component class="vr.view.components.checkbox.VRCheckBox" name="chkPontuacao">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Pontua&#xe7;&#xe3;o"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPrefDependentes">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Dependentes"/>
                           </Properties>
                         </Component>
                       </SubComponents>
