@@ -20,6 +20,7 @@ import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoPostgres2;
+import vrimplantacao.classe.Global;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -1380,6 +1381,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	c.id_loja\n"
                 + "from\n"
                 + "	conveniado c\n"
+                        + "where c.id not in(824, 795, 835)"
                 + "order by\n"
                 + "	c.id"
         )) {
@@ -1398,7 +1400,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDataDesbloqueio(rs.getDate("datadesbloqueio"));
                 imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
                 imp.setDataBloqueio(rs.getDate("databloqueio"));
-                imp.setLojaCadastro(rs.getInt("id_loja"));
+                imp.setLojaCadastro(Global.idLoja);
 
                 result.add(imp);
 //                contador++;

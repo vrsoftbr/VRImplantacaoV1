@@ -288,45 +288,52 @@ public class LojaDAO {
             //("Copiando pdv.finalizadoraconfiguracao.");
             stm.execute(script.copiarPdvFinalizadoraConfiguracao(i_loja));
 
-            try {
-                stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
-            } catch (SQLException e) {
-                e.getMessage();
-                throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
-            }
-            try {
-                stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
-            }
-
-            try {
-                stm.execute(script.copiaPdvAliquotaLayout(i_loja));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+            if (i_loja.isCopiarAcumulador()) {
+                try {
+                    stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
+                } catch (SQLException e) {
+                    e.getMessage();
+                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
+                }
+                try {
+                    stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
+                }
             }
 
-            try {
-                stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+            if (i_loja.isCopiarAliquota()) {
+
+                try {
+                    stm.execute(script.copiaPdvAliquotaLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+                }
+
+                try {
+                    stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+                }
             }
 
-            try {
-                stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
-            }
+            if (i_loja.isCopiarFinalizadora()) {
+                try {
+                    stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
+                }
 
-            try {
-                stm.execute(script.copiaFinalizadoraRetorno(i_loja));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.");
+                try {
+                    stm.execute(script.copiaFinalizadoraRetorno(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.");
+                }
             }
 
             //("Copiando dataprocessamento.");
