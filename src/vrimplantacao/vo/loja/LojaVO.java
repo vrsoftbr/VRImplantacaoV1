@@ -30,6 +30,7 @@ public class LojaVO {
     private boolean copiarAcumulador = false;
     private boolean copiarAliquota = false;
     private boolean copiarFinalizadora = false;
+    private boolean copiarCartoes = false;
 
     public int getId() {
         return id;
@@ -282,5 +283,11 @@ public class LojaVO {
         this.copiarFinalizadora = copiarFinalizadora;
     }
 
+    public boolean isCopiarCartoes() {
+        return copiarCartoes;
+    }
 
+    public void setCopiarCartoes(boolean copiarCartoes) {
+        this.copiarCartoes = copiarCartoes;
+    }
 }

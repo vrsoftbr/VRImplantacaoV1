@@ -190,6 +190,14 @@ public class LojaGeradorScripts {
         return sql;
     }
 
+    public String inserirDataPdvConsistencia(LojaVO i_loja) throws Exception {
+        String sql
+                = "INSERT INTO pdv.consistencia (data, id_loja) \n"
+                + "VALUES (CURRENT_DATE - INTERVAL '1 day', " + i_loja.getId() +");";
+        
+        return sql;
+    }
+
     public String copiaUsuarioPermissao(LojaVO i_loja) throws Exception {
         String sql = "insert into permissaoloja (id, id_loja,id_permissao)\n"
                 + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja "
@@ -264,6 +272,25 @@ public class LojaGeradorScripts {
         String sql = "insert into pdv.aliquotalayout (id, id_loja, descricao)\n"
                 + "select (select max((id)+1) from pdv.aliquotalayout)," + i_loja.getId() + ", descricao from pdv.aliquotalayout where id_loja = " + i_loja.getIdCopiarLoja() + "\n"
                 + "group by id";
+
+        return sql;
+    }
+
+    public String copiaPdvCartaoLayout(LojaVO i_loja) throws Exception {
+        String sql
+                = "BEGIN;\n"
+                + "DELETE FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getId() + ";\n"
+                + "INSERT INTO pdv.cartaolayout (id, id_loja, id_tipocartao, posicao, tamanho, id_tipocartaocampo)\n"
+                + "SELECT (SELECT COALESCE(MAX(id), 0) FROM pdv.cartaolayout) + \n"
+                + "       ROW_NUMBER() OVER (), \n"
+                + "       " + i_loja.getId() + ", \n"
+                + "       id_tipocartao, \n"
+                + "       posicao, \n"
+                + "       tamanho, \n"
+                + "       id_tipocartaocampo \n"
+                + "FROM pdv.cartaolayout \n"
+                + "WHERE id_loja = " + i_loja.getIdCopiarLoja() + ";\n"
+                + "COMMIT;";
 
         return sql;
     }

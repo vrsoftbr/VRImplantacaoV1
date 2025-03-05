@@ -335,9 +335,22 @@ public class LojaDAO {
                     throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.");
                 }
             }
+            ProgressBar.setStatus("salvando loja... 50%");
+
+            if (i_loja.isCopiarCartoes()) {
+                try {
+                    stm.execute(script.copiaPdvCartaoLayout(i_loja));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new Exception("Erro ao copiar Cartões.");
+                }
+            }
 
             //("Copiando dataprocessamento.");
             stm.execute(script.inserirDataProcessamento(i_loja).getInsert());
+            
+            //("Inserindo data no PDV Consistencia"); --DESATIVADO ATÉ SEGUNDA ORDEM.
+//            stm.execute(script.inserirDataPdvConsistencia(i_loja));
 
             //("Copiando comprovante.");
             stm.execute(script.inserirComprovante(i_loja));
