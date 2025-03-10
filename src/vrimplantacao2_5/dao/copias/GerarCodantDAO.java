@@ -12,7 +12,7 @@ public class GerarCodantDAO {
 
     public void gerarCodant() throws Exception {
 
-        Util.exibirMensagemConfirmar("Deseja criar todas as Codant faltantes?", "Confirmação de criação de Codant");
+//        Util.exibirMensagemConfirmar("Deseja criar todas as Codant faltantes?", "Confirmação de criação de Codant");
 
         createCodant(sqlCodantProduto(), "PRODUTO");
         createCodant(sqlCodantFornecedor(), "FORNECEDOR");
@@ -21,7 +21,7 @@ public class GerarCodantDAO {
         createCodant(sqlCodantEan(), "EAN");
         createCodant(sqlMapaTributacao(), "MAPA_TRIBUTAÇÃO");
 
-        Util.exibirMensagem("Codant criadas com sucesso!", "Informativo");
+//        Util.exibirMensagem("Codant criadas com sucesso!", "Informativo");
     }
 
     private void createCodant(String sql, String tabela) {

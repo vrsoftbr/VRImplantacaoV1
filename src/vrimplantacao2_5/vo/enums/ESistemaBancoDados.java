@@ -187,7 +187,7 @@ public enum ESistemaBancoDados {
     ORACLE_ARIUS(197, "ARIUS", 9, "ORACLE", "", "PROREG", "automa", 1521, ""),
     ORACLE_CONSINCO(209, "CONSINCO", 9, "ORACLE", "", "", "", 1521, ""),
     ORACLE_WINTHOR(236, "WINTHOR", 9, "ORACLE", "", "", "", 1521, ""),
-        ORACLE_PARAGUAI(275, "PARAGUAI", 9, "ORACLE", "", "", "", 1521, ""),
+    ORACLE_PARAGUAI(275, "PARAGUAI", 9, "ORACLE", "", "", "", 1521, ""),
 //POSTGRESQL
     POSTGRESQL_ATHOS(9, "ATHOS", 11, "POSTGRESQL", "", "athos", "j2mhw82dyu1kn5g4", 5432, ""),
     POSTGRESQL_AUTOSYSTEM(12, "AUTOSYSTEM", 11, "POSTGRESQL", "", "", "", 5432, ""),
@@ -229,6 +229,7 @@ public enum ESistemaBancoDados {
     POSTGRESQL_ALTERDATAWSHOP(254, "ALTERDATAWSHOP", 11, "POSTGRESQL", "ALTERDATA_SHOP", "postgres", "#abc123#", 5432, ""),
     POSTGRESQL_PROSUPER(254, "PROSUPER", 11, "POSTGRESQL", "", "postgres", "", 8746, ""),
     POSTGRESQL_ATIVO(274, "ATIVO", 11, "POSTGRESQL", "", "postgres", "", 8746, ""),
+    POSTGRESQL_VR_SUPER(275, "VR_SUPER", 11, "POSTGRESQL", "", "postgres", "postgres", 54323, ""),
 //SQLSERVER
     SQLSERVER_ACCESYS(2, "ACCESYS", 13, "SQLSERVER", "", "sa", "@66E$Y$", 1433, ""),
     SQLSERVER_ACOM(3, "ACOM", 13, "SQLSERVER", "", "", "", 1433, ""),

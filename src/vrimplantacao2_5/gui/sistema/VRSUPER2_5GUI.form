@@ -54,9 +54,9 @@
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabImportacao">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o">
+              <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.tabImportacao.TabConstraints.tabTitle&gt;">
                 <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.tabImportacao.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.tabImportacao.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </JTabbedPaneConstraints>
             </Constraint>
@@ -67,9 +67,9 @@
             <Component class="vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI" name="tabFornecedores">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Fornecedores">
+                  <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.tabFornecedores.TabConstraints.tabTitle&gt;">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.tabFornecedores.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.tabFornecedores.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -78,9 +78,9 @@
             <Container class="javax.swing.JPanel" name="tabCli">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Clientes">
+                  <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.tabCli.TabConstraints.tabTitle&gt;">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.tabCli.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.tabCli.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -116,9 +116,9 @@
             <Container class="javax.swing.JPanel" name="tabParametro">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Ajuste">
+                  <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.tabParametro.TabConstraints.tabTitle&gt;">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.tabParametro.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.tabParametro.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -140,9 +140,9 @@
             <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProdutos">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Produtos">
+                  <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.tabProdutos.TabConstraints.tabTitle&gt;">
                     <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.tabProdutos.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.tabProdutos.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </JTabbedPaneConstraints>
                 </Constraint>
@@ -153,9 +153,9 @@
         <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Balan&#xe7;a">
+              <JTabbedPaneConstraints tabName="&lt;VRSUPER2_5GUI.pnlBalanca.TabConstraints.tabTitle&gt;">
                 <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.pnlBalanca.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.pnlBalanca.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </JTabbedPaneConstraints>
             </Constraint>
@@ -190,7 +190,7 @@
               <Image iconType="3" name="/vrframework/img/importar.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.btnMigrar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.btnMigrar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="4"/>
@@ -206,10 +206,10 @@
               <Image iconType="3" name="/vrframework/img/apagar.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.jBLimpar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.jBLimpar.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="Modelo2_5GUI.jBLimpar.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="vrimplantacao2_5/gui/sistema/Bundle.properties" key="VRSUPER2_5GUI.jBLimpar.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>

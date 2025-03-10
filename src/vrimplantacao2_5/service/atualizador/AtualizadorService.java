@@ -9,6 +9,7 @@ import java.util.List;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
 import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
+import vrimplantacao2_5.dao.copias.GerarCodantDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.enums.EMetodo;
 import vrimplantacao2_5.vo.enums.EScriptLojaOrigemSistema;
@@ -19,6 +20,7 @@ import vrimplantacao2_5.vo.enums.ETipoOperacao;
 public class AtualizadorService {
 
     private AtualizadorDAO atualizadorDAO;
+    private GerarCodantDAO gerarCodantDAO = new GerarCodantDAO();
 
     public AtualizadorService() {
         this.atualizadorDAO = new AtualizadorDAO();
@@ -57,6 +59,7 @@ public class AtualizadorService {
     }
 
     public void criarSchema() throws Exception {
+        this.gerarCodantDAO.gerarCodant();
         this.atualizadorDAO.criarSchema();
     }
 
@@ -138,7 +141,7 @@ public class AtualizadorService {
         atualizadorDAO.inserirUnidade();
         atualizadorDAO.inserirUsuario();
         atualizadorDAO.atualizarSenhas();
-//        atualizadorDAO.deletarUsuariosInativos();
+        atualizadorDAO.deletarUsuariosInativos();
 
         this.atualizarTabelas();
         this.salvarBancoDados();

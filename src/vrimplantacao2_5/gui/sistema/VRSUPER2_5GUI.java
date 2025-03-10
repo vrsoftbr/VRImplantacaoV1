@@ -9,20 +9,20 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.dao.sistema.Modelo2_5DAO;
+import vrimplantacao2_5.dao.sistema.VRSUPER2_5DAO;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
  * @author Michael-Oliveira
  */
-public class Modelo2_5GUI extends VRInternalFrame {
+public class VRSUPER2_5GUI extends VRInternalFrame {
 
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
-    private static final String SISTEMA = ESistema.MODELO.getNome();
-    private static Modelo2_5GUI instance;
+    private static final String SISTEMA = ESistema.VR_SUPER.getNome();
+    private static VRSUPER2_5GUI instance;
 
-    private final Modelo2_5DAO dao = new Modelo2_5DAO();
+    private final VRSUPER2_5DAO dao = new VRSUPER2_5DAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -32,7 +32,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
     /**
      * Creates new form Inferno
      */
-    public Modelo2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    public VRSUPER2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents2();
 
@@ -67,7 +67,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.MODELO);
+        pnlConn.setSistema(ESistema.VR_SUPER);
         pnlConn.getNomeConexao();
 
         centralizarForm();
@@ -160,7 +160,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Modelo2_5GUI(i_mdiFrame);
+                instance = new VRSUPER2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -195,7 +195,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
 
         setPreferredSize(new java.awt.Dimension(1200, 700));
 
-        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.tabFornecedores.TabConstraints.tabTitle"), tabFornecedores); // NOI18N
+        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.tabFornecedores.TabConstraints.tabTitle"), tabFornecedores); // NOI18N
 
         scpClientes.setViewportView(tabClientes);
 
@@ -213,7 +213,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
             .addComponent(scpClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
         );
 
-        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.tabCli.TabConstraints.tabTitle"), tabCli); // NOI18N
+        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.tabCli.TabConstraints.tabTitle"), tabCli); // NOI18N
 
         javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
         tabParametro.setLayout(tabParametroLayout);
@@ -226,14 +226,14 @@ public class Modelo2_5GUI extends VRInternalFrame {
             .addGap(0, 551, Short.MAX_VALUE)
         );
 
-        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.tabParametro.TabConstraints.tabTitle"), tabParametro); // NOI18N
-        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
+        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.tabParametro.TabConstraints.tabTitle"), tabParametro); // NOI18N
+        tabImportacao.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
 
-        tabMenu.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.tabImportacao.TabConstraints.tabTitle"), tabImportacao); // NOI18N
-        tabMenu.addTab(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.pnlBalanca.TabConstraints.tabTitle"), pnlBalanca); // NOI18N
+        tabMenu.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.tabImportacao.TabConstraints.tabTitle"), tabImportacao); // NOI18N
+        tabMenu.addTab(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.pnlBalanca.TabConstraints.tabTitle"), pnlBalanca); // NOI18N
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.btnMigrar.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.btnMigrar.text")); // NOI18N
         btnMigrar.setFocusable(false);
         btnMigrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnMigrar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -244,8 +244,8 @@ public class Modelo2_5GUI extends VRInternalFrame {
         });
 
         jBLimpar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jBLimpar, org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.jBLimpar.text")); // NOI18N
-        jBLimpar.setToolTipText(org.openide.util.NbBundle.getMessage(Modelo2_5GUI.class, "Modelo2_5GUI.jBLimpar.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jBLimpar, org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.jBLimpar.text")); // NOI18N
+        jBLimpar.setToolTipText(org.openide.util.NbBundle.getMessage(VRSUPER2_5GUI.class, "VRSUPER2_5GUI.jBLimpar.toolTipText")); // NOI18N
         jBLimpar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBLimparActionPerformed(evt);
@@ -346,7 +346,7 @@ public class Modelo2_5GUI extends VRInternalFrame {
             e1.printStackTrace();
         }
 
-        setTitle("Modelo");
+        setTitle("VR-SUPER");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
