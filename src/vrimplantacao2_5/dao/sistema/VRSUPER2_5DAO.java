@@ -132,7 +132,8 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.DATA_NASCIMENTO,
                 OpcaoCliente.ENDERECO,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.VENCIMENTO_ROTATIVO
+                OpcaoCliente.VENCIMENTO_ROTATIVO,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
