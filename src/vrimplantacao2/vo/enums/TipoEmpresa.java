@@ -20,6 +20,15 @@ public enum TipoEmpresa {
     MEI(11, "MEI"),
     PRODUTOR_RURAL_FISICA(12, "PRODUTOR RURAL PES. FISICA");
 
+    public static TipoEmpresa getByDescricao(String descricao) {
+        for (TipoEmpresa tipoEmpresa : values()) {
+            if (tipoEmpresa.descricao.equalsIgnoreCase(descricao)) {
+                return tipoEmpresa;
+            }
+        }
+        return LUCRO_REAL;
+    }
+
     private int id;
     private String descricao;
 

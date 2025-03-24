@@ -681,7 +681,7 @@ public class TstiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdEmpresa(rs.getString("id_empresa"));
                     imp.setCnpj(rs.getString("id_cliente"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
-                    imp.setSenha(1010);
+                    imp.setSenha("1010");
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
                     imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
 

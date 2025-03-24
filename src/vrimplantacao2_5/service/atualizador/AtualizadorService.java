@@ -141,7 +141,7 @@ public class AtualizadorService {
         atualizadorDAO.inserirUnidade();
         atualizadorDAO.inserirUsuario();
         atualizadorDAO.atualizarSenhas();
-        atualizadorDAO.deletarUsuariosInativos();
+//        atualizadorDAO.deletarUsuariosInativos();
 
         this.atualizarTabelas();
         this.salvarBancoDados();

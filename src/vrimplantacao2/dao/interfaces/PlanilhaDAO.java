@@ -1582,7 +1582,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setIdEmpresa(linha.getString("id_empresaconvenio"));
             imp.setBloqueado(linha.getBoolean("bloqueado"));
             imp.setSituacaoCadastro(linha.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-            imp.setSenha(Utils.stringToInt(linha.getString("senha")));
+            imp.setSenha(linha.getString("senha"));
             imp.setCnpj(linha.getString("cnpj"));
             imp.setObservacao(linha.getString("observacao"));
             imp.setValidadeCartao(getData(linha.getString("validadecartao")));

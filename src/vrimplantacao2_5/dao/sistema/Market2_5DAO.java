@@ -1069,7 +1069,7 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdEmpresa(rs.getString("id_empresa"));
                     imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
-                    imp.setSenha(rs.getInt("senha"));
+                    imp.setSenha(rs.getString("senha"));
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
                     imp.setSituacaoCadastro(rs.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setObservacao(rs.getString("observacao"));

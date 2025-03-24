@@ -24,6 +24,7 @@ import vrimplantacao.classe.Global;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -36,6 +37,8 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoPagamento;
@@ -162,6 +165,25 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.RECEITA,
                     OpcaoProduto.PROMOCAO
                 }
+        ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.TIPO_FORNECEDOR,
+                OpcaoFornecedor.ENDERECO,
+                OpcaoFornecedor.ENDERECO_COMPLETO
         ));
     }
 
@@ -635,7 +657,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    //imp.setCodMercadologico4(rs.getString("mercadologico4"));
+                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
                     //imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
@@ -700,15 +722,15 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.bloqueado,\n"
                     + "	f.id_situacaocadastro,\n"
                     + " f.id_tipopagamento,\n"
-                    + "	f.endereco,\n"
-                    + "	f.numero,\n"
-                    + "	f.complemento,\n"
-                    + "	f.bairro,\n"
-                    + "	f.id_municipio ibge_municipio,\n"
+                    + "	fe.endereco,\n"
+                    + "	fe.numero,\n"
+                    + "	fe.complemento,\n"
+                    + "	fe.bairro,\n"
+                    + "	fe.id_municipio ibge_municipio,\n"
                     + "	m.descricao municipio,\n"
-                    + "	f.id_estado ibge_uf,\n"
+                    + "	fe.id_estado ibge_uf,\n"
                     + "	e.sigla uf,\n"
-                    + "	f.cep,\n"
+                    + "	fe.cep,\n"
                     + "	f.enderecocobranca cob_endereco,\n"
                     + "	f.numerocobranca cob_numero,\n"
                     + "	f.complementocobranca cob_complemento,\n"
@@ -722,15 +744,22 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.pedidominimoqtd qtd_minima_pedido,\n"
                     + "	f.pedidominimovalor valor_minimo_pedido,\n"
                     + "	f.datacadastro,\n"
-                    + "	f.observacao\n"
+                    + "	f.observacao,\n"
+                    + "	te.id id_tipo_empresa,\n"
+                    + "	te.descricao descricao_tipo_empresa,\n"
+                    + "	tf.id id_tipo_fornecedor,\n"
+                    + "	tf.descricao descricao_tipo_fornecedor\n"
                     + "from \n"
                     + "	fornecedor f\n"
-                    + "	left join municipio m on f.id_municipio = m.id\n"
-                    + "	left join estado e on f.id_estado = e.id\n"
-                    + "	left join municipio cm on f.id_municipiocobranca = cm.id\n"
-                    + "	left join estado ce on f.id_estadocobranca = ce.id\n"
+                    + "	LEFT JOIN fornecedorendereco fe ON fe.id_fornecedor = f.id\n"
+                    + "	LEFT JOIN tipoempresa te ON te.id = f.id_tipoempresa \n"
+                    + "	LEFT JOIN tipofornecedor tf ON tf.id = f.id_tipofornecedor \n"
+                    + "	LEFT JOIN municipio m on f.id_municipio = m.id\n"
+                    + "	LEFT JOIN estado e on f.id_estado = e.id\n"
+                    + "	LEFT JOIN municipio cm on f.id_municipiocobranca = cm.id\n"
+                    + "	LEFT JOIN estado ce on f.id_estadocobranca = ce.id\n"
                     + "order by \n"
-                    + "	id")) {
+                    + "	f.id")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -767,6 +796,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtd_minima_pedido(rs.getInt("qtd_minima_pedido"));
                     imp.setValor_minimo_pedido(rs.getDouble("valor_minimo_pedido"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setTipoEmpresa(TipoEmpresa.getByDescricao(rs.getString("descricao_tipo_empresa")));
+                    imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
 
                     getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
@@ -1365,7 +1396,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (
                 Statement st = ConexaoPostgres.getConexao().createStatement(); ResultSet rs = st.executeQuery(
-                "select\n"
+                "SELECT\n"
                 + "	c.id,\n"
                 + "	c.nome,\n"
                 + "	c.id_empresa,\n"
@@ -1379,10 +1410,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "	c.visualizasaldo,\n"
                 + "	c.databloqueio,\n"
                 + "	c.id_loja\n"
-                + "from\n"
+                + "FROM\n"
                 + "	conveniado c\n"
-                        + "where c.id not in(824, 795, 835)"
-                + "order by\n"
+                + "WHERE\n"
+                + "	c.id_loja = " + getLojaOrigem() + "\n"
+                + "ORDER BY\n"
                 + "	c.id"
         )) {
             while (rs.next()) {
@@ -1393,7 +1425,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setIdEmpresa(rs.getString("id_empresa"));
                 imp.setBloqueado(rs.getBoolean("bloqueado"));
                 imp.setSituacaoCadastro(SituacaoCadastro.getById(rs.getInt("id_situacaocadastro")));
-                imp.setSenha(rs.getInt("senha"));
+                imp.setSenha(rs.getString("senha"));
                 imp.setCnpj(rs.getString("cnpj"));
                 imp.setObservacao(rs.getString("observacao"));
                 imp.setValidadeCartao(rs.getDate("datavalidadecartao"));

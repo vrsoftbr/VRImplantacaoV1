@@ -14,7 +14,7 @@ public class ConveniadoIMP {
     private String idEmpresa;
     private boolean bloqueado = false;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
-    private int senha = 0;
+    private String senha;
     private String cnpj; // cpf do cliente
     private String observacao;        
     private Date validadeCartao;
@@ -46,7 +46,7 @@ public class ConveniadoIMP {
         this.situacaoCadastro = situacaoCadastro;
     }
 
-    public void setSenha(int senha) {
+    public void setSenha(String senha) {
         this.senha = senha;
     }
 
@@ -106,7 +106,7 @@ public class ConveniadoIMP {
         return situacaoCadastro;
     }
 
-    public int getSenha() {
+    public String getSenha() {
         return senha;
     }
 

@@ -429,7 +429,7 @@ public class ImperiumMarket2_5DAO extends InterfaceDAO implements MapaTributoPro
                     imp.setIdEmpresa(rs.getString("id_empresa"));
                     imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
-                    imp.setSenha(rs.getInt("senha"));
+                    imp.setSenha(rs.getString("senha"));
                     imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
                     imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
 
