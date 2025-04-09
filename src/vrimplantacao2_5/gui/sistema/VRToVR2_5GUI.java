@@ -19,6 +19,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
@@ -148,6 +149,12 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                     dao.apenasAtivo = chkSomenteAtivo.isSelected();
                     dao.setComplemento(pnlConn.getComplemento());
                     dao.setPrecoVendaSemOferta(chkPrecoVendaSemOferta.isSelected());
+
+                    if (chkExecao.isSelected()) {                       
+                        List<OpcaoProduto> opts = new ArrayList();
+                        opts.add(OpcaoProduto.EXCECAO);
+                        importador.atualizarProdutos(opts);
+                    }
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -312,6 +319,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
         chkPrecoVendaSemOferta = new vrframework.bean.checkBox.VRCheckBox();
+        chkExecao = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jBLimpar = new javax.swing.JButton();
@@ -427,9 +435,9 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                     .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFPrazo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkFEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkFTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -671,6 +679,8 @@ public class VRToVR2_5GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkPrecoVendaSemOferta, "Preço venda (Sem Oferta)");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkExecao, "Execao");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -678,6 +688,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkExecao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkPrecoVendaSemOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -688,11 +699,13 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkPrecoVendaSemOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(134, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkExecao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         tabs.addTab("Especifico", jPanel1);
@@ -933,6 +946,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCvTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkCvTransacaoBaixados;
     private vrframework.bean.checkBox.VRCheckBox chkEANAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkExecao;
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;

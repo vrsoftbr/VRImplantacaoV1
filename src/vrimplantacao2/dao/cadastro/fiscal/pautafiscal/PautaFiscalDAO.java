@@ -75,7 +75,7 @@ public class PautaFiscalDAO {
             sql.put("id_aliquotaDebitoForaEstado", vo.getId_aliquotaDebitoForaEstado());
             sql.put("ivaAjustado", vo.getIvaAjustado());
             sql.put("icmsRecolhidoAntecipadamente", vo.isIcmsRecolhidoAntecipadamente());
-            //sql.put("id_aliquotaCreditoForaEstado", vo.getId_aliquotaCreditoForaEstado());
+            sql.put("id_aliquotaCreditoForaEstado", vo.getId_aliquotaCreditoForaEstado());
             
             try (ResultSet rst = stm.executeQuery(
                     sql.getInsert()

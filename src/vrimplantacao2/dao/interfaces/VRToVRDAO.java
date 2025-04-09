@@ -150,6 +150,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.MARGEM_MINIMA,
                     OpcaoProduto.MARGEM_MAXIMA,
@@ -163,7 +164,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PDV_VENDA,
                     OpcaoProduto.RECEITA_BALANCA,
                     OpcaoProduto.RECEITA,
-                    OpcaoProduto.PROMOCAO
+                    OpcaoProduto.PROMOCAO,
+                    OpcaoProduto.VASILHAME,
+                    OpcaoProduto.SUGESTAO_COTACAO
                 }
         ));
     }
@@ -602,7 +605,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pad.desconto atacadodesconto,\n"
                     + "	pf.id id_pautafiscal,\n"
                     + "	p.id_fornecedorfabricante,\n"
-                    + "	p.numeroparcela\n"
+                    + "	p.numeroparcela,\n"
+                    + " p.id_produtovasilhame,\n"
+                    + " vend.operacional \n"
                     + "from\n"
                     + "	produto p\n"
                     + "	join lj on true\n"
@@ -614,8 +619,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		emb.id = p.id_tipoembalagem\n"
                     + "	join produtocomplemento vend on\n"
                     + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
-                    + (precoVendaSemOferta
-                            ? "left join oferta o on o.id_loja = vend.id_loja and o.id_produto = vend.id_produto and o.datatermino > now()\n" : "\n")
                     + "	left join cest on\n"
                     + "		cest.id = p.id_cest\n"
                     + "	left join tipopiscofins piscofcred on \n"
@@ -671,6 +674,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoAnteriorComImposto(rs.getDouble("custocomimpostoanterior"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
+                    imp.setIdVasilhame(rs.getString("id_produtovasilhame"));
                     if (versao.igualOuMaiorQue(4)) {
                         imp.setMargemMaxima(rs.getDouble("margemmaxima"));
                         imp.setMargemMaxima(rs.getDouble("margemminima"));
@@ -694,6 +698,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
                     imp.setFornecedorFabricante(rs.getString("id_fornecedorfabricante"));
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
+                    imp.setOperacional(rs.getInt("operacional"));
 
                     result.add(imp);
 //                    contador++;
@@ -821,6 +826,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	pf.id,\n"
                     + "	lpad(pf.ncm1::varchar, 4, '0') || lpad(pf.ncm2::varchar, 2, '0') || lpad(pf.ncm3::varchar, 2, '0') ncm,\n"
+                    + " pf.id_aliquotacredito,\n"
+                    + "	pf.id_aliquotadebito,\n"
+                    + "	pf.id_aliquotacreditoforaestado,\n"
+                    + "	pf.id_aliquotadebitoforaestado, \n"
                     + "	pf.excecao,\n"
                     + "	uf.sigla uf,\n"
                     + "	pf.iva,\n"
@@ -852,7 +861,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	left join aliquota acfe on\n"
                     + "		pf.id_aliquotacreditoforaestado = acfe.id\n"
                     + "order by\n"
-                    + "	pf.id")) {
+                    + "	pf.excecao desc")) {
                 while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
 
@@ -861,11 +870,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIva(rs.getDouble("iva"));
                     imp.setTipoIva(rs.getInt("tipoiva") == 0 ? TipoIva.PERCENTUAL : TipoIva.VALOR);
                     imp.setIvaAjustado(rs.getDouble("ivaajustado"));
+                    imp.setExcecao(rs.getInt("excecao"));
                     imp.setIcmsRecolhidoAntecipadamente(rs.getBoolean("icmsrecolhidoantecipadamente"));
-                    imp.setAliquotaCredito(rs.getInt("credito_cst"), rs.getDouble("credito_aliquota"), rs.getDouble("credito_reduzido"));
-                    imp.setAliquotaDebito(rs.getInt("debito_cst"), rs.getDouble("debito_aliquota"), rs.getDouble("debito_reduzido"));
-                    imp.setAliquotaCreditoForaEstado(rs.getInt("credito_foraest_cst"), rs.getDouble("credito_foraest_aliquota"), rs.getDouble("debito_foraest_reduzido"));
-                    imp.setAliquotaDebitoForaEstado(rs.getInt("debito_foraest_cst"), rs.getDouble("debito_foraest_aliquota"), rs.getDouble("credito_foraest_reduzido"));
+                    imp.setUf(rs.getString("uf"));
+                    //imp.setAliquotaCredito(rs.getInt("credito_cst"), rs.getDouble("credito_aliquota"), rs.getDouble("credito_reduzido"));
+                    //imp.setAliquotaDebito(rs.getInt("debito_cst"), rs.getDouble("debito_aliquota"), rs.getDouble("debito_reduzido"));
+                    //imp.setAliquotaCreditoForaEstado(rs.getInt("credito_foraest_cst"), rs.getDouble("credito_foraest_aliquota"), rs.getDouble("credito_foraest_reduzido"));
+                    //imp.setAliquotaDebitoForaEstado(rs.getInt("debito_foraest_cst"), rs.getDouble("debito_foraest_aliquota"), rs.getDouble("debito_foraest_reduzido"));
+                    imp.setAliquotaCreditoId(rs.getString("id_aliquotacredito"));
+                    imp.setAliquotaDebitoId(rs.getString("id_aliquotadebito"));
+                    imp.setAliquotaCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
+                    imp.setAliquotaDebitoForaEstadoId(rs.getString("id_aliquotadebitoforaestado"));
 
                     result.add(imp);
                 }
@@ -1693,7 +1708,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " ' '||n.mensagemalergico4||' '||n.mensagemalergico5 as mensagemalergico,\n"
                     + " ni.id_produto \n"
                     + "from nutricionaltoledo n\n"
-                    + "join nutricionaltoledoitem ni on ni.id_nutricionaltoledo = n.id"
+                    + "LEFT JOIN nutricionaltoledoitem ni on ni.id_nutricionaltoledo = n.id"
             )) {
                 while (rst.next()) {
                     NutricionalIMP imp = new NutricionalIMP();
@@ -1752,8 +1767,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " ri.fatorconversao,\n"
                     + " ri.embalagem \n"
                     + "from receita r\n"
-                    + "join receitaproduto rp on rp.id_receita = r.id \n"
-                    + "join receitaitem ri on ri.id_receita = r.id "
+                    + "JOIN receitaproduto rp on rp.id_receita = r.id \n"
+                    + "JOIN receitaitem ri on ri.id_receita = r.id\n"
+                    + "JOIN receitaloja r2 ON r2.id_receita = r.id AND r2.id_loja = " + getLojaOrigem()
             )) {
                 while (rs.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
@@ -1763,10 +1779,16 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportid(rs.getString("id"));
                     imp.setIdproduto(rs.getString("produtoreceita"));
                     imp.setDescricao(rs.getString("descricao"));
-                    imp.setId_situacaocadastro("1".equals(rs.getString("id_situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+
+                    if (rs.getInt("id_situacaocadastro") == 1) {
+                        imp.setId_situacaocadastro(SituacaoCadastro.ATIVO);
+                    } else {
+                        imp.setId_situacaocadastro(SituacaoCadastro.EXCLUIDO);
+                    }
+
                     imp.setRendimento(rs.getDouble("rendimento"));
-                    imp.setQtdembalagemproduto(rs.getInt("qtdembalagemreceita"));
-                    imp.setQtdembalagemreceita(rs.getInt("qtdembalagemproduto"));
+                    imp.setQtdembalagemproduto(rs.getInt("qtdembalagemproduto"));
+                    imp.setQtdembalagemreceita(rs.getInt("qtdembalagemreceita"));
 
                     imp.setFator(rs.getDouble("fatorconversao"));
                     imp.getProdutos().add(rs.getString("receitaitem"));
@@ -1777,6 +1799,41 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "	SELECT \n"
+                    + "	r.id id_receita,\n"
+                    + "	r.descricao,\n"
+                    + "	ri.id id_receita_item\n"
+                    + "	FROM receita r\n"
+                    + "	JOIN receitaitem ri ON ri.id_receita = r.id "
+            )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+
+                while (rst.next()) {
+
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("id_receita"));
+
+                    if (imp == null) {
+                        imp = new ReceitaBalancaIMP();
+                        imp.setId(rst.getString("id_receita"));
+                        imp.setDescricao(rst.getString("descricao"));
+                        imp.setReceita(rst.getString("id_receita_item"));
+                        receitas.put(imp.getId(), imp);
+                    }
+
+                    imp.getProdutos().add(rst.getString("id_receita"));
+                }
+
+                return new ArrayList<>(receitas.values());
+            }
+        }
+
     }
 
     @Override

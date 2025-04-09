@@ -359,7 +359,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
-//                    imp.setCodMercadologico4(rst.getString(""));
+                    imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
 //                    imp.setCodMercadologico5(rst.getString(""));
                     imp.setIdFamiliaProduto(rst.getString("id_familia_produto"));
 
