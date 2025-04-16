@@ -62,7 +62,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     private int idRegiaoForaEstado;
     private boolean somenteClienteFidelidade = false;
     private String tipoRotativo = "";
-    private boolean tributacaoNcmFigura = false;
+    private boolean tributacaoNcmFigura = true;
     private boolean precoUnitario = false;
 
     private Date dataVendaInicial;
@@ -414,16 +414,41 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	codst id,\n"
-                    + "	mensagem descricao,\n"
-                    + "	sittribut cst,\n"
-                    + "	codicm aliquota,\n"
-                    + "	COALESCE(NULLIF(100-COALESCE(percbasered, 0), 100), 0) reducao,\n"
-                    + " percbasered reducao2\n"
+                    + "CAST(CODST AS varchar(50)) id,\n"
+                    + "SITTRIBUT cst,\n"
+                    + "CODICM aliquota,\n"
+                    + "CAST(PERCBASERED AS varchar(255)) reducao,\n"
+                    + "MENSAGEM descricao\n"
+                    + "FROM PCTRIBUT p 	\n"
+                    + "UNION	\n"
+                    + "SELECT\n"
+                    + "	ROW_NUMBER() OVER (\n"
+                    + "	ORDER BY\n"
+                    + "		SITTRIBUT,\n"
+                    + "		PERCICM,\n"
+                    + "		RTRIM(RTRIM(TO_CHAR(PERCICMRED, 'FM999990.00'), '0'), '.') \n"
+                    + "	) || '- E' AS id,\n"
+                    + "		CASE WHEN PERCICMRED <> 0 THEN '20' ELSE '00' end AS cst,\n"
+                    + "	PERCICM AS aliquota,\n"
+                    + "	RTRIM(RTRIM(TO_CHAR(PERCICMRED, 'FM999990.00'), '0'), '.') AS reducao,\n"
+                    + "	CASE\n"
+                    + "		WHEN PERCICMRED IS NOT NULL\n"
+                    + "		AND PERCICMRED > 0 THEN \n"
+                    + "            TO_CHAR(PERCICM, 'FM999990') || '% RDZ ' ||\n"
+                    + "            RTRIM(RTRIM(TO_CHAR(PERCICMRED, 'FM999990.00'), '0'), '.') || '% - E'\n"
+                    + "		ELSE \n"
+                    + "            TO_CHAR(PERCICM, 'FM999990') || '% - E'\n"
+                    + "	END AS descricao\n"
                     + "FROM\n"
-                    + "	PCTRIBUT\n"
-                    + "ORDER BY\n"
-                    + "	codst"
+                    + "	(\n"
+                    + "		SELECT\n"
+                    + "			DISTINCT \n"
+                    + "        SITTRIBUT,\n"
+                    + "			PERCICM,\n"
+                    + "			PERCICMRED\n"
+                    + "		FROM\n"
+                    + "			PCMOVPREENT\n"
+                    + "	)"
             )) {
                 while (rs.next()) {
                     if (tributacaoNcmFigura) {
@@ -432,7 +457,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                                 rs.getString("descricao"),
                                 rs.getInt("cst"),
                                 MathUtils.round(rs.getDouble("aliquota"), 2),
-                                MathUtils.round(rs.getDouble("reducao2"), 2)
+                                MathUtils.round(rs.getDouble("reducao"), 2)
                         ));
                     }
                     result.add(new MapaTributoIMP(
@@ -738,6 +763,20 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             String sql = "WITH \n"
+                    + "tributacao AS (\n"
+                    + "    SELECT *\n"
+                    + "    FROM (\n"
+                    + "        SELECT\n"
+                    + "            CODPROD AS id_produto,\n"
+                    + "            SITTRIBUT AS cst,\n"
+                    + "            PERCICM AS aliquota,\n"
+                    + "            RTRIM(RTRIM(TO_CHAR(PERCICMRED, 'FM999990.000'), '0'), '.') AS reducao, \n"
+                    + "            ROW_NUMBER() OVER (PARTITION BY CODPROD ORDER BY DTMOV DESC) AS rn\n"
+                    + "        FROM PCMOVPREENT \n"
+                    + "        WHERE  NUMREGIAO IS Null"
+                    + "    ) t\n"
+                    + "    WHERE rn = 1\n"
+                    + "), \n"
                     + "icms_dentro_estado AS (\n"
                     + "	SELECT\n"
                     + "		ic.CODPROD id_produto,\n"
@@ -871,7 +910,11 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	pic.piscofinscst,\n"
                     + " tb.PVENDA1 precoatacado,\n"
                     + " tb.PVENDAATAC1 precovarejo,\n"
-                    + " ean.QTMINIMAATACADO qtdatacado\n"
+                    + " ean.QTMINIMAATACADO qtdatacado, \n"
+                    + " tt.cst cst,\n"
+                    + " tt.aliquota aliquota,\n"
+                    + " tt.reducao reducao, \n"
+                    + " tb.CODST id_aliq_sai\n"
                     + "FROM\n"
                     + "	pcprodut p\n"
                     + "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n"
@@ -893,6 +936,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     + "	LEFT JOIN icms_fora_estado ON\n"
                     + "		icms_fora_estado.id_produto = p.codprod\n"
                     + " LEFT JOIN piscofins_icms pic ON pic.codprod = p.codprod\n"
+                    + " LEFT JOIN tributacao tt ON tt.id_produto = p.codprod \n"
                     + "ORDER BY\n"
                     + "	id";
             if (precoUnitario) {
@@ -1169,12 +1213,26 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
                         imp.setPiscofinsCstCredito(rst.getString("piscofins_e"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
-                        imp.setIcmsDebitoId(rst.getString("icms_dentro_estado"));
-                        imp.setIcmsDebitoForaEstadoId(rst.getString("icms_fora_estado"));
-                        imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_fora_estado"));
-                        imp.setIcmsConsumidorId(rst.getString("icms_dentro_estado"));
-                        imp.setIcmsCreditoId(rst.getString("icms_dentro_estado"));
-                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_fora_estado"));
+                        imp.setIcmsDebitoId(rst.getString("id_aliq_sai"));
+                        imp.setIcmsDebitoForaEstadoId(rst.getString("id_aliq_sai"));
+                        imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_aliq_sai"));
+                        imp.setIcmsConsumidorId(rst.getString("id_aliq_sai"));
+//                        imp.setIcmsCreditoId(rst.getString("id_aliq_sai"));
+//                        imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliq_sai"));
+
+                        imp.setIcmsCstEntrada(rst.getInt("cst"));
+                        imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
+
+                        if (rst.getDouble("reducao") != 0) {
+                        imp.setIcmsCstEntrada(20);
+                        imp.setIcmsCstEntradaForaEstado(20);
+                        }
+                        
+                        imp.setIcmsAliqEntrada(rst.getDouble("aliquota"));
+                        imp.setIcmsAliqEntradaForaEstado(rst.getDouble("aliquota"));
+
+                        imp.setIcmsReducaoEntrada(rst.getDouble("reducao"));
+                        imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
                     }
 
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
@@ -1859,7 +1917,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         cont.setTipoContato(TipoContato.NFE);
                         imp.getContatos().put(cont, "5");
                     }*/
-                    
                     if (rst.getString("parcela1") != null) {
                         imp.addCondicaoPagamento(rst.getInt("parcela1"));
                     }

@@ -1806,12 +1806,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "	SELECT \n"
-                    + "	r.id id_receita,\n"
-                    + "	r.descricao,\n"
-                    + "	ri.id id_receita_item\n"
-                    + "	FROM receita r\n"
-                    + "	JOIN receitaitem ri ON ri.id_receita = r.id "
+                    "SELECT\n"
+                    + "r.id id_receita,\n"
+                    + "r.descricao,\n"
+                    + "r2.id id_receita_item,\n"
+                    + "r.observacao observacao,\n"
+                    + "r2.id_produto produto\n"
+                    + "FROM receitatoledo r\n"
+                    + "LEFT JOIN receitatoledoproduto r2 ON r2.id_receitatoledo  = r.id"
             )) {
                 Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
 
@@ -1823,11 +1825,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp = new ReceitaBalancaIMP();
                         imp.setId(rst.getString("id_receita"));
                         imp.setDescricao(rst.getString("descricao"));
+                        imp.setObservacao(rst.getString("observacao"));
                         imp.setReceita(rst.getString("id_receita_item"));
                         receitas.put(imp.getId(), imp);
                     }
 
-                    imp.getProdutos().add(rst.getString("id_receita"));
+                    imp.getProdutos().add(rst.getString("produto"));
                 }
 
                 return new ArrayList<>(receitas.values());
