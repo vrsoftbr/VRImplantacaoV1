@@ -125,6 +125,11 @@ public class FornecedorRepository {
                 if (anterior == null) {
 
                     vo = converter(imp);
+                    
+                    //Se existir Familia Fornecedor
+                    if (imp.getIdFamiliaFornecedor() != null) {
+                    vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
+                    }
 
                     //Se o CNPJ/CPF existir, gera um novo.
                     if (cnpjExistentes.containsKey(Utils.stringToLong(imp.getCnpj_cpf()))) {
@@ -678,6 +683,8 @@ public class FornecedorRepository {
         vo.setRevenda(imp.getRevenda());
         vo.setIdPais(imp.getIdPais());
         
+        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
+            
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());

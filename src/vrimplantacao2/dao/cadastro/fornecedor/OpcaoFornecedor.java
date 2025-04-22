@@ -18,6 +18,7 @@ public enum OpcaoFornecedor {
     /**
      * Quando for unificar, marque esta opção.
      */
+    FAMILIA,
     RAZAO_SOCIAL,
     NOME_FANTASIA,
     ENDERECO,

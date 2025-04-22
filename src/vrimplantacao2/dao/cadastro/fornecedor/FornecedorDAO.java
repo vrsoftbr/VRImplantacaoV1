@@ -212,7 +212,7 @@ public class FornecedorDAO {
                                     sql.put("utilizacrossdocking", false);// boolean NOT NULL DEFAULT false,
                                     sql.putNull("id_lojacrossdocking");// integer,
                                     sql.put("observacao", "IMPORTADO VR " + vo.getObservacao());// character varying(2500) NOT NULL DEFAULT '::character varying'::character varying,
-                                    sql.put("id_pais", vo.getIdPais() == null ? 1058  : vo.getIdPais());// integer NOT NULL,
+                                    sql.put("id_pais", vo.getIdPais() == null ? 1058 : vo.getIdPais());// integer NOT NULL,
                                     sql.put("inscricaomunicipal", vo.getInscricaoMunicipal());// character varying(20) DEFAULT ''::character varying,
                                     sql.putNull("id_contacontabilfiscalpassivo");// bigint,
                                     sql.put("numerocobranca", vo.getNumeroCobranca());// character varying(6) NOT NULL DEFAULT '0'::character varying,
@@ -287,7 +287,7 @@ public class FornecedorDAO {
                         }
                     }
 
-                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                    for (Integer condicao : imp.getCondicoesPagamentos()) {
                         pagamentoDAO.salvar(vo.getId(), condicao);
                     }
 
@@ -591,7 +591,7 @@ public class FornecedorDAO {
             sql.put("id_tipoempresa", 3);// integer NOT NULL,
             sql.put("inscricaosuframa", vo.getInscricaoSuframa());// character varying(9) NOT NULL,
             sql.put("utilizaiva", vo.isUtilizaiva());// boolean NOT NULL,
-            sql.putNull("id_familiafornecedor");// integer,
+            sql.put("id_familiafornecedor", vo.getFamiliaFornecedorVO() != null ? vo.getFamiliaFornecedorVO().getId() : -1, -1);// integer,
             sql.putNull("id_tipoinspecao");// integer,
             sql.put("numeroinspecao", 0);// integer NOT NULL,
             sql.putNull("id_tipotroca");// integer,
@@ -710,7 +710,7 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.BANCO_PADRAO)) {
                     sql.put("id_banco", vo.getIdBanco());
                 }
-                if(opt.contains(OpcaoFornecedor.CEP)) {
+                if (opt.contains(OpcaoFornecedor.CEP)) {
                     sql.put("cep", vo.getCep());
                 }
                 if (opt.contains(OpcaoFornecedor.EMITE_NFE)) {
@@ -722,14 +722,21 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)) {
                     incluirTipoIndicadorIE(vo, sql);
                 }
-                if (opt.contains(OpcaoFornecedor.UTILIZAIVA)){
-                  sql.put("utilizaiva", vo.isUtilizaiva());  
+                if (opt.contains(OpcaoFornecedor.UTILIZAIVA)) {
+                    sql.put("utilizaiva", vo.isUtilizaiva());
                 }
                 if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)) {
                     sql.put("datacadastro", vo.getDataCadastro());
                 }
+                if (opt.contains(OpcaoFornecedor.FAMILIA)) {
+                    if (vo.getFamiliaFornecedorVO() != null) {
+                        sql.put("id_familiafornecedor", vo.getFamiliaFornecedorVO().getId());
+                    } else {
+                        sql.putNull("id_familiafornecedor");
+                    }
+                }
+
                 sql.setWhere("id = " + vo.getId());
-                
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
                 }

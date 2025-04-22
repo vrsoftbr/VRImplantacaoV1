@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.dao.cadastro.EcfDAO;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaRepository;
 import vrimplantacao.dao.cadastro.NutricionalToledoRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
@@ -50,13 +49,13 @@ import vrimplantacao2.dao.cadastro.fiscal.FiscalRepository;
 import vrimplantacao2.dao.cadastro.fiscal.FiscalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.fiscal.inventario.InventarioRepository;
 import vrimplantacao2.dao.cadastro.fiscal.inventario.InventarioRepositoryProvider;
+import vrimplantacao2.dao.cadastro.fornecedor.FamiliaFornecedorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorRepository;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
-import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepository;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
@@ -130,6 +129,7 @@ import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
+import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
@@ -471,6 +471,21 @@ public class Importador {
         dao.setImportLoja(getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
         dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
+    }
+
+    /**
+     * Executa a importação da familia fornecedor.
+     *
+     * @param opcoes
+     * @throws Exception
+     */
+    public void importarFamiliaFornecedor() throws Exception {
+        ProgressBar.setStatus("Carregando familias dos fornecedores...");
+        List<FamiliaFornecedorIMP> familias = getInterfaceDAO().getFamiliaFornecedor();
+
+        FamiliaFornecedorDAO dao = new FamiliaFornecedorDAO();
+        dao.setSistema(getSistema());
+        dao.salvar(familias);
     }
 
     /**
@@ -1065,8 +1080,8 @@ public class Importador {
                 rep.importar(opt);
             }
             if (decisao == 1) {
-                PublicVendaRepository rep = new PublicVendaRepository(provider, 
-                    this.checarVendasDataAtual);
+                PublicVendaRepository rep = new PublicVendaRepository(provider,
+                        this.checarVendasDataAtual);
                 rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
                 rep.eBancoUnificado = eBancoUnificado;
                 rep.importar(opt);
@@ -1320,7 +1335,7 @@ public class Importador {
         DesmembramentoRepository rep = new DesmembramentoRepository(provider);
         rep.importarDesmembramento(desmembramentos);
     }
-    
+
     public void importarPessoaImp() throws Exception {
         ProgressBar.setStatus("Carregando clientes Master 5.0...");
         List<PessoaImp> clientes = getInterfaceDAO().getPessoaImp();

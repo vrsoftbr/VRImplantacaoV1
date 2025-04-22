@@ -54,6 +54,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
+import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -753,7 +754,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	te.id id_tipo_empresa,\n"
                     + "	te.descricao descricao_tipo_empresa,\n"
                     + "	tf.id id_tipo_fornecedor,\n"
-                    + "	tf.descricao descricao_tipo_fornecedor\n"
+                    + "	tf.descricao descricao_tipo_fornecedor, \n"
+                    + "	f.id_familiafornecedor id_familia_fornecedor \n"
                     + "from \n"
                     + "	fornecedor f\n"
                     + "	LEFT JOIN fornecedorendereco fe ON fe.id_fornecedor = f.id\n"
@@ -803,6 +805,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmpresa(TipoEmpresa.getByDescricao(rs.getString("descricao_tipo_empresa")));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
+                    imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
 
                     getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
@@ -919,6 +922,39 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
+
+                    result.add(imp);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
+                }
+            }
+        }
+        contador = 1;
+        return result;
+    }
+
+    @Override
+    public List<FamiliaFornecedorIMP> getFamiliaFornecedor() throws Exception {
+        List<FamiliaFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	id,\n"
+                    + "	descricao,\n"
+                    + "	id_situacaocadastro\n"
+                    + "from\n"
+                    + "	familiafornecedor\n"
+                    + "order by\n"
+                    + "	1")) {
+                while (rs.next()) {
+                    FamiliaFornecedorIMP imp = new FamiliaFornecedorIMP();
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
                     result.add(imp);
 //                    contador++;

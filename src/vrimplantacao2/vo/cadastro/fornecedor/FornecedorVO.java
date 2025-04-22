@@ -43,6 +43,8 @@ public class FornecedorVO {
     private EstadoVO estadoCobranca;
     private int cepCobranca = -1;
     
+    private FamiliaFornecedorVO familiaFornecedor = null;
+    
     private String telefone = "0000000000";
     private int pedidoMinimoQtd = 0;
     private double pedidoMinimoValor = 0.0;
@@ -196,6 +198,10 @@ public class FornecedorVO {
     public int getCepCobranca() {
         return cepCobranca;
     }
+    
+    public FamiliaFornecedorVO getFamiliaFornecedorVO() {
+        return familiaFornecedor;
+    }
 
     public String getTelefone() {
         return telefone;
@@ -321,6 +327,10 @@ public class FornecedorVO {
 
     public void setCepCobranca(int cepCobranca) {
         this.cepCobranca = cepCobranca;
+    }
+    
+    public void setFamiliaFornecedor(FamiliaFornecedorVO familiaFornecedor) {
+        this.familiaFornecedor = familiaFornecedor;
     }
 
     public void setTelefone(String telefone) {

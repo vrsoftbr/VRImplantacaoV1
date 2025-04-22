@@ -7,6 +7,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.fornecedor.FamiliaFornecedorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
@@ -24,6 +25,7 @@ public class FornecedorRepositoryProvider {
     private String sistema;
     private String lojaOrigem;
     private int lojaVR;
+    private MultiMap<String, FamiliaFornecedorVO> familias;
     private FornecedorDAO fornecedorDAO;
     private FornecedorEnderecoDAO fornecedorEnderecoDAO;
     private ProdutoFornecedorDAO produtoFornecedorDAO;
@@ -68,15 +70,15 @@ public class FornecedorRepositoryProvider {
         this.fornecedorPagamenDAO = new FornecedorPagamentoDAO();
         this.fornecedorPrazoPedido = new FornecedorPrazoPedidoDAO();
     }
-    
+
     public int getIdConexao() {
         return this.idConexao;
     }
-    
+
     public void setIdConexao(int idConexao) {
         this.idConexao = idConexao;
     }
-    
+
     public void setOpcoes(Set<OpcaoFornecedor> opcoes) {
         this.opcoes = opcoes;
     }
@@ -125,7 +127,7 @@ public class FornecedorRepositoryProvider {
         return anterioresDAO.getAnteriores();
     }
 
-    public MunicipioVO getMunicipio(int ibge_municipio) throws Exception {        
+    public MunicipioVO getMunicipio(int ibge_municipio) throws Exception {
         return municipioDAO.getMunicipio(ibge_municipio);
     }
 
@@ -156,11 +158,11 @@ public class FornecedorRepositoryProvider {
     public MultiMap<String, Integer> getContatos() throws Exception {
         return fornecedorContatoDAO.getContatos();
     }
-    
+
     public MultiMap<String, Void> getPagamentos() throws Exception {
         return fornecedorPagamenDAO.getPagamentos();
     }
-    
+
     public MultiMap<String, Void> getDivisoes() throws Exception {
         return fornecedorPrazoDAO.getDivisoes(getLojaVR());
     }
@@ -172,7 +174,7 @@ public class FornecedorRepositoryProvider {
     public void gravarCondicaoPagamento(int id, int condicaoPagamento) throws Exception {
         pagamentoDAO.salvar(id, condicaoPagamento);
     }
-    
+
     public void gravarCondicaoPagamento(FornecedorPagamentoVO pagamento) throws Exception {
         pagamentoDAO.salvar(pagamento);
     }
@@ -184,11 +186,11 @@ public class FornecedorRepositoryProvider {
     public void gravarPrazoPedidoFornecedor(int idFornecedor, int prazoPedidoEntrega) throws Exception {
         fornecedorPrazoPedido.salvarTodasLojas(idFornecedor, prazoPedidoEntrega);
     }
-    
+
     public void atualizarFornecedor(FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
         fornecedorDAO.atualizarFornecedor(vo, opt);
-    }    
-    
+    }
+
     public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opt) throws Exception {
         produtoFornecedorDAO.atualizarProdutoFornecedor(vo, opt);
     }
@@ -208,5 +210,12 @@ public class FornecedorRepositoryProvider {
     void atualizarFornecedorEndereco() {
         fornecedorEnderecoDAO.atualizarFornecedorEndereco();
         fornecedorEnderecoDAO.atualizarFornecedorEndereco();
+    }
+
+    public FamiliaFornecedorVO getFamiliaFornecedor(Integer idFamiliaFornecedor) throws Exception {
+        if (familias == null) {
+            familias = new FamiliaFornecedorDAO().getAnteriores();
+        }
+        return familias.get(sistema, lojaOrigem, idFamiliaFornecedor.toString());
     }
 }

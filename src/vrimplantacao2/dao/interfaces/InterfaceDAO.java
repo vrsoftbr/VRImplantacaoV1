@@ -41,6 +41,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
+import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
@@ -238,6 +239,16 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
 
+    /**
+     * Retorna uma lista das familias dos fornecedores.
+     *
+     * @return Listagem das famílias dos fornecedores.
+     * @throws Exception
+     */
+    public List<FamiliaFornecedorIMP> getFamiliaFornecedor() throws Exception {
+        return new ArrayList<>();
+    }
+    
     /**
      * Permite o retorno listas especificadas dependendo da
      * {@link OpcaoProduto}.
