@@ -498,19 +498,23 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFornContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkTipoForn" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFornSpec" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="chkFornDados" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkFornContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkFornProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace min="-2" pref="66" max="-2" attributes="0"/>
-                                      <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="100" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkFamiliaFornecedor" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkFamiliaXFornecedor" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
-                                  <Component id="chkTipoForn" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkFornSpec" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="302" max="32767" attributes="0"/>
+                              <EmptySpace pref="230" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -520,15 +524,20 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkFornDados" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkContaPagar" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFamiliaFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkFornProdutoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFamiliaXFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkTipoForn" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornSpec" min="-2" max="-2" attributes="0"/>
                               <EmptySpace pref="134" max="32767" attributes="0"/>
                           </Group>
@@ -538,7 +547,7 @@
                   <SubComponents>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornDados">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Dados do fornecedor"/>
+                        <Property name="text" type="java.lang.String" value="Dados do Fornecedor"/>
                       </Properties>
                     </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornContatos">
@@ -558,12 +567,25 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="chkTipoForn">
                       <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Dialog" size="11" style="0"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" value="Tipo de Empresa"/>
                       </Properties>
                     </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornSpec">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Especial"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamiliaFornecedor">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Familia Fornecedor"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamiliaXFornecedor">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Familia X Fornecedor"/>
                       </Properties>
                     </Component>
                   </SubComponents>

@@ -59,6 +59,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
+import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -267,6 +268,34 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             cont++;
             ProgressBar.setStatus("Carregando família de produtos..." + cont);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<FamiliaFornecedorIMP> getFamiliaFornecedor() throws Exception {
+        List<FamiliaFornecedorIMP> result = new ArrayList<>();
+
+        Arquivo familias = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        ProgressBar.setStatus("Carregando família de fornecedores...");
+        int cont = 0;
+
+        for (LinhaArquivo linha : familias) {
+            String id = linha.getString("id_familiafornecedor");
+            if (id != null && !"".equals(id.trim())) {
+                FamiliaFornecedorIMP familia = new FamiliaFornecedorIMP();
+
+                familia.setImportSistema(getSistema());
+                familia.setImportLoja(getLojaOrigem());
+                familia.setImportId(id);
+                familia.setDescricao(linha.getString("familiafornecedor"));
+                familia.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+
+                result.add(familia);
+            }
+            cont++;
+            ProgressBar.setStatus("Carregando família de fornecedores..." + cont);
         }
 
         return result;
@@ -616,6 +645,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (linha.existsColumn("tipoempresa")) {
                     forn.setTipoEmpresa(linha.getInt("tipoempresa") == 1 ? TipoEmpresa.EPP_SIMPLES : TipoEmpresa.LUCRO_REAL);
                 }
+                forn.setIdFamiliaFornecedor(linha.getInt("id_familiafornecedor"));
 
                 int i = 1;
                 while (true) {

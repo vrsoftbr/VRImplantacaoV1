@@ -104,6 +104,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkContaPagar = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoForn = new javax.swing.JCheckBox();
         chkFornSpec = new vrframework.bean.checkBox.VRCheckBox();
+        chkFamiliaFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFamiliaXFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabFornUnificacao = new vrframework.bean.panel.VRPanel();
         chkFornUnificar = new vrframework.bean.checkBox.VRCheckBox();
         chkFornUnificarProd = new vrframework.bean.checkBox.VRCheckBox();
@@ -402,7 +404,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, "Informe o arquivo dos fornecedores");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFornDados, "Dados do fornecedor");
+        org.openide.awt.Mnemonics.setLocalizedText(chkFornDados, "Dados do Fornecedor");
 
         org.openide.awt.Mnemonics.setLocalizedText(chkFornContatos, "Contatos");
 
@@ -410,9 +412,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkContaPagar, "Conta Pagar");
 
+        chkTipoForn.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(chkTipoForn, "Tipo de Empresa");
 
         org.openide.awt.Mnemonics.setLocalizedText(chkFornSpec, "Especial");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkFamiliaFornecedor, "Familia Fornecedor");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkFamiliaXFornecedor, "Familia X Fornecedor");
 
         javax.swing.GroupLayout tabFornImportacaoLayout = new javax.swing.GroupLayout(tabFornImportacao);
         tabFornImportacao.setLayout(tabFornImportacaoLayout);
@@ -421,16 +428,19 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addGroup(tabFornImportacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTipoForn)
+                    .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabFornImportacaoLayout.createSequentialGroup()
                         .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(66, 66, 66)
-                        .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkTipoForn)
-                    .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(302, Short.MAX_VALUE))
+                            .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(100, 100, 100)
+                        .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkFamiliaFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFamiliaXFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(230, Short.MAX_VALUE))
         );
         tabFornImportacaoLayout.setVerticalGroup(
             tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -438,17 +448,23 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFamiliaFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFamiliaXFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkTipoForn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(134, Short.MAX_VALUE))
         );
+
+        chkFornDados.getAccessibleContext().setAccessibleName("Dados do Fornecedor");
 
         tabsForn.addTab("Importação", tabFornImportacao);
 
@@ -1371,6 +1387,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresas;
     private vrframework.bean.checkBox.VRCheckBox chkConvTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkEANAtual;
+    private vrframework.bean.checkBox.VRCheckBox chkFamiliaFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFamiliaXFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornDados;
     private vrframework.bean.checkBox.VRCheckBox chkFornProdutoFornecedor;
@@ -1498,6 +1516,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 dao.setArquivoContaPagar(txtContaPagarFile.getArquivo());
                                 if (tabsForn.getSelectedIndex() == 0) {
                                     List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                                    if (chkFamiliaFornecedor.isSelected()) {
+                                        importador.importarFamiliaFornecedor();
+                                    }
                                     if (chkFornDados.isSelected()) {
                                         opcoes.add(OpcaoFornecedor.DADOS);
                                     }
@@ -1523,10 +1544,17 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         importador.importarFornecedor();
                                     }
                                     if (chkTipoForn.isSelected()) {
-                                        importador.atualizarFornecedor(OpcaoFornecedor.TIPO_EMPRESA);
+                                        opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
+//                                        importador.atualizarFornecedor(OpcaoFornecedor.TIPO_EMPRESA);
+                                    }
+                                    if (chkFamiliaXFornecedor.isSelected()) {
+                                        opcoes.add(OpcaoFornecedor.FAMILIA);
                                     }
                                     if (chkFornProdutoFornecedor.isSelected()) {
                                         importador.importarProdutoFornecedor();
+                                    }
+                                    if (opcoes.contains(OpcaoFornecedor.FAMILIA) || opcoes.contains(OpcaoFornecedor.TIPO_EMPRESA)) {
+                                        importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                                     }
                                     if (chkContaPagar.isSelected()) {
                                         //dao.getOpcoes().put("dateformat", txtFormatoData.getText());
