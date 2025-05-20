@@ -2,7 +2,6 @@ package vrimplantacao2_5.dao.copias;
 
 import java.sql.PreparedStatement;
 import vrframework.classe.Conexao;
-import vrframework.classe.Util;
 
 /**
  *
@@ -13,7 +12,6 @@ public class GerarCodantDAO {
     public void gerarCodant() throws Exception {
 
 //        Util.exibirMensagemConfirmar("Deseja criar todas as Codant faltantes?", "Confirmação de criação de Codant");
-
         createCodant(sqlCodantProduto(), "PRODUTO");
         createCodant(sqlCodantFornecedor(), "FORNECEDOR");
         createCodant(sqlCodantClientePreferencial(), "CLIENTE_PREFERENCIAL");
@@ -24,6 +22,11 @@ public class GerarCodantDAO {
 //        Util.exibirMensagem("Codant criadas com sucesso!", "Informativo");
     }
 
+    public void updateCodantTable() {
+
+        updateCodant(sqlUpdateCodantEan(), "codant_ean");
+    }
+
     private void createCodant(String sql, String tabela) {
 
         try (PreparedStatement pst = Conexao.prepareStatement(sql)) {
@@ -32,6 +35,15 @@ public class GerarCodantDAO {
 
         } catch (Exception e) {
             throw new RuntimeException("Erro ao tentar criar Codant referente a " + tabela + ".", e);
+        }
+    }
+
+    private void updateCodant(String sql, String tabela) {
+
+        try (PreparedStatement pst = Conexao.prepareStatement(sql)) {
+            pst.execute();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao tentar atualizar a tabela referente a " + tabela + ".", e);
         }
     }
 
@@ -165,6 +177,7 @@ public class GerarCodantDAO {
                 + "	valor numeric(10, 3) DEFAULT 0 NOT NULL,\n"
                 + "	tipoembalagem varchar(20) DEFAULT 'UN'::character varying NOT NULL,\n"
                 + "	dataimportacao timestamp DEFAULT now() NULL,\n"
+                + "	obsimportacao varchar,"
                 + "	CONSTRAINT codant_ean_pkey PRIMARY KEY (importsistema, importloja, importid, ean)\n"
                 + ");";
 
@@ -187,7 +200,26 @@ public class GerarCodantDAO {
                 + "	orig_porcentagemdesonerado numeric(13, 3) NULL,\n"
                 + "	CONSTRAINT mapatributacao_pkey PRIMARY KEY (sistema, agrupador, orig_id)\n"
                 + "	);";
-        
+
+        return sql;
+    }
+
+    private String sqlUpdateCodantEan() {
+
+        String sql = "    DO $$\n"
+                + "        BEGIN\n"
+                + "            IF NOT EXISTS (\n"
+                + "                SELECT 1\n"
+                + "                FROM information_schema.columns\n"
+                + "                WHERE table_schema = 'implantacao'\n"
+                + "                  AND table_name = 'codant_ean'\n"
+                + "                  AND column_name = 'obsimportacao'\n"
+                + "            ) THEN\n"
+                + "                ALTER TABLE implantacao.codant_ean ADD COLUMN obsimportacao varchar;\n"
+                + "            END IF;\n"
+                + "        END;\n"
+                + "        $$;";
+
         return sql;
     }
 }

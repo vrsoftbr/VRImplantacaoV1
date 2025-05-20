@@ -166,7 +166,7 @@ public class ProdutoAnteriorEanDAO {
         }
     }
 
-    public void salvar(ProdutoAnteriorEanVO anterior) throws Exception {
+    public void salvar(ProdutoAnteriorEanVO anterior, String obsImportacaoEan) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setSchema("implantacao");
@@ -188,6 +188,7 @@ public class ProdutoAnteriorEanDAO {
                 sql.put("importloja", anterior.getImportLoja());
                 sql.put("importid", anterior.getImportId());
                 sql.put("ean", anterior.getEan() != null ? anterior.getEan() : "");
+                sql.put("obsimportacao", obsImportacaoEan);
                 
                 stm.execute(sql.getInsert());
                 eans.put(anterior,

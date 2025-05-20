@@ -135,7 +135,7 @@ public class ProdutoAutomacaoDAO {
                     antEan.getImportId(),
                     antEan.getEan()
             )) {
-                eanAnteriorDAO.salvar(antEan);
+                eanAnteriorDAO.salvar(antEan, "");
             }
         }
     }
@@ -164,7 +164,7 @@ public class ProdutoAutomacaoDAO {
                     antEan.getImportId(),
                     antEan.getEan()
             )) {
-                eanAnteriorDAO.salvar(antEan);
+                eanAnteriorDAO.salvar(antEan, "");
             }
         }
     }

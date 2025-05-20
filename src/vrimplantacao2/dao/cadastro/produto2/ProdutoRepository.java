@@ -138,6 +138,7 @@ public class ProdutoRepository {
 
                 StringBuilder rep = new StringBuilder();
                 imp.setImportSistema(this.provider.getSistema());
+                String obsImportacaoEan = "";
 
                 try {
 
@@ -241,8 +242,9 @@ public class ProdutoRepository {
                             provider.anterior().salvar(anterior);
 
                             if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
+                                obsImportacaoEan = "EAN JA CADASTRADO NO VR MASTER - CODIGO ATUAL " + prod.getId();
                                 ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-                                provider.eanAnterior().salvar(eanAnterior);
+                                provider.eanAnterior().salvar(eanAnterior, obsImportacaoEan);
                             }
 
                             continue;
@@ -273,6 +275,9 @@ public class ProdutoRepository {
                     } //</editor-fold>
                     else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
+                        
+                        obsImportacaoEan = "EAN JA CADASTRADO NO VR MASTER - CODIGO ATUAL " + idProdutoExistente;
+                        
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
                     } else {
                         rep.append("01|Produto sem código atual no VR");
@@ -289,12 +294,13 @@ public class ProdutoRepository {
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(anterior.getCodigoAtual());
                             provider.automacao().salvar(automacao);
+                            obsImportacaoEan = "EAN NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString();
                         }
                     }
 
                     if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
                         ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-                        provider.eanAnterior().salvar(eanAnterior);
+                        provider.eanAnterior().salvar(eanAnterior, obsImportacaoEan);
                     }
 
                     notificar();
@@ -561,7 +567,7 @@ public class ProdutoRepository {
 
                             if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
                                 ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-                                provider.eanAnterior().salvar(eanAnterior);
+                                provider.eanAnterior().salvar(eanAnterior, "");
                             }
                         }
 
@@ -666,9 +672,9 @@ public class ProdutoRepository {
                             provider.getLojaVR());
                 }
 
-                if (optSimples.contains(OpcaoProduto.PRECO) || 
-                    optSimples.contains(OpcaoProduto.CUSTO) || 
-                    optSimples.contains(OpcaoProduto.ESTOQUE)) {
+                if (optSimples.contains(OpcaoProduto.PRECO)
+                        || optSimples.contains(OpcaoProduto.CUSTO)
+                        || optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     logController.executarLogAtualizacao(organizados, getSistema(), getLoja());
                 }
 
@@ -1056,6 +1062,7 @@ public class ProdutoRepository {
 
     private void processarProdutoIMPParaUnificacao(ProdutoIMP imp, boolean unificarProdutoBalanca, ProdutoIDStack idStack, String dataHoraImportacao) throws Exception {
         String obsImportacao = "";
+        String obsImportacaoEan = "";
         imp.setManterEAN(false);
         //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
         int id;
@@ -1111,6 +1118,7 @@ public class ProdutoRepository {
                         provider.salvarProdutoPisCofins(codigoAtual);
                     }
                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                    obsImportacaoEan = "EAN NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();;
                     //provider.anterior().salvar(anterior);
                     double estoque = complemento.getEstoque();
                     for (LojaVO loja : provider.getLojas()) {
@@ -1159,6 +1167,8 @@ public class ProdutoRepository {
 
                         obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE "
                                 + ProdutoRepository.class.getName().toString();
+                        obsImportacaoEan = "EAN NOVO - INSERIDO PELO METODO unificar DA CLASSE "
+                                + ProdutoRepository.class.getName().toString();;
 
                         //provider.anterior().salvar(anterior);
                         double estoque = complemento.getEstoque();
@@ -1183,6 +1193,7 @@ public class ProdutoRepository {
                         }
                     } else {
                         obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                        obsImportacaoEan = "EAN UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                     }
                 }
                 /**
@@ -1200,6 +1211,7 @@ public class ProdutoRepository {
                 codigoAtual = new ProdutoVO();
                 codigoAtual.setId(id);
                 obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                obsImportacaoEan = "EAN UNIFICADO EM OUTRO PRODUTO - UNIFICADO AO PRODUTO DE CODIGO ATUAL " + codigoAtual.getId();
 
                 // gravar codigo atual se for null
                 gravarCodigoAtual(provider.getSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
@@ -1224,7 +1236,8 @@ public class ProdutoRepository {
         }
         if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
             ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-            provider.eanAnterior().salvar(eanAnterior);
+
+            provider.eanAnterior().salvar(eanAnterior, obsImportacaoEan);
         }
         notificar();
     }

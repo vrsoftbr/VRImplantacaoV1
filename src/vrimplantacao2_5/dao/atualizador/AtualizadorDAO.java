@@ -463,8 +463,8 @@ public class AtualizadorDAO {
                     + "$$ language plpgsql");
         }
     }
-    
-        public void deletarUsuariosInativos() throws Exception {
+
+    public void deletarUsuariosInativos() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("DELETE FROM implantacao2_5.usuario WHERE id in (3, 4, 5)");
         }

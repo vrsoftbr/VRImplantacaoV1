@@ -90,6 +90,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         chkCopiarAliquota.setSelected(false);
         chkCopiarFinalizadora.setSelected(false);
         chkCopiarCartoes.setSelected(false);
+        chkCopiarSpedConfig.setSelected(false);
 
         habilitarTela();
     }
@@ -129,6 +130,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.setCopiarAliquota(chkCopiarAliquota.isSelected());
         oLoja.setCopiarFinalizadora(chkCopiarFinalizadora.isSelected());
         oLoja.setCopiarCartoes(chkCopiarCartoes.isSelected());
+        oLoja.setCopiarConfigSped(chkCopiarSpedConfig.isSelected());
 
         try {
             new LojaController().salvar(oLoja);
@@ -228,6 +230,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         chkCopiarAliquota = new vrframework.bean.checkBox.VRCheckBox();
         chkCopiarFinalizadora = new vrframework.bean.checkBox.VRCheckBox();
         chkCopiarCartoes = new vrframework.bean.checkBox.VRCheckBox();
+        chkCopiarSpedConfig = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, "jCheckBox1");
 
@@ -631,6 +634,14 @@ public class LojaCadastroGUI extends VRInternalFrame {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCopiarSpedConfig, "Copiar Config Sped");
+        chkCopiarSpedConfig.setName(""); // NOI18N
+        chkCopiarSpedConfig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCopiarSpedConfigActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout trocaPanel1Layout = new javax.swing.GroupLayout(trocaPanel1);
         trocaPanel1.setLayout(trocaPanel1Layout);
         trocaPanel1Layout.setHorizontalGroup(
@@ -641,10 +652,12 @@ public class LojaCadastroGUI extends VRInternalFrame {
                     .addGroup(trocaPanel1Layout.createSequentialGroup()
                         .addComponent(chkCopiarAcumulador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(chkCopiarAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkCopiarFinalizadora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkCopiarAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCopiarCartoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(trocaPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCopiarSpedConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCopiarFinalizadora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         trocaPanel1Layout.setVerticalGroup(
@@ -656,7 +669,9 @@ public class LojaCadastroGUI extends VRInternalFrame {
                     .addComponent(chkCopiarAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCopiarFinalizadora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCopiarCartoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(trocaPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCopiarCartoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCopiarSpedConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -682,9 +697,9 @@ public class LojaCadastroGUI extends VRInternalFrame {
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(trocaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(trocaPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -838,6 +853,10 @@ public class LojaCadastroGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCopiarAcumuladorActionPerformed
 
+    private void chkCopiarSpedConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCopiarSpedConfigActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCopiarSpedConfigActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnSair;
     private vrframework.bean.button.VRButton btnSalvar;
@@ -857,6 +876,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCopiarAliquota;
     private vrframework.bean.checkBox.VRCheckBox chkCopiarCartoes;
     private vrframework.bean.checkBox.VRCheckBox chkCopiarFinalizadora;
+    private vrframework.bean.checkBox.VRCheckBox chkCopiarSpedConfig;
     private vrframework.bean.checkBox.VRCheckBox chkGeraConcentrador;
     private javax.swing.JCheckBox chkOferta;
     private javax.swing.JCheckBox chkOutrasDespesas;

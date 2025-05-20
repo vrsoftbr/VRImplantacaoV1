@@ -31,6 +31,7 @@ public class LojaVO {
     private boolean copiarAliquota = false;
     private boolean copiarFinalizadora = false;
     private boolean copiarCartoes = false;
+    private boolean copiarConfigSped = false;
 
     public int getId() {
         return id;
@@ -289,5 +290,13 @@ public class LojaVO {
 
     public void setCopiarCartoes(boolean copiarCartoes) {
         this.copiarCartoes = copiarCartoes;
+    }
+    
+    public boolean isCopiarConfigSped() {
+        return copiarConfigSped;
+    }
+    
+    public void setCopiarConfigSped(boolean copiarConfigSped) {
+        this.copiarConfigSped = copiarConfigSped;
     }
 }

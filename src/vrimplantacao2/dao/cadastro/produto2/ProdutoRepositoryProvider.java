@@ -461,8 +461,8 @@ public class ProdutoRepositoryProvider {
             return dao.getEansAnteriores().containsKey(getSistema(), getLoja(), impid, ean);
         }
 
-        public void salvar(ProdutoAnteriorEanVO eanAnterior) throws Exception {
-            dao.salvar(eanAnterior);
+        public void salvar(ProdutoAnteriorEanVO eanAnterior, String obsImportacao) throws Exception {
+            dao.salvar(eanAnterior, obsImportacao);
         }
     
     }

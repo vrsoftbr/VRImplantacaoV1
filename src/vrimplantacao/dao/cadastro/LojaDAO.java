@@ -348,10 +348,9 @@ public class LojaDAO {
 
             //("Copiando dataprocessamento.");
             stm.execute(script.inserirDataProcessamento(i_loja).getInsert());
-            
+
             //("Inserindo data no PDV Consistencia"); --DESATIVADO ATÉ SEGUNDA ORDEM.
 //            stm.execute(script.inserirDataPdvConsistencia(i_loja));
-
             //("Copiando comprovante.");
             stm.execute(script.inserirComprovante(i_loja));
 
@@ -449,6 +448,15 @@ public class LojaDAO {
             if (i_loja.isCopiaUsuario() == true) {
                 //("Copiando Usuario.");
                 stm.execute(script.copiaUsuarioPermissao(i_loja));
+            }
+
+            if (i_loja.isCopiarConfigSped() == true) {
+                //("Copiando Configuração de Sped.");
+                try {
+                    stm.execute(script.copiarConfiguracaoSped(i_loja));
+                } catch (Exception e) {
+                    throw new Exception("Erro ao copiar as configurações de Sped.");
+                }
             }
             ProgressBar.setStatus("salvando loja... 90%");
 

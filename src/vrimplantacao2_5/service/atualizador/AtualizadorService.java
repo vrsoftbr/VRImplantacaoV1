@@ -60,6 +60,7 @@ public class AtualizadorService {
 
     public void criarSchema() throws Exception {
         this.gerarCodantDAO.gerarCodant();
+        this.gerarCodantDAO.updateCodantTable();
         this.atualizadorDAO.criarSchema();
     }
 

@@ -193,8 +193,8 @@ public class LojaGeradorScripts {
     public String inserirDataPdvConsistencia(LojaVO i_loja) throws Exception {
         String sql
                 = "INSERT INTO pdv.consistencia (data, id_loja) \n"
-                + "VALUES (CURRENT_DATE - INTERVAL '1 day', " + i_loja.getId() +");";
-        
+                + "VALUES (CURRENT_DATE - INTERVAL '1 day', " + i_loja.getId() + ");";
+
         return sql;
     }
 
@@ -203,6 +203,28 @@ public class LojaGeradorScripts {
                 + "select nextval('permissaoloja_id_seq')," + i_loja.getId() + ",id_permissao from permissaoloja "
                 + " where id_loja = " + i_loja.getIdCopiarLoja();
 
+        return sql;
+    }
+
+    public String copiarConfiguracaoSped(LojaVO i_loja) throws Exception {
+        String sql = "DO $$\n"
+                + "    BEGIN\n"
+                + "        INSERT INTO sped.configuracaoloja (id_loja, id_contabilista)\n"
+                + "        SELECT " + i_loja.getId() + ", id_contabilista FROM sped.configuracaoloja WHERE id_loja = " + i_loja.getIdCopiarLoja() + ";\n"
+                + "\n"
+                + "        INSERT INTO sped.configuracao (\n"
+                + "            id_loja, tipocontribuicao, codigoincidencia, metodoapropriacao, tipoapuracao,\n"
+                + "            aluguel, leasing, valorpis, valorcofins, codigopiscumulativo, codigopisnaocumulativo,\n"
+                + "            codigocofinscumulativo, codigocofinsnaocumulativo, id_contabilista, id_planocontareferencial\n"
+                + "        )\n"
+                + "        SELECT\n"
+                + "            " + i_loja.getId() + ", tipocontribuicao, codigoincidencia, metodoapropriacao, tipoapuracao,\n"
+                + "            aluguel, leasing, valorpis, valorcofins, codigopiscumulativo, codigopisnaocumulativo,\n"
+                + "            codigocofinscumulativo, codigocofinsnaocumulativo, id_contabilista, id_planocontareferencial\n"
+                + "        FROM sped.configuracao\n"
+                + "        WHERE id_loja = " + i_loja.getIdCopiarLoja() + ";\n"
+                + "    END\n"
+                + "    $$;";
         return sql;
     }
 
