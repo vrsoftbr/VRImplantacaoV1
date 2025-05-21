@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.usuario;
 
-import vrimplantacao2.dao.cadastro.fornecedor.*;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,9 +17,9 @@ import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
+import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
 import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.cadastro.usuario.UsuarioAnteriorVO;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
@@ -53,11 +52,10 @@ public class UsuarioRepository {
         this.provider = provider;
         this.logController = new LogController();
     }
-//    
-//    public String getLoja() {
-//        return provider.getLojaOrigem();
-//    }
-//    
+
+    public String getLoja() {
+        return provider.getLojaOrigem();
+    }
 
     public void salvar2_5(List<UsuarioIMP> usuarios) throws Exception {
         UsuarioService usuarioService = new UsuarioService();
@@ -65,105 +63,97 @@ public class UsuarioRepository {
 
         int idConexao = usuarioService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = usuarioService.verificaRegistro();
-        
+
         String impSistema = usuarioService.getImpSistemaInicial();
 
-//        if (this.forcarUnificacao) {
+        if (this.forcarUnificacao) {
 //            unificar(fornecedores);
-//        } else {
-//
-//            if (registro > 0 && idConexao == 0 || 
-//                    (!impSistema.isEmpty() && 
-//                        !impSistema.equals(this.provider.getSistema()))) {
+        } else {
+
+            if (registro > 0 && idConexao == 0
+                    || (!impSistema.isEmpty()
+                    && !impSistema.equals(this.provider.getSistema()))) {
+
+//                FAZER LOGICA DE UNIFICAÇÃO
 //                unificar(fornecedores);
-//            } else {
-//                boolean existeConexao = fornecedorService.
-//                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), 
-//                                                  this.provider.getSistema(), 
-//                                                  this.provider.getIdConexao());
-//
-//                String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-//                                
-//                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
-//                    
-//                    this.provider.setStatus("Fornecedor - Copiando código anterior Fornecedor...");
-//                    
-//                    fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
-//                }
-//
-//                salvar(fornecedores);
-//            }
-//        }
+            } else {
+                boolean existeConexao = usuarioService.
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(),
+                                this.provider.getSistema(),
+                                this.provider.getIdConexao());
+
+                String lojaModelo = usuarioService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+
+                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+
+                    this.provider.setStatus("Fornecedor - Copiando código anterior Fornecedor...");
+
+                    usuarioService.copiarCodantUsuario(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
+                }
+
+                salvar(usuarios);
+            }
+        }
     }
-//    
-//    public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
-//        MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
-//        fornecedores = null;
+    
+    public void salvar(List<UsuarioIMP> usuarios) throws Exception {
+        MultiMap<String, UsuarioIMP> filtrados = filtrar(usuarios);
+        usuarios = null;
 //        //Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
 //        System.gc();
-//        organizar(filtrados);
-//
-//        try {
-//            provider.begin();
-//
-//            MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
+        organizar(filtrados);
+
+        try {
+            provider.begin();
+
+            MultiMap<String, UsuarioAnteriorVO> anteriores = provider.getAnteriores();
 //            Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
-//            FornecedorIDStack ids = provider.getIdsExistentes();
+            UsuarioIDStack ids = provider.getIdsExistentes();
 //            this.contatos = provider.getContatos();
 //            MultiMap<String, Void> pagamentos = provider.getPagamentos();
 //            MultiMap<String, Void> divisoes = provider.getDivisoes();
 //            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
 //
-//            provider.setStatus("Fornecedores - Gravando...");
-//            provider.setMaximum(filtrados.size());
-//            
-//            for (FornecedorIMP imp : filtrados.values()) {
-//                FornecedorAnteriorVO anterior = anteriores.get(
-//                        provider.getSistema(),
-//                        provider.getLojaOrigem(),
-//                        imp.getImportId()
-//                );
-//
-//                FornecedorVO vo;
-//
-//                if (anterior == null) {
-//
-//                    vo = converter(imp);
-//                    
-//                    //Se existir Familia Fornecedor
+            provider.setStatus("Usuários - Gravando...");
+            provider.setMaximum(filtrados.size());
+            
+            for (UsuarioIMP imp : filtrados.values()) {
+                UsuarioAnteriorVO anterior = anteriores.get(
+                        provider.getSistema(),
+                        provider.getLojaOrigem(),
+                        imp.getImportId()
+                );
+
+                UsuarioVO vo;
+
+                if (anterior == null) {
+
+                    vo = converter(imp);
+                    
+//                    //Se existir Tipo Setor
 //                    if (imp.getIdFamiliaFornecedor() != null) {
 //                    vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
 //                    }
 //
-//                    //Se o CNPJ/CPF existir, gera um novo.
-//                    if (cnpjExistentes.containsKey(Utils.stringToLong(imp.getCnpj_cpf()))) {
-//                        vo.setCnpj(-2);
-//                    }
-//
-//                    int id = ids.obterID(imp.getImportId());
-//
-//                    //Obtem um ID válido.
-//                    if (vo.getCnpj() < 0) {
-//                        vo.setCnpj(id);
-//                    }
-//
-//                    vo.setId(id);
-//                    gravarFornecedor(vo);
+                    int id = ids.obterID(imp.getImportId());
+
+                    vo.setId(id);
+                    gravarUsuario(vo);
 //                    cnpjExistentes.put(vo.getCnpj(), vo);
-//
-//                    anterior = converterAnterior(imp);
-//                    anterior.setCodigoAtual(vo);
+
+                    anterior = converterAnterior(imp);
+                    anterior.setCodigoAtual(vo);
 //                    anterior.setIdConexao(provider.getIdConexao());
-//                    gravarFornecedorAnterior(anterior);
-//                    anteriores.put(
-//                            anterior,
-//                            provider.getSistema(),
-//                            provider.getLojaOrigem(),
-//                            imp.getImportId()
-//                    );
-//                } else {
-//                    vo = anterior.getCodigoAtual();
-//                }
+                    gravarUsuarioAnterior(anterior);
+                    anteriores.put(
+                            anterior,
+                            provider.getSistema(),
+                            provider.getLojaOrigem(),
+                            imp.getImportId()
+                    );
+                } else {
+                    vo = anterior.getCodigoAtual();
+                }
 //
 //                if (vo != null) {
 //                    processarContatos(imp, vo, opt);
@@ -181,27 +171,25 @@ public class UsuarioRepository {
 //                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
 //                    }
 //                }
-//
-//                provider.next();
-//            }
-//            
-//            if (versao.igualOuMaiorQue(4, 1, 39)){
-//                provider.gravarFornecedorEndereco();
-//            }
-//                        
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            
-//            //Executa log de operação
-//            logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
-//                    sdf.format(new Date()),
-//                    provider.getLojaVR());
-//
-//            provider.commit();
-//        } catch (Exception e) {
-//            provider.rollback();
-//            throw e;
-//        }
-//    }
+
+                provider.next();
+            }
+            
+
+                        
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            
+            //Executa log de operação
+            logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
+                    sdf.format(new Date()),
+                    provider.getLojaVR());
+
+            provider.commit();
+        } catch (Exception e) {
+            provider.rollback();
+            throw e;
+        }
+    }
 //
 //    public void atualizar(List<FornecedorIMP> fornecedores, OpcaoFornecedor... opcoes) throws Exception {
 //        Set<OpcaoFornecedor> opt = new HashSet<>(Arrays.asList(opcoes));
@@ -526,38 +514,21 @@ public class UsuarioRepository {
 //            }
 //        }
 //    }
-//
-//    public MultiMap<String, FornecedorIMP> filtrar(List<FornecedorIMP> fornecedores) throws Exception {
-//        MultiMap<String, FornecedorIMP> result = new MultiMap<>();
-//
-//        for (FornecedorIMP imp : fornecedores) {
-//            result.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getImportId()
-//            );
-//        }
-//        
-//        boolean importarSomenteOsAtivos = provider.getOpcoes().contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS);
-//        if (importarSomenteOsAtivos) {
-//            MultiMap<String, FornecedorIMP> ativos = new MultiMap<>();
-//            for (FornecedorIMP imp: result.values()) {
-//                if (imp.isAtivo()) {
-//                    ativos.put(
-//                        imp,
-//                        imp.getImportSistema(),
-//                        imp.getImportLoja(),
-//                        imp.getImportId()
-//                    );
-//                }
-//            }
-//            result = ativos;
-//        }
-//
-//        return result;
-//    }
-//
+
+    public MultiMap<String, UsuarioIMP> filtrar(List<UsuarioIMP> usuarios) throws Exception {
+        MultiMap<String, UsuarioIMP> result = new MultiMap<>();
+
+        for (UsuarioIMP imp : usuarios) {
+            result.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId()
+            );
+        }
+        return result;
+    }
+
 //    public MultiMap<String, ProdutoFornecedorIMP> filtrarProdFornecedor(List<ProdutoFornecedorIMP> produtoFornecedores) throws Exception {
 //        MultiMap<String, ProdutoFornecedorIMP> result = new MultiMap<>();
 //
@@ -572,48 +543,48 @@ public class UsuarioRepository {
 //
 //        return result;
 //    }
-//
-//    public void organizar(MultiMap<String, FornecedorIMP> filtrados) {
-//        MultiMap<String, FornecedorIMP> idsValidos = new MultiMap<>(3);
-//        MultiMap<String, FornecedorIMP> idsInvalidos = new MultiMap<>(3);
-//
-//        for (FornecedorIMP imp : filtrados.values()) {
-//            String[] chave = new String[]{
-//                imp.getImportSistema(),
-//                imp.getImportLoja(),
-//                imp.getImportId()
-//            };
-//            try {
-//                int id = Integer.parseInt(imp.getImportId());
-//                if (id > 1 && id <= 999999) {
-//                    idsValidos.put(imp, chave);
-//                } else {
-//                    idsInvalidos.put(imp, chave);
-//                }
-//            } catch (NumberFormatException ex) {
-//                idsInvalidos.put(imp, chave);
-//            }
-//        }
-//
-//        filtrados.clear();
-//        for (FornecedorIMP imp : idsValidos.getSortedMap().values()) {
-//            filtrados.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getImportId()
-//            );
-//        }
-//        for (FornecedorIMP imp : idsInvalidos.getSortedMap().values()) {
-//            filtrados.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getImportId()
-//            );
-//        }
-//    }
-//
+
+    public void organizar(MultiMap<String, UsuarioIMP> filtrados) {
+        MultiMap<String, UsuarioIMP> idsValidos = new MultiMap<>(3);
+        MultiMap<String, UsuarioIMP> idsInvalidos = new MultiMap<>(3);
+
+        for (UsuarioIMP imp : filtrados.values()) {
+            String[] chave = new String[]{
+                imp.getImportSistema(),
+                imp.getImportLoja(),
+                imp.getImportId()
+            };
+            try {
+                int id = Integer.parseInt(imp.getImportId());
+                if (id > 1 && id <= 999999) {
+                    idsValidos.put(imp, chave);
+                } else {
+                    idsInvalidos.put(imp, chave);
+                }
+            } catch (NumberFormatException ex) {
+                idsInvalidos.put(imp, chave);
+            }
+        }
+
+        filtrados.clear();
+        for (UsuarioIMP imp : idsValidos.getSortedMap().values()) {
+            filtrados.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId()
+            );
+        }
+        for (UsuarioIMP imp : idsInvalidos.getSortedMap().values()) {
+            filtrados.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId()
+            );
+        }
+    }
+
 //    public void organizarProdutoFornecedor(MultiMap<String, ProdutoFornecedorIMP> filtrados) {
 //        MultiMap<String, ProdutoFornecedorIMP> idsValidos = new MultiMap<>(3);
 //        MultiMap<String, ProdutoFornecedorIMP> idsInvalidos = new MultiMap<>(3);
@@ -654,75 +625,19 @@ public class UsuarioRepository {
 //            );
 //        }
 //    }
-//
-//    public FornecedorVO converter(FornecedorIMP imp) throws Exception {
-//        FornecedorVO vo = new FornecedorVO();
-//
-//        vo.setRazaoSocial(imp.getRazao());
-//        vo.setNomeFantasia(imp.getFantasia());
-//        vo.setCnpj(Utils.stringToLong(imp.getCnpj_cpf(), -1));
-//        vo.setInscricaoEstadual(imp.getIe_rg());
-//        vo.setInscricaoMunicipal(imp.getInsc_municipal());
-//        vo.setInscricaoSuframa(imp.getSuframa());
-//        vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-//        vo.setBloqueado(imp.isBloqueado());
-//        vo.setTelefone(imp.getTel_principal());
-//        vo.setPedidoMinimoQtd(imp.getQtd_minima_pedido());
-//        vo.setPedidoMinimoValor(imp.getValor_minimo_pedido());
-//        vo.setDataCadastro(imp.getDatacadastro() != null ? imp.getDatacadastro() : new Date());
-//        vo.setObservacao(imp.getObservacao());
-//        if (imp.getTipo_inscricao() == TipoInscricao.VAZIO) {
-//            vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
-//        } else {
-//            vo.setTipoInscricao(imp.getTipo_inscricao());
-//        }
-//        vo.setTipoFornecedor(imp.getTipoFornecedor());
-//        vo.setTipoEmpresa(imp.getTipoEmpresa());
-//        vo.setTipoPagamento(imp.getTipoPagamento());
-//        vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
-//        vo.setUtilizaNfe(imp.isEmiteNfe());
-//        vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
-//        vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
-//        vo.setUtilizaiva(imp.getUtilizaiva() == null ? false : !"0".equals(imp.getUtilizaiva().trim()));
-//        vo.setRevenda(imp.getRevenda());
-//        vo.setIdPais(imp.getIdPais());
-//        
+
+    public UsuarioVO converter(UsuarioIMP imp) throws Exception {
+        UsuarioVO vo = new UsuarioVO();
+
+        vo.setLogin(imp.getLogin());
+        vo.setNome(imp.getNome());
+        vo.setSenha(imp.getSenha());
+        vo.setSituacaoCadastro(imp.getSituacaoCadastro());
+   
 //        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
-//            
-//        //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
-//        vo.setEndereco(imp.getEndereco());
-//        vo.setNumero(imp.getNumero());
-//        vo.setComplemento(imp.getComplemento());
-//        vo.setBairro(imp.getBairro());
-//        vo.setMunicipio(provider.getMunicipio(imp.getIbge_municipio()));
-//        if (vo.getMunicipio() == null) {
-//            vo.setMunicipio(provider.getMunicipio(imp.getMunicipio(), imp.getUf()));
-//            if (vo.getMunicipio() == null) {
-//                vo.setMunicipio(provider.getMunicipioPadrao());
-//            }
-//        }
-//        vo.setEstado(vo.getMunicipio().getEstado());
-//        vo.setCep(Utils.stringToInt(imp.getCep()));
-//        //</editor-fold>
-//
-//        //<editor-fold defaultstate="collapsed" desc="ENDEREÇO COBRANÇA">
-//        vo.setEnderecoCobranca(imp.getCob_endereco());
-//        vo.setNumeroCobranca(imp.getCob_numero());
-//        vo.setComplementoCobranca(imp.getCob_complemento());
-//        vo.setBairroCobranca(imp.getCob_bairro());
-//        vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_ibge_municipio()));
-//        if (vo.getMunicipioCobranca() == null) {
-//            vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_municipio(), imp.getCob_uf()));
-//            if (vo.getMunicipioCobranca() == null) {
-//                vo.setMunicipioCobranca(provider.getMunicipioPadrao());
-//            }
-//        }
-//        vo.setEstadoCobranca(vo.getMunicipioCobranca().getEstado());
-//        vo.setCepCobranca(Utils.stringToInt(imp.getCob_cep()));
-//        //</editor-fold>
-//
-//        return vo;
-//    }
+
+        return vo;
+    }
 //
 //    public ProdutoFornecedorVO converterProdutoFornecedor(ProdutoFornecedorIMP imp) {
 //        ProdutoFornecedorVO vo = new ProdutoFornecedorVO();
@@ -739,26 +654,28 @@ public class UsuarioRepository {
 //
 //        return vo;
 //    }
-//
-//    public void gravarFornecedor(FornecedorVO vo) throws Exception {
-//        provider.gravarFornecedor(vo);
-//    }
-//
-//    public FornecedorAnteriorVO converterAnterior(FornecedorIMP imp) {
-//        FornecedorAnteriorVO ant = new FornecedorAnteriorVO();
-//        ant.setImportSistema(provider.getSistema());
-//        ant.setImportLoja(imp.getImportLoja());
-//        ant.setImportId(imp.getImportId());
-//        ant.setRazao(Utils.acertarTexto(imp.getRazao()));
-//        ant.setFantasia(Utils.acertarTexto(imp.getFantasia()));
-//        ant.setCnpjCpf(Utils.acertarTexto(imp.getCnpj_cpf()));
-//        return ant;
-//    }
-//
-//    public void gravarFornecedorAnterior(FornecedorAnteriorVO anterior) throws Exception {
-//        provider.gravarFornecedorAnterior(anterior);
-//    }
-//
+
+    public void gravarUsuario(UsuarioVO vo) throws Exception {
+        provider.gravarUsuario(vo);
+    }
+
+    public UsuarioAnteriorVO converterAnterior(UsuarioIMP imp) {
+        UsuarioAnteriorVO ant = new UsuarioAnteriorVO();
+        ant.setImportSistema(provider.getSistema());
+        ant.setImportLoja(imp.getImportLoja());
+        ant.setImportId(imp.getImportId());
+        ant.setLogin(imp.getLogin());
+        ant.setNome(imp.getNome());
+        ant.setIdTipoSetor(imp.getIdTipoSetor());
+        ant.setSituacaoCadastro(imp.getSituacaoCadastro());
+                
+        return ant;
+    }
+
+    public void gravarUsuarioAnterior(UsuarioAnteriorVO anterior) throws Exception {
+        provider.gravarUsuarioAnterior(anterior);
+    }
+
 //    public FornecedorContatoVO converterContatoFornecedor(FornecedorContatoIMP imp) {
 //        FornecedorContatoVO contato = new FornecedorContatoVO();
 //        contato.setNome(imp.getNome());

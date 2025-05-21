@@ -1,6 +1,5 @@
 package vrimplantacao2_5.service.migracao;
 
-import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.usuario.UsuarioAnteriorDAO;
 
 /**
@@ -27,18 +26,18 @@ public class UsuarioService {
         return this.usuarioAnteriorDAO.verificaRegistro();
     }
     
-//    public boolean verificaMigracaoMultiloja(String lojaOrigem, String sistema, int idConexao) throws Exception {
-//        return this.fornecedorAnteriorDAO.verificaMigracaoMultiloja(lojaOrigem, sistema, idConexao);
-//    }
-//    
-//    public void copiarCodantFornecedor(String sistema, String lojaModelo, String lojaNova) throws Exception {
-//        this.fornecedorAnteriorDAO.copiarCodantFornecedor(sistema, lojaModelo, lojaNova);
-//    }
-//    
-//    public String getLojaModelo(int idConexao, String sistema) throws Exception {
-//        return this.fornecedorAnteriorDAO.getLojaModelo(idConexao, sistema);
-//    }
-//
+    public boolean verificaMigracaoMultiloja(String lojaOrigem, String sistema, int idConexao) throws Exception {
+        return this.usuarioAnteriorDAO.verificaMigracaoMultiloja(lojaOrigem, sistema, idConexao);
+    }
+    
+    public void copiarCodantUsuario(String sistema, String lojaModelo, String lojaNova) throws Exception {
+        this.usuarioAnteriorDAO.copiarCodantUsuario(sistema, lojaModelo, lojaNova);
+    }
+    
+    public String getLojaModelo(int idConexao, String sistema) throws Exception {
+        return this.usuarioAnteriorDAO.getLojaModelo(idConexao, sistema);
+    }
+
 //    public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
 //        return this.fornecedorAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
 //    }

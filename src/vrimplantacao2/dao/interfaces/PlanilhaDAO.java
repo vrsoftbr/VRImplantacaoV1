@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
@@ -1686,7 +1685,6 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             
             result.add(imp);
         }
-        
         return result;
     }
 }

@@ -1,18 +1,82 @@
 package vrimplantacao2.vo.cadastro.usuario;
 
 import vrimplantacao2.vo.cadastro.fornecedor.*;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class UsuarioAnteriorVO {
-    
-//    private String importSistema;
-//    private String importLoja;
-//    private String importId;
-//    private UsuarioVO codigoAtual;
-//    private String login;
-//    private String nome;
-//    private int idTipoSetor;
-//    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
-    
+
+    private String importSistema;
+    private String importLoja;
+    private String importId;
+    private UsuarioVO codigoAtual;
+    private String login;
+    private String nome;
+    private int idTipoSetor;
+    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+
+    public String getImportSistema() {
+        return importSistema;
+    }
+
+    public void setImportSistema(String importSistema) {
+        this.importSistema = importSistema;
+    }
+
+    public String getImportLoja() {
+        return importLoja;
+    }
+
+    public void setImportLoja(String importLoja) {
+        this.importLoja = importLoja;
+    }
+
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
+
+    public UsuarioVO getCodigoAtual() {
+        return codigoAtual;
+    }
+
+    public void setCodigoAtual(UsuarioVO codigoAtual) {
+        this.codigoAtual = codigoAtual;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public int getIdTipoSetor() {
+        return idTipoSetor;
+    }
+
+    public void setIdTipoSetor(int idTipoSetor) {
+        this.idTipoSetor = idTipoSetor;
+    }
+
+    public SituacaoCadastro getSituacaoCadastro() {
+        return situacaoCadastro;
+    }
+
+    public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+        this.situacaoCadastro = situacaoCadastro;
+    }
 
 //    public String getImportSistema() {
 //        return importSistema;

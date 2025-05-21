@@ -1,18 +1,19 @@
 package vrimplantacao2.dao.cadastro.usuario;
 
-import vrimplantacao2.dao.cadastro.fornecedor.*;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.fornecedor.FamiliaFornecedorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
+import vrimplantacao2.vo.cadastro.usuario.UsuarioAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
+import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
 import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
 
@@ -28,10 +29,10 @@ public class UsuarioRepositoryProvider {
 
     private final int lojaVR;
 //    private MultiMap<String, FamiliaFornecedorVO> familias;
-//    private FornecedorDAO fornecedorDAO;
+    private UsuarioDAO usuarioDAO;
 //    private FornecedorEnderecoDAO fornecedorEnderecoDAO;
 //    private ProdutoFornecedorDAO produtoFornecedorDAO;
-//    private FornecedorAnteriorDAO anterioresDAO;
+    private UsuarioAnteriorDAO anterioresDAO;
 //    private MunicipioDAO municipioDAO;
 //    private FornecedorContatoDAO fornecedorContatoDAO;
 //    private FornecedorPagamentoDAO pagamentoDAO;
@@ -61,7 +62,7 @@ public class UsuarioRepositoryProvider {
         this.sistema = sistema;
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
-//        this.fornecedorDAO = new FornecedorDAO();
+        this.usuarioDAO = new UsuarioDAO();
 //        this.fornecedorEnderecoDAO = new FornecedorEnderecoDAO();
 //        this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
 //        this.fornecedorContatoDAO = new FornecedorContatoDAO();
@@ -108,6 +109,11 @@ public class UsuarioRepositoryProvider {
     public void commit() throws Exception {
         Conexao.commit();
     }
+        
+    public void setStatus(String mensagem) throws Exception {
+        ProgressBar.setStatus(mensagem);
+    }
+
 
 
 //    public String getSistema() {
@@ -133,23 +139,19 @@ public class UsuarioRepositoryProvider {
 //    public void commit() throws Exception {
 //        Conexao.commit();
 //    }
-//
-//    public void setStatus(String mensagem) throws Exception {
-//        ProgressBar.setStatus(mensagem);
-//    }
-//
-//    public void setMaximum(int size) throws Exception {
-//        ProgressBar.setMaximum(size);
-//    }
-//
-//    public void next() throws Exception {
-//        ProgressBar.next();
-//    }
-//
-//    public MultiMap<String, FornecedorAnteriorVO> getAnteriores() throws Exception {
-//        return anterioresDAO.getAnteriores();
-//    }
-//
+
+    public void setMaximum(int size) throws Exception {
+        ProgressBar.setMaximum(size);
+    }
+
+    public void next() throws Exception {
+        ProgressBar.next();
+    }
+
+    public MultiMap<String, UsuarioAnteriorVO> getAnteriores() throws Exception {
+        return anterioresDAO.getAnteriores();
+    }
+
 //    public MunicipioVO getMunicipio(int ibge_municipio) throws Exception {
 //        return municipioDAO.getMunicipio(ibge_municipio);
 //    }
@@ -165,19 +167,19 @@ public class UsuarioRepositoryProvider {
 //    public Map<Long, FornecedorVO> getCnpjExistentes() throws Exception {
 //        return fornecedorDAO.getCnpjExistentes();
 //    }
-//
-//    public void gravarFornecedor(FornecedorVO vo) throws Exception {
-//        fornecedorDAO.gravarFornecedor(vo);
-//    }
-//
-//    public void gravarFornecedorAnterior(FornecedorAnteriorVO anterior) throws Exception {
-//        anterioresDAO.gravarFornecedorAnterior(anterior);
-//    }
-//
-//    public FornecedorIDStack getIdsExistentes() throws Exception {
-//        return new FornecedorIDStack();
-//    }
-//
+
+    public void gravarUsuario(UsuarioVO vo) throws Exception {
+        usuarioDAO.gravarUsuario(vo);
+    }
+
+    public void gravarUsuarioAnterior(UsuarioAnteriorVO anterior) throws Exception {
+        anterioresDAO.gravarUsuarioAnterior(anterior);
+    }
+
+    public UsuarioIDStack getIdsExistentes() throws Exception {
+        return new UsuarioIDStack();
+    }
+
 //    public MultiMap<String, Integer> getContatos() throws Exception {
 //        return fornecedorContatoDAO.getContatos();
 //    }

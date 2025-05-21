@@ -18,6 +18,7 @@ public class GerarCodantDAO {
         createCodant(sqlCodantClienteEventual(), "CLIENTE_EVENTUAL");
         createCodant(sqlCodantEan(), "EAN");
         createCodant(sqlMapaTributacao(), "MAPA_TRIBUTAÇÃO");
+        createCodant(sqlCodantUsuario(), "USUARIO");
 
 //        Util.exibirMensagem("Codant criadas com sucesso!", "Informativo");
     }
@@ -200,6 +201,24 @@ public class GerarCodantDAO {
                 + "	orig_porcentagemdesonerado numeric(13, 3) NULL,\n"
                 + "	CONSTRAINT mapatributacao_pkey PRIMARY KEY (sistema, agrupador, orig_id)\n"
                 + "	);";
+
+        return sql;
+    }
+
+    private String sqlCodantUsuario() {
+
+        String sql = "CREATE TABLE IF NOT EXISTS implantacao.codant_usuario (\n"
+                + "    importsistema varchar NOT NULL,\n"
+                + "    importloja varchar NOT NULL,\n"
+                + "    importid varchar NOT NULL,\n"
+                + "    codigoatual int4 NULL,\n"
+                + "    login varchar NULL,\n"
+                + "    nome varchar NULL,\n"
+                + "    tiposetor int4 NULL,\n"
+                + "    situacaocadastro int4 NULL,\n"
+                + "    dataimportacao timestamp,\n"
+                + "    CONSTRAINT codant_usuario_pkey PRIMARY KEY (importsistema, importloja, importid)\n"
+                + ");";
 
         return sql;
     }
