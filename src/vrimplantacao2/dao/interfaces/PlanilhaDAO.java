@@ -73,6 +73,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -1660,4 +1661,32 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<UsuarioIMP> getUsuarios() throws Exception {
+        List<UsuarioIMP> result = new ArrayList<>();
+
+        Arquivo usuarios = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
+        ProgressBar.setStatus("Carregando transação convenio...");
+
+        for (LinhaArquivo linha : usuarios) {
+            UsuarioIMP imp = new UsuarioIMP();
+
+            imp.setImportSistema(getSistema());
+            imp.setImportLoja(getLojaOrigem());
+            imp.setImportId(linha.getString("id"));
+            imp.setLogin(linha.getString("login"));
+            imp.setNome(linha.getString("nome"));
+            imp.setSenha(linha.getString("senha"));
+            imp.setIdTema(linha.getInt("id_tipo_setor"));
+            imp.setSituacaoCadastro(
+                    linha.getInt("id_situacao_cadastro") == 1
+                    ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+            imp.setVerificaAtualizacao(linha.getBoolean("verifica_atualizacao"));
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
 }

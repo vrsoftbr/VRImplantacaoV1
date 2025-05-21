@@ -127,11 +127,15 @@ import vrimplantacao2_5.controller.interfaces.InterfaceController;
 
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.usuario.OpcaoUsuario;
+import vrimplantacao2.dao.cadastro.usuario.UsuarioRepository;
+import vrimplantacao2.dao.cadastro.usuario.UsuarioRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
+import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {
@@ -959,6 +963,31 @@ public class Importador {
                 getLojaVR()
         );
         rep.getRecebimentoCaixa().salvar(recebimentos, opcoes);
+    }
+
+    public void importarUsuarios(OpcaoUsuario... opt) throws Exception {
+        this.importarUsuarios(new HashSet<>(Arrays.asList(opt)));
+    }
+
+    /**
+     * Executa a importação dos usuarios.
+     *
+     * @param opt
+     * @throws Exception
+     */
+    public void importarUsuarios(Set<OpcaoUsuario> opt) throws Exception {
+        ProgressBar.setStatus("Carregando usuários...");
+        List<UsuarioIMP> usuarios = getInterfaceDAO().getUsuarios();
+
+        UsuarioRepositoryProvider provider = new UsuarioRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR(),
+                getIdConexao()
+        );
+        provider.setOpcoes(opt);
+        UsuarioRepository rep = new UsuarioRepository(provider);
+        rep.salvar2_5(usuarios);
     }
 
     /**

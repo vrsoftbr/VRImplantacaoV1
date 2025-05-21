@@ -58,6 +58,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -248,7 +249,7 @@ public abstract class InterfaceDAO {
     public List<FamiliaFornecedorIMP> getFamiliaFornecedor() throws Exception {
         return new ArrayList<>();
     }
-    
+
     /**
      * Permite o retorno listas especificadas dependendo da
      * {@link OpcaoProduto}.
@@ -396,6 +397,16 @@ public abstract class InterfaceDAO {
      * @throws Exception
      */
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retorna uma listagem com os usuários.
+     *
+     * @return Retorna uma listagem com os usuários.
+     * @throws Exception
+     */
+    public List<UsuarioIMP> getUsuarios() throws Exception {
         return new ArrayList<>();
     }
 
@@ -652,7 +663,7 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
 
-    public List<PessoaImp> getPessoaImp() throws Exception  {
+    public List<PessoaImp> getPessoaImp() throws Exception {
         return new ArrayList<>();
     }
 
