@@ -95,9 +95,12 @@ public class UsuarioRepository {
             }
         }
     }
-    
+
     public void salvar(List<UsuarioIMP> usuarios) throws Exception {
         MultiMap<String, UsuarioIMP> filtrados = filtrar(usuarios);
+        MultiMap<String, UsuarioVO> loginExistentes = provider.getLoginExistentes();
+        boolean loginExistente = false;
+
         usuarios = null;
 //        //Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
 //        System.gc();
@@ -107,16 +110,12 @@ public class UsuarioRepository {
             provider.begin();
 
             MultiMap<String, UsuarioAnteriorVO> anteriores = provider.getAnteriores();
-//            Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
+
             UsuarioIDStack ids = provider.getIdsExistentes();
-//            this.contatos = provider.getContatos();
-//            MultiMap<String, Void> pagamentos = provider.getPagamentos();
-//            MultiMap<String, Void> divisoes = provider.getDivisoes();
-//            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
-//
+
             provider.setStatus("Usuários - Gravando...");
             provider.setMaximum(filtrados.size());
-            
+
             for (UsuarioIMP imp : filtrados.values()) {
                 UsuarioAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -129,20 +128,33 @@ public class UsuarioRepository {
                 if (anterior == null) {
 
                     vo = converter(imp);
-                    
-//                    //Se existir Tipo Setor
-//                    if (imp.getIdFamiliaFornecedor() != null) {
-//                    vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
-//                    }
+
+                    //Se existir Tipo Setor
+                    if (imp.getIdTipoSetor() > 0) {
+                        vo.setIdTipoSetor(provider.getTipoSetor(imp.getIdTipoSetor()).getId());
+                    }
 //
                     int id = ids.obterID(imp.getImportId());
 
                     vo.setId(id);
-                    gravarUsuario(vo);
-//                    cnpjExistentes.put(vo.getCnpj(), vo);
 
-                    anterior = converterAnterior(imp);
-                    anterior.setCodigoAtual(vo);
+                    String observacaoImportacao = "";
+
+                    //Se existir um usuário com o login, não gravar!
+                    if (loginExistentes.get(vo.getLogin()) != null) {
+                        loginExistente = true;
+                        observacaoImportacao = "USUÁRIO NÃO IMPORTADO - LOGIN " + vo.getLogin() + " JÁ EXISTENTE";
+                    }
+
+                    anterior = converterAnterior(imp, observacaoImportacao);
+
+                    if (!loginExistente) {
+                        gravarUsuario(vo);
+                        anterior.setObservacaoImportacao("USUÁRIO INSERIDO COMO NOVO");
+                        anterior.setCodigoAtual(vo);
+                        loginExistentes.put(vo, vo.getLogin());
+                    }
+
 //                    anterior.setIdConexao(provider.getIdConexao());
                     gravarUsuarioAnterior(anterior);
                     anteriores.put(
@@ -154,31 +166,13 @@ public class UsuarioRepository {
                 } else {
                     vo = anterior.getCodigoAtual();
                 }
-//
-//                if (vo != null) {
-//                    processarContatos(imp, vo, opt);
-//
-//                    for (Integer condicao : imp.getCondicoesPagamentos()) {
-//                        provider.gravarCondicaoPagamento(vo.getId(), condicao);
-//                    }
-//
-//                    if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-//                        
-//                        processarDivisoes(imp, vo, divisoes);                    
-//                    }
-//                    
-//                    if (imp.getPrazoPedido() > 0) {
-//                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
-//                    }
-//                }
 
+                loginExistente = false;
                 provider.next();
             }
-            
 
-                        
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
                     sdf.format(new Date()),
@@ -543,7 +537,6 @@ public class UsuarioRepository {
 //
 //        return result;
 //    }
-
     public void organizar(MultiMap<String, UsuarioIMP> filtrados) {
         MultiMap<String, UsuarioIMP> idsValidos = new MultiMap<>(3);
         MultiMap<String, UsuarioIMP> idsInvalidos = new MultiMap<>(3);
@@ -625,7 +618,6 @@ public class UsuarioRepository {
 //            );
 //        }
 //    }
-
     public UsuarioVO converter(UsuarioIMP imp) throws Exception {
         UsuarioVO vo = new UsuarioVO();
 
@@ -633,9 +625,8 @@ public class UsuarioRepository {
         vo.setNome(imp.getNome());
         vo.setSenha(imp.getSenha());
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
-   
-//        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
 
+//        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
         return vo;
     }
 //
@@ -659,7 +650,7 @@ public class UsuarioRepository {
         provider.gravarUsuario(vo);
     }
 
-    public UsuarioAnteriorVO converterAnterior(UsuarioIMP imp) {
+    public UsuarioAnteriorVO converterAnterior(UsuarioIMP imp, String observacaoImportacao) {
         UsuarioAnteriorVO ant = new UsuarioAnteriorVO();
         ant.setImportSistema(provider.getSistema());
         ant.setImportLoja(imp.getImportLoja());
@@ -668,7 +659,8 @@ public class UsuarioRepository {
         ant.setNome(imp.getNome());
         ant.setIdTipoSetor(imp.getIdTipoSetor());
         ant.setSituacaoCadastro(imp.getSituacaoCadastro());
-                
+        ant.setObservacaoImportacao(observacaoImportacao);
+
         return ant;
     }
 
@@ -707,5 +699,4 @@ public class UsuarioRepository {
 //    public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opt) throws Exception {
 //        provider.atualizarProdutoFornecedor(vo, opt);
 //    }
-
 }

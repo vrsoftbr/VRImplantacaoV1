@@ -1,6 +1,5 @@
 package vrimplantacao2.vo.cadastro.usuario;
 
-import vrimplantacao2.vo.cadastro.fornecedor.*;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class UsuarioAnteriorVO {
@@ -13,6 +12,7 @@ public class UsuarioAnteriorVO {
     private String nome;
     private int idTipoSetor;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+    private String observacaoImportacao = "";
 
     public String getImportSistema() {
         return importSistema;
@@ -76,6 +76,14 @@ public class UsuarioAnteriorVO {
 
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
         this.situacaoCadastro = situacaoCadastro;
+    }
+
+    public String getObservacaoImportacao() {
+        return observacaoImportacao;
+    }
+
+    public void setObservacaoImportacao(String observacaoImportacao) {
+        this.observacaoImportacao = observacaoImportacao;
     }
 
 //    public String getImportSistema() {

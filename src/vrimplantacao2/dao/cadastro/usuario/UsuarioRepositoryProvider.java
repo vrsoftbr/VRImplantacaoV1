@@ -16,6 +16,7 @@ import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
 import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
+import vrimplantacao2.vo.cadastro.usuario.TipoSetorVO;
 
 /**
  *
@@ -28,7 +29,7 @@ public class UsuarioRepositoryProvider {
     private final String lojaOrigem;
 
     private final int lojaVR;
-//    private MultiMap<String, FamiliaFornecedorVO> familias;
+    private MultiMap<String, TipoSetorVO> setores;
     private UsuarioDAO usuarioDAO;
 //    private FornecedorEnderecoDAO fornecedorEnderecoDAO;
 //    private ProdutoFornecedorDAO produtoFornecedorDAO;
@@ -66,7 +67,7 @@ public class UsuarioRepositoryProvider {
 //        this.fornecedorEnderecoDAO = new FornecedorEnderecoDAO();
 //        this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
 //        this.fornecedorContatoDAO = new FornecedorContatoDAO();
-//        this.anterioresDAO = new FornecedorAnteriorDAO();
+        this.anterioresDAO = new UsuarioAnteriorDAO();
 //        this.municipioDAO = new MunicipioDAO();
 //        this.pagamentoDAO = new FornecedorPagamentoDAO();
 //        this.fornecedorPrazoDAO = new FornecedorPrazoDAO();
@@ -163,10 +164,10 @@ public class UsuarioRepositoryProvider {
 //    public MunicipioVO getMunicipioPadrao() throws Exception {
 //        return Parametros.get().getMunicipioPadrao2();
 //    }
-//
-//    public Map<Long, FornecedorVO> getCnpjExistentes() throws Exception {
-//        return fornecedorDAO.getCnpjExistentes();
-//    }
+
+    public MultiMap<String, UsuarioVO> getLoginExistentes() throws Exception {
+        return usuarioDAO.getLoginExistentes();
+    }
 
     public void gravarUsuario(UsuarioVO vo) throws Exception {
         usuarioDAO.gravarUsuario(vo);
@@ -236,11 +237,11 @@ public class UsuarioRepositoryProvider {
 //        fornecedorEnderecoDAO.atualizarFornecedorEndereco();
 //        fornecedorEnderecoDAO.atualizarFornecedorEndereco();
 //    }
-//
-//    public FamiliaFornecedorVO getFamiliaFornecedor(Integer idFamiliaFornecedor) throws Exception {
-//        if (familias == null) {
-//            familias = new FamiliaFornecedorDAO().getAnteriores();
-//        }
-//        return familias.get(sistema, lojaOrigem, idFamiliaFornecedor.toString());
-//    }
+
+    public TipoSetorVO getTipoSetor(Integer idTipoSetor) throws Exception {
+        if (setores == null) {
+            setores = new TipoSetorDAO().getAnteriores();
+        }
+        return setores.get(sistema, lojaOrigem, idTipoSetor.toString());
+    }
 }

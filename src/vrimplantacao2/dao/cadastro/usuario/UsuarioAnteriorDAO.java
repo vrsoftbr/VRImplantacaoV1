@@ -2,16 +2,11 @@ package vrimplantacao2.dao.cadastro.usuario;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
-import vrimplantacao2.vo.cadastro.local.EstadoVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioAnteriorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
@@ -35,19 +30,14 @@ public class UsuarioAnteriorDAO {
                     + "	ca.importloja,\n"
                     + "	ca.importid,\n"
                     + "	ca.codigoatual,\n"
-                    + "	f.razaosocial,\n"
-                    + "	f.nomefantasia,\n"
-                    + "	f.cnpj cnpj_cpf,\n"
-                    + "	ca.cnpj,\n"
-                    + "	ca.razao,\n"
-                    + "	ca.fantasia,\n"
-                    + "	f.id_estado,\n"
-                    + "	e.sigla uf_sigla,\n"
-                    + "	e.descricao uf_descricao\n"
+                    + "	u.login,\n"
+                    + "	u.nome,\n"
+                    + "	u.id_tiposetor,\n"
+                    + "	u.id_situacaocadastro, \n"
+                    + "	ca.observacaoimportacao \n"
                     + "from \n"
                     + "	implantacao.codant_usuario ca\n"
-                    + "	left join fornecedor f on ca.codigoatual = f.id\n"
-                    + "       left join estado e on f.id_estado = e.id\n"
+                    + "	left join usuario u on ca.codigoatual = u.id\n"
                     + "order by\n"
                     + "	ca.importsistema,\n"
                     + "	ca.importloja,\n"
@@ -60,10 +50,11 @@ public class UsuarioAnteriorDAO {
                     vo.setImportId(rst.getString("importid"));
                     vo.setLogin(rst.getString("login"));
                     vo.setNome(rst.getString("nome"));
-                    vo.setIdTipoSetor(rst.getInt("id_tipo_setor"));
+                    vo.setIdTipoSetor(rst.getInt("id_tiposetor"));
                     vo.setSituacaoCadastro(
-                            rst.getInt("id_situacao_cadastro") == 1
+                            rst.getInt("id_situacaocadastro") == 1
                             ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    vo.setObservacaoImportacao(rst.getString("observacaoimportacao"));
                     int codigoAtual = rst.getInt("codigoatual");
                     if (codigoAtual > 0) {
                         UsuarioVO u = new UsuarioVO();
@@ -134,7 +125,6 @@ public class UsuarioAnteriorDAO {
 //            }
 //        }
 //    }
-
     public void gravarUsuarioAnterior(UsuarioAnteriorVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -150,9 +140,9 @@ public class UsuarioAnteriorDAO {
             }
             sql.put("login", vo.getLogin());
             sql.put("nome", vo.getNome());
-            sql.put("idTipoSetor", vo.getIdTipoSetor());
-            sql.put("idTipoSetor", vo.getIdTipoSetor());
-            sql.put("id_situacaoCadastro", vo.getSituacaoCadastro() == SituacaoCadastro.ATIVO ? 1 : 0);
+            sql.put("tiposetor", vo.getIdTipoSetor());
+            sql.put("situacaoCadastro", vo.getSituacaoCadastro() == SituacaoCadastro.ATIVO ? 1 : 0);
+            sql.put("observacaoimportacao", vo.getObservacaoImportacao());
             stm.execute(sql.getInsert());
         }
     }

@@ -10,14 +10,14 @@ public class UsuarioService {
     
     private UsuarioAnteriorDAO usuarioAnteriorDAO;
     
-//    public UsuarioService() throws Exception {
-//        this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
+    public UsuarioService() throws Exception {
+        this.usuarioAnteriorDAO = new UsuarioAnteriorDAO();
+    }
+    
+//    public UsuarioService(UsuarioAnteriorDAO usuarioAnteriorDAO) {
+//        this.usuarioAnteriorDAO = usuarioAnteriorDAO;
 //    }
 //    
-//    public UsuarioService(FornecedorAnteriorDAO fornecedorAnteriorDAO) {
-//        this.fornecedorAnteriorDAO = fornecedorAnteriorDAO;
-//    }
-    
     public int existeConexaoMigrada(int idConexao, String sistema) throws Exception {
         return this.usuarioAnteriorDAO.getConexaoMigrada(idConexao, sistema);
     }

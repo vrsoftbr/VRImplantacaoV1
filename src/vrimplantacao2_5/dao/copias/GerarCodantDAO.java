@@ -217,6 +217,8 @@ public class GerarCodantDAO {
                 + "    tiposetor int4 NULL,\n"
                 + "    situacaocadastro int4 NULL,\n"
                 + "    dataimportacao timestamp,\n"
+                + "    id_conexao int4, \n"
+                + "    observacaoimportacao varchar, \n"
                 + "    CONSTRAINT codant_usuario_pkey PRIMARY KEY (importsistema, importloja, importid)\n"
                 + ");";
 

@@ -1,40 +1,16 @@
 package vrimplantacao2.dao.cadastro.usuario;
 
-import vrimplantacao2.dao.cadastro.fornecedor.*;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
-import vrimplantacao.dao.sistema.EstadoDAO;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
-import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.utils.collection.IDStack;
-import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.utils.sql.SQLUtils;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoAnteriorVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
-import vrimplantacao2.vo.enums.ContaContabilFinanceiro;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoIndicadorIE;
-import vrimplantacao2.vo.enums.TipoInscricao;
-import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
-import vrimplantacao2.vo.importacao.FornecedorIMP;
 
 public class UsuarioDAO {
 
-//    private MultiMap<Long, FornecedorVO> cnpjExistentes;
+    private MultiMap<String, UsuarioVO> loginExistentes;
 //    private int lojaVR;
 //
 //    public UsuarioDAO() throws Exception {
@@ -47,33 +23,7 @@ public class UsuarioDAO {
 //        }
 //        return cnpjExistentes;
 //    }
-//
-//    public void atualizarCnpjExistentes() throws Exception {
-//        cnpjExistentes = new MultiMap<>();
-//        try (Statement stm = Conexao.createStatement()) {
-//            try (ResultSet rst = stm.executeQuery(
-//                    "select\n"
-//                    + "	id,\n"
-//                    + "	cnpj,\n"
-//                    + "	razaosocial,\n"
-//                    + "	nomefantasia\n"
-//                    + "from\n"
-//                    + "	fornecedor\n"
-//                    + "order by\n"
-//                    + "	id"
-//            )) {
-//                while (rst.next()) {
-//                    FornecedorVO vo = new FornecedorVO();
-//                    vo.setId(rst.getInt("id"));
-//                    vo.setCnpj(rst.getLong("cnpj"));
-//                    vo.setRazaoSocial(rst.getString("razaosocial"));
-//                    vo.setNomeFantasia(rst.getString("nomefantasia"));
-//                    cnpjExistentes.put(vo, vo.getCnpj());
-//                }
-//            }
-//        }
-//    }
-//
+
 //    /**
 //     * Converte e grava uma listagem de {@link FornecedorIMP} no banco de dados.
 //     *
@@ -559,7 +509,7 @@ public class UsuarioDAO {
             sql.put("nome", vo.getNome());
             sql.put("senha", vo.getSenha());
             sql.put("id_tiposetor", vo.getIdTipoSetor());
-            sql.put("id_situacaocadastro", vo.getSituacaoCadastro()== SituacaoCadastro.ATIVO ? 1 : 0);
+            sql.put("id_situacaocadastro", vo.getSituacaoCadastro() == SituacaoCadastro.ATIVO ? 1 : 0);
             sql.put("id_loja", vo.getIdLoja());
             sql.put("datahoraultimoacesso", vo.getDataHoraUltimoAcesso());
             sql.put("id_tema", vo.getIdTema());
@@ -569,6 +519,37 @@ public class UsuarioDAO {
             sql.put("exibepopupofertacontingencia", vo.getExibePopupOfertaContingencia());
 
             stm.execute(sql.getInsert());
+        }
+    }
+
+    public MultiMap<String, UsuarioVO> getLoginExistentes() throws Exception {
+        if (loginExistentes == null) {
+            atualizarLoginExistentes();
+        }
+        return loginExistentes;
+    }
+
+    public void atualizarLoginExistentes() throws Exception {
+        loginExistentes = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	id,\n"
+                    + "	login,\n"
+                    + "	nome\n"
+                    + "FROM\n"
+                    + "	usuario u\n"
+                    + "ORDER BY\n"
+                    + "	id"
+            )) {
+                while (rst.next()) {
+                    UsuarioVO vo = new UsuarioVO();
+                    vo.setId(rst.getInt("id"));
+                    vo.setLogin(rst.getString("login"));
+                    vo.setNome(rst.getString("nome"));
+                    loginExistentes.put(vo, vo.getLogin());
+                }
+            }
         }
     }
 

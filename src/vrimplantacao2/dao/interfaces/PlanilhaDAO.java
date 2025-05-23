@@ -72,6 +72,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -1661,12 +1662,33 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<TipoSetorIMP> getTipoSetor() throws Exception {
+        List<TipoSetorIMP> result = new ArrayList<>();
+
+        Arquivo setores = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
+        ProgressBar.setStatus("Carregando tipo de setor...");
+
+        for (LinhaArquivo linha : setores) {
+            TipoSetorIMP imp = new TipoSetorIMP();
+
+            imp.setImportSistema(getSistema());
+            imp.setImportLoja(getLojaOrigem());
+            imp.setImportId(linha.getString("id_tiposetor"));
+            imp.setDescricao(Utils.acertarTexto(linha.getString("descricao_tiposetor"), 20, "SEM DESCRICAO "));
+
+            result.add(imp);
+        }
+        return result;
+    }
+
+    @Override
     public List<UsuarioIMP> getUsuarios() throws Exception {
         List<UsuarioIMP> result = new ArrayList<>();
 
         Arquivo usuarios = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
 
-        ProgressBar.setStatus("Carregando transação convenio...");
+        ProgressBar.setStatus("Carregando usuarios...");
 
         for (LinhaArquivo linha : usuarios) {
             UsuarioIMP imp = new UsuarioIMP();
@@ -1674,15 +1696,15 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setImportSistema(getSistema());
             imp.setImportLoja(getLojaOrigem());
             imp.setImportId(linha.getString("id"));
-            imp.setLogin(linha.getString("login"));
+            imp.setLogin(Utils.acertarTexto(linha.getString("login"), 12, "SEM DESCRICAO "));
             imp.setNome(linha.getString("nome"));
             imp.setSenha(linha.getString("senha"));
-            imp.setIdTema(linha.getInt("id_tipo_setor"));
+            imp.setIdTipoSetor(linha.getInt("id_tiposetor"));
             imp.setSituacaoCadastro(
-                    linha.getInt("id_situacao_cadastro") == 1
+                    linha.getString("situacaocadastro").equals("S")
                     ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-            imp.setVerificaAtualizacao(linha.getBoolean("verifica_atualizacao"));
-            
+            imp.setVerificaAtualizacao(linha.getBoolean("verificaatualizacao"));
+
             result.add(imp);
         }
         return result;

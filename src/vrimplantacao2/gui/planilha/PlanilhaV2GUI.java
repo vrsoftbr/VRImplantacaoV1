@@ -190,6 +190,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         vRLabel25 = new vrframework.bean.label.VRLabel();
         tabFornImportacao1 = new vrframework.bean.panel.VRPanel();
         chkUsuarios = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoSetor = new vrframework.bean.checkBox.VRCheckBox();
         tabParametro = new vrframework.bean.panel.VRPanel();
         txtFormatoData = new javax.swing.JTextField();
         vRLabel16 = new vrframework.bean.label.VRLabel();
@@ -1098,21 +1099,27 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkUsuarios, "Usuários");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkTipoSetor, "Tipo Setor");
+
         javax.swing.GroupLayout tabFornImportacao1Layout = new javax.swing.GroupLayout(tabFornImportacao1);
         tabFornImportacao1.setLayout(tabFornImportacao1Layout);
         tabFornImportacao1Layout.setHorizontalGroup(
             tabFornImportacao1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornImportacao1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabFornImportacao1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkTipoSetor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         tabFornImportacao1Layout.setVerticalGroup(
             tabFornImportacao1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornImportacao1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(chkTipoSetor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(353, Short.MAX_VALUE))
+                .addContainerGap(323, Short.MAX_VALUE))
         );
 
         chkUsuarios.getAccessibleContext().setAccessibleName("Usuarios");
@@ -1473,6 +1480,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkPorEanHistorico;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
     private javax.swing.JCheckBox chkTipoForn;
+    private vrframework.bean.checkBox.VRCheckBox chkTipoSetor;
     private vrframework.bean.checkBox.VRCheckBox chkUsuarios;
     private javax.swing.JComboBox cmbLojaDestino;
     private javax.swing.JLabel jLabel2;
@@ -1777,8 +1785,12 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 }
                             }
                             case 5: {
-                                dao.setArquivoConvenioEmpresas(txtOutrosFile.getArquivo());
+                                dao.setArquivo(txtOutrosFile.getArquivo());
                                 dao.getOpcoes().put("delimiter", txtOutrosDelimitador.getText());
+                                
+                                if (chkTipoSetor.isSelected()) {
+                                    importador.importarTipoSetor();
+                                }
 
                                 if (chkUsuarios.isSelected()) {
                                     importador.importarUsuarios();
@@ -1893,7 +1905,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         parametros.put(txtConvTransacoes.getArquivo(), "IMPORTACAO", "PLANILHA", "CONVENIO_TRANSACOES");
         parametros.put(txtConvDelimitador.getText(), "IMPORTACAO", "PLANILHA", "CONVENIO_DELIMITADOR");
         parametros.put(txtConvQuote.getText(), "IMPORTACAO", "PLANILHA", "CONVENIO_QUOTE");
-        parametros.put(txtOutrosFile.getArquivo(), "IMPORTACAO", "PLANILHA", "ARQUIVO");
+        parametros.put(txtOutrosFile.getArquivo(), "IMPORTACAO", "PLANILHA", "OUTROS", "ARQUIVO");
         parametros.put(txtOutrosDelimitador.getText(), "IMPORTACAO", "PLANILHA", "OUTROS_DELIMITADOR");
         parametros.salvar();
     }

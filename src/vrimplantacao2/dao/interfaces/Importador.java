@@ -128,6 +128,7 @@ import vrimplantacao2_5.controller.interfaces.InterfaceController;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.usuario.OpcaoUsuario;
+import vrimplantacao2.dao.cadastro.usuario.TipoSetorDAO;
 import vrimplantacao2.dao.cadastro.usuario.UsuarioRepository;
 import vrimplantacao2.dao.cadastro.usuario.UsuarioRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
@@ -135,6 +136,7 @@ import vrimplantacao2.vo.importacao.DesmembramentoIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
+import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
@@ -965,12 +967,27 @@ public class Importador {
         rep.getRecebimentoCaixa().salvar(recebimentos, opcoes);
     }
 
+    /**
+     * Executa a importação do Tipo de Setor dos Usuários.
+     *
+     * @param opcoes
+     * @throws Exception
+     */
+    public void importarTipoSetor() throws Exception {
+        ProgressBar.setStatus("Carregando tipos de setores...");
+        List<TipoSetorIMP> setores = getInterfaceDAO().getTipoSetor();
+
+        TipoSetorDAO dao = new TipoSetorDAO();
+        dao.setSistema(getSistema());
+        dao.salvar(setores);
+    }
+
     public void importarUsuarios(OpcaoUsuario... opt) throws Exception {
         this.importarUsuarios(new HashSet<>(Arrays.asList(opt)));
     }
 
     /**
-     * Executa a importação dos usuarios.
+     * Executa a importação dos usuários.
      *
      * @param opt
      * @throws Exception

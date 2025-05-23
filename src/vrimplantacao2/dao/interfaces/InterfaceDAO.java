@@ -58,6 +58,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -397,6 +398,16 @@ public abstract class InterfaceDAO {
      * @throws Exception
      */
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Retorna uma lista dos setores.
+     *
+     * @return Listagem dos tipos de setores.
+     * @throws Exception
+     */
+    public List<TipoSetorIMP> getTipoSetor() throws Exception {
         return new ArrayList<>();
     }
 
