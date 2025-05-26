@@ -20,11 +20,11 @@ public class UsuarioIMP {
     private boolean exibepopupestoquecongelado = false;
     private int tempoVerificacaoPopup = 180;
     private boolean exibePopupOfertaContingencia = false;
-    
+
     public String getImportSistema() {
         return importSistema;
     }
-    
+
     public void setImportSistema(String importSistema) {
         this.importSistema = importSistema;
     }
@@ -32,7 +32,7 @@ public class UsuarioIMP {
     public String getImportLoja() {
         return importLoja;
     }
-    
+
     public void setImportLoja(String importLoja) {
         this.importLoja = importLoja;
     }
@@ -40,7 +40,7 @@ public class UsuarioIMP {
     public String getImportId() {
         return importId;
     }
-    
+
     public void setImportId(String importId) {
         this.importId = importId;
     }

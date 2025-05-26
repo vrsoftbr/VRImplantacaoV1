@@ -115,18 +115,19 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="vRLabel8" max="32767" attributes="0"/>
-                                  <Component id="txtDelimitadorProd" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtDelimitadorProd" min="-2" pref="30" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
+                                      <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
                                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="401" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
-                                      <Component id="txtProdutoFile" pref="618" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtProdutoFile" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
                               </Group>
@@ -148,17 +149,17 @@
                               <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                               <Component id="txtProdutoFile" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtDelimitadorProd" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDelimitadorProd" min="-2" pref="21" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="tabsProduto" pref="424" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                      <Component id="tabsProduto" pref="430" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -167,7 +168,7 @@
           <SubComponents>
             <Component class="javax.swing.JTextField" name="txtDelimitadorProd">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtProdutoFile">
@@ -236,7 +237,7 @@
                               <Component id="btnDelFamiliaProduto" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDelProdutos" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="290" max="32767" attributes="0"/>
+                              <EmptySpace pref="296" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -365,7 +366,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMapaTribut" min="-2" pref="32" max="-2" attributes="0"/>
-                              <EmptySpace pref="311" max="32767" attributes="0"/>
+                              <EmptySpace pref="317" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -439,7 +440,7 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel18" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtDelimitadorForn" min="-2" pref="22" max="-2" attributes="0"/>
+                                      <Component id="txtDelimitadorForn" min="-2" pref="26" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="lblContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -697,7 +698,7 @@
             </Container>
             <Component class="javax.swing.JTextField" name="txtDelimitadorForn">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="lblContaPagar">
@@ -736,11 +737,11 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel12" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtVendaDelimitador" min="-2" pref="15" max="-2" attributes="0"/>
+                                      <Component id="txtVendaDelimitador" min="-2" pref="27" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="vRLabel13" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtVendaStrQuote" min="-2" pref="15" max="-2" attributes="0"/>
+                                      <Component id="txtVendaStrQuote" min="-2" pref="27" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -798,7 +799,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtVendaDelimitador">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtVendaStrQuote">
@@ -861,11 +862,11 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="vRLabel15" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtClienteDelimitador" min="-2" pref="15" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtClienteDelimitador" min="-2" pref="27" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="vRLabel14" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtClienteStrQuote" min="-2" pref="15" max="-2" attributes="0"/>
+                              <Component id="txtClienteStrQuote" min="-2" pref="27" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
@@ -903,7 +904,7 @@
           <SubComponents>
             <Component class="javax.swing.JTextField" name="txtClienteDelimitador">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel15">
@@ -1414,40 +1415,39 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
-                              <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtConvEmpresas" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="vRLabel22" max="32767" attributes="0"/>
-                                  <Component id="vRLabel21" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtConvConveniados" alignment="0" pref="467" max="32767" attributes="0"/>
-                                  <Component id="txtConvTransacoes" max="32767" attributes="0"/>
+                                  <Component id="txtConvEmpresas" max="32767" attributes="0"/>
+                                  <Component id="txtConvConveniados" pref="467" max="32767" attributes="0"/>
                               </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="vRLabel22" min="-2" pref="175" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtConvTransacoes" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkConvEmpresas" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel19" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtConvDelimitador" min="-2" pref="15" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtConvDelimitador" min="-2" pref="27" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtConvQuote" min="-2" pref="15" max="-2" attributes="0"/>
+                                      <Component id="txtConvQuote" min="-2" pref="27" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkConvTransacao" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkConvTransacao" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -1460,32 +1460,36 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="vRLabel19" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtConvDelimitador" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="vRLabel20" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtConvQuote" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="2" attributes="0">
+                                          <Component id="vRLabel19" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="txtConvDelimitador" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="vRLabel20" alignment="2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="txtConvQuote" alignment="2" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="vRLabel7" min="-2" pref="26" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="txtConvEmpresas" min="-2" pref="26" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="vRLabel21" min="-2" pref="26" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="txtConvConveniados" min="-2" pref="26" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="txtConvEmpresas" pref="26" max="32767" attributes="0"/>
-                          <Component id="vRLabel7" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="vRLabel22" min="-2" pref="21" max="-2" attributes="0"/>
+                          <Component id="txtConvTransacoes" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="txtConvConveniados" pref="26" max="32767" attributes="0"/>
-                          <Component id="vRLabel21" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="vRLabel22" alignment="2" min="-2" pref="21" max="-2" attributes="0"/>
-                          <Component id="txtConvTransacoes" alignment="2" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="chkConvEmpresas" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkConvTransacao" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="257" max="32767" attributes="0"/>
                   </Group>
@@ -1495,7 +1499,7 @@
           <SubComponents>
             <Component class="javax.swing.JTextField" name="txtConvDelimitador">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtConvQuote">
@@ -1573,7 +1577,7 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtOutrosDelimitador" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtOutrosDelimitador" min="-2" pref="27" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -1611,7 +1615,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtOutrosDelimitador">
               <Properties>
-                <Property name="text" type="java.lang.String" value="^"/>
+                <Property name="text" type="java.lang.String" value=";"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtOutrosFile">

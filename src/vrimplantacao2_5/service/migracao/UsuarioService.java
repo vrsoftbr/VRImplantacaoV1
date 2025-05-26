@@ -4,7 +4,7 @@ import vrimplantacao2.dao.cadastro.usuario.UsuarioAnteriorDAO;
 
 /**
  *
- * @author Lucas Santos
+ * @author Wesley
  */
 public class UsuarioService {
     
@@ -14,10 +14,6 @@ public class UsuarioService {
         this.usuarioAnteriorDAO = new UsuarioAnteriorDAO();
     }
     
-//    public UsuarioService(UsuarioAnteriorDAO usuarioAnteriorDAO) {
-//        this.usuarioAnteriorDAO = usuarioAnteriorDAO;
-//    }
-//    
     public int existeConexaoMigrada(int idConexao, String sistema) throws Exception {
         return this.usuarioAnteriorDAO.getConexaoMigrada(idConexao, sistema);
     }
@@ -37,10 +33,6 @@ public class UsuarioService {
     public String getLojaModelo(int idConexao, String sistema) throws Exception {
         return this.usuarioAnteriorDAO.getLojaModelo(idConexao, sistema);
     }
-
-//    public boolean verificaMultilojaMigrada(String lojaOrigem, String sistema, int idConexao) throws Exception {
-//        return this.fornecedorAnteriorDAO.verificaMultilojaMigrada(lojaOrigem, sistema, idConexao);
-//    }
     
     public String getImpSistemaInicial() throws Exception {
         return this.usuarioAnteriorDAO.getImpSistema();

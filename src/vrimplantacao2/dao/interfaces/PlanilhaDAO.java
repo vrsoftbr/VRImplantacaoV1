@@ -1703,8 +1703,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setSituacaoCadastro(
                     linha.getString("situacaocadastro").equals("S")
                     ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-            imp.setVerificaAtualizacao(linha.getBoolean("verificaatualizacao"));
-
+            imp.setVerificaAtualizacao(linha.getString("verificaatualizacao").equals("S"));
             result.add(imp);
         }
         return result;

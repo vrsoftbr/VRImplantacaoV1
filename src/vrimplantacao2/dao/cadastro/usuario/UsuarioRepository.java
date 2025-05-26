@@ -1,51 +1,31 @@
 package vrimplantacao2.dao.cadastro.usuario;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.produto2.DivisaoDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.ProdutoVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
-import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioVO;
-import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.usuario.UsuarioAnteriorVO;
-import vrimplantacao2.vo.enums.TipoInscricao;
-import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
-import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
-import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
-import vrimplantacao2_5.service.migracao.FornecedorService;
 import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.service.migracao.UsuarioService;
 import vrimplantacao2_5.vo.enums.EOperacao;
 
 /**
  *
- * @author Leandro
+ * @author Wesley
  */
 public class UsuarioRepository {
 
     private static final Logger LOG = Logger.getLogger(UsuarioRepository.class.getName());
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
-//    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
-//
-    private UsuarioRepositoryProvider provider;
-//    private MultiMap<String, Integer> contatos;
+    private final UsuarioRepositoryProvider provider;
     private boolean forcarUnificacao = false;
-//
+
     private final LogController logController;
 
     public UsuarioRepository(UsuarioRepositoryProvider provider) {
@@ -66,33 +46,27 @@ public class UsuarioRepository {
 
         String impSistema = usuarioService.getImpSistemaInicial();
 
-        if (this.forcarUnificacao) {
-//            unificar(fornecedores);
-        } else {
-
-            if (registro > 0 && idConexao == 0
-                    || (!impSistema.isEmpty()
-                    && !impSistema.equals(this.provider.getSistema()))) {
-
+        if (registro > 0 && idConexao == 0
+                || (!impSistema.isEmpty()
+                && !impSistema.equals(this.provider.getSistema()))) {
 //                FAZER LOGICA DE UNIFICAÇÃO
 //                unificar(fornecedores);
-            } else {
-                boolean existeConexao = usuarioService.
-                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(),
-                                this.provider.getSistema(),
-                                this.provider.getIdConexao());
+        } else {
+            boolean existeConexao = usuarioService.
+                    verificaMigracaoMultiloja(this.provider.getLojaOrigem(),
+                            this.provider.getSistema(),
+                            this.provider.getIdConexao());
 
-                String lojaModelo = usuarioService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
+            String lojaModelo = usuarioService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
 
-                if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
+            if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
 
-                    this.provider.setStatus("Fornecedor - Copiando código anterior Fornecedor...");
+                this.provider.setStatus("Usuários - Copiando código anterior dos Usuários...");
 
-                    usuarioService.copiarCodantUsuario(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
-                }
-
-                salvar(usuarios);
+                usuarioService.copiarCodantUsuario(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
             }
+
+            salvar(usuarios);
         }
     }
 
@@ -102,8 +76,6 @@ public class UsuarioRepository {
         boolean loginExistente = false;
 
         usuarios = null;
-//        //Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
-//        System.gc();
         organizar(filtrados);
 
         try {
@@ -128,12 +100,12 @@ public class UsuarioRepository {
                 if (anterior == null) {
 
                     vo = converter(imp);
+                    vo.setIdLoja(provider.getLojaVR());
 
-                    //Se existir Tipo Setor
                     if (imp.getIdTipoSetor() > 0) {
                         vo.setIdTipoSetor(provider.getTipoSetor(imp.getIdTipoSetor()).getId());
                     }
-//
+
                     int id = ids.obterID(imp.getImportId());
 
                     vo.setId(id);
@@ -149,7 +121,7 @@ public class UsuarioRepository {
                     anterior = converterAnterior(imp, observacaoImportacao);
 
                     if (!loginExistente) {
-                        gravarUsuario(vo);
+                        gravarUsuario(vo, versao);
                         anterior.setObservacaoImportacao("USUÁRIO INSERIDO COMO NOVO");
                         anterior.setCodigoAtual(vo);
                         loginExistentes.put(vo, vo.getLogin());
@@ -408,106 +380,6 @@ public class UsuarioRepository {
 //            throw e;
 //        }
 //    }
-//
-//    public void processarContatos(FornecedorIMP imp, FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
-//        for (FornecedorContatoIMP impCont : imp.getContatos().values()) {
-//            StringBuilder log = new StringBuilder("|Fornecedor|").append(imp.getImportId()).append("|");
-//            //Converte o IMP em VO
-//            FornecedorContatoVO contato = converterContatoFornecedor(impCont);
-//            contato.setFornecedor(vo);
-//            
-//            //Se houver algum contato cadastrado com essa assinatura,
-//            //Não executa a rotina
-//            if (!contatos.containsKey(
-//                    String.valueOf(contato.getFornecedor().getId()),
-//                    contato.getNome(),
-//                    contato.getTelefone(),
-//                    contato.getCelular(),
-//                    contato.getEmail()
-//            )) {
-//                log.append("contato não existe||");
-//                if (opt.contains(OpcaoFornecedor.CONTATOS)) {
-//                    gravarFornecedorContato(contato);
-//                    contatos.put(
-//                            contato.getId(),
-//                            String.valueOf(contato.getFornecedor().getId()),
-//                            contato.getNome(),
-//                            contato.getTelefone(),
-//                            contato.getCelular(),
-//                            contato.getEmail()
-//                    );
-//                    log.append("inserido|");
-//                }
-//            } else {
-//                contato.setId(contatos.get(
-//                        String.valueOf(contato.getFornecedor().getId()),
-//                        contato.getNome(),
-//                        contato.getTelefone(),
-//                        contato.getCelular(),
-//                        contato.getEmail()
-//                ));
-//                log.append("contato existe|").append(contato.getId()).append("|");
-//                provider.atualizarContato(contato, opt);
-//                log.append("atualizado|");
-//            }
-//            LOG.fine(log.toString());
-//        }
-//    }
-//
-//    public void processarPagamentos(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> pagamentos) throws Exception {
-//        for (FornecedorPagamentoIMP impPag : imp.getPagamentos().values()) {
-//            FornecedorPagamentoVO pagamento = converterPagamentoFornecedor(impPag);
-//            pagamento.setFornecedor(vo);
-//            //Se houver algum contato cadastrado com essa assinatura,
-//            //Não executa a rotina
-//            if (!pagamentos.containsKey(
-//                    String.valueOf(pagamento.getFornecedor().getId()),
-//                    String.valueOf(pagamento.getVencimento())
-//            )) {
-//                gravarFornecedorPagamento(pagamento);
-//                pagamentos.put(
-//                        null,
-//                        String.valueOf(pagamento.getFornecedor().getId()),
-//                        String.valueOf(pagamento.getVencimento())
-//                );
-//            }
-//        }
-//    }
-//    
-//    public void processarDivisoes(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> div) throws Exception {
-//        Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
-//        
-//        if (imp.getDivisoes().isEmpty()) {
-//            provider.gravarPrazoFornecedor(
-//                    vo.getId(),
-//                    0, 
-//                    7, 
-//                    7, 
-//                    7);
-//        } else {
-//            for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
-//
-//                Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
-//                int idDivisao;
-//                if (divisao != null) {
-//                    idDivisao = divisao.getValue();
-//                } else {
-//                    idDivisao = 0;
-//                }
-//
-//                if (!div.containsKey(
-//                        String.valueOf(vo.getId()),
-//                        String.valueOf(idDivisao)                    
-//                )) {
-//                    provider.gravarPrazoFornecedor(vo.getId(), idDivisao, impDiv.getPrazoEntrega(), impDiv.getPrazoVisita(), impDiv.getPrazoSeguranca());
-//                    div.put(null, 
-//                        String.valueOf(vo.getId()),
-//                        String.valueOf(idDivisao)                    
-//                    );
-//                }            
-//            }
-//        }
-//    }
 
     public MultiMap<String, UsuarioIMP> filtrar(List<UsuarioIMP> usuarios) throws Exception {
         MultiMap<String, UsuarioIMP> result = new MultiMap<>();
@@ -523,20 +395,6 @@ public class UsuarioRepository {
         return result;
     }
 
-//    public MultiMap<String, ProdutoFornecedorIMP> filtrarProdFornecedor(List<ProdutoFornecedorIMP> produtoFornecedores) throws Exception {
-//        MultiMap<String, ProdutoFornecedorIMP> result = new MultiMap<>();
-//
-//        for (ProdutoFornecedorIMP imp : produtoFornecedores) {
-//            result.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getIdProduto()
-//            );
-//        }
-//
-//        return result;
-//    }
     public void organizar(MultiMap<String, UsuarioIMP> filtrados) {
         MultiMap<String, UsuarioIMP> idsValidos = new MultiMap<>(3);
         MultiMap<String, UsuarioIMP> idsInvalidos = new MultiMap<>(3);
@@ -578,46 +436,6 @@ public class UsuarioRepository {
         }
     }
 
-//    public void organizarProdutoFornecedor(MultiMap<String, ProdutoFornecedorIMP> filtrados) {
-//        MultiMap<String, ProdutoFornecedorIMP> idsValidos = new MultiMap<>(3);
-//        MultiMap<String, ProdutoFornecedorIMP> idsInvalidos = new MultiMap<>(3);
-//
-//        for (ProdutoFornecedorIMP imp : filtrados.values()) {
-//            String[] chave = new String[]{
-//                imp.getImportSistema(),
-//                imp.getImportLoja(),
-//                imp.getIdProduto()
-//            };
-//            try {
-//                int id = Integer.parseInt(imp.getIdProduto());
-//                if (id > 1 && id <= 999999) {
-//                    idsValidos.put(imp, chave);
-//                } else {
-//                    idsInvalidos.put(imp, chave);
-//                }
-//            } catch (NumberFormatException ex) {
-//                idsInvalidos.put(imp, chave);
-//            }
-//        }
-//
-//        filtrados.clear();
-//        for (ProdutoFornecedorIMP imp : idsValidos.getSortedMap().values()) {
-//            filtrados.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getIdProduto()
-//            );
-//        }
-//        for (ProdutoFornecedorIMP imp : idsInvalidos.getSortedMap().values()) {
-//            filtrados.put(
-//                    imp,
-//                    imp.getImportSistema(),
-//                    imp.getImportLoja(),
-//                    imp.getIdProduto()
-//            );
-//        }
-//    }
     public UsuarioVO converter(UsuarioIMP imp) throws Exception {
         UsuarioVO vo = new UsuarioVO();
 
@@ -625,29 +443,14 @@ public class UsuarioRepository {
         vo.setNome(imp.getNome());
         vo.setSenha(imp.getSenha());
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
+        vo.setVerificaAtualizacao(imp.isVerificaAtualizacao());
 
 //        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
         return vo;
     }
-//
-//    public ProdutoFornecedorVO converterProdutoFornecedor(ProdutoFornecedorIMP imp) {
-//        ProdutoFornecedorVO vo = new ProdutoFornecedorVO();
-//
-//        ProdutoVO prodVO = new ProdutoVO();
-//        prodVO.setId(Integer.parseInt(imp.getIdProduto()));
-//        vo.setProduto(prodVO);
-//        FornecedorVO forVO = new FornecedorVO();
-//        forVO.setId(Integer.parseInt(imp.getIdFornecedor()));
-//        vo.setFornecedor(forVO);
-//        vo.setIpi(imp.getIpi());
-//        vo.setTipoIpi(imp.getTipoIpi());
-//        vo.setQtdEmbalagem(imp.getQtdEmbalagem());
-//
-//        return vo;
-//    }
 
-    public void gravarUsuario(UsuarioVO vo) throws Exception {
-        provider.gravarUsuario(vo);
+    public void gravarUsuario(UsuarioVO vo, Versao versao) throws Exception {
+        provider.gravarUsuario(vo, versao);
     }
 
     public UsuarioAnteriorVO converterAnterior(UsuarioIMP imp, String observacaoImportacao) {
@@ -667,36 +470,4 @@ public class UsuarioRepository {
     public void gravarUsuarioAnterior(UsuarioAnteriorVO anterior) throws Exception {
         provider.gravarUsuarioAnterior(anterior);
     }
-
-//    public FornecedorContatoVO converterContatoFornecedor(FornecedorContatoIMP imp) {
-//        FornecedorContatoVO contato = new FornecedorContatoVO();
-//        contato.setNome(imp.getNome());
-//        contato.setTelefone(imp.getTelefone());
-//        contato.setCelular(imp.getCelular());
-//        contato.setEmail(imp.getEmail());
-//        contato.setTipoContato(imp.getTipoContato());
-//        return contato;
-//    }
-//
-//    public FornecedorPagamentoVO converterPagamentoFornecedor(FornecedorPagamentoIMP imp) throws Exception {
-//        FornecedorPagamentoVO pagamento = new FornecedorPagamentoVO();
-//        pagamento.setVencimento(imp.getVencimento());
-//        return pagamento;
-//    }
-//
-//    public void gravarFornecedorContato(FornecedorContatoVO contato) throws Exception {
-//        provider.gravarFornecedorContato(contato);
-//    }
-//
-//    public void gravarFornecedorPagamento(FornecedorPagamentoVO pagamento) throws Exception {
-//        provider.gravarCondicaoPagamento(pagamento);
-//    }
-//
-//    private void atualizarFornecedor(FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
-//        provider.atualizarFornecedor(vo, opt);
-//    }
-//
-//    public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opt) throws Exception {
-//        provider.atualizarProdutoFornecedor(vo, opt);
-//    }
 }

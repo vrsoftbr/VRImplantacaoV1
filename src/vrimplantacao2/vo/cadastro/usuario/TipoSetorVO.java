@@ -7,11 +7,6 @@ public class TipoSetorVO {
     private int id = -1;
     private String descricao = "SEM DESCRICAO";
 
-//    public TipoSetorVO(int id, String descricao) {
-//        this.id = id;
-//        this.descricao = descricao;
-//    }
-
     public TipoSetorVO() {}
 
     public int getId() {
