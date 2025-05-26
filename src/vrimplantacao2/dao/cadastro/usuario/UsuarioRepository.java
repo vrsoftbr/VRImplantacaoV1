@@ -445,7 +445,6 @@ public class UsuarioRepository {
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
         vo.setVerificaAtualizacao(imp.isVerificaAtualizacao());
 
-//        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
         return vo;
     }
 
