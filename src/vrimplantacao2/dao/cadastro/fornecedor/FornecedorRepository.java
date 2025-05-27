@@ -35,9 +35,9 @@ import vrimplantacao2_5.vo.enums.EOperacao;
  * @author Leandro
  */
 public class FornecedorRepository {
-    
+
     private static final Logger LOG = Logger.getLogger(FornecedorRepository.class.getName());
-    
+
     private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     private FornecedorRepositoryProvider provider;
@@ -50,40 +50,40 @@ public class FornecedorRepository {
         this.provider = provider;
         this.logController = new LogController();
     }
-    
+
     public String getLoja() {
         return provider.getLojaOrigem();
     }
-    
+
     public void salvar2_5(List<FornecedorIMP> fornecedores) throws Exception {
         FornecedorService fornecedorService = new FornecedorService();
         this.forcarUnificacao = provider.getOpcoes().contains(OpcaoFornecedor.FORCAR_UNIFICACAO);
-        
+
         int idConexao = fornecedorService.existeConexaoMigrada(this.provider.getIdConexao(), this.provider.getSistema()),
                 registro = fornecedorService.verificaRegistro();
-        
+
         String impSistema = fornecedorService.getImpSistemaInicial();
 
         if (this.forcarUnificacao) {
             unificar(fornecedores);
         } else {
 
-            if (registro > 0 && idConexao == 0 || 
-                    (!impSistema.isEmpty() && 
-                        !impSistema.equals(this.provider.getSistema()))) {
+            if (registro > 0 && idConexao == 0
+                    || (!impSistema.isEmpty()
+                    && !impSistema.equals(this.provider.getSistema()))) {
                 unificar(fornecedores);
             } else {
                 boolean existeConexao = fornecedorService.
-                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(), 
-                                                  this.provider.getSistema(), 
-                                                  this.provider.getIdConexao());
+                        verificaMigracaoMultiloja(this.provider.getLojaOrigem(),
+                                this.provider.getSistema(),
+                                this.provider.getIdConexao());
 
                 String lojaModelo = fornecedorService.getLojaModelo(this.provider.getIdConexao(), this.provider.getSistema());
-                                
+
                 if (registro > 0 && existeConexao && !getLoja().equals(lojaModelo)) {
-                    
+
                     this.provider.setStatus("Fornecedor - Copiando código anterior Fornecedor...");
-                    
+
                     fornecedorService.copiarCodantFornecedor(this.provider.getSistema(), lojaModelo, this.provider.getLojaOrigem());
                 }
 
@@ -91,7 +91,7 @@ public class FornecedorRepository {
             }
         }
     }
-    
+
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;
@@ -108,11 +108,11 @@ public class FornecedorRepository {
             this.contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
             MultiMap<String, Void> divisoes = provider.getDivisoes();
-            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
+            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{OpcaoFornecedor.CONTATOS}));
 
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
-            
+
             for (FornecedorIMP imp : filtrados.values()) {
                 FornecedorAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -125,10 +125,10 @@ public class FornecedorRepository {
                 if (anterior == null) {
 
                     vo = converter(imp);
-                    
+
                     //Se existir Familia Fornecedor
                     if (imp.getIdFamiliaFornecedor() != null) {
-                    vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
+                        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
                     }
 
                     //Se o CNPJ/CPF existir, gera um novo.
@@ -169,10 +169,10 @@ public class FornecedorRepository {
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-                        
-                        processarDivisoes(imp, vo, divisoes);                    
+
+                        processarDivisoes(imp, vo, divisoes);
                     }
-                    
+
                     if (imp.getPrazoPedido() > 0) {
                         provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                     }
@@ -180,13 +180,13 @@ public class FornecedorRepository {
 
                 provider.next();
             }
-            
-            if (versao.igualOuMaiorQue(4, 1, 39)){
+
+            if (versao.igualOuMaiorQue(4, 1, 39)) {
                 provider.gravarFornecedorEndereco();
             }
-                        
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             //Executa log de operação
             logController.executar(EOperacao.SALVAR_FORNECEDOR.getId(),
                     sdf.format(new Date()),
@@ -272,8 +272,8 @@ public class FornecedorRepository {
                 }
                 provider.next();
             }
-            
-            if (versao.igualOuMaiorQue(4, 1, 39)){
+
+            if (versao.igualOuMaiorQue(4, 1, 39)) {
                 provider.atualizarFornecedorEndereco();
             }
 
@@ -299,14 +299,14 @@ public class FornecedorRepository {
             for (ProdutoFornecedorIMP imp : filtrados.values()) {
 
                 ProdutoFornecedorVO vo = converterProdutoFornecedor(imp);
-                
-                if(opt.contains(OpcaoProdutoFornecedor.IPI)){
+
+                if (opt.contains(OpcaoProdutoFornecedor.IPI)) {
                     atualizarProdutoFornecedor(vo, opt);
                 }
-                if(opt.contains(OpcaoProdutoFornecedor.QTDEMBALAGEM)){
+                if (opt.contains(OpcaoProdutoFornecedor.QTDEMBALAGEM)) {
                     atualizarProdutoFornecedor(vo, opt);
                 }
-                
+
                 provider.next();
             }
 
@@ -331,7 +331,7 @@ public class FornecedorRepository {
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
             FornecedorIDStack ids = provider.getIdsExistentes();
             this.contatos = provider.getContatos();
-            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
+            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{OpcaoFornecedor.CONTATOS}));
 
             provider.setStatus("Fornecedores - Gravando Unificação...");
             provider.setMaximum(filtrados.size());
@@ -343,8 +343,8 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 FornecedorVO fornecedorPorCnpj = cnpjExistentes.get(Utils.stringToLong(imp.getCnpj_cpf()));
-                
-                if(Utils.stringToLong(imp.getCnpj_cpf()) == 0) {
+
+                if (Utils.stringToLong(imp.getCnpj_cpf()) == 0) {
                     fornecedorPorCnpj = null;
                 }
 
@@ -394,9 +394,9 @@ public class FornecedorRepository {
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-                        
+
                     }
-                    
+
                     if (imp.getPrazoPedido() > 0) {
                         provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                     }
@@ -404,18 +404,18 @@ public class FornecedorRepository {
 
                 provider.next();
             }
-            
-            if (versao.igualOuMaiorQue(4, 1, 39)){
+
+            if (versao.igualOuMaiorQue(4, 1, 39)) {
                 provider.gravarFornecedorEndereco();
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            
+
             //Executa log de operação
             logController.executar(EOperacao.UNIFICAR_FORNECEDOR.getId(),
                     sdf.format(new Date()),
                     provider.getLojaVR());
-                    
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -429,7 +429,7 @@ public class FornecedorRepository {
             //Converte o IMP em VO
             FornecedorContatoVO contato = converterContatoFornecedor(impCont);
             contato.setFornecedor(vo);
-            
+
             //Se houver algum contato cadastrado com essa assinatura,
             //Não executa a rotina
             if (!contatos.containsKey(
@@ -487,16 +487,16 @@ public class FornecedorRepository {
             }
         }
     }
-    
+
     public void processarDivisoes(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> div) throws Exception {
         Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
-        
+
         if (imp.getDivisoes().isEmpty()) {
             provider.gravarPrazoFornecedor(
                     vo.getId(),
-                    0, 
-                    7, 
-                    7, 
+                    0,
+                    7,
+                    7,
                     7);
         } else {
             for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
@@ -511,14 +511,14 @@ public class FornecedorRepository {
 
                 if (!div.containsKey(
                         String.valueOf(vo.getId()),
-                        String.valueOf(idDivisao)                    
+                        String.valueOf(idDivisao)
                 )) {
                     provider.gravarPrazoFornecedor(vo.getId(), idDivisao, impDiv.getPrazoEntrega(), impDiv.getPrazoVisita(), impDiv.getPrazoSeguranca());
-                    div.put(null, 
-                        String.valueOf(vo.getId()),
-                        String.valueOf(idDivisao)                    
+                    div.put(null,
+                            String.valueOf(vo.getId()),
+                            String.valueOf(idDivisao)
                     );
-                }            
+                }
             }
         }
     }
@@ -534,17 +534,17 @@ public class FornecedorRepository {
                     imp.getImportId()
             );
         }
-        
+
         boolean importarSomenteOsAtivos = provider.getOpcoes().contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS);
         if (importarSomenteOsAtivos) {
             MultiMap<String, FornecedorIMP> ativos = new MultiMap<>();
-            for (FornecedorIMP imp: result.values()) {
+            for (FornecedorIMP imp : result.values()) {
                 if (imp.isAtivo()) {
                     ativos.put(
-                        imp,
-                        imp.getImportSistema(),
-                        imp.getImportLoja(),
-                        imp.getImportId()
+                            imp,
+                            imp.getImportSistema(),
+                            imp.getImportLoja(),
+                            imp.getImportId()
                     );
                 }
             }
@@ -682,9 +682,11 @@ public class FornecedorRepository {
         vo.setUtilizaiva(imp.getUtilizaiva() == null ? false : !"0".equals(imp.getUtilizaiva().trim()));
         vo.setRevenda(imp.getRevenda());
         vo.setIdPais(imp.getIdPais());
-        
-        vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
-            
+
+        if (imp.getIdFamiliaFornecedor() != null) {
+            vo.setFamiliaFornecedor(provider.getFamiliaFornecedor(imp.getIdFamiliaFornecedor()));
+        }
+
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());
