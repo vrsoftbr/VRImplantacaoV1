@@ -2247,22 +2247,22 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rs.getString("id_produtopai"));
-                    imp.setDescricao(rs.getString("descricao_pai"));
+                    imp.setImpIdProduto(rs.getString("id_produtopai"));
+                    imp.setDescricaoAssociado(rs.getString("descricao_pai"));
                     imp.setQtdEmbalagem(rs.getInt("qtde"));
-                    imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                    imp.setImpIdProdutoItem(rs.getString("id_produtofilho"));
+                    imp.setDescricaoAssociadoItem(rs.getString("descricao_filho"));
                     imp.setPercentualPreco(rs.getDouble("percentualpreco"));
-                    imp.setPercentualCusto(rs.getDouble("percentualcusto"));
+                    imp.setPercentualPreco(rs.getDouble("percentualcusto"));
 
                     if (inverteAssociado) {
-                        imp.setId(rs.getString("id_produtopai"));
-                        imp.setDescricao(rs.getString("descricao_pai"));
+                        imp.setImpIdProduto(rs.getString("id_produtopai"));
+                        imp.setDescricaoAssociado(rs.getString("descricao_pai"));
                         imp.setQtdEmbalagem(rs.getInt("qtde"));
-                        imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
-                        imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                        imp.setImpIdProdutoItem(rs.getString("id_produtofilho"));
+                        imp.setDescricaoAssociadoItem(rs.getString("descricao_filho"));
                         imp.setPercentualPreco(rs.getDouble("percentualpreco"));
-                        imp.setPercentualCusto(rs.getDouble("percentualcusto"));
+                        imp.setPercentualcustoestoque(rs.getDouble("percentualcusto"));
                         imp.setAplicaEstoque(false);
                         imp.setAplicaCusto(true);
                     }

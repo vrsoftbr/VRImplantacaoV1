@@ -197,38 +197,41 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	a2.id id,\n"
-                    + "	a2.id_produto idproduto,\n"
-                    + "   a2.qtdembalagem,\n"
-                    + "	p2.descricaocompleta descricaoassociado,\n"
-                    + "	a.id_produto idprodutoitem,\n"
-                    + "	p.descricaocompleta descricaoassociadoitem,\n"
-                    + "	a.aplicacusto,\n"
-                    + "	a.aplicaestoque,\n"
-                    + "	a.aplicapreco,\n"
-                    + "	a.percentualcustoestoque,\n"
-                    + "	a.percentualpreco,\n"
-                    + "	a.qtdembalagem qtdembalagemitem\n"
-                    + "from\n"
+                    "SELECT \n"
+                    + "	a2.id id_associado,\n"
+                    + "	a2.id_produto id_produto,\n"
+                    + "	p2.descricaocompleta descricao_associado,\n"
+                    + " a2.qtdembalagem,\n"
+                    + " a.id id_associado_item,\n"
+                    + "	a.id_produto id_produto_item,\n"
+                    + "	p.descricaocompleta descricao_associado_item,\n"
+                    + "	a.qtdembalagem qtdembalagem_item,\n"
+                    + "	a.percentualpreco percentual_preco,\n"
+                    + "	a.aplicapreco aplica_preco,\n"
+                    + "	a.aplicacusto aplica_custo,\n"
+                    + "	a.aplicaestoque aplica_estoque,\n"
+                    + "	a.percentualcustoestoque percentual_custo_estoque\n"
+                    + "FROM \n"
                     + "	associadoitem a\n"
-                    + "join produto p on a.id_produto = p.id\n"
-                    + "join associado a2 on a.id_associado = a2.id\n"
-                    + "join produto p2 on a2.id_produto = p2.id")) {
+                    + "JOIN produto p on a.id_produto = p.id\n"
+                    + "JOIN associado a2 on a.id_associado = a2.id\n"
+                    + "JOIN produto p2 on a2.id_produto = p2.id")) {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rs.getString("idproduto"));
-                    imp.setDescricao(rs.getString("descricaoassociado"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricaoassociadoitem"));
-                    imp.setProdutoAssociadoId(rs.getString("idprodutoitem"));
+                    imp.setImpIdAssociado(rs.getString("id_associado"));
+                    imp.setImpIdProduto(rs.getString("id_produto"));
+                    imp.setDescricaoAssociado(rs.getString("escricao_associado"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setQtdEmbalagemItem(rs.getInt("qtdembalagemitem"));
-                    imp.setPercentualCusto(rs.getDouble("percentualcustoestoque"));
-                    imp.setPercentualPreco(rs.getDouble("percentualpreco"));
-                    imp.setAplicaCusto(rs.getBoolean("aplicacusto"));
-                    imp.setAplicaEstoque(rs.getBoolean("aplicaestoque"));
-                    imp.setAplicaPreco(rs.getBoolean("aplicapreco"));
+                    imp.setImpIdAssociadoItem(rs.getString("id_associado_item"));
+                    imp.setImpIdProdutoItem(rs.getString("id_produto_item"));
+                    imp.setDescricaoAssociadoItem(rs.getString("descricao_associado_item"));
+                    imp.setQtdEmbalagemItem(rs.getInt("qtdembalagem_item"));
+                    imp.setPercentualPreco(rs.getDouble("percentual_preco"));
+                    imp.setAplicaPreco(rs.getBoolean("aplica_preco"));
+                    imp.setAplicaCusto(rs.getBoolean("aplica_custo"));
+                    imp.setAplicaEstoque(rs.getBoolean("aplica_estoque"));
+                    imp.setPercentualcustoestoque(rs.getDouble("percentual_custo_estoque"));
 
                     result.add(imp);
                     contador++;

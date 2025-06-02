@@ -1275,17 +1275,19 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         for (LinhaArquivo linha : produtos) {
             AssociadoIMP imp = new AssociadoIMP();
 
-            imp.setId(linha.getString("idproduto_principal"));
-            imp.setDescricao(linha.getString("descricaoproduto_principal"));
+            imp.setImpIdAssociado(linha.getString("id_associado"));
+            imp.setImpIdProduto(linha.getString("id_produto"));
+            imp.setDescricaoAssociado(linha.getString("descricao_associado"));
             imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
-            imp.setProdutoAssociadoId(linha.getString("idproduto_item"));
-            imp.setDescricaoProdutoAssociado(linha.getString("descproduto_item"));
+            imp.setImpIdAssociadoItem(linha.getString("id_associado_item"));
+            imp.setImpIdProdutoItem(linha.getString("id_produto_item"));
+            imp.setDescricaoAssociadoItem(linha.getString("descricao_associado_item"));
             imp.setQtdEmbalagemItem(linha.getInt("qtdembalagem_item"));
-            imp.setPercentualPreco(linha.getDouble("percentualpreco"));
-            imp.setAplicaPreco(linha.getBoolean("aplicapreco"));
-            imp.setAplicaCusto(linha.getBoolean("aplicacusto"));
-            imp.setAplicaEstoque(linha.getBoolean("aplicaestoque"));
-            imp.setPercentualCusto(linha.getDouble("percentualcustoestoque"));
+            imp.setPercentualPreco(linha.getDouble("percentual_preco"));
+            imp.setAplicaPreco(linha.getString("aplica_preco").equals("S"));
+            imp.setAplicaCusto(linha.getString("aplica_custo").equals("S"));
+            imp.setAplicaEstoque(linha.getString("aplica_estoque").equals("S"));
+            imp.setPercentualcustoestoque(linha.getDouble("percentual_custo_estoque"));
 
             result.add(imp);
         }

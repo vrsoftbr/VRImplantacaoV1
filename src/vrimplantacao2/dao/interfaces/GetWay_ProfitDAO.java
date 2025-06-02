@@ -2466,11 +2466,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rst.getString("produtopai"));
-                    imp.setDescricao(rst.getString("descricaopai"));
+                    imp.setImpIdProduto(rst.getString("produtopai"));
+                    imp.setDescricaoAssociado(rst.getString("descricaopai"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
-                    imp.setDescricaoProdutoAssociado(rst.getString("descricaofilho"));
+                    imp.setImpIdProdutoItem(rst.getString("produtofilho"));
+                    imp.setDescricaoAssociadoItem(rst.getString("descricaofilho"));
 
                     result.add(imp);
                 }

@@ -171,11 +171,11 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rs.getString("id_produtopai"));
-                    imp.setDescricao(rs.getString("descricao_pai"));
+                    imp.setImpIdProduto(rs.getString("id_produtopai"));
+                    imp.setDescricaoAssociado(rs.getString("descricao_pai"));
                     imp.setQtdEmbalagem(rs.getInt("qtde"));
-                    imp.setProdutoAssociadoId(rs.getString("id_produtofilho"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                    imp.setImpIdProduto(rs.getString("id_produtofilho"));
+                    imp.setDescricaoAssociadoItem(rs.getString("descricao_filho"));
 
                     result.add(imp);
                 }

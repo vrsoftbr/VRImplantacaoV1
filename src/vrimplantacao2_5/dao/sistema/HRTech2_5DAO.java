@@ -403,10 +403,10 @@ public class HRTech2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     String idFilho = rs.getString("ean").trim().length() < 7 && rs.getString("idprodutofilho").trim().equals(rs.getString("ean").trim())
                             ? rs.getString("idprodutofilho").substring(0, rs.getString("idprodutofilho").length() - 1) : rs.getString("idprodutofilho");
 
-                    imp.setId(idPai);
-                    imp.setDescricao(rs.getString("descricaoprodutopai"));
-                    imp.setProdutoAssociadoId(idFilho);
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricaoprodutofilho"));
+                    imp.setImpIdProduto(idPai);
+                    imp.setDescricaoAssociado(rs.getString("descricaoprodutopai"));
+                    imp.setImpIdProduto(idFilho);
+                    imp.setDescricaoAssociadoItem(rs.getString("descricaoprodutofilho"));
 
                     result.add(imp);
                 }

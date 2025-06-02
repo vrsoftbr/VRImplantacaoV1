@@ -2,36 +2,47 @@ package vrimplantacao2.vo.importacao;
 
 /**
  * Representa a importação do associado.
- * @author Leandro
+ *
+ * @author Wesley
  */
 public class AssociadoIMP {
-    
-    private String id;
-    private String descricao;
+
+    private String impIdAssociado;
+    private String impIdProduto;
+    private String descricaoAssociado;
     private int qtdEmbalagem;
+    private String impIdAssociadoItem;
+    private String impIdProdutoItem;
+    private String descricaoAssociadoItem;
     private int qtdEmbalagemItem = 1;
-    private String produtoAssociadoId;
-    private String descricaoProdutoAssociado;
     private double percentualPreco = 0;
-    private double percentualCusto = 0;
     private boolean aplicaPreco = false;
     private boolean aplicaCusto = false;
     private boolean aplicaEstoque = true;
+    private double  percentualcustoestoque = 0;
 
-    public String getId() {
-        return id;
+    public String getImpIdAssociado() {
+        return impIdAssociado;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setImpIdAssociado(String impIdAssociado) {
+        this.impIdAssociado = impIdAssociado;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getImpIdProduto() {
+        return impIdProduto;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setImpIdProduto(String impIdProduto) {
+        this.impIdProduto = impIdProduto;
+    }
+
+    public String getDescricaoAssociado() {
+        return descricaoAssociado;
+    }
+
+    public void setDescricaoAssociado(String descricaoAssociado) {
+        this.descricaoAssociado = descricaoAssociado;
     }
 
     public int getQtdEmbalagem() {
@@ -42,20 +53,36 @@ public class AssociadoIMP {
         this.qtdEmbalagem = qtdEmbalagem;
     }
 
-    public String getProdutoAssociadoId() {
-        return produtoAssociadoId;
+    public String getImpIdAssociadoItem() {
+        return impIdAssociadoItem;
     }
 
-    public void setProdutoAssociadoId(String produtoAssociadoId) {
-        this.produtoAssociadoId = produtoAssociadoId;
+    public void setImpIdAssociadoItem(String impIdAssociadoItem) {
+        this.impIdAssociadoItem = impIdAssociadoItem;
     }
 
-    public String getDescricaoProdutoAssociado() {
-        return descricaoProdutoAssociado;
+    public String getImpIdProdutoItem() {
+        return impIdProdutoItem;
     }
 
-    public void setDescricaoProdutoAssociado(String descricaoProdutoAssociado) {
-        this.descricaoProdutoAssociado = descricaoProdutoAssociado;
+    public void setImpIdProdutoItem(String impIdProdutoItem) {
+        this.impIdProdutoItem = impIdProdutoItem;
+    }
+
+    public String getDescricaoAssociadoItem() {
+        return descricaoAssociadoItem;
+    }
+
+    public void setDescricaoAssociadoItem(String descricaoAssociadoItem) {
+        this.descricaoAssociadoItem = descricaoAssociadoItem;
+    }
+
+    public int getQtdEmbalagemItem() {
+        return qtdEmbalagemItem;
+    }
+
+    public void setQtdEmbalagemItem(int qtdEmbalagemItem) {
+        this.qtdEmbalagemItem = qtdEmbalagemItem;
     }
 
     public double getPercentualPreco() {
@@ -64,28 +91,6 @@ public class AssociadoIMP {
 
     public void setPercentualPreco(double percentualPreco) {
         this.percentualPreco = percentualPreco;
-    }
-
-    public double getPercentualCusto() {
-        return percentualCusto;
-    }
-
-    public void setPercentualCusto(double percentualCusto) {
-        this.percentualCusto = percentualCusto;
-    }
-
-    /**
-     * @return the qtdEmbalagemItem
-     */
-    public int getQtdEmbalagemItem() {
-        return qtdEmbalagemItem;
-    }
-
-    /**
-     * @param qtdEmbalagemItem the qtdEmbalagemItem to set
-     */
-    public void setQtdEmbalagemItem(int qtdEmbalagemItem) {
-        this.qtdEmbalagemItem = qtdEmbalagemItem;
     }
 
     public boolean isAplicaPreco() {
@@ -111,5 +116,12 @@ public class AssociadoIMP {
     public void setAplicaEstoque(boolean aplicaEstoque) {
         this.aplicaEstoque = aplicaEstoque;
     }
-    
+
+    public double getPercentualcustoestoque() {
+        return percentualcustoestoque;
+    }
+
+    public void setPercentualcustoestoque(double percentualcustoestoque) {
+        this.percentualcustoestoque = percentualcustoestoque;
+    }
 }

@@ -344,9 +344,9 @@ public class Modelo2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rst.getString(""));
+                    imp.setImpIdProduto(rst.getString(""));
                     imp.setQtdEmbalagem(rst.getInt(""));
-                    imp.setProdutoAssociadoId(rst.getString(""));
+                    imp.setImpIdProdutoItem(rst.getString(""));
                     imp.setQtdEmbalagemItem(rst.getInt(""));
 
                     result.add(imp);

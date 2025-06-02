@@ -1581,9 +1581,9 @@ public class ShiDAO2_5 extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rst.getString("idpai"));
+                    imp.setImpIdProduto(rst.getString("idpai"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembpai"));
-                    imp.setProdutoAssociadoId(rst.getString("idfilho"));
+                    imp.setImpIdProdutoItem(rst.getString("idfilho"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtdembfilho"));
 
                     result.add(imp);

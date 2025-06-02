@@ -433,9 +433,9 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rst.getString("idproduto_pai"));
+                    imp.setImpIdProduto(rst.getString("idproduto_pai"));
                     imp.setQtdEmbalagem(1);
-                    imp.setProdutoAssociadoId(rst.getString("idproduto_filho"));
+                    imp.setImpIdProdutoItem(rst.getString("idproduto_filho"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtd"));
                     result.add(imp);
                 }

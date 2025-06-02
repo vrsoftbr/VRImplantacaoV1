@@ -455,11 +455,11 @@ public class Provenco_TentaculoDAO extends InterfaceDAO implements MapaTributoPr
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rs.getString("produto_pai"));
-                    imp.setDescricao(rs.getString("descricao_pai"));
+                    imp.setImpIdProduto(rs.getString("produto_pai"));
+                    imp.setDescricaoAssociado(rs.getString("descricao_pai"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setProdutoAssociadoId(rs.getString("produto_filho"));
-                    imp.setDescricaoProdutoAssociado(rs.getString("descricao_filho"));
+                    imp.setImpIdProdutoItem(rs.getString("produto_filho"));
+                    imp.setDescricaoAssociadoItem(rs.getString("descricao_filho"));
 
                     result.add(imp);
                 }

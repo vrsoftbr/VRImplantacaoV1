@@ -681,9 +681,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rst.getString("produto_pai") + rst.getString("digito_pai_id"));
+                    imp.setImpIdProduto(rst.getString("produto_pai") + rst.getString("digito_pai_id"));
                     imp.setQtdEmbalagem(rst.getInt("qtembalagem_pai") == 0 ? 1 : rst.getInt("qtembalagem_pai"));
-                    imp.setProdutoAssociadoId(rst.getString("produto_filho") + rst.getString("digito_filho_id"));
+                    imp.setImpIdProdutoItem(rst.getString("produto_filho") + rst.getString("digito_filho_id"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_filho") == 0 ? 1 : rst.getInt("qtdembalagem_filho"));
                     result.add(imp);
                 }

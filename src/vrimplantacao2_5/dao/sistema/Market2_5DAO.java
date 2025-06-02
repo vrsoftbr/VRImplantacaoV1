@@ -552,9 +552,9 @@ public class Market2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rst.getString("idproduto_principal"));
+                    imp.setImpIdProduto(rst.getString("idproduto_principal"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setProdutoAssociadoId(rst.getString("idproduto_item"));
+                    imp.setImpIdProdutoItem(rst.getString("idproduto_item"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_item"));
                     result.add(imp);
                 }

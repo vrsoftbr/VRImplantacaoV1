@@ -2705,9 +2705,9 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rst.getString("produto_pai"));
+                    imp.setImpIdProduto(rst.getString("produto_pai"));
                     imp.setQtdEmbalagem(rst.getInt("qtdproduto_pai"));
-                    imp.setProdutoAssociadoId(rst.getString("produto_filho"));
+                    imp.setImpIdProdutoItem(rst.getString("produto_filho"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtdeemb"));
                     result.add(imp);
                 }

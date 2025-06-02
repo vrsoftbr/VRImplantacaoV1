@@ -375,9 +375,9 @@ public class CefasConcretizeDAO2_5 extends InterfaceDAO implements MapaTributoPr
             )) {
                 while (rs.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-                    imp.setId(rs.getString(""));
+                    imp.setImpIdProduto(rs.getString(""));
                     imp.setQtdEmbalagem(rs.getInt(""));
-                    imp.setProdutoAssociadoId(rs.getString(""));
+                    imp.setImpIdProdutoItem(rs.getString(""));
                     imp.setQtdEmbalagemItem(rs.getInt(""));
                     result.add(imp);
                 }

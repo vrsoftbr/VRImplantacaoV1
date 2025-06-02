@@ -460,8 +460,7 @@ public class UsuarioRepository {
         ant.setLogin(imp.getLogin());
         ant.setNome(imp.getNome());
         ant.setIdTipoSetor(imp.getIdTipoSetor());
-        ant.setSituacaoCadastro(imp.getSituacaoCadastro());
-        ant.setObservacaoImportacao(observacaoImportacao);
+        ant.setSituacaoCadastro(imp.getSituacaoCadastro());        ant.setObservacaoImportacao(observacaoImportacao);
 
         return ant;
     }

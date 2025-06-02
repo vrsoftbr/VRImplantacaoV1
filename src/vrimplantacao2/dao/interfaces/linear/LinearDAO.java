@@ -1195,9 +1195,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
 
-                    imp.setId(rst.getString("id_pai"));
+                    imp.setImpIdProduto(rst.getString("id_pai"));
                     imp.setQtdEmbalagem(rst.getInt("qtde"));
-                    imp.setProdutoAssociadoId(rst.getString("id_filho"));
+                    imp.setImpIdProdutoItem(rst.getString("id_filho"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtde"));
 
                     result.add(imp);
