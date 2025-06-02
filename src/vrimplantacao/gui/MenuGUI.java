@@ -325,6 +325,7 @@ import vrimplantacao2_5.gui.cadastro.usuario.ConsultaUsuarioGUI;
 import vrimplantacao2_5.conversor.ConversorGUI;
 import vrimplantacao2_5.gui.copias.CopiarPromocoesGUI;
 import vrimplantacao2_5.gui.copias.GeradorDeBackupGUI;
+import vrimplantacao2_5.gui.copias.ZerarEstoqueGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 import vrimplantacao2_5.gui.login.LoginGUI;
@@ -985,6 +986,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem22 = new javax.swing.JMenuItem();
         gerarCodant = new javax.swing.JMenuItem();
         gerarBackup = new javax.swing.JMenuItem();
+        zerarEstoque = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
@@ -3727,6 +3729,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFerramentas.add(gerarBackup);
 
+        zerarEstoque.setText("Zerar Estoque");
+        zerarEstoque.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zerarEstoqueActionPerformed(evt);
+            }
+        });
+        mnuFerramentas.add(zerarEstoque);
+
         mnuMenu.add(mnuFerramentas);
 
         mnuPlanilha.setText("Planilha");
@@ -5799,13 +5809,22 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_copiarPromocoesActionPerformed
 
     private void gerarBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerarBackupActionPerformed
-        
+
         try {
             GeradorDeBackupGUI.Exibir(this);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_gerarBackupActionPerformed
+
+    private void zerarEstoqueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zerarEstoqueActionPerformed
+        
+        try {
+            ZerarEstoqueGUI.Exibir(this);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_zerarEstoqueActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnMemo;
@@ -6171,6 +6190,7 @@ public final class MenuGUI extends VRMdiFrame {
     private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.desktopPane.VRDesktopPane vrDesktopPane;
+    private javax.swing.JMenuItem zerarEstoque;
     // End of variables declaration//GEN-END:variables
 
     /**
