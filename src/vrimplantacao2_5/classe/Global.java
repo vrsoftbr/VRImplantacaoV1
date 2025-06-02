@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
  */
 public class Global {
 
-    public static String VERSAO = "2.6.01";
+    public static String VERSAO = "2.6.02";
     public static final Date DATA_VERSAO = new GregorianCalendar(2021, 05, 14).getTime();
     private static int idUsuario;
     private static String nomeUsuario;
