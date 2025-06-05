@@ -675,7 +675,7 @@ public class ProdutoRepository {
                 if (optSimples.contains(OpcaoProduto.PRECO)
                         || optSimples.contains(OpcaoProduto.CUSTO)
                         || optSimples.contains(OpcaoProduto.ESTOQUE)) {
-                    logController.executarLogAtualizacao(organizados, getSistema(), getLoja());
+                    logController.executarLogAtualizacao(organizados, getSistema(), getLoja(), getLojaVR());
                 }
 
                 provider.commit();

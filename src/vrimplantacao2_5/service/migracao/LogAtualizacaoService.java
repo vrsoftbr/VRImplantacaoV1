@@ -20,23 +20,24 @@ import vrimplantacao2_5.vo.cadastro.LogAtualizacaoVO;
  */
 public class LogAtualizacaoService {
 
-    private LogAtualizacaoDAO logAtualizacaoDAO;
+    private final LogAtualizacaoDAO logAtualizacaoDAO;
 
     public LogAtualizacaoService() {
         this.logAtualizacaoDAO = new LogAtualizacaoDAO();
     }
 
-    public void converteLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
+    public void converteLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String impLoja, Integer lojaAtual) throws Exception {
         List<LogAtualizacaoVO> listaVo = new ArrayList<>();
         ProgressBar.setStatus("Convertendo id de log: " + organizados.size());
         ProgressBar.setMaximum(organizados.size());
         for (ProdutoIMP organizado : organizados) {
             LogAtualizacaoVO vo = new LogAtualizacaoVO();
             vo.setImpSistema(sistema);
-            vo.setImpLoja(loja);
+            vo.setImpLoja(impLoja);
             vo.setImpId(organizado.getImportId());
+            vo.setLojaatual(lojaAtual);
             vo.setDescricao(organizado.getDescricaoCompleta());
-            vo.setCoigoatual(new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(organizado.getImportId())));
+            vo.setCoigoatual(new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, impLoja, String.valueOf(organizado.getImportId())));
             vo.setPreco(organizado.getPrecovenda());
             vo.setDataAlteracao(new Date());
             vo.setEstoque(organizado.getEstoque());
@@ -45,7 +46,7 @@ public class LogAtualizacaoService {
             listaVo.add(vo);
             ProgressBar.next();
         }
-        logAtualizacaoDAO.deletarLogAtualizacao(sistema, loja);
+        logAtualizacaoDAO.deletarLogAtualizacao(sistema, impLoja, lojaAtual);
         logAtualizacaoDAO.salvarLogAtualizacao(listaVo);
     }
 

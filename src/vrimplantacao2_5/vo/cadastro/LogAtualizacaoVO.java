@@ -16,6 +16,7 @@ public class LogAtualizacaoVO {
     private String impSistema;
     private String impLoja;
     private String impId;
+    private int lojaatual;
     private String descricao;
     private int coigoatual;
     private double preco;
@@ -46,6 +47,14 @@ public class LogAtualizacaoVO {
 
     public void setImpId(String impId) {
         this.impId = impId;
+    }
+
+    public int getLojaatual() {
+        return lojaatual;
+    }
+
+    public void setLojaatual(int lojaatual) {
+        this.lojaatual = lojaatual;
     }
 
     public String getDescricao() {

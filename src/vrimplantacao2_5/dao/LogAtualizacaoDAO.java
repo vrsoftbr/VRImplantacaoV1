@@ -37,6 +37,7 @@ public class LogAtualizacaoDAO {
                     + "	impid varchar(100),\n"
                     + " impsistema varchar(100),\n"
                     + " imploja varchar(6),\n"
+                    + " lojaatual integer, \n"
                     + "	descricao varchar(250),\n"
                     + "	codigoatual integer,\n"
                     + "	preco varchar(250),\n"
@@ -45,6 +46,21 @@ public class LogAtualizacaoDAO {
                     + "	custosemimposto varchar(250),\n"
                     + "	dataalteracao timestamp\n"
                     + ")"
+            );
+
+            stm.execute(
+                    "DO $$\n"
+                    + "BEGIN\n"
+                    + "    IF NOT EXISTS (\n"
+                    + "        SELECT 1 FROM information_schema.columns \n"
+                    + "        WHERE table_schema = 'implantacao' \n"
+                    + "        AND table_name = 'log_atualizacao' \n"
+                    + "        AND column_name = 'lojaatual'\n"
+                    + "    ) THEN\n"
+                    + "        ALTER TABLE implantacao.log_atualizacao\n"
+                    + "        ADD COLUMN lojaatual integer;\n"
+                    + "    END IF;\n"
+                    + "END $$;"
             );
         } catch (PSQLException e) {
             System.out.println("erro ao criar tabela implantacao.log_atualizacao: \n\n" + e.getMessage());
@@ -66,6 +82,7 @@ public class LogAtualizacaoDAO {
                 sql.put("impid", logPrecoVO.getImpId());
                 sql.put("impsistema", logPrecoVO.getImpSistema());
                 sql.put("imploja", logPrecoVO.getImpLoja());
+                sql.put("lojaatual", logPrecoVO.getLojaatual());
                 sql.put("descricao", Utils.acertarTexto(logPrecoVO.getDescricao()));
                 sql.put("codigoatual", logPrecoVO.getCoigoatual());
                 sql.put("preco", logPrecoVO.getPreco());
@@ -85,10 +102,10 @@ public class LogAtualizacaoDAO {
         }
     }
 
-    public void deletarLogAtualizacao(String sistema, String loja) throws Exception {
+    public void deletarLogAtualizacao(String sistema, String loja, Integer lojaAtual) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from implantacao.log_atualizacao "
-                    + "where impsistema = '" + sistema + "' and imploja = '" + loja + "'");
+                    + "where impsistema = '" + sistema + "' and imploja = '" + loja + "' and lojaatual = " + lojaAtual);
         }
     }
 

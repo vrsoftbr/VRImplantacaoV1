@@ -31,7 +31,7 @@ public class LogController {
         service.executar(logVO);
     }
 
-    public void executarLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String loja) throws Exception {
-        serviceLogAtualizacao.converteLogAtualizacao(organizados, sistema, loja);
+    public void executarLogAtualizacao(List<ProdutoIMP> organizados, String sistema, String impLoja, Integer lojaAtual) throws Exception {
+        serviceLogAtualizacao.converteLogAtualizacao(organizados, sistema, impLoja, lojaAtual);
     }
 }
