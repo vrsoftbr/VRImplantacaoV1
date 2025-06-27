@@ -1,5 +1,6 @@
 package vrimplantacao2_5.dao.configuracao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -356,17 +357,31 @@ public class ConfiguracaoBaseDadosDAO {
     public boolean existeConexao(ConfiguracaoBaseDadosVO configuracaoVO) throws Exception {
         boolean retorno = false;
 
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                      "select \n"
-                    + "	id\n"
-                    + "from \n"
-                    + "	implantacao2_5.conexao\n"
-                    + "where \n"
-                    + "	id_sistema = " + configuracaoVO.getSistema().getId() + " and \n"
-                    + "	id_bancodados = " + configuracaoVO.getBancoDados().getId() + " and \n"
-                    + "	nomeschema = '" + configuracaoVO.getSchema() + "' and\n"
-                    + " host = '" + configuracaoVO.getHost() + "'")) {
+//        try (Statement stm = Conexao.createStatement()) {
+//            try (ResultSet rs = stm.executeQuery(
+//                      "select \n"
+//                    + "	id\n"
+//                    + "from \n"
+//                    + "	implantacao2_5.conexao\n"
+//                    + "where \n"
+//                    + "	id_sistema = " + configuracaoVO.getSistema().getId() + " and \n"
+//                    + "	id_bancodados = " + configuracaoVO.getBancoDados().getId() + " and \n"
+//                    + "	nomeschema = '" + configuracaoVO.getSchema() + "' and\n"
+//                    + " host = '" + configuracaoVO.getHost() + "'")) {
+        String sql = "SELECT id " +
+                     "FROM implantacao2_5.conexao " +
+                     "WHERE id_sistema = ? " +
+                     "AND id_bancodados = ? " +
+                     "AND nomeschema = ? " +
+                     "AND host = ?";
+
+        try (PreparedStatement ps = Conexao.prepareStatement(sql)) {
+            ps.setInt(1, configuracaoVO.getSistema().getId());
+            ps.setInt(2, configuracaoVO.getBancoDados().getId());
+            ps.setString(3, configuracaoVO.getSchema());
+            ps.setString(4, configuracaoVO.getHost());
+
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     retorno = true;
                 }
