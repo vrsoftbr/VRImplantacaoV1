@@ -442,12 +442,20 @@ public class LojaDAO {
 
             if (i_loja.isCopiaOperador() == true) {
                 //("Copiando Operador.");
-                stm.execute(script.copiarOperador(i_loja));
+                try {
+                    stm.execute(script.copiarOperador(i_loja));
+                } catch (Exception e) {
+                    throw new Exception("Erro ao copiar os operadores.");
+                }
             }
 
             if (i_loja.isCopiaUsuario() == true) {
                 //("Copiando Usuario.");
+                try {
                 stm.execute(script.copiaUsuarioPermissao(i_loja));
+                } catch (Exception e) {
+                    throw new Exception("Erro ao copiar as permissões de usuários.");
+                }
             }
 
             if (i_loja.isCopiarConfigSped() == true) {
