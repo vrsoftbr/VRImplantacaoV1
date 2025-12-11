@@ -184,7 +184,7 @@
                                   <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -194,18 +194,16 @@
                       <Component id="chkGeraConcentrador" min="-2" max="-2" attributes="0"/>
                       <Component id="chkCopiaTecladoLayout" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkServidorCentral" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkCopiaMargem" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkCopiaPermissao" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="chkCopiaPrecoVenda" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="chkCopiaCusto" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -247,7 +245,6 @@
                       <Component id="chkGeraConcentrador" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="chkServidorCentral" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="chkCopiaPrecoVenda" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkCopiaCusto" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -360,12 +357,6 @@
         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiaPrecoVenda">
           <Properties>
             <Property name="text" type="java.lang.String" value="Copia Pre&#xe7;o Venda"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiaCusto">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Copia Custo"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
           </Properties>
         </Component>
@@ -651,17 +642,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="chkCopiarAcumulador" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                           <Component id="chkCopiarAliquota" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="chkCopiarCartoes" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chkCopiarSpedConfig" min="-2" max="-2" attributes="0"/>
                       <Component id="chkCopiarFinalizadora" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="23" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

@@ -316,6 +316,7 @@ import vrimplantacao2_5.gui.sistema.CPlus2_5GUI;
 import vrimplantacao2_5.gui.sistema.CadastraFacil2_5GUI;
 import vrimplantacao2_5.gui.sistema.Cefas2_5GUI;
 import vrimplantacao2_5.gui.sistema.CenterInformatica2_5GUI;
+import vrimplantacao2_5.gui.sistema.Ciss2_5GUI;
 import vrimplantacao2_5.gui.sistema.ConnexOne2_5GUI;
 import vrimplantacao2_5.gui.sistema.Consinco2_5GUI;
 import vrimplantacao2_5.gui.sistema.ControlWare2_5GUI;
@@ -702,7 +703,12 @@ public enum ESistema {
     CISS(28, "CISS", new CissDAO()) {
         @Override
         public VRInternalFrame getInternalFrame(VRMdiFrame frame) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            try {
+                return new Ciss2_5GUI(frame);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, "");
+            }
+            return null;
         }
     },
     CLICK(29, "CLICK", new ClickDAO()) {

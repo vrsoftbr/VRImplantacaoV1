@@ -118,7 +118,8 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PAGAR_FORNECEDOR,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.SITUACAO_CADASTRO,
-                OpcaoFornecedor.TIPO_EMPRESA
+                OpcaoFornecedor.TIPO_EMPRESA,
+                OpcaoFornecedor.MUNICIPIO
         ));
     }
 
@@ -238,7 +239,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "	p.id AS id,\n"
                     + "	p.\"codigoBarras\" AS ean,\n"
-                    + "	p.\"qtdEmbalagem\" AS qtdEmbalagem,\n"
+                    + "	p.\"qtdEmbalagem\" AS qtd_embalagem,\n"
                     + "	p.embalagem AS embalagem \n"
                     + "FROM\n"
                     + "	produto.produtocodigobarras p"
@@ -250,7 +251,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd_embalagem"));
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
 
                     result.add(imp);
@@ -295,19 +296,20 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p5.\"pesoLiquido\" AS peso_liquido,\n"
                     + "REPLACE(n.codigo, '.', '') AS ncm,\n"
                     + "c.codigo AS cest,\n"
-                    + "rf.id AS icms,\n"
+                    + "ricmse.id AS icms_entrada,\n"
+                    + "ricmss.id AS icms_saida,\n"
                     + "pisd.cst AS id_pis_cofins_debito,\n"
                     + "pisc.cst AS id_pis_cofins_credito,\n"
                     + "nr.codigo AS id_natureza_receita\n"
                     + "FROM produto.produto p \n"
-                    + "LEFT JOIN produto.produtocomplemento p2 ON p2.\"produtoId\" = p.id AND p2.\"idLoja\" = " + getLojaOrigem() + " --COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11\n"
-                    + "LEFT JOIN produto.classificacaoproduto c3 ON c3.id = p.\"idClassificacaoProduto\" \n"
+                    + "LEFT JOIN produto.produtocomplemento p2 ON p2.\"produtoId\" = p.id AND p2.\"idLoja\" =  " + getLojaOrigem() + "--COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11\n"
+                    + "LEFT JOIN produto.classificacaoproduto c3 ON c3.id = p.\"idClassificacaoProduto\" AND c3.nivel = 3\n"
                     + "LEFT JOIN produto.classificacaoproduto c2 ON c2.id = c3.\"idPai\" AND c2.nivel = 2\n"
-                    + "LEFT JOIN produto.classificacaoproduto c1 ON c1.id = c2.\"idPai\" AND c1.nivel = 3\n"
+                    + "LEFT JOIN produto.classificacaoproduto c1 ON c1.id = c2.\"idPai\" AND c1.nivel = 1\n"
                     + "LEFT JOIN produto.familiaprodutoitem fp ON fp.\"idProduto\" = p.id\n"
-                    + "LEFT JOIN estoque.estoqueonline e ON e.id = p.id AND e.\"idLoja\" = 11 --COLOCAR O ID DA LOJA AQUI\n"
+                    + "LEFT JOIN estoque.estoqueonline e ON e.\"idProduto\" = p.id AND e.\"idLoja\" = " + getLojaOrigem() + " --COLOCAR O ID DA LOJA AQUI\n"
                     + "LEFT JOIN produto.produtocompra p7 ON p7.\"idProduto\" = p.id\n"
-                    + "LEFT JOIN produto.produtocompraloja p8 ON p8.\"idProdutoCompra\" = p7.id AND p8.\"idLoja\" = " + getLojaOrigem() + " --COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11\n"
+                    + "LEFT JOIN produto.produtocompraloja p8 ON p8.\"idProdutoCompra\" = p7.id AND p8.\"idLoja\" =  " + getLojaOrigem() + "--COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11\n"
                     + "LEFT JOIN produto.produtocodigobarras p4 ON p4.\"idProduto\" = p.id\n"
                     + "LEFT JOIN produto.pesosmedidas p5 ON p5.\"idCodigoBarras\" = p4.id\n"
                     + "LEFT JOIN fiscal.ncm n ON n.id = p.\"idNCM\" \n"
@@ -317,15 +319,18 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN fiscal.piscofins pisd ON p6.\"idPisCofinsDebito\" = pisd.id \n"
                     + "LEFT JOIN fiscal.naturezareceita nr ON p6.\"idNaturezaReceita\" = nr.id \n"
                     + "JOIN fiscal.produtofiscal pf ON pf.\"idProduto\" = p.id \n"
-                    + "JOIN fiscal.produtofiscalregrafiscal prf ON prf.\"idProdutoFiscal\" = pf.id\n"
-                    + "JOIN fiscal.regrafiscal rf ON rf.id = prf.\"idRegraFiscal\" AND rf.\"tipoOperacao\" = 1\n"
+                    + "JOIN fiscal.produtofiscalregrafiscal pf2e ON pf2e.\"idProdutoFiscal\" = pf.id \n"
+                    + "JOIN fiscal.produtofiscalregrafiscal pf2s ON pf2s.\"idProdutoFiscal\" = pf.id \n"
+                    + "JOIN fiscal.regrafiscal re ON re.id = pf2e.\"idRegraFiscal\" AND re.\"tipoOperacao\" = 1\n"
+                    + "JOIN fiscal.regrafiscalicms ricmse ON ricmse.\"idRegraFiscal\" = re.id\n"
+                    + "JOIN fiscal.regrafiscal rs ON rs.id = pf2s.\"idRegraFiscal\" AND rs.\"tipoOperacao\" = 2\n"
+                    + "JOIN fiscal.regrafiscalicms ricmss ON ricmss.\"idRegraFiscal\" = rs.id\n"
                     + "LEFT JOIN (\n"
                     + "    SELECT DISTINCT ON (p3.\"produtoComplementoId\") p3.*\n"
                     + "    FROM produto.precohistorico p3\n"
                     + "    ORDER BY p3.\"produtoComplementoId\", p3.\"dataAlteracao\" DESC\n"
                     + ") p3 \n"
-                    + "    ON p3.\"produtoComplementoId\" = p2.id\n"
-                    + "WHERE p4.\"codigoBarras\" IS NOT NULL"
+                    + "    ON p3.\"produtoComplementoId\" = p2.id"
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -359,7 +364,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
-                    imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
+//                    imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
 //                    imp.setCodMercadologico5(rst.getString(""));
                     imp.setIdFamiliaProduto(rst.getString("id_familia_produto"));
 
@@ -375,15 +380,16 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    String idIcmsDebito = rst.getString("icms");
+                    String idIcmsDebito = rst.getString("icms_saida");
+                    String idIcmsCredito = rst.getString("icms_entrada");
 
                     imp.setIcmsDebitoId(idIcmsDebito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
                     imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
 
-                    imp.setIcmsCreditoId(idIcmsDebito);
-                    imp.setIcmsCreditoForaEstadoId(idIcmsDebito);
+                    imp.setIcmsCreditoId(idIcmsCredito);
+                    imp.setIcmsCreditoForaEstadoId(idIcmsCredito);
 
                     imp.setPiscofinsCstDebito(rst.getString("id_pis_cofins_debito"));
                     imp.setPiscofinsCstCredito(rst.getString("id_pis_cofins_credito"));
@@ -493,7 +499,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "e.endereco AS endereco,\n"
                     + "e.num AS numero,\n"
                     + "e.bairro AS bairro,\n"
-                    + "e.municipio AS municipio,\n"
+                    + "e.\"codMunicipio\" AS municipio,\n"
                     + "e.uf AS uf,\n"
                     + "e.cep AS cep,\n"
                     + "e.complemento AS complemento,\n"
@@ -521,7 +527,9 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("municipio"));
+//                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipio"));
+
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -543,15 +551,15 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "t.\"idPessoaFornecedor\" AS id_fornecedor,\n"
+                    "SELECT p.\"idPessoa\" AS id_fornecedor,\n"
                     + "t2.\"idProduto\" AS id_produto,\n"
-                    + "t3.\"codigoExterno\" AS codigo_externo,\n"
+                    + "COALESCE (t3.\"codigoExterno\", 'SEM COD') AS codigo_externo,\n"
                     + "t4.\"quantidadeCompra\" AS qtd_embalagem\n"
                     + "FROM pessoa.tabelafornecedor t \n"
-                    + "LEFT JOIN pessoa.tabelafornecedoritem t2 ON t2.\"idTabelaFornecedor\" = t.id\n"
-                    + "JOIN pessoa.tabelafornecedorcodigoexterno t3 ON t3.\"idTabelaFornecedorItem\" = t2.id \n"
-                    + "JOIN pessoa.tabelafornecedorconversao t4 ON t4.\"idTabelaFornecedorItem\" = t2.id "
+                    + "JOIN pessoa.pessoafornecedor p ON t.\"idPessoaFornecedor\" = p.id \n"
+                    + "JOIN pessoa.tabelafornecedoritem t2 ON t2.\"idTabelaFornecedor\" = t.id\n"
+                    + "LEFT JOIN pessoa.tabelafornecedorcodigoexterno t3 ON t3.\"idTabelaFornecedorItem\" = t2.id \n"
+                    + "LEFT JOIN pessoa.tabelafornecedorconversao t4 ON t4.\"idTabelaFornecedorItem\" = t2.id "
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -652,7 +660,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p2.\"dataCadastro\" AS data_cadastro,\n"
                     + "p2.ativo,\n"
                     + "CASE WHEN c.celular IS NOT NULL THEN c.celular ELSE c.telefone END AS contato\n"
-                    + "FROM pessoa.pessoacliente p \n"
+                    + "FROM pessoa.pessoafisica p \n"
                     + "LEFT JOIN pessoa.pessoa p2 ON p2.id = p.\"idPessoa\" \n"
                     + "LEFT JOIN pessoa.pessoafisica p3 ON p3.\"idPessoa\" = p.\"idPessoa\" \n"
                     + "LEFT JOIN pessoa.pessoajuridica p4 ON p4.\"idPessoa\" = p.\"idPessoa\" \n"
@@ -688,7 +696,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<CreditoRotativoIMP> getCreditoRotato() throws Exception {
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -703,10 +711,12 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.\"dataVencimento\" AS data_vencimento,\n"
                     + "c.observacao AS observacao \n"
                     + "FROM financeiro.contareceber c \n"
-                    + "JOIN pessoa.pessoa p ON p.id = c.\"idPessoa\" \n"
-                    + "JOIN pessoa.pessoafisica p2 ON p2.\"idPessoa\" = p.id \n"
-                    + "WHERE c.\"idLoja\" = " + getLojaOrigem() + "\n --COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11"
-                    + "AND \"idFormaPagamento\" = 5"
+                    + "LEFT JOIN pessoa.pessoa p ON p.id = c.\"idPessoa\" \n"
+                    + "LEFT JOIN pessoa.pessoafisica p2 ON p2.\"idPessoa\" = p.id \n"
+                    + "WHERE c.\"idLoja\" = " + getLojaOrigem() + "\n"
+                    + " --COLOCAR O ID DA LOJA AQUI, NO CASO TEM QUE CHEGAR 11\n"
+                    + "AND \"idFormaPagamento\" = 999\n"
+                    + "AND situacao = 1"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -856,11 +866,10 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
-    
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static class VendaIterator implements Iterator<VendaIMP> {
-
 
         private Statement stm = ConexaoPostgres.getConexao().createStatement();
         private ResultSet rst;
@@ -901,7 +910,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
 
             this.sql
-                    = "SELECT\n"
+                    = "SELECT DISTINCT\n"
                     + "v.id AS id_venda,\n"
                     + "v.\"numeroCupom\" AS numero_cupom,\n"
                     + "v.\"numeroPDV\" AS ecf,\n"
@@ -911,8 +920,11 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "v.subtotal AS subtotal,\n"
                     + "v.cancelado AS cancelado \n"
                     + "FROM venda.venda v \n"
-                    + "WHERE \"idLoja\" = 11\n"
-                    + "AND v.\"dataHoraEmissaoCupom\" BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "';";
+                    + "JOIN venda.relatoriovendapdv rv ON rv.\"idVenda\" = v.id \n"
+                    + "JOIN venda.relatoriovendapdvpagamento rp ON rv.id = rp.\"idRelatorioVendaPdv\" \n"
+                    + "WHERE v.\"idLoja\" = 36\n"
+                    + "AND v.\"dataHoraEmissaoCupom\" BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'\n"
+                    + "ORDER BY 5;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -959,6 +971,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("preco_venda"));
+                        next.setValorDesconto(rst.getDouble("valor_desconto"));
                         next.setTotalBruto(rst.getDouble("total_bruto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                     }
@@ -974,7 +987,7 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "SELECT \n"
+                    = "SELECT DISTINCT\n"
                     + "vi.\"idVenda\" AS id_venda,\n"
                     + "vi.id AS id_venda_item,\n"
                     + "vi.sequencia AS sequencia,\n"
@@ -986,11 +999,15 @@ public class VRSUPER2_5DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "vi.\"precoVenda\" AS preco_venda,\n"
                     + "vi.\"valorSubTotal\" AS preco_venda,\n"
                     + "vi.\"valorTotal\" AS total_bruto,\n"
-                    + "vi.cancelado AS cancelado\n"
+                    + "vi.cancelado AS cancelado, \n"
+                    + "vi.\"valorDesconto\" AS valor_desconto \n"
                     + "FROM venda.vendaitem vi \n"
+                    + "JOIN venda.relatoriovendapdv rv ON rv.\"idVenda\" = vi.\"idVenda\" \n"
                     + "JOIN venda.venda v ON v.id = vi.\"idVenda\" \n"
-                    + "WHERE v.\"idLoja\" = 11\n"
-                    + "AND v.\"dataHoraEmissaoCupom\" BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "';";
+                    + "JOIN venda.relatoriovendapdvpagamento rp ON rv.id = rp.\"idRelatorioVendaPdv\" "
+                    + "WHERE v.\"idLoja\" = 36\n"
+                    + "AND v.\"dataHoraEmissaoCupom\" BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'\n"
+                    + "AND vi.cancelado = FALSE ;";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

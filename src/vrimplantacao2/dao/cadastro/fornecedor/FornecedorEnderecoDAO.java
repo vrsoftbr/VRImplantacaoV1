@@ -56,7 +56,7 @@ class FornecedorEnderecoDAO {
                     + "	where\n"
                     + "		id not in (select id_fornecedor from fornecedorendereco))"
             );
-            gravarFornecedorEnderecoCobranca();
+//            gravarFornecedorEnderecoCobranca();
         } catch (Exception e) {
             System.out.println("Erro na execução do script de inserção na classe FornecedorEnderecoDAO");
             e.printStackTrace();

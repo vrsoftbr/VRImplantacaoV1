@@ -22,7 +22,7 @@ public class OutraReceitaVO {
     private String observacao = "";// character varying(500) NOT NULL,
     private SituacaoReceberOutrasReceitas situacao = SituacaoReceberOutrasReceitas.ABERTO;// id_situacaoreceberoutrasreceitas integer NOT NULL,
     private TipoLocalCobranca tipoLocalCobranca = TipoLocalCobranca.CARTEIRA;// id_tipolocalcobranca integer NOT NULL,
-    private TipoReceita tipoReceita = TipoReceita.CR_OUTRAS_UNIDADES;// id_tiporeceita integer NOT NULL,
+    private TipoReceita tipoReceita;// id_tiporeceita integer NOT NULL,
     private int idFornecedor;//id_fornecedor integer,
     private int idBoleto;//id_boleto bigint,
     private Timestamp dataHoraAlteracao = new Timestamp(new Date().getTime());// timestamp without time zone NOT NULL DEFAULT now(),
@@ -107,7 +107,7 @@ public class OutraReceitaVO {
     }
 
     public void setTipoReceita(TipoReceita tipoReceita) {
-        this.tipoReceita = tipoReceita == null ? TipoReceita.CR_OUTRAS_UNIDADES : tipoReceita;
+        this.tipoReceita = tipoReceita == null ? null : tipoReceita;
     }
 
     public int getIdFornecedor() {

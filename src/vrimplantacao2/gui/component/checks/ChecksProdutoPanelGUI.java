@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.component.checks;
 
-import com.ibm.db2.jcc.resources.ResourceKeys;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import vrframework.bean.panel.VRPanel;
-import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -76,7 +72,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public void setImportador(Importador importador) {
         this.importador = importador;
-        this.importador.checarVendasDataAtual = chkVerificarVendadDeHoje.isSelected();
+//        this.importador.checarVendasDataAtual = chkVerificarVendadDeHoje.isSelected();
     }
 
     public void setOpcoesDisponiveis(InterfaceDAO dao) {
@@ -572,18 +568,18 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 ((JCheckBox) p).setSelected(false);
             }
         }
-        for (Component p : tabParametros.getComponents()) {
-            if (p instanceof VRPanel) {
-                for (Component c : ((VRPanel) p).getComponents()) {
-                    if (c instanceof JCheckBox) {
-                        ((JCheckBox) c).setSelected(false);
-                    }
-                }
-            }
-            if (p instanceof JCheckBox) {
-                ((JCheckBox) p).setSelected(false);
-            }
-        }
+//        for (Component p : tabParametros.getComponents()) {
+//            if (p instanceof VRPanel) {
+//                for (Component c : ((VRPanel) p).getComponents()) {
+//                    if (c instanceof JCheckBox) {
+//                        ((JCheckBox) c).setSelected(false);
+//                    }
+//                }
+//            }
+//            if (p instanceof JCheckBox) {
+//                ((JCheckBox) p).setSelected(false);
+//            }
+//        }
         for (Component p : tabImportacaoVendas.getComponents()) {
             if (p instanceof VRPanel) {
                 for (Component c : ((VRPanel) p).getComponents()) {

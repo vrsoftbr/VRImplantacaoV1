@@ -36,6 +36,15 @@ public enum TipoEmpresa {
         this.id = id;
         this.descricao = descricao;
     }
+    
+    public static TipoEmpresa getById(int id) {
+        for (TipoEmpresa te: values()) {
+            if (id == te.id) {
+                return te;
+            }
+        }
+        return LUCRO_REAL;
+    }
 
     public int getId() {
         return id;

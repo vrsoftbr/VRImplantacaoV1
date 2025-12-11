@@ -54,6 +54,7 @@ public enum EScriptLojaOrigemSistema {
     CPLUS(22, 5, "SELECT e.codempresa AS id, e.nomeempresa AS descricao from empresa e"),
     CADASTRAFACIL(23, 5, "select lpad(id_empresa, 4, ''0'') as id, nome_razao AS descricao FROM empresa"),
     CEFAS(24, 9, "select codfilial id, nomefantasia descricao from filial"),
+    CISS(28, 6, "select IDEMPRESA as id, NOMEFANTASIA as descricao from DBA.EMPRESA"),
     EASYSAC(44, 13, "select cdloja id, fantas descricao from sac999"),
     FENIX(54, 5, "select id_empresa as id, CASE WHEN nm_fantasia IS NULL THEN NM_CONTRIBUINTE ELSE NM_FANTASIA end descricao from empresa order by 1"),
     GZSISTEMAS(66, 8, "select codigo id, nomfan descricao, cgc from mercodb.lojas order by codigo"),
@@ -185,7 +186,7 @@ public enum EScriptLojaOrigemSistema {
     SIMPLESOLUTION(273, 8, "select emp_ID as id, emp_RAZAOSOCIAL as descricao from empresa_cad"),
     ATIVO(274, 11, "select codigo as id, nomefanta as descricao from empresas e "),
     PARAGUAI(275, 9, "SELECT SUC_EMPR id, SUC_DESC descricao FROM ADCS.GEN_SUCURSAL"),
-    VR_SUPER(276, 11, "SELECT 11  id, 1 descricao FROM produto.produto p LIMIT 1");
+    VR_SUPER(276, 11, "SELECT 36  id, 1 descricao FROM produto.produto p LIMIT 1");
     
     private int idSistema;
 

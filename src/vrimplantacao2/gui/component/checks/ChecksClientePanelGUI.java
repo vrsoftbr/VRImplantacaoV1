@@ -499,12 +499,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             importador.importarCheque();
         }
 
-        if (chkConveniado.isSelected()) {
-            importador.importarConvenioConveniado();
-        }
-
         if (chkConveniadoEmpresa.isSelected()) {
             importador.importarConvenioEmpresa();
+        }
+                
+        if (chkConveniado.isSelected()) {
+            importador.importarConvenioConveniado();
         }
 
         if (chkConveniadoTransacao.isSelected()) {
@@ -558,7 +558,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         }
         for (Component p : tabConvenio.getComponents()) {
             if (p instanceof VRPanel) {
-                for (Component c : ((VRPanel) p).getComponents()) {
+                for (Component c : ((JPanel) p).getComponents()) {
                     if (c instanceof JCheckBox) {
                         ((JCheckBox) c).setSelected(false);
                     }

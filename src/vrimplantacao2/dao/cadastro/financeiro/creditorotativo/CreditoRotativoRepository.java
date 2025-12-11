@@ -21,7 +21,6 @@ import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoVO;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
-import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.vo.enums.EOperacao;
 

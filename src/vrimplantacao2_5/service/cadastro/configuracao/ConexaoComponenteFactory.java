@@ -7,6 +7,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoMySQL;
 import vrimplantacao2_5.dao.conexao.ConexaoOracle;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2_5.dao.conexao.ConexaoSqlServer;
+import vrimplantacao2_5.dao.conexao.ConexaoDB2;
 import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
 
 
@@ -37,6 +38,9 @@ public abstract class ConexaoComponenteFactory {
             break; 
             case SQLSERVER:
                 driverConn = new ConexaoSqlServer();
+            break; 
+            case DB2:
+                driverConn = new ConexaoDB2();
             break; 
             default: driverConn = null;
         }

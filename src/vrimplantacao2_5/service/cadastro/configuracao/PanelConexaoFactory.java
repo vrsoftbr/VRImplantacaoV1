@@ -2,6 +2,7 @@ package vrimplantacao2_5.service.cadastro.configuracao;
 
 import vrframework.classe.Util;
 import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.gui.componente.conexao.db2.ConexaoDB2Panel;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
@@ -64,6 +65,11 @@ public abstract class PanelConexaoFactory {
                 panelConexao = new ConexaoSqlServerPanel(bdVO.getSchema(), bdVO.getPorta(),
                         bdVO.getUsuario(), bdVO.getSenha());
                 break;
+                
+            case DB2:
+                panelConexao = new ConexaoDB2Panel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;                
 
             default:
                 return null;

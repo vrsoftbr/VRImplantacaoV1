@@ -41,6 +41,7 @@ import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepository;
 import vrimplantacao2.dao.cadastro.desmembramento.DesmembramentoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroRepository;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.financeiro.contasreceber.OpcaoContasReceber;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoProvider;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoRepository;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.OpcaoCreditoRotativo;
@@ -133,11 +134,13 @@ import vrimplantacao2.dao.cadastro.usuario.UsuarioRepository;
 import vrimplantacao2.dao.cadastro.usuario.UsuarioRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.PublicVendaRepository;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
+import vrimplantacao2.vo.importacao.DevolucaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
+import vrimplantacao2.vo.importacao.VerbaIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {
@@ -954,6 +957,28 @@ public class Importador {
                 getLojaVR()
         );
         rep.getContasPagar().salvar(pagamentos, opcoes);
+    }
+        
+    public void importarVerbas(OpcaoContasReceber... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando Contas a Receber - VERBAS ...");
+        List<VerbaIMP> verbas = getInterfaceDAO().getVerbas();
+        FinanceiroRepository rep = new FinanceiroRepository(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        rep.getVerbas().salvar(verbas, opcoes);
+    }
+        
+    public void importarDevolucao(OpcaoContasReceber... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando Contas a Receber - DEVOLUCAO ...");
+        List<DevolucaoIMP> devolucoes = getInterfaceDAO().getDevolucao();
+        FinanceiroRepository rep = new FinanceiroRepository(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        rep.getDevolucao().salvar(devolucoes, opcoes);
     }
 
     public void importarRecebimentoCaixa(OpcaoRecebimentoCaixa... opcoes) throws Exception {

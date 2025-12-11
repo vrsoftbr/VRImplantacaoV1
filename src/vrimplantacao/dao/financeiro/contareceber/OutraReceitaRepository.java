@@ -17,7 +17,6 @@ import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaItemVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaVO;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.SituacaoReceberOutrasReceitas;
 import vrimplantacao2.vo.enums.TipoLocalCobranca;
-import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ContaReceberPagamentoIMP;
 
@@ -191,7 +190,8 @@ public class OutraReceitaRepository {
         vo.setObservacao(imp.getObservacao());
         vo.setSituacao(SituacaoReceberOutrasReceitas.ABERTO);
         vo.setTipoLocalCobranca(TipoLocalCobranca.CARTEIRA);
-        vo.setTipoReceita(TipoReceita.CR_OUTRAS_UNIDADES);
+//        vo.setTipoReceita(TipoReceita.CR_OUTRAS_UNIDADES);
+        vo.setTipoReceita(imp.getTipoReceita());
         vo.setValor(imp.getValor());
         
         return vo;

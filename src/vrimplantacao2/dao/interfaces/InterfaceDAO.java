@@ -40,6 +40,7 @@ import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.DesmembramentoIMP;
+import vrimplantacao2.vo.importacao.DevolucaoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -62,6 +63,7 @@ import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2.vo.importacao.VerbaIMP;
 
 /**
  * Classe padrão para cria interfaces de importação.
@@ -431,7 +433,27 @@ public abstract class InterfaceDAO {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         return new ArrayList<>();
     }
-
+    
+    /**
+    * Retorna uma listagem com os as verbas para gravar no banco de dados.
+    *
+    * @return Lista de verbas.
+    * @throws Exception
+    */
+    public List<VerbaIMP> getVerbas() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
+    * Retorna uma listagem com os as devoluções para gravar no banco de dados.
+    *
+    * @return Lista de devoluções.
+    * @throws Exception
+    */
+    public List<DevolucaoIMP> getDevolucao() throws Exception {
+        return new ArrayList<>();
+    }
+            
     /**
      * Retorna uma listagem com os recebimentos do caixa.
      *

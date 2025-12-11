@@ -20,7 +20,7 @@ public class ContaReceberIMP {
     private String observacao;// character varying(500) NOT NULL,
     private boolean ativo = true;
     private TipoLocalCobranca tipoLocalCobranca = TipoLocalCobranca.CARTEIRA;// id_tipolocalcobranca integer NOT NULL,
-    private TipoReceita tipoReceita = TipoReceita.CR_OUTRAS_UNIDADES;// id_tiporeceita integer NOT NULL,
+    private TipoReceita tipoReceita;// id_tiporeceita integer NOT NULL,
     private String idFornecedor;//id_fornecedor integer,
     private final Set<ContaReceberPagamentoIMP> pagamentos = new LinkedHashSet<>();
 

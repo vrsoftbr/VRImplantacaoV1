@@ -85,7 +85,7 @@ public class NutricionalRepositoryProvider {
     }
 
     public Map<String, Integer> getProdutos() throws Exception {
-        return this.produtoDAO.getAnteriores(sistema, loja);
+        return this.produtoDAO.getAnterioresNutricionalBalanca(sistema, loja);
     }
     
     public void begin() throws Exception {

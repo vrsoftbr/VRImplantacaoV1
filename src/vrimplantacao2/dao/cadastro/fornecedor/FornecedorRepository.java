@@ -436,8 +436,8 @@ public class FornecedorRepository {
                     String.valueOf(contato.getFornecedor().getId()),
                     contato.getNome(),
                     contato.getTelefone(),
-                    contato.getCelular(),
-                    contato.getEmail()
+                    contato.getEmail(),
+                    contato.getCelular()
             )) {
                 log.append("contato não existe||");
                 if (opt.contains(OpcaoFornecedor.CONTATOS)) {
@@ -447,8 +447,8 @@ public class FornecedorRepository {
                             String.valueOf(contato.getFornecedor().getId()),
                             contato.getNome(),
                             contato.getTelefone(),
-                            contato.getCelular(),
-                            contato.getEmail()
+                            contato.getEmail(),
+                            contato.getCelular()
                     );
                     log.append("inserido|");
                 }
@@ -457,8 +457,8 @@ public class FornecedorRepository {
                         String.valueOf(contato.getFornecedor().getId()),
                         contato.getNome(),
                         contato.getTelefone(),
-                        contato.getCelular(),
-                        contato.getEmail()
+                        contato.getEmail(),
+                        contato.getCelular()
                 ));
                 log.append("contato existe|").append(contato.getId()).append("|");
                 provider.atualizarContato(contato, opt);
@@ -704,19 +704,21 @@ public class FornecedorRepository {
         //</editor-fold>
 
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO COBRANÇA">
-        vo.setEnderecoCobranca(imp.getCob_endereco());
-        vo.setNumeroCobranca(imp.getCob_numero());
-        vo.setComplementoCobranca(imp.getCob_complemento());
-        vo.setBairroCobranca(imp.getCob_bairro());
-        vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_ibge_municipio()));
-        if (vo.getMunicipioCobranca() == null) {
-            vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_municipio(), imp.getCob_uf()));
+        if (imp.getCob_endereco() != null) {
+            vo.setEnderecoCobranca(imp.getCob_endereco());
+            vo.setNumeroCobranca(imp.getCob_numero());
+            vo.setComplementoCobranca(imp.getCob_complemento());
+            vo.setBairroCobranca(imp.getCob_bairro());
+            vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_ibge_municipio()));
             if (vo.getMunicipioCobranca() == null) {
-                vo.setMunicipioCobranca(provider.getMunicipioPadrao());
+                vo.setMunicipioCobranca(provider.getMunicipio(imp.getCob_municipio(), imp.getCob_uf()));
+                if (vo.getMunicipioCobranca() == null) {
+                    vo.setMunicipioCobranca(provider.getMunicipioPadrao());
+                }
             }
+            vo.setEstadoCobranca(vo.getMunicipioCobranca().getEstado());
+            vo.setCepCobranca(Utils.stringToInt(imp.getCob_cep()));
         }
-        vo.setEstadoCobranca(vo.getMunicipioCobranca().getEstado());
-        vo.setCepCobranca(Utils.stringToInt(imp.getCob_cep()));
         //</editor-fold>
 
         return vo;

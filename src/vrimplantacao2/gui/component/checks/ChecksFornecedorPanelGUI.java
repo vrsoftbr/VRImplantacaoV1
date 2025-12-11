@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.swing.JCheckBox;
 import vrframework.bean.panel.VRPanel;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.financeiro.contasreceber.OpcaoContasReceber;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -348,6 +349,14 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         if (chkOutrasDespesas.isSelected()) {
             importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
         }
+        
+        if (chkReceberVerbas.isSelected()) {
+            importador.importarVerbas(OpcaoContasReceber.VERBAS);
+        }
+                  
+        if (chkReceberDevolucoes.isSelected()) {
+            importador.importarDevolucao(OpcaoContasReceber.DEVOLUCAO);
+        }
     }
 
     public void executarImportacao() throws Exception {
@@ -394,6 +403,19 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 ((JCheckBox) p).setSelected(false);
             }
         }
+                for (Component p : pnlContaReceber.getComponents()) {
+            if (p instanceof VRPanel) {
+                for (Component c : ((VRPanel) p).getComponents()) {
+                    if (c instanceof JCheckBox) {
+                        ((JCheckBox) c).setSelected(false);
+                    }
+                }
+            }
+            if (p instanceof JCheckBox) {
+                ((JCheckBox) p).setSelected(false);
+            }
+        }
+                
         for (Component p : pnlProdForn.getComponents()) {
             if (p instanceof VRPanel) {
                 for (Component c : ((VRPanel) p).getComponents()) {
@@ -467,6 +489,11 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         chkPagarFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         ImportarSemFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkOutrasDespesas = new vrframework.bean.checkBox.VRCheckBox();
+        pnlContaReceber = new javax.swing.JPanel();
+        pnlContasReceber = new vrframework.bean.panel.VRPanel();
+        jLabel13 = new javax.swing.JLabel();
+        chkReceberVerbas = new vrframework.bean.checkBox.VRCheckBox();
+        chkReceberDevolucoes = new vrframework.bean.checkBox.VRCheckBox();
 
         setName(""); // NOI18N
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -514,7 +541,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametrosLayout.createSequentialGroup()
                 .addComponent(pnlParametros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 259, Short.MAX_VALUE))
+                .addGap(0, 240, Short.MAX_VALUE))
         );
 
         addTab("Parâmetros", tabParametros);
@@ -860,7 +887,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             .addGroup(pnlProdFornLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(258, Short.MAX_VALUE))
+                .addContainerGap(247, Short.MAX_VALUE))
         );
 
         addTab("Importação de Produto Fornecedor", pnlProdForn);
@@ -926,6 +953,62 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
         addTab("Importação de Contas à Pagar", pnlContaPagar);
 
+        pnlContasReceber.setBorder(null);
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "CONTAS À RECEBER");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkReceberVerbas, "Verbas");
+        chkReceberVerbas.setToolTipText("");
+        chkReceberVerbas.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkReceberDevolucoes, "Devoluções");
+        chkReceberDevolucoes.setEnabled(true);
+
+        javax.swing.GroupLayout pnlContasReceberLayout = new javax.swing.GroupLayout(pnlContasReceber);
+        pnlContasReceber.setLayout(pnlContasReceberLayout);
+        pnlContasReceberLayout.setHorizontalGroup(
+            pnlContasReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContasReceberLayout.createSequentialGroup()
+                .addGroup(pnlContasReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlContasReceberLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel13))
+                    .addGroup(pnlContasReceberLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkReceberVerbas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkReceberDevolucoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(541, Short.MAX_VALUE))
+        );
+        pnlContasReceberLayout.setVerticalGroup(
+            pnlContasReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContasReceberLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlContasReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkReceberVerbas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkReceberDevolucoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnlContaReceberLayout = new javax.swing.GroupLayout(pnlContaReceber);
+        pnlContaReceber.setLayout(pnlContaReceberLayout);
+        pnlContaReceberLayout.setHorizontalGroup(
+            pnlContaReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlContasReceber, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnlContaReceberLayout.setVerticalGroup(
+            pnlContaReceberLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContaReceberLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlContasReceber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(236, Short.MAX_VALUE))
+        );
+
+        addTab("Importação de Contas à Receber", pnlContaReceber);
+
         getAccessibleContext().setAccessibleName("Importação de Fornecedores");
     }// </editor-fold>//GEN-END:initComponents
 
@@ -964,6 +1047,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPrazoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkRazao;
+    public vrframework.bean.checkBox.VRCheckBox chkReceberDevolucoes;
+    public vrframework.bean.checkBox.VRCheckBox chkReceberVerbas;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmpresa;
@@ -972,13 +1057,16 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public javax.swing.JCheckBox chkUtilizaiva;
     public javax.swing.JLabel jLabel12;
+    public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
     public javax.swing.JPanel pnlContaPagar;
+    public javax.swing.JPanel pnlContaReceber;
     public vrframework.bean.panel.VRPanel pnlContasPagar;
+    public vrframework.bean.panel.VRPanel pnlContasReceber;
     public vrframework.bean.panel.VRPanel pnlContato;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDadosComplementares;
