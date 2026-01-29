@@ -520,8 +520,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 //                    imp.setIcmsCreditoId(rst.getString("id_icms_saida"));
 //                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms_saida"));
                     vResult.add(imp);
-                    contador++;
-                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
@@ -579,8 +579,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("prodcod"));
                     imp.setCodigoExterno(rst.getString("codfabricante") == null ? "0" : rst.getString("codfabricante"));
                     vResult.add(imp);
-                    ProgressBar.setStatus("Carregando dados..." + contador);
-                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
                 }
             }
         }
@@ -865,8 +865,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     vResult.add(imp);
-                    ProgressBar.setStatus("Carregando dados..." + contador);
-                    contador++;
+//                    ProgressBar.setStatus("Carregando dados..." + contador);
+//                    contador++;
                 }
                 return vResult;
             }

@@ -760,6 +760,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 } else {
                     imp.setInscricaoestadual(linha.getString("rg"));
                 }
+                imp.setInscricaoestadual(linha.getString("ie"));
                 imp.setOrgaoemissor(linha.getString("orgaoemissor"));
                 imp.setRazao(linha.getString("razao"));
                 imp.setFantasia(linha.getString("fantasia"));

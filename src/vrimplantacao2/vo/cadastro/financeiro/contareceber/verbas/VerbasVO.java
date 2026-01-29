@@ -18,7 +18,7 @@ public class VerbasVO {
     private int mercadologico1;
     private int id_tipoverba = 7;
     private int id_situacaocadastro = 1;
-    private int id_situacaoverba = 0;
+    private int id_situacaoverba = 1;
     private String representante = "MIGRADO";
     private String telefone = "";
     private int id_tipolocalcobranca = 0;
