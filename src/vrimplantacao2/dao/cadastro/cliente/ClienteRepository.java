@@ -19,6 +19,7 @@ import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
+import vrimplantacao2.vo.cadastro.cliente.ClienteEventualEnderecoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
@@ -285,7 +286,8 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
+                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO) ||
+                            opt.contains(OpcaoCliente.ENDERECO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.TIPO_INSCRICAO)) {
@@ -495,6 +497,7 @@ public class ClienteRepository {
                     );
 
                     ClienteEventualVO cliente = null;
+                    ClienteEventualEnderecoVO clienteEndereco = null;
 
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
                     if (anterior == null) {
@@ -516,6 +519,9 @@ public class ClienteRepository {
                         cliente = converterClienteEventual(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
+                        
+                        clienteEndereco = converterClienteEventualEndereco(imp);
+                        clienteEndereco.setClienteEventual(cliente);
 
                         anterior = converterClienteEventualAnterior(imp);
                         anterior.setCodigoAtual(cliente);
@@ -524,6 +530,7 @@ public class ClienteRepository {
                         //Grava as informações
                         gravarClienteEventual(cliente);
                         gravarClienteEventualAnterior(anterior);
+                        gravarClienteEventualEndereco(clienteEndereco);
 
                         //Incluindo o produto nas listagens
                         cnpjCadastrados.put(cnpj, id);
@@ -878,6 +885,34 @@ public class ClienteRepository {
         vo.setNome(imp.getRazao());
         return vo;
     }
+    
+    public ClienteEventualEnderecoVO converterClienteEventualEndereco(ClienteIMP imp) throws Exception {
+        ClienteEventualEnderecoVO vo = new ClienteEventualEnderecoVO();
+        vo.setEndereco(imp.getEndereco());
+        vo.setNumero(imp.getNumero());
+        vo.setBairro(imp.getBairro());
+        vo.setComplemento(imp.getComplemento());
+        vo.setCep(Utils.stringToInt(imp.getCep()));
+        {
+            MunicipioVO mun = provider.getMunicipioById(imp.getCobrancaMunicipioIBGE());
+            if (mun == null) {
+                mun = provider.getMunicipioByNomeUf(
+                        Utils.acertarTexto(imp.getCobrancaMunicipio()),
+                        Utils.acertarTexto(imp.getCobrancaUf())
+                );
+                if (mun == null) {
+                    mun = provider.getMunicipioPadrao();
+                }
+            }
+            vo.setId_municipio(mun.getId());
+            vo.setId_estado(mun.getEstado().getId());
+        }
+        vo.setInscricao_estadual(imp.getInscricaoestadual());
+        vo.setInscricao_municipal(imp.getInscricaoMunicipal());
+        vo.setTelefone(imp.getTelefone());
+        
+        return vo;
+    }
 
     public void gravarClienteEventual(ClienteEventualVO cliente) throws Exception {
         provider.eventual().salvar(cliente);
@@ -885,6 +920,10 @@ public class ClienteRepository {
 
     public void gravarClienteEventualAnterior(ClienteEventualAnteriorVO anterior) throws Exception {
         provider.eventual().salvar(anterior);
+    }
+    
+    public void gravarClienteEventualEndereco(ClienteEventualEnderecoVO endereco) throws Exception {
+        provider.eventual().salvar(endereco);
     }
 
     /**
@@ -1113,6 +1152,9 @@ public class ClienteRepository {
                         ClienteEventualVO cliente = converterClienteEventual(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
+                        
+                        ClienteEventualEnderecoVO clienteEndereco = converterClienteEventualEndereco(imp);
+                        clienteEndereco.setClienteEventual(cliente);
 
                         anterior = converterClienteEventualAnterior(imp);
                         anterior.setCodigoAtual(cliente);
@@ -1121,7 +1163,8 @@ public class ClienteRepository {
                         //Grava as informações
                         gravarClienteEventual(cliente);
                         gravarClienteEventualAnterior(anterior);
-
+                        gravarClienteEventualEndereco(clienteEndereco);
+                        
                         importarContatoEventual(cliente, imp, contatos);
 
                         //Incluindo o produto nas listagens

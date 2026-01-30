@@ -748,7 +748,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("CLICod"));
                     imp.setRazao(rst.getString("CLINome"));
                     imp.setFantasia(rst.getString("CLIFantasia"));
-                    //imp.setEndereco(rst.getString("CLIEnd"));
+                    imp.setEndereco(rst.getString("CLIEnd"));
                     imp.setBairro(rst.getString("CLIBairro"));
                     imp.setCep(rst.getString("CLICep"));
                     // imp.setMunicipioIBGE(rst.getInt("cidibge"));

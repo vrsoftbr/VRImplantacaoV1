@@ -16,6 +16,7 @@ import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
+import vrimplantacao2.vo.cadastro.cliente.ClienteEventualEnderecoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
@@ -233,6 +234,7 @@ public class ClienteRepositoryProvider {
             this.anteriorDAO = new ClienteEventualAnteriorDAO();
             this.eventualDAO = new ClienteEventualDAO();
             this.eventualContatoDAO = new ClienteEventualContatoDAO();
+            this.eventualEnderecoDAO = new ClienteEventualEnderecoDAO();
             this.anteriorDAO.createTable();
             this.prov = prov;
         }
@@ -240,6 +242,7 @@ public class ClienteRepositoryProvider {
         private final ClienteEventualDAO eventualDAO;
         private final ClienteEventualAnteriorDAO anteriorDAO;
         private final ClienteEventualContatoDAO eventualContatoDAO;
+        private final ClienteEventualEnderecoDAO eventualEnderecoDAO;
 
         public void salvar(ClienteEventualVO cliente) throws Exception {
             eventualDAO.salvar(cliente);
@@ -247,6 +250,10 @@ public class ClienteRepositoryProvider {
 
         public void salvar(ClienteEventualAnteriorVO anterior) throws Exception {
             anteriorDAO.salvar(anterior);
+        }
+        
+        public void salvar(ClienteEventualEnderecoVO endereco) throws Exception {
+            eventualEnderecoDAO.salvar(endereco);
         }
 
         public void salvar(ClienteEventualContatoVO contato) throws Exception {
