@@ -221,7 +221,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImpIdAssociado(rs.getString("id_associado"));
                     imp.setImpIdProduto(rs.getString("id_produto"));
-                    imp.setDescricaoAssociado(rs.getString("escricao_associado"));
+                    imp.setDescricaoAssociado(rs.getString("descricao_associado"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setImpIdAssociadoItem(rs.getString("id_associado_item"));
                     imp.setImpIdProdutoItem(rs.getString("id_produto_item"));

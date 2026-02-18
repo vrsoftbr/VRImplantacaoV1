@@ -141,6 +141,7 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VerbaIMP;
+import vrimplantacao2_5.dao.sistema.ClienteGenericoDAO;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {

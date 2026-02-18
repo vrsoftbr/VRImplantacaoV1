@@ -216,7 +216,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PRODUTO_FORNECEDOR,
                 OpcaoFornecedor.CONDICAO_PAGAMENTO,
                 OpcaoFornecedor.OBSERVACAO,
-                OpcaoFornecedor.PRAZO_FORNECEDOR
+                OpcaoFornecedor.PRAZO_FORNECEDOR,
+                OpcaoFornecedor.ENDERECO_COMPLETO
         ));
     }
 
@@ -498,6 +499,8 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     }
+                    
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
 
                     String idIcmsDebito = rst.getString("id_icms_saida");
 
@@ -639,7 +642,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBairro(rst.getString("FORBairro"));
                     imp.setCep(rst.getString("FORCep"));
                     //imp.setMunicipio(rst.getString("CIDNome"));
-                    //imp.setIbge_municipio(rst.getInt("cidibge"));
+                    imp.setIbge_municipio(rst.getInt("cidibge"));
                     imp.setUf(rst.getString("ciduf"));
                     imp.setNumero(rst.getString("fornumero"));
                     imp.setComplemento(rst.getString("forcomplemento"));
@@ -737,7 +740,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ret028.\"CLICPRenda\",\n"
                     + "	ret028.\"CLITrabFone\",\n"
                     + "	ret028.cliativo,\n"
-                    + "	ret028.clilimcc\n"
+                    + "	ret028.CLILIMCONVENIO valor_limite\n"
                     + "FROM\n"
                     + "	ret028\n"
                     + "LEFT JOIN RET501 ON	RET501.\"CIDCod\" = ret028.\"CIDCod\""
@@ -756,7 +759,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("ciduf"));
                     imp.setNumero(rst.getString("clinumero"));
                     imp.setComplemento(rst.getString("clicomplemento"));
-                    imp.setValorLimite(rst.getDouble("CLILIMCred") > 1000000.00 ? 10000.00 : rst.getDouble("CLILIMCred"));
+                    imp.setValorLimite(rst.getDouble("valor_limite") > 1000000.00 ? 10000.00 : rst.getDouble("valor_limite"));
                     imp.setDataCadastro(rst.getDate("CLICadastro"));
                     imp.setDataNascimento(rst.getDate("CLINasc"));
                     imp.setTelefone(rst.getString("CLIFone1"));
