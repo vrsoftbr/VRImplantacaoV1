@@ -32,7 +32,7 @@ public class AtualizadorController {
     public void salvarBancoDados() throws Exception {
         this.atualizadorService.salvarBancoDados();
     }
-    
+
     public void salvarSistema() throws Exception {
         this.atualizadorService.salvarSistema();
     }

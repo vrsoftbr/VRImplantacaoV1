@@ -45,7 +45,7 @@ public class MapaTributacaoButton extends JButton {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formActionPerformed
-        try {        
+        try {         
             MapaTributacaoView.exibir(
                     provider.getFrame(), 
                     provider.getSistema(), 

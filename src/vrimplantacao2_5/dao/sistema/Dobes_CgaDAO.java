@@ -8,7 +8,6 @@ package vrimplantacao2_5.dao.sistema;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -754,7 +753,7 @@ public class Dobes_CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEndereco(rst.getString("CLIEnd"));
                     imp.setBairro(rst.getString("CLIBairro"));
                     imp.setCep(rst.getString("CLICep"));
-                    // imp.setMunicipioIBGE(rst.getInt("cidibge"));
+                    imp.setMunicipioIBGE(rst.getInt("cidibge"));
                     imp.setMunicipio(rst.getString("CIDNome"));
                     imp.setUf(rst.getString("ciduf"));
                     imp.setNumero(rst.getString("clinumero"));

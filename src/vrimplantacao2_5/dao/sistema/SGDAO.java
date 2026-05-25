@@ -54,6 +54,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
         cadcli.dbf
         cadfil.dbf
         cadforn.dbf
+        cadgss.dbf
         cadpro.dbf
         conrec.dbf
         contpag.dbf
@@ -65,6 +66,7 @@ import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
         tpiscof.dbf
         tabgru.dbf
         tabdep.dbf
+        tabmar.dbf
  */
 public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -191,15 +193,30 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	distinct \n"
-                    + "	alikicm01 || '-' || coalesce(cdsitrib01, 0) id,\n"
-                    + "	alikicm01 descricao,\n"
-                    + "	cdsitrib01 cst\n"
-                    + "from \n"
-                    + "	cadpro")) {
+                    "SELECT DISTINCT \n" +
+                    "	alikicm01 || '-' || subtri01 as id,\n" +
+                    "	CASE \n" +
+                    "		WHEN subtri01 = 'S' THEN 'SUBISTITUIDO'\n" +
+                    "		WHEN subtri01 = 'N' THEN 'NAO TRIBUTADO'\n" +
+                    "		WHEN subtri01 = '' THEN alikicm01 || '%'\n" +
+                    "		WHEN subtri01 = 'D' THEN 'DIFERIMENTO'\n" +
+                    "	END AS descricao,\n" +
+                    "	CASE \n" +
+                    "		WHEN subtri01 = 'S' THEN 60\n" +
+                    "		WHEN subtri01 = 'N' THEN 41\n" +
+                    "		WHEN subtri01 = '' THEN 0\n" +
+                    "		WHEN subtri01 = 'D' THEN 51\n" +
+                    "	END AS cst,\n" +
+                    "	alikicm01 AS aliquota\n" +
+                    "FROM cadpro c ")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            0
+                    ));
                 }
             }
         }
@@ -249,7 +266,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.balanca01,\n"
                     + " p.agrupa01 familia_id,\n"
                     //+ "	ean.codbarra codigobarras,\n"
-                    + (digitobalanca == true ? "case when p.balanca01 is not null then left(ean.codbarra::varchar,-1) "
+                    + (digitobalanca == true ? "case when p.balanca01 <> '' then left(ean.codbarra::varchar,-1) "
                             + "else ean.codbarra::varchar end codigobarras,\n" : "ean.codbarra codigobarras,\n")
                     + "	ean.qtdeembal qtdembalagemvenda,\n"
                     + "(p.descpro01||''||p.desccomp01) descricaocompleta,\n"
@@ -258,7 +275,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.datacad01 datacadastro,\n"
                     + "	p.unidpro01 unidade,\n"
                     + "	p.cusreal01 custocomimposto,\n"
-                    + "	p.custfis01 custosemimposto,\n"
+                    + "	p.precust01 custosemimposto,\n"
                     + "	p.prevend01 precovenda,\n"
                     + "	p.precopdv01 precopdv,\n"
                     + "	p.margtra01 margem,\n"
@@ -274,7 +291,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.classfis01,\n"
                     + "	p.pbcreduz01 icmsreducao,\n"
                     + "	p.icmcompr01 icmsaliquotacredito,\n"
-                    + "	p.alikicm01 || '-' || coalesce(p.cdsitrib01, 0) id_aliquotadebito, \n"
+                    + "	p.alikicm01 || '-' || p.subtri01 id_aliquotadebito, \n"
                     + "	p.cdobsicm01 idicms,\n"
                     + "	p.aicmstef01 icmstef,\n"
                     + "case when upper(p.piscofin01) = 'M' then '04'\n"
@@ -435,10 +452,11 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " codagru03 id,\n"
-                    + " desagru03 descricao\n"
-                    + "from tabagr;"
+                    "SELECT DISTINCT \n" +
+                    " f.codagru03 id,\n" +
+                    " f.desagru03 descricao\n" +
+                    "FROM tabagr f\n" +
+                    "JOIN cadpro p ON f.codagru03 = p.agrupa01"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -555,7 +573,7 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	codforn13 id_fornecedor,\n"
                     + "	codpro13 id_produto,\n"
-                    + "	p.unidpro01 unidade,\n"
+                    + "	CASE WHEN qtdeemb13 = 0 THEN 1 else qtdeemb13 END unidade,\n"
                     + "	ce.cdfabric codexterno\n"
                     + "from\n"
                     + "	profor pf\n"
@@ -571,6 +589,12 @@ public class SGDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setCodigoExterno(rs.getString("codexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("unidade"));
+                    
+                    
+                    if(imp.getIdFornecedor().equals("1263.0")) {
+                        System.out.println("vrimplantacao2_5.dao.sistema.SGDAO.getProdutosFornecedores()");
+                    }
 
                     result.add(imp);
                 }

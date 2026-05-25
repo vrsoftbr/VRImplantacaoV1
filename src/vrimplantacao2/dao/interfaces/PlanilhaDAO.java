@@ -157,7 +157,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         Arquivo mercadologicos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando mercadologico de produtos...");
-        int cont = 0;
+//        int cont = 0;
 
         for (LinhaArquivo linha : mercadologicos) {
             MercadologicoIMP helper = new MercadologicoIMP();
@@ -181,8 +181,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             helper.setMerc5Descricao(linha.getString("mercadologico5"));
 
             result.add(helper);
-            cont++;
-            ProgressBar.setStatus("Carregando mercadológico..." + cont);
+//            cont++;
+//            ProgressBar.setStatus("Carregando mercadológico..." + cont);
         }
 
         return result;
@@ -252,7 +252,6 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         Arquivo familias = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando família de produtos...");
-        int cont = 0;
 
         for (LinhaArquivo linha : familias) {
             String id = linha.getString("id_familiaproduto");
@@ -267,8 +266,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 result.add(familia);
             }
-            cont++;
-            ProgressBar.setStatus("Carregando família de produtos..." + cont);
+            
+//            ProgressBar.setStatus("Carregando família de produtos...");
         }
 
         return result;
@@ -783,25 +782,25 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDataCadastro(getData(linha.getString("dataCadastro")));
                 String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
                 imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                imp.setEmpresa(linha.getString("empresa"));
-                imp.setEmpresaEndereco(linha.getString("empresaEndereco"));
-                imp.setEmpresaNumero(linha.getString("empresaNumero"));
-                imp.setEmpresaComplemento(linha.getString("empresaComplemento"));
-                imp.setEmpresaBairro(linha.getString("empresaBairro"));
-                imp.setEmpresaMunicipioIBGE(linha.getInt("empresaMunicipioIBGE"));
-                imp.setEmpresaMunicipio(linha.getString("empresaMunicipio"));
-                imp.setEmpresaUfIBGE(linha.getInt("empresaUfIBGE"));
-                imp.setEmpresaUf(linha.getString("empresaUf"));
-                imp.setEmpresaCep(linha.getString("empresaCep"));
-                imp.setEmpresaTelefone(linha.getString("empresaTelefone"));
-                imp.setDataAdmissao(getData(linha.getString("dataAdmissao")));
+//                imp.setEmpresa(linha.getString("empresa"));
+//                imp.setEmpresaEndereco(linha.getString("empresaEndereco"));
+//                imp.setEmpresaNumero(linha.getString("empresaNumero"));
+//                imp.setEmpresaComplemento(linha.getString("empresaComplemento"));
+//                imp.setEmpresaBairro(linha.getString("empresaBairro"));
+//                imp.setEmpresaMunicipioIBGE(linha.getInt("empresaMunicipioIBGE"));
+//                imp.setEmpresaMunicipio(linha.getString("empresaMunicipio"));
+//                imp.setEmpresaUfIBGE(linha.getInt("empresaUfIBGE"));
+//                imp.setEmpresaUf(linha.getString("empresaUf"));
+//                imp.setEmpresaCep(linha.getString("empresaCep"));
+//                imp.setEmpresaTelefone(linha.getString("empresaTelefone"));
+//                imp.setDataAdmissao(getData(linha.getString("dataAdmissao")));
                 imp.setCargo(linha.getString("cargo"));
                 imp.setSalario(linha.getDouble("salario"));
                 imp.setValorLimite(linha.getDouble("valorLimite"));
-                imp.setNomeConjuge(linha.getString("nomeConjuge"));
-                imp.setDataNascimentoConjuge(linha.getData("dataNascimentoConjuge"));
-                imp.setNomePai(linha.getString("nomePai"));
-                imp.setNomeMae(linha.getString("nomeMae"));
+//                imp.setNomeConjuge(linha.getString("nomeConjuge"));
+//                imp.setDataNascimentoConjuge(linha.getData("dataNascimentoConjuge"));
+//                imp.setNomePai(linha.getString("nomePai"));
+//                imp.setNomeMae(linha.getString("nomeMae"));
                 imp.setObservacao(linha.getString("observacao"));
                 imp.setObservacao2(linha.getString("observacao2"));
                 imp.setDiaVencimento(linha.getInt("diaVencimento"));
@@ -810,26 +809,26 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 } else {
                     imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
                 }
-                imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
+//                imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
                 imp.setSenha(linha.getInt("senha"));
                 imp.setTelefone(linha.getString("telefone"));
                 imp.setCelular(linha.getString("celular"));
                 imp.setEmail(linha.getString("email"));
-                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
-                imp.setPonto(linha.getDouble("pontos"));
+//                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
+//                imp.setPonto(linha.getDouble("pontos"));
                 //EVENTUAL
-                imp.setFax(linha.getString("fax"));
-                imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));
-                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
-                imp.setCobrancaEndereco(linha.getString("cobrancaendereco"));
-                imp.setCobrancaNumero(linha.getString("cobrancanumero"));
-                imp.setCobrancaComplemento(linha.getString("cobrancacomplemento"));
-                imp.setCobrancaBairro(linha.getString("cobrancabairro"));
-                imp.setCobrancaMunicipioIBGE(linha.getInt("cobrancamunicipioibge"));
-                imp.setCobrancaMunicipio(linha.getString("cobrancamunicipio"));
-                imp.setCobrancaUfIBGE(linha.getInt("cobrancaufibge"));
-                imp.setCobrancaUf(linha.getString("cobrancauf"));
-                imp.setCobrancaCep(linha.getString("cobrancacep"));
+//                imp.setFax(linha.getString("fax"));
+//                imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));
+//                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
+//                imp.setCobrancaEndereco(linha.getString("cobrancaendereco"));
+//                imp.setCobrancaNumero(linha.getString("cobrancanumero"));
+//                imp.setCobrancaComplemento(linha.getString("cobrancacomplemento"));
+//                imp.setCobrancaBairro(linha.getString("cobrancabairro"));
+//                imp.setCobrancaMunicipioIBGE(linha.getInt("cobrancamunicipioibge"));
+//                imp.setCobrancaMunicipio(linha.getString("cobrancamunicipio"));
+//                imp.setCobrancaUfIBGE(linha.getInt("cobrancaufibge"));
+//                imp.setCobrancaUf(linha.getString("cobrancauf"));
+//                imp.setCobrancaCep(linha.getString("cobrancacep"));
                 String tipoOrgaoPublicoStr = linha.getString("tipoorgaopublico");
                 tipoOrgaoPublicoStr = Utils.acertarTexto(tipoOrgaoPublicoStr, "NENHUM");
                 switch (tipoOrgaoPublicoStr) {
@@ -843,7 +842,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoOrgaoPublico(TipoOrgaoPublico.NENHUM);
                         break;
                 }
-                imp.setLimiteCompra(linha.getDouble("limitecompra"));
+//                imp.setLimiteCompra(linha.getDouble("limitecompra"));
                 imp.setInscricaoMunicipal(linha.getString("inscricaomunicipal"));
                 String tipoIndicadorIeStr = Utils.acertarTexto(linha.getString("tipoindicadorie"), "NAO CONTRIBUINTE");
                 switch (tipoIndicadorIeStr) {
@@ -858,51 +857,51 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         break;
                 }
 
-                int i = 1;
-                while (true) {
-                    String prefixo = "cont" + i + "_";
-                    if (linha.existsColumn(prefixo + "nome")) {
-                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
-                        {
-                            String email = linha.getString(prefixo + "email");
-                            String cel = linha.getString(prefixo + "celular");
-                            String fone = linha.getString(prefixo + "telefone");
-                            String nome = linha.getString(prefixo + "nome");
-                            if (!"".equals(nome)
-                                    || !"".equals(cel)
-                                    || !"".equals(fone)
-                                    || !"".equals(email)) {
-                                imp.addContato(String.valueOf(i), nome, fone, cel, email);
-                            }
-                        }
+//                int i = 1;
+//                while (true) {
+//                    String prefixo = "cont" + i + "_";
+//                    if (linha.existsColumn(prefixo + "nome")) {
+//                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
+//                        {
+//                            String email = linha.getString(prefixo + "email");
+//                            String cel = linha.getString(prefixo + "celular");
+//                            String fone = linha.getString(prefixo + "telefone");
+//                            String nome = linha.getString(prefixo + "nome");
+//                            if (!"".equals(nome)
+//                                    || !"".equals(cel)
+//                                    || !"".equals(fone)
+//                                    || !"".equals(email)) {
+//                                imp.addContato(String.valueOf(i), nome, fone, cel, email);
+//                            }
+//                        }
+//
+//                        i++;
+//                    } else {
+//                        break;
+//                    }
+//                }
 
-                        i++;
-                    } else {
-                        break;
-                    }
-                }
-
-                i = 1;
-                while (true) {
-                    String prefixo = "dep" + i + "_";
-                    if (linha.existsColumn(prefixo + "nome")) {
-                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
-                        {
-                            String cpf = linha.getString(prefixo + "cpf");
-                            String tipoDependente = linha.getString(prefixo + "tipodependente");
-                            String nome = linha.getString(prefixo + "nome");
-                            if (!"".equals(nome)
-                                    || !"".equals(cpf)
-                                    || !"".equals(tipoDependente)) {
-                                imp.addDependente(String.valueOf(i), nome, cpf, tipoDependente);
-                            }
-                        }
-
-                        i++;
-                    } else {
-                        break;
-                    }
-                }
+//                i = 1;
+//                while (true) {
+//                    String prefixo = "dep" + i + "_";
+//                    if (linha.existsColumn(prefixo + "nome")) {
+//                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
+//                        {
+//                            String cpf = linha.getString(prefixo + "cpf");
+//                            String tipoDependente = linha.getString(prefixo + "tipodependente");
+//                            String nome = linha.getString(prefixo + "nome");
+//                            if (!"".equals(nome)
+//                                    || !"".equals(cpf)
+//                                    || !"".equals(tipoDependente)) {
+//                                imp.addDependente(String.valueOf(i), nome, cpf, tipoDependente);
+//                            }
+//                        }
+//
+//                        i++;
+//                    } else {
+//                        break;
+//                    }
+//                }
             } catch (Exception e) {
                 throw e;
             }
