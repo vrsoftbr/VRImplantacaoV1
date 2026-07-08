@@ -764,7 +764,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setRazao(linha.getString("razao"));
                 imp.setFantasia(linha.getString("fantasia"));
                 imp.setAtivo(!"N".equalsIgnoreCase(linha.getString("ativo")));
-                imp.setBloqueado("N".equalsIgnoreCase(linha.getString("bloqueado")));
+                imp.setBloqueado("S".equalsIgnoreCase(linha.getString("bloqueado")));
                 imp.setDataBloqueio(getData(linha.getString("dataBloqueio")));
                 imp.setEndereco(linha.getString("endereco"));
                 imp.setNumero(linha.getString("numero"));
@@ -775,9 +775,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setUfIBGE(linha.getInt("ufIBGE"));
                 imp.setUf(linha.getString("uf"));
                 imp.setCep(linha.getString("cep"));
-                String civil = linha.getString("estadoCivil") + "   ";
-                civil = (civil != null ? civil.substring(1, 3) : "NAO");
-                imp.setEstadoCivil(estCivil.get(civil));
+//                String civil = linha.getString("estadoCivil") + "   ";
+//                civil = (civil != null ? civil.substring(1, 3) : "NAO");
+//                imp.setEstadoCivil(estCivil.get(civil));
                 imp.setDataNascimento(getData(linha.getString("dataNascimento")));
                 imp.setDataCadastro(getData(linha.getString("dataCadastro")));
                 String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";

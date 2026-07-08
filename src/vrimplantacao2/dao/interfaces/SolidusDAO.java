@@ -23,6 +23,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -733,7 +735,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstConsumidor(rst.getInt("icms_saida_cst"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("icms_saida_aliq"));
                     imp.setIcmsReducaoConsumidor(rst.getDouble("icms_saida_reducao"));
-                    
+
                     imp.setPautaFiscalId(rst.getString("ncm"));
                     imp.setDivisao(rst.getString("divisao"));
 
@@ -744,7 +746,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     /*@Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -776,7 +778,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return null;
     }*/
-
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -1464,11 +1465,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yyyy");
     private String dataInicioVenda;
     private String dataTerminoVenda;
-    
+
     public void setDataVendaInicio(Date dataVendaIncio) {
         this.dataInicioVenda = tipoConexao == TipoConexao.FIREBIRD ? DATE_FORMAT.format(dataVendaIncio) : DATE_FORMAT_ORACLE.format(dataVendaIncio);
     }
-    
+
     public void setDataVendaTermino(Date dataVendaTermino) {
         this.dataTerminoVenda = tipoConexao == TipoConexao.FIREBIRD ? DATE_FORMAT.format(dataVendaTermino) : DATE_FORMAT_ORACLE.format(dataVendaTermino);
     }
@@ -1618,11 +1619,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
                 if (next == null) {
                     if (rst.next()) {
-                        
+
                         String horaInicio = rst.getString("data") + " " + rst.getString("horaInicio");
                         String horaTermino = rst.getString("data") + " " + rst.getString("horaTermino");
-                        
-                        
+
                         next = new VendaIMP();
 
                         next.setId(rst.getInt("ecf") + "-" + rst.getString("id"));
@@ -1716,10 +1716,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    v.cod_tributacao\n"
                         + "from\n"
                         + (conexao == TipoConexao.FIREBIRD ? "tab_produto_pdv v\n" : "intersolid.tab_produto_pdv v\n")
-                        + "join " +(conexao == TipoConexao.FIREBIRD ? "tab_produto p " : "intersolid.tab_produto p ") + "on v.cod_produto = p.cod_produto\n"
+                        + "join " + (conexao == TipoConexao.FIREBIRD ? "tab_produto p " : "intersolid.tab_produto p ") + "on v.cod_produto = p.cod_produto\n"
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
-                        + (conexao == TipoConexao.FIREBIRD 
+                        + (conexao == TipoConexao.FIREBIRD
                                 ? " and v.dta_saida >= '" + dataInicio + " 00:00:00' and v.dta_saida <= '" + dataTermino + " 23:59:59'\n"
                                 : " and v.dta_saida >= to_date('" + dataInicio + "', 'DD/MM/YYYY') and v.dta_saida <= to_date('" + dataTermino + "', 'DD/MM/YYYY') \n")
                         + "    and v.num_ident != 0\n"

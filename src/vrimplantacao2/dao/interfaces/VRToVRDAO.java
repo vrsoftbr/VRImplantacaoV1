@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -46,6 +47,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
@@ -410,10 +412,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rs.getString("mercadologico2"));
                     imp.setMerc3ID(rs.getString("cod_mercadologico3"));
                     imp.setMerc3Descricao(rs.getString("mercadologico3"));
-                    imp.setMerc4ID(rs.getString("cod_mercadologico4"));
-                    imp.setMerc4Descricao(rs.getString("mercadologico4"));
-                    imp.setMerc5ID(rs.getString("cod_mercadologico5"));
-                    imp.setMerc5Descricao(rs.getString("mercadologico5"));
+//                    imp.setMerc4ID(rs.getString("cod_mercadologico4"));
+//                    imp.setMerc4Descricao(rs.getString("mercadologico4"));
+//                    imp.setMerc5ID(rs.getString("cod_mercadologico5"));
+//                    imp.setMerc5Descricao(rs.getString("mercadologico5"));
 
                     result.add(imp);
                 }
@@ -571,8 +573,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.mercadologico1,\n"
                     + "	p.mercadologico2,\n"
                     + "	p.mercadologico3,\n"
-                    + "	p.mercadologico4,\n"
-                    + "	p.mercadologico5,\n"
+//                    + "	p.mercadologico4,\n"
+//                    + "	p.mercadologico5,\n"
                     + "	p.id_familiaproduto,\n"
                     + "	p.pesobruto,\n"
                     + "	p.pesoliquido,\n"
@@ -664,7 +666,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
+//                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
                     //imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
@@ -812,7 +814,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
-
+                    
                     result.add(imp);
 //                    contador++;
 //                    ProgressBar.setStatus("Carregando dados..." + contador);
@@ -1024,6 +1026,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
+        
+        Map<String, List<ClienteContatoIMP>> mapContato = this.getMapClienteContatoImp();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -1107,8 +1111,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.id")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
+                    String impid = rs.getString("id");
 
-                    imp.setId(rs.getString("id"));
+                    imp.setId(impid);
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
                     imp.setOrgaoemissor(rs.getString("orgaoemissor"));
@@ -1163,16 +1169,52 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
 
-                    getContatoCliente(imp);
+//                    getContatoCliente(imp);
+                    
+                    imp.setContatos(mapContato.getOrDefault(imp, null));
 
                     result.add(imp);
-//                    contador++;
-//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
-        contador = 1;
         return result;
+    }
+    
+    private Map<String, List<ClienteContatoIMP>> getMapClienteContatoImp() throws SQLException {
+        
+        Map<String, List<ClienteContatoIMP>> mapContato = new HashMap<>();
+    
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " cp.id_clientepreferencial,\n"
+                    + "	cp.id,\n"
+                    + "	nome,\n"
+                    + "	telefone,\n"
+                    + "	celular,\n"
+                    + "	tc.descricao contato\n"
+                    + "from \n"
+                    + "	clientepreferencialcontato cp\n"
+                    + "join tipocontato tc on cp.id_tipocontato = tc.id \n"
+            )) {
+                while (rs.next()) {
+                    ClienteContatoIMP contato = new ClienteContatoIMP(
+                        rs.getString("id"),
+                        rs.getString("nome"),
+                        rs.getString("telefone"),
+                        rs.getString("celular"),
+                        rs.getString("email")
+                    );
+                    
+                    mapContato.computeIfAbsent(
+                                rs.getString("id_clientepreferencial"),
+                                k -> new ArrayList<>()
+                        )
+                        .add(contato);
+                }
+            }
+        }
+        return mapContato;
     }
 
     private void getContatoCliente(ClienteIMP imp) throws SQLException {

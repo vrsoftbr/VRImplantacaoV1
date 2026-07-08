@@ -675,6 +675,10 @@ public class ClienteIMP {
         return contatos;
     }
 
+    public void setContatos(List<ClienteContatoIMP> contatos) {
+        this.contatos = contatos;
+    }
+
     public List<ClienteDependenteIMP> getDependentes() {
         return dependentes;
     }

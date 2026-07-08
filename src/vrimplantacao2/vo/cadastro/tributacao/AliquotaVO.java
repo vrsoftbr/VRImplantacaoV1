@@ -50,7 +50,7 @@ public class AliquotaVO {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = StringUtils.acertarTexto(descricao, 15);
+        this.descricao = StringUtils.acertarTexto(descricao, 20);
     }
 
     public int getCst() {

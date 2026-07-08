@@ -2466,7 +2466,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             if (chkPdvVendas.isSelected()
                     && edtDtVendaIni.getDate() != null
-                    && edtDtVendaFim.getDate() != null) {
+                    && edtDtVendaFim.getDate() != null
+                    ) {
 
                 if (chkVerificarVendadDeHoje.isSelected()) {
                     importador.checarVendasDataAtual = true;

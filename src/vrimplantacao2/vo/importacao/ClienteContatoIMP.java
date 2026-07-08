@@ -12,6 +12,19 @@ public class ClienteContatoIMP {
     private String celular;
     private String email;
 
+    public ClienteContatoIMP() {
+    }
+    
+  
+
+    public ClienteContatoIMP(String id, String nome, String telefone, String celular, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.telefone = telefone;
+        this.celular = celular;
+        this.email = email;
+    }
+
     public String getId() {
         return id;
     }

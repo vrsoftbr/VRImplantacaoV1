@@ -101,6 +101,12 @@ public class ProdutoDAO {
      * @throws Exception
      */
     public void salvar(ProdutoVO vo) throws Exception {
+        
+        System.out.println("----------------------------------------------------");
+        System.out.println("Salvando id: " + vo.getId());
+        System.out.println("Descricao: " + vo.getDescricaoCompleta());
+        System.out.println("Impid: " + vo.getImpId());
+        
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produto");

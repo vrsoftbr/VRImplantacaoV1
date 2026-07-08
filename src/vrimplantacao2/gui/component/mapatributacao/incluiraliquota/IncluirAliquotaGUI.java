@@ -78,7 +78,7 @@ public class IncluirAliquotaGUI extends VRDialog {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel4, "Descrição");
 
-        txtDescricao.setColumns(15);
+        txtDescricao.setColumns(20);
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "CST");
 
@@ -128,8 +128,7 @@ public class IncluirAliquotaGUI extends VRDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(txtReduzido, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
-                        .addComponent(txtAliqFinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(0, 0, 0))))
+                        .addComponent(txtAliqFinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtAliquota, txtCst, txtReduzido});
@@ -354,7 +353,7 @@ public class IncluirAliquotaGUI extends VRDialog {
         }
         
         void loadView() {
-            view.txtDescricao.setText(StringUtils.acertarTexto(aliquota.getDescricao(), 15));
+            view.txtDescricao.setText(StringUtils.acertarTexto(aliquota.getDescricao(), 20));
             view.txtCst.setInt(aliquota.getCst());
             view.txtAliquota.setDouble(aliquota.getAliquota());
             view.txtReduzido.setDouble(aliquota.getReduzido());

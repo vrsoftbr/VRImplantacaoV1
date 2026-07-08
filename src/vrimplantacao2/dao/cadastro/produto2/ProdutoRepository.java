@@ -1088,6 +1088,10 @@ public class ProdutoRepository {
         ProdutoVO codigoAtual = null;
         if (eanValido) {
             if (!eanExistente || forcarNovo) {
+                
+                System.out.println("-------------------------------------");
+                System.out.println("Método FORÇAR NOVO");
+                System.out.println("impid: " + imp.getImportId());
                 /**
                  * Mesmo que um determinado EAN não esteja cadastrado no sistema
                  * (pois o mesmo pode ter sido excluído por um usuário), é

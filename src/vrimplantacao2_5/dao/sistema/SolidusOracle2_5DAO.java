@@ -31,6 +31,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -50,6 +51,7 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
@@ -187,7 +189,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.PDV_VENDA // Habilita importacão de Vendas
+                OpcaoProduto.PDV_VENDA, // Habilita importacão de Vendas
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -221,6 +224,88 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                 OpcaoCliente.RECEBER_CHEQUE,
                 OpcaoCliente.VENCIMENTO_ROTATIVO
         ));
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "WITH ULTIMO_ASSOCIADO AS (\n"
+                    + "    SELECT\n"
+                    + "        COD_PRODUTO,\n"
+                    + "        COD_ASSOCIADO\n"
+                    + "    FROM (\n"
+                    + "        SELECT\n"
+                    + "            p.COD_PRODUTO,\n"
+                    + "            p.COD_ASSOCIADO,\n"
+                    + "            ROW_NUMBER() OVER (\n"
+                    + "                PARTITION BY p.COD_PRODUTO\n"
+                    + "                ORDER BY p.DTA_SAIDA DESC\n"
+                    + "            ) AS RN\n"
+                    + "        FROM TAB_PRODUTO_PDV p\n"
+                    + "        WHERE p.COD_ASSOCIADO IS NOT NULL\n"
+                    + "    )\n"
+                    + "    WHERE RN = 1\n"
+                    + ")\n"
+                    + "SELECT\n"
+                    + "	ua.COD_PRODUTO AS id_associado,\n"
+                    + "	ua.COD_PRODUTO AS id_produto,\n"
+                    + "	p.DES_PRODUTO AS descricao_associado,\n"
+                    + "	p.QTD_EMBALAGEM_VENDA AS qtdembalagem,\n"
+                    + "	TO_CHAR(ua.COD_PRODUTO) || '-' || TO_CHAR(ua.COD_ASSOCIADO) AS id_associado_item,\n"
+                    + "	ua.COD_ASSOCIADO AS id_produto_item,\n"
+                    + "	pa.DES_PRODUTO AS descricao_associado_item,\n"
+                    + "	pa.QTD_EMBALAGEM_VENDA AS qtdembalagem_item,\n"
+                    + "	1 AS percentual_preco,\n"
+                    + "	0 AS aplica_preco,\n"
+                    + "	0 AS aplica_custo,\n"
+                    + "	1 AS aplica_estoque,\n"
+                    + "	0 AS percentual_custo_estoque\n"
+                    + "FROM ULTIMO_ASSOCIADO ua \n"
+                    + "JOIN TAB_PRODUTO p ON p.COD_PRODUTO = ua.COD_PRODUTO \n"
+                    + "JOIN TAB_PRODUTO pa ON pa.COD_PRODUTO = ua.COD_ASSOCIADO\n"
+                    + "UNION \n"
+                    + "SELECT\n"
+                    + "	TO_CHAR(ua.COD_PRODUTO) || '-' || TO_CHAR(ua.COD_ASSOCIADO) AS id_associado,\n"
+                    + "	ua.COD_ASSOCIADO AS id_produto,\n"
+                    + "	pa.DES_PRODUTO AS descricao_associado,\n"
+                    + "	pa.QTD_EMBALAGEM_VENDA AS qtdembalagem,\n"
+                    + "	ua.COD_PRODUTO AS id_associado_item,\n"
+                    + "	ua.COD_PRODUTO AS id_produto_item,\n"
+                    + "	p.DES_PRODUTO AS descricao_associado_item,\n"
+                    + "	p.QTD_EMBALAGEM_VENDA AS qtdembalagem_item,\n"
+                    + "	1 AS percentual_preco,\n"
+                    + "	0 AS aplica_preco,\n"
+                    + "	1 AS aplica_custo,\n"
+                    + "	0 AS aplica_estoque,\n"
+                    + "	0 AS percentual_custo_estoque\n"
+                    + "FROM ULTIMO_ASSOCIADO ua \n"
+                    + "JOIN TAB_PRODUTO p ON p.COD_PRODUTO = ua.COD_PRODUTO \n"
+                    + "JOIN TAB_PRODUTO pa ON pa.COD_PRODUTO = ua.COD_ASSOCIADO")) {
+                while (rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+
+                    imp.setImpIdAssociado(rs.getString("id_associado"));
+                    imp.setImpIdProduto(rs.getString("id_produto"));
+                    imp.setDescricaoAssociado(rs.getString("descricao_associado"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setImpIdAssociadoItem(rs.getString("id_associado_item"));
+                    imp.setImpIdProdutoItem(rs.getString("id_produto_item"));
+                    imp.setDescricaoAssociadoItem(rs.getString("descricao_associado_item"));
+                    imp.setQtdEmbalagemItem(rs.getInt("qtdembalagem_item"));
+                    imp.setPercentualPreco(rs.getDouble("percentual_preco"));
+                    imp.setAplicaPreco(rs.getBoolean("aplica_preco"));
+                    imp.setAplicaCusto(rs.getBoolean("aplica_custo"));
+                    imp.setAplicaEstoque(rs.getBoolean("aplica_estoque"));
+                    imp.setPercentualcustoestoque(rs.getDouble("percentual_custo_estoque"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -660,14 +745,16 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setValidade(rst.getInt("validade"));
 
+                    if (imp.getImportId().equals("01434712")) {
+                        System.out.println("TESTE");
+                    }
+
                     long ean = Utils.stringToLong(imp.getEan());
-                    if (imp.isBalanca() && (ean <= 999999) && removerDigitoProdutoBalanca) {
+                    if (imp.isBalanca() && (ean <= 9999999) && removerDigitoProdutoBalanca) {
                         String eanAux = String.valueOf(ean);
                         eanAux = eanAux.substring(0, eanAux.length() - 1);
                         imp.setEan(eanAux);
-                    }
-
-                    if (imp.isBalanca() && (String.valueOf(ean).length() == 7)) {
+                    } else if (imp.isBalanca() && (String.valueOf(ean).length() == 7)) {
                         String eanAux = String.valueOf(ean);
                         eanAux = eanAux.substring(1, 7);
                         imp.setEan(eanAux);
@@ -1080,6 +1167,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
         String tab_fluxo = "intersolid.tab_fluxo",
                 tab_entidade = "intersolid.tab_entidade";
 
+        this.entidadesCreditoRotativo = getEntidades();
+
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -1437,6 +1526,9 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
         private VendaIMP next;
 
         public VendaIterator(String idLojaCliente, String dataInicio, String dataTermino) {
+
+            dataInicio = "01/06/2024";
+            dataTermino = "31/09/2024";
             try {
                 this.stm = ConexaoOracle.getConexao().createStatement();
                 this.rst = stm.executeQuery(
@@ -1560,6 +1652,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
 
         public VendaItemIterator(String idLojaCliente, String dataInicio, String dataTermino) {
+            dataInicio = "01/06/2024";
+            dataTermino = "31/09/2024";
             try {
                 try (Statement st = ConexaoOracle.getConexao().createStatement()) {
                     try (ResultSet rs = st.executeQuery(
