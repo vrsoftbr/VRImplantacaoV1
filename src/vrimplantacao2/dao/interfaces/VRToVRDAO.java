@@ -58,6 +58,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -719,6 +720,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
+        
+        Map<String, List<FornecedorContatoIMP>> mapContato = this.getMapContatoFornecedorImp();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -812,16 +815,28 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
                     imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
 
-                    getContatoFornecedor(imp);
+//                    getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
                     
+                    List<FornecedorContatoIMP> contatos =
+                            mapContato.get(imp.getImportId());
+
+                    if (contatos != null) {
+                        for (FornecedorContatoIMP contato : contatos) {
+                            imp.addContato(
+                                contato.getImportId(),
+                                contato.getNome(),
+                                contato.getTelefone(),
+                                contato.getCelular(),
+                                contato.getTipoContato(),
+                                contato.getEmail()
+                            );
+                        }
+                    }
                     result.add(imp);
-//                    contador++;
-//                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
         }
-        contador = 1;
         return result;
     }
 
@@ -1000,6 +1015,46 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+    }
+    
+        
+    private Map<String, List<FornecedorContatoIMP>> getMapContatoFornecedorImp() throws SQLException {
+        
+        Map<String, List<FornecedorContatoIMP>> mapContato = new HashMap<>();
+    
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " fc.id_fornecedor,\n"
+                    + " fc.id,\n"
+                    + "	telefone,\n"
+                    + " nome,\n"
+                    + "	celular,\n"
+                    + "	email,\n"
+                    + "	tp.id tipo\n"
+                    + "from \n"
+                    + "	fornecedorcontato fc\n"
+                    + "join tipocontato tp on fc.id_tipocontato = tp.id"
+            )) {
+                while (rs.next()) {
+                    FornecedorContatoIMP contato = new FornecedorContatoIMP(
+                        rs.getString("id"),
+                        rs.getString("nome"),
+                        rs.getString("telefone"),
+                        rs.getString("celular"),
+                        rs.getString("email"),
+                        rs.getInt("tipo")
+                    );
+                    
+                    mapContato.computeIfAbsent(
+                                rs.getString("id_fornecedor"),
+                                k -> new ArrayList<>()
+                        )
+                        .add(contato);
+                }
+            }
+        }
+        return mapContato;
     }
 
     private void getDivisaoFornecedor(FornecedorIMP imp) throws SQLException {

@@ -1527,8 +1527,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         public VendaIterator(String idLojaCliente, String dataInicio, String dataTermino) {
 
-            dataInicio = "01/06/2024";
-            dataTermino = "31/09/2024";
+            dataInicio = "08/07/2026";
+            dataTermino = "31/07/2026";
             try {
                 this.stm = ConexaoOracle.getConexao().createStatement();
                 this.rst = stm.executeQuery(
@@ -1652,8 +1652,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
 
         public VendaItemIterator(String idLojaCliente, String dataInicio, String dataTermino) {
-            dataInicio = "01/06/2024";
-            dataTermino = "31/09/2024";
+            dataInicio = "08/07/2026";
+            dataTermino = "31/07/2026";
             try {
                 try (Statement st = ConexaoOracle.getConexao().createStatement()) {
                     try (ResultSet rs = st.executeQuery(

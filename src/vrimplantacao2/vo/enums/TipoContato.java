@@ -35,4 +35,13 @@ public enum TipoContato {
         return COMERCIAL;
     }
     
+    public static TipoContato getById(int id) {
+        for (TipoContato tipo : values()) {
+            if (tipo.id == id) {
+                return tipo;
+            }
+        }
+        return COMERCIAL;
+    }
+    
 }

@@ -14,8 +14,6 @@ public class ClienteContatoIMP {
 
     public ClienteContatoIMP() {
     }
-    
-  
 
     public ClienteContatoIMP(String id, String nome, String telefone, String celular, String email) {
         this.id = id;

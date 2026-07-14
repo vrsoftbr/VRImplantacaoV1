@@ -18,6 +18,17 @@ public class FornecedorContatoIMP {
     private String email;
     private String celular;
 
+    public FornecedorContatoIMP() {
+    }
+
+    public FornecedorContatoIMP(String importId, String nome, String telefone, String celular, String email, int idTipoContato) {
+        this.nome = nome;
+        this.telefone = telefone;
+        this.email = email;
+        this.celular = celular;
+        this.tipoContato = TipoContato.getById(idTipoContato);
+    }
+
     public String getImportSistema() {
         return importSistema;
     }
