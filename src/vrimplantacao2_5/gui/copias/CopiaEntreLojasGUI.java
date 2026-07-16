@@ -105,15 +105,18 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
                 .addGap(80, 80, 80)
                 .addGroup(pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlDadosLayout.createSequentialGroup()
-                        .addComponent(clb1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(194, 194, 194))
+                        .addComponent(clb1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(131, 131, 131))
                     .addGroup(pnlDadosLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(clb2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(80, 80, 80))
+                    .addGroup(pnlDadosLayout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(141, 141, 141))
+                    .addGroup(pnlDadosLayout.createSequentialGroup()
+                        .addComponent(clb2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,7 +144,6 @@ public class CopiaEntreLojasGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(estoque, "Estoque");
         estoque.setToolTipText("");
-        estoque.setActionCommand("Estoque");
 
         org.openide.awt.Mnemonics.setLocalizedText(estoqueMaximo, "Estoque Máximo");
         estoqueMaximo.setToolTipText("");

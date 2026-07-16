@@ -19,6 +19,19 @@ public class FornecedorDivisaoIMP {
     private int prazoEntrega;
     private int prazoSeguranca;
 
+    public FornecedorDivisaoIMP() {
+    }
+
+    public FornecedorDivisaoIMP(String importSistema, String importLoja, String importFornecedorId, String importId, int prazoVisita, int prazoEntrega, int prazoSeguranca) {
+        this.importSistema = importSistema;
+        this.importLoja = importLoja;
+        this.importFornecedorId = importFornecedorId;
+        this.importId = importId;
+        this.prazoVisita = prazoVisita;
+        this.prazoEntrega = prazoEntrega;
+        this.prazoSeguranca = prazoSeguranca;
+    }
+
     /**
      * @return the importSistema
      */

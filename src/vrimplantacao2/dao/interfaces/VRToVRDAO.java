@@ -59,6 +59,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
+import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -722,6 +723,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         
         Map<String, List<FornecedorContatoIMP>> mapContato = this.getMapContatoFornecedorImp();
+        Map<String, List<FornecedorDivisaoIMP>> mapDivisao = this.getMapDivisoesFornecedorImp();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -777,10 +779,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.id")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                    
+                    String impid = rs.getString("id");
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
+                    imp.setImportId(impid);
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
@@ -816,10 +820,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
 
 //                    getContatoFornecedor(imp);
-                    getDivisaoFornecedor(imp);
-                    
-                    List<FornecedorContatoIMP> contatos =
-                            mapContato.get(imp.getImportId());
+//                    getDivisaoFornecedor(imp);                    
+                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
+
+                    List<FornecedorContatoIMP> contatos = mapContato.get(impid);
 
                     if (contatos != null) {
                         for (FornecedorContatoIMP contato : contatos) {
@@ -1076,6 +1080,46 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+    }
+    
+    private Map<String, List<FornecedorDivisaoIMP>> getMapDivisoesFornecedorImp() throws SQLException {
+        
+        Map<String, List<FornecedorDivisaoIMP>> mapDivisao = new HashMap<>();
+    
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	id,\n"
+                    + "	id_divisaofornecedor,\n"
+                    + "	id_fornecedor,\n"
+                    + "	prazoentrega,\n"
+                    + "	prazovisita,\n"
+                    + "	prazoseguranca\n"
+                    + "from \n"
+                    + "	fornecedorprazo\n"
+                    + " where\n"
+                    + "	id_loja = " + getLojaOrigem()
+            )) {
+                while (rs.next()) {
+                    FornecedorDivisaoIMP divisao = new FornecedorDivisaoIMP(
+                        getSistema(),
+                        getLojaOrigem(),
+                        rs.getString("id_fornecedor"),
+                        rs.getString("id"),
+                        rs.getInt("prazovisita"),
+                        rs.getInt("prazoentrega"),
+                        rs.getInt("prazoseguranca")
+                    );
+                    
+                    mapDivisao.computeIfAbsent(
+                                rs.getString("id_fornecedor"),
+                                k -> new ArrayList<>()
+                        )
+                        .add(divisao);
+                }
+            }
+        }
+        return mapDivisao;
     }
 
     @Override

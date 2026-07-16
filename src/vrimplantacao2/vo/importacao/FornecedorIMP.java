@@ -107,7 +107,7 @@ public class FornecedorIMP {
             }
     );
     
-    private final List<FornecedorDivisaoIMP> divisoes = new ArrayList<>();
+    private List<FornecedorDivisaoIMP> divisoes = new ArrayList<>();
     
     private final MultiMap<String, FornecedorPagamentoIMP> pagamentos = new MultiMap<>(
             new Factory<FornecedorPagamentoIMP>() {
@@ -423,6 +423,10 @@ public class FornecedorIMP {
     
     public List<FornecedorDivisaoIMP> getDivisoes() {
         return divisoes;
+    }
+
+    public void setDivisoes(List<FornecedorDivisaoIMP> divisoes) {
+        this.divisoes = divisoes;
     }
 
     public void setCondicaoPagamento(int condicaoPagamento) {
