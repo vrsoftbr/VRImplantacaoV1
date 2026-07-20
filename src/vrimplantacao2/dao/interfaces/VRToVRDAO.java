@@ -29,6 +29,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
+import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstIMP;
+import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
@@ -80,7 +82,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Importacao
  */
-public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
+public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, MapaReformaTributariaCstProvider {
 
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
@@ -346,7 +348,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
+    @Override
+    public List<MapaReformaTributariaCstIMP> getMapaReformaTributariaCst() throws Exception {
+        
+        System.err.println("Chegou no get de CST da reforma");
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
