@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.component.mapareformatributaria.cst;
 
 import java.util.List;
+import vrimplantacao2.vo.importacao.MapaReformaTributariaCstIMP;
 
 /**
  *

@@ -29,7 +29,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
-import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstIMP;
 import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
@@ -63,6 +62,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaReformaTributariaCstIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
@@ -348,14 +348,42 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
         }
         return result;
     }
-    
+
     @Override
     public List<MapaReformaTributariaCstIMP> getMapaReformaTributariaCst() throws Exception {
-        
-        System.err.println("Chegou no get de CST da reforma");
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<MapaReformaTributariaCstIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT 	\n"
+                    + "	c.id AS id,\n"
+                    + "	c.cst AS cst,\n"
+                    + "	c.descricao AS descricao,\n"
+                    + "	c.grupoibscbs,\n"
+                    + "	c.gruporeducao,\n"
+                    + "	c.grupodiferimento,\n"
+                    + "	c.grupotribregular,\n"
+                    + "	c.grupoibscbsmono \n"
+                    + "FROM reformatributaria.cst c \n"
+                    + "ORDER BY c.cst::NUMERIC, c.descricao "
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaReformaTributariaCstIMP(
+                            rs.getString("id"),
+                            rs.getInt("cst"),
+                            rs.getString("descricao"),
+                            rs.getBoolean("grupoibscbs"),
+                            rs.getBoolean("gruporeducao"),
+                            rs.getBoolean("grupodiferimento"),
+                            rs.getBoolean("grupotribregular"),
+                            rs.getBoolean("grupoibscbsmono")
+                    ));
+                }
+            }
+        }
+        return result;
     }
-    
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -584,8 +612,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	p.mercadologico1,\n"
                     + "	p.mercadologico2,\n"
                     + "	p.mercadologico3,\n"
-//                    + "	p.mercadologico4,\n"
-//                    + "	p.mercadologico5,\n"
+                    //                    + "	p.mercadologico4,\n"
+                    //                    + "	p.mercadologico5,\n"
                     + "	p.id_familiaproduto,\n"
                     + "	p.pesobruto,\n"
                     + "	p.pesoliquido,\n"
@@ -730,7 +758,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         Map<String, List<FornecedorContatoIMP>> mapContato = this.getMapContatoFornecedorImp();
         Map<String, List<FornecedorDivisaoIMP>> mapDivisao = this.getMapDivisoesFornecedorImp();
 
@@ -788,7 +816,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	f.id")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     String impid = rs.getString("id");
 
                     imp.setImportLoja(getLojaOrigem());
@@ -837,12 +865,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     if (contatos != null) {
                         for (FornecedorContatoIMP contato : contatos) {
                             imp.addContato(
-                                contato.getImportId(),
-                                contato.getNome(),
-                                contato.getTelefone(),
-                                contato.getCelular(),
-                                contato.getTipoContato(),
-                                contato.getEmail()
+                                    contato.getImportId(),
+                                    contato.getNome(),
+                                    contato.getTelefone(),
+                                    contato.getCelular(),
+                                    contato.getTipoContato(),
+                                    contato.getEmail()
                             );
                         }
                     }
@@ -1029,12 +1057,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             }
         }
     }
-    
-        
+
     private Map<String, List<FornecedorContatoIMP>> getMapContatoFornecedorImp() throws SQLException {
-        
+
         Map<String, List<FornecedorContatoIMP>> mapContato = new HashMap<>();
-    
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -1051,19 +1078,19 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             )) {
                 while (rs.next()) {
                     FornecedorContatoIMP contato = new FornecedorContatoIMP(
-                        rs.getString("id"),
-                        rs.getString("nome"),
-                        rs.getString("telefone"),
-                        rs.getString("celular"),
-                        rs.getString("email"),
-                        rs.getInt("tipo")
+                            rs.getString("id"),
+                            rs.getString("nome"),
+                            rs.getString("telefone"),
+                            rs.getString("celular"),
+                            rs.getString("email"),
+                            rs.getInt("tipo")
                     );
-                    
+
                     mapContato.computeIfAbsent(
-                                rs.getString("id_fornecedor"),
-                                k -> new ArrayList<>()
-                        )
-                        .add(contato);
+                            rs.getString("id_fornecedor"),
+                            k -> new ArrayList<>()
+                    )
+                            .add(contato);
                 }
             }
         }
@@ -1090,11 +1117,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             }
         }
     }
-    
+
     private Map<String, List<FornecedorDivisaoIMP>> getMapDivisoesFornecedorImp() throws SQLException {
-        
+
         Map<String, List<FornecedorDivisaoIMP>> mapDivisao = new HashMap<>();
-    
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -1111,20 +1138,20 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             )) {
                 while (rs.next()) {
                     FornecedorDivisaoIMP divisao = new FornecedorDivisaoIMP(
-                        getSistema(),
-                        getLojaOrigem(),
-                        rs.getString("id_fornecedor"),
-                        rs.getString("id"),
-                        rs.getInt("prazovisita"),
-                        rs.getInt("prazoentrega"),
-                        rs.getInt("prazoseguranca")
+                            getSistema(),
+                            getLojaOrigem(),
+                            rs.getString("id_fornecedor"),
+                            rs.getString("id"),
+                            rs.getInt("prazovisita"),
+                            rs.getInt("prazoentrega"),
+                            rs.getInt("prazoseguranca")
                     );
-                    
+
                     mapDivisao.computeIfAbsent(
-                                rs.getString("id_fornecedor"),
-                                k -> new ArrayList<>()
-                        )
-                        .add(divisao);
+                            rs.getString("id_fornecedor"),
+                            k -> new ArrayList<>()
+                    )
+                            .add(divisao);
                 }
             }
         }
@@ -1134,7 +1161,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         Map<String, List<ClienteContatoIMP>> mapContato = this.getMapClienteContatoImp();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -1219,7 +1246,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	c.id")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     String impid = rs.getString("id");
 
                     imp.setId(impid);
@@ -1278,7 +1305,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
 
 //                    getContatoCliente(imp);
-                    
                     imp.setContatos(mapContato.getOrDefault(imp, null));
 
                     result.add(imp);
@@ -1287,11 +1313,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
         }
         return result;
     }
-    
+
     private Map<String, List<ClienteContatoIMP>> getMapClienteContatoImp() throws SQLException {
-        
+
         Map<String, List<ClienteContatoIMP>> mapContato = new HashMap<>();
-    
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
@@ -1307,18 +1333,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             )) {
                 while (rs.next()) {
                     ClienteContatoIMP contato = new ClienteContatoIMP(
-                        rs.getString("id"),
-                        rs.getString("nome"),
-                        rs.getString("telefone"),
-                        rs.getString("celular"),
-                        rs.getString("email")
+                            rs.getString("id"),
+                            rs.getString("nome"),
+                            rs.getString("telefone"),
+                            rs.getString("celular"),
+                            rs.getString("email")
                     );
-                    
+
                     mapContato.computeIfAbsent(
-                                rs.getString("id_clientepreferencial"),
-                                k -> new ArrayList<>()
-                        )
-                        .add(contato);
+                            rs.getString("id_clientepreferencial"),
+                            k -> new ArrayList<>()
+                    )
+                            .add(contato);
                 }
             }
         }

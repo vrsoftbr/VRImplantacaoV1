@@ -1,11 +1,16 @@
-package vrimplantacao2.vo.importacao;
+package vrimplantacao2.gui.component.mapareformatributaria.cst;
+
+import vrimplantacao2.vo.cadastro.reformatributaria.CstVO;
+import vrimplantacao2.vo.enums.Cst;
 
 /**
  *
  * @author wesley
  */
-public class MapaReformaTributariaCstIMP {
+public class MapaReformaTributariaCstVO {
     
+    private String sistema;
+    private String loja;
     private String origId;
     private int origCst;
     private String origDescricao;
@@ -14,8 +19,11 @@ public class MapaReformaTributariaCstIMP {
     private boolean grupoDiferimento;
     private boolean grupoTribRegular;
     private boolean grupoIbsCbsMono;
+    private Cst cst;
 
-    public MapaReformaTributariaCstIMP(String origId, int origCst, String origDescricao, boolean grupoIbsCbs, boolean grupoReducao, boolean grupoDiferimento, boolean grupoTribRegular, boolean grupoIbsCbsMono) {
+    public MapaReformaTributariaCstVO(String sistema, String loja, String origId, int origCst, String origDescricao, boolean grupoIbsCbs, boolean grupoReducao, boolean grupoDiferimento, boolean grupoTribRegular, boolean grupoIbsCbsMono) {
+        this.sistema = sistema;
+        this.loja = loja;
         this.origId = origId;
         this.origCst = origCst;
         this.origDescricao = origDescricao;
@@ -24,6 +32,22 @@ public class MapaReformaTributariaCstIMP {
         this.grupoDiferimento = grupoDiferimento;
         this.grupoTribRegular = grupoTribRegular;
         this.grupoIbsCbsMono = grupoIbsCbsMono;
+    }
+
+    public String getSistema() {
+        return sistema;
+    }
+
+    public void setSistema(String sistema) {
+        this.sistema = sistema;
+    }
+
+    public String getLoja() {
+        return loja;
+    }
+
+    public void setLoja(String loja) {
+        this.loja = loja;
     }
 
     public String getOrigId() {
@@ -88,5 +112,27 @@ public class MapaReformaTributariaCstIMP {
 
     public void setGrupoIbsCbsMono(boolean grupoIbsCbsMono) {
         this.grupoIbsCbsMono = grupoIbsCbsMono;
+    }
+    
+    public Cst getCst() {
+        return cst;
+    }
+
+    public void setCst(Cst cst) {
+        this.cst = cst;
+    }
+    
+    public CstVO converterEmVo() {
+        CstVO vo = new CstVO(
+                String.format("%03d", this.origCst),
+                this.origDescricao,
+                this.grupoIbsCbs,
+                this.grupoReducao,
+                this.grupoDiferimento,
+                this.grupoTribRegular,
+                this.grupoIbsCbsMono
+        );
+                
+        return vo;
     }
 }

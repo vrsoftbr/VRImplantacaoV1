@@ -657,7 +657,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
                     + "    pl.qtd_est_atual estoque,\n"
                     + "    pl.qtd_est_minimo estoqueminimo,\n"
                     + "    pl.val_margem margem,\n"
-                    + "    round(pl.val_custo_cheio,2) custo,\n"
+                    + "    round(pl.val_custo_cheio,2) custo_sem_imposto,\n"
+                    + "    round(pl.VAL_CUSTO_REP,2) custo_com_imposto,\n"
                     //+ "    case when pl.val_custo_tabela = 0 then pl.val_custo_cheio else pl.val_custo_tabela end custosemimposto,\n"
                     //+ "    case when pl.val_custo_cheio = 0 then pl.val_custo_tabela else pl.val_custo_cheio end custocomimposto,\n"
                     + "    pl.val_venda precovenda,\n"
@@ -1527,8 +1528,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
 
         public VendaIterator(String idLojaCliente, String dataInicio, String dataTermino) {
 
-            dataInicio = "08/07/2026";
-            dataTermino = "31/07/2026";
+            dataInicio = "10/07/2026";
+            dataTermino = "22/07/2026";
             try {
                 this.stm = ConexaoOracle.getConexao().createStatement();
                 this.rst = stm.executeQuery(
@@ -1652,8 +1653,8 @@ public class SolidusOracle2_5DAO extends InterfaceDAO implements MapaTributoProv
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
 
         public VendaItemIterator(String idLojaCliente, String dataInicio, String dataTermino) {
-            dataInicio = "08/07/2026";
-            dataTermino = "31/07/2026";
+            dataInicio = "10/07/2026";
+            dataTermino = "22/07/2026";
             try {
                 try (Statement st = ConexaoOracle.getConexao().createStatement()) {
                     try (ResultSet rs = st.executeQuery(

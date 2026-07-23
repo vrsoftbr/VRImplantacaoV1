@@ -353,7 +353,7 @@ public class IncluirAliquotaGUI extends VRDialog {
         }
         
         void loadView() {
-            view.txtDescricao.setText(StringUtils.acertarTexto(aliquota.getDescricao(), 20));
+            view.txtDescricao.setText(StringUtils.acertarTexto(aliquota.getDescricao(), 25));
             view.txtCst.setInt(aliquota.getCst());
             view.txtAliquota.setDouble(aliquota.getAliquota());
             view.txtReduzido.setDouble(aliquota.getReduzido());
