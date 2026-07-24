@@ -9,6 +9,7 @@ import org.openide.util.Exceptions;
 import vrimplantacao.dao.cadastro.CstDAO;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaCstIMP;
 import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaDAO;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 
 /**
  *
@@ -21,8 +22,8 @@ public class MapaReformaTributariaCstController {
     private List<Cst> cstsVR;
     private final CstDAO cstDao = new CstDAO();
     private List<MapaReformaTributariaCstVO> mapa;
+    private MapaReformaTributariaProvider provider;
     private final MapaReformaTributariaCstView view;
-    private MapaReformaTributariaCstProvider provider;
     private final MapaReformaTributariaDAO dao = new MapaReformaTributariaDAO();
         
     public MapaReformaTributariaCstController(MapaReformaTributariaCstView view) {
@@ -53,11 +54,11 @@ public class MapaReformaTributariaCstController {
         return mapa;
     }
 
-    public MapaReformaTributariaCstProvider getProvider() {
+    public MapaReformaTributariaProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(MapaReformaTributariaCstProvider provider) {
+    public void setProvider(MapaReformaTributariaProvider provider) {
         this.provider = provider;
     }
     
@@ -69,7 +70,7 @@ public class MapaReformaTributariaCstController {
 
         dao.vincularCsts(getSistema(), getLoja());
 
-        mapa = dao.getMapa(getSistema(), getLoja());
+        mapa = dao.getMapaCst(getSistema(), getLoja());
 
         //Atualiza a view
         view.refresh();
@@ -114,10 +115,6 @@ public class MapaReformaTributariaCstController {
         int mapaIndex = view.tblMapa.getLinhaSelecionada();
         MapaReformaTributariaCstVO map = this.mapa.get(mapaIndex);
         
-        if(map.getCst() != null) {
-            return;
-        }
-        
         try {
             cstDao.insert(map.converterEmVo());
         } catch(Exception e) {
@@ -160,7 +157,7 @@ public class MapaReformaTributariaCstController {
             
             map.setCst(cst);
             
-            dao.gravarMapa(map);            
+            dao.gravarMapaCst(map);            
             
             view.refresh();
             if (mapaIndex < view.tblMapa.getRowCount() - 1) {

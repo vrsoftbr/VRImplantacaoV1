@@ -1,4 +1,4 @@
-package vrimplantacao2.gui.component.mapareformatributaria.cst;
+package vrimplantacao2.gui.component.mapareformatributaria;
 
 import java.awt.Frame;
 
@@ -8,7 +8,7 @@ import java.awt.Frame;
  */
 public interface ReformaTributariaProvider {
 
-    public MapaReformaTributariaCstProvider getProvider();
+    public MapaReformaTributariaProvider getProvider();
 
     public String getSistema();
 

@@ -29,7 +29,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
-import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
@@ -77,12 +76,14 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
+import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
 
 /**
  *
  * @author Importacao
  */
-public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, MapaReformaTributariaCstProvider {
+public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, MapaReformaTributariaProvider {
 
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
@@ -342,6 +343,41 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                             rs.getDouble("porcentagemfcp"),
                             rs.getBoolean("icmsdesonerado"),
                             rs.getDouble("percentualicmsdesonerado")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<MapaReformaTributariaClassificacaoIMP> getMapaReformaTributariaClassificacao() throws Exception {
+        List<MapaReformaTributariaClassificacaoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	id,\n"
+                    + "	reducao,\n"
+                    + "	diferimento,\n"
+                    + "	id_cstibscbs,\n"
+                    + "	cclasstrib,\n"
+                    + "	descricao,\n"
+                    + "	fundamentacaolegal,\n"
+                    + "	aliquotazero \n"
+                    + "FROM reformatributaria.classificacaotributaria \n"
+                    + "ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaReformaTributariaClassificacaoIMP(
+                            rs.getString("id"),
+                            rs.getDouble("reducao"),
+                            rs.getDouble("diferimento"),
+                            rs.getString("id_cstibscbs"),
+                            rs.getString("cclasstrib"),
+                            rs.getString("descricao"),
+                            rs.getString("fundamentacaolegal"),
+                            rs.getBoolean("aliquotazero")
                     ));
                 }
             }

@@ -14,6 +14,7 @@ import org.openide.util.Exceptions;
 import vrimplantacao2.vo.enums.Cst;
 import java.awt.event.MouseListener;
 import vrframework.bean.table.VRColumnTable;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 
 /**
  *
@@ -45,11 +46,11 @@ public class MapaReformaTributariaCstView extends JDialog {
         txtAgrupador.setText(loja);
     }
 
-    public void setProvider(MapaReformaTributariaCstProvider provider) {
+    public void setProvider(MapaReformaTributariaProvider provider) {
         controller.setProvider(provider);
     }
 
-    public MapaReformaTributariaCstProvider getProvider() {
+    public MapaReformaTributariaProvider getProvider() {
         return controller.getProvider();
     }
     
@@ -236,7 +237,7 @@ public class MapaReformaTributariaCstView extends JDialog {
         }
     }//GEN-LAST:event_btnAtualizarOnClick
 
-    public static void exibir(Frame mdiFrame, String sistema, String loja, MapaReformaTributariaCstProvider provider) throws Exception {
+    public static void exibir(Frame mdiFrame, String sistema, String loja, MapaReformaTributariaProvider provider) throws Exception {
         MapaReformaTributariaCstView view = new MapaReformaTributariaCstView();
         view.setSistema(sistema);
         view.setLoja(loja);

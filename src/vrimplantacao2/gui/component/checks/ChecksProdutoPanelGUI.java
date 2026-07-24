@@ -14,8 +14,9 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapareformatributaria.classificacaotributaria.MapaReformaTributariaClassificacaoView;
 import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstView;
-import vrimplantacao2.gui.component.mapareformatributaria.cst.ReformaTributariaProvider;
+import vrimplantacao2.gui.component.mapareformatributaria.ReformaTributariaProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -658,7 +659,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jPanel1 = new javax.swing.JPanel();
         jLabel16 = new javax.swing.JLabel();
         btnReformaCst = new javax.swing.JButton();
-        btnReformaCst1 = new javax.swing.JButton();
+        btnClassificacaoTributaria = new javax.swing.JButton();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -1130,10 +1131,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(btnReformaCst1, "Reforma Tributária");
-        btnReformaCst1.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(btnClassificacaoTributaria, "Classificação Tributária");
+        btnClassificacaoTributaria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReformaCst1ActionPerformed(evt);
+                btnClassificacaoTributariaActionPerformed(evt);
             }
         });
 
@@ -1146,7 +1147,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnReformaCst, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnReformaCst1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnClassificacaoTributaria, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 426, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -1158,7 +1159,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addGap(23, 23, 23)
                         .addComponent(btnReformaCst)
                         .addGap(18, 18, 18)
-                        .addComponent(btnReformaCst1)))
+                        .addComponent(btnClassificacaoTributaria)))
                 .addGap(0, 567, Short.MAX_VALUE))
         );
 
@@ -1939,19 +1940,29 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 reformaTributariaProvider.getProvider()
             );
         } catch (Exception ex) {
-            System.out.println("Erro ao abrir o MAPA de Reforma Tributária");
+            System.out.println("Erro ao abrir o MAPA de Reforma Tributária - CST");
         }
     }//GEN-LAST:event_btnReformaCstActionPerformed
 
-    private void btnReformaCst1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReformaCst1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnReformaCst1ActionPerformed
+    private void btnClassificacaoTributariaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClassificacaoTributariaActionPerformed
+
+        try {
+            MapaReformaTributariaClassificacaoView.exibir(
+                reformaTributariaProvider.getFrame(),
+                reformaTributariaProvider.getSistema(),
+                reformaTributariaProvider.getLoja(),
+                reformaTributariaProvider.getProvider()
+            );
+        } catch (Exception ex) {
+            System.out.println("Erro ao abrir o MAPA de Reforma Tributária");
+        }
+    }//GEN-LAST:event_btnClassificacaoTributariaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
+    public javax.swing.JButton btnClassificacaoTributaria;
     public vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTribut;
     public javax.swing.JButton btnReformaCst;
-    public javax.swing.JButton btnReformaCst1;
     public vrframework.bean.checkBox.VRCheckBox chkAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkAtacado;
     public vrframework.bean.checkBox.VRCheckBox chkAtualizarSomenteIncluidosUnificacao;

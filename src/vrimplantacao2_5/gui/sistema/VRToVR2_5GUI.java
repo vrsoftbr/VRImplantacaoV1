@@ -21,12 +21,12 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
-import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstProvider;
-import vrimplantacao2.gui.component.mapareformatributaria.cst.ReformaTributariaProvider;
+import vrimplantacao2.gui.component.mapareformatributaria.ReformaTributariaProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.vo.enums.ESistema;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 
 /**
  *
@@ -97,7 +97,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         tabProdutos.setReformaTributariaProvider(new ReformaTributariaProvider() {
 
             @Override
-            public MapaReformaTributariaCstProvider getProvider() {
+            public MapaReformaTributariaProvider getProvider() {
                 return dao;
             }
 
