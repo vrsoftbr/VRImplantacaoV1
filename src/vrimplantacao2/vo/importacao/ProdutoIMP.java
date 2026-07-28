@@ -192,6 +192,8 @@ public class ProdutoIMP {
     
     @DatabaseField private TipoCompra tipoCompra = TipoCompra.NENHUM;
     
+    @DatabaseField private String impidClassificacaoTributaria;
+    
     private int codigoAtual;
     private int operacional = 0;
     
@@ -574,7 +576,7 @@ public class ProdutoIMP {
     }    
     public void setPiscofinsNaturezaReceita(String piscofinsNaturezaReceita) {
         this.piscofinsNaturezaReceita = Utils.stringToInt(piscofinsNaturezaReceita);
-    }
+    }    
 
     @Deprecated
     public void setIcmsCst(String icmsCst) {
@@ -1165,6 +1167,14 @@ public class ProdutoIMP {
 
     public void setTipoCompra(TipoCompra tipoCompra) {
         this.tipoCompra = tipoCompra;
+    }
+
+    public String getImpidClassificacaoTributaria() {
+        return impidClassificacaoTributaria;
+    }
+
+    public void setImpidClassificacaoTributaria(String impidClassificacaoTributaria) {
+        this.impidClassificacaoTributaria = impidClassificacaoTributaria;
     }
         
     public boolean from(ProdutoBalancaVO bal) {

@@ -75,6 +75,7 @@ public class ProdutoVO {
     private double percentualPerda = 0;
     private int qtdDiasMinimoValidade = 0;
     private TipoCompra tipoCompra = TipoCompra.NENHUM;
+    private int idClassificacaoTributaria = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -506,5 +507,12 @@ public class ProdutoVO {
     public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
         this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
     }
-    
+
+    public int getIdClassificacaoTributaria() {
+        return idClassificacaoTributaria;
+    }
+
+    public void setIdClassificacaoTributaria(int idClassificacaoTributaria) {
+        this.idClassificacaoTributaria = idClassificacaoTributaria;
+    }
 }

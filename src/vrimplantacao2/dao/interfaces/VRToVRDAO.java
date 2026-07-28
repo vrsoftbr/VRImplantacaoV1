@@ -688,7 +688,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	p.id_fornecedorfabricante,\n"
                     + "	p.numeroparcela,\n"
                     + " p.id_produtovasilhame,\n"
-                    + " vend.operacional \n"
+                    + " vend.operacional \n,"
+                    + " rt.id_classificacao \n"
                     + "from\n"
                     + "	produto p\n"
                     + "	join lj on true\n"
@@ -717,6 +718,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "		p.ncm2 = pf.ncm2 and\n"
                     + "		p.ncm3 = pf.ncm3 and\n"
                     + "		aliq.excecao = pf.excecao\n"
+                    + " left join reformatributaria.classificacaotributariaproduto rt on\n"
+                    + "         rt.id_produto = p.id and \n"
+                    + "         rt.id_loja = lj.id \n"
                     + (apenasProdutoAtivo == true ? " where vend.id_situacaocadastro = 1" : "")
                     + "order by\n"
                     + "	p.id"
@@ -780,6 +784,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setFornecedorFabricante(rs.getString("id_fornecedorfabricante"));
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
                     imp.setOperacional(rs.getInt("operacional"));
+                    imp.setImpidClassificacaoTributaria(rs.getString("id_classificacao"));
 
                     result.add(imp);
 //                    contador++;

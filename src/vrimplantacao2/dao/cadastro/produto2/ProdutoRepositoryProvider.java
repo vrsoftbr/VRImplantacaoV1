@@ -52,6 +52,8 @@ import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.PisCofinsVO;
+import vrimplantacao.dao.cadastro.ClassificacaoTributariaProdutoDAO;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaDAO;
 
 /**
  * Classe Proxy utilizada para fornecer dados do banco Postgres ao 
@@ -72,6 +74,8 @@ public class ProdutoRepositoryProvider {
     private DivisaoDAO divisaoDAO;
     private FornecedorAnteriorDAO fornecedorAntDAO;
     private boolean importarPorPlanilha;
+    private ClassificacaoTributariaProdutoDAO classificacaoTributariaProdutoDAO = new ClassificacaoTributariaProdutoDAO();
+    private MapaReformaTributariaDAO mapaReformaTributariaDAO = new MapaReformaTributariaDAO();
 
     public ProdutoRepositoryProvider() {
         try {
@@ -175,6 +179,11 @@ public class ProdutoRepositoryProvider {
                 codMercadologico5
         );
     }
+    
+    public int getIdClassificacaoTributaria(String impidClassificacaoTributaria) throws Exception {
+        
+        return mapaReformaTributariaDAO.getClassificacaoTributariaByImpid(sistema, loja, impidClassificacaoTributaria);
+    }
 
     public void salvar(ProdutoVO prod) throws Exception {
         produtoDAO.salvar(prod);
@@ -186,6 +195,11 @@ public class ProdutoRepositoryProvider {
     
     public void salvarProdutoPisCofins(ProdutoVO prod) throws Exception{
         produtoDAO.salvarProdutoPisCofins(prod);
+    }
+    
+    public void salvarClassificacaoTributariaProduto(ProdutoVO prod) throws Exception{
+        
+        classificacaoTributariaProdutoDAO.insert(prod.getId(), prod.getIdClassificacaoTributaria(), lojaVR);
     }
 
     public void atualizar(ProdutoVO prod, Set<OpcaoProduto> opt) throws Exception {

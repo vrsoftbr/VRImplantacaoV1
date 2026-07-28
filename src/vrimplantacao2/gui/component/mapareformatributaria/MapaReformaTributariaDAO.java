@@ -615,4 +615,24 @@ public class MapaReformaTributariaDAO {
 
         }
     }
+    
+    public int getClassificacaoTributariaByImpid(String sistema, String loja, String impid) throws Exception {
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id_classificacao " +
+                    "FROM implantacao.reformatributaria_classificacao " +
+                    "WHERE sistema = " + SQLUtils.stringSQL(sistema) +
+                    " AND loja = " + SQLUtils.stringSQL(loja) +
+                    " AND orig_id = " + SQLUtils.stringSQL(impid)
+            )) {
+
+                if (rst.next()) {
+                    return rst.getInt("id_classificacao");
+                }
+            }
+        }
+
+        return 0;
+    }
 }

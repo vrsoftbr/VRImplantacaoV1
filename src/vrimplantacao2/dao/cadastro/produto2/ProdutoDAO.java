@@ -283,7 +283,7 @@ public class ProdutoDAO {
             }
         }
     }
-
+    
     /**
      * Executa um update na tabela produtos.
      *

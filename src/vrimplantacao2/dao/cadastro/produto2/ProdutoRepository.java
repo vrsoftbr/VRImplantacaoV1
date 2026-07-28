@@ -272,6 +272,12 @@ public class ProdutoRepository {
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
+                        
+                        //SALVAR CONFIGURAÇÃO DE REFORMA TRIBUTÁRIA
+                        if (versao.igualOuMaiorQue(4, 4) && prod.getIdClassificacaoTributaria() != 0) {
+                            provider.salvarClassificacaoTributariaProduto(prod);
+                        }
+                                                
                     } //</editor-fold>
                     else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
@@ -1737,6 +1743,13 @@ public class ProdutoRepository {
         }
         vo.setPercentualPerda(imp.getPercentualPerda());
         vo.setTipoCompra(imp.getTipoCompra());
+        
+        if (imp.getImpidClassificacaoTributaria() != null) {
+            int idClassificacaoTributariaAtual = provider.getIdClassificacaoTributaria(imp.getImpidClassificacaoTributaria());
+            if (idClassificacaoTributariaAtual != 0) {
+                vo.setIdClassificacaoTributaria(idClassificacaoTributariaAtual);
+            }
+        }
 
         return vo;
     }
