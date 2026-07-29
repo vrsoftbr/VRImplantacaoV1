@@ -11,16 +11,26 @@ public class ClienteContatoIMP {
     private String telefone;
     private String celular;
     private String email;
+    private int tipoContato;
 
     public ClienteContatoIMP() {
     }
-
+    
     public ClienteContatoIMP(String id, String nome, String telefone, String celular, String email) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.celular = celular;
         this.email = email;
+    }
+
+    public ClienteContatoIMP(String id, String nome, String telefone, String celular, String email, int tipoContato) {
+        this.id = id;
+        this.nome = nome;
+        this.telefone = telefone;
+        this.celular = celular;
+        this.email = email;
+        this.tipoContato = tipoContato;
     }
 
     public String getId() {
@@ -70,6 +80,8 @@ public class ClienteContatoIMP {
     public void setEmail(String email) {
         this.email = email;
     }
-    
-    
+
+    public int getTipoContato() {
+        return tipoContato;
+    }
 }

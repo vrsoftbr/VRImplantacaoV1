@@ -141,7 +141,6 @@ import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VerbaIMP;
-import vrimplantacao2_5.dao.sistema.ClienteGenericoDAO;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 
 public class Importador {
@@ -610,6 +609,11 @@ public class Importador {
      */
     public void importarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais...");
+        
+        Set<OpcaoCliente> opcoesImportacao = new HashSet<>(Arrays.asList(opcoes));
+        opcoesImportacao.addAll(OpcaoCliente.getContato());
+        
+        
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesPreferenciais();
 
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
@@ -619,7 +623,7 @@ public class Importador {
         provider.setLojaVR(getLojaVR());
         provider.setIdConexao(getIdConexao());
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.salvarClientePreferencial2_5(clientes, new HashSet<>(Arrays.asList(opcoes)));
+        rep.salvarClientePreferencial2_5(clientes, opcoesImportacao);
     }
 
     public void importarClientePontuacao() throws Exception {

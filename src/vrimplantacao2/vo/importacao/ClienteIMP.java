@@ -109,6 +109,7 @@ public class ClienteIMP {
 
     private List<ClienteContatoIMP> contatos = new ArrayList<>();
     private List<ClienteDependenteIMP> dependentes = new ArrayList<>();
+    private List<ClienteEnderecoIMP> enderecos = new ArrayList<>();
 
     public ClienteIMP() {
     }
@@ -677,6 +678,14 @@ public class ClienteIMP {
 
     public void setContatos(List<ClienteContatoIMP> contatos) {
         this.contatos = contatos;
+    }
+
+    public List<ClienteEnderecoIMP> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<ClienteEnderecoIMP> enderecos) {
+        this.enderecos = enderecos;
     }
 
     public List<ClienteDependenteIMP> getDependentes() {

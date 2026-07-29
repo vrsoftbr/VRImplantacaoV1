@@ -32,11 +32,12 @@ import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaPromocaoPontuacaoVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
+import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
 import vrimplantacao2.vo.importacao.ClienteDependenteIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.migracao.LogController;
 import vrimplantacao2_5.vo.enums.EOperacao;
 import vrimplantacao2_5.service.migracao.ClienteEventualService;
@@ -286,8 +287,8 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO) ||
-                            opt.contains(OpcaoCliente.ENDERECO)) {
+                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)
+                            || opt.contains(OpcaoCliente.ENDERECO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.TIPO_INSCRICAO)) {
@@ -398,7 +399,7 @@ public class ClienteRepository {
 
     private void importarContatoPreferencial(ClientePreferencialVO cliente, ClienteIMP imp, MultiMap<String, Void> contatos) throws Exception {
         //Gravando os contatos se o código atual estiver preenchido.
-        if (cliente != null) {
+        if (cliente != null && imp.getContatos() != null) {
             for (ClienteContatoIMP impCont : imp.getContatos()) {
                 //Converte o IMP em VO
                 ClientePreferencialContatoVO contato = converterContatoPreferencial(impCont);
@@ -484,6 +485,7 @@ public class ClienteRepository {
                 Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
                 MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
                 MultiMap<String, Void> contatos = provider.eventual().getContatosExistentes();
+                MultiMap<String, Void> enderecos = provider.eventual().getEnderecosExistentes();
                 //</editor-fold>
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
@@ -519,7 +521,7 @@ public class ClienteRepository {
                         cliente = converterClienteEventual(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
-                        
+
                         clienteEndereco = converterClienteEventualEndereco(imp);
                         clienteEndereco.setClienteEventual(cliente);
 
@@ -530,7 +532,7 @@ public class ClienteRepository {
                         //Grava as informações
                         gravarClienteEventual(cliente);
                         gravarClienteEventualAnterior(anterior);
-                        gravarClienteEventualEndereco(clienteEndereco);
+//                        gravarClienteEventualEndereco(clienteEndereco);
 
                         //Incluindo o produto nas listagens
                         cnpjCadastrados.put(cnpj, id);
@@ -547,6 +549,8 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CONTATOS)) {
                         importarContatoEventual(cliente, imp, contatos);
                     }
+
+                    importarEnderecoEventual(cliente, imp, enderecos);
 
                     provider.notificar();
                 }
@@ -584,6 +588,44 @@ public class ClienteRepository {
                             contato.getTelefone(),
                             contato.getCelular(),
                             contato.getEmail()
+                    );
+                }
+            }
+        }
+    }
+
+    private void importarEnderecoEventual(ClienteEventualVO cliente, ClienteIMP imp, MultiMap<String, Void> contatos) throws Exception {
+        //Gravando os contatos se o código atual estiver preenchido.
+        if (cliente != null) {
+            for (ClienteEnderecoIMP impEnd : imp.getEnderecos()) {
+                //Converte o IMP em VO
+                ClienteEventualEnderecoVO endereco = converterEnderecoEventual(impEnd);
+                endereco.setIdClienteEventual(cliente.getId());
+                //Se houver algum contato cadastrado com essa assinatura,
+                //Não executa a rotina
+                if (!contatos.containsKey(
+                        String.valueOf(endereco.getIdClienteEventual()),
+                        endereco.getEndereco(),
+                        endereco.getNumero(),
+                        endereco.getBairro(),
+                        String.valueOf(endereco.getCep()),
+                        String.valueOf(endereco.getId_municipio()),
+                        String.valueOf(endereco.getId_estado()),
+                        String.valueOf(endereco.getId_pais()),
+                        String.valueOf(endereco.getTipo_endereco())
+                )) {
+                    gravarClienteEventualEndereco(endereco);
+                    contatos.put(
+                            null,
+                            String.valueOf(endereco.getIdClienteEventual()),
+                            endereco.getEndereco(),
+                            endereco.getNumero(),
+                            endereco.getBairro(),
+                            String.valueOf(endereco.getCep()),
+                            String.valueOf(endereco.getId_municipio()),
+                            String.valueOf(endereco.getId_estado()),
+                            String.valueOf(endereco.getId_pais()),
+                            String.valueOf(endereco.getTipo_endereco())
                     );
                 }
             }
@@ -885,7 +927,7 @@ public class ClienteRepository {
         vo.setNome(imp.getRazao());
         return vo;
     }
-    
+
     public ClienteEventualEnderecoVO converterClienteEventualEndereco(ClienteIMP imp) throws Exception {
         ClienteEventualEnderecoVO vo = new ClienteEventualEnderecoVO();
         vo.setEndereco(imp.getEndereco());
@@ -910,7 +952,7 @@ public class ClienteRepository {
         vo.setInscricao_estadual(imp.getInscricaoestadual());
         vo.setInscricao_municipal(imp.getInscricaoMunicipal());
         vo.setTelefone(imp.getTelefone());
-        
+
         return vo;
     }
 
@@ -921,7 +963,7 @@ public class ClienteRepository {
     public void gravarClienteEventualAnterior(ClienteEventualAnteriorVO anterior) throws Exception {
         provider.eventual().salvar(anterior);
     }
-    
+
     public void gravarClienteEventualEndereco(ClienteEventualEnderecoVO endereco) throws Exception {
         provider.eventual().salvar(endereco);
     }
@@ -1152,7 +1194,7 @@ public class ClienteRepository {
                         ClienteEventualVO cliente = converterClienteEventual(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
-                        
+
                         ClienteEventualEnderecoVO clienteEndereco = converterClienteEventualEndereco(imp);
                         clienteEndereco.setClienteEventual(cliente);
 
@@ -1164,7 +1206,7 @@ public class ClienteRepository {
                         gravarClienteEventual(cliente);
                         gravarClienteEventualAnterior(anterior);
                         gravarClienteEventualEndereco(clienteEndereco);
-                        
+
                         importarContatoEventual(cliente, imp, contatos);
 
                         //Incluindo o produto nas listagens
@@ -1216,23 +1258,43 @@ public class ClienteRepository {
 
         String celular = "", telefone = "";
 
-        if (impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
-            if (impCont.getTelefone().length() > 14) {
-                telefone = impCont.getTelefone().substring(0, 14);
-            }
-        }
-
-        if (impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
-            if (impCont.getCelular().length() > 14) {
-                celular = impCont.getCelular().substring(0, 14);
-            }
-        }
-
+//        if (impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
+//            if (impCont.getTelefone().length() > 14) {
+//                telefone = impCont.getTelefone().substring(0, 14);
+//            }
+//        }
+//
+//        if (impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
+//            if (impCont.getCelular().length() > 14) {
+//                celular = impCont.getCelular().substring(0, 14);
+//            }
+//        }
         cont.setNome(impCont.getNome());
-        cont.setTelefone(telefone);
-        cont.setCelular(celular);
+        cont.setTelefone(impCont.getTelefone());
+        cont.setCelular(impCont.getCelular());
         cont.setEmail(impCont.getEmail());
+        cont.setTipoContato(TipoContato.getById(impCont.getTipoContato()));
         return cont;
+    }
+
+    public ClienteEventualEnderecoVO converterEnderecoEventual(ClienteEnderecoIMP impEnd) {
+        ClienteEventualEnderecoVO end = new ClienteEventualEnderecoVO();
+
+        end.setTipo_endereco(impEnd.getTipo_endereco());
+        end.setEndereco(impEnd.getEndereco());
+        end.setNumero(impEnd.getNumero());
+        end.setBairro(impEnd.getBairro());
+        end.setCep(impEnd.getCep());
+        end.setId_municipio(impEnd.getId_municipio());
+        end.setId_estado(impEnd.getId_estado());
+        end.setId_pais(impEnd.getId_pais());
+        end.setInscricao_municipal(impEnd.getInscricao_municipal());
+        end.setInscricao_municipal(impEnd.getInscricao_municipal());
+        end.setId_tipoindicadorie(impEnd.getId_tipoindicadorie());
+        end.setTelefone(impEnd.getTelefone());
+        end.setComplemento(impEnd.getComplemento());
+
+        return end;
     }
 
     public void gravarClientePreferencialContato(ClientePreferencialContatoVO contato) throws Exception {

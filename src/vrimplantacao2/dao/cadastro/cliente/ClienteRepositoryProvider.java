@@ -37,6 +37,7 @@ public class ClienteRepositoryProvider {
     private String lojaOrigem;
     private int lojaVR;
     private ClientePreferencialDAO clientePreferencialDAO;
+    private ClienteEventualDAO clienteEventualDAO;
     private ProdutoDAO produtoDAO;
     private Map<Integer, MunicipioVO> municipioByID;
     private MultiMap<String, MunicipioVO> municipioByDesc;
@@ -51,6 +52,7 @@ public class ClienteRepositoryProvider {
         this.pref = new OrgPreferencial(this);
         this.food = new OrgClienteFood();
         this.clientePreferencialDAO = new ClientePreferencialDAO();
+        this.clienteEventualDAO = new ClienteEventualDAO();
     }
 
     public void setNotificacao(String mensagem, int qtd) throws Exception {
@@ -274,6 +276,10 @@ public class ClienteRepositoryProvider {
 
         public ClienteRepositoryProvider getProvider() {
             return prov;
+        }
+        
+        public MultiMap<String, Void> getEnderecosExistentes() throws Exception {
+            return eventualEnderecoDAO.getEnderecosExistentes();
         }
     }
 

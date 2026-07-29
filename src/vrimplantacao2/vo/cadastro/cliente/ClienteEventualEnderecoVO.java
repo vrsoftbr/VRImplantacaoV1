@@ -10,6 +10,7 @@ public class ClienteEventualEnderecoVO {
     
     private int id;// integer NOT NULL,
     private ClienteEventualVO clienteEventual;//NOT NULL,
+    private int idClienteEventual;//NOT NULL,
     private int tipo_endereco = 0;// integer NOT NULL,
     private String endereco = "SEM ENDERECO";// character varying(50) NOT NULL,
     private String numero = "0";// character varying(6) NOT NULL,
@@ -38,6 +39,14 @@ public class ClienteEventualEnderecoVO {
 
     public void setClienteEventual(ClienteEventualVO clienteEventual) {
         this.clienteEventual = clienteEventual;
+    }
+
+    public int getIdClienteEventual() {
+        return idClienteEventual;
+    }
+
+    public void setIdClienteEventual(int idClienteEventual) {
+        this.idClienteEventual = idClienteEventual;
     }
 
     public int getTipo_endereco() {

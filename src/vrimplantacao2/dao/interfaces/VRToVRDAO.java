@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import vrimplantacao.classe.Global;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -77,6 +79,7 @@ import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
+import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
 
 /**
@@ -648,8 +651,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	p.mercadologico1,\n"
                     + "	p.mercadologico2,\n"
                     + "	p.mercadologico3,\n"
-                    //                    + "	p.mercadologico4,\n"
-                    //                    + "	p.mercadologico5,\n"
+                                        + "	p.mercadologico4,\n"
+                                        + "	p.mercadologico5,\n"
                     + "	p.id_familiaproduto,\n"
                     + "	p.pesobruto,\n"
                     + "	p.pesoliquido,\n"
@@ -799,7 +802,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-
+        
         Map<String, List<FornecedorContatoIMP>> mapContato = this.getMapContatoFornecedorImp();
         Map<String, List<FornecedorDivisaoIMP>> mapDivisao = this.getMapDivisoesFornecedorImp();
 
@@ -897,11 +900,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
                     imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
 
-//                    getContatoFornecedor(imp);
-//                    getDivisaoFornecedor(imp);                    
-                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
+                    getDivisaoFornecedor(imp);                    
+//                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
 
-                    List<FornecedorContatoIMP> contatos = mapContato.get(impid);
+                    List<FornecedorContatoIMP> contatos = mapContato.getOrDefault(impid, Collections.emptyList());
 
                     if (contatos != null) {
                         for (FornecedorContatoIMP contato : contatos) {
@@ -1346,7 +1348,129 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
 
 //                    getContatoCliente(imp);
-                    imp.setContatos(mapContato.getOrDefault(imp, null));
+                    imp.setContatos(mapContato.getOrDefault(imp.getId(), Collections.emptyList()));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientesEventuais() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        Map<String, List<ClienteContatoIMP>> mapContato = this.getMapClienteEventualContatoImp();
+        Map<String, List<ClienteEnderecoIMP>> mapEndereco = this.getMapClienteEventualEnderecoImp();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	c.id id,\n"
+                    + "	c.cnpj,\n"
+                    + "	c.inscricaoestadual,\n"
+                    + "	c.nome razao,\n"
+                    + "	c.nome fantasia,\n"
+                    + "	c.id_situacaocadastro,\n"
+                    + "	CASE WHEN c.bloqueado THEN 'S' ELSE 'N'	END bloqueado,\n"
+                    + "	c.endereco,\n"
+                    + "	c.numero,\n"
+                    + "	c.complemento,\n"
+                    + "	c.bairro,\n"
+                    + "	c.id_municipio municipioIBGE,\n"
+                    + "	mun.descricao municipio,\n"
+                    + "	c.id_estado ufIBGE,\n"
+                    + "	est.sigla uf,\n"
+                    + "	c.cep,\n"
+                    + "	c.datacadastro,\n"
+                    + "	c.telefone cobrancaTelefone,\n"
+                    + "	0 prazopagamento,\n"
+                    + "	c.endereco cobrancaendereco,\n"
+                    + "	c.numero cobrancanumero,\n"
+                    + "	c.complemento cobrancacomplemento,\n"
+                    + "	c.bairro cobrancabairro,\n"
+                    + "	c.id_municipio cobrancamunicipioibge,\n"
+                    + "	mun.descricao cobrancamunicipio,\n"
+                    + "	c.id_estado cobrancaufibge,\n"
+                    + "	est.sigla cobrancauf,\n"
+                    + "	c.cep cobrancacep,\n"
+                    + "	'NENHUM'::varchar tipoorgaopublico,\n"
+                    + "	0 limitecompra,\n"
+                    + "	''::varchar inscricaomunicipal,\n"
+                    + "	'NAO CONTRIBUINTE'::varchar tipoindicadorie\n"
+                    + "FROM \n"
+                    + "	clienteeventual c\n"
+                    + "LEFT JOIN municipio mun ON\n"
+                    + "		c.id_municipio = mun.id\n"
+                    + "LEFT JOIN estado est ON\n"
+                    + "		c.id_estado = est.id\n"
+                    + "ORDER BY\n"
+                    + "	c.id")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    String impid = rs.getString("id");
+
+                    imp.setId(impid);
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+//                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getInt("id_situacaocadastro") == 1);
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
+//                    imp.setDataBloqueio(rs.getDate("databloqueio"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getString("municipioibge"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUfIBGE(rs.getInt("ufibge"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+//                    imp.setEstadoCivil(rs.getInt("id_estadocivil"));
+//                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+//                    imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+//                    imp.setEmpresa(rs.getString("empresa"));
+//                    imp.setEmpresaEndereco(rs.getString("empresaendereco"));
+//                    imp.setEmpresaNumero(rs.getString("empresanumero"));
+//                    imp.setEmpresaComplemento(rs.getString("empresacomplemento"));
+//                    imp.setEmpresaBairro(rs.getString("empresabairro"));
+//                    imp.setEmpresaMunicipioIBGE(rs.getInt("empresamunicipioibge"));
+//                    imp.setEmpresaMunicipio(rs.getString("empresamunicipio"));
+//                    imp.setEmpresaUfIBGE(rs.getInt("empresaufibge"));
+//                    imp.setEmpresaUf(rs.getString("empresauf"));
+//                    imp.setEmpresaCep(rs.getString("empresacep"));
+//                    imp.setEmpresaTelefone(rs.getString("empresatelefone"));
+//                    imp.setDataAdmissao(rs.getDate("dataadmissao"));
+//                    imp.setCargo(rs.getString("cargo"));
+//                    imp.setSalario(rs.getDouble("salario"));
+//                    imp.setValorLimite(rs.getDouble("valorlimite"));
+//                    imp.setNomeConjuge(rs.getString("nomeconjuge"));
+//                    imp.setNomePai(rs.getString("nomepai"));
+//                    imp.setNomeMae(rs.getString("nomemae"));
+//                    imp.setEmail(rs.getString("email"));
+                    imp.setCobrancaTelefone(rs.getString("cobrancatelefone"));
+                    imp.setPrazoPagamento(rs.getInt("prazopagamento"));
+                    imp.setCobrancaEndereco(rs.getString("cobrancaendereco"));
+                    imp.setCobrancaNumero(rs.getString("cobrancanumero"));
+                    imp.setCobrancaComplemento(rs.getString("cobrancacomplemento"));
+                    imp.setCobrancaBairro(rs.getString("cobrancabairro"));
+                    imp.setCobrancaMunicipioIBGE(rs.getInt("cobrancamunicipioibge"));
+                    imp.setCobrancaMunicipio(rs.getString("cobrancamunicipio"));
+                    imp.setCobrancaUfIBGE(rs.getInt("cobrancaufibge"));
+                    imp.setCobrancaUf(rs.getString("cobrancauf"));
+                    imp.setCobrancaCep(rs.getString("cobrancacep"));
+                    imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
+                    imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+
+//                    getContatoCliente(imp);
+                    imp.setContatos(mapContato.getOrDefault(imp.getId(), Collections.emptyList()));
+
+                    imp.setEnderecos(mapEndereco.getOrDefault(imp.getId(), Collections.emptyList()));
 
                     result.add(imp);
                 }
@@ -1378,7 +1502,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                             rs.getString("nome"),
                             rs.getString("telefone"),
                             rs.getString("celular"),
-                            rs.getString("email")
+                            null
                     );
 
                     mapContato.computeIfAbsent(
@@ -1390,6 +1514,99 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             }
         }
         return mapContato;
+    }
+
+    private Map<String, List<ClienteContatoIMP>> getMapClienteEventualContatoImp() throws SQLException {
+
+        Map<String, List<ClienteContatoIMP>> mapContato = new HashMap<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cp.id_clienteeventual,\n"
+                    + "	cp.id,\n"
+                    + "	nome,\n"
+                    + "	telefone,\n"
+                    + "	celular,\n"
+                    + "	tc.descricao contato,\n"
+                    + "	email, \n"
+                    + " id_tipocontato \n"
+                    + "from \n"
+                    + "	clienteeventualcontato cp\n"
+                    + "join tipocontato tc on cp.id_tipocontato = tc.id "
+            )) {
+                while (rs.next()) {
+                    ClienteContatoIMP contato = new ClienteContatoIMP(
+                            rs.getString("id"),
+                            rs.getString("nome"),
+                            rs.getString("telefone"),
+                            rs.getString("celular"),
+                            rs.getString("email"),
+                            rs.getInt("id_tipocontato")
+                    );
+
+                    mapContato.computeIfAbsent(
+                            rs.getString("id_clienteeventual"),
+                            k -> new ArrayList<>()
+                    )
+                            .add(contato);
+                }
+            }
+        }
+        return mapContato;
+    }
+
+    private Map<String, List<ClienteEnderecoIMP>> getMapClienteEventualEnderecoImp() throws SQLException {
+
+        Map<String, List<ClienteEnderecoIMP>> mapEndereco = new HashMap<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "  id_clienteeventual,\n"
+                    + " id,\n"
+                    + " id_tipoendereco,\n"
+                    + " endereco,\n"
+                    + " numero,\n"
+                    + " bairro,\n"
+                    + " cep,\n"
+                    + " id_municipio,\n"
+                    + " id_estado,\n"
+                    + " id_pais,\n"
+                    + " inscricaoestadual,\n"
+                    + " inscricaomunicipal,\n"
+                    + " id_tipoindicadorie,\n"
+                    + " telefone,\n"
+                    + " complemento \n"
+                    + "FROM clienteeventualendereco c "
+            )) {
+                while (rs.next()) {
+                    ClienteEnderecoIMP endereco = new ClienteEnderecoIMP(
+                            rs.getInt("id"),
+                            rs.getInt("id_tipoendereco"),
+                            rs.getString("endereco"),
+                            rs.getString("numero"),
+                            rs.getString("bairro"),
+                            rs.getInt("cep"),
+                            rs.getInt("id_municipio"),
+                            rs.getInt("id_estado"),
+                            rs.getInt("id_pais"),
+                            rs.getString("inscricaoestadual"),
+                            rs.getString("inscricaomunicipal"),
+                            rs.getInt("id_tipoindicadorie"),
+                            rs.getString("telefone"),
+                            rs.getString("complemento")
+                    );
+
+                    mapEndereco.computeIfAbsent(
+                            rs.getString("id_clienteeventual"),
+                            k -> new ArrayList<>()
+                    )
+                            .add(endereco);
+                }
+            }
+        }
+        return mapEndereco;
     }
 
     private void getContatoCliente(ClienteIMP imp) throws SQLException {

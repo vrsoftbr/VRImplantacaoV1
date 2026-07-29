@@ -318,7 +318,7 @@ public abstract class InterfaceDAO {
      * @throws Exception
      */
     public List<ClienteIMP> getClientesEventuais() throws Exception {
-        return getClientes();
+        return getClientesEventuais();
     }
 
     /**
