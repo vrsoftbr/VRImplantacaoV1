@@ -20,7 +20,7 @@ public class NcmVO {
 
     public NcmVO() {
     }
-    
+
     public NcmVO(int ncm1, int ncm2, int ncm3) {
         this.ncm1 = ncm1;
         this.ncm2 = ncm2;

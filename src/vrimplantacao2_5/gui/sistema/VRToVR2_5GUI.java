@@ -94,6 +94,13 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             }
         });
         
+        tabProdutos.setOpcoesDisponiveis(dao);
+
+        carregarParametros();
+
+        pnlConn.setSistema(ESistema.VRMASTER);
+        pnlConn.getNomeConexao();
+        
         tabProdutos.setReformaTributariaProvider(new ReformaTributariaProvider() {
 
             @Override
@@ -116,14 +123,12 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
+            
+            @Override
+            public int getLojaVR() {
+                return pnlConn.getLojaVR();
+            }
         });
-
-        tabProdutos.setOpcoesDisponiveis(dao);
-
-        carregarParametros();
-
-        pnlConn.setSistema(ESistema.VRMASTER);
-        pnlConn.getNomeConexao();
 
         centralizarForm();
         this.setMaximum(false);

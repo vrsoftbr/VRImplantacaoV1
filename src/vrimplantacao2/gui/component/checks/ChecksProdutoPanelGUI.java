@@ -17,6 +17,7 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapareformatributaria.classificacaotributaria.MapaReformaTributariaClassificacaoView;
 import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstView;
 import vrimplantacao2.gui.component.mapareformatributaria.ReformaTributariaProvider;
+import vrimplantacao2.gui.component.mapareformatributaria.classificacaotributariancm.MapaReformaTributariaClassificacaoNcmView;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -33,7 +34,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     private Set<OpcaoProduto> opt = OpcaoProduto.getPadrao();
     private List<OpcaoProduto> parametrosExtras = new ArrayList<>();
     private ReformaTributariaProvider reformaTributariaProvider;
-    
     private ImportAction importadorMercadologico = new ImportAction(this) {
 
         @Override
@@ -660,6 +660,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel16 = new javax.swing.JLabel();
         btnReformaCst = new javax.swing.JButton();
         btnClassificacaoTributaria = new javax.swing.JButton();
+        btnClassificacaoTributariaNcm = new javax.swing.JButton();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -1138,6 +1139,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(btnClassificacaoTributariaNcm, "Classificação Tributária - NCM");
+        btnClassificacaoTributariaNcm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClassificacaoTributariaNcmActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -1147,20 +1155,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnReformaCst, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnClassificacaoTributaria, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnClassificacaoTributaria, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnClassificacaoTributariaNcm, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 426, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addComponent(btnReformaCst)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnClassificacaoTributaria)))
+                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 567, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(btnReformaCst)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnClassificacaoTributaria)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnClassificacaoTributariaNcm)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btnReformaCst.getAccessibleContext().setAccessibleDescription("");
@@ -1958,9 +1969,25 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
     }//GEN-LAST:event_btnClassificacaoTributariaActionPerformed
 
+    private void btnClassificacaoTributariaNcmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClassificacaoTributariaNcmActionPerformed
+       
+        try {
+            MapaReformaTributariaClassificacaoNcmView.exibir(
+                reformaTributariaProvider.getFrame(),
+                reformaTributariaProvider.getSistema(),
+                reformaTributariaProvider.getLoja(),
+                reformaTributariaProvider.getProvider(),
+                reformaTributariaProvider.getLojaVR()
+            );
+        } catch (Exception ex) {
+            System.out.println("Erro ao abrir o MAPA de Reforma Tributária NCM");
+        }
+    }//GEN-LAST:event_btnClassificacaoTributariaNcmActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
     public javax.swing.JButton btnClassificacaoTributaria;
+    public javax.swing.JButton btnClassificacaoTributariaNcm;
     public vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTribut;
     public javax.swing.JButton btnReformaCst;
     public vrframework.bean.checkBox.VRCheckBox chkAssociado;

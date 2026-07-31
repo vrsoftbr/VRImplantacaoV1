@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.vo.enums.Cst;
+import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.enums.ClassificacaoTributaria;
+import vrimplantacao2.vo.enums.ClassificacaoTributariaNcm;
 import vrimplantacao2.gui.component.mapareformatributaria.cst.MapaReformaTributariaCstVO;
 import vrimplantacao2.gui.component.mapareformatributaria.classificacaotributaria.MapaReformaTributariaClassificacaoVO;
+import vrimplantacao2.gui.component.mapareformatributaria.classificacaotributariancm.MapaReformaTributariaClassificacaoNcmVO;
 
 /**
  *
@@ -65,6 +68,32 @@ public class MapaReformaTributariaDAO {
                     + "	diferimento numeric(11, 2) NULL,\n"
                     + "	fundamentacaolegal varchar NULL,\n"
                     + "	aliquotazero bool DEFAULT false NULL,\n"
+                    + "	primary key (sistema, loja, orig_id)\n"
+                    + ");"
+            );
+        }
+    }
+
+    /**
+     * Cria a tabela implantacao.reformatributaria_classificacaoncm se não
+     * existir.
+     *
+     * @throws Exception
+     */
+    public void createTableReformaTributariaClassificacaoNcm() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "CREATE TABLE IF NOT EXISTS implantacao.reformatributaria_classificacaoncm(\n"
+                    + "	sistema varchar NOT NULL,\n"
+                    + "	loja varchar NOT NULL,\n"
+                    + "	orig_id varchar NOT NULL,\n"
+                    + " orig_id_classificacao varchar NOT NULL,\n"
+                    + "	orig_ncm1 numeric(4, 0) NOT NULL,\n"
+                    + "	orig_ncm2 numeric(2, 0) NOT NULL,\n"
+                    + "	orig_ncm3 numeric(2, 0) NOT NULL,\n"
+                    + " id_classificacao_tributacao_ncm numeric(6) NULL,\n"
+                    + "	id_classificacao numeric(6) NULL,\n"
+                    + "	id_ncm numeric(6) NULL,\n"
                     + "	primary key (sistema, loja, orig_id)\n"
                     + ");"
             );
@@ -236,6 +265,65 @@ public class MapaReformaTributariaDAO {
         }
     }
 
+    public void gravarReformaTributariaClassificacaoNcmOrigem(List<MapaReformaTributariaClassificacaoNcmVO> reformaTributariaClassificacaoNcm) throws Exception {
+        MapaReformaTributariaClassificacaoNcmVO rtClassificacaoNcmVO = null;
+        try {
+            Conexao.begin();
+
+            try (Statement stm = Conexao.createStatement()) {
+                for (MapaReformaTributariaClassificacaoNcmVO vo : reformaTributariaClassificacaoNcm) {
+                    rtClassificacaoNcmVO = vo;
+                    SQLBuilder sql = new SQLBuilder();
+                    sql.setSchema("implantacao");
+                    sql.setTableName("reformatributaria_classificacaoncm");
+                    sql.put("sistema", vo.getSistema());
+                    sql.put("loja", vo.getLoja());
+                    sql.put("orig_id", vo.getOrigId());
+                    sql.put("orig_id_classificacao", vo.getOrigIdClassificacao());
+                    sql.put("orig_ncm1", vo.getOrigNcm1());
+                    sql.put("orig_ncm2", vo.getOrigNcm2());
+                    sql.put("orig_ncm3", vo.getOrigNcm3());
+
+                    if (vo.getClassificacaoNcm() != null) {
+                        sql.put("id_classificacao", vo.getClassificacaoNcm().getId());
+                        sql.put("id_ncm", vo.getClassificacaoNcm().getIdNcm());
+                    }
+                    try (ResultSet rst = stm.executeQuery(
+                            "select"
+                            + "	rt.sistema,\n"
+                            + "	rt.loja,\n"
+                            + "	rt.orig_id\n"
+                            + "from\n"
+                            + "	implantacao.reformatributaria_classificacaoncm rt\n"
+                            + "where\n"
+                            + "	rt.sistema = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getSistema()) + " and\n"
+                            + "	rt.loja = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getLoja()) + " and\n"
+                            + "	rt.orig_id = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getOrigId())
+                    )) {
+                        if (!rst.next()) {
+                            stm.execute(sql.getInsert());
+                        }
+                    }
+                }
+            }
+
+            Conexao.commit();
+        } catch (Exception e) {
+            System.out.println("select"
+                    + "	rt.sistema,\n"
+                    + "	rt.loja,\n"
+                    + "	rt.orig_id\n"
+                    + "from\n"
+                    + "	implantacao.reformatributaria_classificacaoncm rt\n"
+                    + "where\n"
+                    + "	rt.sistema = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getSistema()) + " and\n"
+                    + "	rt.loja = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getLoja()) + " and\n"
+                    + "	rt.orig_id = " + SQLUtils.stringSQL(rtClassificacaoNcmVO.getOrigId()));
+            Conexao.rollback();
+            throw e;
+        }
+    }
+
 //    public Map<String, MapaReformaTributariaCstVO> getMapaAsMap(String sistema, String loja) throws Exception {
 //        Map<String, MapaReformaTributariaCstVO> result = new HashMap<>();
 //        
@@ -368,6 +456,75 @@ public class MapaReformaTributariaDAO {
                                         rst.getString("descricao"),
                                         rst.getString("fundamentacaolegal"),
                                         rst.getBoolean("aliquotazero")
+                                )
+                        );
+                    }
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<MapaReformaTributariaClassificacaoNcmVO> getMapaClassificacaoNcm(String sistema, String loja, boolean exibirTodas) throws Exception {
+        List<MapaReformaTributariaClassificacaoNcmVO> result = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(
+                "SELECT \n"
+                + "    rc.sistema,\n"
+                + "    rc.loja,\n"
+                + "    rc.orig_id,\n"
+                + "    rc.orig_id_classificacao,\n"
+                + "    rc.orig_ncm1,\n"
+                + "    rc.orig_ncm2,\n"
+                + "    rc.orig_ncm3,\n"
+                + "    rc.id_classificacao_tributacao_ncm,\n"
+                + "    c.id,\n"
+                + "    c.id_classificacao,\n"
+                + "    c.id_ncm,\n"
+                + "    c.ncm1,\n"
+                + "    c.ncm2,\n"
+                + "    c.ncm3\n"
+                + "FROM implantacao.reformatributaria_classificacaoncm rc\n"
+                + "LEFT JOIN reformatributaria.classificacaotributariancm c\n"
+                + "       ON rc.id_classificacao_tributacao_ncm = c.id\n"
+                + "WHERE rc.sistema = " + SQLUtils.stringSQL(sistema) + "\n"
+                + "  AND rc.loja = " + SQLUtils.stringSQL(loja) + "\n"
+        );
+
+        if (!exibirTodas) {
+            sql.append("  AND rc.id_classificacao_tributacao_ncm IS NULL\n");
+        }
+
+        sql.append(
+                "ORDER BY id NULLS FIRST, id, rc.orig_id::NUMERIC, rc.id_classificacao"
+        );
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sql.toString())) {
+                while (rst.next()) {
+
+                    MapaReformaTributariaClassificacaoNcmVO vo = new MapaReformaTributariaClassificacaoNcmVO(
+                            rst.getString("sistema"),
+                            rst.getString("loja"),
+                            rst.getString("orig_id"),
+                            rst.getString("orig_id_classificacao"),
+                            rst.getInt("orig_ncm1"),
+                            rst.getInt("orig_ncm2"),
+                            rst.getInt("orig_ncm3")
+                    );
+
+                    if (rst.getString("id_classificacao_tributacao_ncm") != null) {
+                        vo.setClassificacaoNcm(
+                                new ClassificacaoTributariaNcm(
+                                        rst.getInt("id"),
+                                        rst.getInt("id_classificacao"),
+                                        rst.getInt("id_ncm"),
+                                        rst.getInt("ncm1"),
+                                        rst.getInt("ncm2"),
+                                        rst.getInt("ncm3")
                                 )
                         );
                     }
@@ -615,16 +772,64 @@ public class MapaReformaTributariaDAO {
 
         }
     }
-    
+
+    public void vincularClassificacoesNcm(String sistema, String loja, int lojaVR) throws Exception {
+
+        try (Statement st = Conexao.createStatement()) {
+
+            st.execute(
+                    "WITH mapa AS (\n"
+                    + "    SELECT\n"
+                    + "        m.sistema,\n"
+                    + "        m.loja,\n"
+                    + "        m.orig_id,\n"
+                    + "        c.id_classificacao,\n"
+                    + "        n.id AS id_ncm,\n"
+                    + "        ctn.id AS id_classificacao_tributacao_ncm\n"
+                    + "    FROM implantacao.reformatributaria_classificacaoncm m\n"
+                    + "\n"
+                    + "    JOIN implantacao.reformatributaria_classificacao c\n"
+                    + "         ON c.sistema = m.sistema\n"
+                    + "        AND c.loja    = m.loja\n"
+                    + "        AND c.orig_id = m.orig_id_classificacao\n"
+                    + "\n"
+                    + "    JOIN public.ncm n\n"
+                    + "              ON n.ncm1 = m.orig_ncm1 \n"
+                    + "              AND n.ncm2 = m.orig_ncm2 \n"
+                    + "              AND n.ncm3 = m.orig_ncm3 \n"
+                    + "\n"
+                    + "    LEFT JOIN reformatributaria.classificacaotributariancm ctn\n"
+                    + "           ON ctn.id_classificacao = c.id_classificacao\n"
+                    + "           AND ctn.id_ncm = n.id \n"
+                    + "           AND ctn.id_loja = " + lojaVR
+                    + ")\n"
+                    + "\n"
+                    + "UPDATE implantacao.reformatributaria_classificacaoncm a\n"
+                    + "SET\n"
+                    + "    id_classificacao = mapa.id_classificacao,\n"
+                    + "    id_ncm = mapa.id_ncm,\n"
+                    + "    id_classificacao_tributacao_ncm = mapa.id_classificacao_tributacao_ncm\n"
+                    + "FROM mapa \n"
+                    + "WHERE a.sistema = mapa.sistema \n"
+                    + "  AND a.loja    = mapa.loja\n"
+                    + "  AND a.orig_id = mapa.orig_id\n"
+                    + "  AND a.sistema = '" + sistema + "' \n"
+                    + "  AND a.loja    = '" + loja + "' \n"
+                    + "  AND (a.id_classificacao_tributacao_ncm IS NULL OR a.id_ncm IS NULL);"
+            );
+
+        }
+    }
+
     public int getClassificacaoTributariaByImpid(String sistema, String loja, String impid) throws Exception {
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT id_classificacao " +
-                    "FROM implantacao.reformatributaria_classificacao " +
-                    "WHERE sistema = " + SQLUtils.stringSQL(sistema) +
-                    " AND loja = " + SQLUtils.stringSQL(loja) +
-                    " AND orig_id = " + SQLUtils.stringSQL(impid)
+                    "SELECT id_classificacao "
+                    + "FROM implantacao.reformatributaria_classificacao "
+                    + "WHERE sistema = " + SQLUtils.stringSQL(sistema)
+                    + " AND loja = " + SQLUtils.stringSQL(loja)
+                    + " AND orig_id = " + SQLUtils.stringSQL(impid)
             )) {
 
                 if (rst.next()) {
@@ -634,5 +839,85 @@ public class MapaReformaTributariaDAO {
         }
 
         return 0;
+    }
+
+    public NcmVO getNcm(int ncm1, int ncm2, int ncm3) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + " id,\n"
+                    + " ncm1,\n"
+                    + " ncm2,\n"
+                    + " ncm3,\n"
+                    + " descricao\n"
+                    + "from \n"
+                    + " ncm \n"
+                    + "where \n"
+                    + " nivel = 3 \n"
+                    + " and ncm1 = " + ncm1
+                    + " and ncm2 = " + ncm2
+                    + " and ncm3 = " + ncm3
+                    + " order by ncm1, ncm2, ncm3"
+            )) {
+
+                if (rst.next()) {
+                    NcmVO ncm = new NcmVO();
+                    ncm.setId(rst.getInt("id"));
+                    ncm.setNcm1(rst.getInt("ncm1"));
+                    ncm.setNcm2(rst.getInt("ncm2"));
+                    ncm.setNcm3(rst.getInt("ncm3"));
+                    ncm.setDescricao(rst.getString("descricao"));
+
+                    return ncm;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<NcmVO> getNcms(Integer ncm1, Integer ncm2, Integer ncm3) throws Exception {
+
+        List<NcmVO> result = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT ");
+        sql.append(" id, ncm1, ncm2, ncm3, descricao ");
+        sql.append("FROM ncm ");
+        sql.append("WHERE nivel = 3 ");
+
+        if (ncm1 != null) {
+            sql.append(" AND ncm1 = ").append(ncm1);
+        }
+
+        if (ncm2 != null) {
+            sql.append(" AND ncm2 = ").append(ncm2);
+        }
+
+        if (ncm3 != null) {
+            sql.append(" AND ncm3 = ").append(ncm3);
+        }
+
+        sql.append(" ORDER BY ncm1, ncm2, ncm3 ");
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sql.toString())) {
+
+                while (rst.next()) {
+
+                    NcmVO ncm = new NcmVO();
+
+                    ncm.setId(rst.getInt("id"));
+                    ncm.setNcm1(rst.getInt("ncm1"));
+                    ncm.setNcm2(rst.getInt("ncm2"));
+                    ncm.setNcm3(rst.getInt("ncm3"));
+                    ncm.setDescricao(rst.getString("descricao"));
+
+                    result.add(ncm);
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -16,4 +16,5 @@ public interface ReformaTributariaProvider {
 
     public Frame getFrame();
 
+    public int getLojaVR();
 }

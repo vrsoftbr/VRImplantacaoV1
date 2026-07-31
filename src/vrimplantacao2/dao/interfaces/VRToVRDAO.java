@@ -81,6 +81,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
+import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoNcmIMP;
 
 /**
  *
@@ -424,6 +425,38 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
     }
 
     @Override
+    public List<MapaReformaTributariaClassificacaoNcmIMP> getMapaReformaTributariaClassificacaoNcm() throws Exception {
+        List<MapaReformaTributariaClassificacaoNcmIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + " id,\n"
+                    + " id_classificacao,\n"
+                    + " id_ncm,\n"
+                    + " ncm1,\n"
+                    + " ncm2,\n"
+                    + " ncm3 \n"
+                    + "FROM reformatributaria.classificacaotributariancm c \n"
+                    + "WHERE id_loja = " + getLojaOrigem() + " \n"
+                    + "ORDER BY 4, 5, 6, 2"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaReformaTributariaClassificacaoNcmIMP(
+                            rs.getString("id"),
+                            rs.getString("id_classificacao"),
+                            rs.getString("id_ncm"),
+                            rs.getInt("ncm1"),
+                            rs.getInt("ncm2"),
+                            rs.getInt("ncm3")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
@@ -651,8 +684,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	p.mercadologico1,\n"
                     + "	p.mercadologico2,\n"
                     + "	p.mercadologico3,\n"
-                                        + "	p.mercadologico4,\n"
-                                        + "	p.mercadologico5,\n"
+                    + "	p.mercadologico4,\n"
+                    + "	p.mercadologico5,\n"
                     + "	p.id_familiaproduto,\n"
                     + "	p.pesobruto,\n"
                     + "	p.pesoliquido,\n"
@@ -802,7 +835,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         Map<String, List<FornecedorContatoIMP>> mapContato = this.getMapContatoFornecedorImp();
         Map<String, List<FornecedorDivisaoIMP>> mapDivisao = this.getMapDivisoesFornecedorImp();
 
@@ -900,7 +933,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
                     imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
 
-                    getDivisaoFornecedor(imp);                    
+                    getDivisaoFornecedor(imp);
 //                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
 
                     List<FornecedorContatoIMP> contatos = mapContato.getOrDefault(impid, Collections.emptyList());
