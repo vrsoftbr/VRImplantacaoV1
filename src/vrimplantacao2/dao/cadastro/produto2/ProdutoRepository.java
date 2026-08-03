@@ -1722,7 +1722,7 @@ public class ProdutoRepository {
             vo.setTipoEmbalagemVolume(vo.getTipoEmbalagem());
         } else {
             vo.setTipoEmbalagemVolume(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagemVolume()));
-        }
+        }   
         vo.setVolume(imp.getVolume());
         vo.setVendaControlada(imp.isVendaControlada());
         vo.setProdutoecommerce(imp.isProdutoECommerce());
@@ -1743,6 +1743,8 @@ public class ProdutoRepository {
         }
         vo.setPercentualPerda(imp.getPercentualPerda());
         vo.setTipoCompra(imp.getTipoCompra());
+        
+        vo.setConferido(imp.isConferido());
         
         if (imp.getImpidClassificacaoTributaria() != null) {
             int idClassificacaoTributariaAtual = provider.getIdClassificacaoTributaria(imp.getImpidClassificacaoTributaria());

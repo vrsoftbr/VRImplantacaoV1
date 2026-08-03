@@ -75,6 +75,7 @@ public class ProdutoVO {
     private double percentualPerda = 0;
     private int qtdDiasMinimoValidade = 0;
     private TipoCompra tipoCompra = TipoCompra.NENHUM;
+    private boolean conferido = false;
     private int idClassificacaoTributaria = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
@@ -506,6 +507,14 @@ public class ProdutoVO {
 
     public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
         this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
+    }
+
+    public boolean isConferido() {
+        return conferido;
+    }
+
+    public void setConferido(boolean conferido) {
+        this.conferido = conferido;
     }
 
     public int getIdClassificacaoTributaria() {

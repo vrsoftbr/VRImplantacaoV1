@@ -55,6 +55,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
@@ -697,6 +698,10 @@ public abstract class InterfaceDAO {
     }
 
     public List<PessoaImp> getPessoaImp() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    public List<ProdutoSimilarIMP> getProdutoSimilar() throws Exception {
         return new ArrayList<>();
     }
 

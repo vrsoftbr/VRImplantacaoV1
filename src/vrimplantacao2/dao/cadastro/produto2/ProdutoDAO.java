@@ -442,6 +442,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.TIPO_COMPRA)) {
             sql.put("id_tipocompra", vo.getTipoCompra().getId());
         }
+        if (opt.contains(OpcaoProduto.CONFERIDO)) {
+            sql.put("conferido", vo.isConferido());
+        }
 
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();

@@ -191,6 +191,7 @@ public class ProdutoIMP {
     @DatabaseField private int qtdDiasMinimoValidade = 0;
     
     @DatabaseField private TipoCompra tipoCompra = TipoCompra.NENHUM;
+    @DatabaseField private boolean conferido = false;
     
     @DatabaseField private String impidClassificacaoTributaria;
     
@@ -1167,6 +1168,14 @@ public class ProdutoIMP {
 
     public void setTipoCompra(TipoCompra tipoCompra) {
         this.tipoCompra = tipoCompra;
+    }
+
+    public boolean isConferido() {
+        return conferido;
+    }
+
+    public void setConferido(boolean conferido) {
+        this.conferido = conferido;
     }
 
     public String getImpidClassificacaoTributaria() {

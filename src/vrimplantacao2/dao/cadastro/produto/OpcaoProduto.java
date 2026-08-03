@@ -401,6 +401,12 @@ public enum OpcaoProduto {
             return "Produto E-Commerce";
         }
     },
+    CONFERIDO {
+        @Override
+        public String toString() {
+            return "Conferido";
+        }
+    },
     DIVISAO {
         @Override
         public String toString() {
@@ -412,6 +418,12 @@ public enum OpcaoProduto {
         public String toString() {
             return "Código de Benefício";
         }
+    },
+    SIMILAR {
+       @Override
+       public String toString() {
+           return "Produto Similar";
+       }
     },
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.

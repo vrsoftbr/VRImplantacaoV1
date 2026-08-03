@@ -82,6 +82,7 @@ import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaP
 import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoNcmIMP;
+import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
 
 /**
  *
@@ -178,8 +179,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     OpcaoProduto.RECEITA,
                     OpcaoProduto.PROMOCAO,
                     OpcaoProduto.VASILHAME,
-                    OpcaoProduto.SUGESTAO_COTACAO
-                }
+                    OpcaoProduto.SUGESTAO_COTACAO,
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                    OpcaoProduto.PRODUTO_ECOMMERCE,
+                    OpcaoProduto.CONFERIDO,
+                    OpcaoProduto.SIMILAR,}
         ));
     }
 
@@ -251,6 +256,46 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             }
         }
         contador = 1;
+        return result;
+    }
+
+    @Override
+    public List<ProdutoSimilarIMP> getProdutoSimilar() throws Exception {
+        List<ProdutoSimilarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ps.id,\n"
+                    + "	ps.descricao,\n"
+                    + "	ps.id_situacaocadastro ativo,\n"
+                    + "	s.id AS id_produto_similar_item,\n"
+                    + "	s.id_produto,\n"
+                    + "	p.descricaocompleta descricao_item\n"
+                    + "FROM\n"
+                    + "	similarproduto ps \n"
+                    + "LEFT JOIN similarprodutoitem s\n"
+                    + "    ON\n"
+                    + "	ps.id = s.id_similarproduto \n"
+                    + "JOIN produto p ON\n"
+                    + "	p.id = s.id_produto \n"
+                    + "ORDER BY\n"
+                    + "	ps.id,\n"
+                    + "	s.id")) {
+                while (rs.next()) {
+                    ProdutoSimilarIMP imp = new ProdutoSimilarIMP();
+
+                    imp.setIdProdutoSimilar(rs.getString("id"));
+                    imp.setDescricaoTitulo(rs.getString("descricao"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setIdProdutoSimilarItem(rs.getString("id_produto_similar_item"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setDescricaoItem(rs.getString("descricao_item"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -725,7 +770,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	p.numeroparcela,\n"
                     + " p.id_produtovasilhame,\n"
                     + " vend.operacional \n,"
-                    + " rt.id_classificacao \n"
+                    + " rt.id_classificacao, \n"
+                    + " p.produtoecommerce, \n"
+                    + " p.conferido, \n"
+                    + " p.volume, \n"
+                    + " tev.descricao tipo_embalagem_volume \n"
                     + "from\n"
                     + "	produto p\n"
                     + "	join lj on true\n"
@@ -735,6 +784,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "		ean_un.id = ean.id_tipoembalagem\n"
                     + "left join tipoembalagem emb on\n"
                     + "		emb.id = p.id_tipoembalagem\n"
+                    + "left join tipoembalagem tev ON tev.id = p.id_tipoembalagemvolume \n"
                     + "	join produtocomplemento vend on\n"
                     + "		p.id = vend.id_produto and vend.id_loja = lj.id\n"
                     + "	left join cest on\n"
@@ -821,6 +871,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
                     imp.setOperacional(rs.getInt("operacional"));
                     imp.setImpidClassificacaoTributaria(rs.getString("id_classificacao"));
+                    imp.setTipoEmbalagemVolume(rs.getString("tipo_embalagem_volume"));
+                    imp.setProdutoECommerce(rs.getBoolean("produtoecommerce"));
+                    imp.setConferido(rs.getBoolean("conferido"));
+
+                    double volume = rs.getDouble("volume");
+                    if (!rs.wasNull()) {
+                        imp.setVolume(volume);
+                    }
 
                     result.add(imp);
 //                    contador++;

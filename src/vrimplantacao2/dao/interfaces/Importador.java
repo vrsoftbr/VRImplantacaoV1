@@ -125,7 +125,6 @@ import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2_5.controller.interfaces.InterfaceController;
-
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepository;
 import vrimplantacao2.dao.cadastro.promocao.PromocaoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.usuario.OpcaoUsuario;
@@ -142,6 +141,9 @@ import vrimplantacao2.vo.importacao.TipoSetorIMP;
 import vrimplantacao2.vo.importacao.UsuarioIMP;
 import vrimplantacao2.vo.importacao.VerbaIMP;
 import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
+import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
+import vrimplantacao2.dao.cadastro.produtosimilar.ProdutoSimilarRepository;
+import vrimplantacao2.dao.cadastro.produtosimilar.ProdutoSimilarRepositoryProvider;
 
 public class Importador {
 
@@ -1343,6 +1345,24 @@ public class Importador {
         );
         AssociadoRepository rep = new AssociadoRepository(provider);
         rep.importarAssociado(associados, opt);
+    }
+    
+    /**
+     * Importa o cadastro de produtos similares do sistema.
+     *
+     * @param opcoes Opções de importação dos produtos similares.
+     * @throws Exception
+     */
+    public void importarProdutoSimilar() throws Exception {
+        ProgressBar.setStatus("Carregando produtos similares...");
+        List<ProdutoSimilarIMP> produtoSimilar = getInterfaceDAO().getProdutoSimilar();
+        ProdutoSimilarRepositoryProvider provider = new ProdutoSimilarRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        ProdutoSimilarRepository rep = new ProdutoSimilarRepository(provider);
+        rep.importarProdutoSimilar(produtoSimilar);
     }
 
     /**
