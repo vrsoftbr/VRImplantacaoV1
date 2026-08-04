@@ -293,13 +293,13 @@ public class LojaDAO {
                     stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
                 } catch (SQLException e) {
                     e.getMessage();
-                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.");
+                    throw new Exception("Erro ao copiar PdvAcumuladorLayout.", e);
                 }
                 try {
                     stm.execute(script.copiaAcumuladorLayoutRetorno(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.");
+                    throw new Exception("Erro ao copiar AcumuladorLayoutRetorno.", e);
                 }
             }
 
@@ -309,14 +309,14 @@ public class LojaDAO {
                     stm.execute(script.copiaPdvAliquotaLayout(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar PdvAliquotaLayout.");
+                    throw new Exception("Erro ao copiar PdvAliquotaLayout.", e);
                 }
 
                 try {
                     stm.execute(script.copiaAliquotaLayoutRetorno(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.");
+                    throw new Exception("Erro ao copiar AliquotaLayoutRetorno.", e);
                 }
             }
 
@@ -325,14 +325,14 @@ public class LojaDAO {
                     stm.execute(script.copiaPdvFinalizadoraLayout(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.");
+                    throw new Exception("Erro ao copiar PdvFinalizadoraLayout.", e);
                 }
 
                 try {
                     stm.execute(script.copiaFinalizadoraRetorno(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.");
+                    throw new Exception("Erro ao copiar PdvFinalizadoraLayoutRetorno.", e);
                 }
             }
             ProgressBar.setStatus("salvando loja... 50%");
@@ -342,7 +342,7 @@ public class LojaDAO {
                     stm.execute(script.copiaPdvCartaoLayout(i_loja));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar Cartões.");
+                    throw new Exception("Erro ao copiar Cartões.", e);
                 }
             }
 
@@ -356,14 +356,14 @@ public class LojaDAO {
 
             //("Copiando pdv.operador.");
             stm.execute(script.copiarPdvOperador(i_loja));
-            ProgressBar.setStatus("salvando loja... 60%");
+            ProgressBar.setStatus("salvando loja... 55%");
 
             //("Copiando notasaidasequencia.");
             stm.execute(script.inserirNotaSaidaSequencia(i_loja).getInsert());
 
             //("Copiando tiposaidanotasaidasequencia.");
             stm.execute(script.copiarTipoSaidaNotaSaidaSequencia(i_loja));
-            ProgressBar.setStatus("salvando loja... 70%");
+            ProgressBar.setStatus("salvando loja... 60%");
 
             if (i_loja.isCopiaOferta() == true) {
                 if (validaOferta(i_loja) == false) {
@@ -395,7 +395,7 @@ public class LojaDAO {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new Exception("Erro ao copiar ECF, certifique-se de que tenha ecf's na base.");
+                    throw new Exception("Erro ao copiar ECF, certifique-se de que tenha ecf's na base.", e);
                 }
 //                try {
 //                    stm.execute(script.copiaPdvAcumuladorLayout(i_loja));
@@ -438,7 +438,7 @@ public class LojaDAO {
                 }
 
             }
-            ProgressBar.setStatus("salvando loja... 80%");
+            ProgressBar.setStatus("salvando loja... 70%");
 
             if (i_loja.isCopiaOperador() == true) {
                 //("Copiando Operador.");
@@ -466,7 +466,7 @@ public class LojaDAO {
                     throw new Exception("Erro ao copiar as configurações de Sped.");
                 }
             }
-            ProgressBar.setStatus("salvando loja... 90%");
+            ProgressBar.setStatus("salvando loja... 80%");
 
             if (versao.igualOuMaiorQue(4, 1, 39)) {
                 //("Copiando parametroagendarecebimento.");
@@ -502,6 +502,15 @@ public class LojaDAO {
             if (isSchemaVrHistoricoVendaExiste()) {
                 stm.execute(script.insereLojaPdvHistoricoVenda(i_loja));
             }
+            
+            ProgressBar.setStatus("salvando loja... 90%");
+            try {
+                stm.execute(script.insereClassificacaoTributariaProduto(i_loja));
+                stm.execute(script.insereClassificacaoTributariaNcm(i_loja));
+            } catch (Exception e) {
+                throw new Exception("Erro ao copiar informações da Reforma Tributária.", e);
+            }
+            
             ProgressBar.setStatus("salvando loja... 100%");
 
         } catch (Exception ex) {

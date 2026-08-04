@@ -300,8 +300,7 @@ public class LojaGeradorScripts {
 
     public String copiaPdvCartaoLayout(LojaVO i_loja) throws Exception {
         String sql
-                = "BEGIN;\n"
-                + "DELETE FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getId() + ";\n"
+                = "DELETE FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getId() + ";\n"
                 + "INSERT INTO pdv.cartaolayout (id, id_loja, id_tipocartao, posicao, tamanho, id_tipocartaocampo)\n"
                 + "SELECT (SELECT COALESCE(MAX(id), 0) FROM pdv.cartaolayout) + \n"
                 + "       ROW_NUMBER() OVER (), \n"
@@ -311,8 +310,7 @@ public class LojaGeradorScripts {
                 + "       tamanho, \n"
                 + "       id_tipocartaocampo \n"
                 + "FROM pdv.cartaolayout \n"
-                + "WHERE id_loja = " + i_loja.getIdCopiarLoja() + ";\n"
-                + "COMMIT;";
+                + "WHERE id_loja = " + i_loja.getIdCopiarLoja() + ";";
 
         return sql;
     }
@@ -763,6 +761,26 @@ public class LojaGeradorScripts {
     public String insereLojaPdvHistoricoVenda(LojaVO i_loja) throws Exception {
         String sql = "INSERT INTO vrhistoricovenda.configuracaoloja(id_loja, novaconsulta, ultimaconsulta)"
                 + " VALUES (" + i_loja.getId() + " , true, NULL);";
+
+        return sql;
+    }
+
+    public String insereClassificacaoTributariaProduto(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO reformatributaria.classificacaotributariaproduto \n"
+                + "( id_classificacao, id_produto, id_loja)\n"
+                + "select id_classificacao, id_produto, " + i_loja.getId() + " \n"
+                + "FROM reformatributaria.classificacaotributariaproduto\n"
+                + "WHERE id_loja = " + i_loja.getIdCopiarLoja();
+
+        return sql;
+    }
+
+    public String insereClassificacaoTributariaNcm(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO reformatributaria.classificacaotributariancm \n"
+                + "(id_classificacao, id_ncm, ncm1, ncm2, ncm3, id_loja) \n"
+                + "SELECT c.id_classificacao, c.id_ncm, c.ncm1, ncm2, ncm3, " + i_loja.getId() + " \n"
+                + "FROM reformatributaria.classificacaotributariancm c \n"
+                + "WHERE id_loja = " + i_loja.getIdCopiarLoja();
 
         return sql;
     }
