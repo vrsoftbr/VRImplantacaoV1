@@ -713,8 +713,8 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.CEP)) {
                     sql.put("cep", vo.getCep());
                 }
-                if (opt.contains(OpcaoFornecedor.EMITE_NFE)) {
-                    sql.put("utilizanfe", vo.isUtilizaNfe());
+                if (opt.contains(OpcaoFornecedor.EMITE_NF)) {
+                    sql.put("emitenf", vo.isEmitenf());
                 }
                 if (opt.contains(OpcaoFornecedor.PERMITE_NF_SEM_PEDIDO)) {
                     sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());
@@ -724,6 +724,15 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.UTILIZAIVA)) {
                     sql.put("utilizaiva", vo.isUtilizaiva());
+                }
+                if (opt.contains(OpcaoFornecedor.REVENDA)) {
+                    sql.put("revenda", vo.getRevenda());
+                }
+                if (opt.contains(OpcaoFornecedor.UTILIZA_NFE)) {
+                    sql.put("utilizanfe", vo.isUtilizaNfe());
+                }
+                if (opt.contains(OpcaoFornecedor.UTILIZA_CONFERENCIA)) {
+                    sql.put("utilizaconferencia", vo.isUtilizaconferencia());
                 }
                 if (opt.contains(OpcaoFornecedor.DATA_CADASTRO)) {
                     sql.put("datacadastro", vo.getDataCadastro());

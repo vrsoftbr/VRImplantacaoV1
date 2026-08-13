@@ -151,6 +151,8 @@ public class ProdutoIMP {
     @DatabaseField private String icmsCreditoForaEstadoId;
     @DatabaseField private String icmsConsumidorId;
     
+    @DatabaseField private String regraFiscalConsumidorId;
+    
     @DatabaseField private double atacadoPreco = 0;
     @DatabaseField private double atacadoPorcentagem = 0;
     @DatabaseField private String codigoSped = "";
@@ -189,12 +191,17 @@ public class ProdutoIMP {
     
     @DatabaseField private double percentualPerda = 0;
     @DatabaseField private int qtdDiasMinimoValidade = 0;
+    @DatabaseField private boolean utilizaValidadeEntrada = false;
     
     @DatabaseField private TipoCompra tipoCompra = TipoCompra.NENHUM;
     @DatabaseField private boolean conferido = false;
     
     @DatabaseField private String impidClassificacaoTributaria;
     
+    @DatabaseField private String descricaoLojaVirtual;
+    @DatabaseField private int tipoImagem = 1;
+    @DatabaseField private String imagem;
+
     private int codigoAtual;
     private int operacional = 0;
     
@@ -416,6 +423,10 @@ public class ProdutoIMP {
 
     public String getIcmsConsumidorId() {
         return icmsConsumidorId;
+    }
+
+    public String getRegraFiscalConsumidorId() {
+        return regraFiscalConsumidorId;
     }
 
     public void setImportSistema(String importSistema) {
@@ -948,6 +959,10 @@ public class ProdutoIMP {
         this.icmsConsumidorId = icmsConsumidorId;
     }
 
+    public void setRegraFiscalConsumidorId(String regraFiscalConsumidorId) {
+        this.regraFiscalConsumidorId = regraFiscalConsumidorId;
+    }
+
     public void setManterEAN(boolean manterEAN) {
         this.manterEAN = manterEAN;
     }
@@ -1161,6 +1176,14 @@ public class ProdutoIMP {
     public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
         this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
     }
+
+    public boolean isUtilizaValidadeEntrada() {
+        return utilizaValidadeEntrada;
+    }
+
+    public void setUtilizaValidadeEntrada(boolean utilizaValidadeEntrada) {
+        this.utilizaValidadeEntrada = utilizaValidadeEntrada;
+    }
     
     public TipoCompra getTipoCompra() {
         return tipoCompra;
@@ -1184,6 +1207,30 @@ public class ProdutoIMP {
 
     public void setImpidClassificacaoTributaria(String impidClassificacaoTributaria) {
         this.impidClassificacaoTributaria = impidClassificacaoTributaria;
+    }
+
+    public String getDescricaoLojaVirtual() {
+        return descricaoLojaVirtual;
+    }
+
+    public void setDescricaoLojaVirtual(String descricaoLojaVirtual) {
+        this.descricaoLojaVirtual = descricaoLojaVirtual;
+    }
+
+    public int getTipoImagem() {
+        return tipoImagem;
+    }
+
+    public void setTipoImagem(int tipoImagem) {
+        this.tipoImagem = tipoImagem;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }
         
     public boolean from(ProdutoBalancaVO bal) {

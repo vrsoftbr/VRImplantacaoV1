@@ -54,6 +54,7 @@ import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao.dao.cadastro.ClassificacaoTributariaProdutoDAO;
 import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaDAO;
+import vrimplantacao2.vo.cadastro.ProdutoLojaVirtualVO;
 
 /**
  * Classe Proxy utilizada para fornecer dados do banco Postgres ao 
@@ -191,6 +192,10 @@ public class ProdutoRepositoryProvider {
     
     public void salvarLojaVirtual(ProdutoVO prod, long ean) throws Exception {
         produtoDAO.salvarLojaVirtual(prod, ean);
+    }
+    
+    public void salvarLojaVirtual(ProdutoLojaVirtualVO vo) throws Exception {
+        produtoDAO.salvarLojaVirtual(vo);
     }
     
     public void salvarProdutoPisCofins(ProdutoVO prod) throws Exception{

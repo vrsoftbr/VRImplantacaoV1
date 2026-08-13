@@ -17,6 +17,7 @@ import vrimplantacao2.vo.cadastro.receita.ReceitaAnteriorVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaItemVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaLojaVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaProdutoVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
@@ -165,7 +166,11 @@ public class ReceitaRepository {
 
         vo.setDescricao(imp.getDescricao());
         vo.setFichatecnica(imp.getFichatecnica());
-        vo.setId_situacaocadastro(1);
+        vo.setId_situacaocadastro(
+            imp.getId_situacaocadastro() != null
+                ? imp.getId_situacaocadastro().getId()
+                : SituacaoCadastro.ATIVO.getId()
+        );
 
         LOG.fine("RECEITA: " + vo.getDescricao());
         return vo;

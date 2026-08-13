@@ -676,11 +676,13 @@ public class FornecedorRepository {
         vo.setTipoEmpresa(imp.getTipoEmpresa());
         vo.setTipoPagamento(imp.getTipoPagamento());
         vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
-        vo.setUtilizaNfe(imp.isEmiteNfe());
+        vo.setUtilizaNfe(imp.isUtilizanfe());
         vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
         vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
-        vo.setUtilizaiva(imp.getUtilizaiva() == null ? false : !"0".equals(imp.getUtilizaiva().trim()));
-        vo.setRevenda(imp.getRevenda());
+        vo.setUtilizaiva(imp.getUtilizaiva());
+        vo.setRevenda(imp.isRevenda());
+        vo.setUtilizaconferencia(imp.isUtilizaconferencia());
+        vo.setEmitenf(imp.isEmiteNfe());
         vo.setIdPais(imp.getIdPais());
 
         if (imp.getIdFamiliaFornecedor() != null) {

@@ -42,7 +42,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlConn" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="269" max="32767" attributes="0"/>
+              <Component id="tabs" pref="296" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -97,25 +97,33 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFamiliaFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkFamiliaFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace pref="205" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFamiliaXFornecedor" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFEndereco" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFTipoFornecedor" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFPrazo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkFlagsFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFEndereco" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFamiliaXFornecedor" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -134,30 +142,32 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRazaoSocial" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkFCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkFTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFEndereco" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFEmail" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFEmail" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFContasAPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFEndereco" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="9" max="32767" attributes="0"/>
+                          <Component id="chkFlagsFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -273,6 +283,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFamiliaXFornecedorActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFlagsFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Flags Fornecedor"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFlagsFornecedorActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
@@ -549,7 +570,7 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkPdvVendasCustos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="138" max="32767" attributes="0"/>
+                          <EmptySpace pref="165" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -646,7 +667,7 @@
                       <Component id="chkSomenteAtivo" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkPrecoVendaSemOferta" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="155" max="32767" attributes="0"/>
+                      <EmptySpace pref="182" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -664,6 +685,7 @@
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPrecoVendaSemOferta">
               <Properties>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Pre&#xe7;o venda (Sem Oferta)"/>
               </Properties>
             </Component>

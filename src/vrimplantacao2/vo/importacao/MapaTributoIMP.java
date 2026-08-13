@@ -14,6 +14,7 @@ public class MapaTributoIMP {
     private double fcp = 0;
     private boolean desonerado = false;
     private double porcentagemDesonerado = 0;
+    private int csosn;
     
     public static MapaTributoIMP make(String id, String descricao) {
         return new MapaTributoIMP(id, descricao);
@@ -44,6 +45,14 @@ public class MapaTributoIMP {
         this.fcp = fcp;
         this.desonerado = desonerado;
         this.porcentagemDesonerado = porcentagemDesonerado;
+    }
+    
+    public MapaTributoIMP(String id, String descricao, int cst, double aliquota, double reduzido, double fcp, boolean desonerado, double porcentagemDesonerado, int csosn) {
+        this(id, descricao, cst, aliquota, reduzido);
+        this.fcp = fcp;
+        this.desonerado = desonerado;
+        this.porcentagemDesonerado = porcentagemDesonerado;
+        this.csosn = csosn;
     }
 
     public String getId() {
@@ -109,5 +118,12 @@ public class MapaTributoIMP {
     public void setPorcentagemDesonerado(double porcentagemDesonerado) {
         this.porcentagemDesonerado = porcentagemDesonerado;
     }
-    
+
+    public int getCsosn() {
+        return csosn;
+    }
+
+    public void setCsosn(int csosn) {
+        this.csosn = csosn;
+    }
 }

@@ -1,17 +1,16 @@
 package vrimplantacao2.dao.cadastro.nutricional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
-import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
-import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
+import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
 
 /**
  *
@@ -58,7 +57,7 @@ public class NutricionalRepository {
             for (NutricionalIMP imp: nutricionais) {
                 LOG.finer("Nutricional: " + imp.getId() + " - " + imp.getDescricao());
                 NutricionalAnteriorVO anterior = anteriores.get(imp.getId());
-                
+
                 if (anterior == null) {
                     
                     anterior = converterAnterior(imp);
@@ -121,7 +120,7 @@ public class NutricionalRepository {
                                     LOG.finest("ID Toledo Produto " + idProduto + " gravado no nutricional " + anterior.getCodigoAtualToledo()); 
                                 }
                             }
-                        }
+                        }                     
                     }
                 }
                 

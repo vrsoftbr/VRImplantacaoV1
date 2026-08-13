@@ -55,26 +55,29 @@ public class FornecedorIMP {
     private double valor_minimo_pedido;
     private Date datacadastro;
     private String observacao;
-    
+
     private int prazoPedido = 15;
     private String idDivisao;
-    
+
     private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
-    
+
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
-    
+
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
     private TipoPagamento tipoPagamento;
     private int idBanco;
     private boolean emiteNfe = false;
     private boolean permiteNfSemPedido = false;
-    
+
     private TipoIndicadorIE tipoIndicadorIe;
-    private String utilizaiva = "0";
     private boolean revenda = false;
+    private boolean utilizaiva = false;
+    private boolean utilizanfe = false;
+    private boolean utilizaconferencia = false;
+    
     private Integer idPais;
     private Integer idFamiliaFornecedor;
-    
+
     public TipoIndicadorIE getTipoIndicadorIe() {
         return tipoIndicadorIe;
     }
@@ -82,45 +85,43 @@ public class FornecedorIMP {
     public void setTipoIndicadorIe(TipoIndicadorIE tipoIndicadorIe) {
         this.tipoIndicadorIe = tipoIndicadorIe;
     }
-    
-    
 
     public Set<Integer> getCondicoesPagamentos() {
         return condicoesPagamentos;
     }
-    
+
     public void addCondicaoPagamento(int condicaoPagamento) {
         this.condicoesPagamentos.add(condicaoPagamento < 0 ? 0 : condicaoPagamento);
     }
-    
+
     private final MultiMap<String, FornecedorContatoIMP> contatos = new MultiMap<>(
             new Factory<FornecedorContatoIMP>() {
-                @Override
-                public FornecedorContatoIMP make() {
-                    FornecedorContatoIMP ret = new FornecedorContatoIMP();
-                    ret.setImportSistema(FornecedorIMP.this.getImportSistema());
-                    ret.setImportLoja(FornecedorIMP.this.getImportLoja());
-                    ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
+        @Override
+        public FornecedorContatoIMP make() {
+            FornecedorContatoIMP ret = new FornecedorContatoIMP();
+            ret.setImportSistema(FornecedorIMP.this.getImportSistema());
+            ret.setImportLoja(FornecedorIMP.this.getImportLoja());
+            ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
 
-                    return ret;
-                }
-            }
+            return ret;
+        }
+    }
     );
-    
+
     private List<FornecedorDivisaoIMP> divisoes = new ArrayList<>();
-    
+
     private final MultiMap<String, FornecedorPagamentoIMP> pagamentos = new MultiMap<>(
             new Factory<FornecedorPagamentoIMP>() {
-                @Override
-                public FornecedorPagamentoIMP make() {
-                    FornecedorPagamentoIMP ret = new FornecedorPagamentoIMP();
-                    ret.setImportSistema(FornecedorIMP.this.getImportSistema());
-                    ret.setImportLoja(FornecedorIMP.this.getImportLoja());
-                    ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
-                    return ret;
-                }                    
-            }
-    );    
+        @Override
+        public FornecedorPagamentoIMP make() {
+            FornecedorPagamentoIMP ret = new FornecedorPagamentoIMP();
+            ret.setImportSistema(FornecedorIMP.this.getImportSistema());
+            ret.setImportLoja(FornecedorIMP.this.getImportLoja());
+            ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
+            return ret;
+        }
+    }
+    );
 
     public String getImportSistema() {
         return importSistema;
@@ -259,17 +260,23 @@ public class FornecedorIMP {
     }
 
     public int getPrazoEntrega() {
-        if (getDivisoes().isEmpty()) return 7;
+        if (getDivisoes().isEmpty()) {
+            return 7;
+        }
         return getDivisoes().get(0).getPrazoEntrega();
     }
 
     public int getPrazoSeguranca() {
-        if (getDivisoes().isEmpty()) return 7;
+        if (getDivisoes().isEmpty()) {
+            return 7;
+        }
         return getDivisoes().get(0).getPrazoSeguranca();
     }
 
     public int getPrazoVisita() {
-        if (getDivisoes().isEmpty()) return 7;
+        if (getDivisoes().isEmpty()) {
+            return 7;
+        }
         return getDivisoes().get(0).getPrazoVisita();
     }
 
@@ -416,11 +423,11 @@ public class FornecedorIMP {
     public MultiMap<String, FornecedorContatoIMP> getContatos() {
         return contatos;
     }
-    
+
     public MultiMap<String, FornecedorPagamentoIMP> getPagamentos() {
         return pagamentos;
     }
-    
+
     public List<FornecedorDivisaoIMP> getDivisoes() {
         return divisoes;
     }
@@ -465,11 +472,13 @@ public class FornecedorIMP {
     public void setTipoEmpresa(TipoEmpresa tipoEmpresa) {
         this.tipoEmpresa = tipoEmpresa;
     }
-    
+
     /**
-     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo, 
+     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo,
      * então o contato não é incluiso e null é retornado.
-     * @param id ID que identificará o contato na lista de contatos do fornecedor.
+     *
+     * @param id ID que identificará o contato na lista de contatos do
+     * fornecedor.
      * @param nome Nome do contato.
      * @param telefone Telefone do contato.
      * @param celular Celular do contato.
@@ -478,9 +487,9 @@ public class FornecedorIMP {
      * @return Contato cadastrado ou null quando o nome for vazio.
      */
     public FornecedorContatoIMP addContato(String id, String nome, String telefone, String celular, TipoContato tipo, String email) {
-        
+
         if (nome != null && !"".equals(nome.trim())) {
-            
+
             if (id == null) {
                 int cont = 1;
                 while (contatos.containsKey("CONTATO " + cont)) {
@@ -488,7 +497,7 @@ public class FornecedorIMP {
                 }
                 id = "CONTATO " + cont;
             }
-            
+
             FornecedorContatoIMP cont = contatos.make(id);
             cont.setImportSistema(getImportSistema());
             cont.setImportLoja(getImportLoja());
@@ -498,26 +507,26 @@ public class FornecedorIMP {
             cont.setTelefone(telefone);
             cont.setCelular(celular);
             cont.setTipoContato(tipo);
-            cont.setEmail(email);            
-            return cont;            
+            cont.setEmail(email);
+            return cont;
         } else {
             return null;
-        }        
+        }
     }
-    
+
     /**
      * Inclui as divisões dos fornecedor
-     * 
+     *
      * @param id
      * @param prazoVisita
      * @param prazoEntrega
      * @param prazoSeguranca
      * @return Divisão cadastrada ou null quando o nome for vazio.
-    */    
+     */
     public FornecedorDivisaoIMP addDivisao(String id, int prazoVisita, int prazoEntrega, int prazoSeguranca) {
-        
+
         FornecedorDivisaoIMP div = new FornecedorDivisaoIMP();
-        
+
         div.setImportSistema(getImportSistema());
         div.setImportLoja(getImportLoja());
         div.setImportFornecedorId(getImportId());
@@ -525,15 +534,16 @@ public class FornecedorIMP {
         div.setPrazoEntrega(prazoEntrega);
         div.setPrazoSeguranca(prazoSeguranca);
         div.setPrazoVisita(prazoVisita);
-        
+
         this.divisoes.add(div);
-        
+
         return div;
     }
-    
+
     /**
-     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo, 
+     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo,
      * então o contato não é incluiso e null é retornado.
+     *
      * @param nome Nome do contato.
      * @param telefone Telefone do contato.
      * @param celular Celular do contato.
@@ -541,13 +551,14 @@ public class FornecedorIMP {
      * @param email E-mail do contato.
      * @return Contato cadastrado ou null quando o nome for vazio.
      */
-    public FornecedorContatoIMP addContato(String nome, String telefone, String celular, TipoContato tipo, String email) {        
+    public FornecedorContatoIMP addContato(String nome, String telefone, String celular, TipoContato tipo, String email) {
         return addContato(null, nome, telefone, celular, tipo, email);
     }
-    
+
     /**
      * Incluí uma forma de pagamento no cadastro do fornecedor.
-     * @param id  ID da condição de pagamento.
+     *
+     * @param id ID da condição de pagamento.
      * @param vencimento Dia de vencimento.
      * @return Forma de pagamento do fornecedor que foi armazenada.
      */
@@ -578,7 +589,9 @@ public class FornecedorIMP {
     }
 
     /**
-     * Método criado para facilitar a inclusão de celular nos contatos do fornecedor.
+     * Método criado para facilitar a inclusão de celular nos contatos do
+     * fornecedor.
+     *
      * @param descricao Descricão que será utilizada no contato.
      * @param celular Celular que será gravado.
      * @return Contato incluso.
@@ -595,6 +608,7 @@ public class FornecedorIMP {
     /**
      * Método criado para facilitar a inclusão de telefones adicionais nos
      * contatos do fornecedor.
+     *
      * @param descricao Descrição que será utilizada nos contatos.
      * @param telefone Telefone a ser incluso.
      * @return Contato incluso.
@@ -609,7 +623,9 @@ public class FornecedorIMP {
     }
 
     /**
-     * Método criado para facilitar a inclusão de e-mails no fornecedor como contato.
+     * Método criado para facilitar a inclusão de e-mails no fornecedor como
+     * contato.
+     *
      * @param descricao Descrição que será utilizada no cadastro.
      * @param email E-mail do fornecedor.
      * @param tipo Tipo de e-mail.
@@ -642,8 +658,9 @@ public class FornecedorIMP {
     /**
      * Método de conveniência para atribuir um tipo produtor rural ao
      * fornecedor. Ao acionar este método é verificado o cnpj do fornecedor e se
-     * for pessoa física atribui o valor {@link TipoEmpresa#PRODUTOR_RURAL_FISICA}
-     * senão {@link TipoEmpresa#PRODUTOR_RURAL_JURIDICO}.
+     * for pessoa física atribui o valor
+     * {@link TipoEmpresa#PRODUTOR_RURAL_FISICA} senão
+     * {@link TipoEmpresa#PRODUTOR_RURAL_JURIDICO}.
      */
     public void setProdutorRural() {
         if (Utils.stringToLong(this.cnpj_cpf) <= 99999999999L) {
@@ -713,22 +730,38 @@ public class FornecedorIMP {
         this.idDivisao = idDivisao;
     }
 
-    public String getUtilizaiva() {
+    public boolean getUtilizaiva() {
         return utilizaiva;
     }
 
-    public void setUtilizaiva(String utilizaiva) {
+    public void setUtilizaiva(boolean utilizaiva) {
         this.utilizaiva = utilizaiva;
-    }    
-    
-    public boolean getRevenda() {
+    }
+
+    public boolean isRevenda() {
         return revenda;
     }
 
     public void setRevenda(boolean revenda) {
         this.revenda = revenda;
-    }    
+    }
 
+    public boolean isUtilizanfe() {
+        return utilizanfe;
+    }
+
+    public void setUtilizanfe(boolean utilizanfe) {
+        this.utilizanfe = utilizanfe;
+    }
+
+    public boolean isUtilizaconferencia() {
+        return utilizaconferencia;
+    }
+
+    public void setUtilizaconferencia(boolean utilizaconferencia) {
+        this.utilizaconferencia = utilizaconferencia;
+    }
+    
     public Integer getIdPais() {
         return idPais;
     }
@@ -736,7 +769,7 @@ public class FornecedorIMP {
     public void setIdPais(Integer idPais) {
         this.idPais = idPais;
     }
-    
+
     public Integer getIdFamiliaFornecedor() {
         return idFamiliaFornecedor;
     }

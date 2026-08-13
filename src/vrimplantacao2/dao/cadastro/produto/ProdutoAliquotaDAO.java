@@ -39,7 +39,11 @@ public class ProdutoAliquotaDAO {
             if (versao.igualOuMaiorQue(3, 19, 1, 64)) {
                 sql.put("excecao", vo.getExcecao());
             }
-
+            
+            if (!vo.getRegraFiscalConsumidor().equals("0")) {
+                sql.put("id_regrafiscalconsumidor", vo.getRegraFiscalConsumidor());
+            }
+            
             sql.getReturning().add("id");
 
             try (ResultSet rst = stm.executeQuery(
@@ -173,6 +177,13 @@ public class ProdutoAliquotaDAO {
                 if (!versao.igualOuMenorQue(3, 18, 3)) {
                     sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                 }
+                
+                if (vo.getRegraFiscalConsumidor() != null && !vo.getRegraFiscalConsumidor().equals("0")) {
+                    sql.put("id_regrafiscalconsumidor", vo.getRegraFiscalConsumidor()); 
+                } else {
+                    sql.putNull("id_regrafiscalconsumidor");
+                }
+                
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 

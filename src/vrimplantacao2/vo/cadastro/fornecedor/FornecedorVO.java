@@ -59,6 +59,8 @@ public class FornecedorVO {
     private boolean permiteNfSemPedido = false;
     private boolean utilizaiva = false;
     private boolean revenda = false;
+    private boolean utilizaconferencia = false;
+    private boolean emitenf = false; 
     
     private Integer idPais = 1058;
     
@@ -416,6 +418,22 @@ public class FornecedorVO {
     public void setRevenda(boolean revenda) {
         this.revenda = revenda;
     }    
+
+    public boolean isUtilizaconferencia() {
+        return utilizaconferencia;
+    }
+
+    public void setUtilizaconferencia(boolean utilizaconferencia) {
+        this.utilizaconferencia = utilizaconferencia;
+    }
+
+    public boolean isEmitenf() {
+        return emitenf;
+    }
+
+    public void setEmitenf(boolean emitenf) {
+        this.emitenf = emitenf;
+    }
 
     public Integer getIdPais() {
         return idPais;

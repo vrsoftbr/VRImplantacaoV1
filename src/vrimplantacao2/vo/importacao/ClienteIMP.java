@@ -106,6 +106,7 @@ public class ClienteIMP {
     private String inscricaoMunicipal;
     private TipoIndicadorIE tipoIndicadorIe = TipoIndicadorIE.NAO_CONTRIBUINTE;
     private int grupo;
+    private int idClasserisco;
 
     private List<ClienteContatoIMP> contatos = new ArrayList<>();
     private List<ClienteDependenteIMP> dependentes = new ArrayList<>();
@@ -700,6 +701,14 @@ public class ClienteIMP {
         this.senha = senha;
     }
 
+    public int getIdClasserisco() {
+        return idClasserisco;
+    }
+
+    public void setIdClasserisco(int idClasserisco) {
+        this.idClasserisco = idClasserisco;
+    }
+    
     /**
      * Inclui um contato.
      *

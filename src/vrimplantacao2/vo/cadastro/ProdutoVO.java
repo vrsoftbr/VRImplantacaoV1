@@ -74,6 +74,7 @@ public class ProdutoVO {
     private int idVasilhame;
     private double percentualPerda = 0;
     private int qtdDiasMinimoValidade = 0;
+    private boolean utilizaValidadeEntrada = false;
     private TipoCompra tipoCompra = TipoCompra.NENHUM;
     private boolean conferido = false;
     private int idClassificacaoTributaria = 0;
@@ -507,6 +508,14 @@ public class ProdutoVO {
 
     public void setQtdDiasMinimoValidade(int qtdDiasMinimoValidade) {
         this.qtdDiasMinimoValidade = qtdDiasMinimoValidade;
+    }
+
+    public boolean isUtilizaValidadeEntrada() {
+        return utilizaValidadeEntrada;
+    }
+
+    public void setUtilizaValidadeEntrada(boolean utilizaValidadeEntrada) {
+        this.utilizaValidadeEntrada = utilizaValidadeEntrada;
     }
 
     public boolean isConferido() {

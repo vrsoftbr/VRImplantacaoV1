@@ -23,7 +23,6 @@ import vrframework.classe.VRException;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -36,6 +35,7 @@ import vrimplantacao2.vo.cadastro.ProdutoAutomacaoDescontoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoLojaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
+import vrimplantacao2.vo.cadastro.ProdutoLojaVirtualVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.enums.Icms;
@@ -258,16 +258,21 @@ public class ProdutoRepository {
                         if (versao.igualOuMaiorQue(4, 1)) {
                             provider.salvarProdutoPisCofins(prod);
                         }
+                        
+                        if (imp.getDescricaoLojaVirtual() != null) {
+                            ProdutoLojaVirtualVO produtoLojaVirtual = converterProdutoLojaVirtual(imp, prod.getId());
 
-                        if (prod.getDescricaoCompleta() != null
-                                && !prod.getDescricaoCompleta().trim().isEmpty()
-                                && prod.getDescricaoCompleta().length() >= 3
-                                && ean > 999999) {
-
-                            if (!(ean > 99999999999999l)) {
-                                provider.salvarLojaVirtual(prod, ean);
-                            }
+                            provider.salvarLojaVirtual(produtoLojaVirtual);
                         }
+//                        if (prod.getDescricaoCompleta() != null
+//                                && !prod.getDescricaoCompleta().trim().isEmpty()
+//                                && prod.getDescricaoCompleta().length() >= 3
+//                                && ean > 999999) {
+//
+//                            if (!(ean > 99999999999999l)) {
+//                                provider.salvarLojaVirtual(prod, ean);
+//                            }
+//                        }
 
                         if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
@@ -1322,6 +1327,7 @@ public class ProdutoRepository {
         String idIcmsCreditoForaEstado = imp.getIcmsCreditoForaEstadoId();
         String idIcmsCreditoFornecedor = imp.getIcmsCreditoId();
         String idIcmsConsumidor = imp.getIcmsConsumidorId();
+        String idRegraFiscalConsumidor = imp.getRegraFiscalConsumidorId();
 
         if (idIcmsDebito != null) {
 
@@ -1456,6 +1462,7 @@ public class ProdutoRepository {
         aliquota.setAliquotaCreditoForaEstado(creditoForaEstado);
         aliquota.setAliquotaDebitoForaEstadoNf(debitoForaEstadoNfe);
         aliquota.setAliquotaConsumidor(consumidor);
+        aliquota.setRegraFiscalConsumidor(idRegraFiscalConsumidor);
 
         if (idIcmsCreditoFornecedor != null) {
             aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
@@ -1519,6 +1526,17 @@ public class ProdutoRepository {
         complemento.setValidade(imp.getValidade());
 
         return complemento;
+    }
+    
+    public ProdutoLojaVirtualVO converterProdutoLojaVirtual(ProdutoIMP imp, int produtoId) {
+        ProdutoLojaVirtualVO produtoLojaVirtual = new ProdutoLojaVirtualVO();
+        
+        produtoLojaVirtual.setIdProduto(produtoId);
+        produtoLojaVirtual.setDescricao(imp.getDescricaoLojaVirtual());
+        produtoLojaVirtual.setIdTipoOrigemImagem(imp.getTipoImagem());
+        produtoLojaVirtual.setImagem(imp.getImagem());
+        
+        return produtoLojaVirtual;
     }
 
     /**
@@ -1703,6 +1721,7 @@ public class ProdutoRepository {
         vo.setAceitaMultiplicacaoPDV(imp.isAceitaMultiplicacaoPDV());
 
         vo.setQtdDiasMinimoValidade(imp.getQtdDiasMinimoValidade());
+        vo.setUtilizaValidadeEntrada(imp.isUtilizaValidadeEntrada());
 
         //Importação da divisão de fornecedores
         Entry<String, Integer> divisaoFornecedor = this.divisoes.get(imp.getDivisao());

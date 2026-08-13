@@ -1076,7 +1076,7 @@ public class ProdutoAnteriorDAO {
                     + "order by 1"
             )) {
                 while (rst.next()) {
-                    result.put(rst.getString("codigoatual"), rst.getInt("codigoatual"));
+                    result.put(rst.getString("impid"), rst.getInt("codigoatual"));
                 }
             }
         }

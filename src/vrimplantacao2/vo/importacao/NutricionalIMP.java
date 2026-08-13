@@ -299,7 +299,7 @@ public class NutricionalIMP {
     }
 
     public void setIdTipoMedida(int idTipoMedida) {
-        this.idTipoMedida = (idTipoMedida - 1);
+        this.idTipoMedida = (idTipoMedida);
     }
 
     public int getMedidaInteira() {

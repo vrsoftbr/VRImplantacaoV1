@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,13 +25,10 @@ import vrimplantacao.classe.Global;
 import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -71,18 +67,20 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.PromocaoIMP;
-import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
-import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
 import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoNcmIMP;
-import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
+import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
+import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 
 /**
  *
@@ -179,12 +177,15 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     OpcaoProduto.RECEITA,
                     OpcaoProduto.PROMOCAO,
                     OpcaoProduto.VASILHAME,
-                    OpcaoProduto.SUGESTAO_COTACAO,
                     OpcaoProduto.VOLUME_QTD,
                     OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                     OpcaoProduto.PRODUTO_ECOMMERCE,
                     OpcaoProduto.CONFERIDO,
-                    OpcaoProduto.SIMILAR,}
+                    OpcaoProduto.SIMILAR,
+                    OpcaoProduto.SUGESTAO_COTACAO,
+                    OpcaoProduto.SUGESTAO_PEDIDO,
+                    OpcaoProduto.ACEITA_MULTIPLICACAO_PDV
+                }
         ));
     }
 
@@ -365,6 +366,16 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	select p.id_aliquotacreditocusto from produtoaliquota p\n"
                     + "	union\n"
                     + "	select p.id_aliquotacreditoforaestado from produtoaliquota p\n"
+                    + "	union\n"
+                    + "	select pf.id_aliquotacredito from pautafiscal pf\n"
+                    + "	union\n"
+                    + "	select pf.id_aliquotadebito from pautafiscal pf\n"
+                    + "	union\n"
+                    + "	select pf.id_aliquotadebitoforaestado from pautafiscal pf\n"
+                    + "	union\n"
+                    + " select id_aliquota from fiscal.regrafiscalicms r \n"
+                    + "	union\n"
+                    + "	select pf.id_aliquotacreditoforaestado from pautafiscal pf\n"
                     + ")\n"
                     + "select \n"
                     + "	id,\n"
@@ -374,7 +385,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	reduzido,\n"
                     + "	porcentagemfcp,\n"
                     + "	icmsdesonerado,\n"
-                    + "	percentualicmsdesonerado \n"
+                    + "	percentualicmsdesonerado, \n"
+                    + " csosn \n"
                     + "from 	\n"
                     + "	aliquota\n"
                     + "where \n"
@@ -391,7 +403,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                             rs.getDouble("reduzido"),
                             rs.getDouble("porcentagemfcp"),
                             rs.getBoolean("icmsdesonerado"),
-                            rs.getDouble("percentualicmsdesonerado")
+                            rs.getDouble("percentualicmsdesonerado"),
+                            rs.getInt("csosn")
                     ));
                 }
             }
@@ -748,6 +761,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " 	vend.margemmaxima,\n"
                     + " 	vend.margemminima,\n"
                     : " 	p.margem,\n")
+                    + "	p.qtddiasminimovalidade,\n"
+                    + "	p.utilizavalidadeentrada,\n"
                     + "	vend.id_situacaocadastro,\n"
                     + "	vend.descontinuado,\n"
                     + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
@@ -762,6 +777,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " 	aliq.id_aliquotacredito,\n"
                     + " 	aliq.id_aliquotacreditocusto,\n"
                     + " 	aliq.id_aliquotacreditoforaestado,\n"
+                    + "         COALESCE(id_regrafiscalconsumidor, 0) AS id_regrafiscalconsumidor, \n"
                     + "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n"
                     + "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n"
                     + "	pad.desconto atacadodesconto,\n"
@@ -774,7 +790,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " p.produtoecommerce, \n"
                     + " p.conferido, \n"
                     + " p.volume, \n"
-                    + " tev.descricao tipo_embalagem_volume \n"
+                    + " p.aceitamultiplicacaopdv, \n"
+                    + " tev.descricao tipo_embalagem_volume, \n"
+                    + " pv.descricao AS descricao_loja_virtual, \n"
+                    + " pv.id_tipoorigemimagem AS tipo_imagem, \n"
+                    + " pv.imagem \n"
                     + "from\n"
                     + "	produto p\n"
                     + "	join lj on true\n"
@@ -807,6 +827,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " left join reformatributaria.classificacaotributariaproduto rt on\n"
                     + "         rt.id_produto = p.id and \n"
                     + "         rt.id_loja = lj.id \n"
+                    + " LEFT JOIN oferta o ON o.id_produto = p.id AND o.id_loja = lj.id AND o.id_situacaooferta = 1 \n"
+                    + " AND CURRENT_DATE BETWEEN datainicio AND datatermino \n"
+                    + " LEFT JOIN produtolojavirtual pv ON pv.id_produto = p.id \n"
                     + (apenasProdutoAtivo == true ? " where vend.id_situacaocadastro = 1" : "")
                     + "order by\n"
                     + "	p.id"
@@ -867,6 +890,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotaconsumidor"));
                     imp.setIcmsCreditoId(rs.getString("id_aliquotacredito"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
+                    imp.setRegraFiscalConsumidorId(rs.getString("id_regrafiscalconsumidor"));
                     imp.setFornecedorFabricante(rs.getString("id_fornecedorfabricante"));
                     imp.setNumeroparcela(rs.getInt("numeroparcela"));
                     imp.setOperacional(rs.getInt("operacional"));
@@ -874,6 +898,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoEmbalagemVolume(rs.getString("tipo_embalagem_volume"));
                     imp.setProdutoECommerce(rs.getBoolean("produtoecommerce"));
                     imp.setConferido(rs.getBoolean("conferido"));
+                    imp.setAceitaMultiplicacaoPDV(rs.getBoolean("aceitamultiplicacaopdv"));
+                    imp.setUtilizaValidadeEntrada(rs.getBoolean("utilizavalidadeentrada"));
+                    imp.setQtdDiasMinimoValidade(rs.getInt("qtddiasminimovalidade"));
+                    imp.setDescricaoLojaVirtual(rs.getString("descricao_loja_virtual"));
+                    imp.setTipoImagem(rs.getInt("tipo_imagem"));
+                    imp.setImagem(rs.getString("imagem"));
 
                     double volume = rs.getDouble("volume");
                     if (!rs.wasNull()) {
@@ -937,7 +967,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	te.descricao descricao_tipo_empresa,\n"
                     + "	tf.id id_tipo_fornecedor,\n"
                     + "	tf.descricao descricao_tipo_fornecedor, \n"
-                    + "	f.id_familiafornecedor id_familia_fornecedor \n"
+                    + "	f.id_familiafornecedor id_familia_fornecedor, \n"
+                    + " f.revenda, \n"
+                    + " f.utilizaiva, \n"
+                    + " f.utilizanfe, \n"
+                    + " f.utilizaconferencia, \n"
+                    + " f.emitenf \n"
                     + "from \n"
                     + "	fornecedor f\n"
                     + "	LEFT JOIN fornecedorendereco fe ON fe.id_fornecedor = f.id\n"
@@ -990,6 +1025,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoEmpresa(TipoEmpresa.getByDescricao(rs.getString("descricao_tipo_empresa")));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rs.getInt("id_tipo_fornecedor")));
                     imp.setIdFamiliaFornecedor(rs.getInt("id_familia_fornecedor"));
+                    imp.setRevenda(rs.getBoolean("revenda"));
+                    imp.setUtilizaiva(rs.getBoolean("utilizaiva"));
+                    imp.setUtilizanfe(rs.getBoolean("utilizanfe"));
+                    imp.setUtilizaconferencia(rs.getBoolean("utilizaconferencia"));
+                    imp.setEmiteNfe(rs.getBoolean("emitenf"));
 
                     getDivisaoFornecedor(imp);
 //                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
@@ -1489,7 +1529,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "	'NENHUM'::varchar tipoorgaopublico,\n"
                     + "	0 limitecompra,\n"
                     + "	''::varchar inscricaomunicipal,\n"
-                    + "	'NAO CONTRIBUINTE'::varchar tipoindicadorie\n"
+                    + "	'NAO CONTRIBUINTE'::varchar tipoindicadorie, \n"
+                    + " id_classerisco \n"
                     + "FROM \n"
                     + "	clienteeventual c\n"
                     + "LEFT JOIN municipio mun ON\n"
@@ -1557,6 +1598,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setCobrancaCep(rs.getString("cobrancacep"));
                     imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+                    imp.setIdClasserisco(rs.getInt("id_classerisco"));
 
 //                    getContatoCliente(imp);
                     imp.setContatos(mapContato.getOrDefault(imp.getId(), Collections.emptyList()));
@@ -2268,6 +2310,19 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " n.medidaInteira,\n"
                     + " n.id_tipomedidadecimal,\n"
                     + " n.Id_tipounidadeporcao,\n"
+                    + " n.mensagemalergico1,\n"
+                    + " n.mensagemalergico2,\n"
+                    + " n.mensagemalergico3,\n"
+                    + " n.mensagemalergico4,\n"
+                    + " n.mensagemalergico5,\n"
+                    + " n.mensagemalergico6,\n"
+                    + " n.mensagemalergico7,\n"
+                    + " n.mensagemalergico8,\n"
+                    + " n.mensagemalergico9,\n"
+                    + " n.mensagemalergico10,\n"
+                    + " n.mensagemalergico11,\n"
+                    + " n.mensagemalergico12,\n"
+                    + " n.mensagemalergico13,\n"
                     + " n.mensagemalergico1||' '||n.mensagemalergico2||' '||n.mensagemalergico3||\n"
                     + " ' '||n.mensagemalergico4||' '||n.mensagemalergico5 as mensagemalergico,\n"
                     + " ni.id_produto \n"
@@ -2284,6 +2339,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setProteina(rst.getDouble("proteina"));
                     imp.setQuantidade(rst.getInt("quantidade"));
                     imp.setGordura(rst.getDouble("gordura"));
+                    imp.setGorduraSaturada(rst.getDouble("gorduraSaturada"));
                     imp.setFibra(rst.getDouble("fibra"));
                     imp.setCalcio(rst.getDouble("calcio"));
                     imp.setFerro(rst.getDouble("ferro"));
@@ -2302,8 +2358,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setId_tipomedidadecimal(rst.getInt("id_tipomedidadecimal"));
                     imp.setId_tipounidadeporcao(rst.getInt("Id_tipounidadeporcao"));
 
-                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
                     imp.addProduto(rst.getString("id_produto"));
+
+                    for (int i = 1; i <= 13; i++) {
+                        String mensagem = rst.getString("mensagemalergico" + i);
+
+                        if (mensagem != null && !mensagem.trim().isEmpty()) {
+                            imp.getMensagemAlergico().add(mensagem);
+                        }
+                    }
+//                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+
                     result.add(imp);
                 }
             }

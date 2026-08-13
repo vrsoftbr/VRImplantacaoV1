@@ -15,6 +15,7 @@ public class ProdutoAliquotaVO {
     private Icms aliquotaDebitoForaEstadoNf;
     private Icms aliquotaConsumidor;
     private String aliquotaCreditoFornecedor;
+    private String regraFiscalConsumidor;
     private int excecao = 0;
     private int beneficio = 0;
     
@@ -112,5 +113,13 @@ public class ProdutoAliquotaVO {
 
     public void setBeneficio(int beneficio) {
         this.beneficio = beneficio;
+    }
+
+    public String getRegraFiscalConsumidor() {
+        return regraFiscalConsumidor;
+    }
+
+    public void setRegraFiscalConsumidor(String regraFiscalConsumidor) {
+        this.regraFiscalConsumidor = regraFiscalConsumidor;
     }
 }

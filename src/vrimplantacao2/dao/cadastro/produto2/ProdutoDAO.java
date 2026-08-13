@@ -11,13 +11,14 @@ import java.util.logging.Logger;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
+import vrimplantacao2.vo.cadastro.ProdutoLojaVirtualVO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
@@ -152,7 +153,7 @@ public class ProdutoDAO {
                 sql.put("excecao", vo.getExcecao());
             }
             sql.put("id_tipomercadoria", 99);
-            sql.put("sugestaopedido", true);
+            sql.put("sugestaopedido", vo.isSugestaoPedido());
             sql.put("aceitamultiplicacaopdv", vo.isAceitaMultiplicacaoPDV());
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
             sql.put("id_divisaofornecedor", 0);
@@ -187,13 +188,13 @@ public class ProdutoDAO {
                     : vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
 
             sql.put("vendapdv", true);
-            sql.put("conferido", false);
+            sql.put("conferido", vo.isConferido());
             sql.put("permitequebra", true);
             sql.put("permiteperda", true);
             sql.put("id_codigoanp", vo.getCodigoAnp() != 0 ? vo.getCodigoAnp() : null);
             sql.put("impostomedionacional", 0);
             sql.put("impostomedioimportado", 0);
-            sql.put("sugestaocotacao", true);
+            sql.put("sugestaocotacao", vo.isSugestaoCotacao());
             sql.put("tara", 0.0);
             sql.put("utilizatabelasubstituicaotributaria", false);
             sql.put("id_tipolocaltroca", 0);
@@ -350,8 +351,7 @@ public class ProdutoDAO {
                 sql.put("margem", vo.getMargem());
             }
         }
-        if (opt.contains(OpcaoProduto.VALIDADE) && versao.menorQue(4,2,0)) {
-            sql.put("validade", vo.getValidade());
+        if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
             if (vo.getQtdDiasMinimoValidade() > 0) {
                 sql.put("utilizavalidadeentrada", true);
@@ -536,6 +536,26 @@ public class ProdutoDAO {
             if (versao.maiorQue(3, 21) && versao.menorQue(4,2)) {
                 sql.put("codigobarras", ean);
             }
+
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                System.out.println(sql.getInsert());
+                throw e;
+            }
+        }
+    }
+    
+        public void salvarLojaVirtual(ProdutoLojaVirtualVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtolojavirtual");
+
+            sql.put("id_produto", vo.getIdProduto());
+            sql.put("descricao", vo.getDescricao());
+            sql.put("id_tipoorigemimagem", vo.getIdTipoOrigemImagem());
+            sql.put("imagem", vo.getImagem());
+            sql.put("id_imagem", -1);
 
             try {
                 stm.execute(sql.getInsert());

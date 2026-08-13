@@ -912,7 +912,7 @@ public class ClienteRepository {
         vo.setId_contaContabilFiscalPassivo(0);
         vo.setId_contaContabilFiscalAtivo(0);
         vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
-        vo.setId_classeRisco(0);
+        vo.setId_classeRisco(imp.getIdClasserisco());
 
         return vo;
     }
@@ -1289,7 +1289,7 @@ public class ClienteRepository {
         end.setId_estado(impEnd.getId_estado());
         end.setId_pais(impEnd.getId_pais());
         end.setInscricao_municipal(impEnd.getInscricao_municipal());
-        end.setInscricao_municipal(impEnd.getInscricao_municipal());
+        end.setInscricao_estadual(impEnd.getInscricao_estadual());
         end.setId_tipoindicadorie(impEnd.getId_tipoindicadorie());
         end.setTelefone(impEnd.getTelefone());
         end.setComplemento(impEnd.getComplemento());
