@@ -1764,6 +1764,9 @@ public class ProdutoRepository {
         vo.setTipoCompra(imp.getTipoCompra());
         
         vo.setConferido(imp.isConferido());
+        vo.setPermitePerda(imp.isPermitePerda());
+        vo.setPermiteQuebra(imp.isPermiteQuebra());
+        vo.setPermiteTroca(imp.isPermiteTroca());
         
         if (imp.getImpidClassificacaoTributaria() != null) {
             int idClassificacaoTributariaAtual = provider.getIdClassificacaoTributaria(imp.getImpidClassificacaoTributaria());

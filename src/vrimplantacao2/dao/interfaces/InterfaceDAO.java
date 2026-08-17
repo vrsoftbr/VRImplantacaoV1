@@ -704,6 +704,10 @@ public abstract class InterfaceDAO {
     public List<ProdutoSimilarIMP> getProdutoSimilar() throws Exception {
         return new ArrayList<>();
     }
+    
+    public Map<String, Long> getValidacaoProduto() throws Exception {
+        return new LinkedHashMap<>();
+    }
 
     /**
      * Utilize esta classe para casos onde não haja cadastro de família, utilize

@@ -691,6 +691,75 @@
             </Component>
           </SubComponents>
         </Container>
+        <Container class="javax.swing.JPanel" name="jPanel2">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Relat&#xf3;rios">
+                <Property name="tabTitle" type="java.lang.String" value="Relat&#xf3;rios"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkQntdFlagForn" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkQntdFlagProd" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="411" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="btnGerarRelatorio" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkQntdFlagProd" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkQntdFlagForn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="174" max="32767" attributes="0"/>
+                      <Component id="btnGerarRelatorio" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQntdFlagProd">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Relat&#xf3;rio Produtos"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQntdFlagForn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Relat&#xf3;rio Fornecedor"/>
+                <Property name="actionCommand" type="java.lang.String" value="Relat&#xf3;rio Fornecedor"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.button.VRButton" name="btnGerarRelatorio">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/vrframework/img/importar.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Gerar Relat&#xf3;rio"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="4"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGerarRelatorioActionPerformed"/>
+              </Events>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
     <Container class="vrframework.bean.panel.VRPanel" name="vRPanel3">

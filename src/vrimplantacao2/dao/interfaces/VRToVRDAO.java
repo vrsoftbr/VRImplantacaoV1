@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.sql.ResultSetMetaData;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,7 +186,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     OpcaoProduto.SIMILAR,
                     OpcaoProduto.SUGESTAO_COTACAO,
                     OpcaoProduto.SUGESTAO_PEDIDO,
-                    OpcaoProduto.ACEITA_MULTIPLICACAO_PDV
+                    OpcaoProduto.ACEITA_MULTIPLICACAO_PDV,
+                    OpcaoProduto.PERMITE_QUEBRA,
+                    OpcaoProduto.PERMITE_PERDA,
+                    OpcaoProduto.PERMITE_TROCA
                 }
         ));
     }
@@ -789,6 +794,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " rt.id_classificacao, \n"
                     + " p.produtoecommerce, \n"
                     + " p.conferido, \n"
+                    + " p.permitequebra, \n"
+                    + " p.permiteperda, \n"
+                    + " p.permitetroca, \n"
+                    + " p.vendapdv, \n"
                     + " p.volume, \n"
                     + " p.aceitamultiplicacaopdv, \n"
                     + " tev.descricao tipo_embalagem_volume, \n"
@@ -813,7 +822,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + "		p.id_tipopiscofinscredito = piscofcred.id\n"
                     + "	left join tipopiscofins piscofdeb on \n"
                     + "		p.id_tipopiscofins = piscofdeb.id\n"
-                    + "	join produtoaliquota aliq on \n"
+                    + "	left join produtoaliquota aliq on \n"
                     + "		p.id = aliq.id_produto and \n"
                     + "		aliq.id_estado = lj.id_estado\n"
                     + "	left join produtoautomacaodesconto pad on\n"
@@ -898,6 +907,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setTipoEmbalagemVolume(rs.getString("tipo_embalagem_volume"));
                     imp.setProdutoECommerce(rs.getBoolean("produtoecommerce"));
                     imp.setConferido(rs.getBoolean("conferido"));
+                    imp.setPermiteQuebra(rs.getBoolean("permitequebra"));
+                    imp.setPermitePerda(rs.getBoolean("permiteperda"));
+                    imp.setPermiteTroca(rs.getBoolean("permitetroca"));
+                    imp.setVendaPdv(rs.getBoolean("vendapdv"));
                     imp.setAceitaMultiplicacaoPDV(rs.getBoolean("aceitamultiplicacaopdv"));
                     imp.setUtilizaValidadeEntrada(rs.getBoolean("utilizavalidadeentrada"));
                     imp.setQtdDiasMinimoValidade(rs.getInt("qtddiasminimovalidade"));
@@ -2749,6 +2762,60 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
             }
         }
         return result;
+    }
+
+    @Override
+    public Map<String, Long> getValidacaoProduto() throws Exception {
+
+        Map<String, Long> resultado = new LinkedHashMap<>();
+
+        String sql
+                = "SELECT "
+                + "COUNT(*) AS total, "
+                + "COUNT(*) FILTER (WHERE pesavel) AS pesavel, "
+                + "COUNT(*) FILTER (WHERE vendacontrolada) AS vendacontrolada, "
+                + "COUNT(*) FILTER (WHERE vendapdv) AS vendapdv, "
+                + "COUNT(*) FILTER (WHERE conferido) AS conferido, "
+                + "COUNT(*) FILTER (WHERE permitequebra) AS permitequebra, "
+                + "COUNT(*) FILTER (WHERE permiteperda) AS permiteperda, "
+                + "COUNT(*) FILTER (WHERE sazonal) AS sazonal, "
+                + "COUNT(*) FILTER (WHERE consignado) AS consignado, "
+                + "COUNT(*) FILTER (WHERE permitetroca) AS permitetroca, "
+                + "COUNT(*) FILTER (WHERE sugestaopedido) AS sugestaopedido, "
+                + "COUNT(*) FILTER (WHERE aceitamultiplicacaopdv) AS aceitamultiplicacaopdv, "
+                + "COUNT(*) FILTER (WHERE sugestaocotacao) AS sugestaocotacao, "
+                + "COUNT(*) FILTER (WHERE utilizavalidadeentrada) AS utilizavalidadeentrada, "
+                + "COUNT(*) FILTER (WHERE produtoecommerce) AS produtoecommerce, "
+                + "COUNT(*) FILTER (WHERE permitedescontopdv) AS permitedescontopdv, "
+                + "COUNT(*) FILTER (WHERE verificapesopdv) AS verificapesopdv, "
+                + "COUNT(*) FILTER (WHERE promocaoauditada) AS promocaoauditada, "
+                + "COUNT(*) FILTER (WHERE produtoassessorado) AS produtoassessorado, "
+                + "COUNT(*) FILTER (WHERE controlepoliciacivil) AS controlepoliciacivil, "
+                + "COUNT(*) FILTER (WHERE operacaoprodutoperfumariape) AS operacaoprodutoperfumariape, "
+                + "COUNT(*) FILTER (WHERE produtoincentivado) AS produtoincentivado, "
+                + "COUNT(*) FILTER (WHERE cestabasica) AS cestabasica, "
+                + "COUNT(*) FILTER (WHERE isentoanvisa) AS isentoanvisa, "
+                + "COUNT(*) FILTER (WHERE desativarenviomasterfiscobrasil) AS desativarenviomasterfiscobrasil "
+                + "FROM produto";
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = stm.executeQuery(sql)) {
+
+            if (rs.next()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+
+                    String campo = metaData.getColumnName(i).toUpperCase();
+                    Long valor = rs.getLong(i);
+
+                    resultado.put(campo, valor);
+                }
+            }
+        }
+
+        return resultado;
     }
 
     private Date dataInicioVenda;

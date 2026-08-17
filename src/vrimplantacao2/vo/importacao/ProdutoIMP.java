@@ -195,6 +195,9 @@ public class ProdutoIMP {
     
     @DatabaseField private TipoCompra tipoCompra = TipoCompra.NENHUM;
     @DatabaseField private boolean conferido = false;
+    @DatabaseField private boolean permitePerda = true;
+    @DatabaseField private boolean permiteQuebra = true;
+    @DatabaseField private boolean permiteTroca = true;
     
     @DatabaseField private String impidClassificacaoTributaria;
     
@@ -1201,6 +1204,30 @@ public class ProdutoIMP {
         this.conferido = conferido;
     }
 
+    public boolean isPermitePerda() {
+        return permitePerda;
+    }
+
+    public void setPermitePerda(boolean permitePerda) {
+        this.permitePerda = permitePerda;
+    }
+
+    public boolean isPermiteQuebra() {
+        return permiteQuebra;
+    }
+
+    public void setPermiteQuebra(boolean permiteQuebra) {
+        this.permiteQuebra = permiteQuebra;
+    }
+
+    public boolean isPermiteTroca() {
+        return permiteTroca;
+    }
+
+    public void setPermiteTroca(boolean permiteTroca) {
+        this.permiteTroca = permiteTroca;
+    }
+    
     public String getImpidClassificacaoTributaria() {
         return impidClassificacaoTributaria;
     }

@@ -9,8 +9,8 @@ import java.util.GregorianCalendar;
  */
 public class Global {
 
-    public static String VERSAO = "2.6.10";
-    public static final Date DATA_VERSAO = new GregorianCalendar(2026, 8, 4).getTime();
+    public static String VERSAO = "2.6.11";
+    public static final Date DATA_VERSAO = new GregorianCalendar(2026, 8, 17).getTime();
     private static int idUsuario;
     private static String nomeUsuario;
     private static int idUnidade;

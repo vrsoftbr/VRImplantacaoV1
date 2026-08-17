@@ -170,7 +170,7 @@ public class ProdutoDAO {
                 sql.put("ncm3", ncm.getNcm3());
             }
             sql.put("ddv", 0);
-            sql.put("permitetroca", true);
+            sql.put("permitetroca", vo.isPermiteTroca());
             sql.put("temperatura", 0);
             sql.put("id_tipoorigemmercadoria", 0);
             if (versao.igualOuMaiorQue(3, 18, 2)) {
@@ -189,8 +189,8 @@ public class ProdutoDAO {
 
             sql.put("vendapdv", true);
             sql.put("conferido", vo.isConferido());
-            sql.put("permitequebra", true);
-            sql.put("permiteperda", true);
+            sql.put("permitequebra", vo.isPermiteQuebra());
+            sql.put("permiteperda", vo.isPermitePerda());
             sql.put("id_codigoanp", vo.getCodigoAnp() != 0 ? vo.getCodigoAnp() : null);
             sql.put("impostomedionacional", 0);
             sql.put("impostomedioimportado", 0);
@@ -445,7 +445,16 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.CONFERIDO)) {
             sql.put("conferido", vo.isConferido());
         }
-
+        if (opt.contains(OpcaoProduto.PERMITE_PERDA)) {
+            sql.put("permiteperda", vo.isPermitePerda());
+        }
+        if (opt.contains(OpcaoProduto.PERMITE_QUEBRA)) {
+            sql.put("permitequebra", vo.isPermiteQuebra());
+        }
+        if (opt.contains(OpcaoProduto.PERMITE_TROCA)) {
+            sql.put("permitetroca", vo.isPermiteTroca());
+        }
+        
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();
         LOG.fine(strSql);

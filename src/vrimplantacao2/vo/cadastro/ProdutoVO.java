@@ -59,6 +59,9 @@ public class ProdutoVO {
     private NormaReposicao normaReposicao = NormaReposicao.CAIXA;
     private boolean sugestaoCotacao = true;
     private boolean sugestaoPedido = true;
+    private boolean permiteQuebra = true;
+    private boolean permitePerda = true;
+    private boolean permiteTroca = true;
     private int idFornecedorFabricante = 0;
     private int excecao = 0;
     private int idComprador = 1;
@@ -378,6 +381,30 @@ public class ProdutoVO {
         this.sugestaoPedido = sugestaoPedido;
     }    
 
+    public boolean isPermiteQuebra() {
+        return permiteQuebra;
+    }
+
+    public void setPermiteQuebra(boolean permiteQuebra) {
+        this.permiteQuebra = permiteQuebra;
+    }
+
+    public boolean isPermitePerda() {
+        return permitePerda;
+    }
+
+    public void setPermitePerda(boolean permitePerda) {
+        this.permitePerda = permitePerda;
+    }
+
+    public boolean isPermiteTroca() {
+        return permiteTroca;
+    }
+
+    public void setPermiteTroca(boolean permiteTroca) {
+        this.permiteTroca = permiteTroca;
+    }
+    
     public int getIdFornecedorFabricante() {
         return idFornecedorFabricante;
     }

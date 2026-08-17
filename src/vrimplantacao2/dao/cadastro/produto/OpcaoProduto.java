@@ -407,6 +407,24 @@ public enum OpcaoProduto {
             return "Conferido";
         }
     },
+    PERMITE_QUEBRA {
+        @Override
+        public String toString() {
+            return "Permite Quebra";
+        }
+    },
+    PERMITE_PERDA {
+        @Override
+        public String toString() {
+            return "Permite Perda";
+        }
+    },
+    PERMITE_TROCA {
+        @Override
+        public String toString() {
+            return "Permite Troca";
+        }
+    },
     DIVISAO {
         @Override
         public String toString() {
