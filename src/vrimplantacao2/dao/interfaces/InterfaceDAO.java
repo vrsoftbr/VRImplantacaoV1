@@ -46,6 +46,7 @@ import vrimplantacao2.vo.importacao.FamiliaFornecedorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
+import vrimplantacao2.vo.importacao.KitIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
@@ -702,6 +703,10 @@ public abstract class InterfaceDAO {
     }
     
     public List<ProdutoSimilarIMP> getProdutoSimilar() throws Exception {
+        return new ArrayList<>();
+    }
+
+    public List<KitIMP> getKit() throws Exception {
         return new ArrayList<>();
     }
     

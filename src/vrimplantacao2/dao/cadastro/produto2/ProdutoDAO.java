@@ -158,8 +158,8 @@ public class ProdutoDAO {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
             sql.put("id_divisaofornecedor", 0);
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
-            sql.put("sazonal", false);
-            sql.put("consignado", false);
+            sql.put("sazonal", vo.isSazonal());
+            sql.put("consignado", vo.isConsignado());
             {
                 NcmVO ncm = vo.getNcm();
                 if (ncm == null) {
@@ -212,16 +212,17 @@ public class ProdutoDAO {
             sql.put("id_normacompra", vo.getNormaCompra().getId());
             sql.putNull("lastro");
             sql.putNull("camadas");
-            sql.put("promocaoauditada", false);
+            sql.put("promocaoauditada", vo.isPromocaoAuditada());
             sql.putNull("substituicaoestadual");
             sql.putNull("substituicaoestadualoutros");
             sql.putNull("substituicaoestadualexterior");
             sql.put("id_cest", vo.getCest() != null ? vo.getCest().getId() : null);
             sql.putNull("lastro");
-            sql.put("permitedescontopdv", true);
-            sql.put("verificapesopdv", false);
+            sql.put("permitedescontopdv", vo.isPermiteDescontoPdv());
+            sql.put("verificapesopdv", vo.isVerificaPesoPdv());
             sql.put("produtoecommerce", vo.isProdutoecommerce());
             sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
+            sql.put("produtoassessorado", vo.isProdutoAssessorado());
             if (versao.igualOuMenorQue(3, 17, 10)) {
                 sql.put("id_tipoproduto", 0);
                 sql.put("fabricacaopropria", false);
@@ -353,11 +354,11 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
-            if (vo.getQtdDiasMinimoValidade() > 0) {
-                sql.put("utilizavalidadeentrada", true);
-            } else {
-                sql.put("utilizavalidadeentrada", false);
-            }
+//            if (vo.getQtdDiasMinimoValidade() > 0) {
+                sql.put("utilizavalidadeentrada", vo.isUtilizaValidadeEntrada());
+//            } else {
+//                sql.put("utilizavalidadeentrada", false);
+//            }
         }
         if (opt.contains(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO)) {
             sql.put("id_tipoembalagem", vo.getTipoEmbalagem().getId());
@@ -444,6 +445,24 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.CONFERIDO)) {
             sql.put("conferido", vo.isConferido());
+        }
+        if (opt.contains(OpcaoProduto.SAZONAL)) {
+            sql.put("sazonal", vo.isSazonal());
+        }
+        if (opt.contains(OpcaoProduto.PERMITE_DESCONTO_PDV)) {
+            sql.put("permitedescontopdv", vo.isPermiteDescontoPdv());
+        }
+        if (opt.contains(OpcaoProduto.VERIFICA_PESO_PDV)) {
+            sql.put("verificapesopdv", vo.isVerificaPesoPdv());
+        }
+        if (opt.contains(OpcaoProduto.PROMOCAO_AUDITADA)) {
+            sql.put("promocaoauditada", vo.isPromocaoAuditada());
+        }
+        if (opt.contains(OpcaoProduto.PRODUTO_ASSESSORADO)) {
+            sql.put("produtoassessorado", vo.isProdutoAssessorado());
+        }
+        if (opt.contains(OpcaoProduto.CONSIGNADO)) {
+            sql.put("consignado", vo.isConsignado());
         }
         if (opt.contains(OpcaoProduto.PERMITE_PERDA)) {
             sql.put("permiteperda", vo.isPermitePerda());

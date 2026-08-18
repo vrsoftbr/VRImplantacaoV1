@@ -220,7 +220,7 @@ public class NutricionalRepository {
         nut.setId_tipounidadeporcao(imp.getId_tipounidadeporcao());
         nut.setAcucaresAdicionados(imp.getAcucaresadicionados());
         nut.setAcucaresTotais(imp.getAcucarestotais());
-        if (imp.getIdTipoMedida() > 0) {
+        if (imp.getIdTipoMedida() >= 0) {
             nut.setId_tipomedida(imp.getIdTipoMedida());
         }
         nut.setMedidainteira(imp.getMedidaInteira());

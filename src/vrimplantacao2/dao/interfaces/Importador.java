@@ -56,6 +56,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.FornecedorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
+import vrimplantacao2.dao.cadastro.kit.KitRepository;
+import vrimplantacao2.dao.cadastro.kit.KitRepositoryProvider;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepository;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepositoryProvider;
@@ -144,6 +146,7 @@ import vrimplantacao2_5.relatorios.gerador.GeradorArquivosRepository;
 import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
 import vrimplantacao2.dao.cadastro.produtosimilar.ProdutoSimilarRepository;
 import vrimplantacao2.dao.cadastro.produtosimilar.ProdutoSimilarRepositoryProvider;
+import vrimplantacao2.vo.importacao.KitIMP;
 
 public class Importador {
 
@@ -1363,6 +1366,23 @@ public class Importador {
         );
         ProdutoSimilarRepository rep = new ProdutoSimilarRepository(provider);
         rep.importarProdutoSimilar(produtoSimilar);
+    }
+    
+    /**
+     * Importa o cadastro de kits do sistema.
+     *
+     * @throws Exception
+     */
+    public void importarKit() throws Exception {
+        ProgressBar.setStatus("Carregando kits....");
+        List<KitIMP> kits = getInterfaceDAO().getKit();
+        KitRepositoryProvider provider = new KitRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        KitRepository rep = new KitRepository(provider);
+        rep.importarKit(kits);
     }
 
     /**

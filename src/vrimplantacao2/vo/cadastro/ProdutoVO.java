@@ -2,17 +2,17 @@ package vrimplantacao2.vo.cadastro;
 
 import java.util.Date;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.CestVO;
-import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 import vrimplantacao2.utils.Factory;
-import vrimplantacao2.utils.MathUtils;
-import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
-import vrimplantacao2.vo.enums.NormaReposicao;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.PisCofinsVO;
-import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2_5.vo.enums.TipoCompra;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
+import vrimplantacao.vo.vrimplantacao.CestVO;
+import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.enums.NormaReposicao;
+import vrimplantacao2.vo.enums.NaturezaReceitaVO;
+import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 
 public class ProdutoVO {
 
@@ -80,6 +80,12 @@ public class ProdutoVO {
     private boolean utilizaValidadeEntrada = false;
     private TipoCompra tipoCompra = TipoCompra.NENHUM;
     private boolean conferido = false;
+    private boolean sazonal = false;
+    private boolean permiteDescontoPdv = true;
+    private boolean verificaPesoPdv = false;
+    private boolean promocaoAuditada = false;
+    private boolean produtoAssessorado = false;
+    private boolean consignado = false;
     private int idClassificacaoTributaria = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
@@ -553,6 +559,54 @@ public class ProdutoVO {
         this.conferido = conferido;
     }
 
+    public boolean isSazonal() {
+        return sazonal;
+    }
+
+    public void setSazonal(boolean sazonal) {
+        this.sazonal = sazonal;
+    }
+
+    public boolean isPermiteDescontoPdv() {
+        return permiteDescontoPdv;
+    }
+
+    public void setPermiteDescontoPdv(boolean permiteDescontoPdv) {
+        this.permiteDescontoPdv = permiteDescontoPdv;
+    }
+
+    public boolean isVerificaPesoPdv() {
+        return verificaPesoPdv;
+    }
+
+    public void setVerificaPesoPdv(boolean verificaPesoPdv) {
+        this.verificaPesoPdv = verificaPesoPdv;
+    }
+
+    public boolean isPromocaoAuditada() {
+        return promocaoAuditada;
+    }
+
+    public void setPromocaoAuditada(boolean promocaoAuditada) {
+        this.promocaoAuditada = promocaoAuditada;
+    }
+
+    public boolean isProdutoAssessorado() {
+        return produtoAssessorado;
+    }
+
+    public boolean isConsignado() {
+        return consignado;
+    }
+
+    public void setConsignado(boolean consignado) {
+        this.consignado = consignado;
+    }
+    
+    public void setProdutoAssessorado(boolean produtoAssessorado) {
+        this.produtoAssessorado = produtoAssessorado;
+    }
+    
     public int getIdClassificacaoTributaria() {
         return idClassificacaoTributaria;
     }

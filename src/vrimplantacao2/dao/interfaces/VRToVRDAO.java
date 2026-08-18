@@ -19,14 +19,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vr.core.parametro.versao.Versao;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoPostgres2;
-import vrimplantacao.classe.Global;
-import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
+import vrframework.classe.Conexao;
+import vrimplantacao.classe.Global;
+import vrframework.classe.ProgressBar;
+import vr.core.parametro.versao.Versao;
+import vrimplantacao2.vo.importacao.KitIMP;
+import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2_5.dao.conexao.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -61,23 +62,23 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaReformaTributariaCstIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
-import vrimplantacao2.vo.importacao.OperadorIMP;
-import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.PessoaImp;
-import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.PromocaoIMP;
-import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
+import vrimplantacao2.vo.importacao.OperadorIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.ProdutoSimilarIMP;
 import vrimplantacao2.vo.importacao.ClienteEnderecoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaReformaTributariaCstIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoIMP;
 import vrimplantacao2.vo.importacao.MapaReformaTributariaClassificacaoNcmIMP;
@@ -189,7 +190,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     OpcaoProduto.ACEITA_MULTIPLICACAO_PDV,
                     OpcaoProduto.PERMITE_QUEBRA,
                     OpcaoProduto.PERMITE_PERDA,
-                    OpcaoProduto.PERMITE_TROCA
+                    OpcaoProduto.PERMITE_TROCA,
+                    OpcaoProduto.VENDA_CONTROLADA,
+                    OpcaoProduto.SAZONAL,
+                    OpcaoProduto.CONSIGNADO,
+                    OpcaoProduto.PERMITE_DESCONTO_PDV,
+                    OpcaoProduto.VERIFICA_PESO_PDV,
+                    OpcaoProduto.PROMOCAO_AUDITADA,
+                    OpcaoProduto.PRODUTO_ASSESSORADO
                 }
         ));
     }
@@ -258,6 +266,43 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     result.add(imp);
                     contador++;
                     ProgressBar.setStatus("Carregando dados..." + contador);
+                }
+            }
+        }
+        contador = 1;
+        return result;
+    }
+
+    @Override
+    public List<KitIMP> getKit() throws Exception {
+        List<KitIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	k.id AS impid_kit,\n"
+                    + "	k.id_produto AS impid_produto_principal,\n"
+                    + "	k.preconormal AS preco_normal,\n"
+                    + "	k3.id AS impid_kit_item,\n"
+                    + "	k3.id_produto AS impid_produto_item,\n"
+                    + "	k3.precovenda preco,\n"
+                    + "	k3.quantidade \n"
+                    + "FROM kit k \n"
+                    + "JOIN kitloja k2 ON k.id = k2.id_kit AND k2.id_loja = " + getLojaOrigem() + " \n"
+                    + "JOIN kititem k3 ON k.id = k3.id_kit")) {
+                while (rs.next()) {
+                    KitIMP imp = new KitIMP();
+
+                    imp.setImpid_kit(rs.getString("impid_kit"));
+                    imp.setImpid_produto_principal(rs.getString("impid_produto_principal"));
+                    imp.setPreco_normal(rs.getBoolean("preco_normal"));
+                    imp.setImpid_kit_item(rs.getString("impid_kit_item"));
+                    imp.setImpid_produto_item(rs.getString("impid_produto_item"));
+                    imp.setPreco(rs.getDouble("preco"));
+                    imp.setQuantidade(rs.getDouble("quantidade"));
+
+                    result.add(imp);
+                    contador++;
                 }
             }
         }
@@ -799,6 +844,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " p.permitetroca, \n"
                     + " p.vendapdv, \n"
                     + " p.volume, \n"
+                    + " p.vendacontrolada, \n"
+                    + " p.sazonal, \n"
+                    + " p.utilizavalidadeentrada, \n"
+                    + " p.permitedescontopdv, \n"
+                    + " p.verificapesopdv, \n"
+                    + " p.promocaoauditada, \n"
+                    + " p.produtoassessorado, \n"
+                    + " p.consignado, \n"
                     + " p.aceitamultiplicacaopdv, \n"
                     + " tev.descricao tipo_embalagem_volume, \n"
                     + " pv.descricao AS descricao_loja_virtual, \n"
@@ -880,7 +933,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setIdVasilhame(rs.getString("id_produtovasilhame"));
                     if (versao.igualOuMaiorQue(4)) {
                         imp.setMargemMaxima(rs.getDouble("margemmaxima"));
-                        imp.setMargemMaxima(rs.getDouble("margemminima"));
+                        imp.setMargemMinima(rs.getDouble("margemminima"));
                     }
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
@@ -911,6 +964,13 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setPermitePerda(rs.getBoolean("permiteperda"));
                     imp.setPermiteTroca(rs.getBoolean("permitetroca"));
                     imp.setVendaPdv(rs.getBoolean("vendapdv"));
+                    imp.setVendaControlada(rs.getBoolean("vendacontrolada"));
+                    imp.setSazonal(rs.getBoolean("sazonal"));
+                    imp.setPermiteDescontoPdv(rs.getBoolean("permitedescontopdv"));
+                    imp.setVerificaPesoPdv(rs.getBoolean("verificapesopdv"));
+                    imp.setPromocaoAuditada(rs.getBoolean("promocaoauditada"));
+                    imp.setProdutoAssessorado(rs.getBoolean("produtoassessorado"));
+                    imp.setConsignado(rs.getBoolean("consignado"));
                     imp.setAceitaMultiplicacaoPDV(rs.getBoolean("aceitamultiplicacaopdv"));
                     imp.setUtilizaValidadeEntrada(rs.getBoolean("utilizavalidadeentrada"));
                     imp.setQtdDiasMinimoValidade(rs.getInt("qtddiasminimovalidade"));

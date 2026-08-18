@@ -1767,6 +1767,13 @@ public class ProdutoRepository {
         vo.setPermitePerda(imp.isPermitePerda());
         vo.setPermiteQuebra(imp.isPermiteQuebra());
         vo.setPermiteTroca(imp.isPermiteTroca());
+        vo.setConsignado(imp.isConsignado());
+        
+        vo.setSazonal(imp.isSazonal());
+        vo.setPermiteDescontoPdv(imp.isPermiteDescontoPdv());
+        vo.setVerificaPesoPdv(imp.isVerificaPesoPdv());
+        vo.setPromocaoAuditada(imp.isPromocaoAuditada());
+        vo.setProdutoAssessorado(imp.isProdutoAssessorado());
         
         if (imp.getImpidClassificacaoTributaria() != null) {
             int idClassificacaoTributariaAtual = provider.getIdClassificacaoTributaria(imp.getImpidClassificacaoTributaria());

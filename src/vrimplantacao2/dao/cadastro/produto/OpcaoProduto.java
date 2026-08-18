@@ -425,6 +425,42 @@ public enum OpcaoProduto {
             return "Permite Troca";
         }
     },
+    SAZONAL {
+        @Override
+        public String toString() {
+            return "Sazonal";
+        }
+    },
+    CONSIGNADO {
+        @Override
+        public String toString() {
+            return "Consignado";
+        }
+    },
+    PERMITE_DESCONTO_PDV {
+        @Override
+        public String toString() {
+            return "Permite Desconto PDV";
+        }
+    },
+    VERIFICA_PESO_PDV {
+        @Override
+        public String toString() {
+            return "Verifica Peso PDV";
+        }
+    },
+    PROMOCAO_AUDITADA {
+        @Override
+        public String toString() {
+            return "Promoção auditada";
+        }
+    },
+    PRODUTO_ASSESSORADO {
+        @Override
+        public String toString() {
+            return "Produto assessorado";
+        }
+    },
     DIVISAO {
         @Override
         public String toString() {

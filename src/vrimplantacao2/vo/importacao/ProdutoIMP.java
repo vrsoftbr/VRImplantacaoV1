@@ -198,6 +198,12 @@ public class ProdutoIMP {
     @DatabaseField private boolean permitePerda = true;
     @DatabaseField private boolean permiteQuebra = true;
     @DatabaseField private boolean permiteTroca = true;
+    @DatabaseField private boolean sazonal = false;
+    @DatabaseField private boolean permiteDescontoPdv = true;
+    @DatabaseField private boolean verificaPesoPdv = false;
+    @DatabaseField private boolean promocaoAuditada = false;
+    @DatabaseField private boolean produtoAssessorado = false;
+    @DatabaseField private boolean consignado = false;
     
     @DatabaseField private String impidClassificacaoTributaria;
     
@@ -1227,8 +1233,56 @@ public class ProdutoIMP {
     public void setPermiteTroca(boolean permiteTroca) {
         this.permiteTroca = permiteTroca;
     }
-    
-    public String getImpidClassificacaoTributaria() {
+
+    public boolean isSazonal() {
+        return sazonal;
+    }
+
+    public void setSazonal(boolean sazonal) {
+        this.sazonal = sazonal;
+    }
+
+    public boolean isPermiteDescontoPdv() {
+        return permiteDescontoPdv;
+    }
+
+    public void setPermiteDescontoPdv(boolean permiteDescontoPdv) {
+        this.permiteDescontoPdv = permiteDescontoPdv;
+    }
+
+    public boolean isVerificaPesoPdv() {
+        return verificaPesoPdv;
+    }
+
+    public void setVerificaPesoPdv(boolean verificaPesoPdv) {
+        this.verificaPesoPdv = verificaPesoPdv;
+    }
+
+    public boolean isPromocaoAuditada() {
+        return promocaoAuditada;
+    }
+
+    public void setPromocaoAuditada(boolean promocaoAuditada) {
+        this.promocaoAuditada = promocaoAuditada;
+    }
+
+    public boolean isProdutoAssessorado() {
+        return produtoAssessorado;
+    }
+
+    public void setProdutoAssessorado(boolean produtoAssessorado) {
+        this.produtoAssessorado = produtoAssessorado;
+    }
+
+    public boolean isConsignado() {
+        return consignado;
+    }
+
+    public void setConsignado(boolean consignado) {
+        this.consignado = consignado;
+    }
+        
+        public String getImpidClassificacaoTributaria() {
         return impidClassificacaoTributaria;
     }
 
