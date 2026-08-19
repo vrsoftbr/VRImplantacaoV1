@@ -201,13 +201,13 @@ public class FornecedorDAO {
                                     sql.putNull("id_tipotroca");// integer,
                                     sql.put("id_tipofornecedor", vo.getTipoFornecedor().getId());// integer NOT NULL,
                                     sql.put("id_contacontabilfinanceiro", ContaContabilFinanceiro.PAGAMENTO_FORNECEDOR.getID());// integer,
-                                    sql.put("utilizanfe", false);// boolean NOT NULL,
+                                    sql.put("utilizanfe", vo.isUtilizaNfe());// boolean NOT NULL,
                                     sql.put("datacadastro", vo.getDataCadastro());// date NOT NULL,
-                                    sql.put("utilizaconferencia", false);// boolean NOT NULL,
+                                    sql.put("utilizaconferencia", vo.isUtilizaconferencia());// boolean NOT NULL,
                                     sql.put("numero", vo.getNumero());// character varying(6) NOT NULL DEFAULT ''::character varying,
-                                    sql.put("permitenfsempedido", false);// boolean NOT NULL DEFAULT false,
+                                    sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());// boolean NOT NULL DEFAULT false,
                                     sql.put("modelonf", "55");// character varying(2) NOT NULL DEFAULT ''::character varying,
-                                    sql.put("emitenf", false);// boolean NOT NULL DEFAULT true,
+                                    sql.put("emitenf", vo.isEmitenf());// boolean NOT NULL DEFAULT true,
                                     sql.put("tiponegociacao", 0);// integer NOT NULL DEFAULT 0,
                                     sql.put("utilizacrossdocking", false);// boolean NOT NULL DEFAULT false,
                                     sql.putNull("id_lojacrossdocking");// integer,
@@ -221,7 +221,7 @@ public class FornecedorDAO {
                                     sql.putNull("id_contacontabilfiscalativo");// bigint,
                                     sql.put("utilizaedi", false);// boolean NOT NULL DEFAULT false,
                                     sql.put("tiporegravencimento", -1);// integer NOT NULL DEFAULT '-1'::integer,
-                                    sql.put("nfemitidapostofiscal", false);// boolean DEFAULT false,
+                                    sql.put("nfemitidapostofiscal", vo.isNfemitidapostofiscal());// boolean DEFAULT false,
                                     incluirTipoIndicadorIE(vo, sql);
 
                                     stm.execute(sql.getInsert());

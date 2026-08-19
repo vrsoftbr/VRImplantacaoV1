@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import receita.ReceitaItemIMP;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import receita.ReceitaProdutoIMP;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
@@ -712,6 +713,14 @@ public abstract class InterfaceDAO {
     
     public Map<String, Long> getValidacaoProduto() throws Exception {
         return new LinkedHashMap<>();
+    }
+    
+    public Map<String, Long> getValidacaoFornecedor() throws Exception {
+        return new LinkedHashMap<>();
+    }
+    
+    public Set<Long> getValidaProdutosBalanca() throws Exception {
+        return new LinkedHashSet<>();
     }
 
     /**

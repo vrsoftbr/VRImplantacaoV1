@@ -29,6 +29,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.vo.enums.ESistema;
 import vrimplantacao2.gui.component.mapareformatributaria.MapaReformaTributariaProvider;
 import vrimplantacao2_5.relatorios.gerador.GeradorValidacao;
+import vrimplantacao2_5.relatorios.gerador.GeradorValidacaoProdutoBalanca;
 
 /**
  *
@@ -239,6 +240,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
                                 opcoes.add(OpcaoFornecedor.UTILIZA_NFE);
                                 opcoes.add(OpcaoFornecedor.EMITE_NF);
                                 opcoes.add(OpcaoFornecedor.UTILIZA_CONFERENCIA);
+                                opcoes.add(OpcaoFornecedor.PERMITE_NF_SEM_PEDIDO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -364,6 +366,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         chkQntdFlagProd = new vrframework.bean.checkBox.VRCheckBox();
         chkQntdFlagForn = new vrframework.bean.checkBox.VRCheckBox();
         btnGerarRelatorio = new vrframework.bean.button.VRButton();
+        chkValidaProdutoPesavel = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jBLimpar = new javax.swing.JButton();
@@ -790,7 +793,6 @@ public class VRToVR2_5GUI extends VRInternalFrame {
         org.openide.awt.Mnemonics.setLocalizedText(chkQntdFlagProd, "Relatório Produtos");
 
         org.openide.awt.Mnemonics.setLocalizedText(chkQntdFlagForn, "Relatório Fornecedor");
-        chkQntdFlagForn.setActionCommand("Relatório Fornecedor");
 
         btnGerarRelatorio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnGerarRelatorio, "Gerar Relatório");
@@ -803,26 +805,30 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkValidaProdutoPesavel, "Validar Produto Pesável");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkQntdFlagForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkQntdFlagProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(411, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnGerarRelatorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 216, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnGerarRelatorio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkValidaProdutoPesavel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(32, 32, 32))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkQntdFlagProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkQntdFlagProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkValidaProdutoPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkQntdFlagForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
@@ -1068,6 +1074,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private void btnGerarRelatorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGerarRelatorioActionPerformed
         // TODO add your handling code here:
         GeradorValidacao geradorValidacao = new GeradorValidacao(dao);
+        GeradorValidacaoProdutoBalanca geradorValidacaoProdutoBalanca = new GeradorValidacaoProdutoBalanca(dao);
         
         if(chkQntdFlagProd.isSelected()) {
             boolean gerado = geradorValidacao.gerarValidacaoProdutoTxt();
@@ -1082,7 +1089,28 @@ public class VRToVR2_5GUI extends VRInternalFrame {
             }
         }
         if(chkQntdFlagForn.isSelected()) {
-//            geradorValidacao.gerarValidacaoProdutoTxt();
+            boolean gerado = geradorValidacao.gerarValidacaoFornecedorTxt();
+
+            if (gerado) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Relatório de validação de fornecedores gerado com sucesso.",
+                    "Relatórios",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        }
+        if(chkValidaProdutoPesavel.isSelected()) {
+            boolean gerado = geradorValidacaoProdutoBalanca.gerarValidacaoCodigoProdutoBalancaTxt();
+
+            if (gerado) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Relatório de validação de produtos de balança gerado com sucesso.",
+                    "Relatórios",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            }
         }
     }//GEN-LAST:event_btnGerarRelatorioActionPerformed
 
@@ -1125,6 +1153,7 @@ public class VRToVR2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkQntdFlagProd;
     private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteAtivo;
+    private vrframework.bean.checkBox.VRCheckBox chkValidaProdutoPesavel;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JButton jBLimpar;

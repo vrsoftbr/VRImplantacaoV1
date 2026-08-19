@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.sql.ResultSetMetaData;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -197,7 +198,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     OpcaoProduto.PERMITE_DESCONTO_PDV,
                     OpcaoProduto.VERIFICA_PESO_PDV,
                     OpcaoProduto.PROMOCAO_AUDITADA,
-                    OpcaoProduto.PRODUTO_ASSESSORADO
+                    OpcaoProduto.PRODUTO_ASSESSORADO,
+                    OpcaoProduto.VASILHAME
                 }
         ));
     }
@@ -852,6 +854,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " p.promocaoauditada, \n"
                     + " p.produtoassessorado, \n"
                     + " p.consignado, \n"
+                    + " p.controlepoliciacivil, \n"
                     + " p.aceitamultiplicacaopdv, \n"
                     + " tev.descricao tipo_embalagem_volume, \n"
                     + " pv.descricao AS descricao_loja_virtual, \n"
@@ -971,6 +974,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setPromocaoAuditada(rs.getBoolean("promocaoauditada"));
                     imp.setProdutoAssessorado(rs.getBoolean("produtoassessorado"));
                     imp.setConsignado(rs.getBoolean("consignado"));
+                    imp.setControlePoliciaCivil(rs.getBoolean("controlepoliciacivil"));
                     imp.setAceitaMultiplicacaoPDV(rs.getBoolean("aceitamultiplicacaopdv"));
                     imp.setUtilizaValidadeEntrada(rs.getBoolean("utilizavalidadeentrada"));
                     imp.setQtdDiasMinimoValidade(rs.getInt("qtddiasminimovalidade"));
@@ -1045,7 +1049,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     + " f.utilizaiva, \n"
                     + " f.utilizanfe, \n"
                     + " f.utilizaconferencia, \n"
-                    + " f.emitenf \n"
+                    + " f.emitenf, "
+                    + " permitenfsempedido \n"
                     + "from \n"
                     + "	fornecedor f\n"
                     + "	LEFT JOIN fornecedorendereco fe ON fe.id_fornecedor = f.id\n"
@@ -1103,6 +1108,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
                     imp.setUtilizanfe(rs.getBoolean("utilizanfe"));
                     imp.setUtilizaconferencia(rs.getBoolean("utilizaconferencia"));
                     imp.setEmiteNfe(rs.getBoolean("emitenf"));
+                    imp.setPermiteNfSemPedido(rs.getBoolean("permitenfsempedido"));
 
                     getDivisaoFornecedor(imp);
 //                    imp.setDivisoes(mapDivisao.getOrDefault(impid, null));
@@ -2872,6 +2878,73 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider, Mapa
 
                     resultado.put(campo, valor);
                 }
+            }
+        }
+
+        return resultado;
+    }
+
+    @Override
+    public Map<String, Long> getValidacaoFornecedor() throws Exception {
+
+        Map<String, Long> resultado = new LinkedHashMap<>();
+
+        String sql
+                = "SELECT "
+                + "COUNT(*) AS total, "
+                + "COUNT(*) FILTER (WHERE revenda) AS revenda, "
+                + "COUNT(*) FILTER (WHERE descontofunrural) AS descontofunrural, "
+                + "COUNT(*) FILTER (WHERE utilizaiva) AS utilizaiva, "
+                + "COUNT(*) FILTER (WHERE utilizanfe) AS utilizanfe, "
+                + "COUNT(*) FILTER (WHERE utilizaconferencia) AS utilizaconferencia, "
+                + "COUNT(*) FILTER (WHERE permitenfsempedido) AS permitenfsempedido, "
+                + "COUNT(*) FILTER (WHERE emitenf) AS emitenf, "
+                + "COUNT(*) FILTER (WHERE utilizacrossdocking) AS utilizacrossdocking, "
+                + "COUNT(*) FILTER (WHERE utilizaedi) AS utilizaedi, "
+                + "COUNT(*) FILTER (WHERE nfemitidapostofiscal) AS nfemitidapostofiscal, "
+                + "COUNT(*) FILTER (WHERE utilizaprodepe) AS utilizaprodepe, "
+                + "COUNT(*) FILTER (WHERE alteradopaf) AS alteradopaf, "
+                + "COUNT(*) FILTER (WHERE antecipacaopagamento) AS antecipacaopagamento, "
+                + "COUNT(*) FILTER (WHERE recalcularnotafiscal) AS recalcularnotafiscal, "
+                + "COUNT(*) FILTER (WHERE bloqueadoautomatico) AS bloqueadoautomatico, "
+                + "COUNT(*) FILTER (WHERE bloqueado) AS bloqueado "
+                + "FROM fornecedor";
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = stm.executeQuery(sql)) {
+
+            if (rs.next()) {
+
+                ResultSetMetaData metaData = rs.getMetaData();
+
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+
+                    String campo = metaData.getColumnName(i).toUpperCase();
+                    Long valor = rs.getLong(i);
+
+                    resultado.put(campo, valor);
+                }
+            }
+        }
+
+        return resultado;
+    }
+
+    public Set<Long> getValidaProdutosBalanca() throws Exception {
+
+        Set<Long> resultado = new LinkedHashSet<>();
+
+        String sql
+                = "SELECT id "
+                + "FROM produto "
+                + "WHERE pesavel = true";
+//                + "OR id_tipoembalagem = 4 ";
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = stm.executeQuery(sql)) {
+
+            while (rs.next()) {
+                resultado.add(rs.getLong("id"));
             }
         }
 

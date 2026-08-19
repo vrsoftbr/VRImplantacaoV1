@@ -1,9 +1,9 @@
 package vrimplantacao2.dao.cadastro.produto;
 
+import java.util.Set;
+import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public enum OpcaoProduto {
@@ -435,6 +435,12 @@ public enum OpcaoProduto {
         @Override
         public String toString() {
             return "Consignado";
+        }
+    },
+    CONTROLE_POLICIA_CIVIL {
+        @Override
+        public String toString() {
+            return "Controle Policia Civil";
         }
     },
     PERMITE_DESCONTO_PDV {

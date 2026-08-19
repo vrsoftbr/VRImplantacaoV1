@@ -703,18 +703,18 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="chkQntdFlagForn" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkQntdFlagProd" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="411" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="btnGerarRelatorio" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace pref="216" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="btnGerarRelatorio" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkValidaProdutoPesavel" alignment="1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -722,7 +722,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkQntdFlagProd" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkQntdFlagProd" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkValidaProdutoPesavel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkQntdFlagForn" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="174" max="32767" attributes="0"/>
@@ -741,7 +744,6 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQntdFlagForn">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Relat&#xf3;rio Fornecedor"/>
-                <Property name="actionCommand" type="java.lang.String" value="Relat&#xf3;rio Fornecedor"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.button.VRButton" name="btnGerarRelatorio">
@@ -757,6 +759,11 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGerarRelatorioActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValidaProdutoPesavel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Validar Produto Pes&#xe1;vel"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>

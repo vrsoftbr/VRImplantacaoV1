@@ -1768,6 +1768,7 @@ public class ProdutoRepository {
         vo.setPermiteQuebra(imp.isPermiteQuebra());
         vo.setPermiteTroca(imp.isPermiteTroca());
         vo.setConsignado(imp.isConsignado());
+        vo.setControlePoliciaCivil(imp.isControlePoliciaCivil());
         
         vo.setSazonal(imp.isSazonal());
         vo.setPermiteDescontoPdv(imp.isPermiteDescontoPdv());

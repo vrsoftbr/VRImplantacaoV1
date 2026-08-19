@@ -102,12 +102,12 @@ public class ProdutoDAO {
      * @throws Exception
      */
     public void salvar(ProdutoVO vo) throws Exception {
-        
+
         System.out.println("----------------------------------------------------");
         System.out.println("Salvando id: " + vo.getId());
         System.out.println("Descricao: " + vo.getDescricaoCompleta());
         System.out.println("Impid: " + vo.getImpId());
-        
+
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produto");
@@ -127,9 +127,9 @@ public class ProdutoDAO {
             sql.put("descricaoreduzida", vo.getDescricaoReduzida());
             sql.put("pesoliquido", vo.getPesoLiquido());
             sql.put("datacadastro", vo.getDatacadastro());
-            if (versao.menorQue(4, 2,0)) {
+            if (versao.menorQue(4, 2, 0)) {
                 sql.put("validade", vo.getValidade());
-                }
+            }
             sql.put("pesobruto", vo.getPesoBruto());
             sql.put("comprimentoembalagem", 0);
             sql.put("larguraembalagem", 0);
@@ -160,6 +160,7 @@ public class ProdutoDAO {
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
             sql.put("sazonal", vo.isSazonal());
             sql.put("consignado", vo.isConsignado());
+            sql.put("controlepoliciacivil", vo.isControlePoliciaCivil());
             {
                 NcmVO ncm = vo.getNcm();
                 if (ncm == null) {
@@ -285,7 +286,7 @@ public class ProdutoDAO {
             }
         }
     }
-    
+
     /**
      * Executa um update na tabela produtos.
      *
@@ -355,7 +356,7 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("qtddiasminimovalidade", vo.getQtdDiasMinimoValidade());
 //            if (vo.getQtdDiasMinimoValidade() > 0) {
-                sql.put("utilizavalidadeentrada", vo.isUtilizaValidadeEntrada());
+            sql.put("utilizavalidadeentrada", vo.isUtilizaValidadeEntrada());
 //            } else {
 //                sql.put("utilizavalidadeentrada", false);
 //            }
@@ -464,6 +465,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.CONSIGNADO)) {
             sql.put("consignado", vo.isConsignado());
         }
+        if (opt.contains(OpcaoProduto.CONTROLE_POLICIA_CIVIL)) {
+            sql.put("controlepoliciacivil", vo.isControlePoliciaCivil());
+        }
         if (opt.contains(OpcaoProduto.PERMITE_PERDA)) {
             sql.put("permiteperda", vo.isPermitePerda());
         }
@@ -473,7 +477,7 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.PERMITE_TROCA)) {
             sql.put("permitetroca", vo.isPermiteTroca());
         }
-        
+
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();
         LOG.fine(strSql);
@@ -561,7 +565,7 @@ public class ProdutoDAO {
             sql.put("descricao", vo.getDescricaoCompleta());
             sql.put("id_tipoorigemimagem", 1);
 
-            if (versao.maiorQue(3, 21) && versao.menorQue(4,2)) {
+            if (versao.maiorQue(3, 21) && versao.menorQue(4, 2)) {
                 sql.put("codigobarras", ean);
             }
 
@@ -573,8 +577,8 @@ public class ProdutoDAO {
             }
         }
     }
-    
-        public void salvarLojaVirtual(ProdutoLojaVirtualVO vo) throws Exception {
+
+    public void salvarLojaVirtual(ProdutoLojaVirtualVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produtolojavirtual");

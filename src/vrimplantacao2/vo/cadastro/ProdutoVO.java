@@ -86,6 +86,7 @@ public class ProdutoVO {
     private boolean promocaoAuditada = false;
     private boolean produtoAssessorado = false;
     private boolean consignado = false;
+    private boolean controlePoliciaCivil = false;
     private int idClassificacaoTributaria = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
@@ -601,6 +602,14 @@ public class ProdutoVO {
 
     public void setConsignado(boolean consignado) {
         this.consignado = consignado;
+    }
+
+    public boolean isControlePoliciaCivil() {
+        return controlePoliciaCivil;
+    }
+
+    public void setControlePoliciaCivil(boolean controlePoliciaCivil) {
+        this.controlePoliciaCivil = controlePoliciaCivil;
     }
     
     public void setProdutoAssessorado(boolean produtoAssessorado) {

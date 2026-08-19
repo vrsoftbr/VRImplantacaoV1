@@ -281,6 +281,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPromocaoAuditada.setVisible(opt.contains(OpcaoProduto.PROMOCAO_AUDITADA));
             chkProdutoAssessorado.setVisible(opt.contains(OpcaoProduto.PRODUTO_ASSESSORADO));
             chkConsignado.setVisible(opt.contains(OpcaoProduto.CONSIGNADO));
+            chkControlePoliciaCivil.setVisible(opt.contains(OpcaoProduto.CONTROLE_POLICIA_CIVIL));
             tabImportacao.add(pnlImpInfoAdic);
         }
 
@@ -774,6 +775,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkPromocaoAuditada = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoAssessorado = new vrframework.bean.checkBox.VRCheckBox();
         chkConsignado = new vrframework.bean.checkBox.VRCheckBox();
+        chkControlePoliciaCivil = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpOutrosDados = new vrframework.bean.panel.VRPanel();
         jLabel9 = new javax.swing.JLabel();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -1703,6 +1705,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkConsignado, "Consignado");
         chkConsignado.setToolTipText("");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkControlePoliciaCivil, "Controle Policia CIvil");
+        chkControlePoliciaCivil.setToolTipText("");
+
         javax.swing.GroupLayout pnlImpInfoAdicLayout = new javax.swing.GroupLayout(pnlImpInfoAdic);
         pnlImpInfoAdic.setLayout(pnlImpInfoAdicLayout);
         pnlImpInfoAdicLayout.setHorizontalGroup(
@@ -1770,7 +1775,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkConsignado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkSazonal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(chkSazonal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkControlePoliciaCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlImpInfoAdicLayout.createSequentialGroup()
                                 .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1835,7 +1842,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkSugestaoCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkConferido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSazonal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkConsignado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkConsignado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkControlePoliciaCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -2110,6 +2118,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCompradorProduto;
     public vrframework.bean.checkBox.VRCheckBox chkConferido;
     public vrframework.bean.checkBox.VRCheckBox chkConsignado;
+    public vrframework.bean.checkBox.VRCheckBox chkControlePoliciaCivil;
     public vrframework.bean.checkBox.VRCheckBox chkCopiarIcmsDebitoNaEntrada;
     public vrframework.bean.checkBox.VRCheckBox chkCusto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
@@ -2679,6 +2688,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkConsignado.isSelected()) {
                     opcoes.add(OpcaoProduto.CONSIGNADO);
+                }
+                if (chkControlePoliciaCivil.isSelected()) {
+                    opcoes.add(OpcaoProduto.CONTROLE_POLICIA_CIVIL);
                 }
                 if (chkMultiplicaPdv.isSelected()) {
                     opcoes.add(OpcaoProduto.ACEITA_MULTIPLICACAO_PDV);

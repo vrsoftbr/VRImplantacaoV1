@@ -1563,6 +1563,8 @@
                                           <Component id="chkConsignado" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkSazonal" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkControlePoliciaCivil" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="chkVendaControlada" min="-2" max="-2" attributes="0"/>
@@ -1640,6 +1642,7 @@
                               <Component id="chkConferido" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkSazonal" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkConsignado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkControlePoliciaCivil" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="16" max="32767" attributes="0"/>
                       </Group>
@@ -1824,6 +1827,12 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConsignado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Consignado"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkControlePoliciaCivil">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Controle Policia CIvil"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </Component>

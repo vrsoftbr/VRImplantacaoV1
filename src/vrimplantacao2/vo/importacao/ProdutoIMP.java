@@ -204,6 +204,7 @@ public class ProdutoIMP {
     @DatabaseField private boolean promocaoAuditada = false;
     @DatabaseField private boolean produtoAssessorado = false;
     @DatabaseField private boolean consignado = false;
+    @DatabaseField private boolean controlePoliciaCivil = false;
     
     @DatabaseField private String impidClassificacaoTributaria;
     
@@ -1281,8 +1282,16 @@ public class ProdutoIMP {
     public void setConsignado(boolean consignado) {
         this.consignado = consignado;
     }
-        
-        public String getImpidClassificacaoTributaria() {
+
+    public boolean isControlePoliciaCivil() {
+        return controlePoliciaCivil;
+    }
+
+    public void setControlePoliciaCivil(boolean controlePoliciaCivil) {
+        this.controlePoliciaCivil = controlePoliciaCivil;
+    }
+    
+    public String getImpidClassificacaoTributaria() {
         return impidClassificacaoTributaria;
     }
 

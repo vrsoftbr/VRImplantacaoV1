@@ -61,6 +61,7 @@ public class FornecedorVO {
     private boolean revenda = false;
     private boolean utilizaconferencia = false;
     private boolean emitenf = false; 
+    private boolean nfemitidapostofiscal = false; 
     
     private Integer idPais = 1058;
     
@@ -433,6 +434,14 @@ public class FornecedorVO {
 
     public void setEmitenf(boolean emitenf) {
         this.emitenf = emitenf;
+    }
+
+    public boolean isNfemitidapostofiscal() {
+        return nfemitidapostofiscal;
+    }
+
+    public void setNfemitidapostofiscal(boolean nfemitidapostofiscal) {
+        this.nfemitidapostofiscal = nfemitidapostofiscal;
     }
 
     public Integer getIdPais() {
